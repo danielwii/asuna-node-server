@@ -1,0 +1,56 @@
+# http://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+; HTML
+[*.{html,jade,pug,tpl,nunj}]
+indent_style = space
+indent_size = 2
+
+; JS
+[*.{js,es6,ts,tsx}]
+indent_style = space
+indent_size = 2
+
+; GraphQL
+[*.graphql]
+indent_style = space
+indent_size = 2
+
+; Styles
+[*.{css,scss,sass,less}]
+indent_style = space
+indent_size = 2
+
+[*.yaml]
+indent_style = space
+indent_size = 2
+
+; Markdown
+[*.md]
+trim_trailing_whitespace = false
+
+; Shell
+[*.sh]
+indent_style = tab
+
+; Golang
+[*.go]
+indent_style = tab
+indent_size = 4
+
+; Python
+[*.py]
+max_line_length = 120
+indent_style = space
+indent_size = 4
+ignore_frosted_errors = E103
+skip = runtests.py,build
+balanced_wrapping = true
+not_skip = __init__.py

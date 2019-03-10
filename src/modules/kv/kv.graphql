@@ -1,0 +1,15 @@
+type KeyValuePair implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  collection: String!
+  key: String!
+  type: String!
+  name: String
+  value: Any
+}
+
+type Query {
+  kv(collection: String, key: String): [KeyValuePair]
+}

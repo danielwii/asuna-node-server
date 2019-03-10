@@ -1,0 +1,19 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    //    "tslint-config-airbnb"
+  ],
+  "rulesDirectory": ["tslint-plugin-prettier"],
+  "jsRules": {},
+  "rules": {
+    "prettier": true,
+    "ter-arrow-parens": [true, "as-needed"],
+    "variable-name": false,
+    "align": false,
+    "no-var-requires": false,
+    "space-before-function-paren": [
+      true,
+      { "anonymous": "never", "named": "never", "asyncArrow": "always" }
+    ]
+  }
+}

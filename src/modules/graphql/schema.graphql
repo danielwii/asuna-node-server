@@ -1,0 +1,8 @@
+type ModelSchema {
+  name: String!
+  schema: Any
+}
+
+type Query {
+  model_schemas: [ModelSchema]
+}

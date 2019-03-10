@@ -1,0 +1,32 @@
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { MetaInfo } from '../decorators/meta.decorator';
+
+export abstract class AbstractBaseEntity extends BaseEntity {
+  @PrimaryGeneratedColumn() id: number;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 100, name: 'updated_by' })
+  updatedBy: string;
+}
+
+export class AbstractNameEntity extends AbstractBaseEntity {
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  name: string;
+
+  @MetaInfo({ name: '描述' })
+  @Column('text', { nullable: true, name: 'description' })
+  description: string;
+}

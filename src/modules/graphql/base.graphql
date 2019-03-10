@@ -1,0 +1,49 @@
+scalar Date
+scalar JsonObject
+scalar JsonArray
+scalar Any
+
+enum Order {
+  ASC
+  DESC
+}
+
+enum DefaultOrderBy {
+  createdAt_ASC
+  createdAt_DESC
+}
+
+input Sorter {
+  column: String!
+  order: Order = ASC
+}
+
+input PageRequest {
+  page: Int = 0
+  size: Int = 10
+  orderBy: Sorter
+}
+
+input TimeCondition {
+  column: String!
+  before: Date
+  after: Date
+}
+
+input QueryCondition {
+  ids: [Int!]
+  random: Int
+  extra: JsonObject
+}
+
+interface BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+interface PagedQuery {
+  total: Int
+  page: Int
+  size: Int
+}
