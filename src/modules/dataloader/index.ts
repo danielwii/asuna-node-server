@@ -24,13 +24,13 @@ function build<T>(loader): DataLoaderFunction<T> {
   };
 }
 
-export function dataLoaderProxy(preloader?: () => any | Promise<any>) {
+export function createDataLoaderProxy(preloader?: () => any | Promise<any>) {
   return {
     clear(segment, id) {
       cacheMap.delete(`${segment}-${id}`);
     },
     async preload() {
-      return preloader();
+      return preloader ? preloader() : Promise.resolve();
     },
   };
 }

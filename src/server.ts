@@ -17,7 +17,7 @@ if (process.env.NODE_ENV === 'production') {
 import { AnyExceptionFilter } from './modules/common/filters/any-exception.filter';
 import { ValidationPipe } from './modules/common/pipes/validation.pipe';
 import { ConfigKeys, configLoader } from './modules/helpers/config.helper';
-import { dataLoaderProxy } from './modules/dataloader';
+import { createDataLoaderProxy } from './modules/dataloader';
 
 interface IBootstrapOptions {}
 
@@ -66,9 +66,9 @@ export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Pro
     // preload data
     // --------------------------------------------------------------
 
-    dataLoaderProxy()
-      .preload()
-      .catch(console.error);
+    // dataLoaderProxy()
+    //   .preload()
+    //   .catch(console.error);
 
     return app;
   });
