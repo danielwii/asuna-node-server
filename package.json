@@ -8,6 +8,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "yarn tsc",
+    "build:watch": "yarn tsc -w",
     "postinstall": "yarn build"
   },
   "devDependencies": {
