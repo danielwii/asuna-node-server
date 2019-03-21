@@ -1,4 +1,4 @@
-import { ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { GenericDataLoader } from '../../dataloader';
 import { getRequestFromContext } from '../utils';
@@ -9,7 +9,7 @@ const genericDataLoader = new GenericDataLoader();
 export class DataLoaderInterceptor implements NestInterceptor {
   public intercept(
     context: ExecutionContext,
-    call$: Observable<any>,
+    next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request = getRequestFromContext(context);
 
@@ -23,6 +23,6 @@ export class DataLoaderInterceptor implements NestInterceptor {
       request.dataLoaders = genericDataLoader.createLoaders();
     }
 
-    return call$;
+    return next.handle();
   }
 }

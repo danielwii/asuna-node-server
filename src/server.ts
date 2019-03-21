@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import * as responseTime from 'response-time';
@@ -33,7 +34,7 @@ export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Pro
     process.env.TYPEORM_ENTITIES = `${__dirname}/**/*.entities.ts`;
   }
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.use(helmet());

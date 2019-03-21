@@ -1,4 +1,5 @@
-import { Injectable, Logger, MiddlewareFunction, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 import * as passport from 'passport';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
@@ -14,18 +15,16 @@ export class AuthMiddleware implements NestMiddleware {
   jwtAuthenticator = passport.authenticate('jwt', { session: false });
   adminAuthenticator = passport.authenticate('api-key', { session: false });
 
-  resolve(...args: any[]): MiddlewareFunction {
-    return (req, res, next) => {
-      try {
-        if (isApiKeyRequest(req)) {
-          this.adminAuthenticator(req, res, next);
-        } else {
-          this.jwtAuthenticator(req, res, next);
-        }
-      } catch (e) {
-        logger.error(e.message);
-        next();
+  use(req: Request, res: Response, next: () => void): any {
+    try {
+      if (isApiKeyRequest(req)) {
+        this.adminAuthenticator(req, res, next);
+      } else {
+        this.jwtAuthenticator(req, res, next);
       }
-    };
+    } catch (e) {
+      logger.error(e.message);
+      next();
+    }
   }
 }

@@ -6,38 +6,30 @@ import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 import { ValidationException } from '../../base/base.exceptions';
 
+const logger = new Logger('AnyExceptionFilter');
+
 @Catch()
 export class AnyExceptionFilter implements ExceptionFilter {
-  private static readonly logger = new Logger(AnyExceptionFilter.name);
-
   static handleSqlExceptions(exception) {
-    if (R.is(QueryFailedError, exception)) {
-      /*
-       * 包装唯一性约束，用于前端检测
-       */
-      if (exception.code === 'ER_DUP_ENTRY') {
-        const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
-        const [, model] = exception.sql.match(/`(\w+)`.+/);
-        const metadata = getRepository(model).metadata;
-        const [index] = metadata.indices.filter(index => index.name === key);
-        return new ValidationException(
-          index.name,
-          (index.givenColumnNames as string[]).map(name => ({
-            constraints: {
-              isUnique: `${name} must be unique`,
-            },
-            property: name,
-            target: { [name]: value },
-            value,
-          })),
-        );
-      } else {
-        console.warn('[unhandled QueryFailedError]', exception);
-      }
-    } else if (R.is(EntityNotFoundError, exception)) {
-      exception.status = 404;
-    } else {
-      console.warn('[unhandled exception]', { exception });
+    /*
+     * 包装唯一性约束，用于前端检测
+     */
+    if (exception.code === 'ER_DUP_ENTRY') {
+      const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
+      const [, model] = exception.sql.match(/`(\w+)`.+/);
+      const metadata = getRepository(model).metadata;
+      const [index] = metadata.indices.filter(index => index.name === key);
+      return new ValidationException(
+        index.name,
+        (index.givenColumnNames as string[]).map(name => ({
+          constraints: {
+            isUnique: `${name} must be unique`,
+          },
+          property: name,
+          target: { [name]: value },
+          value,
+        })),
+      );
     }
     return exception;
   }
@@ -47,32 +39,35 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    const e = AnyExceptionFilter.handleSqlExceptions(exception);
+    let processed = exception;
 
-    if (e.status && e.status === HttpStatus.BAD_REQUEST) {
-      AnyExceptionFilter.logger.warn(JSON.stringify(e.message));
-      console.warn(e);
-    } else if (e.status && e.status === HttpStatus.NOT_FOUND) {
-      AnyExceptionFilter.logger.warn(JSON.stringify(e.message));
+    if (R.is(QueryFailedError, exception)) {
+      processed = AnyExceptionFilter.handleSqlExceptions(exception);
+    } else if (R.is(EntityNotFoundError, exception)) {
+      (<any>processed).status = 404;
     } else {
-      AnyExceptionFilter.logger.error(JSON.stringify(e.message));
-      console.error(e);
+      // logger.warn(`[unhandled exception] ${JSON.stringify(exception)}`);
     }
 
-    const status = e.status || HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = processed.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse = processed.getResponse() as any;
 
-    if (R.is(HttpException, e)) {
-      response.status(status).json({
-        name: e.response.error,
-        message: e.response.message,
-      });
-    } else if (R.is(Error, e)) {
-      response.status(status).json({
-        name: 'Error',
-        message: e.message,
-      });
+    if (status && status === HttpStatus.BAD_REQUEST) {
+      logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
+    } else if (status && status === HttpStatus.NOT_FOUND) {
+      logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
     } else {
-      response.status(status).json(e);
+      logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`);
+    }
+
+    if (R.is(HttpException, processed)) {
+      response
+        .status(status)
+        .json({ name: exceptionResponse.error, message: exceptionResponse.message });
+    } else if (R.is(Error, processed)) {
+      response.status(status).json({ name: 'Error', message: processed.message });
+    } else {
+      response.status(status).json(processed);
     }
   }
 }

@@ -1,6 +1,5 @@
 import {
   Controller,
-  FilesInterceptor,
   Logger,
   Post,
   Query,
@@ -11,7 +10,7 @@ import {
 
 import * as bluebird from 'bluebird';
 import { Validator } from 'class-validator';
-import * as multer from 'multer';
+// import * as multer from 'multer';
 import * as util from 'util';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
@@ -57,7 +56,7 @@ export class UploaderController {
   }
 
   @Post()
-  @UseInterceptors(
+  @UseInterceptors(/*
     FilesInterceptor('files', 3, {
       storage: multer.diskStorage({
         filename(req, file, cb) {
@@ -84,7 +83,7 @@ export class UploaderController {
         }
       },
     }),
-  )
+  */)
   async upload(@Query('prefix') prefix: string = '', @Req() req, @UploadedFiles() files) {
     logger.log(util.inspect({ prefix, files, err: req.fileValidationError }, { colors: true }));
     if (req.fileValidationError) {
