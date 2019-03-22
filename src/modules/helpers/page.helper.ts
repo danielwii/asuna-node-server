@@ -37,6 +37,15 @@ export interface Pageable<T> {
   items: T[];
 }
 
+export interface Cursured<T> {
+  totalCount: number;
+  pageInfo: {
+    endCursor: string;
+    hasNextPage: boolean;
+  };
+  items: T[];
+}
+
 export const toPage = (pageRequest: PageRequest) => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
   if (page < 0) {

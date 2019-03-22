@@ -12,12 +12,15 @@
     "target": "esnext",
     "skipLibCheck": true,
     "sourceMap": true,
+    "inlineSources": true,
     "allowJs": false,
     "outDir": "./dist",
+    "declarationDir": "./declaration",
+    "emitDeclarationOnly": true,
     "baseUrl": "./src",
     "lib": ["esnext", "dom"],
     "typeRoots": ["./typings"]
   },
   "include": ["src/**/*"],
-  "exclude": ["./output", "./docs", "./dist"]
+  "exclude": ["./output", "./docs", "./dist", "node_modules"]
 }

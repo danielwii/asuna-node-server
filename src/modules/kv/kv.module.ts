@@ -1,12 +1,13 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
+
 import { KvController } from './kv.controller';
-import { KvResolver } from './kv.resolver';
+import { KvQueryResolver } from './kv.resolver';
 import { KvService } from './kv.service';
 
 const logger = new Logger('KvModule');
 
 @Module({
-  providers: [KvService, KvResolver],
+  providers: [KvService, KvQueryResolver],
   controllers: [KvController],
 })
 export class KvModule implements OnModuleInit {

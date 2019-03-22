@@ -1,7 +1,7 @@
 import { IsEmail } from 'class-validator';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
-import { AbstractBaseEntity } from '../../base/base.entity';
-import { EntityMetaInfo, JsonMap, MetaInfo } from '../../decorators/meta.decorator';
+import { AbstractBaseEntity } from '../../base';
+import { EntityMetaInfo, JsonMap, MetaInfo } from '../../decorators';
 import { safeReloadObject } from '../../helpers/entity.helper';
 
 @EntityMetaInfo({ name: 'auth__roles' })

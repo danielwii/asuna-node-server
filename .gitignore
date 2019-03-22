@@ -4,7 +4,7 @@ node_modules/
 build/
 tmp/
 temp/
-dist/
+declaration/
 uploads/
 coverage/
 yarn-error.log

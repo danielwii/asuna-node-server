@@ -3,6 +3,8 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { GraphQLResolveInfo } from 'graphql';
 import * as DataLoader from 'dataloader';
+import * as Rx from 'rxjs';
+import { Hermes } from '../bus';
 
 const logger = new Logger('DataLoaderCache');
 
@@ -37,7 +39,17 @@ export function createDataLoaderProxy(preloader?: () => any | Promise<any>) {
 
 export class GenericDataLoader {
   private static loaders;
-  constructor() {}
+  private static subject;
+
+  constructor() {
+    logger.log('init ...');
+    if (!GenericDataLoader.subject) {
+      GenericDataLoader.subject = new Rx.Subject().subscribe(value => {
+        logger.log(`subscribe ${JSON.stringify(value)}`);
+      });
+      Hermes.subscribe(GenericDataLoader.name, GenericDataLoader.subject);
+    }
+  }
 
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }) {
     GenericDataLoader.loaders = loaders;

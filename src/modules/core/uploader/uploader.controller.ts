@@ -7,18 +7,18 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as bluebird from 'bluebird';
 import { Validator } from 'class-validator';
-// import * as multer from 'multer';
+import * as multer from 'multer';
 import * as util from 'util';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
+
 import { AdminModule } from '../../admin.module';
 import { UploadException } from '../../base/base.exceptions';
 import { ConfigKeys, configLoader } from '../../helpers/config.helper';
-
-import { ImageMimeType, VideoMimeType, DocMimeType } from '../storage/storage.constants';
+import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import { IStorageEngine, LocalStorage, QiniuStorage } from '../storage/storage.engines';
 
 const logger = new Logger('UploaderController');
@@ -56,7 +56,7 @@ export class UploaderController {
   }
 
   @Post()
-  @UseInterceptors(/*
+  @UseInterceptors(
     FilesInterceptor('files', 3, {
       storage: multer.diskStorage({
         filename(req, file, cb) {
@@ -83,7 +83,7 @@ export class UploaderController {
         }
       },
     }),
-  */)
+  )
   async upload(@Query('prefix') prefix: string = '', @Req() req, @UploadedFiles() files) {
     logger.log(util.inspect({ prefix, files, err: req.fileValidationError }, { colors: true }));
     if (req.fileValidationError) {

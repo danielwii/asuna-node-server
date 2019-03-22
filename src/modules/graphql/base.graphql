@@ -47,3 +47,13 @@ interface PagedQuery {
   page: Int
   size: Int
 }
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean
+}
+
+interface CursoredQuery {
+  totalCount: Int
+  pageInfo: PageInfo
+}

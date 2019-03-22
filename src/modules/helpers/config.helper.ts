@@ -29,6 +29,9 @@ export const ConfigKeys = {
   MAIL_USERNAME: 'MAIL_USERNAME',
   MAIL_PASSWORD: 'MAIL_PASSWORD',
   MAIL_FROM: 'MAIL_FROM',
+
+  WS_REDIS_HOST: 'WS_REDIS_HOST',
+  WS_REDIS_PORT: 'WS_REDIS_PORT',
 };
 
 export const configLoader = createConfigLoader({

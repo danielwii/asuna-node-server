@@ -6,7 +6,7 @@ import { validate } from 'class-validator';
 import { ValidationException } from '../../base/base.exceptions';
 
 @Injectable()
-export class ValidationPipe implements PipeTransform<any> {
+export class CustomValidationPipe implements PipeTransform<any> {
   async transform(value, metadata: ArgumentMetadata) {
     if (value) {
       const { metatype } = metadata;

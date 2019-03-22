@@ -15,7 +15,7 @@ import {
   Raw,
 } from 'typeorm';
 import * as util from 'util';
-import { Condition } from './decorators/meta.decorator';
+import { Condition } from './decorators';
 
 const logger = new Logger('Helper');
 

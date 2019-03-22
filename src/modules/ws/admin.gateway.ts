@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 
 const pkg = require('../../../package.json');
 
-const logger = new Logger('EventsGateway');
+const logger = new Logger('AdminGateway');
 
 @WebSocketGateway({
   namespace: 'admin',
@@ -20,7 +20,7 @@ const logger = new Logger('EventsGateway');
   pingTimeout: 4000,
   serveClient: false,
 })
-export class EventsGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class AdminGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
   private readonly timestamp = Date.now();
