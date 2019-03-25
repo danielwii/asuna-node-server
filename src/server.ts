@@ -9,6 +9,8 @@ import * as responseTime from 'response-time';
 import * as rateLimit from 'express-rate-limit';
 import { json } from 'body-parser';
 import { resolve } from 'path';
+import { AnyExceptionFilter } from './modules/common/filters/any-exception.filter';
+import { ConfigKeys, configLoader } from './modules/helpers/config.helper';
 
 const logger = new Logger('bootstrap');
 const startAt = Date.now();
@@ -19,14 +21,12 @@ if (process.env.NODE_ENV === 'production') {
   moduleAlias.addPath(__dirname);
 }
 
-import { AnyExceptionFilter } from './modules/common/filters/any-exception.filter';
-import { ConfigKeys, configLoader } from './modules/helpers/config.helper';
 const pkg = require('../package.json');
 
 interface IBootstrapOptions {
   root?: string;
   version?: string;
-  redisMode?: 'io' | 'redis';
+  redisMode?: 'io' | 'redis' | 'ws';
 }
 
 export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Promise<any> {
@@ -41,20 +41,27 @@ export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Pro
   let isBuild = __filename.endsWith('js');
   const entities =
     isProduction || isBuild
-      ? [`${resolve(__dirname)}/**/*.entities.js`, `${resolve(__dirname, '../')}/**/*.entities.js`]
+      ? [
+          `${resolve(__dirname)}/**/*.entities.js`,
+          `${resolve(__dirname, '../')}/**/*.entities.js`,
+          `${resolve(options.root)}/**/*.entities.js`,
+        ]
       : [
           `${resolve(__dirname)}/**/*.entities.ts`,
           `${resolve(__dirname, '../../packages')}/**/*.entities.ts`,
+          `${resolve(options.root)}/**/*.entities.ts`,
         ];
   const subscribers =
     isProduction || isBuild
       ? [
           `${resolve(__dirname)}/**/*.subscriber.js`,
           `${resolve(__dirname, '../')}/**/*.subscriber.js`,
+          `${resolve(options.root)}/**/*.subscriber.js`,
         ]
       : [
           `${resolve(__dirname)}/**/*.subscriber.ts`,
           `${resolve(__dirname, '../../packages')}/**/*.subscriber.ts`,
+          `${resolve(options.root)}/**/*.subscriber.ts`,
         ];
 
   logger.log(`resolve typeorm entities: ${entities}`);
@@ -69,6 +76,8 @@ export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Pro
 
   if (options.redisMode === 'redis') {
     app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter')).RedisIoAdapter(app));
+  } else if (options.redisMode === 'ws') {
+    app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
   }
 
   app.use(helmet());

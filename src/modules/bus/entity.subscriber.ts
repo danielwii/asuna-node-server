@@ -7,7 +7,10 @@ import {
   UpdateEvent,
 } from 'typeorm';
 import { Logger } from '@nestjs/common';
+import * as _ from 'lodash';
+
 import { Hermes } from './hermes';
+import { dataLoaderCleaner } from '../dataloader';
 
 const logger = new Logger('EntitySubscriber');
 
@@ -50,6 +53,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       updatedColumns: event.updatedColumns,
       updatedRelations: event.updatedRelations,
     });
+    dataLoaderCleaner.clear(event.entity.constructor.name, _.get(event.entity, 'id'));
     return undefined;
   }
 

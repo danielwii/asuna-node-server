@@ -4,5 +4,5 @@ type ModelSchema {
 }
 
 type Query {
-  model_schemas: [ModelSchema]
+  sys_modelSchemas: [ModelSchema]
 }

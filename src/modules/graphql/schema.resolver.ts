@@ -10,7 +10,7 @@ export class SchemaQueryResolver {
   constructor(private readonly dbService: DBService) {}
 
   @Query()
-  model_schemas() {
+  sys_modelSchemas() {
     return this.dbService.repos().map(repository => {
       const entityName = (repository.metadata.target as any).entityInfo.name;
       return { name: entityName, schema: DBHelper.extractAsunaSchemas(repository) };

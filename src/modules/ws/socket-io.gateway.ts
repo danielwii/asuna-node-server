@@ -12,15 +12,15 @@ import { Server } from 'socket.io';
 
 const pkg = require('../../../package.json');
 
-const logger = new Logger('AdminGateway');
+const logger = new Logger('SocketIOGateway');
 
 @WebSocketGateway({
   namespace: 'admin',
-  pingInterval: 30000,
-  pingTimeout: 4000,
+  // pingInterval: 30000,
+  // pingTimeout: 4000,
   serveClient: false,
 })
-export class AdminGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
   private readonly timestamp = Date.now();
@@ -28,7 +28,7 @@ export class AdminGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
   @SubscribeMessage('events')
   onHeartbeat(client, data): WsResponse<string> {
     const event = 'events';
-    const response = `${pkg.version}-${this.timestamp}`;
+    const response = `admin-${pkg.version}-${this.timestamp}`;
     return { event, data: response };
   }
 

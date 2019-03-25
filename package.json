@@ -9,7 +9,7 @@
   "scripts": {
     "build": "yarn tsc",
     "build:watch": "yarn tsc -w",
-    "postinstall": "yarn build"
+    "postinstall1": "yarn build"
   },
   "devDependencies": {
     "@types/socket.io": "^2.1.2",
@@ -25,6 +25,7 @@
     "@nestjs/passport": "^6.0.0",
     "@nestjs/platform-express": "^6.0.2",
     "@nestjs/platform-socket.io": "^6.0.2",
+    "@nestjs/platform-ws": "^6.0.2",
     "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.0.0",
     "@nestjs/websockets": "^6.0.2",
@@ -44,7 +45,7 @@
     "lru-cache": "^5.1.1",
     "morgan": "^1.9.1",
     "node-buffs": "^0.5.2",
-    "nodemailer": "^5.1.1",
+    "nodemailer": "^6.0.0",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "qiniu": "^7.2.1",

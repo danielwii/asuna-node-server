@@ -1,13 +1,14 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { EventsGateway } from './events.gateway';
+import { WSGateway } from './ws.gateway';
+import { SocketIOGateway } from './socket-io.gateway';
 
-const logger = new Logger('WsModule');
+const logger = new Logger('WSModule');
 
 @Module({
-  providers: [EventsGateway],
+  providers: [SocketIOGateway, WSGateway],
 })
-export class WsModule implements OnModuleInit {
+export class WSModule implements OnModuleInit {
   public onModuleInit() {
     logger.log('init...');
   }

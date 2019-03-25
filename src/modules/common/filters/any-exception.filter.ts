@@ -1,14 +1,14 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
+import { Request, Response } from 'express';
 
 import { ValidationException } from '../../base/base.exceptions';
 
 const logger = new Logger('AnyExceptionFilter');
 
-@Catch()
 export class AnyExceptionFilter implements ExceptionFilter {
   static handleSqlExceptions(exception) {
     /*
@@ -34,10 +34,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
     return exception;
   }
 
-  catch(exception: HttpException, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse();
-    const request = ctx.getRequest();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
     let processed = exception;
 
@@ -49,15 +49,15 @@ export class AnyExceptionFilter implements ExceptionFilter {
       // logger.warn(`[unhandled exception] ${JSON.stringify(exception)}`);
     }
 
-    const status = processed.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse = processed.getResponse() as any;
+    const status: number = (<any>processed).status || HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
       logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
       logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
     } else {
-      logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`);
+      logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`, processed.stack);
     }
 
     if (R.is(HttpException, processed)) {

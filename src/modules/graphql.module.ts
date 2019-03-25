@@ -35,7 +35,9 @@ const logger = new Logger('GraphqlModule');
           : undefined,
       ]),*/
       formatResponse: response => {
-        // logger.log(`response is ${util.inspect(response, false, 3, true)}`);
+        if (response.errors) {
+          logger.warn(util.inspect(response.errors, { colors: true }));
+        }
         return response;
       },
     }),

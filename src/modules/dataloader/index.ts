@@ -26,9 +26,17 @@ function build<T>(loader): DataLoaderFunction<T> {
   };
 }
 
+export const dataLoaderCleaner = {
+  clear(segment, id) {
+    logger.log(`remove ... ${segment}-${id}`);
+    cacheMap.delete(`${segment}-${id}`);
+  },
+};
+
 export function createDataLoaderProxy(preloader?: () => any | Promise<any>) {
   return {
     clear(segment, id) {
+      logger.log(`remove ... ${segment}-${id}`);
       cacheMap.delete(`${segment}-${id}`);
     },
     async preload() {

@@ -40,7 +40,7 @@ export interface Pageable<T> {
 export interface Cursured<T> {
   totalCount: number;
   pageInfo: {
-    endCursor: string;
+    endCursor: string | number;
     hasNextPage: boolean;
   };
   items: T[];

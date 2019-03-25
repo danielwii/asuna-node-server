@@ -6,16 +6,17 @@ import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { UploaderController } from './core/uploader/uploader.controller';
 import { UploadsController } from './core/uploads.controller';
-import { WsModule } from './ws/ws.module';
+import { WSModule } from './ws/ws.module';
 import { KvService } from './kv/kv.service';
 import { AppRestController } from './rest/app-rest.controller';
 import { SearchController } from './search/search.controller';
 import { GraphqlModule } from './graphql.module';
+import { SchemaModules } from './graphql/schema.modules';
 
 const logger = new Logger('AdminModule');
 
 @Module({
-  imports: [AuthModule, WsModule, ClientModule, GraphqlModule],
+  imports: [SchemaModules, AuthModule, WSModule, ClientModule, GraphqlModule],
   providers: [DBService, KvService],
   controllers: [
     ApiController,
@@ -28,7 +29,7 @@ const logger = new Logger('AdminModule');
 export class AdminModule implements OnModuleInit {
   static uploadPath = `${process.cwd()}/uploads`;
 
-  public onModuleInit() {
+  onModuleInit(): any {
     logger.log('init...');
   }
 }
