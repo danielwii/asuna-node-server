@@ -10,13 +10,12 @@ import { WSModule } from './ws/ws.module';
 import { KvService } from './kv/kv.service';
 import { AppRestController } from './rest/app-rest.controller';
 import { SearchController } from './search/search.controller';
-import { GraphqlModule } from './graphql.module';
 import { SchemaModules } from './graphql/schema.modules';
 
 const logger = new Logger('AdminModule');
 
 @Module({
-  imports: [SchemaModules, AuthModule, WSModule, ClientModule, GraphqlModule],
+  imports: [SchemaModules, AuthModule, WSModule, ClientModule],
   providers: [DBService, KvService],
   controllers: [
     ApiController,

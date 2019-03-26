@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
+import { diff } from 'jsondiffpatch';
 
 import { Hermes } from './hermes';
 import { dataLoaderCleaner } from '../dataloader';
@@ -44,14 +45,14 @@ export class EntitySubscriber implements EntitySubscriberInterface {
     logger.log(
       `afterUpdate ${event.entity.constructor.name} ${JSON.stringify({
         entity: event.entity,
-        updatedColumns: event.updatedColumns,
-        updatedRelations: event.updatedRelations,
+        updatedColumns: diff(event.entity, event.databaseEntity),
+        // updatedRelations: event.updatedRelations,
       })}`,
     );
     Hermes.emit(EntitySubscriber.name, 'entity.afterUpdate', {
       entity: event.entity,
-      updatedColumns: event.updatedColumns,
-      updatedRelations: event.updatedRelations,
+      updatedColumns: diff(event.entity, event.databaseEntity),
+      // updatedRelations: event.updatedRelations,
     });
     dataLoaderCleaner.clear(event.entity.constructor.name, _.get(event.entity, 'id'));
     return undefined;
@@ -76,8 +77,8 @@ export class EntitySubscriber implements EntitySubscriberInterface {
     logger.log(
       `beforeUpdate ${event.entity.constructor.name} ${JSON.stringify({
         entity: event.entity,
-        updatedColumns: event.updatedColumns,
-        updatedRelations: event.updatedRelations,
+        updatedColumns: diff(event.entity, event.databaseEntity),
+        // updatedRelations: event.updatedRelations,
       })}`,
     );
     return undefined;

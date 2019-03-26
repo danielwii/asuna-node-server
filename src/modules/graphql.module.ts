@@ -2,8 +2,8 @@ import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as util from 'util';
 
-import { KvModule } from './kv/kv.module';
-import { AppModule } from './app/app.module';
+import { KvModule } from './kv';
+import { AppModule } from './app';
 
 const logger = new Logger('GraphqlModule');
 

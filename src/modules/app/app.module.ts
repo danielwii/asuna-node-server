@@ -8,7 +8,7 @@ const logger = new Logger('AppModule');
   providers: [AppQueryResolver],
 })
 export class AppModule implements OnModuleInit {
-  public onModuleInit() {
+  onModuleInit(): any {
     logger.log('init...');
   }
 }
