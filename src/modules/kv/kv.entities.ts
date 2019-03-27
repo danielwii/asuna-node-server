@@ -1,6 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { AbstractBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../decorators/meta.decorator';
+import { AbstractBaseEntity } from '../base';
+import { EntityMetaInfo, MetaInfo } from '../decorators';
 import { safeReloadJSON } from '../helpers/entity.helper';
 
 export const ValueType = {

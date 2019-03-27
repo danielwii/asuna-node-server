@@ -19,16 +19,16 @@
     "typescript": "^3.3.4000"
   },
   "dependencies": {
-    "@nestjs/common": "^6.0.2",
-    "@nestjs/core": "^6.0.2",
+    "@nestjs/common": "^6.0.3",
+    "@nestjs/core": "^6.0.3",
     "@nestjs/graphql": "^6.0.2",
     "@nestjs/passport": "^6.0.0",
-    "@nestjs/platform-express": "^6.0.2",
-    "@nestjs/platform-socket.io": "^6.0.2",
-    "@nestjs/platform-ws": "^6.0.2",
+    "@nestjs/platform-express": "^6.0.3",
+    "@nestjs/platform-socket.io": "^6.0.3",
+    "@nestjs/platform-ws": "^6.0.3",
     "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.0.0",
-    "@nestjs/websockets": "^6.0.2",
+    "@nestjs/websockets": "^6.0.3",
     "apollo-server-express": "^2.4.8",
     "body-parser": "^1.18.3",
     "class-transformer": "^0.2.0",
@@ -56,6 +56,6 @@
     "socket.io": "^2.2.0",
     "socket.io-redis": "^5.2.0",
     "type-graphql": "^0.17.0",
-    "typeorm": "^0.2.14"
+    "typeorm": "^0.2.16"
   }
 }

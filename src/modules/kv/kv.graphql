@@ -11,5 +11,6 @@ type KeyValuePair implements BaseEntity {
 }
 
 type Query {
-  kv(collection: String, key: String): [KeyValuePair]
+  kv(collection: String, key: String): KeyValuePair
+  kvs(collection: String): [KeyValuePair]
 }

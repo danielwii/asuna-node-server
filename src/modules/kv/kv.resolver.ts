@@ -11,8 +11,14 @@ export class KvQueryResolver {
   constructor(private readonly kvService: KvService) {}
 
   @Query()
-  kv(@Args('collection') collection: string, @Args('key') key: string) {
+  async kv(@Args('collection') collection: string, @Args('key') key: string) {
     this.logger.log(`kv: ${util.inspect({ collection, key }, { colors: true })}`);
-    return this.kvService.find(collection, key);
+    return this.kvService.get(collection, key);
+  }
+
+  @Query()
+  kvs(@Args('collection') collection: string) {
+    this.logger.log(`kv: ${util.inspect({ collection }, { colors: true })}`);
+    return this.kvService.find(collection);
   }
 }

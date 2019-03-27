@@ -29,7 +29,7 @@ interface IBootstrapOptions {
   redisMode?: 'io' | 'redis' | 'ws';
 }
 
-export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Promise<any> {
+export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
   logger.log(`options: ${JSON.stringify(options)}`);
 
   // --------------------------------------------------------------
@@ -70,7 +70,7 @@ export async function bootstrap(AppModule, options: IBootstrapOptions = {}): Pro
   process.env.TYPEORM_ENTITIES = entities.join();
   process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
 
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(appModule);
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
