@@ -10,8 +10,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { RestCrudController } from '../../base/base.controllers';
-import { SignException } from '../../base/base.exceptions';
+import { RestCrudController, SignException } from '../../base';
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AuthService } from './auth.service';
 

@@ -16,7 +16,7 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
 import { AdminModule } from '../../admin.module';
-import { UploadException } from '../../base/base.exceptions';
+import { UploadException } from '../../base';
 import { ConfigKeys, configLoader } from '../../helpers/config.helper';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import { IStorageEngine, LocalStorage, QiniuStorage } from '../storage/storage.engines';
@@ -27,6 +27,7 @@ const logger = new Logger('UploaderController');
 export class UploaderController {
   public static imageStorageEngine: IStorageEngine;
   public static videoStorageEngine: IStorageEngine;
+  public static fileStorageEngine: IStorageEngine;
 
   /**
    * TODO 根据环境变量不同创建存储引擎
@@ -53,6 +54,8 @@ export class UploaderController {
             configLoader.loadConfig(ConfigKeys.VIDEO_QINIU_SECRET_KEY),
           )
         : new LocalStorage(AdminModule.uploadPath, 'videos');
+
+    UploaderController.fileStorageEngine = new LocalStorage(AdminModule.uploadPath, 'files');
   }
 
   @Post()
@@ -75,9 +78,9 @@ export class UploaderController {
           )}`,
         );
         if (!(supportedImage || supportedVideo || supportedDoc)) {
-          req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
-          logger.warn(`unsupported mime type: ${file.mimetype}`);
-          cb(null, false);
+          // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
+          logger.warn(`unsupported mime type: ${file.mimetype}, save as normal file.`);
+          cb(null, true);
         } else {
           cb(null, true);
         }
@@ -105,9 +108,10 @@ export class UploaderController {
           logger.log(
             `no storage engine defined for file type [${file.mimetype}]...${prefix} - ${
               file.filename
-            }`,
+            }, using normal file storage engine.`,
           );
-          return;
+          file.filename = `${file.filename}__${file.originalname}`;
+          return UploaderController.fileStorageEngine.saveEntity(file, prefix);
         }
       })
       .catch(error => {

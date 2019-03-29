@@ -9,7 +9,7 @@ import * as util from 'util';
 
 import { AdminModule } from '../../admin.module';
 
-import { ErrorException } from '../../base/base.exceptions';
+import { ErrorException } from '../../base';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 
@@ -32,8 +32,8 @@ export interface IStorageEngine {
       filename: string;
       bucket: string;
       prefix: string;
-      thumbnailConfig: { opts: ThumbnailParam; param?: string };
-      jpegConfig: { opts: JpegParam; param?: string };
+      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
+      jpegConfig?: { opts: JpegParam; param?: string };
     },
     res,
   ): Promise<any>;

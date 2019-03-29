@@ -37,7 +37,7 @@ export class UploadsController {
     @Query('bucket') bucket: string = 'default',
     @Res() res,
   ) {
-    UploaderController.imageStorageEngine.resolve(
+    return UploaderController.imageStorageEngine.resolve(
       { filename, bucket, prefix, thumbnailConfig, jpegConfig },
       res,
     );
@@ -71,5 +71,21 @@ export class UploadsController {
       throw new NotFoundException();
     }
     return res.sendFile(fullFilePath);
+  }
+
+  @Get('files/*')
+  async getFiles(
+    @Param('0') filename: string,
+    @Query('prefix') prefix: string = '',
+    @Query('bucket') bucket: string = 'default',
+    @Res() res,
+  ) {
+    // const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
+    // logger.log(`check if file '${fullFilePath}' exists`);
+    // if (!fsExtra.existsSync(fullFilePath)) {
+    //   throw new NotFoundException();
+    // }
+    // return res.sendFile(fullFilePath);
+    return UploaderController.fileStorageEngine.resolve({ filename, bucket, prefix }, res);
   }
 }

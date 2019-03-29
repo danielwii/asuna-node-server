@@ -29,7 +29,7 @@ import {
   Profile,
 } from '../helper';
 import { validateObject } from '../helpers/validate.helper';
-import { KvService } from '../kv/kv.service';
+import { KvService } from '../kv';
 import { DBHelper } from './db.helper';
 import { DBService } from './db.service';
 
@@ -42,10 +42,17 @@ export abstract class RestCrudController {
   private readonly dbService: DBService;
 
   // TODO module or prefix may not needed in future
-  constructor(protected module: string = '', protected prefix: string = 't') {
+  protected constructor(protected module: string = '', protected prefix: string = 't') {
     this.module = this.module ? `${this.module}__` : '';
     this.prefix = this.prefix ? `${this.prefix}_` : '';
     logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
+  }
+
+  getModelName(model: string) {
+    if (model.startsWith(this.module) || this.module.includes('__')) {
+      return model;
+    }
+    return `${this.module}${model}`;
   }
 
   @ApiImplicitParam({
@@ -54,7 +61,8 @@ export abstract class RestCrudController {
   })
   @Options(':model')
   options(@Param('model') model: string) {
-    const repository = this.dbService.repo(model);
+    const modelName = this.getModelName(model);
+    const repository = this.dbService.repo(modelName);
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
@@ -69,10 +77,11 @@ export abstract class RestCrudController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ) {
-    const repository = this.dbService.repo(model);
+    const modelName = this.getModelName(model);
+    const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
-    const order = parseOrder(model, sortStr);
+    const order = parseOrder(modelName, sortStr);
     const query = {
       where,
       order,
@@ -83,11 +92,11 @@ export abstract class RestCrudController {
 
     // console.log('list', { query, order });
 
-    const queryBuilder = repository.createQueryBuilder(model);
+    const queryBuilder = repository.createQueryBuilder(modelName);
 
-    DBHelper.wrapParsedFields(model, queryBuilder, parsedFields);
+    DBHelper.wrapParsedFields(modelName, queryBuilder, parsedFields);
     DBHelper.wrapProfile(
-      model,
+      modelName,
       queryBuilder,
       repository,
       profile,
@@ -101,7 +110,7 @@ export abstract class RestCrudController {
     }
 
     const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
-    DBHelper.wrapNormalWhere(model, queryBuilder, normalWhere);
+    DBHelper.wrapNormalWhere(modelName, queryBuilder, normalWhere);
 
     const total = await queryBuilder.getCount();
     const items = await queryBuilder
@@ -122,18 +131,19 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ) {
-    const repository = this.dbService.repo(model);
+    const modelName = this.getModelName(model);
+    const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
 
     logger.log(
-      `get ${util.inspect({ profile, model, parsedFields, relationsStr }, { colors: true })}`,
+      `get ${util.inspect({ profile, modelName, parsedFields, relationsStr }, { colors: true })}`,
     );
 
-    const queryBuilder = repository.createQueryBuilder(model);
+    const queryBuilder = repository.createQueryBuilder(modelName);
 
-    DBHelper.wrapParsedFields(model, queryBuilder, parsedFields);
+    DBHelper.wrapParsedFields(modelName, queryBuilder, parsedFields);
     DBHelper.wrapProfile(
-      model,
+      modelName,
       queryBuilder,
       repository,
       profile,
@@ -149,7 +159,8 @@ export abstract class RestCrudController {
 
   @Delete(':model/:id')
   delete(@Param('model') model: string, @Param('id') id: number) {
-    const repository = this.dbService.repo(model);
+    const modelName = this.getModelName(model);
+    const repository = this.dbService.repo(modelName);
     return repository.delete(id);
   }
 
@@ -159,8 +170,9 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
-    logger.log(`patch ${util.inspect({ user, model, updateTo }, { colors: true })}`);
-    if (model === 'kv__pairs') {
+    const modelName = this.getModelName(model);
+    logger.log(`patch ${util.inspect({ user, modelName, updateTo }, { colors: true })}`);
+    if (modelName === 'kv__pairs') {
       logger.log('save by kvService...');
       return this.kvService.set(
         updateTo.collection,
@@ -171,7 +183,7 @@ export abstract class RestCrudController {
       );
     }
 
-    const repository = this.dbService.repo(model);
+    const repository = this.dbService.repo(modelName);
     const relationKeys = repository.metadata.relations.map(r => r.propertyName);
     const relationIds = R.map(value =>
       _.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value },
@@ -198,13 +210,14 @@ export abstract class RestCrudController {
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ) {
-    logger.log(`patch ${util.inspect({ user, model, id, updateTo }, { colors: true })}`);
-    if (model === 'kv__pairs') {
+    const modelName = this.getModelName(model);
+    logger.log(`patch ${util.inspect({ user, modelName, id, updateTo }, { colors: true })}`);
+    if (modelName === 'kv__pairs') {
       logger.log('update by kvService...');
       return this.kvService.update(id, updateTo.name, updateTo.type, updateTo.value);
     }
 
-    const repository = this.dbService.repo(model);
+    const repository = this.dbService.repo(modelName);
     const relationKeys = repository.metadata.relations.map(r => r.propertyName);
     const relationIds = R.map(value =>
       _.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value },

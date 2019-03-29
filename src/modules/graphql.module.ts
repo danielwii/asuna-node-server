@@ -3,14 +3,14 @@ import { GraphQLModule } from '@nestjs/graphql';
 import * as util from 'util';
 
 import { KvModule } from './kv';
-import { AppModule } from './app';
+import { ReleaseModule } from './release';
 
 const logger = new Logger('GraphqlModule');
 
 @Module({
   imports: [
     KvModule,
-    AppModule,
+    ReleaseModule,
     GraphQLModule.forRoot({
       typePaths: ['../**/*.graphql'],
       // introspection: true,

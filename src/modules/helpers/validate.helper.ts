@@ -1,6 +1,6 @@
 import { validate } from 'class-validator';
 
-import { ValidationException } from '../base/base.exceptions';
+import { ValidationException } from '../base';
 
 export const validateObject = async object => {
   const errors = await validate(object);

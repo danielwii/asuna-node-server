@@ -56,6 +56,8 @@ export interface NormalMetaInfoOptions extends MetaInfoBaseOptions {
   type?:
     | 'Image'
     | 'Images'
+    | 'File'
+    | 'Files'
     | 'Video'
     | 'Videos'
     | 'Authorities'

@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import { FindOperator, getConnection } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import { EntityMetaInfoOptions, MetaInfoOptions } from '../decorators/meta.decorator';
+import { EntityMetaInfoOptions, MetaInfoOptions } from '../decorators';
 import { ParsedFields, parseListParam, parseNormalWhereAndRelatedFields, Profile } from '../helper';
 
 const logger = new Logger('DBHelper');
@@ -39,7 +39,7 @@ export class DBHelper {
       } else {
         const tableName = entityMetadata.tableName;
         const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
-        selectable = opts.module !== 'app' ? opts.module + name : name;
+        selectable = opts.module !== 'release.graphql' ? opts.module + name : name;
       }
     }
     return selectable;
@@ -55,7 +55,7 @@ export class DBHelper {
     } else {
       const tableName = relation.inverseEntityMetadata.tableName;
       const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
-      selectable = opts.module !== 'app' ? opts.module + name : name;
+      selectable = opts.module !== 'release.graphql' ? opts.module + name : name;
     }
     return selectable;
   }

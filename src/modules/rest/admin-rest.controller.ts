@@ -2,9 +2,9 @@ import { Controller } from '@nestjs/common';
 
 import { RestCrudController } from '../base';
 
-@Controller('rest')
-export class AppRestController extends RestCrudController {
+@Controller('admin/rest/admin')
+export class AdminRestController extends RestCrudController {
   constructor() {
-    super('app');
+    super('admin');
   }
 }

@@ -1,0 +1,34 @@
+enum AppUpgradeMode {
+  MANUAL
+  FORCE
+  HOT
+}
+
+enum Platform {
+  ANDROID
+  ANDROID_TV
+  IOS
+}
+
+type AppRelease implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  version: String!
+  upgradeMode: AppUpgradeMode
+  platform: Platform
+  description: String
+  path: [String]
+}
+
+type CursoredAppRelease implements CursoredQuery {
+  totalCount: Int
+  pageInfo: PageInfo
+  items: [AppRelease]
+}
+
+type Query {
+  admin_appReleases(platform: Platform, first: Int, after: String): CursoredAppRelease
+  admin_appRelease(platform: Platform): AppRelease
+}
