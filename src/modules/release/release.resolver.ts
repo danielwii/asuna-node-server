@@ -44,7 +44,7 @@ export class AppQueryResolver {
     // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
     // @Context('getDataLoaders') getDataLoaders,
   ): Promise<AppRelease> {
-    this.logger.log(`admin_appReleases: ${JSON.stringify({ platform })}`);
+    this.logger.log(`admin_appRelease: ${JSON.stringify({ platform })}`);
 
     return AppRelease.findOne({
       where: { platform },

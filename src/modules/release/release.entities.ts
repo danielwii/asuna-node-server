@@ -34,13 +34,13 @@ export class AppRelease extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: 'File', type: 'File' })
-  @Column('simple-json', { nullable: false, name: 'path' })
-  path: JsonArray;
+  @Column('simple-json', { nullable: false, name: 'paths' })
+  paths: JsonArray;
 
   // TODO try reload in entity subscribers
   @BeforeInsert()
   @BeforeUpdate()
   preSave() {
-    safeReloadArray(this, 'path');
+    safeReloadArray(this, 'paths');
   }
 }

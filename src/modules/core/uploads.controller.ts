@@ -37,55 +37,70 @@ export class UploadsController {
     @Query('bucket') bucket: string = 'default',
     @Res() res,
   ) {
-    return UploaderController.imageStorageEngine.resolve(
-      { filename, bucket, prefix, thumbnailConfig, jpegConfig },
-      res,
-    );
+    const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(AdminModule.uploadPath)) {
+      return UploaderController.imageStorageEngine.resolve(
+        { filename, bucket, prefix, thumbnailConfig, jpegConfig },
+        res,
+      );
+    }
   }
 
   @Get('videos/*')
   async getVideo(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default',
+    @Query('bucket') bucket: string = 'default-videos',
     @Res() res,
   ) {
     const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
-    logger.log(`check if file '${fullFilePath}' exists`);
-    if (!fsExtra.existsSync(fullFilePath)) {
-      throw new NotFoundException();
+    if (fullFilePath.startsWith(AdminModule.uploadPath)) {
+      logger.log(`check if file '${fullFilePath}' exists`);
+      if (!fsExtra.existsSync(fullFilePath)) {
+        throw new NotFoundException();
+      }
+      res.sendFile(fullFilePath);
+    } else {
+      res.send();
     }
-    return res.sendFile(fullFilePath);
   }
 
   @Get('attaches/*')
   async getAttaches(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default',
+    @Query('bucket') bucket: string = 'default-attaches',
     @Res() res,
   ) {
     const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
-    logger.log(`check if file '${fullFilePath}' exists`);
-    if (!fsExtra.existsSync(fullFilePath)) {
-      throw new NotFoundException();
+    if (fullFilePath.startsWith(AdminModule.uploadPath)) {
+      logger.log(`check if file '${fullFilePath}' exists`);
+      if (!fsExtra.existsSync(fullFilePath)) {
+        throw new NotFoundException();
+      }
+      res.sendFile(fullFilePath);
+    } else {
+      res.send();
     }
-    return res.sendFile(fullFilePath);
   }
 
   @Get('files/*')
   async getFiles(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default',
+    @Query('bucket') bucket: string = 'default-files',
     @Res() res,
   ) {
-    // const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
-    // logger.log(`check if file '${fullFilePath}' exists`);
-    // if (!fsExtra.existsSync(fullFilePath)) {
-    //   throw new NotFoundException();
-    // }
-    // return res.sendFile(fullFilePath);
-    return UploaderController.fileStorageEngine.resolve({ filename, bucket, prefix }, res);
+    const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(AdminModule.uploadPath)) {
+      logger.log(`check if file '${fullFilePath}' exists`);
+      if (!fsExtra.existsSync(fullFilePath)) {
+        throw new NotFoundException();
+      }
+      res.sendFile(fullFilePath);
+      // return UploaderController.fileStorageEngine.resolve({ filename, bucket, prefix }, res);
+    } else {
+      res.send();
+    }
   }
 }

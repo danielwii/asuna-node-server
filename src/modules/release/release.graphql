@@ -19,7 +19,7 @@ type AppRelease implements BaseEntity {
   upgradeMode: AppUpgradeMode
   platform: Platform
   description: String
-  path: [String]
+  paths: [String]
 }
 
 type CursoredAppRelease implements CursoredQuery {
