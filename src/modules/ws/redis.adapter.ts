@@ -15,7 +15,7 @@ export class RedisIoAdapter extends IoAdapter {
       const host = configLoader.loadConfig(ConfigKeys.WS_REDIS_HOST, 'localhost');
       const port = configLoader.loadConfig(ConfigKeys.WS_REDIS_PORT, 6379);
       logger.log(`init redis ws-adapter: {host:${host}, port:${port}}`);
-      RedisIoAdapter.redisAdapter = redisIoAdapter({ host: 'localhost', port: 6379 });
+      RedisIoAdapter.redisAdapter = redisIoAdapter({ host, port });
     }
   }
 
