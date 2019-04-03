@@ -12,6 +12,7 @@ import { diff } from 'jsondiffpatch';
 
 import { Hermes } from './hermes';
 import { dataLoaderCleaner } from '../dataloader';
+import idx from 'idx';
 
 const logger = new Logger('EntitySubscriber');
 
@@ -22,7 +23,9 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    logger.log(`afterInsert ${event.entity.constructor.name} ${JSON.stringify(event.entity)}`);
+    logger.log(
+      `afterInsert ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify(event.entity)}`,
+    );
     return undefined;
   }
 
@@ -33,7 +36,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
     logger.log(
-      `afterRemove ${event.entity.constructor.name} ${JSON.stringify({
+      `afterRemove ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify({
         entity: event.entity,
         id: event.entityId,
       })}`,
@@ -43,7 +46,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
     logger.log(
-      `afterUpdate ${event.entity.constructor.name} ${JSON.stringify({
+      `afterUpdate ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify({
         entity: event.entity,
         updatedColumns: diff(event.entity, event.databaseEntity),
         // updatedRelations: event.updatedRelations,
@@ -54,18 +57,20 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       updatedColumns: diff(event.entity, event.databaseEntity),
       // updatedRelations: event.updatedRelations,
     });
-    dataLoaderCleaner.clear(event.entity.constructor.name, _.get(event.entity, 'id'));
+    dataLoaderCleaner.clear(idx(event, _ => _.entity.constructor.name), _.get(event.entity, 'id'));
     return undefined;
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    logger.log(`beforeInsert ${event.entity.constructor.name} ${JSON.stringify(event.entity)}`);
+    logger.log(
+      `beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify(event.entity)}`,
+    );
     return undefined;
   }
 
   beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
     logger.log(
-      `beforeRemove ${event.entity.constructor.name} ${JSON.stringify({
+      `beforeRemove ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify({
         entity: event.entity,
         id: event.entityId,
       })}`,
@@ -75,7 +80,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
     logger.log(
-      `beforeUpdate ${event.entity.constructor.name} ${JSON.stringify({
+      `beforeUpdate ${idx(event, _ => _.entity.constructor.name)} ${JSON.stringify({
         entity: event.entity,
         updatedColumns: diff(event.entity, event.databaseEntity),
         // updatedRelations: event.updatedRelations,
