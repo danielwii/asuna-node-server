@@ -49,12 +49,13 @@ export abstract class RestCrudController {
   }
 
   getModelName(model: string) {
-    console.log(this.module, {
+    logger.log({
+      module: this.module,
       model,
       startsWith: model.startsWith(this.module),
       includes__: this.module.includes('__'),
     });
-    if (model.startsWith(this.module) || model.includes('__')) {
+    if (model.startsWith(this.module) || model.includes('__') || this.module === 'app__') {
       return model;
     }
     return `${this.module}${model}`;
