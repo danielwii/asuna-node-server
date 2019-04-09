@@ -32,6 +32,8 @@ export const ConfigKeys = {
 
   WS_REDIS_HOST: 'WS_REDIS_HOST',
   WS_REDIS_PORT: 'WS_REDIS_PORT',
+  WS_REDIS_PASSWORD: 'WS_REDIS_PASSWORD',
+  WS_REDIS_DB: 'WS_REDIS_DB',
 };
 
 export const configLoader = createConfigLoader({
