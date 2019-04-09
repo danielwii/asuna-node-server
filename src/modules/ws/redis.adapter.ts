@@ -25,7 +25,6 @@ export class RedisIoAdapter extends IoAdapter {
         ...(password ? { password } : null),
         db,
       });
-      RedisIoAdapter.redisAdapter.auth();
     }
   }
 
