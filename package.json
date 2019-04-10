@@ -9,7 +9,8 @@
   "scripts": {
     "build": "yarn tsc",
     "build:watch": "yarn tsc -w",
-    "postinstall1": "yarn build"
+    "postinstall1": "yarn build",
+    "test": "echo 'no tests.'"
   },
   "devDependencies": {
     "@types/socket.io": "^2.1.2",
