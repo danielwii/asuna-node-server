@@ -15,20 +15,20 @@ import { ApiImplicitParam } from '@nestjs/swagger';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-
 import { getManager } from 'typeorm';
 import * as util from 'util';
+
 import { AdminUser } from '../core/auth/auth.entities';
 import { CurrentUser } from '../decorators/user.decorator';
-
 import {
+  getModelName,
   parseFields,
   parseNormalWhereAndRelatedFields,
   parseOrder,
   parseWhere,
   Profile,
 } from '../helper';
-import { validateObject } from '../helpers/validate.helper';
+import { validateObject } from '../helpers';
 import { KvService } from '../kv';
 import { DBHelper } from './db.helper';
 import { DBService } from './db.service';
@@ -48,20 +48,13 @@ export abstract class RestCrudController {
     logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
   }
 
-  getModelName(model: string) {
-    if (model.startsWith(this.module) || model.includes('__') || this.module === 'app__') {
-      return model;
-    }
-    return `${this.module}${model}`;
-  }
-
   @ApiImplicitParam({
     name: 'model',
     description: ['about_us', 'about_us_categories', 'videos', 'video_categories'].join(','),
   })
   @Options(':model')
   options(@Param('model') model: string) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     const repository = this.dbService.repo(modelName);
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
@@ -77,7 +70,7 @@ export abstract class RestCrudController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
@@ -131,7 +124,7 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
 
@@ -159,7 +152,7 @@ export abstract class RestCrudController {
 
   @Delete(':model/:id')
   delete(@Param('model') model: string, @Param('id') id: number) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     const repository = this.dbService.repo(modelName);
     return repository.delete(id);
   }
@@ -170,7 +163,7 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     logger.log(`patch ${util.inspect({ user, modelName, updateTo }, { colors: true })}`);
     if (modelName === 'kv__pairs') {
       logger.log('save by kvService...');
@@ -210,7 +203,7 @@ export abstract class RestCrudController {
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = this.getModelName(model);
+    const modelName = getModelName(model);
     logger.log(`patch ${util.inspect({ user, modelName, id, updateTo }, { colors: true })}`);
     if (modelName === 'kv__pairs') {
       logger.log('update by kvService...');

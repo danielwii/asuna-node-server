@@ -1,18 +1,25 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as util from 'util';
+import * as GraphQLJSON from 'graphql-type-json';
+import { join } from 'path';
 
 import { KvModule } from './kv';
-import { ReleaseModule } from './release';
+import { AppModule } from './app';
 
 const logger = new Logger('GraphqlModule');
 
 @Module({
   imports: [
     KvModule,
-    ReleaseModule,
+    AppModule,
     GraphQLModule.forRoot({
+      definitions: {
+        path: join(process.cwd(), 'src/graphql.ts'),
+        outputAs: 'class',
+      },
       typePaths: ['../**/*.graphql'],
+      resolvers: { JSON: GraphQLJSON },
       // introspection: true,
       // debug: true,
       playground: true,

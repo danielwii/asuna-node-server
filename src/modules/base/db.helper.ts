@@ -39,7 +39,7 @@ export class DBHelper {
       } else {
         const tableName = entityMetadata.tableName;
         const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
-        selectable = opts.module !== 'release.graphql' ? opts.module + name : name;
+        selectable = opts.module !== 'app.graphql.graphql' ? opts.module + name : name;
       }
     }
     return selectable;
@@ -55,7 +55,7 @@ export class DBHelper {
     } else {
       const tableName = relation.inverseEntityMetadata.tableName;
       const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
-      selectable = opts.module !== 'release.graphql' ? opts.module + name : name;
+      selectable = opts.module !== 'app.graphql.graphql' ? opts.module + name : name;
     }
     return selectable;
   }

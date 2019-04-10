@@ -8,7 +8,7 @@ import { UploaderController } from './core/uploader/uploader.controller';
 import { UploadsController } from './core/uploads.controller';
 import { WSModule } from './ws/ws.module';
 import { KvService } from './kv';
-import { AppRestController, AdminRestController } from './rest';
+import { WwwRestController, AdminRestController } from './rest';
 import { SearchController } from './search/search.controller';
 import { SchemaModules } from './graphql/schema.modules';
 
@@ -19,7 +19,7 @@ const logger = new Logger('AdminModule');
   providers: [DBService, KvService],
   controllers: [
     ApiController,
-    AppRestController,
+    WwwRestController,
     AdminRestController,
     SearchController,
     UploadsController,

@@ -15,7 +15,9 @@ import {
   Raw,
 } from 'typeorm';
 import * as util from 'util';
+
 import { Condition } from './decorators';
+import { AsunaContext } from './core';
 
 const logger = new Logger('Helper');
 
@@ -23,6 +25,17 @@ export enum Profile {
   // TODO @deprecated this may cause a memory leak
   detail = 'detail',
   ids = 'ids',
+}
+
+export function getModelName(model: string) {
+  if (
+    model.startsWith(this.module) ||
+    model.includes('__') ||
+    this.module === `${AsunaContext.instance.defaultModulePrefix}__`
+  ) {
+    return model;
+  }
+  return `${this.module}${model}`;
 }
 
 /**

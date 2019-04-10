@@ -12,32 +12,32 @@ export const DefaultPageRequest: PageRequest = {
   size: DEFAULT_SIZE,
 };
 
-export interface PageRequest {
+export class PageRequest {
   page: number;
   size: number;
   orderBy?: { column: string; order?: Order };
 }
 
-export interface TimeCondition {
+export class TimeCondition {
   column: string;
   before?: Date;
   after?: Date;
 }
 
-export interface QueryCondition {
+export class QueryCondition {
   ids?: number[];
   random?: number;
   extra?: object;
 }
 
-export interface Pageable<T> {
+export class Pageable<T> {
   total: number;
   page: number;
   size: number;
   items: T[];
 }
 
-export interface Cursured<T> {
+export class Cursured<T> {
   totalCount: number;
   pageInfo: {
     endCursor: string | number;
@@ -45,6 +45,8 @@ export interface Cursured<T> {
   };
   items: T[];
 }
+
+export const emptyPage = (pageInfo): Pageable<any> => ({ ...pageInfo, items: [], total: 0 });
 
 export const toPage = (pageRequest: PageRequest) => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};

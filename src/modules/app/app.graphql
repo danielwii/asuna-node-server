@@ -1,0 +1,49 @@
+enum AppUpgradeMode {
+  MANUAL
+  FORCE
+  HOT
+}
+
+enum Platform {
+  ANDROID
+  ANDROID_TV
+  IOS
+}
+
+type AppInfo implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  key: String
+  isPublished: Boolean
+
+  releases: [AppRelease]
+}
+
+type AppRelease implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  versionCode: String!
+  upgradeMode: AppUpgradeMode
+  platform: Platform
+  description: String
+  paths: [String]
+  isPublished: Boolean
+
+  appInfo: AppInfo
+}
+
+type PagedAppRelease implements PagedQuery {
+  page: Int
+  size: Int
+  total: Int
+  items: [AppRelease]
+}
+
+type Query {
+  app_releases(key: String, pageRequest: PageRequest): PagedAppRelease
+  app_latestRelease(key: String): AppRelease
+}

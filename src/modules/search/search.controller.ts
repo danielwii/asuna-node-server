@@ -6,6 +6,7 @@ import { getConnection, getRepository } from 'typeorm';
 import { DBHelper } from '../base/db.helper';
 
 import {
+  getModelName,
   parseListParam,
   parseNormalWhereAndRelatedFields,
   parseOrder,
@@ -16,7 +17,8 @@ import {
 @Controller('api/search')
 export class SearchController {
   repo(model) {
-    return _.isString(model) ? getRepository(`app__t_${model}`) : getRepository(model);
+    const modelName = getModelName(model);
+    return _.isString(model) ? getRepository(modelName) : getRepository(model);
   }
 
   @Get(':model')

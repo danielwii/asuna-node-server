@@ -1,4 +1,5 @@
 scalar Date
+scalar JSON
 scalar JsonObject
 scalar JsonArray
 scalar Any

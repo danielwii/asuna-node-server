@@ -1,13 +1,13 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { AppQueryResolver } from './release.resolver';
+import { AppQueryResolver } from './app.resolver';
 
-const logger = new Logger('ReleaseModule');
+const logger = new Logger('AppModule');
 
 @Module({
   providers: [AppQueryResolver],
 })
-export class ReleaseModule implements OnModuleInit {
+export class AppModule implements OnModuleInit {
   onModuleInit(): any {
     logger.log('init...');
   }

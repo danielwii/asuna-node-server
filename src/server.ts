@@ -10,7 +10,8 @@ import * as rateLimit from 'express-rate-limit';
 import { json } from 'body-parser';
 import { resolve } from 'path';
 import { AnyExceptionFilter } from './modules/common/filters/any-exception.filter';
-import { ConfigKeys, configLoader } from './modules/helpers/config.helper';
+import { ConfigKeys, configLoader } from './modules/helpers';
+import { AsunaContext, IAsunaContextOpts } from './modules/core';
 
 const logger = new Logger('bootstrap');
 const startAt = Date.now();
@@ -19,6 +20,8 @@ if (process.env.NODE_ENV === 'production') {
   logger.log(`[X] run as production mode at ${__dirname}`);
   const moduleAlias = require('module-alias');
   moduleAlias.addPath(__dirname);
+} else {
+  logger.log(`[X] run as non-production mode at ${__dirname}`);
 }
 
 const pkg = require('../package.json');
@@ -27,10 +30,13 @@ interface IBootstrapOptions {
   root?: string;
   version?: string;
   redisMode?: 'io' | 'redis' | 'ws';
+  context?: IAsunaContextOpts;
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
   logger.log(`options: ${JSON.stringify(options)}`);
+
+  AsunaContext.instance.init(options.context);
 
   // --------------------------------------------------------------
   // Setup app
@@ -93,7 +99,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   app.use(json({ limit: '1mb' }));
   app.enableShutdownHooks();
 
-  if (configLoader.loadConfig(ConfigKeys.DEBUG)) {
+  if (AsunaContext.isDebugMode) {
     logger.log(`[X] debug mode is enabled`);
 
     // --------------------------------------------------------------

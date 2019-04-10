@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "src/index.ts",
@@ -16,12 +16,12 @@
     "prettier": "^1.16.4",
     "tslint": "^5.15.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.4.2"
+    "typescript": "^3.4.3"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.5",
     "@nestjs/core": "^6.0.5",
-    "@nestjs/graphql": "^6.0.5",
+    "@nestjs/graphql": "^6.0.2",
     "@nestjs/passport": "^6.0.0",
     "@nestjs/platform-express": "^6.0.5",
     "@nestjs/platform-socket.io": "^6.0.5",
@@ -37,6 +37,7 @@
     "dataloader": "^1.4.0",
     "email-templates": "^5.0.4",
     "express-rate-limit": "^3.4.0",
+    "graphql-type-json": "^0.2.4",
     "helmet": "^3.16.0",
     "idx": "^2.5.5",
     "jsondiffpatch": "^0.3.11",
