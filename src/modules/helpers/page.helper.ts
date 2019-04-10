@@ -1,3 +1,5 @@
+import { ArgsType } from 'type-graphql';
+
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 10;
 const MAX_PAGE_SIZE = 1000;

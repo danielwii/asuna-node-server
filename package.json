@@ -9,7 +9,8 @@
   "scripts": {
     "build": "yarn tsc",
     "build:watch": "yarn tsc -w",
-    "postinstall1": "yarn build"
+    "postinstall1": "yarn build",
+    "test": "echo 'no tests yet.'"
   },
   "devDependencies": {
     "@types/socket.io": "^2.1.2",
@@ -19,16 +20,16 @@
     "typescript": "^3.4.3"
   },
   "dependencies": {
-    "@nestjs/common": "^6.0.5",
-    "@nestjs/core": "^6.0.5",
-    "@nestjs/graphql": "^6.0.2",
+    "@nestjs/common": "^6.1.0",
+    "@nestjs/core": "^6.1.0",
+    "@nestjs/graphql": "^6.0.5",
     "@nestjs/passport": "^6.0.0",
-    "@nestjs/platform-express": "^6.0.5",
-    "@nestjs/platform-socket.io": "^6.0.5",
-    "@nestjs/platform-ws": "^6.0.5",
+    "@nestjs/platform-express": "^6.1.0",
+    "@nestjs/platform-socket.io": "^6.1.0",
+    "@nestjs/platform-ws": "^6.1.0",
     "@nestjs/swagger": "^3.0.2",
     "@nestjs/typeorm": "^6.0.0",
-    "@nestjs/websockets": "^6.0.5",
+    "@nestjs/websockets": "^6.1.0",
     "apollo-server-express": "^2.4.8",
     "body-parser": "^1.18.3",
     "class-transformer": "^0.2.0",

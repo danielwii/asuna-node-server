@@ -54,7 +54,7 @@ export abstract class RestCrudController {
   })
   @Options(':model')
   options(@Param('model') model: string) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     const repository = this.dbService.repo(modelName);
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
@@ -70,7 +70,7 @@ export abstract class RestCrudController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
@@ -124,7 +124,7 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     const repository = this.dbService.repo(modelName);
     const parsedFields = parseFields(fields);
 
@@ -152,7 +152,7 @@ export abstract class RestCrudController {
 
   @Delete(':model/:id')
   delete(@Param('model') model: string, @Param('id') id: number) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     const repository = this.dbService.repo(modelName);
     return repository.delete(id);
   }
@@ -163,7 +163,7 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     logger.log(`patch ${util.inspect({ user, modelName, updateTo }, { colors: true })}`);
     if (modelName === 'kv__pairs') {
       logger.log('save by kvService...');
@@ -203,7 +203,7 @@ export abstract class RestCrudController {
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = getModelName(model);
+    const modelName = getModelName(model, this.module);
     logger.log(`patch ${util.inspect({ user, modelName, id, updateTo }, { colors: true })}`);
     if (modelName === 'kv__pairs') {
       logger.log('update by kvService...');

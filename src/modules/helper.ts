@@ -27,15 +27,15 @@ export enum Profile {
   ids = 'ids',
 }
 
-export function getModelName(model: string) {
+export function getModelName(model: string, module?: string) {
   if (
-    model.startsWith(this.module) ||
+    model.startsWith(module) ||
     model.includes('__') ||
-    this.module === `${AsunaContext.instance.defaultModulePrefix}__`
+    module === `${AsunaContext.instance.defaultModulePrefix}__`
   ) {
     return model;
   }
-  return `${this.module}${model}`;
+  return `${module || `${AsunaContext.instance.defaultModulePrefix}__`}${model}`;
 }
 
 /**
