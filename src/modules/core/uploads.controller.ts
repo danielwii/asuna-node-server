@@ -50,7 +50,7 @@ export class UploadsController {
   async getVideo(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default-videos',
+    @Query('bucket') bucket: string = 'videos',
     @Res() res,
   ) {
     const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
@@ -69,7 +69,7 @@ export class UploadsController {
   async getAttaches(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default-attaches',
+    @Query('bucket') bucket: string = 'attaches',
     @Res() res,
   ) {
     const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
@@ -88,7 +88,7 @@ export class UploadsController {
   async getFiles(
     @Param('0') filename: string,
     @Query('prefix') prefix: string = '',
-    @Query('bucket') bucket: string = 'default-files',
+    @Query('bucket') bucket: string = 'files',
     @Res() res,
   ) {
     const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);

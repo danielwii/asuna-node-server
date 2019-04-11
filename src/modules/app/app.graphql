@@ -18,7 +18,7 @@ type AppInfo implements BaseEntity {
   key: String
   isPublished: Boolean
 
-  releases: [AppRelease]
+  releases: [AppRelease] # TODO not implemented
 }
 
 type AppRelease implements BaseEntity {
@@ -33,7 +33,7 @@ type AppRelease implements BaseEntity {
   paths: [String]
   isPublished: Boolean
 
-  appInfo: AppInfo
+  appInfo: AppInfo # TODO not implemented
 }
 
 type PagedAppRelease implements PagedQuery {

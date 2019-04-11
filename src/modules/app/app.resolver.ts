@@ -44,6 +44,6 @@ export class AppQueryResolver {
     this.logger.log(`app_latestRelease: ${JSON.stringify({ key })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true } });
-    return AppRelease.findOne({ where: { app: appInfo }, order: { id: 'DESC' } });
+    return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' } });
   }
 }
