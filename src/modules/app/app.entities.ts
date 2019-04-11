@@ -36,6 +36,9 @@ export class AppRelease extends AbstractBaseEntity {
   @Column({ nullable: false, length: 10, name: 'version_code' })
   versionCode: string;
 
+  @Column({ nullable: false, name: 'build_number' })
+  buildNumber: number;
+
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: AppUpgradeMode })
   @Column('varchar', { nullable: true, name: 'upgrade_mode' })
   upgradeMode: keyof typeof AppUpgradeMode;
