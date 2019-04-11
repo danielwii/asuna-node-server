@@ -55,11 +55,10 @@ function yearMonthStr() {
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = new Logger(LocalStorage.name);
 
-  private rootBucket: string = 'default';
   private storagePath: string;
 
-  constructor(storagePath: string, bucket: string = '') {
-    this.storagePath = path.join(storagePath, `${this.rootBucket}${bucket ? `-${bucket}` : ''}`);
+  constructor(storagePath: string, bucket?: string) {
+    this.storagePath = path.join(storagePath, bucket || 'default');
     LocalStorage.logger.log(
       `[constructor] init default[${bucket}] storage path: '${this.storagePath}'`,
     );
