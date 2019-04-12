@@ -2,7 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany } from
 
 import { AbstractBaseEntity, AbstractNameEntity } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../decorators';
-import { safeReloadArray } from '../helpers';
+import { jsonType, safeReloadArray } from '../helpers';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',
@@ -48,7 +48,7 @@ export class AppRelease extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: 'File', type: 'File' })
-  @Column('simple-json', { nullable: false, name: 'paths' })
+  @Column(jsonType(), { nullable: false, name: 'paths' })
   paths: JsonArray;
 
   @MetaInfo({ name: '是否发布？' })

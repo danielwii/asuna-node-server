@@ -1,7 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../decorators';
-import { safeReloadJSON } from '../helpers/entity.helper';
+import { jsonType, safeReloadJSON } from '../helpers';
 
 export const ValueType = {
   string: 'string',
@@ -37,7 +38,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   value: any;
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
-  @Column('simple-json', { nullable: true })
+  @Column(jsonType(), { nullable: true })
   extra: JSON;
 
   @BeforeInsert()

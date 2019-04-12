@@ -1,8 +1,9 @@
 import { IsEmail } from 'class-validator';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+
 import { AbstractBaseEntity } from '../../base';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../decorators';
-import { safeReloadObject } from '../../helpers/entity.helper';
+import { jsonType, safeReloadObject } from '../../helpers';
 
 @EntityMetaInfo({ name: 'auth__roles' })
 @Entity('auth__t_roles')
@@ -16,7 +17,7 @@ export class Role extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: '权限', type: 'Authorities' })
-  @Column('simple-json', { nullable: true })
+  @Column(jsonType(), { nullable: true })
   authorities: JsonMap;
 
   @ManyToMany(type => AdminUser, user => user.roles)

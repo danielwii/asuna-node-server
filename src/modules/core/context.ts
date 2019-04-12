@@ -12,11 +12,14 @@ export interface IAsunaContextOpts {
 
 export class AsunaContext {
   private opts: IAsunaContextOpts;
+
   public readonly dirname: string;
+  public readonly dbType: 'mysql56' | 'mysql57' | 'postgres';
   public static readonly instance = new AsunaContext();
 
   private constructor() {
     this.dirname = join(__dirname, '../..');
+    this.dbType = configLoader.loadConfig(ConfigKeys.DB_TYPE, 'mysql57');
   }
 
   init(opts: IAsunaContextOpts) {
