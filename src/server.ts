@@ -92,7 +92,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   app.use(
     rateLimit({
       windowMs: 60 * 1e3, // 1 minute(s)
-      max: 100, // limit each IP to 100 requests per windowMs
+      max: 1000, // limit each IP to 1000 requests per windowMs
     }),
   );
   app.use(morgan('dev'));
