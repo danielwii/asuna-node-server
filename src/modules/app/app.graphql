@@ -27,6 +27,7 @@ type AppRelease implements BaseEntity {
   updatedAt: Date!
 
   versionCode: String!
+  buildNumber: Int!
   upgradeMode: AppUpgradeMode
   platform: Platform
   description: String
