@@ -4,6 +4,7 @@ import { createConfigLoader } from 'node-buffs';
 const logger = new Logger('ConfigLoader');
 
 export const ConfigKeys = {
+  ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',
   SECRET_KEY: 'SECRET_KEY',
   DEBUG: 'DEBUG',
   PORT: 'PORT',

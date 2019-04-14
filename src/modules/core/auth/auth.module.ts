@@ -2,7 +2,7 @@ import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@n
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { DBService } from '../../base/db.service';
+import { DBService } from '../../base';
 import { KvService } from '../../kv';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthMiddleware } from './admin-auth.middleware';
@@ -16,13 +16,13 @@ import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
 const logger = new Logger('AuthModule');
 
 @Module({
-  imports: [
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secretOrPrivateKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
-      signOptions: { expiresIn: 60 * 60 * 24 * 30 },
-    }),
-  ],
+  // imports: [
+  //   PassportModule.register({ defaultStrategy: 'jwt' }),
+  //   JwtModule.register({
+  //     secretOrPrivateKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
+  //     signOptions: { expiresIn: 60 * 60 * 24 * 30 },
+  //   }),
+  // ],
   providers: [
     AuthService,
     AdminAuthService,

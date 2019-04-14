@@ -1,7 +1,10 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { GenericDataLoader } from '../../dataloader';
-import { getRequestFromContext } from '../utils';
+
+import { getRequestFromContext } from './utils';
+import { GenericDataLoader } from './dataloader';
+
+const logger = new Logger('DataLoaderInterceptor');
 
 const genericDataLoader = new GenericDataLoader();
 

@@ -53,16 +53,16 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      // logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      // logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
     } else if (/40\d/.test(`${status}`)) {
-      // logger.warn(`[unauthorized] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[unauthorized] ${JSON.stringify(processed.message)}`);
     } else {
       logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`, processed.stack);
     }
 
-    if (!response.finished) {
+    if (!response.finished && response.status) {
       if (R.is(HttpException, processed)) {
         response
           .status(status)

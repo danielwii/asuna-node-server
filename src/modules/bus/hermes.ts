@@ -16,7 +16,7 @@ export class Hermes {
   }
 
   static subscribe(source: string, observer?: Rx.PartialObserver<any>) {
-    logger.log(`subscribe from ${source} ... total: ${this.observers.length}`);
+    logger.log(`subscribe from ${source} ... total: ${this.observers.length + 1}`);
     this.observers.push({ source, observer });
     this.subject.subscribe(observer);
   }

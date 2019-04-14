@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
 const logger = new Logger('JwtStrategy');
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private readonly authService: AuthService) {
     super(
       {

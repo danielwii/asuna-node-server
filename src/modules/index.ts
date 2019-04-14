@@ -8,5 +8,5 @@ export * from './app';
 export * from './bus';
 export * from './helpers';
 export * from './helper';
-// export * from './graphql';
+export * from './graphql';
 export * from './core';
