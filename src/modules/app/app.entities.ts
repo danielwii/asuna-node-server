@@ -16,11 +16,20 @@ export const Platform = {
   IOS: 'IOS',
 };
 
+export const Mode = {
+  WEB_PAGE: 'WEB_PAGE',
+  STANDALONE: 'STANDALONE',
+};
+
 @EntityMetaInfo({ name: 'app__infos' })
 @Entity('app__t_infos')
 export class AppInfo extends AbstractNameEntity {
   @Column({ nullable: false, unique: true })
   key: string;
+
+  @MetaInfo({ name: 'Mode', type: 'Enum', enumData: Mode })
+  @Column('varchar', { nullable: true, name: 'mode' })
+  mode: keyof typeof Mode;
 
   @MetaInfo({ name: '是否发布？' })
   @Column({ nullable: true, name: 'published' })

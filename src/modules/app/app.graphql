@@ -10,13 +10,20 @@ enum Platform {
   IOS
 }
 
+enum Mode {
+  WEB_PAGE
+  STANDALONE
+}
+
 type AppInfo implements BaseEntity {
   id: Int!
   createdAt: Date!
   updatedAt: Date!
 
+  name: String
+  description: String
   key: String
-  isPublished: Boolean
+  mode: Mode
 
   releases: [AppRelease] # TODO not implemented
 }
@@ -26,13 +33,12 @@ type AppRelease implements BaseEntity {
   createdAt: Date!
   updatedAt: Date!
 
-  versionCode: String!
-  buildNumber: Int!
+  versionCode: String
+  buildNumber: Int
   upgradeMode: AppUpgradeMode
   platform: Platform
   description: String
   paths: [String]
-  isPublished: Boolean
 
   appInfo: AppInfo # TODO not implemented
 }
@@ -45,6 +51,7 @@ type PagedAppRelease implements PagedQuery {
 }
 
 type Query {
+  app_info(key: String): AppInfo
   app_releases(key: String, pageRequest: PageRequest): PagedAppRelease
   app_latestRelease(key: String): AppRelease
 }

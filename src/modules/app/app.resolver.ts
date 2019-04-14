@@ -19,7 +19,7 @@ export class AppQueryResolver {
   ): Promise<Pageable<AppRelease>> {
     this.logger.log(`app_releases: ${JSON.stringify({ key, pageRequest })}`);
     const pageInfo = toPage(pageRequest);
-    const appInfo = await AppInfo.findOne({ where: { key, isPublished: true } });
+    const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: true });
     if (!appInfo) return emptyPage(pageInfo);
 
     let [items, total] = await AppRelease.findAndCount({
@@ -43,7 +43,18 @@ export class AppQueryResolver {
   ): Promise<AppRelease> {
     this.logger.log(`app_latestRelease: ${JSON.stringify({ key })}`);
 
-    const appInfo = await AppInfo.findOne({ where: { key, isPublished: true } });
-    return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' } });
+    const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: true });
+    return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' }, cache: true });
+  }
+
+  @Query()
+  async app_info(
+    @Args('key') key: string,
+    // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
+    // @Context('getDataLoaders') getDataLoaders,
+  ): Promise<AppInfo> {
+    this.logger.log(`app_info: ${JSON.stringify({ key })}`);
+
+    return AppInfo.findOne({ where: { key, isPublished: true }, cache: true });
   }
 }
