@@ -5,13 +5,13 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { ConfigKeys, configLoader } from '../../../helpers';
 import { IJwtPayload } from '../auth.interfaces';
-import { AuthService } from '../auth.service';
+import { AdminAuthService } from '../admin-auth.service';
 
-const logger = new Logger('JwtStrategy');
+const logger = new Logger('AdminJwtStrategy');
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
+  constructor(private readonly adminAuthService: AdminAuthService) {
     super(
       {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: IJwtPayload) {
     logger.log(`validate ${JSON.stringify(payload)}`);
-    const isValid = await this.authService.validateUser(payload);
+    const isValid = await this.adminAuthService.validateUser(payload);
     if (!isValid) {
       throw new UnauthorizedException();
     }

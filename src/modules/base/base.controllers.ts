@@ -19,7 +19,7 @@ import { getManager } from 'typeorm';
 import * as util from 'util';
 
 import { AdminUser } from '../core/auth/auth.entities';
-import { CurrentUser } from '../decorators/user.decorator';
+import { CurrentUser } from '../decorators';
 import {
   getModelName,
   parseFields,

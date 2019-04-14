@@ -22,7 +22,7 @@ export abstract class AbstractBaseEntity extends BaseEntity {
   updatedBy: string;
 }
 
-export class AbstractNameEntity extends AbstractBaseEntity {
+export abstract class AbstractNameEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;

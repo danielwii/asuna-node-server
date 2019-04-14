@@ -9,7 +9,7 @@ import { DBHelper } from './db.helper';
 const logger = new Logger('DBService');
 
 export class DBService {
-  private isValidEntity(metadata): boolean {
+  static isValidEntity(metadata): boolean {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
     const isRelation = _.includes(metadata.target as string, '__tr_');
     if (isNotEntityInfo && !isRelation) {
@@ -22,7 +22,7 @@ export class DBService {
   repo<Entity>(entity: ObjectType<Entity> | string) {
     if (_.isString(entity)) {
       const entityMetadata = getConnection().entityMetadatas.find(metadata => {
-        if (this.isValidEntity(metadata)) {
+        if (DBService.isValidEntity(metadata)) {
           return (metadata.target as any).entityInfo.name === entity;
         }
       });
@@ -37,7 +37,7 @@ export class DBService {
 
   repos() {
     return getConnection()
-      .entityMetadatas.filter(metadata => this.isValidEntity(metadata))
+      .entityMetadatas.filter(metadata => DBService.isValidEntity(metadata))
       .map(metadata => getRepository(metadata.target));
   }
 

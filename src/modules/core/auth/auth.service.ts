@@ -2,88 +2,69 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
-import { Connection, FindOneOptions, getManager, Repository } from 'typeorm';
+import {
+  Connection,
+  FindOneOptions,
+  getConnection,
+  getManager,
+  getRepository,
+  Repository,
+} from 'typeorm';
 
-import { ConfigKeys, configLoader } from '../../helpers/config.helper';
-import { SYS_ROLE } from './auth.constants';
+import { ConfigKeys, configLoader } from '../../helpers';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
-import { RoleRepository } from './auth.repositories';
+import { DBService } from '../../base/db.service';
+import { AbstractAuthUser } from './base.entities';
 
 const logger = new Logger('AuthService');
 
 @Injectable()
 export class AuthService {
-  private readonly userRepository: Repository<AdminUser>;
-  private readonly roleRepository: RoleRepository;
+  private readonly userRepository: Repository<AbstractAuthUser>;
   private readonly cryptor = new Cryptor();
 
-  constructor(
-    @InjectConnection()
-    private readonly connection: Connection,
-  ) {
-    this.userRepository = connection.getRepository(AdminUser);
-    this.roleRepository = connection.getCustomRepository(RoleRepository);
+  constructor(@InjectConnection() private readonly connection: Connection) {
+    const entityMetadata = getConnection().entityMetadatas.find(metadata => {
+      if (DBService.isValidEntity(metadata)) {
+        return (
+          metadata.targetName !== AdminUser.name &&
+          Object.getPrototypeOf(metadata.target).name === AbstractAuthUser.name
+        );
+      }
+    });
+    if (entityMetadata) {
+      this.userRepository = getRepository(entityMetadata.target);
+    }
   }
 
   encrypt(password: string) {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  passwordVerify(password: string, user: AdminUser) {
+  passwordVerify(password: string, user: AbstractAuthUser) {
     logger.log(`passwordVerify(${password}, ${JSON.stringify(user)})`);
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 
-  async createUser(username: string, email: string, password: string, roleNames: string[]) {
+  async createUser(username: string, email: string, password: string) {
     const { hash, salt } = this.encrypt(password);
-    const roles = await this.roleRepository.findByNames(roleNames);
 
-    let user = await this.getUser(email);
+    let user = await this.getUser({ email, username });
     if (!user) {
       user = this.userRepository.create({ email, username, isActive: true });
     }
     logger.log(`found user ${JSON.stringify(user)}`);
     user.password = hash;
     user.salt = salt;
-    user.roles = roles;
     return getManager().save(user);
-  }
-
-  /**
-   * 保证 SYS_ADMIN 角色存在并保证该角色至少拥有一个用户
-   * 如果没有则创建预设用户 admin@example.com - password
-   * @returns {Promise<void>}
-   */
-  async initSysAccount() {
-    const role = await this.roleRepository.findOne({ name: SYS_ROLE });
-
-    if (!role) {
-      const entity = this.roleRepository.create({ name: SYS_ROLE });
-      await getManager().save(entity);
-    }
-    logger.log(`found sys role: ${!!role}`);
-
-    const sysRole = await this.roleRepository.findOne({
-      where: { name: SYS_ROLE },
-      relations: ['users'],
-    });
-    logger.log(`found sys role: ${JSON.stringify(sysRole)}`);
-    const usersBySysRole = await sysRole.users;
-    logger.log(`found users for sys role: ${usersBySysRole.length}`);
-    if (!usersBySysRole.length) {
-      logger.log('create SYS_ADMIN account: admin@example.com:password');
-      this.createUser('Admin', 'admin@example.com', 'password', [SYS_ROLE]).catch(e => {
-        logger.warn('cannot create default SYS_ADMIN account', e);
-      });
-    }
   }
 
   /**
    * TODO using env instead
    * @returns {Promise<void>}
    */
-  async createToken(user: AdminUser) {
+  async createToken(user: AbstractAuthUser) {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30;
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -104,18 +85,28 @@ export class AuthService {
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     logger.log(`validateUser >> ${JSON.stringify(jwtPayload)} expired in: ${left}s`);
 
-    const user = await this.getUser(jwtPayload.email, true);
+    const user = await this.getUser(
+      { email: jwtPayload.email, username: jwtPayload.username },
+      true,
+    );
 
     return user != null && user.id === jwtPayload.id;
   }
 
-  public getUser(email: string, isActive?: boolean, options?: FindOneOptions<AdminUser>) {
-    return this.userRepository.findOne({ email, isActive }, options);
+  public getUser(
+    identifier: { email?: string; username?: string },
+    isActive?: boolean,
+    options?: FindOneOptions<AbstractAuthUser>,
+  ) {
+    return this.userRepository.findOne({ ...identifier, isActive }, options);
   }
 
-  public getUserWithPassword(email: string, isActive?: boolean) {
+  public getUserWithPassword(
+    identifier: { email?: string; username?: string },
+    isActive?: boolean,
+  ) {
     return this.userRepository.findOne(
-      { email, isActive },
+      { ...identifier, isActive },
       { select: ['id', 'username', 'email', 'password', 'salt'] },
     );
   }

@@ -5,7 +5,7 @@ import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { Request, Response } from 'express';
 
-import { ValidationException } from '../../base/base.exceptions';
+import { ValidationException } from '../../base';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -53,21 +53,25 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
+      // logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
+      // logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
+    } else if (/40\d/.test(`${status}`)) {
+      // logger.warn(`[unauthorized] ${JSON.stringify(processed.message)}`);
     } else {
       logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`, processed.stack);
     }
 
-    if (R.is(HttpException, processed)) {
-      response
-        .status(status)
-        .json({ name: exceptionResponse.error, message: exceptionResponse.message });
-    } else if (R.is(Error, processed)) {
-      response.status(status).json({ name: 'Error', message: processed.message });
-    } else {
-      response.status(status).json(processed);
+    if (!response.finished) {
+      if (R.is(HttpException, processed)) {
+        response
+          .status(status)
+          .json({ name: exceptionResponse.error, message: exceptionResponse.message });
+      } else if (R.is(Error, processed)) {
+        response.status(status).json({ name: 'Error', message: processed.message });
+      } else {
+        response.status(status).json(processed);
+      }
     }
   }
 }

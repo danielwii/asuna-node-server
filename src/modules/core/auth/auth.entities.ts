@@ -1,9 +1,9 @@
-import { IsEmail } from 'class-validator';
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../decorators';
 import { jsonType, safeReloadObject } from '../../helpers';
+import { AbstractAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__roles' })
 @Entity('auth__t_roles')
@@ -32,26 +32,7 @@ export class Role extends AbstractBaseEntity {
 
 @EntityMetaInfo({ name: 'auth__users' })
 @Entity('auth__t_users')
-export class AdminUser extends AbstractBaseEntity {
-  @Column({ nullable: false, unique: true })
-  @IsEmail()
-  email: string;
-
-  @Column({ nullable: false, unique: true, length: 100 })
-  username: string;
-
-  @MetaInfo({ ignore: true })
-  @Column({ nullable: true, select: false })
-  password: string;
-
-  @MetaInfo({ ignore: true })
-  @Column({ nullable: true, select: false })
-  salt: string;
-
-  @MetaInfo({ name: '是否启用？' })
-  @Column({ nullable: true, name: 'active' })
-  isActive: boolean;
-
+export class AdminUser extends AbstractAuthUser {
   @MetaInfo({ name: '角色' })
   @ManyToMany(type => Role, role => role.users, { primary: true })
   @JoinTable({
