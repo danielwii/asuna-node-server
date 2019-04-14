@@ -2,8 +2,6 @@ import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@n
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
-import { DBService } from '../../base';
-import { KvService } from '../../kv';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthMiddleware } from './admin-auth.middleware';
 import { AuthService } from './auth.service';
@@ -12,6 +10,8 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { AdminAuthService } from './admin-auth.service';
 import { ConfigKeys, configLoader } from '../../helpers';
 import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
+import { KvModule } from '../../kv';
+import { DBModule } from '../../db';
 
 const logger = new Logger('AuthModule');
 
@@ -23,16 +23,10 @@ const logger = new Logger('AuthModule');
   //     signOptions: { expiresIn: 60 * 60 * 24 * 30 },
   //   }),
   // ],
-  providers: [
-    AuthService,
-    AdminAuthService,
-    JwtStrategy,
-    AdminJwtStrategy,
-    ApiKeyStrategy,
-    DBService,
-    KvService,
-  ],
+  imports: [KvModule, DBModule],
+  providers: [AuthService, AdminAuthService, JwtStrategy, AdminJwtStrategy, ApiKeyStrategy],
   controllers: [AdminAuthController],
+  exports: [AuthService],
 })
 export class AuthModule implements NestModule, OnModuleInit {
   constructor(private readonly adminAuthService: AdminAuthService) {}

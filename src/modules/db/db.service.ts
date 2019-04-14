@@ -2,27 +2,18 @@ import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
 import { getConnection, getRepository, ObjectType } from 'typeorm';
 import * as util from 'util';
+
 import { parseFields, Profile } from '../helper';
-import { ErrorException } from './base.exceptions';
 import { DBHelper } from './db.helper';
+import { ErrorException } from '../base';
 
 const logger = new Logger('DBService');
 
 export class DBService {
-  static isValidEntity(metadata): boolean {
-    const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
-    const isRelation = _.includes(metadata.target as string, '__tr_');
-    if (isNotEntityInfo && !isRelation) {
-      logger.error(`Entity '${metadata.targetName}' must add @EntityMetaInfo on it.`);
-      return false;
-    }
-    return !isRelation;
-  }
-
   repo<Entity>(entity: ObjectType<Entity> | string) {
     if (_.isString(entity)) {
       const entityMetadata = getConnection().entityMetadatas.find(metadata => {
-        if (DBService.isValidEntity(metadata)) {
+        if (DBHelper.isValidEntity(metadata)) {
           return (metadata.target as any).entityInfo.name === entity;
         }
       });
@@ -37,7 +28,7 @@ export class DBService {
 
   repos() {
     return getConnection()
-      .entityMetadatas.filter(metadata => DBService.isValidEntity(metadata))
+      .entityMetadatas.filter(metadata => DBHelper.isValidEntity(metadata))
       .map(metadata => getRepository(metadata.target));
   }
 

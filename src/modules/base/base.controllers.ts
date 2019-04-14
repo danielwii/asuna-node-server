@@ -30,8 +30,7 @@ import {
 } from '../helper';
 import { validateObject } from '../helpers';
 import { KvService } from '../kv';
-import { DBHelper } from './db.helper';
-import { DBService } from './db.service';
+import { DBHelper, DBService } from '../db';
 
 const logger = new Logger('RestCrudController');
 

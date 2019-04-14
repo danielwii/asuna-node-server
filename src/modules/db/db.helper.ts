@@ -23,6 +23,16 @@ export interface ColumnSchema {
 }
 
 export class DBHelper {
+  static isValidEntity(metadata): boolean {
+    const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
+    const isRelation = _.includes(metadata.target as string, '__tr_');
+    if (isNotEntityInfo && !isRelation) {
+      logger.error(`Entity '${metadata.targetName}' must add @EntityMetaInfo on it.`);
+      return false;
+    }
+    return !isRelation;
+  }
+
   private static extractSelectableByColumn(
     column: ColumnMetadata,
     opts: { module?: string; prefix?: string },

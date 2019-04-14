@@ -7,6 +7,7 @@ export * from './kv';
 export * from './app';
 export * from './bus';
 export * from './helpers';
+export * from './db';
 export * from './helper';
 export * from './graphql';
 export * from './core';

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 
 import { getConnection, getRepository } from 'typeorm';
-import { DBHelper } from '../base/db.helper';
+import { DBHelper } from '../db';
 
 import {
   getModelName,

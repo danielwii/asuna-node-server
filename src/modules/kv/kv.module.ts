@@ -9,6 +9,7 @@ const logger = new Logger('KvModule');
 @Module({
   providers: [KvService, KvQueryResolver],
   controllers: [KvController],
+  exports: [KvService],
 })
 export class KvModule implements OnModuleInit {
   public onModuleInit() {

@@ -14,8 +14,8 @@ import {
 import { ConfigKeys, configLoader } from '../../helpers';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
-import { DBService } from '../../base/db.service';
 import { AbstractAuthUser } from './base.entities';
+import { DBHelper } from '../../db';
 
 const logger = new Logger('AuthService');
 
@@ -26,7 +26,7 @@ export class AuthService {
 
   constructor(@InjectConnection() private readonly connection: Connection) {
     const entityMetadata = getConnection().entityMetadatas.find(metadata => {
-      if (DBService.isValidEntity(metadata)) {
+      if (DBHelper.isValidEntity(metadata)) {
         return (
           metadata.targetName !== AdminUser.name &&
           Object.getPrototypeOf(metadata.target).name === AbstractAuthUser.name
