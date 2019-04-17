@@ -29,7 +29,7 @@ export enum AsunaCode {
 export class AsunaException extends CodeException {
   status = 500;
 
-  constructor(code: AsunaCode, message: string, errors: any) {
+  constructor(code: AsunaCode | string, message: string, errors?: any) {
     super('ASUNA__' + code, code, message, errors);
   }
 }
@@ -50,6 +50,6 @@ export class UploadException extends AsunaException {
 
 export class SignException extends AsunaException {
   constructor(message) {
-    super(AsunaCode.SIGN, message, null);
+    super(AsunaCode.SIGN, message);
   }
 }

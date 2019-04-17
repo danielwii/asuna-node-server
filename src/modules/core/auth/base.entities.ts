@@ -1,10 +1,11 @@
-import { AbstractBaseEntity } from '../../base';
 import { Column } from 'typeorm';
 import { IsEmail } from 'class-validator';
+
+import { AbstractBaseEntity } from '../../base';
 import { MetaInfo } from '../../decorators';
 
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   @IsEmail()
   email: string;
 

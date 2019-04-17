@@ -95,18 +95,29 @@ export class AuthService {
 
   public getUser(
     identifier: { email?: string; username?: string },
-    isActive?: boolean,
+    isActive: boolean = true,
     options?: FindOneOptions<AbstractAuthUser>,
   ) {
-    return this.userRepository.findOne({ ...identifier, isActive }, options);
+    return this.userRepository.findOne(
+      {
+        ...(identifier.email ? { email: identifier.email } : null),
+        ...(identifier.username ? { username: identifier.username } : null),
+        isActive,
+      },
+      options,
+    );
   }
 
   public getUserWithPassword(
     identifier: { email?: string; username?: string },
-    isActive?: boolean,
+    isActive: boolean = true,
   ) {
     return this.userRepository.findOne(
-      { ...identifier, isActive },
+      {
+        ...(identifier.email ? { email: identifier.email } : null),
+        ...(identifier.username ? { username: identifier.username } : null),
+        isActive,
+      },
       { select: ['id', 'username', 'email', 'password', 'salt'] },
     );
   }
