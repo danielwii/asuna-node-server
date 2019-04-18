@@ -35,6 +35,7 @@ input QueryCondition {
   ids: [Int!]
   random: Int
   extra: JsonObject
+  category: String
 }
 
 interface BaseEntity {
