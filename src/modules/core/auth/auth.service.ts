@@ -90,7 +90,9 @@ export class AuthService {
       true,
     );
 
-    return user != null && user.id === jwtPayload.id;
+    const validated = user != null && user.id === jwtPayload.id;
+    logger.log(`validateUser >> exists: ${!!user}, isValidated: ${validated}`);
+    return validated;
   }
 
   public getUser(

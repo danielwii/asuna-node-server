@@ -106,7 +106,9 @@ export class AdminAuthService {
 
     const user = await this.getUser(jwtPayload.email, true);
 
-    return user != null && user.id === jwtPayload.id;
+    const validated = user != null && user.id === jwtPayload.id;
+    logger.log(`validateUser >> exists: ${!!user}, isValidated: ${validated}`);
+    return validated;
   }
 
   public getUser(email: string, isActive?: boolean, options?: FindOneOptions<AdminUser>) {

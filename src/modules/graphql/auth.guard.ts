@@ -1,8 +1,7 @@
-import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import * as passport from 'passport';
+import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Observable } from 'rxjs';
+import { AbstractAuthUser } from '../core/auth';
 
 const logger = new Logger('GqlAuthGuard');
 
@@ -45,4 +44,8 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     return ctx.getContext().req;
   }
 */
+}
+
+export interface getCurrentUser {
+  (): AbstractAuthUser;
 }

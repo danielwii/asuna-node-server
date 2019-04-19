@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@types/socket.io": "^2.1.2",
+    "@types/passport": "^1.0.0",
     "prettier": "^1.17.0",
     "tslint": "^5.15.0",
     "tslint-plugin-prettier": "^2.0.1",
