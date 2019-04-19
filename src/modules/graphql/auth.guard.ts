@@ -1,12 +1,19 @@
-import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AbstractAuthUser } from '../core/auth';
 
 const logger = new Logger('GqlAuthGuard');
 
+/**
+ * return null if anonymousSupport is true and user authenticate is failed
+ */
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('jwt') {
+  constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
+    super();
+  }
+
   // jwtAuthenticator = passport.authenticate('jwt', { session: false });
 
   // canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
@@ -14,13 +21,16 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
   //   return this.jwtAuthenticator(http.getRequest(), http.getResponse());
   // }
 
-  // handleRequest(err, user, info) {
-  //   logger.log(`handleRequest ${JSON.stringify({ err, user, info })}`);
-  //   if (err || !user) {
-  //     throw err || new UnauthorizedException();
-  //   }
-  //   return user;
-  // }
+  handleRequest(err, user, info) {
+    logger.log(`handleRequest ${JSON.stringify({ err, user, info })}`);
+    if (err || !user) {
+      if (this.opts.anonymousSupport) {
+        return null;
+      }
+      throw err || new UnauthorizedException();
+    }
+    return user;
+  }
 
   /**
    * In order to use AuthGuard together with GraphQL,
