@@ -10,15 +10,22 @@
     "build": "yarn tsc",
     "build:watch": "yarn tsc -w",
     "postinstall1": "yarn build",
-    "test": "echo 'no tests yet.'"
+    "test": "ENV=test jest",
+    "test:cov": "ENV=test jest --coverage --no-cache"
   },
   "devDependencies": {
-    "@types/socket.io": "^2.1.2",
+    "@nestjs/testing": "^6.1.1",
+    "@types/jest": "^24.0.11",
     "@types/passport": "^1.0.0",
+    "@types/socket.io": "^2.1.2",
+    "jest": "^24.7.1",
     "prettier": "^1.17.0",
+    "sqlite3": "^4.0.6",
+    "supertest": "^4.0.2",
+    "ts-jest": "^24.0.2",
     "tslint": "^5.15.0",
     "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.4.3"
+    "typescript": "^3.4.4"
   },
   "dependencies": {
     "@nestjs/common": "^6.1.0",
@@ -40,6 +47,7 @@
     "dataloader": "^1.4.0",
     "email-templates": "^5.0.4",
     "express-rate-limit": "^3.4.0",
+    "graphql": "^14.2.1",
     "graphql-type-json": "^0.3.0",
     "helmet": "^3.16.0",
     "idx": "^2.5.5",

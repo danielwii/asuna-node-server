@@ -5,7 +5,6 @@ import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { UploaderController } from './core/uploader/uploader.controller';
 import { UploadsController } from './core/uploads.controller';
-import { WSModule } from './ws/ws.module';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 import { SchemaModules } from './graphql/schema.modules';
@@ -15,7 +14,7 @@ import { DBModule } from './db';
 const logger = new Logger('AdminModule');
 
 @Module({
-  imports: [SchemaModules, AuthModule, WSModule, ClientModule, KvModule, DBModule],
+  imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule],
   controllers: [
     ApiController,
     WwwRestController,

@@ -18,8 +18,7 @@
     "declarationDir": "./declaration",
     "emitDeclarationOnly": true,
     "baseUrl": "./src",
-    "lib": ["esnext", "dom"],
-    "typeRoots": ["./typings"]
+    "lib": ["esnext", "dom"]
   },
   "include": ["src/**/*"],
   "exclude": ["./output", "./docs", "./dist", "node_modules"]

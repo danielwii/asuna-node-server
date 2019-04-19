@@ -45,7 +45,7 @@ export const ConfigKeys = {
 };
 
 export const configLoader = createConfigLoader({
-  requiredVariables: [],
+  requiredVariables: [ConfigKeys.DB_TYPE],
 });
 
 // logger.log(`NODE_ENV: ${util.inspect(configLoader.loadConfigs())}`);
