@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
-import { ValidationException } from '../base/base.exceptions';
+import { ValidationException } from '../base';
 import { KeyValuePair, ValueType } from './kv.entities';
 
 const logger = new Logger('KvService');
@@ -91,7 +91,9 @@ export class KvService {
       collection:
         collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    logger.log({ collection, key, type, value, stringifyValue });
+    logger.log(
+      `inspect ${util.inspect({ collection, key, type, value, stringifyValue }, { colors: true })}`,
+    );
     const exists = await this.get(entity.collection, entity.key);
     logger.log(`set ${util.inspect({ entity, exists }, { colors: true })}`);
     return this.kvPairRepository.save({ ...(exists ? { id: exists.id } : null), ...entity });

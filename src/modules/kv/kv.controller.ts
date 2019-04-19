@@ -7,10 +7,21 @@ import { KvService } from './kv.service';
 const logger = new Logger('KvController');
 
 class KvPair {
+  @IsString()
+  @IsOptional()
   collection?: string;
+
+  @IsString()
   key: string;
+
+  @IsString()
+  @IsOptional()
   name?: string;
+
+  @IsOptional()
   type?: keyof typeof ValueType;
+
+  @IsString()
   value: any;
 }
 
