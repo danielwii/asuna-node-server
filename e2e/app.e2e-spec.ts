@@ -34,7 +34,6 @@ describe('AppController (e2e)', () => {
       .get('/api/info')
       .expect(200)
       .expect(expected => {
-        console.log(expected.text);
         expect(JSON.parse(expected.text)).not.toBeNull();
       });
   });

@@ -13,71 +13,17 @@ import { AbstractAuthUser, AsunaContext } from './core';
 
 const logger = new Logger('GraphqlModule');
 
-const typePaths = [
-  '../**/*.graphql',
-  // `${join(__dirname, '..')}/**/*.graphql`,
-  // `${AsunaContext.instance.dirname}/**/*.graphql`,
-];
-logger.log(`init ${JSON.stringify({ typePaths })}`);
-
-@Module({
-  imports: [
-    KvModule,
-    AppModule,
-    GraphQLModule.forRoot({
-      // definitions: {
-      //   path: join(process.cwd(), 'src/graphql.generated.ts'),
-      //   outputAs: 'class',
-      // },
-      typePaths,
-      resolvers: { JSON: GraphQLJSON },
-      introspection: AsunaContext.isDebugMode,
-      debug: AsunaContext.isDebugMode,
-      playground: true,
-      resolverValidationOptions: {
-        requireResolversForResolveType: false,
-      },
-      context: context => ({
-        ...context,
-        getDataLoaders: () => _.get(context.req, 'dataLoaders'),
-        getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),
-      }),
-      // tracing: true,
-      /*      extensions: _.compact([
-        configLoader.loadConfig(ConfigKeys.TRACING)
-          ? () =>
-              new OpenTracingExtension({
-                server: tracer,
-                local: graphqlTracer,
-                shouldTraceRequest: info => true,
-                shouldTraceFieldResolver: (source, args, context, info) => true,
-              }) as any
-          : undefined,
-      ]),*/
-      formatResponse: response => {
-        if (response.errors) {
-          logger.warn(`response: ${util.inspect(response.errors, { colors: true })}`);
-        }
-        logger.log(`response: ${util.inspect(response.data, { colors: true })}`);
-        return response;
-      },
-    }),
-  ],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: DataLoaderInterceptor,
-    },
-    /*{
-      provide: APP_INTERCEPTOR,
-      useClass: AuthInterceptor,
-    },*/
-  ],
-})
+@Module({})
 export class GraphqlModule implements OnModuleInit {
-  /*
-  static forRoot(modules = [], options?): DynamicModule {
+  static forRoot(dir, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
+    const typePaths = [
+      // '../**/*.graphql',
+      `${join(__dirname, '..')}/**/*.graphql`,
+      `${dir}/**/*.graphql`,
+    ];
+    logger.log(`typePaths is ${JSON.stringify({ typePaths })}`);
+
     return {
       module: GraphqlModule,
       imports: [
@@ -89,22 +35,21 @@ export class GraphqlModule implements OnModuleInit {
           //   path: join(process.cwd(), 'src/graphql.generated.ts'),
           //   outputAs: 'class',
           // },
-          typePaths: ['../!**!/!*.graphql'],
+          typePaths,
           resolvers: { JSON: GraphQLJSON },
-          // introspection: true,
-          // debug: true,
+          introspection: AsunaContext.isDebugMode,
+          debug: AsunaContext.isDebugMode,
           playground: true,
           resolverValidationOptions: {
             requireResolversForResolveType: false,
           },
-          context: context => {
-            return {
-              ...context,
-              getDataLoaders: () => (context.req as any).dataLoaders,
-            };
-          },
+          context: context => ({
+            ...context,
+            getDataLoaders: () => _.get(context.req, 'dataLoaders'),
+            getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),
+          }),
           // tracing: true,
-          /!*      extensions: _.compact([
+          /*      extensions: _.compact([
             configLoader.loadConfig(ConfigKeys.TRACING)
               ? () =>
                   new OpenTracingExtension({
@@ -114,7 +59,7 @@ export class GraphqlModule implements OnModuleInit {
                     shouldTraceFieldResolver: (source, args, context, info) => true,
                   }) as any
               : undefined,
-          ]),*!/
+          ]),*/
           formatResponse: response => {
             if (response.errors) {
               logger.warn(`response: ${util.inspect(response.errors, { colors: true })}`);
@@ -136,7 +81,6 @@ export class GraphqlModule implements OnModuleInit {
       ],
     };
   }
-*/
 
   onModuleInit() {
     logger.log('init...');

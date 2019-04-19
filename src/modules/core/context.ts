@@ -1,5 +1,4 @@
 import { ConfigKeys, configLoader } from '../helpers';
-import idx from 'idx';
 import { join, resolve } from 'path';
 
 export interface IAsunaContextOpts {
@@ -31,7 +30,7 @@ export class AsunaContext {
     }
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
-      root: idx(opts, _ => _.root),
+      root: opts.root,
     };
   }
 
