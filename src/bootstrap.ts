@@ -36,7 +36,7 @@ interface IBootstrapOptions {
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
   logger.log(`options: ${JSON.stringify(options)}`);
 
-  AsunaContext.instance.init(options.context);
+  AsunaContext.instance.init(options.context || { root: options.root });
 
   // --------------------------------------------------------------
   // Setup app

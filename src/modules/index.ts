@@ -11,3 +11,6 @@ export * from './db';
 export * from './helper';
 export * from './graphql';
 export * from './core';
+export * from './core/auth/auth.module';
+export * from './core/auth/strategy/jwt.strategy';
+export * from './ws';

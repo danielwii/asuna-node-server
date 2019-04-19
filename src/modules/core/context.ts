@@ -1,6 +1,6 @@
 import { ConfigKeys, configLoader } from '../helpers';
 import idx from 'idx';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 export interface IAsunaContextOpts {
   /**
@@ -11,7 +11,10 @@ export interface IAsunaContextOpts {
 }
 
 export class AsunaContext {
-  private opts: IAsunaContextOpts;
+  private opts: IAsunaContextOpts = {
+    defaultModulePrefix: 'www',
+    root: resolve(__dirname, '../..'),
+  };
 
   public readonly dirname: string;
   public readonly dbType: 'mysql56' | 'mysql57' | 'postgres';
@@ -23,8 +26,11 @@ export class AsunaContext {
   }
 
   init(opts: IAsunaContextOpts) {
+    if (opts == null) {
+      throw new Error('opts must not be empty.');
+    }
     this.opts = {
-      defaultModulePrefix: idx(opts, _ => _.defaultModulePrefix) || 'www',
+      defaultModulePrefix: opts.defaultModulePrefix || 'www',
       root: idx(opts, _ => _.root),
     };
   }
