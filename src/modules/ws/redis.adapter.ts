@@ -6,6 +6,10 @@ import { ConfigKeys, configLoader } from '../helpers';
 
 const logger = new Logger('RedisIoAdapter');
 
+/**
+ * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)
+ * https://github.com/socketio/socket.io/issues/1739
+ */
 export class RedisIoAdapter extends IoAdapter {
   private static redisAdapter;
 
@@ -19,12 +23,14 @@ export class RedisIoAdapter extends IoAdapter {
       logger.log(
         `init redis ws-adapter: {host:${host}, port:${port}, db:${db}, with-password:${!!password}`,
       );
-      RedisIoAdapter.redisAdapter = redisIoAdapter({
-        host,
-        port,
-        ...(password ? { password } : null),
-        db,
-      });
+      RedisIoAdapter.redisAdapter = redisIoAdapter(
+        {
+          host,
+          port,
+          ...(password ? { password } : null),
+          db,
+        } as any /* db is not included in redisIoAdapter */,
+      );
     }
   }
 
