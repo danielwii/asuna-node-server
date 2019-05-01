@@ -45,29 +45,30 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   // 根据环境变量调整要拉取的实体
   let isProduction = process.env.NODE_ENV === 'production';
   let isBuild = __filename.endsWith('js');
+  let suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
   const entities =
     isProduction || isBuild
       ? [
           `${resolve(__dirname)}/**/*.entities.js`,
           `${resolve(__dirname, '../')}/**/*.entities.js`,
-          `${resolve(options.root)}/**/*.entities.js`,
+          `${resolve(options.root)}/**/*.entities.${suffix}`,
         ]
       : [
           `${resolve(__dirname)}/**/*.entities.ts`,
           `${resolve(__dirname, '../../packages')}/**/*.entities.ts`,
-          `${resolve(options.root)}/**/*.entities.ts`,
+          `${resolve(options.root)}/**/*.entities.${suffix}`,
         ];
   const subscribers =
     isProduction || isBuild
       ? [
           `${resolve(__dirname)}/**/*.subscriber.js`,
           `${resolve(__dirname, '../')}/**/*.subscriber.js`,
-          `${resolve(options.root)}/**/*.subscriber.js`,
+          `${resolve(options.root)}/**/*.subscriber.${suffix}`,
         ]
       : [
           `${resolve(__dirname)}/**/*.subscriber.ts`,
           `${resolve(__dirname, '../../packages')}/**/*.subscriber.ts`,
-          `${resolve(options.root)}/**/*.subscriber.ts`,
+          `${resolve(options.root)}/**/*.subscriber.${suffix}`,
         ];
 
   logger.log(`resolve typeorm entities: ${entities}`);

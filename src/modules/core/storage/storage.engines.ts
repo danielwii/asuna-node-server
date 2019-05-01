@@ -57,7 +57,7 @@ export class LocalStorage implements IStorageEngine {
 
   private storagePath: string;
 
-  constructor(storagePath: string, bucket?: string) {
+  constructor(storagePath: string, bucket: string = 'default') {
     this.storagePath = path.join(storagePath, bucket || 'default');
     LocalStorage.logger.log(
       `[constructor] init default[${bucket}] storage path: '${this.storagePath}'`,

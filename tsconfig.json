@@ -16,7 +16,6 @@
     "allowJs": false,
     "outDir": "./dist",
     "declarationDir": "./declaration",
-    "emitDeclarationOnly": true,
     "baseUrl": "./src",
     "lib": ["esnext", "dom"]
   },
