@@ -38,6 +38,13 @@ input QueryCondition {
   category: String
 }
 
+input QueryUUIDCondition {
+  ids: [String!]
+  random: Int
+  extra: JsonObject
+  category: String
+}
+
 interface BaseEntity {
   id: Int!
   createdAt: Date!
