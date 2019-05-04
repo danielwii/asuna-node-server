@@ -52,7 +52,7 @@
     "express-rate-limit": "^3.5.0",
     "graphql": "^14.2.1",
     "graphql-type-json": "^0.3.0",
-    "helmet": "^3.16.0",
+    "helmet": "^3.17.0",
     "idx": "^2.5.5",
     "jsondiffpatch": "^0.3.11",
     "jsonwebtoken": "^8.5.1",

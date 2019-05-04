@@ -18,9 +18,9 @@ export class GraphqlModule implements OnModuleInit {
   static forRoot(dir, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const typePaths = [
-      '../**/*.graphql',
-      // `${join(__dirname, '..')}/**/*.graphql`,
-      // `${dir}/**/*.graphql`,
+      // '../**/*.graphql',
+      `${join(__dirname, '../../src')}/**/*.graphql`,
+      `${dir}/**/*.graphql`,
     ];
     logger.log(`typePaths is ${JSON.stringify({ typePaths })}`);
 
