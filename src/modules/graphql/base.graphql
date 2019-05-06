@@ -32,14 +32,7 @@ input TimeCondition {
 }
 
 input QueryCondition {
-  ids: [Int!]
-  random: Int
-  extra: JsonObject
-  category: String
-}
-
-input QueryUUIDCondition {
-  ids: [String!]
+  ids: [Any!]
   random: Int
   extra: JsonObject
   category: String
