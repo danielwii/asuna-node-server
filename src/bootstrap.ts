@@ -97,7 +97,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     }),
   );
   app.use(morgan('dev'));
-  app.use(json({ limit: '1mb' }));
+  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
