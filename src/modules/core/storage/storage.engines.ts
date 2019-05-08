@@ -55,12 +55,14 @@ function yearMonthStr() {
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = new Logger(LocalStorage.name);
 
-  private storagePath: string;
+  private readonly storagePath: string;
+  private readonly bucket: string;
 
   constructor(storagePath: string, bucket: string = 'default') {
-    this.storagePath = path.join(storagePath, bucket || 'default');
+    this.bucket = bucket || 'default';
+    this.storagePath = path.join(storagePath, this.bucket);
     LocalStorage.logger.log(
-      `[constructor] init default[${bucket}] storage path: '${this.storagePath}'`,
+      `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}'`,
     );
     fsExtra.mkdirs(this.storagePath);
   }
@@ -76,6 +78,7 @@ export class LocalStorage implements IStorageEngine {
 
     fsExtra.moveSync(file.path, dest);
     return Promise.resolve({
+      bucket: this.bucket,
       prefix,
       mimetype: file.mimetype,
       mode: StorageMode.LOCAL,
