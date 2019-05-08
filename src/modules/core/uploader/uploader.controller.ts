@@ -17,7 +17,7 @@ import * as uuid from 'uuid';
 
 import { AdminModule } from '../../admin.module';
 import { UploadException } from '../../base';
-import { ConfigKeys, configLoader } from '../../helpers/config.helper';
+import { ConfigKeys, configLoader } from '../../helpers';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import { IStorageEngine, LocalStorage, QiniuStorage } from '../storage/storage.engines';
 

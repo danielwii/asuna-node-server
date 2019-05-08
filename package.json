@@ -12,6 +12,7 @@
     "build:declaration": "yarn tsc --emitDeclarationOnly",
     "build:declaration:watch": "yarn tsc -w --emitDeclarationOnly",
     "build:watch": "yarn tsc -w",
+    "prebuild": "yarn clean",
     "postinstall": "yarn build",
     "test": "ENV=test jest",
     "test:cov": "ENV=test jest --coverage --no-cache"

@@ -5,8 +5,6 @@ import * as supertest from 'supertest';
 import 'jest';
 
 import { AdminModule } from '../src/modules';
-import { AuthModule } from '../src/modules/core/auth/auth.module';
-import { JwtStrategy } from '../src/modules/core/auth/strategy/jwt.strategy';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -14,12 +12,7 @@ describe('AppController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminModule],
-    })
-      .overrideProvider(AuthModule)
-      .useValue({})
-      .overrideProvider(JwtStrategy)
-      .useValue({})
-      .compile();
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();

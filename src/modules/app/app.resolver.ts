@@ -24,7 +24,7 @@ export class AppQueryResolver {
 
     let [items, total] = await AppRelease.findAndCount({
       ...pageInfo,
-      where: { app: appInfo },
+      where: { appInfo: appInfo },
       order:
         pageRequest && pageRequest.orderBy
           ? { [pageRequest.orderBy.column]: pageRequest.orderBy.order }
