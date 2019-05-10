@@ -13,10 +13,14 @@ const logger = new Logger('AdminAuthMiddleware');
  */
 @Injectable()
 export class AdminAuthMiddleware implements NestMiddleware {
-  jwtAuthenticator = passport.authenticate('admin-jwt', { session: false });
   adminAuthenticator = passport.authenticate('api-key', { session: false });
+  jwtAuthenticator = passport.authenticate('admin-jwt', { session: false });
 
   use(req: Request, res: Response, next: () => void): any {
+    if (['/admin/auth/reset-password', '/admin/auth/token'].includes(req.originalUrl)) {
+      next();
+    }
+
     try {
       if (isApiKeyRequest(req)) {
         this.adminAuthenticator(req, res, next);

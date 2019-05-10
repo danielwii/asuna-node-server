@@ -1,4 +1,11 @@
-import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import {
+  Logger,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+  RequestMethod,
+} from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
@@ -33,9 +40,7 @@ export class AuthModule implements NestModule, OnModuleInit {
 
   public configure(consumer: MiddlewareConsumer): void {
     logger.log('configure...');
-    consumer
-      .apply(AdminAuthMiddleware)
-      .forRoutes('/admin/auth/authorized', '/admin/auth/current', '/rest');
+    consumer.apply(AdminAuthMiddleware).forRoutes('/admin', '/rest');
   }
 
   public onModuleInit(): any {
