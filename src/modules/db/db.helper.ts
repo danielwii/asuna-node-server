@@ -182,13 +182,15 @@ export class DBHelper {
       queryBuilder.loadAllRelationIds({ relations });
     } else {
       // 将 parsedFields 解析出但 relationsStr 中并未包含的关联也添加到关联列表中
-      const inputRelations = _.chain(parsedFields.relatedFieldsMap)
-        .keys()
-        .concat(relationsStr)
-        .compact()
-        .uniq()
-        .value()
-        .join(',');
+      const inputRelations = _.join(
+        _.chain(parsedFields.relatedFieldsMap)
+          .keys()
+          .concat(relationsStr)
+          .compact()
+          .uniq()
+          .value(),
+        ',',
+      );
       const relations =
         profile === Profile.detail
           ? repository.metadata.relations.map(r => r.propertyName)
@@ -200,10 +202,10 @@ export class DBHelper {
         // console.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field] as any;
 
-        if (_.isObject(elementCondition)) {
+        if (_.isObject(elementCondition) as any) {
           let innerValue = elementCondition._value;
 
-          if (_.isObject(innerValue) && innerValue.toSql) {
+          if ((_.isObject(innerValue) as any) && innerValue.toSql) {
             innerValue = elementCondition._value.toSql(
               getConnection(),
               `${field}.id`,
@@ -307,9 +309,9 @@ export class DBHelper {
     condition: { field: string; value: string | FindOperator<any> },
     suffix = '',
   ): any {
-    if (_.isObject(condition.value)) {
+    if (_.isObject(condition.value) as any) {
       const elementCondition = condition.value as any;
-      if (_.isObject(elementCondition) && elementCondition.toSql) {
+      if ((_.isObject(elementCondition) as any) && elementCondition.toSql) {
         let innerValue = elementCondition._value;
 
         // console.log({ elementCondition }, elementCondition._type);

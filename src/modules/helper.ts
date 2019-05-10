@@ -138,7 +138,7 @@ export function parseFields(value: string | string[], allRelations?: string[]): 
   const relatedFieldsMap = _.chain(fields)
     .filter(str => str.includes('.'))
     .filter(str => (allRelations ? allRelations.indexOf(str.split('.')[0]) > -1 : true))
-    .reduce<string, any>((result, val) => {
+    .reduce<object>((result, val) => {
       const subModel = val.split('.')[0];
       result[subModel] = [...(result[subModel] || []), val];
       fields.splice(fields.indexOf(val), 1);
