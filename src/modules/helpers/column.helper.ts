@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { AsunaContext } from '../core';
+import { AsunaContext } from '../core/context';
 
 export const jsonType = _.memoize(
   (): 'simple-json' | 'json' | 'jsonb' => {

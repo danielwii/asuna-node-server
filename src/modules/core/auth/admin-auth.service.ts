@@ -31,7 +31,6 @@ export class AdminAuthService {
   }
 
   passwordVerify(password: string, user: AdminUser) {
-    logger.log(`passwordVerify(${password}, ${JSON.stringify(user)})`);
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 
@@ -79,10 +78,6 @@ export class AdminAuthService {
     }
   }
 
-  /**
-   * TODO using env instead
-   * @returns {Promise<void>}
-   */
   async createToken(user: AdminUser) {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30;
