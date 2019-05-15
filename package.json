@@ -59,7 +59,7 @@
     "lru-cache": "^5.1.1",
     "module-alias": "^2.2.0",
     "morgan": "^1.9.1",
-    "node-buffs": "^0.5.4",
+    "node-buffs": "^0.6.0",
     "nodemailer": "^6.1.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
