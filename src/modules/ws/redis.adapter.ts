@@ -17,9 +17,9 @@ export class RedisIoAdapter extends IoAdapter {
     super(app);
     if (!RedisIoAdapter.redisAdapter) {
       const host = configLoader.loadConfig(ConfigKeys.WS_REDIS_HOST, 'localhost');
-      const port = configLoader.loadConfig(ConfigKeys.WS_REDIS_PORT, 6379);
+      const port = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_PORT, 6379);
       const password = configLoader.loadConfig(ConfigKeys.WS_REDIS_PASSWORD);
-      const db = configLoader.loadConfig(ConfigKeys.WS_REDIS_DB, 1);
+      const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
       logger.log(
         `init redis ws-adapter: {host:${host}, port:${port}, db:${db}, with-password:${!!password}`,
       );

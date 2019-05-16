@@ -15,3 +15,4 @@ export * from './core/auth/auth.module';
 export * from './core/auth/strategy/jwt.strategy';
 export * from './ws';
 export * from './common';
+export * from './sort';

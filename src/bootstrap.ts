@@ -116,7 +116,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     SwaggerModule.setup('/swagger', app, document);
   }
 
-  const port = configLoader.loadConfig(ConfigKeys.PORT, 5000);
+  const port = configLoader.loadNumericConfig(ConfigKeys.PORT, 5000);
 
   return app.listen(port).then(opts => {
     logger.log(`started in ${Date.now() - startAt}ms, listening on ${port}`);

@@ -17,7 +17,7 @@ export class EmailService {
   constructor() {
     if (
       configLoader.loadConfig('MAIL_HOST') &&
-      configLoader.loadConfig('MAIL_PORT') &&
+      configLoader.loadNumericConfig('MAIL_PORT') &&
       configLoader.loadConfig('MAIL_USERNAME') &&
       configLoader.loadConfig('MAIL_PASSWORD')
     ) {
@@ -25,7 +25,7 @@ export class EmailService {
         `set ${util.inspect(
           {
             MAIL_HOST: configLoader.loadConfig('MAIL_HOST'),
-            MAIL_PORT: configLoader.loadConfig('MAIL_PORT'),
+            MAIL_PORT: configLoader.loadNumericConfig('MAIL_PORT'),
             MAIL_SSL: `${configLoader.loadConfig('MAIL_SSL')}`,
           },
           { colors: true },
@@ -33,7 +33,7 @@ export class EmailService {
       );
       this.transport = nodemailer.createTransport({
         host: configLoader.loadConfig('MAIL_HOST'),
-        port: configLoader.loadConfig('MAIL_PORT'),
+        port: configLoader.loadNumericConfig('MAIL_PORT'),
         secure: `${configLoader.loadConfig('MAIL_SSL')}`, // upgrade later with STARTTLS
         auth: {
           user: configLoader.loadConfig('MAIL_USERNAME'),
