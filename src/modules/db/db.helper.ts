@@ -293,9 +293,17 @@ export class DBHelper {
     });
   }
 
-  public static wrapParsedFields(model: string, queryBuilder, parsedFields: ParsedFields) {
+  public static wrapParsedFields(
+    model: string,
+    {
+      queryBuilder,
+      parsedFields,
+      primaryKeys,
+    }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
+  ) {
     if (!_.isEmpty(parsedFields.fields)) {
-      const selection = _.uniq<string>([...parsedFields.fields, 'id']).map(
+      const primaryKeyColumns = primaryKeys ? primaryKeys : ['id']; // id for default
+      const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         field => `${model}.${field}`,
       );
       // logger.log(`wrapParsedFields '${util.inspect(selection)}'`);

@@ -46,7 +46,7 @@ export class DBService {
 
     const queryBuilder = repository.createQueryBuilder(opts.entity);
 
-    DBHelper.wrapParsedFields(opts.entity, queryBuilder, parsedFields);
+    DBHelper.wrapParsedFields(opts.entity, { queryBuilder, parsedFields });
     DBHelper.wrapProfile(
       opts.entity,
       queryBuilder,

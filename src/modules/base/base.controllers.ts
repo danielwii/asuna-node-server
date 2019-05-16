@@ -85,8 +85,11 @@ export abstract class RestCrudController {
     // console.log('list', { query, order });
 
     const queryBuilder = repository.createQueryBuilder(modelName);
+    const primaryKeys = repository.metadata.columns
+      .filter(column => column.isPrimary)
+      .map(column => column.propertyName);
 
-    DBHelper.wrapParsedFields(modelName, queryBuilder, parsedFields);
+    DBHelper.wrapParsedFields(modelName, { queryBuilder, parsedFields, primaryKeys });
     DBHelper.wrapProfile(
       modelName,
       queryBuilder,
@@ -133,7 +136,7 @@ export abstract class RestCrudController {
 
     const queryBuilder = repository.createQueryBuilder(modelName);
 
-    DBHelper.wrapParsedFields(modelName, queryBuilder, parsedFields);
+    DBHelper.wrapParsedFields(modelName, { queryBuilder, parsedFields });
     DBHelper.wrapProfile(
       modelName,
       queryBuilder,
