@@ -2,11 +2,12 @@ import { Logger } from '@nestjs/common';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-import { FindOperator, getConnection } from 'typeorm';
+import { FindOperator, getConnection, getRepository, ObjectType } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import { EntityMetaInfoOptions, MetaInfoOptions } from '../decorators';
 import { ParsedFields, parseListParam, parseNormalWhereAndRelatedFields, Profile } from '../helper';
+import { ErrorException } from '../base';
 
 const logger = new Logger('DBHelper');
 
@@ -68,6 +69,22 @@ export class DBHelper {
       selectable = opts.module !== 'app.graphql.graphql' ? opts.module + name : name;
     }
     return selectable;
+  }
+
+  public static repo<Entity>(entity: ObjectType<Entity> | string) {
+    if (_.isString(entity)) {
+      const entityMetadata = getConnection().entityMetadatas.find(metadata => {
+        if (DBHelper.isValidEntity(metadata)) {
+          return (metadata.target as any).entityInfo.name === entity;
+        }
+      });
+      if (entityMetadata) {
+        return getRepository(entityMetadata.target);
+      }
+      throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
+    } else {
+      return getRepository(entity);
+    }
   }
 
   /**

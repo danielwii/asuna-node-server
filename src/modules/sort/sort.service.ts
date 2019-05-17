@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import * as _ from 'lodash';
+import { DBHelper } from '../db';
+import { getModelName } from '../helper';
 
 const logger = new Logger('SortService');
 
@@ -26,7 +29,7 @@ export class SortService {
     const positions = sort.positions;
     if (sort && sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
-      logger.log(`resolve ${relation}`);
+      logger.log(`resolve ${relation} for sorts.`);
       const withRelation = await this.sortRepository.findOne({
         where: { id: sort.id },
         relations: [relation],
@@ -34,11 +37,15 @@ export class SortService {
       });
       items = withRelation[relation];
       logger.log(`load ${items.length} items.`);
+
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(relation)));
+      items.sort(
+        (a: any, b: any) => positions.indexOf(a[primaryKey]) - positions.indexOf(b[primaryKey]),
+      );
     } else {
       logger.warn(`sort not available: ${JSON.stringify(sort)}`);
     }
 
-    items.sort((a: any, b: any) => positions.indexOf(a.id) - positions.indexOf(b.id));
     return items;
   }
 }
