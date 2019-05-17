@@ -70,6 +70,15 @@ export class DBHelper {
     return selectable;
   }
 
+  /**
+   * getPrimaryKeys
+   */
+  public static getPrimaryKeys(repository): string[] {
+    return repository.metadata.columns
+      .filter(column => column.isPrimary)
+      .map(column => column.propertyName);
+  }
+
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}) {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata
       .target as Function).prototype;

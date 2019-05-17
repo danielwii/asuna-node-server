@@ -33,6 +33,7 @@ export class SortService {
         cache: true,
       });
       items = withRelation[relation];
+      logger.log(`load ${items.length} items.`);
     } else {
       logger.warn(`sort not available: ${JSON.stringify(sort)}`);
     }

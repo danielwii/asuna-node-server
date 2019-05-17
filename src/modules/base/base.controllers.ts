@@ -166,7 +166,7 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ) {
     const modelName = getModelName(model, this.module);
-    logger.log(`patch ${util.inspect({ user, modelName, updateTo }, { colors: true })}`);
+    logger.log(`patch ${JSON.stringify({ user, modelName, updateTo })}`);
     if (modelName === 'kv__pairs') {
       logger.log('save by kvService...');
       return this.kvService.set(
@@ -200,13 +200,14 @@ export abstract class RestCrudController {
 
   @Patch(':model/:id')
   async patch(
-    @CurrentUser() user: AdminUser,
+    @CurrentUser() admin: AdminUser,
     @Param('model') model: string,
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ) {
     const modelName = getModelName(model, this.module);
-    logger.log(`patch ${util.inspect({ user, modelName, id, updateTo }, { colors: true })}`);
+    logger.log(`patch ${JSON.stringify({ admin, modelName, id, updateTo })}`);
+    // TODO remove kv handler from default handler
     if (modelName === 'kv__pairs') {
       logger.log('update by kvService...');
       return this.kvService.update(id, updateTo.name, updateTo.type, updateTo.value);
@@ -214,17 +215,23 @@ export abstract class RestCrudController {
 
     const repository = this.dbService.repo(modelName);
     const relationKeys = repository.metadata.relations.map(r => r.propertyName);
-    const relationIds = R.map(value =>
-      _.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value },
-    )(R.pick(relationKeys)(updateTo));
+    const relationIds = R.mapObjIndexed((value, relationModelName) => {
+      const primaryKeys = DBHelper.getPrimaryKeys(this.dbService.repo(relationModelName));
+      logger.log(`resolve ${JSON.stringify({ value, relationModelName, primaryKeys })}`);
+      return _.isArray(value)
+        ? (value as any[]).map(id => ({ [_.first(primaryKeys)]: id }))
+        : { [_.first(primaryKeys)]: value };
+    })(R.pick(relationKeys)(updateTo));
+    logger.log(`patch ${JSON.stringify({ id, relationKeys, relationIds })}`);
 
     const entity = await repository.findOneOrFail(id);
 
     const entityTo = repository.merge(entity, {
       ...updateTo,
       ...relationIds,
-      updatedBy: idx(user, _ => _.username),
+      updatedBy: idx(admin, _ => _.username),
     });
+    logger.log(`patch ${JSON.stringify({ entityTo })}`);
     return repository.save(entityTo);
   }
 }
