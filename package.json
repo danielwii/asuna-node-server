@@ -50,7 +50,7 @@
     "compression": "^1.7.4",
     "dataloader": "^1.4.0",
     "email-templates": "^5.0.5",
-    "express-rate-limit": "^3.5.1",
+    "express-rate-limit": "^4.0.0",
     "graphql": "^14.3.0",
     "graphql-type-json": "^0.3.0",
     "helmet": "^3.18.0",
