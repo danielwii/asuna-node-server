@@ -16,3 +16,4 @@ export * from './core/auth/strategy/jwt.strategy';
 export * from './ws';
 export * from './common';
 export * from './sort';
+export * from './health/terminus-options.service';

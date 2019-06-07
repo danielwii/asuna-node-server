@@ -10,6 +10,8 @@ export interface IAsunaContextOpts {
 }
 
 export class AsunaContext {
+  public static readonly instance = new AsunaContext();
+
   private opts: IAsunaContextOpts = {
     defaultModulePrefix: 'www',
     root: resolve(__dirname, '../..'),
@@ -17,7 +19,6 @@ export class AsunaContext {
 
   public readonly dirname: string;
   public readonly dbType: 'mysql56' | 'mysql57' | 'postgres';
-  public static readonly instance = new AsunaContext();
 
   private constructor() {
     this.dirname = join(__dirname, '../..');
