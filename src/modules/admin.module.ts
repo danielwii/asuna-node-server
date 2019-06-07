@@ -4,7 +4,7 @@ import { ClientModule } from './client/client.module';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { UploaderController } from './core/uploader/uploader.controller';
-import { UploadsController } from './core/uploads.controller';
+import { GetUploadsController } from './core/get-uploads.controller';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 import { SchemaModules } from './graphql/schema.modules';
@@ -21,7 +21,7 @@ const logger = new Logger('AdminModule');
     AdminRestController,
     AppRestController,
     SearchController,
-    UploadsController,
+    GetUploadsController,
     UploaderController,
   ],
   exports: [AuthModule, KvModule, DBModule],

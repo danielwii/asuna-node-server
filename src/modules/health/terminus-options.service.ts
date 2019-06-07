@@ -32,7 +32,7 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
   createTerminusOptions(): TerminusModuleOptions {
     logger.log(`init with indicators: ${JSON.stringify(TerminusOptionsService.healthIndicators)}`);
     const healthEndpoint: TerminusEndpoint = {
-      url: '/health',
+      url: '/admin/health',
       healthIndicators: [
         ...TerminusOptionsService.healthIndicators,
         async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
