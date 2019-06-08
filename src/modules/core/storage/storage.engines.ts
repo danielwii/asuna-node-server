@@ -23,7 +23,7 @@ export enum StorageMode {
 }
 
 export interface IStorageEngine {
-  saveEntity(file, opts: { bucket?: string; region?: string }): Promise<SavedFile>;
+  saveEntity(file, opts: { bucket?: string; prefix?: string; region?: string }): Promise<SavedFile>;
 
   resolve(
     {
@@ -219,7 +219,7 @@ export class MinioStorage implements IStorageEngine {
   private static readonly logger = new Logger(MinioStorage.name);
 
   constructor(private configLoader: () => MinioConfigObject) {
-    MinioStorage.logger.log(`[constructor] init [${classToPlain(configLoader())} ...`);
+    MinioStorage.logger.log(`[constructor] init ${JSON.stringify(classToPlain(configLoader()))}`);
   }
 
   get client() {
@@ -253,26 +253,49 @@ export class MinioStorage implements IStorageEngine {
     return res.status(404).send();
   }
 
-  async saveEntity(file, opts: { bucket?: string; region?: string } = {}): Promise<SavedFile> {
+  async saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     const bucket = opts.bucket || 'default';
+    const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
     const items: BucketItemFromList[] = await this.client.listBuckets();
     if (!(items && items.find(item => item.name === bucket))) {
       await this.client.makeBucket(bucket, region);
     }
 
-    const filenameWithPrefix = join(yearMonthStr(), file.filename);
+    if (!bucket.startsWith('private-')) {
+      await this.client.setBucketPolicy(
+        bucket,
+        JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['s3:GetObject'],
+              Effect: 'Allow',
+              Principal: {
+                AWS: ['*'],
+              },
+              Resource: ['arn:aws:s3:::*'],
+            },
+          ],
+        }),
+      );
+    }
+
+    const filenameWithPrefix = join(prefix, file.filename);
     const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
       'Content-Type': file.mimetype,
     });
-    MinioStorage.logger.log(`[saveEntity] uploaded [${uploaded} ...`);
+    MinioStorage.logger.log(`[saveEntity] uploaded [${uploaded}] ...`);
     return {
-      prefix: null,
-      bucket: bucket,
-      region: region,
+      prefix,
+      bucket,
+      region,
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
-      filename: filenameWithPrefix,
+      filename: file.filename,
     };
   }
 }
@@ -292,17 +315,20 @@ export class QiniuStorage implements IStorageEngine {
     this.mac = new qiniu.auth.digest.Mac(config.accessKey, config.secretKey);
   }
 
-  public saveEntity(file, opts: { bucket?: string; region?: string } = {}): Promise<SavedFile> {
+  public saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('QiniuStorage', 'file must not be null.');
     }
 
     return new Promise<SavedFile>(resolve => {
       const config = this.configLoader();
-      const filename = file.filename;
-      const filenameWithPrefix = join(yearMonthStr(), filename);
-      const prefix = opts.bucket ? opts.bucket : config.prefix;
-      const key = join(prefix, filenameWithPrefix);
+      const bucket = opts.bucket;
+      const prefix = opts.prefix || yearMonthStr();
+      const filenameWithPrefix = join(prefix, file.filename);
+      const key = join(bucket, filenameWithPrefix);
       QiniuStorage.logger.log(`upload file to '${config.bucket}' as '${key}'`);
       const uploadToken = new qiniu.rs.PutPolicy({ scope: config.bucket }).uploadToken(this.mac);
 
@@ -324,10 +350,13 @@ export class QiniuStorage implements IStorageEngine {
               bucket: config.bucket,
               mimetype: file.mimetype,
               mode: StorageMode.QINIU,
-              filename: filenameWithPrefix,
+              filename: file.filename,
             });
           } else {
-            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, { info, body });
+            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
+              info,
+              body,
+            });
           }
         },
       );

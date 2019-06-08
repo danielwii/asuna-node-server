@@ -11,7 +11,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import * as bluebird from 'bluebird';
 import { Validator } from 'class-validator';
 import * as multer from 'multer';
-import * as util from 'util';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
@@ -27,7 +26,7 @@ import {
   StorageMode,
 } from '../storage/storage.engines';
 import { MinioConfigObject, QiniuConfigObject } from '../storage/config.object';
-import { DynamicConfigs, DynamicConfigKeys } from '../../config/dynamicConfigs';
+import { DynamicConfigKeys, DynamicConfigs } from '../../config/dynamicConfigs';
 
 const logger = new Logger('UploaderController');
 
@@ -96,10 +95,7 @@ export class UploaderController {
         const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);
         const supportedDoc = validator.isEnum(file.mimetype, DocMimeType);
         logger.log(
-          `validate file ${util.inspect(
-            { supportedImage, supportedVideo, supportedDoc },
-            { colors: true },
-          )}`,
+          `validate file ${JSON.stringify({ supportedImage, supportedVideo, supportedDoc })}`,
         );
         if (!(supportedImage || supportedVideo || supportedDoc)) {
           // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
@@ -111,8 +107,13 @@ export class UploaderController {
       },
     }),
   )
-  async upload(@Query('prefix') prefix: string = '', @Req() req, @UploadedFiles() files) {
-    logger.log(util.inspect({ prefix, files, err: req.fileValidationError }, { colors: true }));
+  async upload(
+    @Query('bucket') bucket: string = '',
+    @Query('prefix') prefix: string = '',
+    @Req() req,
+    @UploadedFiles() files,
+  ) {
+    logger.log(JSON.stringify({ bucket, prefix, files, err: req.fileValidationError }));
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
     }
@@ -120,27 +121,27 @@ export class UploaderController {
       .map(files, (file: any) => {
         if (_.includes(ImageMimeType, file.mimetype)) {
           logger.log(`save image[${file.mimetype}]...${file.filename}`);
-          return UploaderController.imageStorageEngine.saveEntity(file, { bucket: prefix });
+          return UploaderController.imageStorageEngine.saveEntity(file, { bucket, prefix });
         } else if (_.includes(VideoMimeType, file.mimetype)) {
           logger.log(`save video[${file.mimetype}]...${file.filename}`);
-          return UploaderController.videoStorageEngine.saveEntity(file, { bucket: prefix });
+          return UploaderController.videoStorageEngine.saveEntity(file, { bucket, prefix });
         } else if (_.includes(DocMimeType, file.mimetype)) {
           // TODO reuse videoStorageEngine, create a common handler later
           logger.log(`save doc[${file.mimetype}]...${file.filename}`);
-          return UploaderController.imageStorageEngine.saveEntity(file, { bucket: prefix });
+          return UploaderController.imageStorageEngine.saveEntity(file, { bucket, prefix });
         } else {
           logger.log(
             `no storage engine defined for file type [${file.mimetype}]...` +
               `${prefix} - ${file.filename}, using normal file storage engine.`,
           );
           file.filename = `${file.filename}__${file.originalname}`;
-          return UploaderController.fileStorageEngine.saveEntity(file, { bucket: prefix });
+          return UploaderController.fileStorageEngine.saveEntity(file, { bucket, prefix });
         }
       })
       .catch(error => {
         logger.error(error.message, error.trace);
       });
-    logger.log(`results is ${util.inspect(results, { colors: true })}`);
+    logger.log(`results is ${JSON.stringify(results)}`);
     return results;
   }
 }

@@ -16,6 +16,7 @@ export class AdminAuthMiddleware implements NestMiddleware {
   jwtAuthenticator = passport.authenticate('admin-jwt', { session: false });
 
   use(req: Request, res: Response, next: () => void): any {
+    logger.log(`check url: ${req.originalUrl}`);
     if (['/admin/auth/reset-password', '/admin/auth/token'].includes(req.originalUrl)) {
       next();
     } else {

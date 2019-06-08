@@ -31,6 +31,7 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
 
   createTerminusOptions(): TerminusModuleOptions {
     logger.log(`init with indicators: ${JSON.stringify(TerminusOptionsService.healthIndicators)}`);
+    // TODO not secured by admin auth
     const healthEndpoint: TerminusEndpoint = {
       url: '/admin/health',
       healthIndicators: [

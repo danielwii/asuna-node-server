@@ -58,6 +58,10 @@ function recognizeTypeValue(type: string, value: any) {
   return [newType || 'string', newValue];
 }
 
+export const AsunaCollections = {
+  SYSTEM_SERVER: 'system.server',
+};
+
 @Injectable()
 export class KvService {
   private readonly kvPairRepository: Repository<KeyValuePair>;
