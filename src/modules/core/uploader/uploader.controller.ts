@@ -15,7 +15,7 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
 import { AdminModule } from '../../admin.module';
-import { UploadException } from '../../base';
+import { AsunaCode, AsunaException, UploadException } from '../../base';
 import { ConfigKeys, configLoader } from '../../helpers';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import {
@@ -140,6 +140,7 @@ export class UploaderController {
       })
       .catch(error => {
         logger.error(error.message, error.trace);
+        throw new AsunaException(AsunaCode.UPLOAD, error.message);
       });
     logger.log(`results is ${JSON.stringify(results)}`);
     return results;

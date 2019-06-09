@@ -72,18 +72,21 @@ export class LocalStorage implements IStorageEngine {
     fsExtra.mkdirs(this.storagePath);
   }
 
-  saveEntity(file, opts: { bucket?: string; region?: string } = {}): Promise<SavedFile> {
+  saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('LocalStorage', 'file must not be null.');
     }
-
-    const prefix = `${opts.bucket ? `${opts.bucket}/` : ''}${yearMonthStr()}`;
-    const dest = path.join(this.storagePath, prefix, file.filename);
+    const bucket = opts.bucket || this.bucket || 'default';
+    const prefix = opts.prefix || yearMonthStr();
+    const dest = path.join(this.storagePath, bucket, prefix, file.filename);
     LocalStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
     return Promise.resolve({
-      bucket: this.bucket,
+      bucket,
       prefix,
       mimetype: file.mimetype,
       mode: StorageMode.LOCAL,
