@@ -3,7 +3,7 @@ import { plainToClass } from 'class-transformer';
 
 import { validate } from 'class-validator';
 
-import { ValidationException } from '../../base/base.exceptions';
+import { ValidationException } from '../../sys';
 
 @Injectable()
 export class CustomValidationPipe implements PipeTransform<any> {

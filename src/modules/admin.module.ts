@@ -8,8 +8,8 @@ import { GetUploadsController } from './core/get-uploads.controller';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 import { SchemaModules } from './graphql/schema.modules';
-import { KvModule } from './kv';
 import { DBModule } from './db';
+import { KvModule } from './sys';
 
 const logger = new Logger('AdminModule');
 

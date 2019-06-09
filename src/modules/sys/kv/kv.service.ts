@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
-import { ValidationException } from '../base';
 import { KeyValuePair, ValueType } from './kv.entities';
+import { ValidationException } from '../base';
 
 const logger = new Logger('KvService');
 

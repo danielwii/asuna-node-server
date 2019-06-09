@@ -15,10 +15,10 @@ import { AuthService } from './auth.service';
 import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { AdminAuthService } from './admin-auth.service';
-import { ConfigKeys, configLoader } from '../../helpers';
 import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
-import { KvModule } from '../../kv';
+import { KvModule } from '../../sys';
 import { DBModule } from '../../db';
+import { TokenModule } from '../../sys/token';
 
 const logger = new Logger('AuthModule');
 
@@ -30,7 +30,7 @@ const logger = new Logger('AuthModule');
   //     signOptions: { expiresIn: 60 * 60 * 24 * 30 },
   //   }),
   // ],
-  imports: [KvModule, DBModule],
+  imports: [KvModule, DBModule, TokenModule],
   providers: [AuthService, AdminAuthService, JwtStrategy, AdminJwtStrategy, ApiKeyStrategy],
   controllers: [AdminAuthController],
   exports: [AuthService],

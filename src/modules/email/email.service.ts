@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 import * as path from 'path';
 import * as util from 'util';
 
-import { configLoader } from '../helpers/config.helper';
+import { configLoader } from '../sys';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
 import { StorageMode } from '../core/storage/storage.engines';
 import { MinioConfigObject, QiniuConfigObject } from '../core/storage/config.object';

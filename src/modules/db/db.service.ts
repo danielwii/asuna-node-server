@@ -5,7 +5,7 @@ import * as util from 'util';
 
 import { parseFields, Profile } from '../helper';
 import { DBHelper } from './db.helper';
-import { ErrorException } from '../base';
+import { ErrorException } from '../sys';
 
 const logger = new Logger('DBService');
 

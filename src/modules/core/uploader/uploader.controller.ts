@@ -15,8 +15,7 @@ import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
 import { AdminModule } from '../../admin.module';
-import { AsunaCode, AsunaException, UploadException } from '../../base';
-import { ConfigKeys, configLoader } from '../../helpers';
+import { AsunaCode, AsunaException, ConfigKeys, configLoader, UploadException } from '../../sys';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import {
   IStorageEngine,

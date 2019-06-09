@@ -11,7 +11,7 @@ import { BucketItemFromList } from 'minio';
 import { classToPlain } from 'class-transformer';
 
 import { AdminModule } from '../../admin.module';
-import { ErrorException } from '../../base';
+import { ErrorException } from '../../sys';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';

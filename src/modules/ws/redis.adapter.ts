@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import * as redisIoAdapter from 'socket.io-redis';
 
-import { ConfigKeys, configLoader } from '../helpers';
+import { ConfigKeys, configLoader } from '../sys';
 
 const logger = new Logger('RedisIoAdapter');
 

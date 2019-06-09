@@ -33,6 +33,8 @@ export const ConfigKeys = {
   ACTION_CACHE_DB: 'ACTION_CACHE_DB',
   ACTION_CACHE_DURATION: 'ACTION_CACHE_DURATION',
   PAYLOAD_LIMIT: 'PAYLOAD_LIMIT',
+
+  OTP_SECRET: 'OTP_SECRET',
 };
 
 export const configLoader = createConfigLoader({

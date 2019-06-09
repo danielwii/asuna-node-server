@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { Connection, FindOneOptions, getManager, Repository } from 'typeorm';
 
-import { ConfigKeys, configLoader } from '../../helpers';
+import { ConfigKeys, configLoader } from '../../sys';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';

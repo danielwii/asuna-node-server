@@ -11,7 +11,7 @@ import {
   Repository,
 } from 'typeorm';
 
-import { ConfigKeys, configLoader } from '../../helpers';
+import { ConfigKeys, configLoader } from '../../sys';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';

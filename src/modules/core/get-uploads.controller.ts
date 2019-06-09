@@ -7,7 +7,7 @@ import { AdminModule } from '../admin.module';
 import { JpegParam, JpegPipe } from './image/jpeg.pipe';
 import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
 import { UploaderController } from './uploader/uploader.controller';
-import { ConfigKeys, configLoader } from '../helpers';
+import { ConfigKeys, configLoader } from '../sys';
 
 const logger = new Logger('GetUploadsController');
 

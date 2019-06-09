@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Logger, Query, Req, Res } from '@nestjs/common';
-import { AsunaCollections, KvService } from '../kv';
+import { AsunaCollections, KvService } from '../sys';
 import { Cryptor } from 'node-buffs';
 import querystring from 'querystring';
 

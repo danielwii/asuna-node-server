@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as GraphQLJSON from 'graphql-type-json';
 import { join } from 'path';
 
-import { KvModule } from './kv';
+import { KvModule } from './sys';
 import { AppModule } from './app';
 import { DataLoaderInterceptor } from './dataloader';
 import { AbstractAuthUser, AsunaContext } from './core';
