@@ -9,12 +9,12 @@ import { AdminRestController, AppRestController, WwwRestController } from './res
 import { SearchController } from './search/search.controller';
 import { SchemaModules } from './graphql/schema.modules';
 import { DBModule } from './db';
-import { KvModule } from './sys';
+import { KvModule, TokenModule } from './sys';
 
 const logger = new Logger('AdminModule');
 
 @Module({
-  imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule],
+  imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule, TokenModule],
   controllers: [
     ApiController,
     WwwRestController,
@@ -24,7 +24,7 @@ const logger = new Logger('AdminModule');
     GetUploadsController,
     UploaderController,
   ],
-  exports: [AuthModule, KvModule, DBModule],
+  exports: [AuthModule, KvModule, DBModule, TokenModule],
 })
 export class AdminModule implements OnModuleInit {
   static uploadPath = `${process.cwd()}/uploads`;

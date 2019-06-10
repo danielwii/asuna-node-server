@@ -48,7 +48,7 @@ export class TokenService {
       expiredAt: moment()
         .add(expiredIn, 'minutes')
         .toDate(),
-    });
+    }).save();
   }
 
   /**
@@ -84,9 +84,18 @@ export class TokenService {
     return OperationToken.update({ role, identifier, service }, { isDeprecated: true });
   }
 
+  async getOperationTokenByToken(token: string) {
+    if (token) {
+      return token.length === 9
+        ? this.getOperationTokenByID({ shortId: token })
+        : this.getOperationTokenByID({ token });
+    }
+    return null;
+  }
+
   async getOperationTokenByID({ token, shortId }: { token?: string; shortId?: string }) {
     if ((token && token.trim()) || (shortId && shortId.trim())) {
-      return await OperationToken.findOne({
+      return OperationToken.findOne({
         where: {
           ...(token ? { token } : null),
           ...(shortId ? { shortId } : null),
@@ -96,8 +105,8 @@ export class TokenService {
     return null;
   }
 
-  async useToken({ token, shortId }: { token?: string; shortId?: string }) {
-    const operationToken = await this.getOperationTokenByID({ shortId, token });
+  async useToken(token: string) {
+    const operationToken = await this.getOperationTokenByToken(token);
     if (this.checkAvailable(operationToken)) {
       operationToken.remainingCount--;
       operationToken.usedCount++;
