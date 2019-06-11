@@ -4,8 +4,8 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
-import { ValidationException } from '../base';
 import { KeyValuePair, ValueType } from './kv.entities';
+import { ValidationException } from '../base';
 
 const logger = new Logger('KvService');
 
@@ -57,6 +57,10 @@ function recognizeTypeValue(type: string, value: any) {
   // );
   return [newType || 'string', newValue];
 }
+
+export const AsunaCollections = {
+  SYSTEM_SERVER: 'system.server',
+};
 
 @Injectable()
 export class KvService {

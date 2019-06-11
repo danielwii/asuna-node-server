@@ -1,5 +1,4 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../decorators';
 import { jsonType, safeReloadJSON } from '../helpers';

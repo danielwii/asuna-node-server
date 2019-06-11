@@ -3,7 +3,7 @@ import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
 
 import { AppInfo, AppRelease } from './app.entities';
-import { emptyPage, Pageable, PageRequest, toPage } from '../helpers';
+import { emptyPage, Pageable, PageRequest, toPage } from '../sys';
 
 @Resolver()
 export class AppQueryResolver {

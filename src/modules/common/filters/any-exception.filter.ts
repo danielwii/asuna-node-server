@@ -5,7 +5,7 @@ import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { Request, Response } from 'express';
 
-import { ValidationException } from '../../base';
+import { ValidationException } from '../../sys';
 
 const logger = new Logger('AnyExceptionFilter');
 

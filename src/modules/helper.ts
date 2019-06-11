@@ -16,7 +16,7 @@ import {
 } from 'typeorm';
 import * as util from 'util';
 
-import { Condition } from './decorators';
+import { Condition } from './sys';
 import { AsunaContext } from './core';
 
 const logger = new Logger('Helper');

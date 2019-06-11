@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 
-import { RestCrudController } from '../base';
+import { RestCrudController } from '../sys';
 import { AsunaContext } from '../core';
 
 @Controller('rest')

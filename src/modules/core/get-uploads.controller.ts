@@ -7,11 +7,21 @@ import { AdminModule } from '../admin.module';
 import { JpegParam, JpegPipe } from './image/jpeg.pipe';
 import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
 import { UploaderController } from './uploader/uploader.controller';
+import { ConfigKeys, configLoader } from '../sys';
 
-const logger = new Logger('UploadsController');
+const logger = new Logger('GetUploadsController');
 
 @Controller('uploads')
-export class UploadsController {
+export class GetUploadsController {
+  @Get('options')
+  async getOptions() {
+    return {
+      image: { storage: configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE) },
+      video: { storage: configLoader.loadConfig(ConfigKeys.VIDEO_STORAGE) },
+      file: { storage: configLoader.loadConfig(ConfigKeys.FILE_STORAGE) },
+    };
+  }
+
   /**
    * 1. /images/2018/4/****.png
    * 1.1 /images/2018/4/****.png?thumbnail/<Width>x<Height>

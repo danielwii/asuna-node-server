@@ -16,13 +16,19 @@ export class JpegPipe implements PipeTransform<any> {
     const param = _.find(_.keys(value), fp.startsWith('jpeg/'));
     const jpegParam: JpegParam = { progressive: true, quality: 75 };
     try {
-      const params = param.split('/')[1].split('_');
-      [jpegParam.quality, jpegParam.progressive] = [+params[0] || 75, !(params[1] === 'baseline')];
-      logger.log(util.inspect({ value, metatype, param, params, jpegParam }, { colors: true }));
-      return { opts: jpegParam, param };
+      if (param.includes('/')) {
+        const params = param.split('/')[1].split('_');
+        [jpegParam.quality, jpegParam.progressive] = [
+          +params[0] || 75,
+          !(params[1] === 'baseline'),
+        ];
+        logger.log(util.inspect({ value, metatype, param, params, jpegParam }, { colors: true }));
+        return { opts: jpegParam, param };
+      }
     } catch (e) {
       logger.warn(e.message);
       return { opts: jpegParam, param };
     }
+    return {}; // for default
   }
 }

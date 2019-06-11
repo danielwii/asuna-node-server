@@ -1,3 +1,4 @@
+import * as otplib from 'otplib';
 import {
   Body,
   Controller,
@@ -7,10 +8,11 @@ import {
   Logger,
   Post,
   Req,
+  Res,
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { RestCrudController, SignException } from '../../base';
+import { RestCrudController, SignException, TokenService } from '../../sys';
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
 
@@ -18,8 +20,37 @@ const logger = new Logger('AdminAuthController');
 
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
-  constructor(private readonly adminAuthService: AdminAuthService) {
+  constructor(
+    private readonly adminAuthService: AdminAuthService,
+    private readonly tokenService: TokenService,
+  ) {
     super('auth');
+  }
+
+  @Post('otp')
+  async otp(@Req() request, @Res() res) {
+    const { user } = request;
+    if (!user) {
+      return res.status(HttpStatus.I_AM_A_TEAPOT).send();
+    }
+    logger.log(`generate [login] otp to ${JSON.stringify(user)}`);
+
+    const tokenOptions = {
+      role: 'admin',
+      identifier: `admin-username=${user.username}`,
+      service: 'admin#login',
+    };
+    await this.tokenService.deprecateOperationTokens(tokenOptions as any);
+    const operationToken = await this.tokenService.acquireToken(tokenOptions as any);
+
+    const otpauth = otplib.authenticator.keyuri(
+      operationToken.identifier,
+      operationToken.service,
+      operationToken.shortId,
+    );
+    logger.log('otpauth is', otpauth);
+
+    return res.status(HttpStatus.CREATED).send(otpauth);
   }
 
   // TODO need role: SYS_ADMIN

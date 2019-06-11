@@ -18,7 +18,6 @@ import * as R from 'ramda';
 import { getManager } from 'typeorm';
 import * as util from 'util';
 
-import { AdminUser } from '../core/auth/auth.entities';
 import { CurrentUser } from '../decorators';
 import {
   getModelName,
@@ -27,10 +26,11 @@ import {
   parseOrder,
   parseWhere,
   Profile,
-} from '../helper';
+} from '../../helper';
 import { validateObject } from '../helpers';
+import { DBHelper, DBService } from '../../db';
 import { KvService } from '../kv';
-import { DBHelper, DBService } from '../db';
+import { AdminUser } from '../../core/auth';
 
 const logger = new Logger('RestCrudController');
 

@@ -8,9 +8,9 @@ import * as compression from 'compression';
 import * as responseTime from 'response-time';
 import { json } from 'body-parser';
 import { resolve } from 'path';
-import { AnyExceptionFilter } from './modules/common/filters/any-exception.filter';
-import { ConfigKeys, configLoader } from './modules/helpers';
+import { ConfigKeys, configLoader } from './modules/sys';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
+import { AnyExceptionFilter } from './modules/common';
 
 const rateLimit = require('express-rate-limit');
 const logger = new Logger('bootstrap');
@@ -94,6 +94,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     rateLimit({
       windowMs: 60 * 1e3, // 1 minute(s)
       max: 1000, // limit each IP to 1000 requests per windowMs
+      message: `Too many accounts created from this IP, please try again after 1474560 minutes.`,
     }),
   );
   app.use(morgan('dev'));

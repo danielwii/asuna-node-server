@@ -6,20 +6,24 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
+import * as minio from 'minio';
+import { BucketItemFromList } from 'minio';
+import { classToPlain } from 'class-transformer';
 
 import { AdminModule } from '../../admin.module';
-
-import { ErrorException } from '../../base';
+import { ErrorException } from '../../sys';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
+import { MinioConfigObject, QiniuConfigObject } from './config.object';
 
 export enum StorageMode {
   LOCAL = 'local',
   QINIU = 'qiniu',
+  MINIO = 'minio',
 }
 
 export interface IStorageEngine {
-  saveEntity(file, overwritePrefix?: string): Promise<SavedFile>;
+  saveEntity(file, opts: { bucket?: string; prefix?: string; region?: string }): Promise<SavedFile>;
 
   resolve(
     {
@@ -41,6 +45,7 @@ export interface IStorageEngine {
 
 export interface SavedFile {
   bucket?: string; // default: 'default'
+  region?: string; // default: 'local'
   prefix: string;
   mode: StorageMode;
   mimetype: string;
@@ -58,8 +63,8 @@ export class LocalStorage implements IStorageEngine {
   private readonly storagePath: string;
   private readonly bucket: string;
 
-  constructor(storagePath: string, bucket: string = 'default') {
-    this.bucket = bucket || 'default';
+  constructor(storagePath: string, defaultBucket: string = 'default') {
+    this.bucket = defaultBucket || 'default';
     this.storagePath = path.join(storagePath, this.bucket);
     LocalStorage.logger.log(
       `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}'`,
@@ -67,18 +72,21 @@ export class LocalStorage implements IStorageEngine {
     fsExtra.mkdirs(this.storagePath);
   }
 
-  saveEntity(file, overwritePrefix?: string): Promise<SavedFile> {
+  saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('LocalStorage', 'file must not be null.');
     }
-
-    const prefix = `${overwritePrefix ? `${overwritePrefix}/` : ''}${yearMonthStr()}`;
-    const dest = path.join(this.storagePath, prefix, file.filename);
+    const bucket = opts.bucket || this.bucket || 'default';
+    const prefix = opts.prefix || yearMonthStr();
+    const dest = path.join(this.storagePath, bucket, prefix, file.filename);
     LocalStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
     return Promise.resolve({
-      bucket: this.bucket,
+      bucket,
       prefix,
       mimetype: file.mimetype,
       mode: StorageMode.LOCAL,
@@ -210,35 +218,122 @@ export class BucketStorage {
   }
 }
 
+export class MinioStorage implements IStorageEngine {
+  private static readonly logger = new Logger(MinioStorage.name);
+
+  constructor(private configLoader: () => MinioConfigObject) {
+    MinioStorage.logger.log(`[constructor] init ${JSON.stringify(classToPlain(configLoader()))}`);
+  }
+
+  get client() {
+    const config = this.configLoader();
+    return new minio.Client({
+      endPoint: config.endpoint,
+      port: config.port,
+      useSSL: config.useSSL,
+      accessKey: config.accessKey,
+      secretKey: config.secretKey,
+    });
+  }
+
+  resolve(
+    {
+      filename,
+      bucket,
+      prefix,
+      thumbnailConfig,
+      jpegConfig,
+    }: {
+      filename: string;
+      bucket: string;
+      prefix: string;
+      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
+      jpegConfig?: { opts: JpegParam; param?: string };
+    },
+    res,
+  ): Promise<any> {
+    // FIXME add redirect later
+    return res.status(404).send();
+  }
+
+  async saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
+    const bucket = opts.bucket || 'default';
+    const prefix = opts.prefix || yearMonthStr();
+    const region = opts.region || 'local';
+    const items: BucketItemFromList[] = await this.client.listBuckets();
+    if (!(items && items.find(item => item.name === bucket))) {
+      await this.client.makeBucket(bucket, region);
+    }
+
+    if (!bucket.startsWith('private-')) {
+      await this.client.setBucketPolicy(
+        bucket,
+        JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: ['s3:GetObject'],
+              Effect: 'Allow',
+              Principal: {
+                AWS: ['*'],
+              },
+              Resource: ['arn:aws:s3:::*'],
+            },
+          ],
+        }),
+      );
+    }
+
+    const filenameWithPrefix = join(prefix, file.filename);
+    const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
+      'Content-Type': file.mimetype,
+    });
+    MinioStorage.logger.log(`[saveEntity] uploaded [${uploaded}] ...`);
+    return {
+      prefix,
+      bucket,
+      region,
+      mimetype: file.mimetype,
+      mode: StorageMode.MINIO,
+      filename: file.filename,
+    };
+  }
+}
+
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = new Logger(QiniuStorage.name);
 
   // private temp: string;
-  private mac: qiniu.auth.digest.Mac;
+  private readonly mac: qiniu.auth.digest.Mac;
 
-  constructor(
-    private bucket: string,
-    private prefix: string,
-    accessKey: string,
-    secretKey: string,
-  ) {
-    QiniuStorage.logger.log(`[constructor] init [${bucket}] with default prefix:${prefix} ...`);
+  constructor(private configLoader: () => QiniuConfigObject) {
+    const config = configLoader();
+    QiniuStorage.logger.log(
+      `[constructor] init [${config.bucket}] with default prefix:${config.prefix} ...`,
+    );
     // this.temp = fsExtra.mkdtempSync('temp');
-    this.mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+    this.mac = new qiniu.auth.digest.Mac(config.accessKey, config.secretKey);
   }
 
-  public saveEntity(file, overwritePrefix?: string): Promise<SavedFile> {
+  public saveEntity(
+    file,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('QiniuStorage', 'file must not be null.');
     }
 
     return new Promise<SavedFile>(resolve => {
-      const filename = file.filename;
-      const filenameWithPrefix = join(yearMonthStr(), filename);
-      const prefix = overwritePrefix ? overwritePrefix : this.prefix;
-      const key = join(prefix, filenameWithPrefix);
-      QiniuStorage.logger.log(`upload file to '${this.bucket}' as '${key}'`);
-      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.bucket }).uploadToken(this.mac);
+      const config = this.configLoader();
+      const bucket = opts.bucket;
+      const prefix = opts.prefix || yearMonthStr();
+      const filenameWithPrefix = join(prefix, file.filename);
+      const key = join(bucket, filenameWithPrefix);
+      QiniuStorage.logger.log(`upload file to '${config.bucket}' as '${key}'`);
+      const uploadToken = new qiniu.rs.PutPolicy({ scope: config.bucket }).uploadToken(this.mac);
 
       new qiniu.form_up.FormUploader().putFile(
         uploadToken,
@@ -255,13 +350,16 @@ export class QiniuStorage implements IStorageEngine {
             );
             resolve({
               prefix,
-              bucket: this.bucket,
+              bucket: config.bucket,
               mimetype: file.mimetype,
               mode: StorageMode.QINIU,
-              filename: filenameWithPrefix,
+              filename: file.filename,
             });
           } else {
-            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, { info, body });
+            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
+              info,
+              body,
+            });
           }
         },
       );

@@ -4,7 +4,10 @@ import * as nodemailer from 'nodemailer';
 import * as path from 'path';
 import * as util from 'util';
 
-import { ConfigKeys, configLoader } from '../helpers/config.helper';
+import { configLoader } from '../sys';
+import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
+import { StorageMode } from '../core/storage/storage.engines';
+import { MinioConfigObject, QiniuConfigObject } from '../core/storage/config.object';
 
 const logger = new Logger('EmailService');
 const env = process.env.ENV;
@@ -61,6 +64,14 @@ export class EmailService {
   }
 
   async send({ to, cc, bcc, subject, content, attachments }) {
+    const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
+    let domain = '';
+    if (storageConfigs.mode === StorageMode.QINIU) {
+      domain = (storageConfigs.loader() as QiniuConfigObject).domain;
+    } else if (storageConfigs.mode === StorageMode.MINIO) {
+      // FIXME domain position for attachments may not correct
+      domain = (storageConfigs.loader() as MinioConfigObject).endpoint;
+    }
     return this.email.send({
       message: {
         to,
@@ -70,9 +81,7 @@ export class EmailService {
         attachments: attachments
           ? attachments.map(attachment => ({
               filename: attachment.name,
-              path: `${configLoader.loadConfig(ConfigKeys.IMAGE_QINIU_DOMAIN)}/${
-                attachment.prefix
-              }/${attachment.filename}`,
+              path: `${domain}/${attachment.prefix}/${attachment.filename}`,
             }))
           : null,
         ...(content ? { html: content } : null),

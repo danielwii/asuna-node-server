@@ -1,8 +1,6 @@
 import { Column, Entity } from 'typeorm';
 
-import { AbstractBaseEntity } from '../base';
-import { EntityMetaInfo } from '../decorators';
-import { jsonType } from '../helpers';
+import { AbstractBaseEntity, EntityMetaInfo, jsonType } from '../sys';
 
 export const AuditType = {
   entity: 'entity',

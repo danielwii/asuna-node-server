@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 
-import { RestCrudController } from '../base';
+import { RestCrudController } from '../sys';
 
 @Controller('admin/rest/app')
 export class AppRestController extends RestCrudController {

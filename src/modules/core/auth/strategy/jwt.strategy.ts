@@ -2,7 +2,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { ConfigKeys, configLoader } from '../../../helpers';
+import { ConfigKeys, configLoader } from '../../../sys';
 import { IJwtPayload } from '../auth.interfaces';
 import { AuthService } from '../auth.service';
 
