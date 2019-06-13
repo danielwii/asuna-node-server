@@ -168,8 +168,9 @@ export abstract class RestCrudController {
     const modelName = getModelName(model, this.module);
     logger.log(`patch ${JSON.stringify({ user, modelName, updateTo })}`);
     if (modelName === 'kv__pairs') {
-      logger.log('save by kvService...');
-      return this.kvService.set(KeyValuePair.create(updateTo));
+      const pair = KeyValuePair.create(updateTo);
+      logger.log(`save by kvService... ${JSON.stringify(pair)}`);
+      return this.kvService.set(pair);
     }
 
     const repository = this.dbService.repo(modelName);

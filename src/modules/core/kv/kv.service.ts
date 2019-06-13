@@ -84,7 +84,7 @@ export class KvService {
       throw new ValidationException('kv', 'key must not be blank');
     }
 
-    const { type, value } = pair;
+    const { name, type, value } = pair;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
 
@@ -96,9 +96,7 @@ export class KvService {
       collection:
         collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    logger.log(
-      `inspect ${util.inspect({ collection, key, type, value, stringifyValue }, { colors: true })}`,
-    );
+    logger.log(`inspect ${JSON.stringify({ collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
     logger.log(`set ${util.inspect({ entity, exists }, { colors: true })}`);
     return this.kvPairRepository.save({ ...(exists ? { id: exists.id } : null), ...entity });
