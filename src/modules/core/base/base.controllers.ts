@@ -27,10 +27,10 @@ import {
   parseWhere,
   Profile,
 } from '../../helper';
-import { validateObject } from '../helpers';
-import { DBHelper, DBService } from '../../db';
+import { validateObject } from '../helpers/validate.helper';
+import { DBHelper, DBService } from '../db';
 import { KvService } from '../kv';
-import { AdminUser } from '../../core/auth';
+// import { AdminUser } from '../../core/auth';
 
 const logger = new Logger('RestCrudController');
 
@@ -161,7 +161,7 @@ export abstract class RestCrudController {
 
   @Post(':model')
   async save(
-    @CurrentUser() user: AdminUser,
+    @CurrentUser() user, //: AdminUser,
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
@@ -200,7 +200,7 @@ export abstract class RestCrudController {
 
   @Patch(':model/:id')
   async patch(
-    @CurrentUser() admin: AdminUser,
+    @CurrentUser() admin, //: AdminUser,
     @Param('model') model: string,
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },

@@ -10,11 +10,11 @@ import * as minio from 'minio';
 import { BucketItemFromList } from 'minio';
 import { classToPlain } from 'class-transformer';
 
-import { AdminModule } from '../../admin.module';
-import { ErrorException } from '../../sys';
+import { ErrorException } from '../base';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';
+import { AsunaContext } from '../context';
 
 export enum StorageMode {
   LOCAL = 'local',
@@ -95,7 +95,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public resolve({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
-    const fullFilePath = path.join(AdminModule.uploadPath, bucket, prefix, filename);
+    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
     LocalStorage.logger.log(
       util.inspect({ filename, prefix, bucket, thumbnailConfig, jpegConfig }, { colors: true }),
     );

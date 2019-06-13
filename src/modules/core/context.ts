@@ -1,5 +1,5 @@
 import { join, resolve } from 'path';
-import { ConfigKeys, configLoader } from '../sys/helpers';
+import { ConfigKeys, configLoader } from './config.helper';
 
 export interface IAsunaContextOpts {
   /**
@@ -19,6 +19,7 @@ export class AsunaContext {
 
   public readonly dirname: string;
   public readonly dbType: 'mysql56' | 'mysql57' | 'postgres';
+  public static uploadPath;
 
   private constructor() {
     this.dirname = join(__dirname, '../..');

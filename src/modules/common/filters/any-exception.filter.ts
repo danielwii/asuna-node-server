@@ -4,8 +4,7 @@ import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { Request, Response } from 'express';
-
-import { ValidationException } from '../../sys';
+import { ValidationException } from '../../core';
 
 const logger = new Logger('AnyExceptionFilter');
 

@@ -8,7 +8,7 @@ import {
   jsonType,
   MetaInfo,
   safeReloadArray,
-} from '../sys';
+} from '../core';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',

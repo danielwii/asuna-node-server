@@ -5,8 +5,14 @@ import * as R from 'ramda';
 import { FindOperator, getConnection, getRepository, ObjectType } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import { EntityMetaInfoOptions, ErrorException, MetaInfoOptions } from '../sys';
-import { ParsedFields, parseListParam, parseNormalWhereAndRelatedFields, Profile } from '../helper';
+import {
+  ParsedFields,
+  parseListParam,
+  parseNormalWhereAndRelatedFields,
+  Profile,
+} from '../../helper';
+import { EntityMetaInfoOptions, MetaInfoOptions } from '../decorators';
+import { ErrorException } from '../base';
 
 const logger = new Logger('DBHelper');
 

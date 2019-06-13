@@ -12,9 +12,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { RestCrudController, SignException, TokenService } from '../../sys';
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
+import { RestCrudController, SignException } from '../base';
+import { TokenService } from '../token';
 
 const logger = new Logger('AdminAuthController');
 

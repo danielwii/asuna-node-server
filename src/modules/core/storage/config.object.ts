@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { configLoader } from '../../sys';
+import { configLoader } from '../config.helper';
 
 export const QiniuConfigKeys = {
   STORAGE: 'STORAGE',

@@ -1,6 +1,6 @@
 import { Controller, Get, Logger } from '@nestjs/common';
 import { AppContext } from './app.context';
-import { KvService } from '../sys';
+import { KvService } from './kv';
 import * as _ from 'lodash';
 
 const logger = new Logger('ApiController');

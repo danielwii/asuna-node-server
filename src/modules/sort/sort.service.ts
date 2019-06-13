@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import * as _ from 'lodash';
-import { DBHelper } from '../db';
+import { DBHelper } from '../core/db';
 import { getModelName } from '../helper';
 
 const logger = new Logger('SortService');

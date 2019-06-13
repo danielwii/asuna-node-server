@@ -14,17 +14,26 @@ import * as multer from 'multer';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
-import { AdminModule } from '../../admin.module';
-import { AsunaCode, AsunaException, ConfigKeys, configLoader, UploadException } from '../../sys';
-import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage/storage.constants';
 import {
+  AsunaCode,
+  AsunaContext,
+  AsunaException,
+  ConfigKeys,
+  configLoader,
+  UploadException,
+} from '../../core';
+import {
+  DocMimeType,
+  ImageMimeType,
   IStorageEngine,
   LocalStorage,
+  MinioConfigObject,
   MinioStorage,
+  QiniuConfigObject,
   QiniuStorage,
   StorageMode,
-} from '../storage/storage.engines';
-import { MinioConfigObject, QiniuConfigObject } from '../storage/config.object';
+  VideoMimeType,
+} from '../storage';
 import { DynamicConfigKeys, DynamicConfigs } from '../../config/dynamicConfigs';
 
 const logger = new Logger('UploaderController');
@@ -55,7 +64,7 @@ export class UploaderController {
         loader: () => MinioConfigObject.load(),
       });
     } else {
-      UploaderController.imageStorageEngine = new LocalStorage(AdminModule.uploadPath);
+      UploaderController.imageStorageEngine = new LocalStorage(AsunaContext.uploadPath);
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, { mode: StorageMode.LOCAL });
     }
 
@@ -67,7 +76,7 @@ export class UploaderController {
     } else if (videoStorage === StorageMode.MINIO) {
       UploaderController.videoStorageEngine = new MinioStorage(() => MinioConfigObject.load());
     } else {
-      UploaderController.videoStorageEngine = new LocalStorage(AdminModule.uploadPath, 'videos');
+      UploaderController.videoStorageEngine = new LocalStorage(AsunaContext.uploadPath, 'videos');
     }
 
     const fileStorage = configLoader.loadConfig(ConfigKeys.FILE_STORAGE);
@@ -76,7 +85,7 @@ export class UploaderController {
     } else if (fileStorage === StorageMode.MINIO) {
       UploaderController.fileStorageEngine = new MinioStorage(() => MinioConfigObject.load());
     } else {
-      UploaderController.fileStorageEngine = new LocalStorage(AdminModule.uploadPath, 'files');
+      UploaderController.fileStorageEngine = new LocalStorage(AsunaContext.uploadPath, 'files');
     }
   }
 

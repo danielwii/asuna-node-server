@@ -16,9 +16,9 @@ import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { AdminAuthService } from './admin-auth.service';
 import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
-import { KvModule } from '../../sys';
-import { DBModule } from '../../db';
-import { TokenModule } from '../../sys/token';
+import { KvModule } from '../kv';
+import { DBModule } from '../db';
+import { TokenModule } from '../token';
 
 const logger = new Logger('AuthModule');
 

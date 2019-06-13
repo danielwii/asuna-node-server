@@ -3,9 +3,9 @@ import * as _ from 'lodash';
 import { getConnection, getRepository, ObjectType } from 'typeorm';
 import * as util from 'util';
 
-import { parseFields, Profile } from '../helper';
+import { parseFields, Profile } from '../../helper';
 import { DBHelper } from './db.helper';
-import { ErrorException } from '../sys';
+import { ErrorException } from '../base';
 
 const logger = new Logger('DBService');
 

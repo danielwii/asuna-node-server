@@ -8,7 +8,7 @@ import * as compression from 'compression';
 import * as responseTime from 'response-time';
 import { json } from 'body-parser';
 import { resolve } from 'path';
-import { ConfigKeys, configLoader } from './modules/sys';
+import { ConfigKeys, configLoader } from './modules/core';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
 import { AnyExceptionFilter } from './modules/common';
 

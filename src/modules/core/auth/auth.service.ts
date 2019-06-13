@@ -11,11 +11,11 @@ import {
   Repository,
 } from 'typeorm';
 
-import { ConfigKeys, configLoader } from '../../sys';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
-import { DBHelper } from '../../db';
+import { DBHelper } from '../db';
+import { ConfigKeys, configLoader } from '../config.helper';
 
 const logger = new Logger('AuthService');
 
