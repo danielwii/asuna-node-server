@@ -14,80 +14,15 @@ import * as multer from 'multer';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
-import {
-  AsunaCode,
-  AsunaContext,
-  AsunaException,
-  ConfigKeys,
-  configLoader,
-  UploadException,
-} from '../../core';
-import {
-  DocMimeType,
-  ImageMimeType,
-  IStorageEngine,
-  LocalStorage,
-  MinioConfigObject,
-  MinioStorage,
-  QiniuConfigObject,
-  QiniuStorage,
-  StorageMode,
-  VideoMimeType,
-} from '../storage';
-import { DynamicConfigKeys, DynamicConfigs } from '../../config/dynamicConfigs';
+import { AsunaCode, AsunaException, UploadException } from '../base';
+import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
+import { AsunaContext } from '../context';
 
 const logger = new Logger('UploaderController');
 
 @Controller('api/uploader')
 export class UploaderController {
-  public static imageStorageEngine: IStorageEngine;
-  public static videoStorageEngine: IStorageEngine;
-  public static fileStorageEngine: IStorageEngine;
-
-  /**
-   * TODO 根据环境变量不同创建存储引擎
-   */
-  constructor() {
-    const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE);
-    if (imageStorage === StorageMode.QINIU) {
-      UploaderController.imageStorageEngine = new QiniuStorage(() =>
-        QiniuConfigObject.load('image'),
-      );
-      DynamicConfigs.setup(DynamicConfigKeys.imageStorage, {
-        mode: StorageMode.QINIU,
-        loader: () => QiniuConfigObject.load('image'),
-      });
-    } else if (imageStorage === StorageMode.MINIO) {
-      UploaderController.imageStorageEngine = new MinioStorage(() => MinioConfigObject.load());
-      DynamicConfigs.setup(DynamicConfigKeys.imageStorage, {
-        mode: StorageMode.MINIO,
-        loader: () => MinioConfigObject.load(),
-      });
-    } else {
-      UploaderController.imageStorageEngine = new LocalStorage(AsunaContext.uploadPath);
-      DynamicConfigs.setup(DynamicConfigKeys.imageStorage, { mode: StorageMode.LOCAL });
-    }
-
-    const videoStorage = configLoader.loadConfig(ConfigKeys.VIDEO_STORAGE);
-    if (videoStorage === StorageMode.QINIU) {
-      UploaderController.videoStorageEngine = new QiniuStorage(() =>
-        QiniuConfigObject.load('video'),
-      );
-    } else if (videoStorage === StorageMode.MINIO) {
-      UploaderController.videoStorageEngine = new MinioStorage(() => MinioConfigObject.load());
-    } else {
-      UploaderController.videoStorageEngine = new LocalStorage(AsunaContext.uploadPath, 'videos');
-    }
-
-    const fileStorage = configLoader.loadConfig(ConfigKeys.FILE_STORAGE);
-    if (fileStorage === StorageMode.QINIU) {
-      UploaderController.fileStorageEngine = new QiniuStorage(() => QiniuConfigObject.load('file'));
-    } else if (fileStorage === StorageMode.MINIO) {
-      UploaderController.fileStorageEngine = new MinioStorage(() => MinioConfigObject.load());
-    } else {
-      UploaderController.fileStorageEngine = new LocalStorage(AsunaContext.uploadPath, 'files');
-    }
-  }
+  private context = AsunaContext.instance;
 
   @Post()
   @UseInterceptors(
@@ -129,21 +64,20 @@ export class UploaderController {
       .map(files, (file: any) => {
         if (_.includes(ImageMimeType, file.mimetype)) {
           logger.log(`save image[${file.mimetype}]...${file.filename}`);
-          return UploaderController.imageStorageEngine.saveEntity(file, { bucket, prefix });
+          return this.context.imageStorageEngine.saveEntity(file, { bucket, prefix });
         } else if (_.includes(VideoMimeType, file.mimetype)) {
           logger.log(`save video[${file.mimetype}]...${file.filename}`);
-          return UploaderController.videoStorageEngine.saveEntity(file, { bucket, prefix });
+          return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
         } else if (_.includes(DocMimeType, file.mimetype)) {
-          // TODO reuse videoStorageEngine, create a common handler later
           logger.log(`save doc[${file.mimetype}]...${file.filename}`);
-          return UploaderController.imageStorageEngine.saveEntity(file, { bucket, prefix });
+          return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
         } else {
           logger.log(
             `no storage engine defined for file type [${file.mimetype}]...` +
               `${prefix} - ${file.filename}, using normal file storage engine.`,
           );
           file.filename = `${file.filename}__${file.originalname}`;
-          return UploaderController.fileStorageEngine.saveEntity(file, { bucket, prefix });
+          return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
         }
       })
       .catch(error => {

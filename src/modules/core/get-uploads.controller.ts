@@ -5,7 +5,6 @@ import * as path from 'path';
 
 import { JpegParam, JpegPipe } from './image/jpeg.pipe';
 import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
-import { UploaderController } from './uploader/uploader.controller';
 import { ConfigKeys, configLoader } from './config.helper';
 import { AsunaContext } from './context';
 
@@ -13,6 +12,8 @@ const logger = new Logger('GetUploadsController');
 
 @Controller('uploads')
 export class GetUploadsController {
+  private context = AsunaContext.instance;
+
   @Get('options')
   async getOptions() {
     return {
@@ -47,9 +48,9 @@ export class GetUploadsController {
     @Query('bucket') bucket: string = 'default',
     @Res() res,
   ) {
-    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
-    if (fullFilePath.startsWith(AsunaContext.uploadPath)) {
-      return UploaderController.imageStorageEngine.resolve(
+    const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(this.context.uploadPath)) {
+      return this.context.imageStorageEngine.resolve(
         { filename, bucket, prefix, thumbnailConfig, jpegConfig },
         res,
       );
@@ -63,8 +64,8 @@ export class GetUploadsController {
     @Query('bucket') bucket: string = 'videos',
     @Res() res,
   ) {
-    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
-    if (fullFilePath.startsWith(AsunaContext.uploadPath)) {
+    const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(this.context.uploadPath)) {
       logger.log(`check if file '${fullFilePath}' exists`);
       if (!fsExtra.existsSync(fullFilePath)) {
         throw new NotFoundException();
@@ -82,8 +83,8 @@ export class GetUploadsController {
     @Query('bucket') bucket: string = 'attaches',
     @Res() res,
   ) {
-    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
-    if (fullFilePath.startsWith(AsunaContext.uploadPath)) {
+    const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(this.context.uploadPath)) {
       logger.log(`check if file '${fullFilePath}' exists`);
       if (!fsExtra.existsSync(fullFilePath)) {
         throw new NotFoundException();
@@ -101,8 +102,8 @@ export class GetUploadsController {
     @Query('bucket') bucket: string = 'files',
     @Res() res,
   ) {
-    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
-    if (fullFilePath.startsWith(AsunaContext.uploadPath)) {
+    const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+    if (fullFilePath.startsWith(this.context.uploadPath)) {
       logger.log(`check if file '${fullFilePath}' exists`);
       if (!fsExtra.existsSync(fullFilePath)) {
         throw new NotFoundException();

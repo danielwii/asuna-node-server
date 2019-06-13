@@ -95,7 +95,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public resolve({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
-    const fullFilePath = path.join(AsunaContext.uploadPath, bucket, prefix, filename);
+    const fullFilePath = path.join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
     LocalStorage.logger.log(
       util.inspect({ filename, prefix, bucket, thumbnailConfig, jpegConfig }, { colors: true }),
     );

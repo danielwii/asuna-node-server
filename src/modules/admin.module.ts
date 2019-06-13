@@ -10,12 +10,10 @@ import { TokenModule } from './core/token';
 import { DBModule } from './core/db';
 import { KvModule } from './core/kv';
 import { AuthModule } from './core/auth/auth.module';
-import { AsunaContext, UploaderController } from './core';
 import { FinderController } from './finder/finder.controller';
+import { UploaderController } from './core/uploader/uploader.controller';
 
 const logger = new Logger('AdminModule');
-
-AsunaContext.uploadPath = `${process.cwd()}/uploads`;
 
 @Module({
   imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule, TokenModule],

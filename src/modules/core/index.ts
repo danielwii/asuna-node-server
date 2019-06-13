@@ -1,6 +1,5 @@
 export * from './context';
 export * from './auth';
-export * from './uploader/uploader.controller'; // FIXME export storage engine temporarily
 export * from './decorators';
 export * from './kv';
 export * from './db';
