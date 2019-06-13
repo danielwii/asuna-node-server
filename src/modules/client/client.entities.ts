@@ -7,7 +7,8 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AbstractBaseEntity, EntityMetaInfo, MetaInfo } from '../sys';
+import { EntityMetaInfo, MetaInfo } from '../sys/decorators';
+import { AbstractBaseEntity } from '../sys/base';
 
 @EntityMetaInfo({ name: 'client__users' })
 @Entity('client__t_users')
