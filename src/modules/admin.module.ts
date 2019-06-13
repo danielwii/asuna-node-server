@@ -11,6 +11,7 @@ import { DBModule } from './core/db';
 import { KvModule } from './core/kv';
 import { AuthModule } from './core/auth/auth.module';
 import { AsunaContext, UploaderController } from './core';
+import { FinderController } from './finder/finder.controller';
 
 const logger = new Logger('AdminModule');
 
@@ -26,6 +27,7 @@ AsunaContext.uploadPath = `${process.cwd()}/uploads`;
     SearchController,
     GetUploadsController,
     UploaderController,
+    FinderController,
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })

@@ -70,20 +70,21 @@ export class KvService {
     this.kvPairRepository = connection.getRepository(KeyValuePair);
   }
 
-  async set(
-    collection: string,
-    key: string,
-    name: string,
-    type: keyof typeof ValueType,
-    value: any,
-  ) {
-    collection = collection ? collection.replace('/\b+/', '') : null;
-    key = key ? key.replace('/\b+/', '') : null;
+  async set(pair: {
+    collection?: string;
+    key: string;
+    name?: string;
+    type: keyof typeof ValueType;
+    value: any;
+  }): Promise<KeyValuePair> {
+    const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
+    const key = pair.key ? pair.key.replace('/\b+/', '') : null;
 
     if (!key) {
       throw new ValidationException('kv', 'key must not be blank');
     }
 
+    const { type, value } = pair;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
 
@@ -106,7 +107,7 @@ export class KvService {
     // return this.kvPairRepository.save(entity);
   }
 
-  async update(id: number, name: any, type: any, value: any) {
+  async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
 
     const entity = await this.kvPairRepository.findOne(id);
@@ -118,11 +119,25 @@ export class KvService {
     return this.kvPairRepository.save(entityTo);
   }
 
-  async get(collection: string, key: string) {
-    return (await this.find(collection, key))[0];
+  async get(
+    collection: string,
+    key: string,
+    defaultPair?: {
+      collection?: string;
+      key: string;
+      name: string;
+      type: keyof typeof ValueType;
+      value: any;
+    },
+  ): Promise<KeyValuePair> {
+    const keyValuePair = (await this.find(collection, key))[0];
+    if (!keyValuePair && defaultPair) {
+      return await this.set(defaultPair);
+    }
+    return keyValuePair;
   }
 
-  async find(collection?: string, key?: string) {
+  async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return this.kvPairRepository
       .find({
         collection:

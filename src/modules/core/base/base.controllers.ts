@@ -29,7 +29,7 @@ import {
 } from '../../helper';
 import { validateObject } from '../helpers/validate.helper';
 import { DBHelper, DBService } from '../db';
-import { KvService } from '../kv';
+import { KeyValuePair, KvService } from '../kv';
 // import { AdminUser } from '../../core/auth';
 
 const logger = new Logger('RestCrudController');
@@ -169,13 +169,7 @@ export abstract class RestCrudController {
     logger.log(`patch ${JSON.stringify({ user, modelName, updateTo })}`);
     if (modelName === 'kv__pairs') {
       logger.log('save by kvService...');
-      return this.kvService.set(
-        updateTo.collection,
-        updateTo.key,
-        updateTo.name,
-        updateTo.type,
-        updateTo.value,
-      );
+      return this.kvService.set(KeyValuePair.create(updateTo));
     }
 
     const repository = this.dbService.repo(modelName);

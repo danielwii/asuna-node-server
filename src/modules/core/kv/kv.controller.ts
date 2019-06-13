@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { IsOptional, IsString } from 'class-validator';
 import * as util from 'util';
-import { ValueType } from './kv.entities';
+import { KeyValuePair, ValueType } from './kv.entities';
 import { KvService } from './kv.service';
 
 const logger = new Logger('KvController');
@@ -45,13 +45,7 @@ export class KvController {
   @Post('kv')
   async set(@Body() kvPair: KvPair) {
     logger.log(`set ${util.inspect(kvPair, { colors: true })}`);
-    return this.kvService.set(
-      kvPair.collection,
-      kvPair.key,
-      kvPair.name,
-      kvPair.type,
-      kvPair.value,
-    );
+    return this.kvService.set(KeyValuePair.create(kvPair));
   }
 
   @Get('kv')
