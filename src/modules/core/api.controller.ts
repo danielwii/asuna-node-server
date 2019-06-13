@@ -13,7 +13,7 @@ export class ApiController {
 
   @Get('version')
   currentVersion(): string {
-    return `${this.appContent.version}-${this.appContent.upTime.getTime()}`;
+    return `${this.appContent.version}-${this.appContent.upTime.toISOString()}`;
   }
 
   @Get('info')
@@ -21,7 +21,7 @@ export class ApiController {
     const kv = await this.kvService.get('system.server', 'settings');
     return {
       settings: _.get(kv, 'value'),
-      upTime: this.appContent.upTime.getTime(),
+      upTime: this.appContent.upTime.toISOString(),
       version: this.appContent.version,
     };
   }
