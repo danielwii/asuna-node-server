@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { AsunaContext } from '../context';
+import { Global } from '../global';
 
 export const jsonType = _.memoize((): 'simple-json' | 'json' | 'jsonb' => {
-  const dbType = AsunaContext.instance.dbType;
+  const dbType = Global.dbType;
   if (dbType === 'mysql57') {
     return 'json';
   }

@@ -28,7 +28,6 @@ export class AsunaContext {
   };
 
   public readonly dirname: string;
-  public readonly dbType: 'mysql56' | 'mysql57' | 'postgres';
   public uploadPath: string;
 
   public imageStorageEngine: IStorageEngine;
@@ -37,7 +36,6 @@ export class AsunaContext {
 
   private constructor() {
     this.dirname = join(__dirname, '../..');
-    this.dbType = configLoader.loadConfig(ConfigKeys.DB_TYPE, 'mysql57');
 
     this.initStorageEngine(`${process.cwd()}/uploads`);
   }

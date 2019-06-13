@@ -23,7 +23,10 @@ export enum StorageMode {
 }
 
 export interface IStorageEngine {
-  saveEntity(file, opts: { bucket?: string; prefix?: string; region?: string }): Promise<SavedFile>;
+  saveEntity(
+    file: { filename: string; path: string; mimetype: string },
+    opts: { bucket?: string; prefix?: string; region?: string },
+  ): Promise<SavedFile>;
 
   resolve(
     {
