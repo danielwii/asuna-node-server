@@ -30,7 +30,7 @@ export class AsunaContext {
   public readonly dirname: string;
   public uploadPath: string;
 
-  public imageStorageEngine: IStorageEngine;
+  public defaultStorageEngine: IStorageEngine;
   public videoStorageEngine: IStorageEngine;
   public fileStorageEngine: IStorageEngine;
 
@@ -54,19 +54,19 @@ export class AsunaContext {
     this.uploadPath = uploadPath;
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE);
     if (imageStorage === StorageMode.QINIU) {
-      this.imageStorageEngine = new QiniuStorage(() => QiniuConfigObject.load('image'));
+      this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.load('image'));
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, {
         mode: StorageMode.QINIU,
         loader: () => QiniuConfigObject.load('image'),
       });
     } else if (imageStorage === StorageMode.MINIO) {
-      this.imageStorageEngine = new MinioStorage(() => MinioConfigObject.load());
+      this.defaultStorageEngine = new MinioStorage(() => MinioConfigObject.load());
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, {
         mode: StorageMode.MINIO,
         loader: () => MinioConfigObject.load(),
       });
     } else {
-      this.imageStorageEngine = new LocalStorage(this.uploadPath);
+      this.defaultStorageEngine = new LocalStorage(this.uploadPath);
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, { mode: StorageMode.LOCAL });
     }
 

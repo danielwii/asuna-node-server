@@ -50,7 +50,7 @@ export class GetUploadsController {
   ) {
     const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
     if (fullFilePath.startsWith(this.context.uploadPath)) {
-      return this.context.imageStorageEngine.resolve(
+      return this.context.defaultStorageEngine.resolve(
         { filename, bucket, prefix, thumbnailConfig, jpegConfig },
         res,
       );

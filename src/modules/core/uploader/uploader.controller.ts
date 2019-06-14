@@ -64,7 +64,7 @@ export class UploaderController {
       .map(files, (file: any) => {
         if (_.includes(ImageMimeType, file.mimetype)) {
           logger.log(`save image[${file.mimetype}]...${file.filename}`);
-          return this.context.imageStorageEngine.saveEntity(file, { bucket, prefix });
+          return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
         } else if (_.includes(VideoMimeType, file.mimetype)) {
           logger.log(`save video[${file.mimetype}]...${file.filename}`);
           return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });

@@ -68,11 +68,11 @@ export class LocalStorage implements IStorageEngine {
 
   constructor(storagePath: string, defaultBucket: string = 'default') {
     this.bucket = defaultBucket || 'default';
-    this.storagePath = path.join(storagePath, this.bucket);
+    this.storagePath = storagePath;
     LocalStorage.logger.log(
-      `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}'`,
+      `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'`,
     );
-    fsExtra.mkdirs(this.storagePath);
+    fsExtra.mkdirs(path.join(this.storagePath, this.bucket));
   }
 
   saveEntity(
