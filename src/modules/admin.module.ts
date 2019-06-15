@@ -10,13 +10,13 @@ import { TokenModule } from './core/token';
 import { DBModule } from './core/db';
 import { KvModule } from './core/kv';
 import { AuthModule } from './core/auth/auth.module';
-import { FinderController } from './finder/finder.controller';
 import { UploaderController } from './core/uploader/uploader.controller';
+import { FinderModule } from './finder';
 
 const logger = new Logger('AdminModule');
 
 @Module({
-  imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule, TokenModule],
+  imports: [SchemaModules, AuthModule, ClientModule, KvModule, DBModule, TokenModule, FinderModule],
   controllers: [
     ApiController,
     WwwRestController,
@@ -25,7 +25,6 @@ const logger = new Logger('AdminModule');
     SearchController,
     GetUploadsController,
     UploaderController,
-    FinderController,
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })

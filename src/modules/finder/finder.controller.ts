@@ -1,11 +1,9 @@
 import { Controller, Get, HttpStatus, Logger, Query, Req, Res } from '@nestjs/common';
 import { Cryptor } from 'node-buffs';
-import { plainToClass } from 'class-transformer';
-import { IsIn, IsOptional, IsString, validate } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
-import { AsunaCollections, KvService } from '../core';
-import urljoin = require('url-join');
+import { FinderService } from './finder.service';
 
 const logger = new Logger('FinderController');
 
@@ -29,7 +27,7 @@ export class FinderAssetsSettings {
  */
 @Controller('api/v1/finder')
 export class FinderController {
-  constructor(private readonly kvService: KvService) {}
+  constructor(private readonly finderService: FinderService) {}
 
   @Get()
   async redirect(
@@ -49,33 +47,9 @@ export class FinderController {
 
     const queryParam = querystring.parse(useEncrypt ? Cryptor.desDecrypt(query) : query) as any;
     logger.log(`query ${JSON.stringify(queryParam)} with ${keyByType[type]}`);
-    const upstreams = await this.kvService.get(AsunaCollections.SYSTEM_SERVER, keyByType[type]);
-    logger.log(`upstreams ${JSON.stringify(upstreams)}`);
-    if (!(upstreams && upstreams.value && _.isObject(upstreams.value))) {
-      logger.warn(`${queryParam.name || 'default'} not available in upstream ${keyByType[type]}`);
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
-    }
 
-    if (type === 'assets') {
-      const upstream = upstreams.value[queryParam.name || 'default'];
-      const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream);
-      if (!finderAssetsSettings) {
-        logger.warn(`invalid upstream ${JSON.stringify(upstream)}`);
-        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
-      }
-      const errors = await validate(finderAssetsSettings);
-      if (errors.length) {
-        logger.warn(`invalid settings ${JSON.stringify(errors)}`);
-        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
-      }
-      return res.redirect(
-        HttpStatus.TEMPORARY_REDIRECT,
-        `${upstream.protocol || 'https'}://${urljoin(upstream.hostname, queryParam.path)}`,
-      );
-    } else {
-      // TODO add other handlers later
-      logger.warn('only type assets available');
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
-    }
+    const { name, path } = queryParam;
+    const url = await this.finderService.getUrl(keyByType[type], type, name, path);
+    return res.redirect(HttpStatus.TEMPORARY_REDIRECT, url);
   }
 }

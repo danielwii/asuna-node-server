@@ -14,6 +14,9 @@ export interface JpegParam {
 export class JpegPipe implements PipeTransform<any> {
   async transform(value, { metatype }: ArgumentMetadata) {
     const param = _.find(_.keys(value), fp.startsWith('jpeg/'));
+    if (!param) {
+      return {};
+    }
     const jpegParam: JpegParam = { progressive: true, quality: 75 };
     try {
       if (param.includes('/')) {

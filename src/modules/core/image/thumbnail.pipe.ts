@@ -16,6 +16,9 @@ export interface ThumbnailParam {
 export class ThumbnailPipe implements PipeTransform<any> {
   async transform(value, { metatype }: ArgumentMetadata) {
     const param = _.find(_.keys(value), fp.startsWith('thumbnail/'));
+    if (!param) {
+      return {};
+    }
     const thumbnail: ThumbnailParam = {};
     try {
       if (param.includes('/')) {

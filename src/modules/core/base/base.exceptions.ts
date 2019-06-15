@@ -1,3 +1,5 @@
+import { HttpStatus } from '@nestjs/common';
+
 export class BaseException {
   constructor(public name: string, public message?: string, public errors?: any) {}
 }
@@ -21,6 +23,8 @@ export enum AsunaCode {
   UPLOAD = 'UPLOAD',
   SIGN = 'SIGN',
   BAD_REQUEST = 'BAD_REQUEST',
+  UNPROCESSABLE_ENTITY = 'UNPROCESSABLE_ENTITY',
+  INTERNAL = 'INTERNAL',
 }
 
 /**
@@ -31,6 +35,11 @@ export class AsunaException extends CodeException {
 
   constructor(code: AsunaCode | string, message: string, errors?: any) {
     super('ASUNA__' + code, code, message, errors);
+    if (AsunaCode.BAD_REQUEST === code) {
+      this.status = HttpStatus.BAD_REQUEST;
+    } else if (AsunaCode.UNPROCESSABLE_ENTITY === code) {
+      this.status = HttpStatus.UNPROCESSABLE_ENTITY;
+    }
   }
 }
 
@@ -39,7 +48,7 @@ export class ErrorException extends BaseException {}
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
     super(AsunaCode.VALIDATE, `validate '${model}' error`, errors);
-    this.status = 400;
+    this.status = HttpStatus.BAD_REQUEST;
   }
 }
 export class UploadException extends AsunaException {

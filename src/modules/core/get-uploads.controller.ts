@@ -1,4 +1,13 @@
-import { Controller, Get, Logger, NotFoundException, Param, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Logger,
+  NotFoundException,
+  Param,
+  Query,
+  Res,
+} from '@nestjs/common';
 
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
@@ -7,6 +16,7 @@ import { JpegParam, JpegPipe } from './image/jpeg.pipe';
 import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
 import { ConfigKeys, configLoader } from './config.helper';
 import { AsunaContext } from './context';
+import { FinderService } from '../finder';
 
 const logger = new Logger('GetUploadsController');
 
@@ -14,6 +24,9 @@ const logger = new Logger('GetUploadsController');
 export class GetUploadsController {
   private context = AsunaContext.instance;
 
+  constructor(private readonly finderService: FinderService) {}
+
+  // TODO not finished yet
   @Get('options')
   async getOptions() {
     return {
@@ -21,6 +34,31 @@ export class GetUploadsController {
       video: { storage: configLoader.loadConfig(ConfigKeys.VIDEO_STORAGE) },
       file: { storage: configLoader.loadConfig(ConfigKeys.FILE_STORAGE) },
     };
+  }
+
+  @Get(':bucket/*')
+  async getUploads(
+    @Param('bucket') bucket: string,
+    @Param('0') filenameWithPrefix: string,
+    @Query(ThumbnailPipe) thumbnailConfig: { opts: ThumbnailParam; param?: string },
+    @Query(JpegPipe) jpegConfig: { opts: JpegParam; param?: string },
+    @Res() res,
+  ) {
+    logger.log(
+      `get [${bucket}] file [${filenameWithPrefix}] by ${JSON.stringify({
+        thumbnailConfig,
+        jpegConfig,
+      })}`,
+    );
+    const url = await this.context.defaultStorageEngine.resolve({
+      filename: filenameWithPrefix,
+      bucket,
+      thumbnailConfig,
+      jpegConfig,
+      resolver: url => this.finderService.getUrl('settings.finder.assets', 'assets', null, url),
+    });
+    logger.log(`resolved url is ${url}`);
+    return res.status(HttpStatus.TEMPORARY_REDIRECT).send(url);
   }
 
   /**

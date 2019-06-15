@@ -15,6 +15,7 @@ import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';
 import { AsunaContext } from '../context';
+import urljoin = require('url-join');
 
 export enum StorageMode {
   LOCAL = 'local',
@@ -35,14 +36,16 @@ export interface IStorageEngine {
       prefix,
       thumbnailConfig,
       jpegConfig,
+      resolver,
     }: {
       filename: string;
       bucket: string;
-      prefix: string;
+      prefix?: string;
       thumbnailConfig?: { opts: ThumbnailParam; param?: string };
       jpegConfig?: { opts: JpegParam; param?: string };
+      resolver?: (url: string) => Promise<any>;
     },
-    res,
+    res?,
   ): Promise<any>;
 }
 
@@ -99,6 +102,9 @@ export class LocalStorage implements IStorageEngine {
 
   public resolve({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
     const fullFilePath = path.join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
+    if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
+      throw new Error('filePath must startsWith upload-path');
+    }
     LocalStorage.logger.log(
       util.inspect({ filename, prefix, bucket, thumbnailConfig, jpegConfig }, { colors: true }),
     );
@@ -224,6 +230,8 @@ export class BucketStorage {
 export class MinioStorage implements IStorageEngine {
   private static readonly logger = new Logger(MinioStorage.name);
 
+  private static readonly defaultBucket = 'default';
+
   constructor(private configLoader: () => MinioConfigObject) {
     MinioStorage.logger.log(`[constructor] init ${JSON.stringify(classToPlain(configLoader()))}`);
   }
@@ -246,24 +254,25 @@ export class MinioStorage implements IStorageEngine {
       prefix,
       thumbnailConfig,
       jpegConfig,
+      resolver,
     }: {
       filename: string;
-      bucket: string;
-      prefix: string;
+      bucket?: string;
+      prefix?: string;
       thumbnailConfig?: { opts: ThumbnailParam; param?: string };
       jpegConfig?: { opts: JpegParam; param?: string };
+      resolver?: (url: string) => Promise<any>;
     },
     res,
   ): Promise<any> {
-    // FIXME add redirect later
-    return res.status(404).send();
+    return resolver(urljoin(bucket || MinioStorage.defaultBucket, prefix || '', filename));
   }
 
   async saveEntity(
     file,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
-    const bucket = opts.bucket || 'default';
+    const bucket = opts.bucket || MinioStorage.defaultBucket;
     const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
     const items: BucketItemFromList[] = await this.client.listBuckets();
@@ -379,13 +388,12 @@ export class QiniuStorage implements IStorageEngine {
     }: {
       filename: string;
       bucket: string;
-      prefix: string;
-      thumbnailConfig: { opts: ThumbnailParam; param?: string };
-      jpegConfig: { opts: JpegParam; param?: string };
+      prefix?: string;
+      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
+      jpegConfig?: { opts: JpegParam; param?: string };
     },
     res,
   ): Promise<any> {
-    // FIXME add redirect later
-    return res.status(404).send();
+    return Promise.resolve(urljoin(bucket, prefix, filename));
   }
 }
