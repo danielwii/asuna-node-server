@@ -58,7 +58,7 @@ export class GetUploadsController {
       resolver: url => this.finderService.getUrl('settings.finder.assets', 'assets', null, url),
     });
     logger.log(`resolved url is ${url}`);
-    return res.status(HttpStatus.TEMPORARY_REDIRECT).send(url);
+    return res.redirect(HttpStatus.PERMANENT_REDIRECT, url);
   }
 
   /**
