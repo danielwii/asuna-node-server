@@ -299,16 +299,25 @@ export class MinioStorage implements IStorageEngine {
       );
     }
 
-    const filenameWithPrefix = join(prefix, file.filename);
+    // remove head and tail chars '/' in prefix
+    const resolvedPrefix = (prefix || '')
+      .replace(/^\/+/, '')
+      .replace(/\/+$/, '')
+      .replace(/\/+/g, '/')
+      .trim();
+    const filenameWithPrefix = join(resolvedPrefix, escape(file.filename));
+
     MinioStorage.logger.log(
-      `put object ${JSON.stringify(file)} from ${filenameWithPrefix} to ${bucket}`,
+      `put ${JSON.stringify(
+        file,
+      )} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] and bucket [${bucket}]`,
     );
     const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
       'Content-Type': file.mimetype,
     });
     MinioStorage.logger.log(`[saveEntity] uploaded [${uploaded}] ...`);
     return {
-      prefix,
+      prefix: resolvedPrefix,
       bucket,
       region,
       mimetype: file.mimetype,
