@@ -15,7 +15,7 @@ import {
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
 import { RestCrudController, SignException } from '../base';
-import { TokenService } from '../token';
+import { SysTokenServiceName, TokenService } from '../token';
 
 const logger = new Logger('AdminAuthController');
 
@@ -39,7 +39,7 @@ export class AdminAuthController extends RestCrudController {
     const tokenOptions = {
       role: 'admin',
       identifier: `admin-username=${user.username}`,
-      service: 'admin#login',
+      service: SysTokenServiceName.AdminLogin,
     };
     await this.tokenService.deprecateOperationTokens(tokenOptions as any);
     const operationToken = await this.tokenService.acquireToken(tokenOptions as any);

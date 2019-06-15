@@ -1,10 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as moment from 'moment';
-import { OperationToken } from './token.entities';
+import { OperationToken, OperationTokenType } from './token.entities';
 import { random } from '../helpers';
 import { AsunaCode, AsunaException } from '../base';
 
 const logger = new Logger('TokenService');
+
+export const SysTokenServiceName = {
+  AdminLogin: 'admin#login',
+  SysInvite: 'sys#sys-invite',
+};
 
 @Injectable()
 export class TokenService {
@@ -18,36 +23,56 @@ export class TokenService {
    * @param remainingCount default: 1
    */
   async acquireToken({
+    type,
     payload,
     identifier,
     role,
-    expiredIn = 30 * 24 * 60,
+    expiredInMinutes,
     service,
-    remainingCount = 1,
+    remainingCount,
   }: {
+    type: keyof typeof OperationTokenType;
     payload?: object;
     identifier: string;
     role: 'sys' | 'app' | 'web' | 'other';
     service: string;
-    expiredIn?: number;
+    expiredInMinutes?: number;
     remainingCount?: number;
   }) {
     const token = random(32);
+
+    let typeOptions: Partial<OperationToken> = {
+      [OperationTokenType.OneTime]: { remainingCount: 1 },
+      [OperationTokenType.MultiTimes]: { remainingCount },
+      [OperationTokenType.Unlimited]: {},
+      [OperationTokenType.Any]: {
+        remainingCount,
+        expiredAt: moment()
+          .add(expiredInMinutes, 'minutes')
+          .toDate(),
+      },
+      [OperationTokenType.TimeBased]: {
+        expiredAt: moment()
+          .add(expiredInMinutes, 'minutes')
+          .toDate(),
+      },
+    }[type];
+
+    logger.log(`create token with type options ${JSON.stringify(typeOptions)}`);
+
     return OperationToken.create({
+      type,
       identifier,
       token,
       shortId: token.slice(0, 9),
       role,
       body: payload,
       service,
-      remainingCount,
+      ...typeOptions,
       isUsed: false,
       isActive: true,
       isExpired: false,
       isDeprecated: false,
-      expiredAt: moment()
-        .add(expiredIn, 'minutes')
-        .toDate(),
     }).save();
   }
 
@@ -108,8 +133,9 @@ export class TokenService {
   async useToken(token: string) {
     const operationToken = await this.getOperationTokenByToken(token);
     if (this.checkAvailable(operationToken)) {
-      operationToken.remainingCount--;
-      operationToken.usedCount++;
+      if (operationToken.remainingCount) operationToken.remainingCount--;
+      operationToken.usedCount = operationToken.usedCount ? operationToken.usedCount + 1 : 1;
+
       await operationToken.save();
       await this.checkAvailable(operationToken);
       return operationToken.reload();
@@ -128,13 +154,14 @@ export class TokenService {
       await operationToken.save();
       return false;
     }
-    if (moment().isAfter(moment(operationToken.expiredAt))) {
+
+    if (operationToken.expiredAt && moment().isAfter(moment(operationToken.expiredAt))) {
       operationToken.isExpired = true;
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;
     }
-    if (operationToken.remainingCount < 1) {
+    if (operationToken.remainingCount === 0) {
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;
