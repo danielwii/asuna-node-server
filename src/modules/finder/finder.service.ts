@@ -44,7 +44,9 @@ export class FinderService {
       if (errors.length) {
         throw new AsunaException(AsunaCode.INTERNAL, `invalid settings ${JSON.stringify(errors)}`);
       }
-      return `${upstream.protocol || 'https'}://${urljoin(upstream.hostname, path)}`;
+      const resourcePath = urljoin('/', path).replace(/\/+/g, '/');
+      const portStr = upstream.port ? `:${upstream.port}` : '';
+      return `${upstream.protocol || 'https'}://${upstream.hostname}${portStr}${resourcePath}`;
     } else {
       // TODO add other handlers later
       logger.warn('only type assets is available');

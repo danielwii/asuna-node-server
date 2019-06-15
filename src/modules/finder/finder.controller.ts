@@ -1,6 +1,6 @@
 import { Controller, Get, HttpStatus, Logger, Query, Req, Res } from '@nestjs/common';
 import { Cryptor } from 'node-buffs';
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
 import { FinderService } from './finder.service';
@@ -19,6 +19,10 @@ export class FinderAssetsSettings {
 
   @IsString()
   hostname: string;
+
+  @IsNumber()
+  @IsOptional()
+  port: number;
 }
 
 /**
@@ -50,6 +54,6 @@ export class FinderController {
 
     const { name, path } = queryParam;
     const url = await this.finderService.getUrl(keyByType[type], type, name, path);
-    return res.redirect(HttpStatus.TEMPORARY_REDIRECT, url);
+    return res.redirect(url);
   }
 }
