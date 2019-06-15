@@ -300,6 +300,9 @@ export class MinioStorage implements IStorageEngine {
     }
 
     const filenameWithPrefix = join(prefix, file.filename);
+    MinioStorage.logger.log(
+      `put object ${JSON.stringify(file)} from ${filenameWithPrefix} to ${bucket}`,
+    );
     const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
       'Content-Type': file.mimetype,
     });
