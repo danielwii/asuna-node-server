@@ -33,7 +33,7 @@ export enum AsunaCode {
 export class AsunaException extends CodeException {
   status = 500;
 
-  constructor(code: AsunaCode | string, message: string, errors?: any) {
+  constructor(code: AsunaCode | string, message?: string, errors?: any) {
     super('ASUNA__' + code, code, message, errors);
     if (AsunaCode.BAD_REQUEST === code) {
       this.status = HttpStatus.BAD_REQUEST;
