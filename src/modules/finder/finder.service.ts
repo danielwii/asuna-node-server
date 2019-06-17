@@ -15,10 +15,7 @@ export class FinderService {
 
   async getUrl(key: string, type: 'assets' | 'zones', name: string, path: string) {
     if (!(key && type && path)) {
-      throw new AsunaException(
-        AsunaCode.UNPROCESSABLE_ENTITY,
-        JSON.stringify({ type, name, path }),
-      );
+      throw new AsunaException(AsunaCode.BadRequest, JSON.stringify({ type, name, path }));
     }
 
     const upstreams = await this.kvService.get(AsunaCollections.SYSTEM_SERVER, key);
@@ -26,7 +23,7 @@ export class FinderService {
     if (!(upstreams && upstreams.value && _.isObject(upstreams.value))) {
       logger.warn(`${name || 'default'} not available in upstream ${key}`);
       throw new AsunaException(
-        AsunaCode.INTERNAL,
+        AsunaCode.Unprocessable,
         `${name || 'default'} not available in upstream ${key}`,
       );
     }
@@ -36,13 +33,16 @@ export class FinderService {
       const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream);
       if (!finderAssetsSettings) {
         throw new AsunaException(
-          AsunaCode.INTERNAL,
+          AsunaCode.Unprocessable,
           `invalid upstream ${JSON.stringify(upstream)}`,
         );
       }
       const errors = await validate(finderAssetsSettings);
       if (errors.length) {
-        throw new AsunaException(AsunaCode.INTERNAL, `invalid settings ${JSON.stringify(errors)}`);
+        throw new AsunaException(
+          AsunaCode.Unprocessable,
+          `invalid settings ${JSON.stringify(errors)}`,
+        );
       }
       const resourcePath = urljoin('/', path).replace(/\/+/g, '/');
       const portStr = upstream.port ? `:${upstream.port}` : '';
@@ -50,7 +50,7 @@ export class FinderService {
     } else {
       // TODO add other handlers later
       logger.warn('only type assets is available');
-      throw new AsunaException(AsunaCode.INTERNAL, 'only type assets is available');
+      throw new AsunaException(AsunaCode.InvalidParameter, 'only type assets is available');
     }
   }
 }

@@ -47,7 +47,7 @@ export class FinderController {
       !(_.isString(query) && query.length > 0) ||
       !(_.isString(type) && ['zones', 'assets'].includes(type))
     ) {
-      throw new AsunaException(AsunaCode.BAD_REQUEST, 'params error');
+      throw new AsunaException(AsunaCode.BadRequest, 'params error');
     }
 
     const queryParam = querystring.parse(encrypt ? Cryptor.desDecrypt(query) : query) as any;
@@ -70,7 +70,7 @@ export class ShortFinderController {
   async redirect(@Param('q') q: string, @Req() req, @Res() res) {
     logger.log(`find short ${JSON.stringify({ q })}`);
     if (!(_.isString(q) && q.length > 0)) {
-      throw new AsunaException(AsunaCode.BAD_REQUEST, 'params error');
+      throw new AsunaException(AsunaCode.BadRequest, 'params error');
     }
 
     let query;
@@ -83,11 +83,11 @@ export class ShortFinderController {
         .split('.') as any;
       query = Buffer.from(encodedQuery, 'base64').toString('ascii');
     } catch (e) {
-      throw new AsunaException(AsunaCode.BAD_REQUEST, 'decode error');
+      throw new AsunaException(AsunaCode.BadRequest, 'decode error');
     }
 
     if (!(_.isString(type) && ['zones', 'assets'].includes(type))) {
-      throw new AsunaException(AsunaCode.UNPROCESSABLE_ENTITY, 'invalid param');
+      throw new AsunaException(AsunaCode.InvalidParameter, 'invalid param');
     }
 
     const queryParam = querystring.parse(

@@ -140,7 +140,7 @@ export class TokenService {
       await this.checkAvailable(operationToken);
       return operationToken.reload();
     }
-    throw new AsunaException(AsunaCode.VALIDATE, 'invalid token');
+    throw new AsunaException(AsunaCode.Unprocessable, 'invalid token');
   }
 
   async checkAvailable(operationToken: OperationToken) {

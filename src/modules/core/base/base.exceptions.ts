@@ -15,17 +15,40 @@ export class CodeException extends BaseException {
   }
 }
 
-export enum AsunaCode {
-  /**
-   * 对象格式验证异常
-   */
-  VALIDATE = 'VALIDATE',
-  UPLOAD = 'UPLOAD',
-  SIGN = 'SIGN',
-  BAD_REQUEST = 'BAD_REQUEST',
-  UNPROCESSABLE_ENTITY = 'UNPROCESSABLE_ENTITY',
-  INTERNAL = 'INTERNAL',
+class NameValue {
+  constructor(public readonly name: string, public readonly value: any) {}
 }
+
+/**
+ * 400  invalidParameter          Indicates that a request parameter has an invalid value.
+ * 400  badRequest
+ * 401  invalidCredentials        Indicates that the auth token is invalid or has expired.
+ * 403  insufficientPermissions   Indicates that the user does not have sufficient permissions for the entity specified in the query.
+ * 409  conflict                  Indicates that the request message conflicts with the current state of the resource.
+ *                                The API request cannot be completed because the requested operation would conflict with an existing item. For example, a request that tries to create a duplicate item would create a conflict, though duplicate items are typically identified with more specific errors.
+ * 409  duplicate                 The requested operation failed because it tried to create a resource that already exists.
+ * 422  unprocessable             Indicates an issue with the request message considered in isolation.
+ * 500  unexpected                Better not use it.
+ */
+export const AsunaCode = {
+  InvalidParameter: new NameValue('InvalidParameter', 400),
+  BadRequest: new NameValue('BadRequest', 400),
+  InvalidCredentials: new NameValue('InvalidCredentials', 401),
+  InsufficientPermissions: new NameValue('InvalidParameter', 403),
+  Conflict: new NameValue('Conflict', 409),
+  Duplicate: new NameValue('Duplicate', 409),
+  Unprocessable: new NameValue('Unprocessable', 422),
+
+  /**
+   * use specific errors instead
+   */
+  Unexpected__do_not_use_it: new NameValue('Unexpected', 500),
+  // VALIDATE = 'VALIDATE',
+  // UPLOAD = 'UPLOAD',
+  // SIGN = 'SIGN',
+  // BAD_REQUEST = 'BAD_REQUEST',
+  // UNPROCESSABLE_ENTITY = 'UNPROCESSABLE_ENTITY',
+};
 
 /**
  * 该异常构造前端可以进行交互的格式
@@ -33,32 +56,41 @@ export enum AsunaCode {
 export class AsunaException extends CodeException {
   status = 500;
 
-  constructor(code: AsunaCode | string, message?: string, errors?: any) {
-    super('ASUNA__' + code, code, message, errors);
-    if (AsunaCode.BAD_REQUEST === code) {
-      this.status = HttpStatus.BAD_REQUEST;
-    } else if (AsunaCode.UNPROCESSABLE_ENTITY === code) {
-      this.status = HttpStatus.UNPROCESSABLE_ENTITY;
-    }
+  constructor(code: NameValue, message?: string, errors?: any) {
+    super(code.value, code.name, message, errors);
+    this.status = code.value;
   }
 }
 
+/**
+ * @deprecated use AsunaException directly
+ */
 export class ErrorException extends BaseException {}
 
+/**
+ * @deprecated use AsunaException directly
+ */
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
-    super(AsunaCode.VALIDATE, `validate '${model}' error`, errors);
+    super(AsunaCode.InvalidParameter, `validate '${model}' error`, errors);
     this.status = HttpStatus.BAD_REQUEST;
   }
 }
+
+/**
+ * @deprecated use AsunaException directly
+ */
 export class UploadException extends AsunaException {
   constructor(errors) {
-    super(AsunaCode.UPLOAD, `upload file(s) error`, errors);
+    super(AsunaCode.Unprocessable, `upload file(s) error`, errors);
   }
 }
 
+/**
+ * @deprecated use AsunaException directly
+ */
 export class SignException extends AsunaException {
   constructor(message) {
-    super(AsunaCode.SIGN, message);
+    super(AsunaCode.InvalidCredentials, message);
   }
 }

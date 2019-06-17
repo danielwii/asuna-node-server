@@ -82,7 +82,7 @@ export class UploaderController {
       })
       .catch(error => {
         logger.error(error.message, error.trace);
-        throw new AsunaException(AsunaCode.UPLOAD, error.message);
+        throw new AsunaException(AsunaCode.Unprocessable, error.message);
       });
     logger.log(`results is ${JSON.stringify(results)}`);
     return results;

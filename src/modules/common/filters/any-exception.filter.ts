@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { Request, Response } from 'express';
-import { ValidationException } from '../../core';
+import { AsunaCode, ValidationException } from '../../core';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -63,13 +63,24 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (!response.finished && response.status) {
       if (R.is(HttpException, processed)) {
-        response
-          .status(status)
-          .json({ name: exceptionResponse.error, message: exceptionResponse.message });
+        response.status(status).json({
+          error: {
+            name: AsunaCode.Unexpected__do_not_use_it,
+            message: exceptionResponse.message,
+            details: exceptionResponse.error,
+            raw: processed,
+          },
+        });
       } else if (R.is(Error, processed)) {
-        response.status(status).json({ name: 'Error', message: processed.message });
+        response.status(status).json({
+          error: {
+            name: AsunaCode.Unexpected__do_not_use_it,
+            message: processed.message,
+            raw: processed,
+          },
+        });
       } else {
-        response.status(status).json(processed);
+        response.status(status).json({ error: processed });
       }
     }
   }
