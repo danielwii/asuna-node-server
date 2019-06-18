@@ -1,7 +1,8 @@
-import { ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AbstractAuthUser } from '../core/auth';
+import { AsunaCode, AsunaException } from '../core/base';
 
 const logger = new Logger('GqlAuthGuard');
 
@@ -27,7 +28,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
       if (this.opts.anonymousSupport) {
         return null;
       }
-      throw err || new UnauthorizedException();
+      throw err || new AsunaException(AsunaCode.InsufficientPermissions);
     }
     return user;
   }

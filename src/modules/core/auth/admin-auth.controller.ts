@@ -9,12 +9,11 @@ import {
   Post,
   Req,
   Res,
-  UnauthorizedException,
 } from '@nestjs/common';
 
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
-import { RestCrudController, SignException } from '../base';
+import { AsunaCode, AsunaException, RestCrudController, SignException } from '../base';
 import { SysTokenServiceName, TokenService } from '../token';
 
 const logger = new Logger('AdminAuthController');
@@ -100,7 +99,7 @@ export class AdminAuthController extends RestCrudController {
       relations: ['roles'],
     });
     if (!currentUser) {
-      throw new UnauthorizedException(`id '${user.id}' not exist.`);
+      throw new AsunaException(AsunaCode.InsufficientPermissions, `id '${user.id}' not exist.`);
     }
     return currentUser;
   }

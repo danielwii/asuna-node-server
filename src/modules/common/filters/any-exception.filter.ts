@@ -1,5 +1,6 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
@@ -63,20 +64,22 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (!response.finished && response.status) {
       if (R.is(HttpException, processed)) {
+        const key = _.isString(exceptionResponse.message) ? 'message' : 'details';
         response.status(status).json({
           error: {
-            name: AsunaCode.Unexpected__do_not_use_it,
-            message: exceptionResponse.message,
-            details: exceptionResponse.error,
-            raw: processed,
+            name: exceptionResponse.error,
+            code: status,
+            [key]: exceptionResponse.message,
+            // raw: processed,
           },
         });
       } else if (R.is(Error, processed)) {
         response.status(status).json({
           error: {
-            name: AsunaCode.Unexpected__do_not_use_it,
+            name: AsunaCode.Unexpected__do_not_use_it.name,
+            code: processed.status || AsunaCode.Unexpected__do_not_use_it.value,
             message: processed.message,
-            raw: processed,
+            // raw: processed,
           },
         });
       } else {

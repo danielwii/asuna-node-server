@@ -28,10 +28,10 @@ export class CodeException extends BaseException {
  * 500  unexpected                Better not use it.
  */
 export const AsunaCode = {
-  InvalidParameter: new NameValue('InvalidParameter', 400),
-  BadRequest: new NameValue('BadRequest', 400),
-  InvalidCredentials: new NameValue('InvalidCredentials', 401),
-  InsufficientPermissions: new NameValue('InvalidParameter', 403),
+  InvalidParameter: new NameValue('Invalid Parameter', 400),
+  BadRequest: new NameValue('Bad Request', 400),
+  InvalidCredentials: new NameValue('Invalid Credentials', 401),
+  InsufficientPermissions: new NameValue('Insufficient Permissions', 403),
   Conflict: new NameValue('Conflict', 409),
   Duplicate: new NameValue('Duplicate', 409),
   Unprocessable: new NameValue('Unprocessable', 422),
