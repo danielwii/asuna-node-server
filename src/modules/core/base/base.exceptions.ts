@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { NameValue } from '../../helper';
 
 export class BaseException {
   constructor(public name: string, public message?: string, public errors?: any) {}
@@ -13,10 +14,6 @@ export class CodeException extends BaseException {
   ) {
     super(name, message, errors);
   }
-}
-
-class NameValue {
-  constructor(public readonly name: string, public readonly value: any) {}
 }
 
 /**

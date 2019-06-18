@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 import {
   Any,
@@ -24,6 +25,15 @@ export enum Profile {
   // TODO @deprecated this may cause a memory leak
   detail = 'detail',
   ids = 'ids',
+}
+
+export class NameValue {
+  constructor(public readonly name: string, public readonly value: any) {}
+}
+
+export class EnumHelper {
+  static names = nameValues => _.map(nameValues, fp.get('name'));
+  static values = nameValues => _.map(nameValues, fp.get('value'));
 }
 
 export function getModelName(model: string, module?: string) {
