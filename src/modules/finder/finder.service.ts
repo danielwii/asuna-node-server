@@ -46,6 +46,12 @@ export class FinderService {
       }
       const resourcePath = urljoin('/', path).replace(/\/+/g, '/');
       const portStr = upstream.port ? `:${upstream.port}` : '';
+
+      // get same domain if hostname startswith /
+      if (_.startsWith(upstream.hostname, '/')) {
+        return `${upstream.hostname}${portStr}${resourcePath}`;
+      }
+
       return `${upstream.protocol || 'https'}://${upstream.hostname}${portStr}${resourcePath}`;
     } else {
       // TODO add other handlers later

@@ -61,4 +61,26 @@ describe('FinderModule (e2e)', () => {
         expect(expected.header.location).toBe('https://hostname/1/2/3.png');
       });
   });
+
+  it('/GET /api/v1/finder with same domain', async () => {
+    await kvService.set({
+      collection: AsunaCollections.SYSTEM_SERVER,
+      key: keyByType.assets,
+      type: 'json',
+      value: { default: { hostname: '/s3' } },
+    });
+
+    const query = querystring.stringify({
+      query: querystring.stringify({ path: '1/2/3.png' }),
+      type: 'assets',
+    });
+    expect(query).toBe('query=path%3D1%252F2%252F3.png&type=assets');
+    return supertest(app.getHttpServer())
+      .get(`/api/v1/finder?${query}`)
+      .expect(HttpStatus.FOUND)
+      .expect(expected => {
+        expect(expected.text).toBe('Found. Redirecting to /s3/1/2/3.png');
+        expect(expected.header.location).toBe('/s3/1/2/3.png');
+      });
+  });
 });
