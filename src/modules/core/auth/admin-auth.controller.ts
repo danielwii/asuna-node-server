@@ -14,16 +14,13 @@ import {
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
 import { AsunaCode, AsunaException, RestCrudController, SignException } from '../base';
-import { SysTokenServiceName, TokenService } from '../token';
+import { SysTokenServiceName, TokenHelper } from '../token';
 
 const logger = new Logger('AdminAuthController');
 
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
-  constructor(
-    private readonly adminAuthService: AdminAuthService,
-    private readonly tokenService: TokenService,
-  ) {
+  constructor(private readonly adminAuthService: AdminAuthService) {
     super('auth');
   }
 
@@ -40,8 +37,8 @@ export class AdminAuthController extends RestCrudController {
       identifier: `admin-username=${user.username}`,
       service: SysTokenServiceName.AdminLogin,
     };
-    await this.tokenService.deprecateOperationTokens(tokenOptions as any);
-    const operationToken = await this.tokenService.acquireToken(tokenOptions as any);
+    await TokenHelper.deprecateOperationTokens(tokenOptions as any);
+    const operationToken = await TokenHelper.acquireToken(tokenOptions as any);
 
     const otpauth = otplib.authenticator.keyuri(
       operationToken.identifier,

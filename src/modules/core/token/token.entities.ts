@@ -1,7 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../decorators';
-import { jsonType } from '../helpers';
+import { jsonType, safeReloadJSON } from '../helpers';
 
 export const OperationTokenType = {
   OneTime: 'OneTime',
@@ -75,4 +75,10 @@ export class OperationToken extends AbstractBaseEntity {
   @MetaInfo({ name: '是否已过期' })
   @Column({ nullable: true, name: 'is_expired', default: false })
   isExpired: boolean;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  preSave() {
+    safeReloadJSON(this, 'body');
+  }
 }
