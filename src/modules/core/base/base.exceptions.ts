@@ -25,6 +25,7 @@ export class CodeException extends BaseException {
  *                                The API request cannot be completed because the requested operation would conflict with an existing item. For example, a request that tries to create a duplicate item would create a conflict, though duplicate items are typically identified with more specific errors.
  * 409  duplicate                 The requested operation failed because it tried to create a resource that already exists.
  * 422  unprocessable             Indicates an issue with the request message considered in isolation.
+ * 429  tooManyRequests
  * 500  unexpected                Better not use it.
  */
 export const AsunaCode = {
@@ -34,6 +35,7 @@ export const AsunaCode = {
   InsufficientPermissions: new NameValue('Insufficient Permissions', 403),
   Conflict: new NameValue('Conflict', 409),
   Duplicate: new NameValue('Duplicate', 409),
+  TooManyRequests: new NameValue('Too Many Requests', 429),
   Unprocessable: new NameValue('Unprocessable', 422),
 
   /**
