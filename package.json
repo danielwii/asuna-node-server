@@ -51,7 +51,7 @@
     "class-validator": "^0.9.1",
     "compression": "^1.7.4",
     "dataloader": "^1.4.0",
-    "email-templates": "^5.1.0",
+    "email-templates": "^6.0.0",
     "express-rate-limit": "^5.0.0",
     "graphql": "^14.3.1",
     "graphql-type-json": "^0.3.0",
