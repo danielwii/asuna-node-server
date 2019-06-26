@@ -4,7 +4,7 @@ import * as fp from 'lodash/fp';
 import { GraphQLResolveInfo } from 'graphql';
 import * as DataLoader from 'dataloader';
 import * as Rx from 'rxjs';
-import { Hermes } from '../bus';
+import { Hermes, IAsunaEvent } from '../bus';
 
 const logger = new Logger('DataLoaderCache');
 
@@ -52,10 +52,10 @@ export class GenericDataLoader {
   constructor() {
     logger.log('init ...');
     if (!GenericDataLoader.subject) {
-      GenericDataLoader.subject = new Rx.Subject().subscribe(value => {
-        logger.log(`subscribe ${JSON.stringify(value)}`);
-      });
-      Hermes.subscribe(GenericDataLoader.name, GenericDataLoader.subject);
+      GenericDataLoader.subject = (event: IAsunaEvent) => {
+        // logger.log(`subscribe ${JSON.stringify(value)}`);
+      };
+      Hermes.subscribe(GenericDataLoader.name, 'fanout', GenericDataLoader.subject);
     }
   }
 
