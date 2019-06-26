@@ -5,6 +5,7 @@ build/
 tmp/
 temp/
 declaration/
+dist/
 uploads/
 coverage/
 yarn-error.log
