@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { validate } from 'class-validator';
+import * as _ from 'lodash';
 import * as Rx from 'rxjs';
 
 import { AbstractAuthUser } from '../core/auth';
@@ -95,11 +96,17 @@ export class Hermes {
     source: string,
     event: string,
     payload: any,
-    extras?: { user: AbstractAuthUser; type: string },
+    extras?: { user?: AbstractAuthUser; type?: string },
   ) {
     logger.log(`emit events from [${source}]: {${event}}${JSON.stringify(payload)}`);
     this.subject.next(
-      new AsunaEvent({ name: event, payload, source, user: extras.user, type: extras.type }),
+      new AsunaEvent({
+        name: event,
+        payload,
+        source,
+        user: _.get(extras, 'user'),
+        type: _.get(extras, 'type'),
+      }),
     );
   }
 
