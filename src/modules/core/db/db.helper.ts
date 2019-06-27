@@ -2,9 +2,10 @@ import { Logger } from '@nestjs/common';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-import { FindOperator, getConnection, getRepository, ObjectType } from 'typeorm';
+import { FindOperator, getConnection, getRepository, ObjectType, Repository } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
+
 import {
   ParsedFields,
   parseListParam,
@@ -76,7 +77,7 @@ export class DBHelper {
     return selectable;
   }
 
-  public static repo<Entity>(entity: ObjectType<Entity> | string) {
+  public static repo<Entity>(entity: ObjectType<Entity> | string): Repository<Entity> {
     if (_.isString(entity)) {
       const entityMetadata = getConnection().entityMetadatas.find(metadata => {
         if (DBHelper.isValidEntity(metadata)) {

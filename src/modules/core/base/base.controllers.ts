@@ -15,7 +15,7 @@ import { ApiImplicitParam } from '@nestjs/swagger';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-import { getManager } from 'typeorm';
+import { DeleteResult, getManager } from 'typeorm';
 import * as util from 'util';
 
 import { CurrentUser } from '../decorators';
@@ -151,7 +151,7 @@ export abstract class RestCrudController {
   }
 
   @Delete(':model/:id')
-  delete(@Param('model') model: string, @Param('id') id: number) {
+  delete(@Param('model') model: string, @Param('id') id: number): Promise<DeleteResult> {
     const modelName = getModelName(model, this.module);
     const repository = DBHelper.repo(modelName);
     return repository.delete(id);
