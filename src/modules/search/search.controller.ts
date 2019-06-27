@@ -2,7 +2,7 @@ import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/comm
 import * as _ from 'lodash';
 import * as R from 'ramda';
 
-import { getConnection, getRepository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import { DBHelper } from '../core/db';
 
 import {
@@ -16,7 +16,7 @@ import {
 
 @Controller('api/search')
 export class SearchController {
-  repo(model) {
+  repo<Entity>(model): Repository<Entity> {
     const modelName = getModelName(model);
     return _.isString(model) ? getRepository(modelName) : getRepository(model);
   }
@@ -33,7 +33,7 @@ export class SearchController {
     @Query('where') whereStr?: string,
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
-  ) {
+  ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
     const repository = this.repo(model);
     const select = parseListParam(fields, field => `${model}.${field}`);
     const on = parseListParam(onFields);

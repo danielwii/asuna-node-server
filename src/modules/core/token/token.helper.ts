@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { OperationToken, OperationTokenType } from './token.entities';
 import { random } from '../helpers';
 import { AsunaCode, AsunaException } from '../base';
+import { UpdateResult } from 'typeorm';
 
 const logger = new Logger('TokenHelper');
 
@@ -109,7 +110,7 @@ export class TokenHelper {
     identifier: string;
     role: 'sys' | 'admin' | 'app' | 'web' | 'other';
     service: string;
-  }) {
+  }): Promise<UpdateResult> {
     return OperationToken.update({ role, identifier, service }, { isDeprecated: true });
   }
 

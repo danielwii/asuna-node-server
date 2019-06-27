@@ -10,6 +10,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { UpdateResult } from 'typeorm';
 
 import { ResetPasswordDto, SignDto } from './auth.dto';
 import { AdminAuthService } from './admin-auth.service';
@@ -52,7 +53,7 @@ export class AdminAuthController extends RestCrudController {
 
   // TODO need role: SYS_ADMIN
   @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<UpdateResult> {
     logger.log(`reset password: ${JSON.stringify(resetPasswordDto)}`);
     const user = await this.adminAuthService.getUser(resetPasswordDto.email, true);
 

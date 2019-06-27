@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { createConfigLoader } from 'node-buffs';
+import { ConfigLoader, createConfigLoader } from 'node-buffs';
 
 const logger = new Logger('ConfigLoader');
 
@@ -37,7 +37,7 @@ export const ConfigKeys = {
   OTP_SECRET: 'OTP_SECRET',
 };
 
-export const configLoader = createConfigLoader({
+export const configLoader: ConfigLoader = createConfigLoader({
   requiredVariables: [],
 });
 

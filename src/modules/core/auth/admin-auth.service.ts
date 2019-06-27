@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
-import { Connection, FindOneOptions, getManager, Repository } from 'typeorm';
+import { Connection, FindOneOptions, getManager, Repository, UpdateResult } from 'typeorm';
 
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
@@ -117,7 +117,7 @@ export class AdminAuthService {
     );
   }
 
-  public updatePassword(id: number, password: string, salt: string) {
+  public updatePassword(id: number, password: string, salt: string): Promise<UpdateResult> {
     return this.userRepository.update(id, { password, salt });
   }
 }

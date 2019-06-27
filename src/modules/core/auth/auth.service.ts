@@ -9,6 +9,7 @@ import {
   getManager,
   getRepository,
   Repository,
+  UpdateResult,
 } from 'typeorm';
 
 import { AdminUser } from './auth.entities';
@@ -124,7 +125,7 @@ export class AuthService {
     );
   }
 
-  public updatePassword(id: number, password: string, salt: string) {
+  public updatePassword(id: number, password: string, salt: string): Promise<UpdateResult> {
     return this.userRepository.update(id, { password, salt });
   }
 }

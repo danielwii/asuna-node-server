@@ -66,7 +66,7 @@ export abstract class RestCrudController {
     @Query('where') whereStr?: string,
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
-  ) {
+  ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
     const modelName = getModelName(model, this.module);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);

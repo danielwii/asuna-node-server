@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
-import { getConnection, getRepository, ObjectType } from 'typeorm';
+import { getConnection, getRepository, ObjectType, Repository } from 'typeorm';
 import * as util from 'util';
 
 import { parseFields, Profile } from '../../helper';
@@ -13,7 +13,7 @@ export class DBService {
   /**
    * @deprecated using DBHelper.repo
    */
-  repo<Entity>(entity: ObjectType<Entity> | string) {
+  repo<Entity>(entity: ObjectType<Entity> | string): Repository<Entity> {
     if (_.isString(entity)) {
       const entityMetadata = getConnection().entityMetadatas.find(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
@@ -29,7 +29,7 @@ export class DBService {
     }
   }
 
-  repos() {
+  repos(): Repository<any>[] {
     return getConnection()
       .entityMetadatas.filter(metadata => DBHelper.isValidEntity(metadata))
       .map(metadata => getRepository(metadata.target));
