@@ -1,16 +1,14 @@
 {
   "name": "asuna-node-server",
-  "version": "0.2.8",
+  "version": "0.2.10",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "dist/index.js",
-  "module": "src/index.ts",
-  "types": "declaration/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist && rm -rf ./declaration",
     "tsc": "tsc",
     "build": "yarn tsc",
-    "build:declaration": "yarn tsc --emitDeclarationOnly",
     "prebuild": "yarn clean",
     "postinstall": "yarn build",
     "test": "ENV=test jest",

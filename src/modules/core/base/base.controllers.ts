@@ -159,7 +159,7 @@ export abstract class RestCrudController {
 
   @Post(':model')
   async save(
-    @CurrentUser() user, //: AdminUser,
+    @CurrentUser() user, // : AdminUser,
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
@@ -193,7 +193,7 @@ export abstract class RestCrudController {
 
   @Patch(':model/:id')
   async patch(
-    @CurrentUser() admin, //: AdminUser,
+    @CurrentUser() admin, // : AdminUser,
     @Param('model') model: string,
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },

@@ -8,9 +8,9 @@ import * as compression from 'compression';
 import * as responseTime from 'response-time';
 import { json } from 'body-parser';
 import { resolve } from 'path';
-import { ConfigKeys, configLoader } from './modules/core';
-import { AsunaContext, IAsunaContextOpts } from './modules/core';
+import { AsunaContext, ConfigKeys, configLoader, IAsunaContextOpts } from './modules/core';
 import { AnyExceptionFilter } from './modules/common';
+import { renderObject } from './modules/logger';
 
 const rateLimit = require('express-rate-limit');
 const logger = new Logger('bootstrap');
@@ -26,8 +26,9 @@ if (process.env.NODE_ENV === 'production') {
 
 const pkg = require('../package.json');
 
-interface IBootstrapOptions {
+export interface IBootstrapOptions {
   root?: string;
+  dirname?: string;
   version?: string;
   redisMode?: 'io' | 'redis' | 'ws';
   context?: IAsunaContextOpts;
@@ -41,41 +42,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   // --------------------------------------------------------------
   // Setup app
   // --------------------------------------------------------------
-
-  // 根据环境变量调整要拉取的实体
-  let isProduction = process.env.NODE_ENV === 'production';
-  let isBuild = __filename.endsWith('js');
-  let suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
-  const entities =
-    isProduction || isBuild
-      ? [
-          `${resolve(__dirname)}/**/*.entities.js`,
-          `${resolve(__dirname, '../')}/**/*.entities.js`,
-          `${resolve(options.root)}/**/*.entities.${suffix}`,
-        ]
-      : [
-          `${resolve(__dirname)}/**/*.entities.ts`,
-          `${resolve(__dirname, '../../packages')}/**/*.entities.ts`,
-          `${resolve(options.root)}/**/*.entities.${suffix}`,
-        ];
-  const subscribers =
-    isProduction || isBuild
-      ? [
-          `${resolve(__dirname)}/**/*.subscriber.js`,
-          `${resolve(__dirname, '../')}/**/*.subscriber.js`,
-          `${resolve(options.root)}/**/*.subscriber.${suffix}`,
-        ]
-      : [
-          `${resolve(__dirname)}/**/*.subscriber.ts`,
-          `${resolve(__dirname, '../../packages')}/**/*.subscriber.ts`,
-          `${resolve(options.root)}/**/*.subscriber.${suffix}`,
-        ];
-
-  logger.log(`resolve typeorm entities: ${entities}`);
-  logger.log(`resolve typeorm subscribers: ${subscribers}`);
-
-  process.env.TYPEORM_ENTITIES = entities.join();
-  process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
+  resolveTypeormPaths(options);
 
   const app = await NestFactory.create<NestExpressApplication>(appModule);
   app.useGlobalFilters(new AnyExceptionFilter());
@@ -94,7 +61,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     rateLimit({
       windowMs: 60 * 1e3, // 1 minute(s)
       max: 1000, // limit each IP to 1000 requests per windowMs
-      message: `Too many accounts created from this IP, please try again after 1474560 minutes.`,
+      message: 'Too many accounts created from this IP, please try again after 1474560 minutes.',
     }),
   );
   app.use(morgan('dev'));
@@ -102,13 +69,13 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
-    logger.log(`[X] debug mode is enabled`);
+    logger.log('[X] debug mode is enabled');
 
     // --------------------------------------------------------------
     // Setup Swagger
     // --------------------------------------------------------------
 
-    logger.log(`[X] init swagger at /swagger`);
+    logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()
       .setTitle('API Server')
       .setVersion(options.version)
@@ -132,4 +99,58 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
 
     return app;
   });
+}
+
+/**
+ * 根据环境变量调整要拉取的实体
+ * @param options
+ */
+export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const wasBuilt = __filename.endsWith('js');
+  const dirname = options.dirname || __dirname;
+  const root = options.root || __dirname;
+  const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
+  const entities =
+    isProduction || wasBuilt
+      ? [
+          `${resolve(dirname)}/**/*.entities.js`,
+          // `${resolve(dirname, '../')}/**/*.entities.js`,
+          `${resolve(root)}/**/*.entities.${suffix}`,
+        ]
+      : [
+          `${resolve(dirname)}/**/*.entities.ts`,
+          `${resolve(dirname, '../../packages')}/**/*.entities.ts`,
+          `${resolve(root)}/**/*.entities.${suffix}`,
+        ];
+  const subscribers =
+    isProduction || wasBuilt
+      ? [
+          `${resolve(dirname)}/**/*.subscriber.js`,
+          // `${resolve(dirname, '../')}/**/*.subscriber.js`,
+          `${resolve(root)}/**/*.subscriber.${suffix}`,
+        ]
+      : [
+          `${resolve(dirname)}/**/*.subscriber.ts`,
+          `${resolve(dirname, '../../packages')}/**/*.subscriber.ts`,
+          `${resolve(root)}/**/*.subscriber.${suffix}`,
+        ];
+  logger.log(
+    `options is ${renderObject({
+      options,
+      isProduction,
+      isBuild: wasBuilt,
+      dirname,
+      root,
+      suffix,
+      entities,
+      subscribers,
+    })}`,
+  );
+
+  logger.log(`resolve typeorm entities: ${renderObject(entities)}`);
+  logger.log(`resolve typeorm subscribers: ${renderObject(subscribers)}`);
+
+  process.env.TYPEORM_ENTITIES = entities.join();
+  process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
 }

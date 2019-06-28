@@ -15,7 +15,7 @@ import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';
 import { AsunaContext } from '../context';
-import urljoin = require('url-join');
+import * as urljoin from 'url-join';
 
 export enum StorageMode {
   LOCAL = 'local',

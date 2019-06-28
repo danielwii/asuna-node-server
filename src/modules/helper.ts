@@ -15,9 +15,9 @@ import {
   Not,
   Raw,
 } from 'typeorm';
-import * as util from 'util';
 import { AsunaContext } from './core/context';
 import { Condition } from './core/decorators';
+import { renderObject } from './logger';
 
 const logger = new Logger('Helper');
 
@@ -44,7 +44,7 @@ export function getModelName(model: string, module?: string) {
   ) {
     return model;
   }
-  return `${module || `${AsunaContext.instance.defaultModulePrefix}__`}${model}`;
+  return `${module || `${AsunaContext.instance.defaultModulePrefix}__`}t_${model}`;
 }
 
 /**
@@ -69,8 +69,8 @@ export function parseNormalWhereAndRelatedFields(
   repository,
 ): { normalWhere: any[]; relatedFields: string[] } {
   const allRelations = repository.metadata.relations.map(r => r.propertyName);
-  let normalWhere = [];
-  let relatedFields = [];
+  const normalWhere = [];
+  const relatedFields = [];
   _.each(where, (value, field) => {
     if (_.includes(allRelations, field)) {
       relatedFields.push(field);
@@ -103,7 +103,7 @@ function parseCondition(value: Condition) {
   if (_.has(value, '$isNull')) return IsNull();
   if (_.has(value, '$not')) return Not(value.$not);
   if (_.isBoolean(value)) return value;
-  logger.warn(`no handler found for ${util.inspect(value)}`);
+  logger.warn(`no handler found for ${renderObject(value)}`);
   return value;
 }
 

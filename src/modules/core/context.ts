@@ -1,4 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { join, resolve } from 'path';
+import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
+import { renderObject } from '../logger';
 import { ConfigKeys, configLoader } from './config.helper';
 import {
   IStorageEngine,
@@ -9,7 +12,8 @@ import {
   QiniuStorage,
   StorageMode,
 } from './storage';
-import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
+
+const logger = new Logger('AsunaContext');
 
 export interface IAsunaContextOpts {
   /**
@@ -22,10 +26,7 @@ export interface IAsunaContextOpts {
 export class AsunaContext {
   public static readonly instance = new AsunaContext();
 
-  private opts: IAsunaContextOpts = {
-    defaultModulePrefix: 'www',
-    root: resolve(__dirname, '../..'),
-  };
+  private opts: IAsunaContextOpts;
 
   public readonly dirname: string;
   public uploadPath: string;
@@ -36,21 +37,23 @@ export class AsunaContext {
 
   private constructor() {
     this.dirname = join(__dirname, '../..');
-
+    this.init({
+      defaultModulePrefix: 'www',
+      root: resolve(__dirname, '../..'),
+    });
     this.initStorageEngine(`${process.cwd()}/uploads`);
   }
 
-  init(opts: IAsunaContextOpts) {
-    if (opts == null) {
-      throw new Error('opts must not be empty.');
-    }
+  init(opts: Partial<IAsunaContextOpts> = {}) {
+    logger.log(`init ${renderObject(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
-      root: opts.root,
+      root: opts.root || resolve(__dirname, '../..'),
     };
   }
 
   initStorageEngine(uploadPath: string) {
+    logger.log(`initStorageEngine ${renderObject({ uploadPath })}`);
     this.uploadPath = uploadPath;
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE);
     if (imageStorage === StorageMode.QINIU) {

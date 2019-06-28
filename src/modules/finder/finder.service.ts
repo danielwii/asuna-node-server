@@ -5,7 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { FinderAssetsSettings } from './finder.controller';
 import { AsunaCode, AsunaException } from '../core/base';
-import urljoin = require('url-join');
+import * as urljoin from 'url-join';
 
 const logger = new Logger('FinderService');
 
