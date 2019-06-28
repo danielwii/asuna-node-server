@@ -5,7 +5,7 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { FinderAssetsSettings } from './finder.controller';
 import { AsunaCode, AsunaException } from '../core/base';
-import * as urljoin from 'url-join';
+import { join } from 'path';
 
 const logger = new Logger('FinderService');
 
@@ -44,7 +44,7 @@ export class FinderService {
           `invalid settings ${JSON.stringify(errors)}`,
         );
       }
-      const resourcePath = urljoin('/', path).replace(/\/+/g, '/');
+      const resourcePath = join('/', path).replace(/\/+/g, '/');
       const portStr = upstream.port ? `:${upstream.port}` : '';
 
       // get same domain if hostname startswith /

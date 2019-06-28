@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "dist/index.js",
@@ -27,6 +27,8 @@
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.5.2"
   },
@@ -79,7 +81,6 @@
     "socket.io": "^2.2.0",
     "socket.io-redis": "^5.2.0",
     "type-graphql": "^0.17.4",
-    "typeorm": "^0.2.18",
-    "url-join": "^4.0.0"
+    "typeorm": "^0.2.18"
   }
 }

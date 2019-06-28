@@ -1,13 +1,11 @@
 import { Logger } from '@nestjs/common';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
-import * as path from 'path';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
 import * as minio from 'minio';
-import { BucketItemFromList } from 'minio';
 import { classToPlain } from 'class-transformer';
 
 import { ErrorException } from '../base';
@@ -15,7 +13,6 @@ import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';
 import { AsunaContext } from '../context';
-import * as urljoin from 'url-join';
 
 export enum StorageMode {
   LOCAL = 'local',
@@ -75,7 +72,7 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(
       `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'`,
     );
-    fsExtra.mkdirs(path.join(this.storagePath, this.bucket));
+    fsExtra.mkdirs(join(this.storagePath, this.bucket));
   }
 
   saveEntity(
@@ -87,7 +84,7 @@ export class LocalStorage implements IStorageEngine {
     }
     const bucket = opts.bucket || this.bucket || 'default';
     const prefix = opts.prefix || yearMonthStr();
-    const dest = path.join(this.storagePath, bucket, prefix, file.filename);
+    const dest = join(this.storagePath, bucket, prefix, file.filename);
     LocalStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
@@ -101,7 +98,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public resolve({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
-    const fullFilePath = path.join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
+    const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }
@@ -166,7 +163,7 @@ export class BucketStorage {
   private storagePath: string;
 
   constructor(storagePath: string) {
-    this.storagePath = path.join(storagePath, this.rootBucket);
+    this.storagePath = join(storagePath, this.rootBucket);
     BucketStorage.logger.log(`[constructor] init storage path: '${this.storagePath}'`);
     fsExtra.mkdirs(this.storagePath);
   }
@@ -180,23 +177,23 @@ export class BucketStorage {
       throw new ErrorException('BucketStorage', 'bucket name cannot be empty.');
     }
     if (name.includes('/')) {
-      throw new ErrorException('BucketStorage', 'bucket name cannot be path.');
+      throw new ErrorException('BucketStorage', 'bucket name cannot be ');
     }
-    return Promise.resolve(fsExtra.mkdirsSync(path.join(this.storagePath, name)));
+    return Promise.resolve(fsExtra.mkdirsSync(join(this.storagePath, name)));
   }
 
   public deleteBucket(name: string): Promise<any> {
     if (!name) {
       throw new ErrorException('BucketStorage', 'bucket name cannot be empty.');
     }
-    return Promise.resolve(fsExtra.rmdirSync(path.join(this.storagePath, name)));
+    return Promise.resolve(fsExtra.rmdirSync(join(this.storagePath, name)));
   }
 
   public listEntities(bucketName: string): Promise<any> {
     if (!bucketName) {
       throw new ErrorException('BucketStorage', 'bucket name cannot be empty.');
     }
-    return Promise.resolve(fsExtra.readFileSync(path.join(this.storagePath, bucketName)));
+    return Promise.resolve(fsExtra.readFileSync(join(this.storagePath, bucketName)));
   }
 
   public saveEntity(bucketName: string, file): Promise<any> {
@@ -213,7 +210,7 @@ export class BucketStorage {
 
     const now = new Date();
     const prefix = `${now.getFullYear()}/${now.getMonth()}`;
-    const dest = path.join(this.storagePath, bucketName, prefix, file.filename);
+    const dest = join(this.storagePath, bucketName, prefix, file.filename);
     BucketStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
@@ -265,7 +262,7 @@ export class MinioStorage implements IStorageEngine {
     },
     res,
   ): Promise<any> {
-    return resolver(urljoin(bucket || MinioStorage.defaultBucket, prefix || '', filename));
+    return resolver(join(bucket || MinioStorage.defaultBucket, prefix || '', filename));
   }
 
   async saveEntity(
@@ -275,7 +272,7 @@ export class MinioStorage implements IStorageEngine {
     const bucket = opts.bucket || MinioStorage.defaultBucket;
     const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
-    const items: BucketItemFromList[] = await this.client.listBuckets();
+    const items: minio.BucketItemFromList[] = await this.client.listBuckets();
     if (!(items && items.find(item => item.name === bucket))) {
       await this.client.makeBucket(bucket, region);
     }
@@ -406,6 +403,6 @@ export class QiniuStorage implements IStorageEngine {
     },
     res,
   ): Promise<any> {
-    return Promise.resolve(urljoin(bucket, prefix, filename));
+    return Promise.resolve(join(bucket, prefix, filename));
   }
 }
