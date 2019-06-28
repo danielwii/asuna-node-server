@@ -10,8 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "outDir": "dist"
   },
   "include": ["src"]
 }
