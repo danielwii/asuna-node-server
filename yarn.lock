@@ -456,7 +456,7 @@
     fastify-formbody "3.1.0"
     path-to-regexp "3.0.0"
 
-"@nestjs/platform-socket.io@^6.3.1":
+"@nestjs/platform-socket.io@^6.3.2":
   version "6.3.2"
   resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.3.2.tgz#b30c4a7d1867caaeeadf5f3d7830b85b84809ef9"
   integrity sha512-I1PCr4pWKJQFZHi76Wma3W8I376mf924gbh7Uss3ep7EMIMWYF7yfr59923c4P3G1k/+jakWJRzLPkX8DNlgnw==
@@ -478,12 +478,12 @@
     lodash "4.17.11"
     path-to-regexp "3.0.0"
 
-"@nestjs/terminus@^6.3.3":
-  version "6.3.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-6.3.3.tgz#cd53cecd4f36c4378d7f7d2855388e32d554b2e8"
-  integrity sha512-d9UIxOh+me25Um3pn1yWL/etE6pjClSSIvoCdX6kpQk50WAM3xC9Nu+H/b/148DW1Y8Mwz8+cdxfYMo1dOMzWQ==
+"@nestjs/terminus@^6.3.4":
+  version "6.3.4"
+  resolved "https://registry.yarnpkg.com/@nestjs/terminus/-/terminus-6.3.4.tgz#76b322c648e8b1d7be2119c30c9ca17ad47fd8e1"
+  integrity sha512-1Cz4DV1bhKGRc/Qc/yyps35lNBzDaNPWUedmZVxgdBK6TXkU7A8tQKKGYopO7Jn0JJJ9RVotxxdzSu3n9HAgVg==
   dependencies:
-    check-disk-space "^2.0.0"
+    check-disk-space "^2.1.0"
     gulp "^4.0.2"
     gulp-clean "^0.4.0"
     gulp-typescript "^5.0.1"
@@ -655,6 +655,11 @@
   dependencies:
     "@types/connect" "*"
     "@types/node" "*"
+
+"@types/common-tags@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.8.0.tgz#79d55e748d730b997be5b7fce4b74488d8b26a6b"
+  integrity sha512-htRqZr5qn8EzMelhX/Xmx142z218lLyGaeZ3YR8jlze4TATRU9huKKvuBmAJEW4LCC4pnY1N6JAm6p85fMHjhg==
 
 "@types/connect@*":
   version "3.4.32"
@@ -1192,7 +1197,7 @@ apollo-server-errors@2.3.0:
   resolved "https://registry.yarnpkg.com/apollo-server-errors/-/apollo-server-errors-2.3.0.tgz#700622b66a16dffcad3b017e4796749814edc061"
   integrity sha512-rUvzwMo2ZQgzzPh2kcJyfbRSfVKRMhfIlhY7BzUfM4x6ZT0aijlgsf714Ll3Mbf5Fxii32kD0A/DmKsTecpccw==
 
-apollo-server-express@^2.6.6:
+apollo-server-express@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/apollo-server-express/-/apollo-server-express-2.6.7.tgz#22307e08b75be1553f4099d00028abe52597767d"
   integrity sha512-qbCQM+8LxXpwPNN5Sdvcb+Sne8zuCORFt25HJtPJRkHlyBUzOd7JA7SEnUn5e2geTiiGoVIU5leh+++C51udTw==
@@ -2033,10 +2038,10 @@ character-parser@^2.1.1:
   dependencies:
     is-regex "^1.0.3"
 
-check-disk-space@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/check-disk-space/-/check-disk-space-2.0.0.tgz#4edc4e3c89034c34a6d32557f4d68a5a88f473fd"
-  integrity sha512-lk2C3PZ2w8rc+ESS5dQlmJw/Ei0xmMH/Z8PQiLzAzuBCXL2jA/3An/3j+krvLc5L9xjJUclYZwyP9QigmkeOKA==
+check-disk-space@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/check-disk-space/-/check-disk-space-2.1.0.tgz#2e77fe62f30d9676dc37a524ea2008f40c780295"
+  integrity sha512-f0nx9oJF/AVF8nhSYlF1EBvMNnO+CXyLwKhPvN1943iOMI9TWhQigLZm80jAf0wzQhwKkzA8XXjyvuVUeGGcVQ==
 
 cheerio@^0.22.0:
   version "0.22.0"
@@ -2308,6 +2313,11 @@ commist@^1.0.0:
   dependencies:
     leven "^2.1.0"
     minimist "^1.1.0"
+
+common-tags@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/common-tags/-/common-tags-1.8.0.tgz#8e3153e542d4a39e9b10554434afaaf98956a937"
+  integrity sha512-6P6g0uetGpW/sdyUy/iQQCbFF0kWVMSIVSyYz7Zgjcgh8mgw8PQzDNZeyZ5DQ2gM7LBoZPHmnjz8rUthkBG5tw==
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -4051,10 +4061,10 @@ graphql-upload@^8.0.2:
     http-errors "^1.7.2"
     object-path "^0.11.4"
 
-graphql@^14.3.1:
-  version "14.4.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.4.0.tgz#e97086acfc0338e4fdc8f7dba519c6b8a6badfd9"
-  integrity sha512-E55z1oK6e4cGxCqlSsRWytYDPcIUxky3XkbuQUf6TIjCmn6C7CuBJpmkMF1066q95yPAGOZVPTVT7jABKbRFSA==
+graphql@^14.4.1:
+  version "14.4.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.4.1.tgz#7a7818d3f63f66b9528ba5416b6c88460db62280"
+  integrity sha512-g4HUH26CohlMjaHneXMAtvG3QtO6peJIUTFxrPW4g5LNnXkUuFoBI6Bk1c14Q5kW8+FyjM/tTbePTgpiVB/2hQ==
   dependencies:
     iterall "^1.2.2"
 
