@@ -62,6 +62,10 @@ function yearMonthStr() {
   return `${now.getFullYear()}/${now.getMonth() + 1}`;
 }
 
+function convertFilename(filename: string) {
+  return filename.replace(/[^\w\._]+/g, '_');
+}
+
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = new Logger(LocalStorage.name);
 
@@ -86,7 +90,8 @@ export class LocalStorage implements IStorageEngine {
     }
     const bucket = opts.bucket || this.bucket || 'default';
     const prefix = opts.prefix || yearMonthStr();
-    const dest = join(this.storagePath, bucket, prefix, file.filename);
+    const filename = convertFilename(file.filename);
+    const dest = join(this.storagePath, bucket, prefix, filename);
     LocalStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
@@ -95,7 +100,7 @@ export class LocalStorage implements IStorageEngine {
       prefix,
       mimetype: file.mimetype,
       mode: StorageMode.LOCAL,
-      filename: file.filename,
+      filename,
     });
   }
 
@@ -212,7 +217,8 @@ export class BucketStorage {
 
     const now = new Date();
     const prefix = `${now.getFullYear()}/${now.getMonth()}`;
-    const dest = join(this.storagePath, bucketName, prefix, file.filename);
+    const filename = convertFilename(file.filename);
+    const dest = join(this.storagePath, bucketName, prefix, filename);
     BucketStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
 
     fsExtra.moveSync(file.path, dest);
@@ -221,7 +227,7 @@ export class BucketStorage {
       bucket: `${this.rootBucket}/${bucketName}`,
       mimetype: file.mimetype,
       mode: StorageMode.LOCAL,
-      filename: file.filename,
+      filename,
     });
   }
 }
@@ -236,7 +242,9 @@ export class MinioStorage implements IStorageEngine {
     opts: { defaultBucket?: string } = {},
   ) {
     this.defaultBucket = opts.defaultBucket || 'default';
-    MinioStorage.logger.log(`[constructor] init ${JSON.stringify(classToPlain(configLoader()))}`);
+    MinioStorage.logger.log(
+      `[constructor] init ${renderObject({ configs: classToPlain(configLoader()), opts })}`,
+    );
   }
 
   get client() {
@@ -311,7 +319,8 @@ export class MinioStorage implements IStorageEngine {
       .replace(/\/+$/, '')
       .replace(/\/+/g, '/')
       .trim();
-    const filenameWithPrefix = join(resolvedPrefix, escape(file.filename));
+    const filename = convertFilename(file.filename);
+    const filenameWithPrefix = join(resolvedPrefix, filename);
 
     MinioStorage.logger.log(oneLineTrim`
       put ${renderObject(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
@@ -327,7 +336,7 @@ export class MinioStorage implements IStorageEngine {
       region,
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
-      filename: file.filename,
+      filename,
     };
   }
 }
@@ -359,7 +368,8 @@ export class QiniuStorage implements IStorageEngine {
       const config = this.configLoader();
       const bucket = opts.bucket;
       const prefix = opts.prefix || yearMonthStr();
-      const filenameWithPrefix = join(prefix, file.filename);
+      const filename = convertFilename(file.filename);
+      const filenameWithPrefix = join(prefix, filename);
       const key = join(bucket, filenameWithPrefix);
       QiniuStorage.logger.log(`upload file to '${config.bucket}' as '${key}'`);
       const uploadToken = new qiniu.rs.PutPolicy({ scope: config.bucket }).uploadToken(this.mac);
@@ -382,7 +392,7 @@ export class QiniuStorage implements IStorageEngine {
               bucket: config.bucket,
               mimetype: file.mimetype,
               mode: StorageMode.QINIU,
-              filename: file.filename,
+              filename,
             });
           } else {
             throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
