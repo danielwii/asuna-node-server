@@ -77,7 +77,9 @@ export class AsunaContext {
     if (videoStorage === StorageMode.QINIU) {
       this.videoStorageEngine = new QiniuStorage(() => QiniuConfigObject.load('video'));
     } else if (videoStorage === StorageMode.MINIO) {
-      this.videoStorageEngine = new MinioStorage(() => MinioConfigObject.load());
+      this.videoStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
+        defaultBucket: 'videos',
+      });
     } else {
       this.videoStorageEngine = new LocalStorage(this.uploadPath, 'videos');
     }
@@ -86,7 +88,9 @@ export class AsunaContext {
     if (fileStorage === StorageMode.QINIU) {
       this.fileStorageEngine = new QiniuStorage(() => QiniuConfigObject.load('file'));
     } else if (fileStorage === StorageMode.MINIO) {
-      this.fileStorageEngine = new MinioStorage(() => MinioConfigObject.load());
+      this.fileStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
+        defaultBucket: 'files',
+      });
     } else {
       this.fileStorageEngine = new LocalStorage(this.uploadPath, 'files');
     }

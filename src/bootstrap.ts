@@ -19,7 +19,7 @@ const startAt = Date.now();
 if (process.env.NODE_ENV === 'production') {
   logger.log(`[X] run as production mode at ${__dirname}`);
   const moduleAlias = require('module-alias');
-  moduleAlias.addPath(__dirname);
+  moduleAlias.addPath(__dirname as any);
 } else {
   logger.log(`[X] run as non-production mode at ${__dirname}`);
 }
@@ -35,7 +35,7 @@ export interface IBootstrapOptions {
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
-  logger.log(`options: ${JSON.stringify(options)}`);
+  logger.log(`options: ${renderObject(options)}`);
 
   AsunaContext.instance.init(options.context || { root: options.root });
 
@@ -44,6 +44,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   // --------------------------------------------------------------
   resolveTypeormPaths(options);
 
+  logger.log('create app ...');
   const app = await NestFactory.create<NestExpressApplication>(appModule);
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));

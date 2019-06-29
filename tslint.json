@@ -5,6 +5,7 @@
   "jsRules": {},
   "rules": {
     "prettier": true,
+    "no-trailing-whitespace": [true, "ignore-template-strings"],
     "ter-arrow-parens": [true, "as-needed"],
     "variable-name": false,
     "align": false,

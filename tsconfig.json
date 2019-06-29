@@ -11,7 +11,8 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "incremental": true
   },
   "include": [
     "src/**/*"

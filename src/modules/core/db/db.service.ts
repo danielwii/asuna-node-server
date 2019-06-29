@@ -10,25 +10,6 @@ import { ErrorException } from '../base';
 const logger = new Logger('DBService');
 
 export class DBService {
-  /**
-   * @deprecated using DBHelper.repo
-   */
-  repo<Entity>(entity: ObjectType<Entity> | string): Repository<Entity> {
-    if (_.isString(entity)) {
-      const entityMetadata = getConnection().entityMetadatas.find(metadata => {
-        if (DBHelper.isValidEntity(metadata)) {
-          return (metadata.target as any).entityInfo.name === entity;
-        }
-      });
-      if (entityMetadata) {
-        return getRepository(entityMetadata.target);
-      }
-      throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
-    } else {
-      return getRepository(entity);
-    }
-  }
-
   repos(): Repository<any>[] {
     return getConnection()
       .entityMetadatas.filter(metadata => DBHelper.isValidEntity(metadata))
@@ -42,7 +23,7 @@ export class DBService {
     fields?: string;
     relationsStr?: string | string[];
   }): Promise<any> {
-    const repository = this.repo(opts.entity);
+    const repository = DBHelper.repo(opts.entity);
     const parsedFields = parseFields(opts.fields);
 
     logger.log(`get ${util.inspect({ opts, parsedFields }, { colors: true })}`);

@@ -8,6 +8,7 @@ export class BaseException {
 export class CodeException extends BaseException {
   constructor(
     public code: string,
+    public errCode: string,
     public name: string,
     public message?: string,
     public errors?: any,
@@ -58,6 +59,13 @@ export class AsunaException extends CodeException {
   constructor(code: NameValue, message?: string, errors?: any) {
     super(code.value, code.name, message, errors);
     this.status = code.value;
+  }
+}
+
+export class AsunaBusinessException extends AsunaException {
+  constructor(errCode: string, message?: string, errors?: any) {
+    super(AsunaCode.Unprocessable, message, errors);
+    this.errCode = errCode;
   }
 }
 

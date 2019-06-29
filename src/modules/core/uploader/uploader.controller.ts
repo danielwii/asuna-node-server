@@ -10,6 +10,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as bluebird from 'bluebird';
 import { Validator } from 'class-validator';
+import { oneLineTrim } from 'common-tags';
 import * as multer from 'multer';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
@@ -63,24 +64,26 @@ export class UploaderController {
     const results = await bluebird
       .map(files, (file: any) => {
         if (_.includes(ImageMimeType, file.mimetype)) {
-          logger.log(`save image[${file.mimetype}]...${file.filename}`);
+          logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
           return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
-        } else if (_.includes(VideoMimeType, file.mimetype)) {
-          logger.log(`save video[${file.mimetype}]...${file.filename}`);
+        }
+        if (_.includes(VideoMimeType, file.mimetype)) {
+          logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
           return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
-        } else if (_.includes(DocMimeType, file.mimetype)) {
-          logger.log(`save doc[${file.mimetype}]...${file.filename}`);
-          return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
-        } else {
-          logger.log(
-            `no storage engine defined for file type [${file.mimetype}]...` +
-              `${prefix} - ${file.filename}, using normal file storage engine.`,
-          );
-          file.filename = `${file.filename}__${file.originalname}`;
+        }
+        if (_.includes(DocMimeType, file.mimetype)) {
+          logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
           return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
         }
+        logger.log(oneLineTrim`
+          no storage engine defined for file type [${file.mimetype}]...
+          to [${bucket}-${prefix}] - ${file.filename}, using normal file storage engine.
+        `);
+        file.filename = `${file.filename}__${file.originalname}`;
+        return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       })
       .catch(error => {
+        console.error(error);
         logger.error(error.message, error.trace);
         throw new AsunaException(AsunaCode.Unprocessable, error.message);
       });

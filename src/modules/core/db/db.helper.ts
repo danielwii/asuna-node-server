@@ -81,6 +81,7 @@ export class DBHelper {
     if (_.isString(entity)) {
       const entityMetadata = getConnection().entityMetadatas.find(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
+          // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${entity}`);
           return (metadata.target as any).entityInfo.name === entity;
         }
       });
@@ -191,7 +192,8 @@ export class DBHelper {
 
   /**
    * profile.ids -> load all ids for relationship
-   * profile.detail -> (you should not do this, it may cause memory leak) load all details about relationship
+   * profile.detail -> (you should not do this, it may cause memory leak)
+   *                    load all details about relationship
    * @param model
    * @param queryBuilder
    * @param repository
@@ -367,7 +369,7 @@ export class DBHelper {
 
           innerValue = innerValue.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
 
-          let temp = innerValue.split(' ');
+          const temp = innerValue.split(' ');
           temp.splice(1, 0, 'not');
           temp.splice(3, 1, `'${temp[3]}'`);
           innerValue = temp.join(' ');
@@ -400,9 +402,8 @@ export class DBHelper {
         return innerValue;
       }
       return elementCondition;
-    } else {
-      // queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
-      return { [condition.field]: condition.value };
     }
+    // queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
+    return { [condition.field]: condition.value };
   }
 }

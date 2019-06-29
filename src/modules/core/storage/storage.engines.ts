@@ -1,18 +1,20 @@
 import { Logger } from '@nestjs/common';
+import { classToPlain } from 'class-transformer';
+import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
+import * as minio from 'minio';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
-import * as minio from 'minio';
-import { classToPlain } from 'class-transformer';
+import { renderObject } from '../../logger';
 
 import { ErrorException } from '../base';
+import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject, QiniuConfigObject } from './config.object';
-import { AsunaContext } from '../context';
 
 export enum StorageMode {
   LOCAL = 'local',
@@ -57,7 +59,7 @@ export interface SavedFile {
 
 function yearMonthStr() {
   const now = new Date();
-  return `${now.getFullYear()}/${now.getMonth()}`;
+  return `${now.getFullYear()}/${now.getMonth() + 1}`;
 }
 
 export class LocalStorage implements IStorageEngine {
@@ -69,9 +71,9 @@ export class LocalStorage implements IStorageEngine {
   constructor(storagePath: string, defaultBucket: string = 'default') {
     this.bucket = defaultBucket || 'default';
     this.storagePath = storagePath;
-    LocalStorage.logger.log(
-      `[constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'`,
-    );
+    LocalStorage.logger.log(oneLineTrim`
+      [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
+    `);
     fsExtra.mkdirs(join(this.storagePath, this.bucket));
   }
 
@@ -148,9 +150,9 @@ export class LocalStorage implements IStorageEngine {
             { colors: true },
           )}`,
         );
-        return res.status(404).send(err.message);
+        res.status(404).send(err.message);
       } else {
-        return res.type(ext).sendFile(outputPath);
+        res.type(ext).sendFile(outputPath);
       }
     });
   }
@@ -227,9 +229,13 @@ export class BucketStorage {
 export class MinioStorage implements IStorageEngine {
   private static readonly logger = new Logger(MinioStorage.name);
 
-  private static readonly defaultBucket = 'default';
+  private readonly defaultBucket;
 
-  constructor(private configLoader: () => MinioConfigObject) {
+  constructor(
+    private configLoader: () => MinioConfigObject,
+    opts: { defaultBucket?: string } = {},
+  ) {
+    this.defaultBucket = opts.defaultBucket || 'default';
     MinioStorage.logger.log(`[constructor] init ${JSON.stringify(classToPlain(configLoader()))}`);
   }
 
@@ -262,22 +268,25 @@ export class MinioStorage implements IStorageEngine {
     },
     res,
   ): Promise<any> {
-    return resolver(join(bucket || MinioStorage.defaultBucket, prefix || '', filename));
+    return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 
   async saveEntity(
     file,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
-    const bucket = opts.bucket || MinioStorage.defaultBucket;
+    const bucket = opts.bucket || this.defaultBucket;
     const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
     const items: minio.BucketItemFromList[] = await this.client.listBuckets();
+    MinioStorage.logger.log(`found buckets: ${renderObject(items)}`);
     if (!(items && items.find(item => item.name === bucket))) {
+      MinioStorage.logger.log(`create bucket [${bucket}] for region [${region}]`);
       await this.client.makeBucket(bucket, region);
     }
 
     if (!bucket.startsWith('private-')) {
+      MinioStorage.logger.log(`bucket [${bucket}] is not private, set anonymous access policy`);
       await this.client.setBucketPolicy(
         bucket,
         JSON.stringify({
@@ -304,15 +313,14 @@ export class MinioStorage implements IStorageEngine {
       .trim();
     const filenameWithPrefix = join(resolvedPrefix, escape(file.filename));
 
-    MinioStorage.logger.log(
-      `put ${JSON.stringify(
-        file,
-      )} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] and bucket [${bucket}]`,
-    );
+    MinioStorage.logger.log(oneLineTrim`
+      put ${renderObject(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
+      and bucket [${bucket}]
+    `);
     const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
       'Content-Type': file.mimetype,
     });
-    MinioStorage.logger.log(`[saveEntity] uploaded [${uploaded}] ...`);
+    MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`);
     return {
       prefix: resolvedPrefix,
       bucket,
