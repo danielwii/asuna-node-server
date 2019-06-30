@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import * as moment from 'moment';
 import { OperationToken, OperationTokenType } from './token.entities';
 import { random } from '../helpers';
-import { AsunaCode, AsunaException } from '../base';
+import { AsunaError, AsunaException } from '../base';
 import { UpdateResult } from 'typeorm';
 
 const logger = new Logger('TokenHelper');
@@ -145,7 +145,7 @@ export class TokenHelper {
       await TokenHelper.checkAvailable(operationToken);
       return operationToken.reload();
     }
-    throw new AsunaException(AsunaCode.Unprocessable, 'invalid token');
+    throw new AsunaException(AsunaError.Unprocessable, 'invalid token');
   }
 
   static async checkAvailable(operationToken: OperationToken) {

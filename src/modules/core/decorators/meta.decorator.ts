@@ -134,12 +134,14 @@ export type MetaInfoOptions =
  * @returns {Function}
  * @constructor
  */
+// tslint:disable-next-line:function-name
 export function MetaInfo(options: MetaInfoOptions): Function {
   return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
     target.info = { ...target.info, [propertyKey]: options };
   };
 }
 
+// tslint:disable-next-line:function-name
 export function EntityMetaInfo(options: EntityMetaInfoOptions): Function {
   return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
     target.entityInfo = options;

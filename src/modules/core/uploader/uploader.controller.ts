@@ -15,7 +15,7 @@ import * as multer from 'multer';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 
-import { AsunaCode, AsunaException, UploadException } from '../base';
+import { AsunaError, AsunaException, UploadException } from '../base';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
 import { AsunaContext } from '../context';
 
@@ -85,7 +85,7 @@ export class UploaderController {
       .catch(error => {
         console.error(error);
         logger.error(error.message, error.trace);
-        throw new AsunaException(AsunaCode.Unprocessable, error.message);
+        throw new AsunaException(AsunaError.Unprocessable, error.message);
       });
     logger.log(`results is ${JSON.stringify(results)}`);
     return results;

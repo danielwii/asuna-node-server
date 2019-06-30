@@ -1,11 +1,12 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { Request, Response } from 'express';
-import { AsunaCode, ValidationException } from '../../core';
+import { AsunaError, AsunaException, ValidationException } from '../../core';
+import { renderObject } from '../../logger';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -53,37 +54,45 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      logger.warn(`[bad_request] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[bad_request] ${renderObject(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[not_found] ${renderObject(processed.message)}`);
     } else if (/40\d/.test(`${status}`)) {
-      logger.warn(`[unauthorized] ${JSON.stringify(processed.message)}`);
+      logger.warn(`[unauthorized] ${renderObject(processed.message)}`);
     } else {
-      logger.error(`[unhandled exception] ${JSON.stringify(processed.message)}`, processed.stack);
+      logger.error(`[unhandled exception] ${renderObject(processed.message)}`, processed.stack);
     }
 
     if (!response.finished && response.status) {
       if (R.is(HttpException, processed)) {
-        const key = _.isString(exceptionResponse.message) ? 'message' : 'details';
+        const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
         response.status(status).json({
           error: {
+            status,
             name: exceptionResponse.error,
-            code: status,
+            code: exceptionResponse.code,
             [key]: exceptionResponse.message,
             // raw: processed,
-          },
+          } as AsunaException,
         });
       } else if (R.is(Error, processed)) {
         response.status(status).json({
           error: {
-            name: AsunaCode.Unexpected__do_not_use_it.name,
-            code: processed.status || AsunaCode.Unexpected__do_not_use_it.value,
+            status,
+            name: AsunaError.Unexpected__do_not_use_it.name,
+            code: processed.status || AsunaError.Unexpected__do_not_use_it.value,
             message: processed.message,
             // raw: processed,
-          },
+          } as AsunaException,
         });
       } else {
-        response.status(status).json({ error: processed });
+        try {
+          response.status(status).json({ error: processed as AsunaException });
+        } catch (e) {
+          response
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .json({ error: processed as AsunaException });
+        }
       }
     }
   }

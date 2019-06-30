@@ -36,6 +36,7 @@ export class AsunaContext {
   public fileStorageEngine: IStorageEngine;
 
   private constructor() {
+    logger.log('init ...');
     this.dirname = join(__dirname, '../..');
     this.init({
       defaultModulePrefix: 'www',

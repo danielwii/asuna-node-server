@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AsunaCode, AsunaException } from '../base';
+import { AsunaError, AsunaException } from '../base';
 
 const logger = new Logger('JwtAuthGuard');
 
@@ -16,7 +16,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (this.opts.anonymousSupport) {
         return null;
       }
-      throw err || new AsunaException(AsunaCode.InsufficientPermissions);
+      throw err || new AsunaException(AsunaError.InsufficientPermissions);
     }
     return user;
   }

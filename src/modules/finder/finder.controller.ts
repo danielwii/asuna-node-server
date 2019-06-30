@@ -4,7 +4,7 @@ import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
 import { FinderService } from './finder.service';
-import { AsunaCode, AsunaException } from '../core/base';
+import { AsunaError, AsunaException } from '../core/base';
 
 const logger = new Logger('FinderController');
 
@@ -47,7 +47,7 @@ export class FinderController {
       !(_.isString(query) && query.length > 0) ||
       !(_.isString(type) && ['zones', 'assets'].includes(type))
     ) {
-      throw new AsunaException(AsunaCode.BadRequest, 'params error');
+      throw new AsunaException(AsunaError.BadRequest, 'params error');
     }
 
     const queryParam = querystring.parse(encrypt ? Cryptor.desDecrypt(query) : query) as any;
@@ -70,7 +70,7 @@ export class ShortFinderController {
   async redirect(@Param('q') q: string, @Req() req, @Res() res) {
     logger.log(`find short ${JSON.stringify({ q })}`);
     if (!(_.isString(q) && q.length > 0)) {
-      throw new AsunaException(AsunaCode.BadRequest, 'params error');
+      throw new AsunaException(AsunaError.BadRequest, 'params error');
     }
 
     let query;
@@ -83,11 +83,11 @@ export class ShortFinderController {
         .split('.') as any;
       query = Buffer.from(encodedQuery, 'base64').toString('ascii');
     } catch (e) {
-      throw new AsunaException(AsunaCode.BadRequest, 'decode error');
+      throw new AsunaException(AsunaError.BadRequest, 'decode error');
     }
 
     if (!(_.isString(type) && ['zones', 'assets'].includes(type))) {
-      throw new AsunaException(AsunaCode.InvalidParameter, 'invalid param');
+      throw new AsunaException(AsunaError.InvalidParameter, 'invalid param');
     }
 
     const queryParam = querystring.parse(

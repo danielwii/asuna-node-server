@@ -1,4 +1,3 @@
-import * as otplib from 'otplib';
 import {
   Body,
   Controller,
@@ -10,12 +9,14 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-
-import { ResetPasswordDto, SignDto } from './auth.dto';
-import { AdminAuthService } from './admin-auth.service';
-import { AsunaCode, AsunaException, RestCrudController, SignException } from '../base';
+import { renderObject } from '../../logger';
+import { AsunaError, AsunaException, SignException } from '../base';
+import { RestCrudController } from '../base/base.controllers';
 import { SysTokenServiceName, TokenHelper } from '../token';
+import { AdminAuthService } from './admin-auth.service';
+import { ResetPasswordDto, SignDto } from './auth.dto';
 
 const logger = new Logger('AdminAuthController');
 
@@ -31,7 +32,7 @@ export class AdminAuthController extends RestCrudController {
     if (!user) {
       return res.status(HttpStatus.I_AM_A_TEAPOT).send();
     }
-    logger.log(`generate [login] otp to ${JSON.stringify(user)}`);
+    logger.log(`generate [login] otp to ${renderObject(user)}`);
 
     const tokenOptions = {
       role: 'admin',
@@ -52,9 +53,10 @@ export class AdminAuthController extends RestCrudController {
   }
 
   // TODO need role: SYS_ADMIN
+  // FIXME type ResetPasswordDto not recognise email
   @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<UpdateResult> {
-    logger.log(`reset password: ${JSON.stringify(resetPasswordDto)}`);
+  async resetPassword(@Body() resetPasswordDto): Promise<UpdateResult> {
+    logger.log(`reset password: ${renderObject(resetPasswordDto)}`);
     const user = await this.adminAuthService.getUser(resetPasswordDto.email, true);
 
     if (!user) {
@@ -92,12 +94,12 @@ export class AdminAuthController extends RestCrudController {
   @Get('current')
   async current(@Req() request) {
     const { user } = request;
-    logger.log(`current... ${JSON.stringify(user)}`);
+    logger.log(`current... ${renderObject(user)}`);
     const currentUser = await this.adminAuthService.getUser(user.email, true, {
       relations: ['roles'],
     });
     if (!currentUser) {
-      throw new AsunaException(AsunaCode.InsufficientPermissions, `id '${user.id}' not exist.`);
+      throw new AsunaException(AsunaError.InsufficientPermissions, `id '${user.id}' not exist.`);
     }
     return currentUser;
   }

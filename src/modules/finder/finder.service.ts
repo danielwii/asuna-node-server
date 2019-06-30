@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { FinderAssetsSettings } from './finder.controller';
-import { AsunaCode, AsunaException } from '../core/base';
+import { AsunaError, AsunaException } from '../core/base';
 import { join } from 'path';
 
 const logger = new Logger('FinderService');
@@ -15,7 +15,7 @@ export class FinderService {
 
   async getUrl(key: string, type: 'assets' | 'zones', name: string, path: string) {
     if (!(key && type && path)) {
-      throw new AsunaException(AsunaCode.BadRequest, JSON.stringify({ type, name, path }));
+      throw new AsunaException(AsunaError.BadRequest, JSON.stringify({ type, name, path }));
     }
 
     const upstreams = await this.kvService.get(AsunaCollections.SYSTEM_SERVER, key);
@@ -23,7 +23,7 @@ export class FinderService {
     if (!(upstreams && upstreams.value && _.isObject(upstreams.value))) {
       logger.warn(`${name || 'default'} not available in upstream ${key}`);
       throw new AsunaException(
-        AsunaCode.Unprocessable,
+        AsunaError.Unprocessable,
         `${name || 'default'} not available in upstream ${key}`,
       );
     }
@@ -33,14 +33,14 @@ export class FinderService {
       const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream);
       if (!finderAssetsSettings) {
         throw new AsunaException(
-          AsunaCode.Unprocessable,
+          AsunaError.Unprocessable,
           `invalid upstream ${JSON.stringify(upstream)}`,
         );
       }
       const errors = await validate(finderAssetsSettings);
       if (errors.length) {
         throw new AsunaException(
-          AsunaCode.Unprocessable,
+          AsunaError.Unprocessable,
           `invalid settings ${JSON.stringify(errors)}`,
         );
       }
@@ -56,7 +56,7 @@ export class FinderService {
     } else {
       // TODO add other handlers later
       logger.warn('only type assets is available');
-      throw new AsunaException(AsunaCode.InvalidParameter, 'only type assets is available');
+      throw new AsunaException(AsunaError.InvalidParameter, 'only type assets is available');
     }
   }
 }

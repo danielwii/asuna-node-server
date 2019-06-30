@@ -1,21 +1,6 @@
+// tslint:disable:max-line-length
 import { HttpStatus } from '@nestjs/common';
 import { NameValue } from '../../helper';
-
-export class BaseException {
-  constructor(public name: string, public message?: string, public errors?: any) {}
-}
-
-export class CodeException extends BaseException {
-  constructor(
-    public code: string,
-    public errCode: string,
-    public name: string,
-    public message?: string,
-    public errors?: any,
-  ) {
-    super(name, message, errors);
-  }
-}
 
 /**
  * 400  invalidParameter          Indicates that a request parameter has an invalid value.
@@ -29,7 +14,7 @@ export class CodeException extends BaseException {
  * 429  tooManyRequests
  * 500  unexpected                Better not use it.
  */
-export const AsunaCode = {
+export const AsunaError = {
   InvalidParameter: new NameValue('Invalid Parameter', 400),
   BadRequest: new NameValue('Bad Request', 400),
   InvalidCredentials: new NameValue('Invalid Credentials', 401),
@@ -53,34 +38,40 @@ export const AsunaCode = {
 /**
  * 该异常构造前端可以进行交互的格式
  */
-export class AsunaException extends CodeException {
-  status = 500;
+export class AsunaBaseException {
+  constructor(
+    public status: HttpStatus,
+    public code: string,
+    public name: string,
+    public message?: string,
+    public errors?: any,
+  ) {}
+}
 
-  constructor(code: NameValue, message?: string, errors?: any) {
-    super(code.value, code.name, message, errors);
-    this.status = code.value;
+export class AsunaException extends AsunaBaseException {
+  constructor(nameValue: NameValue, message?: string, errors?: any) {
+    super(nameValue.value, null, nameValue.name, message, errors);
   }
 }
 
-export class AsunaBusinessException extends AsunaException {
-  constructor(errCode: string, message?: string, errors?: any) {
-    super(AsunaCode.Unprocessable, message, errors);
-    this.errCode = errCode;
+export class AsunaCodeException extends AsunaBaseException {
+  constructor(nameValue: NameValue, code: string, message?: string, errors?: any) {
+    super(nameValue.value, code, nameValue.name, message, errors);
   }
 }
 
-/**
- * @deprecated use AsunaException directly
- */
-export class ErrorException extends BaseException {}
+export class ErrorException extends AsunaBaseException {
+  constructor(name: string, message?: string, errors?: any) {
+    super(AsunaError.Unprocessable.value, name, AsunaError.Unprocessable.name, message, errors);
+  }
+}
 
 /**
  * @deprecated use AsunaException directly
  */
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
-    super(AsunaCode.InvalidParameter, `validate '${model}' error`, errors);
-    this.status = HttpStatus.BAD_REQUEST;
+    super(AsunaError.InvalidParameter, `validate '${model}' error`, errors);
   }
 }
 
@@ -89,7 +80,7 @@ export class ValidationException extends AsunaException {
  */
 export class UploadException extends AsunaException {
   constructor(errors) {
-    super(AsunaCode.Unprocessable, `upload file(s) error`, errors);
+    super(AsunaError.Unprocessable, 'upload file(s) error', errors);
   }
 }
 
@@ -98,6 +89,6 @@ export class UploadException extends AsunaException {
  */
 export class SignException extends AsunaException {
   constructor(message) {
-    super(AsunaCode.InvalidCredentials, message);
+    super(AsunaError.InvalidCredentials, message);
   }
 }
