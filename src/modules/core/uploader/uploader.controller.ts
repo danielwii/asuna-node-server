@@ -14,6 +14,7 @@ import { oneLineTrim } from 'common-tags';
 import * as multer from 'multer';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
+import { renderObject } from '../../logger';
 
 import { AsunaError, AsunaException, UploadException } from '../base';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
@@ -87,7 +88,7 @@ export class UploaderController {
         logger.error(error.message, error.trace);
         throw new AsunaException(AsunaError.Unprocessable, error.message);
       });
-    logger.log(`results is ${JSON.stringify(results)}`);
+    logger.log(`results is ${renderObject(results)}`);
     return results;
   }
 }

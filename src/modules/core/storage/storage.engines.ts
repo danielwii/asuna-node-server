@@ -326,10 +326,18 @@ export class MinioStorage implements IStorageEngine {
       put ${renderObject(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
       and bucket [${bucket}]
     `);
-    const uploaded = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, {
-      'Content-Type': file.mimetype,
-    });
-    MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`);
+    // TODO upload to remote may failed
+    this.client
+      .fPutObject(bucket, filenameWithPrefix, file.path, {
+        'Content-Type': file.mimetype,
+      })
+      .then(uploaded => MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`))
+      .catch(error =>
+        MinioStorage.logger.error(
+          `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
+          error.trace,
+        ),
+      );
     return {
       prefix: resolvedPrefix,
       bucket,
