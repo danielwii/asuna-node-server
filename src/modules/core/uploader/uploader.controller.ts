@@ -55,6 +55,7 @@ export class UploaderController {
   async upload(
     @Query('bucket') bucket: string = '',
     @Query('prefix') prefix: string = '',
+    @Query('local') local: string, // 是否使用本地存储
     @Req() req,
     @UploadedFiles() files,
   ) {
@@ -64,6 +65,13 @@ export class UploaderController {
     }
     const results = await bluebird
       .map(files, (file: any) => {
+        if (local === '1') {
+          logger.log(
+            `save file[${file.mimetype}] to local storage [${bucket}-${prefix}]...${file.filename}`,
+          );
+          return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
+        }
+
         if (_.includes(ImageMimeType, file.mimetype)) {
           logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
           return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });

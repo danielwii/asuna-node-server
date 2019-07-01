@@ -34,6 +34,7 @@ export class AsunaContext {
   public defaultStorageEngine: IStorageEngine;
   public videoStorageEngine: IStorageEngine;
   public fileStorageEngine: IStorageEngine;
+  public localStorageEngine: IStorageEngine;
 
   private constructor() {
     logger.log('init ...');
@@ -95,6 +96,8 @@ export class AsunaContext {
     } else {
       this.fileStorageEngine = new LocalStorage(this.uploadPath, 'files');
     }
+
+    this.localStorageEngine = new LocalStorage(this.uploadPath, 'local');
   }
 
   get defaultModulePrefix() {
