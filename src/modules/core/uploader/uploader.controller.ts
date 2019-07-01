@@ -31,7 +31,7 @@ export class UploaderController {
     FilesInterceptor('files', 3, {
       storage: multer.diskStorage({
         filename(req, file, cb) {
-          cb(null, `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}`);
+          cb(null, `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`);
         },
       }),
       fileFilter(req, file, cb) {
@@ -85,10 +85,10 @@ export class UploaderController {
           return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
         }
         logger.log(oneLineTrim`
-          no storage engine defined for file type [${file.mimetype}]...
-          to [${bucket}-${prefix}] - ${file.filename}, using normal file storage engine.
+          no storage engine defined for file type [${file.mimetype}]
+          to bucket(${bucket})/prefix(${prefix}) - ${file.filename}, 
+          using normal file storage engine.
         `);
-        file.filename = `${file.filename}__${file.originalname}`;
         return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       })
       .catch(error => {
