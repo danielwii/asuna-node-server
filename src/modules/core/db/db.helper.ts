@@ -149,7 +149,7 @@ export class DBHelper {
 
   public static getMetadata(model: string): EntityMetadata {
     return this.metadatas.find(metadata => {
-      logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
+      // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
       return this.getEntityInfo(metadata).name === model;
     });
   }
