@@ -20,7 +20,6 @@ import * as util from 'util';
 
 import { CurrentUser } from '../decorators';
 import {
-  getModelName,
   parseFields,
   parseNormalWhereAndRelatedFields,
   parseOrder,
@@ -40,8 +39,8 @@ export abstract class RestCrudController {
 
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {
-    this.module = this.module ? `${this.module}__` : '';
-    this.prefix = this.prefix ? `${this.prefix}_` : '';
+    // this.module = this.module ? `${this.module}__` : '';
+    // this.prefix = this.prefix ? `${this.prefix}_` : '';
     logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
   }
 
@@ -51,8 +50,7 @@ export abstract class RestCrudController {
   })
   @Options(':model')
   options(@Param('model') model: string) {
-    const modelName = getModelName(model, this.module);
-    const repository = DBHelper.repo(modelName);
+    const repository = DBHelper.repo(DBHelper.getModelName(model, this.module));
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
@@ -67,11 +65,11 @@ export abstract class RestCrudController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
-    const modelName = getModelName(model, this.module);
+    const modelName = DBHelper.getModelName(model, this.module);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
-    const order = parseOrder(modelName, sortStr);
+    const order = parseOrder(modelName.model, sortStr);
     const query = {
       where,
       order,
@@ -82,14 +80,14 @@ export abstract class RestCrudController {
 
     // console.log('list', { query, order });
 
-    const queryBuilder = repository.createQueryBuilder(modelName);
+    const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns
       .filter(column => column.isPrimary)
       .map(column => column.propertyName);
 
-    DBHelper.wrapParsedFields(modelName, { queryBuilder, parsedFields, primaryKeys });
+    DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
     DBHelper.wrapProfile(
-      modelName,
+      modelName.model,
       queryBuilder,
       repository,
       profile,
@@ -103,7 +101,7 @@ export abstract class RestCrudController {
     }
 
     const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
-    DBHelper.wrapNormalWhere(modelName, queryBuilder, normalWhere);
+    DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWhere);
 
     const total = await queryBuilder.getCount();
     const items = await queryBuilder
@@ -124,7 +122,7 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ) {
-    const modelName = getModelName(model, this.module);
+    const modelName = DBHelper.getModelName(model, this.module);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
 
@@ -132,11 +130,11 @@ export abstract class RestCrudController {
       `get ${util.inspect({ profile, modelName, parsedFields, relationsStr }, { colors: true })}`,
     );
 
-    const queryBuilder = repository.createQueryBuilder(modelName);
+    const queryBuilder = repository.createQueryBuilder(modelName.model);
 
-    DBHelper.wrapParsedFields(modelName, { queryBuilder, parsedFields });
+    DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields });
     DBHelper.wrapProfile(
-      modelName,
+      modelName.model,
       queryBuilder,
       repository,
       profile,
@@ -152,7 +150,7 @@ export abstract class RestCrudController {
 
   @Delete(':model/:id')
   delete(@Param('model') model: string, @Param('id') id: number): Promise<DeleteResult> {
-    const modelName = getModelName(model, this.module);
+    const modelName = DBHelper.getModelName(model, this.module);
     const repository = DBHelper.repo(modelName);
     return repository.delete(id);
   }
@@ -163,9 +161,10 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = getModelName(model, this.module);
+    const modelName = DBHelper.getModelName(model, this.module);
     logger.log(`patch ${JSON.stringify({ user, modelName, updateTo })}`);
-    if (modelName === 'kv__pairs') {
+    // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
+    if (modelName.model === 'kv__pairs') {
       const pair = KeyValuePair.create(updateTo);
       logger.log(`save by kvService... ${JSON.stringify(pair)}`);
       return this.kvService.set(pair);
@@ -198,10 +197,10 @@ export abstract class RestCrudController {
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ) {
-    const modelName = getModelName(model, this.module);
+    const modelName = DBHelper.getModelName(model, this.module);
     logger.log(`patch ${JSON.stringify({ admin, modelName, id, updateTo })}`);
     // TODO remove kv handler from default handler
-    if (modelName === 'kv__pairs') {
+    if (modelName.model === 'kv__pairs') {
       logger.log('update by kvService...');
       return this.kvService.update(id, updateTo.name, updateTo.type, updateTo.value);
     }

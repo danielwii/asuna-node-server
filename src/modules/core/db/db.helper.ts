@@ -2,7 +2,14 @@ import { Logger } from '@nestjs/common';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-import { FindOperator, getConnection, getRepository, ObjectType, Repository } from 'typeorm';
+import {
+  EntityMetadata,
+  FindOperator,
+  getConnection,
+  getRepository,
+  ObjectType,
+  Repository,
+} from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 
@@ -12,6 +19,8 @@ import {
   parseNormalWhereAndRelatedFields,
   Profile,
 } from '../../helper';
+import { renderObject } from '../../logger';
+import { AsunaContext } from '../context';
 import { EntityMetaInfoOptions, MetaInfoOptions } from '../decorators';
 import { ErrorException } from '../base';
 
@@ -29,7 +38,22 @@ export interface ColumnSchema {
   };
 }
 
+export type ModelName = {
+  model: string;
+  module: string;
+  /**
+   * 在数据库重的名称
+   */
+  dbName: string;
+  /**
+   * EntityInfo 注解的名称，约定上，应该是 module 和 name 的组合
+   */
+  entityName: string;
+};
+
 export class DBHelper {
+  static metadatas: EntityMetadata[] = [];
+
   static isValidEntity(metadata): boolean {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
     const isRelation = _.includes(metadata.target as string, '__tr_');
@@ -77,20 +101,76 @@ export class DBHelper {
     return selectable;
   }
 
-  public static repo<Entity>(entity: ObjectType<Entity> | string): Repository<Entity> {
-    if (_.isString(entity)) {
-      const entityMetadata = getConnection().entityMetadatas.find(metadata => {
+  private static loadMetadatas() {
+    if (this.metadatas.length === 0) {
+      getConnection().entityMetadatas.find(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
-          // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${entity}`);
-          return (metadata.target as any).entityInfo.name === entity;
+          this.metadatas.push(metadata);
         }
       });
+    }
+  }
+
+  /**
+   * 获取不包括 t_ 的模型名称， app__t_model -> app__model
+   * 如果 module 为空，则使用默认的 module 名称
+   * @param model
+   * @param module 模块名称，不包括 __
+   */
+  public static getModelName(model: string, module?: string): ModelName {
+    this.loadMetadatas();
+
+    let parsedModel = model;
+    const parsedModule = module || AsunaContext.instance.defaultModulePrefix;
+    // 已包含 module 信息的 modelName
+    if (
+      model.startsWith(module) ||
+      model.includes('__') ||
+      !module ||
+      module === AsunaContext.instance.defaultModulePrefix
+    ) {
+      // const metadata = this.getMetadata(model);
+      // const entityInfo = this.getEntityInfo(metadata);
+      // return { model, dbName: metadata.tableName, entityName: entityInfo.name };
+    } else {
+      parsedModel = `${module}__${model}`;
+    }
+
+    logger.log(`getModelName ${renderObject({ parsedModel, model, parsedModule, module })}`);
+    const metadata = this.getMetadata(parsedModel);
+    const entityInfo = this.getEntityInfo(metadata);
+    return {
+      model,
+      dbName: metadata.tableName,
+      entityName: entityInfo.name,
+      module: parsedModule,
+    };
+  }
+
+  public static getMetadata(model: string): EntityMetadata {
+    return this.metadatas.find(metadata => {
+      logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
+      return this.getEntityInfo(metadata).name === model;
+    });
+  }
+
+  public static getEntityInfo(metadata: EntityMetadata): EntityMetaInfoOptions {
+    return _.get(metadata, 'target.entityInfo');
+  }
+
+  public static repo<Entity>(entity: ObjectType<Entity> | string | ModelName): Repository<Entity> {
+    this.loadMetadatas();
+
+    if (_.isString(entity)) {
+      const entityMetadata = this.getMetadata(this.getModelName(entity).model);
       if (entityMetadata) {
         return getRepository(entityMetadata.target);
       }
       throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
+    } else if ((entity as ModelName).model) {
+      return getRepository((entity as ModelName).dbName);
     } else {
-      return getRepository(entity);
+      return getRepository(entity as ObjectType<Entity>);
     }
   }
 

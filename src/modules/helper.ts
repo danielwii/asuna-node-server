@@ -37,6 +37,7 @@ export class EnumHelper {
 }
 
 /**
+ * @deprecated
  * 获取不包括 t_ 的模型名称， app__t_model -> app__model
  * @param model
  * @param module

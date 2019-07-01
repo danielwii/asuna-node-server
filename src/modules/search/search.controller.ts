@@ -2,11 +2,10 @@ import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nes
 import * as _ from 'lodash';
 import * as R from 'ramda';
 
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { DBHelper } from '../core/db';
 
 import {
-  getModelName,
   parseListParam,
   parseNormalWhereAndRelatedFields,
   parseOrder,
@@ -18,11 +17,6 @@ const logger = new Logger('SearchController');
 
 @Controller('api/search')
 export class SearchController {
-  repo<Entity>(model): Repository<Entity> {
-    const modelName = getModelName(model);
-    return _.isString(model) ? getRepository(modelName) : getRepository(model);
-  }
-
   @Get(':model')
   async search(
     @Param('model') model: string,
@@ -36,7 +30,7 @@ export class SearchController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
-    const repository = this.repo(model);
+    const repository = DBHelper.repo(model);
     const select = parseListParam(fields, field => `${model}.${field}`);
     const on = parseListParam(onFields);
 

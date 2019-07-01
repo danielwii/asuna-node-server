@@ -20,7 +20,7 @@ export interface IAsunaContextOpts {
    * default: app
    */
   defaultModulePrefix?: string;
-  root: string;
+  // root: string;
 }
 
 export class AsunaContext {
@@ -38,18 +38,18 @@ export class AsunaContext {
   private constructor() {
     logger.log('init ...');
     this.dirname = join(__dirname, '../..');
-    this.init({
+    this.setup({
       defaultModulePrefix: 'www',
-      root: resolve(__dirname, '../..'),
+      // root: resolve(__dirname, '../..'),
     });
     this.initStorageEngine(`${process.cwd()}/uploads`);
   }
 
-  init(opts: Partial<IAsunaContextOpts> = {}) {
-    logger.log(`init ${renderObject(opts)}`);
+  setup(opts: Partial<IAsunaContextOpts> = {}) {
+    logger.log(`setup ${renderObject(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
-      root: opts.root || resolve(__dirname, '../..'),
+      // root: opts.root || resolve(__dirname, '../..'),
     };
   }
 
@@ -98,7 +98,7 @@ export class AsunaContext {
   }
 
   get defaultModulePrefix() {
-    return this.opts.defaultModulePrefix;
+    return this.opts.defaultModulePrefix || 'www';
   }
 
   static get isDebugMode() {
