@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { Job } from 'bull';
 import { classToPlain } from 'class-transformer';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
@@ -8,6 +9,7 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
+import { AsunaSystemQueue, Hermes } from '../../bus';
 import { renderObject } from '../../logger';
 
 import { ErrorException } from '../base';
@@ -245,6 +247,25 @@ export class MinioStorage implements IStorageEngine {
     MinioStorage.logger.log(
       `[constructor] init ${renderObject({ configs: classToPlain(configLoader()), opts })}`,
     );
+
+    Hermes.setupJobProcessor(AsunaSystemQueue.UPLOAD, (job: Job) => {
+      const { bucket, filenameWithPrefix, file } = job.data;
+      return this.client
+        .fPutObject(bucket, filenameWithPrefix, file.path, {
+          'Content-Type': file.mimetype,
+        })
+        .then(uploaded => {
+          MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`);
+          return uploaded;
+        })
+        .catch(error => {
+          MinioStorage.logger.error(
+            `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
+            error.trace,
+          );
+          return error;
+        });
+    });
   }
 
   get client() {
@@ -324,20 +345,21 @@ export class MinioStorage implements IStorageEngine {
 
     MinioStorage.logger.log(oneLineTrim`
       put ${renderObject(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
-      and bucket [${bucket}]
+      and bucket [${bucket}], add upload job to queue(${AsunaSystemQueue.UPLOAD})
     `);
-    // TODO upload to remote may failed
-    this.client
-      .fPutObject(bucket, filenameWithPrefix, file.path, {
-        'Content-Type': file.mimetype,
-      })
-      .then(uploaded => MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`))
-      .catch(error =>
+
+    const { queue } = Hermes.getQueue(AsunaSystemQueue.UPLOAD);
+    queue
+      .add(
+        { bucket, filenameWithPrefix, file },
+        { attempts: 3, backoff: { delay: 60_000, type: 'exponential' }, timeout: 60_000 * 10 },
+      )
+      .catch(reason => {
         MinioStorage.logger.error(
-          `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
-          error.trace,
-        ),
-      );
+          // TODO trigger event when job failed
+          `upload error: ${renderObject(reason)}, should trigger an event later.`,
+        );
+      });
     return {
       prefix: resolvedPrefix,
       bucket,
