@@ -4,12 +4,13 @@
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "src/index.ts",
+  "types": "declaration/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist && rm -rf ./declaration",
     "tsc": "tsc",
-    "build-ignore": "yarn tsc",
-    "prebuild-ignore": "yarn clean",
-    "postinstall-ignore": "yarn build",
+    "build": "yarn tsc",
+    "prebuild": "yarn clean",
+    "postinstall": "yarn build",
     "test": "ENV=test jest",
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./"
