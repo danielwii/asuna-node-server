@@ -11,6 +11,11 @@ export const ConfigKeys = {
   TRACING: 'TRACING',
   DB_TYPE: 'DB_TYPE',
 
+  /**
+   * 用与访问上传文件的资源地址
+   */
+  RESOURCE_PATH: 'RESOURCE_PATH',
+
   VIDEO_STORAGE: 'VIDEO_STORAGE',
   IMAGE_STORAGE: 'IMAGE_STORAGE',
   FILE_STORAGE: 'FILE_STORAGE',

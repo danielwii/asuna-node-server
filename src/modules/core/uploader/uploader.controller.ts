@@ -13,10 +13,12 @@ import { Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as multer from 'multer';
 import * as _ from 'lodash';
+import { join } from 'path';
 import * as uuid from 'uuid';
 import { renderObject } from '../../logger';
 
 import { AsunaError, AsunaException, UploadException } from '../base';
+import { ConfigKeys, configLoader } from '../config.helper';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
 import { AsunaContext } from '../context';
 
@@ -92,11 +94,19 @@ export class UploaderController {
         return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       })
       .catch(error => {
-        console.error(error);
         logger.error(error.message, error.trace);
         throw new AsunaException(AsunaError.Unprocessable, error.message);
       });
     logger.log(`results is ${renderObject(results)}`);
-    return results;
+    return results.map(saved => ({
+      ...saved,
+      // 用于访问的资源地址
+      fullpath: join(
+        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
+        saved.bucket,
+        saved.prefix,
+        saved.filename,
+      ),
+    }));
   }
 }
