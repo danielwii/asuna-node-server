@@ -12,6 +12,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "dist",
+    "baseUrl": "src",
     "incremental": true
   },
   "include": [

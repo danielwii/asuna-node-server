@@ -50,8 +50,10 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /f', () => {
-    let encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString('base64');
-    const query = Buffer.from(encodedQuery + '.0.assets').toString('base64');
+    const encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString(
+      'base64',
+    );
+    const query = Buffer.from(`${encodedQuery}.0.assets`).toString('base64');
     expect(query).toBe('Y0dGMGFEMHhKVEpHTWlVeVJqTXVjRzVuLjAuYXNzZXRz');
     return supertest(app.getHttpServer())
       .get(`/f/${query}`)

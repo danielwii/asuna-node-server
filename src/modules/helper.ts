@@ -15,7 +15,6 @@ import {
   Not,
   Raw,
 } from 'typeorm';
-import { AsunaContext } from './core/context';
 import { Condition } from './core/decorators';
 import { renderObject } from './logger';
 
@@ -40,23 +39,6 @@ export function isBlank(value) {
   return (_.isEmpty(value) && !_.isNumber(value)) || (_.isNaN(value) && _.isString(value))
     ? !!_.trim(value)
     : _.isEmpty(value);
-}
-
-/**
- * @deprecated
- * 获取不包括 t_ 的模型名称， app__t_model -> app__model
- * @param model
- * @param module
- */
-export function getModelName(model: string, module?: string) {
-  if (
-    model.startsWith(module) ||
-    model.includes('__') ||
-    module === `${AsunaContext.instance.defaultModulePrefix}__`
-  ) {
-    return model;
-  }
-  return `${module || `${AsunaContext.instance.defaultModulePrefix}__`}${model}`;
 }
 
 /**

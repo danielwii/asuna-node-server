@@ -109,42 +109,23 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
  */
 export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
   const isProduction = process.env.NODE_ENV === 'production';
-  const wasBuilt = __filename.endsWith('js');
+  // const wasBuilt = __filename.endsWith('js');
   const dirname = options.dirname || __dirname;
   const root = options.root || __dirname;
-  const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
-  const entities =
-    isProduction || wasBuilt
-      ? [
-          `${resolve(dirname)}/**/*.entities.js`,
-          // `${resolve(dirname, '../')}/**/*.entities.js`,
-          `${resolve(root)}/**/*.entities.${suffix}`,
-        ]
-      : [
-          `${resolve(dirname)}/**/*.entities.ts`,
-          `${resolve(dirname, '../../packages')}/**/*.entities.ts`,
-          `${resolve(root)}/**/*.entities.${suffix}`,
-        ];
-  const subscribers =
-    isProduction || wasBuilt
-      ? [
-          `${resolve(dirname)}/**/*.subscriber.js`,
-          // `${resolve(dirname, '../')}/**/*.subscriber.js`,
-          `${resolve(root)}/**/*.subscriber.${suffix}`,
-        ]
-      : [
-          `${resolve(dirname)}/**/*.subscriber.ts`,
-          `${resolve(dirname, '../../packages')}/**/*.subscriber.ts`,
-          `${resolve(root)}/**/*.subscriber.${suffix}`,
-        ];
+  // const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
+  const entities = [`${resolve(dirname)}/**/*.entities.ts`, `${resolve(root)}/**/*.entities.ts`];
+  const subscribers = [
+    `${resolve(dirname)}/**/*.subscriber.ts`,
+    `${resolve(root)}/**/*.subscriber.ts`,
+  ];
   logger.log(
     `options is ${renderObject({
       options,
       isProduction,
-      isBuild: wasBuilt,
+      // isBuild: wasBuilt,
       dirname,
       root,
-      suffix,
+      // suffix,
       entities,
       subscribers,
     })}`,
