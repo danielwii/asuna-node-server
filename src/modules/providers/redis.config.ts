@@ -1,6 +1,9 @@
+import { Logger } from '@nestjs/common';
 import * as Redis from 'redis';
 import { Exclude } from 'class-transformer';
 import { ConfigKeys, configLoader } from '../core/config.helper'; // TODO refactor
+
+const logger = new Logger('RedisConfig');
 
 export const RedisConfigKeys = {
   REDIS_ENABLE: 'REDIS_ENABLE',
@@ -24,6 +27,7 @@ export class RedisConfigObject {
 
   static load(prefix: string = ''): RedisConfigObject {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    logger.log(`load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     return new RedisConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`, false),
       host: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_HOST}`, 'localhost'),
@@ -35,6 +39,7 @@ export class RedisConfigObject {
 
   static loadOr(prefix: string = ''): RedisConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    logger.log(`load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     if (enable === true) {
       return RedisConfigObject.load('ws');
@@ -42,7 +47,7 @@ export class RedisConfigObject {
     if (enable === false) {
       return null;
     }
-    RedisConfigObject.load();
+    return RedisConfigObject.load();
   }
 
   get options(): Redis.RedisOptions {

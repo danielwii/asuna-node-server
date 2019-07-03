@@ -3,8 +3,8 @@ import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import * as Rx from 'rxjs';
-import { isBlank, renderObject } from '../../common';
-import { RedisConfigKeys, RedisConfigObject } from '../../providers';
+import { isBlank, r, renderObject } from '../../common';
+import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth';
 import { ConfigKeys, configLoader } from '../config.helper';
 
@@ -98,8 +98,8 @@ export class Hermes {
       () => logger.log('Hermes completed'),
     );
 
-    logger.log('init queues...');
     const configObject = RedisConfigObject.loadOr('job');
+    logger.log(`init queues...${r(configObject)}`);
     if (configObject && configObject.enable) {
       const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB);
       logger.log(`init job with redis db: ${db}`);
@@ -144,7 +144,7 @@ export class Hermes {
   }
 
   static regQueue(queueName: string, opts?: QueueOptions): AsunaQueue {
-    assert.strictEqual(isBlank(queueName), false, 'queue name must not empty');
+    assert.strictEqual(isBlank(queueName), false, 'queue name must not be empty');
 
     if (this.queues[queueName]) {
       return this.queues[name];
@@ -171,7 +171,14 @@ export class Hermes {
    * @param processor
    */
   static setupJobProcessor(queueName: string, processor: (payload: any) => Promise<any>): void {
-    this.getQueue(queueName).processor = processor;
+    assert.strictEqual(isBlank(queueName), false, 'queue name must not be empty');
+
+    const queue = this.getQueue(queueName);
+    if (!queue) {
+      logger.error(`queue(${queueName}) not found`);
+      return;
+    }
+    queue.processor = processor;
   }
 
   static subscribe(

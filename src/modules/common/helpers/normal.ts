@@ -26,6 +26,8 @@ export function renderObject(o: object) {
   return isProduction ? JSON.stringify(o) : inspect(o, { colors: true });
 }
 
+export const r = (o: object) => (isProduction ? JSON.stringify(o) : inspect(o, { colors: true }));
+
 export enum Profile {
   // TODO @deprecated this may cause a memory leak
   detail = 'detail',
