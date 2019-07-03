@@ -100,6 +100,10 @@ export class AsunaContext {
     this.localStorageEngine = new LocalStorage(this.uploadPath, 'local');
   }
 
+  getFilePath(fullpath: string): string {
+    return join(this.uploadPath, '../', fullpath);
+  }
+
   get defaultModulePrefix() {
     return this.opts.defaultModulePrefix || 'www';
   }
