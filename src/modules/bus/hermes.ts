@@ -1,8 +1,9 @@
 import { Logger } from '@nestjs/common';
-import { Job, Queue } from 'bull';
+import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import * as Rx from 'rxjs';
+import { ConfigKeys, configLoader } from '../../../declaration/modules/core';
 import { AbstractAuthUser } from '../core/auth';
 import { isBlank } from '../helper';
 import { renderObject } from '../logger';
@@ -25,12 +26,6 @@ export interface AsunaObserver {
   source: string;
   routePattern: 'fanout' | RegExp;
   next: (event: IAsunaEvent) => void;
-}
-
-export interface AsunaJob {
-  name: string;
-  payload: any;
-  processor: (payload: any) => Promise<any>;
 }
 
 export const AsunaSystemQueue = {
@@ -63,7 +58,7 @@ export class AsunaEvent implements IAsunaEvent {
 
 export type AsunaQueue = {
   name: string;
-  mode: 'in-memory' | 'distributed';
+  opts?: QueueOptions;
   queue: Queue;
   processor?: (payload: any) => Promise<any>;
 };
@@ -104,7 +99,18 @@ export class Hermes {
     );
 
     logger.log('init queues...');
-    Hermes.regQueue(AsunaSystemQueue.UPLOAD, 'in-memory');
+    // TODO refactor: using provider
+    const host = configLoader.loadConfig(ConfigKeys.ACTION_CACHE_HOST, 'localhost');
+    const port = configLoader.loadNumericConfig(ConfigKeys.ACTION_CACHE_PORT, 6379);
+    const password = configLoader.loadConfig(ConfigKeys.ACTION_CACHE_PASSWORD);
+    Hermes.regQueue(AsunaSystemQueue.UPLOAD, {
+      redis: {
+        host,
+        port,
+        ...(password ? { password } : null),
+        db: 6,
+      },
+    });
   }
 
   static emitEvents(source: string, events: IAsunaEvent[]) {
@@ -140,22 +146,21 @@ export class Hermes {
     );
   }
 
-  static regQueue(queueName: string, mode: 'in-memory' | 'distributed'): AsunaQueue {
+  static regQueue(queueName: string, opts?: QueueOptions): AsunaQueue {
     assert.strictEqual(isBlank(queueName), false, 'queue name must not empty');
-    assert.strictEqual(mode === 'distributed', false, 'distributed mode is not implemented yet.');
 
     if (this.queues[queueName]) {
       return this.queues[name];
     }
 
-    const queue = new Queue(queueName);
+    const queue = new Queue(queueName, opts);
     queue.process((job: Job) => {
       logger.log(`queue(${queueName}) run job ${job.name} with ${renderObject(job.data)}`);
       return this.getQueue(queueName).processor != null
         ? this.getQueue(queueName).processor(job)
         : Promise.reject(`no processor registered for ${queueName}`);
     });
-    this.queues[queueName] = { name: queueName, mode, queue };
+    this.queues[queueName] = { name: queueName, opts, queue };
     return this.queues[queueName];
   }
 
