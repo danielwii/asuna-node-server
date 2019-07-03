@@ -4,7 +4,7 @@ import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
 import { FinderService } from './finder.service';
-import { AsunaError, AsunaException } from '../core/base';
+import { AsunaError, AsunaException } from '../common';
 
 const logger = new Logger('FinderController');
 

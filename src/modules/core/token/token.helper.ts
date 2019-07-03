@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import * as moment from 'moment';
 import { OperationToken, OperationTokenType } from './token.entities';
 import { random } from '../helpers';
-import { AsunaError, AsunaException } from '../base';
+import { AsunaError, AsunaException } from '../../common';
 import { UpdateResult } from 'typeorm';
 
 const logger = new Logger('TokenHelper');

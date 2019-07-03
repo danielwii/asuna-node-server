@@ -1,11 +1,8 @@
 import { Logger } from '@nestjs/common';
-import * as _ from 'lodash';
-import { getConnection, getRepository, ObjectType, Repository } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
 import * as util from 'util';
-
-import { parseFields, Profile } from '../../helper';
+import { parseFields, Profile } from '../../common';
 import { DBHelper } from './db.helper';
-import { ErrorException } from '../base';
 
 const logger = new Logger('DBService');
 

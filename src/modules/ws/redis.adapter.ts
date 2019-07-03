@@ -1,8 +1,9 @@
 import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import * as redisIoAdapter from 'socket.io-redis';
-
+import { renderObject } from '../common';
 import { ConfigKeys, configLoader } from '../core';
+import { RedisConfigObject } from '../providers';
 
 const logger = new Logger('RedisIoAdapter');
 
@@ -16,18 +17,20 @@ export class RedisIoAdapter extends IoAdapter {
   constructor(app) {
     super(app);
     if (!RedisIoAdapter.redisAdapter) {
-      const host = configLoader.loadConfig(ConfigKeys.WS_REDIS_HOST, 'localhost');
-      const port = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_PORT, 6379);
-      const password = configLoader.loadConfig(ConfigKeys.WS_REDIS_PASSWORD);
+      const configObject = RedisConfigObject.loadOr('ws');
+
+      if (!(configObject && configObject.enable)) {
+        logger.warn(`no redis config found: ${renderObject(configObject)}`);
+        return;
+      }
+
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
-      logger.log(
-        `init redis ws-adapter: {host:${host}, port:${port}, db:${db}, with-password:${!!password}`,
-      );
+      logger.log(`init redis ws-adapter: ${renderObject(configObject)} with db: ${db}`);
       RedisIoAdapter.redisAdapter = redisIoAdapter(
         {
-          host,
-          port,
-          ...(password ? { password } : null),
+          host: configObject.host,
+          port: configObject.port,
+          ...(configObject.password ? { password: configObject.password } : null),
           db,
         } as any /* db is not included in redisIoAdapter */,
       );

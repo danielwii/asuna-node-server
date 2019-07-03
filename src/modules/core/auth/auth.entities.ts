@@ -2,7 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } fro
 
 import { AbstractAuthUser } from './base.entities';
 import { jsonType, safeReloadObject } from '../helpers';
-import { EntityMetaInfo, JsonMap, MetaInfo } from '../decorators';
+import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 
 @EntityMetaInfo({ name: 'auth__roles' })

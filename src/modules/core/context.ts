@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
-import { join, resolve } from 'path';
+import { join } from 'path';
+import { renderObject } from '../common';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
-import { renderObject } from '../logger';
 import { ConfigKeys, configLoader } from './config.helper';
 import {
   IStorageEngine,

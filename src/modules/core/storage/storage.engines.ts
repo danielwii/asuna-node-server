@@ -9,14 +9,12 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
-import { AsunaSystemQueue, Hermes } from '../../bus';
-import { renderObject } from '../../logger';
-
-import { ErrorException } from '../base';
+import { ErrorException, renderObject } from '../../common';
+import { AsunaSystemQueue, Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
-import { MinioConfigObject, QiniuConfigObject } from './config.object';
+import { MinioConfigObject, QiniuConfigObject } from './storage.config';
 
 export enum StorageMode {
   LOCAL = 'local',

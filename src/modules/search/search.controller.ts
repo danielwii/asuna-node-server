@@ -11,7 +11,7 @@ import {
   parseOrder,
   parseWhere,
   Profile,
-} from '../helper';
+} from '../common';
 
 const logger = new Logger('SearchController');
 

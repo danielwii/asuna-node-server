@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AsunaError, AsunaException } from '../base';
+import { AsunaError, AsunaException } from '../../common';
 
 const logger = new Logger('JwtAuthGuard');
 

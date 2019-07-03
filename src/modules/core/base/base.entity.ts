@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { MetaInfo } from '../decorators';
+import { MetaInfo } from '../../common/decorators';
 
 export abstract class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id!: number;

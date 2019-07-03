@@ -1,3 +1,7 @@
+import { Logger } from '@nestjs/common';
+import idx from 'idx';
+import { diff } from 'jsondiffpatch';
+import * as _ from 'lodash';
 import {
   BaseEntity,
   EntitySubscriberInterface,
@@ -6,20 +10,15 @@ import {
   RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
-import { Logger } from '@nestjs/common';
-import * as _ from 'lodash';
-import { diff } from 'jsondiffpatch';
-
+import { dataLoaderCleaner } from '../../dataloader';
 import { Hermes } from './hermes';
-import { dataLoaderCleaner } from '../dataloader';
-import idx from 'idx';
 
 const logger = new Logger('EntitySubscriber');
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
   constructor() {
-    logger.log(`init ...`);
+    logger.log('init ...');
   }
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { FinderAssetsSettings } from './finder.controller';
-import { AsunaError, AsunaException } from '../core/base';
+import { AsunaError, AsunaException } from '../common';
 import { join } from 'path';
 
 const logger = new Logger('FinderService');

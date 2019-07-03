@@ -3,10 +3,10 @@ import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import * as Rx from 'rxjs';
-import { ConfigKeys, configLoader } from '../core';
-import { AbstractAuthUser } from '../core/auth';
-import { isBlank } from '../helper';
-import { renderObject } from '../logger';
+import { isBlank, renderObject } from '../../common';
+import { RedisConfigKeys, RedisConfigObject } from '../../providers';
+import { AbstractAuthUser } from '../auth';
+import { ConfigKeys, configLoader } from '../config.helper';
 
 const assert = require('assert');
 const Queue = require('bull');
@@ -99,18 +99,15 @@ export class Hermes {
     );
 
     logger.log('init queues...');
-    // TODO refactor: using provider
-    const host = configLoader.loadConfig(ConfigKeys.ACTION_CACHE_HOST, 'localhost');
-    const port = configLoader.loadNumericConfig(ConfigKeys.ACTION_CACHE_PORT, 6379);
-    const password = configLoader.loadConfig(ConfigKeys.ACTION_CACHE_PASSWORD);
-    Hermes.regQueue(AsunaSystemQueue.UPLOAD, {
-      redis: {
-        host,
-        port,
-        ...(password ? { password } : null),
-        db: 6,
-      },
-    });
+    const configObject = RedisConfigObject.loadOr('job');
+    if (configObject && configObject.enable) {
+      const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB);
+      logger.log(`init job with redis db: ${db}`);
+      Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) });
+      return;
+    }
+
+    logger.error('no redis defined, in-memory mode for job is not implemented yet.');
   }
 
   static emitEvents(source: string, events: IAsunaEvent[]) {

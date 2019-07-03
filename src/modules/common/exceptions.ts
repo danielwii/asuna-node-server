@@ -1,6 +1,6 @@
 // tslint:disable:max-line-length
 import { HttpStatus } from '@nestjs/common';
-import { NameValue } from '../../helper';
+import { NameValue } from './helpers';
 
 /**
  * 400  invalidParameter          Indicates that a request parameter has an invalid value.

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Request } from 'express';
 import * as _ from 'lodash';
-import { Hermes, IAsunaEvent } from '../bus';
+import { Hermes, IAsunaEvent } from '../core/bus';
 
 import { AbstractAuthUser } from '../core/auth';
 

@@ -2,7 +2,7 @@ import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AbstractAuthUser } from '../core/auth';
-import { AsunaError, AsunaException } from '../core/base';
+import { AsunaError, AsunaException } from '../common';
 
 const logger = new Logger('GqlAuthGuard');
 
@@ -57,6 +57,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 */
 }
 
+// tslint:disable-next-line:class-name
 export interface getCurrentUser {
   (): AbstractAuthUser;
 }

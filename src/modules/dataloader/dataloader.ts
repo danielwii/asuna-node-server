@@ -4,7 +4,7 @@ import * as fp from 'lodash/fp';
 import { GraphQLResolveInfo } from 'graphql';
 import * as DataLoader from 'dataloader';
 import * as Rx from 'rxjs';
-import { Hermes, IAsunaEvent } from '../bus';
+import { Hermes, IAsunaEvent } from '../core/bus';
 
 const logger = new Logger('DataLoaderCache');
 

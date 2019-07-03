@@ -15,10 +15,16 @@ import {
   Not,
   Raw,
 } from 'typeorm';
-import { Condition } from './core/decorators';
-import { renderObject } from './logger';
+import { inspect } from 'util';
+import { Condition } from '../decorators';
 
 const logger = new Logger('Helper');
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+export function renderObject(o: object) {
+  return isProduction ? JSON.stringify(o) : inspect(o, { colors: true });
+}
 
 export enum Profile {
   // TODO @deprecated this may cause a memory leak

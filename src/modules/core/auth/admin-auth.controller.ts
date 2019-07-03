@@ -11,12 +11,11 @@ import {
 } from '@nestjs/common';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-import { renderObject } from '../../logger';
-import { AsunaError, AsunaException, SignException } from '../base';
+import { AsunaError, AsunaException, renderObject, SignException } from '../../common';
 import { RestCrudController } from '../base/base.controllers';
 import { SysTokenServiceName, TokenHelper } from '../token';
 import { AdminAuthService } from './admin-auth.service';
-import { ResetPasswordDto, SignDto } from './auth.dto';
+import { SignDto } from './auth.dto';
 
 const logger = new Logger('AdminAuthController');
 
