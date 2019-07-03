@@ -3,7 +3,7 @@ import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import * as Rx from 'rxjs';
-import { ConfigKeys, configLoader } from '../../../declaration/modules/core';
+import { ConfigKeys, configLoader } from '../core';
 import { AbstractAuthUser } from '../core/auth';
 import { isBlank } from '../helper';
 import { renderObject } from '../logger';
