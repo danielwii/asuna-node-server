@@ -42,7 +42,7 @@ export class RedisConfigObject {
     logger.log(`load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     if (enable === true) {
-      return RedisConfigObject.load('ws');
+      return RedisConfigObject.load(prefix);
     }
     if (enable === false) {
       return null;
