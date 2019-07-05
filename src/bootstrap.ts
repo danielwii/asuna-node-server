@@ -8,7 +8,7 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import { resolve } from 'path';
 import * as responseTime from 'response-time';
-import { AnyExceptionFilter, renderObject } from './modules/common';
+import { AnyExceptionFilter, r } from './modules/common';
 import { AsunaContext, ConfigKeys, configLoader, IAsunaContextOpts } from './modules/core';
 
 const rateLimit = require('express-rate-limit');
@@ -29,12 +29,17 @@ export interface IBootstrapOptions {
   root?: string;
   dirname?: string;
   version?: string;
+  /**
+   * io     - socket.io
+   * redis  - 基于 redis 共享 websocket 信息
+   * ws     - websocket
+   */
   redisMode?: 'io' | 'redis' | 'ws';
   context?: IAsunaContextOpts;
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
-  logger.log(`options: ${renderObject(options)}`);
+  logger.log(`options: ${r(options)}`);
 
   AsunaContext.instance.setup(options.context);
   // AsunaContext.instance.setup(options.context || { root: options.root });
@@ -71,15 +76,16 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
 
   if (AsunaContext.isDebugMode) {
     logger.log('[X] debug mode is enabled');
+  }
 
-    // --------------------------------------------------------------
-    // Setup Swagger
-    // --------------------------------------------------------------
-
+  // --------------------------------------------------------------
+  // Setup Swagger
+  // --------------------------------------------------------------
+  if (configLoader.loadBoolConfig(ConfigKeys.SWAGGER)) {
     logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()
       .setTitle('API Server')
-      .setVersion(options.version)
+      .setVersion(`${options.version}, Core: ${pkg.version}`)
       .build();
     const document = SwaggerModule.createDocument(app, swaggerOptions);
     SwaggerModule.setup('/swagger', app, document);
@@ -118,7 +124,7 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
     `${resolve(root)}/**/*.subscriber.ts`,
   ];
   logger.log(
-    `options is ${renderObject({
+    `options is ${r({
       options,
       isProduction,
       // isBuild: wasBuilt,
@@ -130,8 +136,8 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
     })}`,
   );
 
-  logger.log(`resolve typeorm entities: ${renderObject(entities)}`);
-  logger.log(`resolve typeorm subscribers: ${renderObject(subscribers)}`);
+  logger.log(`resolve typeorm entities: ${r(entities)}`);
+  logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
 
   process.env.TYPEORM_ENTITIES = entities.join();
   process.env.TYPEORM_SUBSCRIBERS = subscribers.join();

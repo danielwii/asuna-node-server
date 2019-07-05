@@ -1,4 +1,5 @@
 import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import * as util from 'util';
 import { EmailService } from './email.service';
@@ -17,6 +18,7 @@ class MailBody {
   attachments: any[];
 }
 
+@ApiUseTags('core')
 @Controller('api/email')
 export class EmailController {
   constructor(private readonly mailService: EmailService) {}

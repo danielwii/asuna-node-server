@@ -1,4 +1,5 @@
 import { Body, Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 import { Request } from 'express';
 
@@ -13,6 +14,7 @@ class CommandDTO {
   payload: any;
 }
 
+@ApiUseTags('core')
 @Controller('api/v1/command')
 export class CqrsController {
   constructor(private readonly cqrsService: CqrsService) {}

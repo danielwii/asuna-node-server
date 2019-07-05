@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { configLoader } from '../config.helper';
 
 export const QiniuConfigKeys = {
@@ -15,9 +15,9 @@ export class QiniuConfigObject {
   prefix: string;
   domain: string;
 
-  @Exclude()
   accessKey: string;
-  @Exclude()
+  @Expose({ name: 'with-secret-key', toPlainOnly: true })
+  @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;
 
   constructor(partial: Partial<QiniuConfigObject>) {
@@ -54,9 +54,9 @@ export class MinioConfigObject {
   port: number;
   useSSL: boolean;
 
-  @Exclude()
   accessKey: string;
-  @Exclude()
+  @Expose({ name: 'with-secret-key', toPlainOnly: true })
+  @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;
 
   constructor(partial: Partial<MinioConfigObject>) {

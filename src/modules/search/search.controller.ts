@@ -1,4 +1,5 @@
 import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 
@@ -15,6 +16,7 @@ import {
 
 const logger = new Logger('SearchController');
 
+@ApiUseTags('core')
 @Controller('api/search')
 export class SearchController {
   @Get(':model')

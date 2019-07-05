@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "src/index.ts",
@@ -85,6 +85,7 @@
     "shortid": "^2.2.14",
     "socket.io": "^2.2.0",
     "socket.io-redis": "^5.2.0",
+    "swagger-ui-express": "^4.0.7",
     "type-graphql": "^0.17.4",
     "typeorm": "^0.2.18"
   }

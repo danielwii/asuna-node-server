@@ -9,9 +9,10 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-import { AsunaError, AsunaException, renderObject, SignException } from '../../common';
+import { AsunaError, AsunaException, r, SignException } from '../../common';
 import { RestCrudController } from '../base/base.controllers';
 import { SysTokenServiceName, TokenHelper } from '../token';
 import { AdminAuthService } from './admin-auth.service';
@@ -19,6 +20,7 @@ import { SignDto } from './auth.dto';
 
 const logger = new Logger('AdminAuthController');
 
+@ApiUseTags('sys-admin')
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
   constructor(private readonly adminAuthService: AdminAuthService) {
@@ -31,7 +33,7 @@ export class AdminAuthController extends RestCrudController {
     if (!user) {
       return res.status(HttpStatus.I_AM_A_TEAPOT).send();
     }
-    logger.log(`generate [login] otp to ${renderObject(user)}`);
+    logger.log(`generate [login] otp to ${r(user)}`);
 
     const tokenOptions = {
       role: 'admin',
@@ -55,7 +57,7 @@ export class AdminAuthController extends RestCrudController {
   // FIXME type ResetPasswordDto not recognise email
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto): Promise<UpdateResult> {
-    logger.log(`reset password: ${renderObject(resetPasswordDto)}`);
+    logger.log(`reset password: ${r(resetPasswordDto)}`);
     const user = await this.adminAuthService.getUser(resetPasswordDto.email, true);
 
     if (!user) {
@@ -93,7 +95,7 @@ export class AdminAuthController extends RestCrudController {
   @Get('current')
   async current(@Req() request) {
     const { user } = request;
-    logger.log(`current... ${renderObject(user)}`);
+    logger.log(`current... ${r(user)}`);
     const currentUser = await this.adminAuthService.getUser(user.email, true, {
       relations: ['roles'],
     });

@@ -1,4 +1,5 @@
 import { Controller, Get, Logger, Param, Query, Req, Res } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import { Cryptor } from 'node-buffs';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
@@ -30,6 +31,7 @@ export class FinderAssetsSettings {
  * api/v1/finder?query=des-encoded-base64&useEncrypt=true
  * api/v1/finder?query=`querystring.stringify({name: "default"})`
  */
+@ApiUseTags('core')
 @Controller('api/v1/finder')
 export class FinderController {
   constructor(private readonly finderService: FinderService) {}
@@ -62,6 +64,7 @@ export class FinderController {
 /**
  * f/{base64-encoded-str} encoded-str.encrypted
  */
+@ApiUseTags('core')
 @Controller('f')
 export class ShortFinderController {
   constructor(private readonly finderService: FinderService) {}

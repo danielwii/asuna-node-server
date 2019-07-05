@@ -20,7 +20,7 @@ import {
   parseListParam,
   parseNormalWhereAndRelatedFields,
   Profile,
-  renderObject,
+  r,
 } from '../../common';
 import { AsunaContext } from '../context';
 
@@ -136,7 +136,7 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    logger.log(`getModelName ${renderObject({ parsedModel, model, parsedModule, module })}`);
+    logger.log(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
     const entityInfo = this.getEntityInfo(metadata);
     return {

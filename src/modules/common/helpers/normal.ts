@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -26,7 +27,10 @@ export function renderObject(o: object) {
   return isProduction ? JSON.stringify(o) : inspect(o, { colors: true });
 }
 
-export const r = (o: object) => (isProduction ? JSON.stringify(o) : inspect(o, { colors: true }));
+export const r = (o: any, transform: boolean = false) => {
+  const value = transform ? classToPlain(o) : o;
+  return isProduction ? JSON.stringify(value) : inspect(value, { colors: true });
+};
 
 export enum Profile {
   // TODO @deprecated this may cause a memory leak
@@ -105,7 +109,7 @@ function parseCondition(value: Condition) {
   if (_.has(value, '$isNull')) return IsNull();
   if (_.has(value, '$not')) return Not(value.$not);
   if (_.isBoolean(value)) return value;
-  logger.warn(`no handler found for ${renderObject(value)}`);
+  logger.warn(`no handler found for ${r(value)}`);
   return value;
 }
 

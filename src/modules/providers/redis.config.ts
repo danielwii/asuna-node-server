@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
+import { Expose, Transform } from 'class-transformer';
 import * as Redis from 'redis';
-import { Exclude } from 'class-transformer';
-import { ConfigKeys, configLoader } from '../core/config.helper'; // TODO refactor
+import { configLoader } from '../core/config.helper'; // TODO refactor
 
 const logger = new Logger('RedisConfig');
 
@@ -16,7 +16,8 @@ export const RedisConfigKeys = {
 export class RedisConfigObject {
   host?: string;
   port?: number;
-  @Exclude()
+  @Expose({ name: 'with-password', toPlainOnly: true })
+  @Transform(value => !!value, { toPlainOnly: true })
   password?: string;
   db?: number;
   enable?: boolean;
@@ -27,7 +28,7 @@ export class RedisConfigObject {
 
   static load(prefix: string = ''): RedisConfigObject {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
-    logger.log(`load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
+    logger.log(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     return new RedisConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`, false),
       host: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_HOST}`, 'localhost'),
@@ -39,7 +40,7 @@ export class RedisConfigObject {
 
   static loadOr(prefix: string = ''): RedisConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
-    logger.log(`load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
+    logger.log(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     if (enable === true) {
       return RedisConfigObject.load(prefix);

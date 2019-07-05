@@ -1,10 +1,12 @@
 import { Controller, Get, Logger } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import { AppContext } from './app.context';
 import { KvService } from './kv';
 import * as _ from 'lodash';
 
 const logger = new Logger('ApiController');
 
+@ApiUseTags('core')
 @Controller('api')
 export class ApiController {
   private readonly appContent = AppContext.instance;

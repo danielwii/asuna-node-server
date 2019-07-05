@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import * as util from 'util';
 import { KeyValuePair, ValueType } from './kv.entities';
@@ -38,6 +39,7 @@ class GetKvPairRequest {
   transform?: string;
 }
 
+@ApiUseTags('core')
 @Controller('api')
 export class KvController {
   constructor(private readonly kvService: KvService) {}

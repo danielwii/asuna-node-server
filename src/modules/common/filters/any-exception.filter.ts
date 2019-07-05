@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { AsunaError, AsunaException, renderObject, ValidationException } from '..';
+import { AsunaError, AsunaException, r, ValidationException } from '..';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -53,13 +53,13 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      logger.warn(`[bad_request] ${renderObject(processed.message)}`);
+      logger.warn(`[bad_request] ${r(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${renderObject(processed.message)}`);
+      logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40\d/.test(`${status}`)) {
-      logger.warn(`[unauthorized] ${renderObject(processed.message)}`);
+      logger.warn(`[unauthorized] ${r(processed.message)}`);
     } else {
-      logger.error(`[unhandled exception] ${renderObject(processed.message)}`, processed.stack);
+      logger.error(`[unhandled exception] ${r(processed.message)}`, processed.stack);
     }
 
     if (!response.finished && response.status) {

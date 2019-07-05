@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { join } from 'path';
-import { renderObject } from '../common';
+import { r } from '../common';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
 import { ConfigKeys, configLoader } from './config.helper';
 import {
@@ -47,7 +47,7 @@ export class AsunaContext {
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}) {
-    logger.log(`setup ${renderObject(opts)}`);
+    logger.log(`setup ${r(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
       // root: opts.root || resolve(__dirname, '../..'),
@@ -55,7 +55,7 @@ export class AsunaContext {
   }
 
   initStorageEngine(uploadPath: string) {
-    logger.log(`initStorageEngine ${renderObject({ uploadPath })}`);
+    logger.log(`initStorageEngine ${r({ uploadPath })}`);
     this.uploadPath = uploadPath;
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE);
     if (imageStorage === StorageMode.QINIU) {

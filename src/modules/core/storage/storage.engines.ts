@@ -9,7 +9,7 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
 import * as util from 'util';
-import { ErrorException, renderObject } from '../../common';
+import { ErrorException, r } from '../../common';
 import { AsunaSystemQueue, Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
@@ -243,11 +243,29 @@ export class MinioStorage implements IStorageEngine {
   ) {
     this.defaultBucket = opts.defaultBucket || 'default';
     MinioStorage.logger.log(
-      `[constructor] init ${renderObject({ configs: classToPlain(configLoader()), opts })}`,
+      `[constructor] init ${r({ configs: classToPlain(configLoader()), opts })}`,
     );
-
+    /*
     Hermes.setupJobProcessor(AsunaSystemQueue.UPLOAD, (job: Job) => {
       const { bucket, filenameWithPrefix, file } = job.data;
+      return this.client
+        .fPutObject(bucket, filenameWithPrefix, file.path, {
+          'Content-Type': file.mimetype,
+        })
+        .then(uploaded => {
+          MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`);
+          return uploaded;
+        })
+        .catch(error => {
+          MinioStorage.logger.error(
+            `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
+            error.trace,
+          );
+          return error;
+        });
+    });*/
+    Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_UPLOAD, payload => {
+      const { bucket, filenameWithPrefix, file } = payload;
       return this.client
         .fPutObject(bucket, filenameWithPrefix, file.path, {
           'Content-Type': file.mimetype,
@@ -306,7 +324,7 @@ export class MinioStorage implements IStorageEngine {
     const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
     const items: minio.BucketItemFromList[] = await this.client.listBuckets();
-    MinioStorage.logger.log(`found buckets: ${renderObject(items)}`);
+    MinioStorage.logger.log(`found buckets: ${r(items)}`);
     if (!(items && items.find(item => item.name === bucket))) {
       MinioStorage.logger.log(`create bucket [${bucket}] for region [${region}]`);
       await this.client.makeBucket(bucket, region);
@@ -342,10 +360,12 @@ export class MinioStorage implements IStorageEngine {
     const filenameWithPrefix = join(resolvedPrefix, filename);
 
     MinioStorage.logger.log(oneLineTrim`
-      put ${renderObject(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
-      and bucket [${bucket}], add upload job to queue(${AsunaSystemQueue.UPLOAD})
+      put ${r(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
+      and bucket [${bucket}], add upload job to queue(${AsunaSystemQueue.IN_MEMORY_UPLOAD})
     `);
-
+    const { queue } = Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD);
+    queue.next({ bucket, filenameWithPrefix, file });
+    /*
     const { queue } = Hermes.getQueue(AsunaSystemQueue.UPLOAD);
     queue
       .add(
@@ -355,9 +375,9 @@ export class MinioStorage implements IStorageEngine {
       .catch(reason => {
         MinioStorage.logger.error(
           // TODO trigger event when job failed
-          `upload error: ${renderObject(reason)}, should trigger an event later.`,
+          `upload error: ${r(reason)}, should trigger an event later.`,
         );
-      });
+      });*/
     return {
       prefix: resolvedPrefix,
       bucket,

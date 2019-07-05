@@ -1,4 +1,5 @@
 import { Controller, Get, Logger, NotFoundException, Param, Query, Res } from '@nestjs/common';
+import { ApiUseTags } from '@nestjs/swagger';
 
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
@@ -11,6 +12,7 @@ import { FinderService } from '../finder';
 
 const logger = new Logger('GetUploadsController');
 
+@ApiUseTags('core')
 @Controller('uploads')
 export class GetUploadsController {
   private context = AsunaContext.instance;
