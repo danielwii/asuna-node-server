@@ -6306,10 +6306,10 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-buffs@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.2.tgz#87c01935e34926b29775b58031633b6268e8a2f1"
-  integrity sha512-0nIrzfdkwbDOc5jUTOPc/IKAaGNZrtsiyG3gsVqNGQKT0HNyyYzXjN3JQxf341GqjOXWRVPuCay6527dSx0VEA==
+node-buffs@^0.6.4:
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.4.tgz#51b512123906c94ded9a68362f9dd04ae4a965fe"
+  integrity sha512-JdNbzK1q4m13xroUJqicH5nkgLRXSSIQ17yyrme6thQW7yfkyr+RH2jqXpYxmgOzvZydLl7VySoR9YxdRAIriA==
   dependencies:
     dotenv "^8.0.0"
     lodash "^4.17.11"

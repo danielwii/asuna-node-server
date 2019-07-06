@@ -72,7 +72,7 @@
     "minio": "^7.0.10",
     "module-alias": "^2.2.0",
     "morgan": "^1.9.1",
-    "node-buffs": "^0.6.2",
+    "node-buffs": "^0.6.4",
     "nodemailer": "^6.2.1",
     "otplib": "^11.0.1",
     "passport": "^0.4.0",
