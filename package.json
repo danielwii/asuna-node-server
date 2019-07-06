@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "^6.3.2",
+    "@types/bluebird": "^3.5.27",
     "@types/bull": "^3.5.14",
     "@types/common-tags": "^1.8.0",
     "@types/graphql": "^14.2.2",

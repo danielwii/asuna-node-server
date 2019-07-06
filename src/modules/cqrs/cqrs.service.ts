@@ -1,18 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Request } from 'express';
 import * as _ from 'lodash';
-import { Hermes, IAsunaEvent } from '../core/bus';
+import { Hermes, IAsunaCommand, IAsunaEvent } from '../core/bus';
 
 import { AbstractAuthUser } from '../core/auth';
-
-export interface IAsunaCommand {
-  type: string;
-  service: string;
-  payload: any;
-  user: AbstractAuthUser;
-  extra?: object;
-  tracking?: object;
-}
 
 export class AsunaCommand implements IAsunaCommand {
   type: string;
@@ -35,6 +26,12 @@ export class AsunaCommand implements IAsunaCommand {
     this.type = opts.type || 'default/v1';
     this.extra = { ua: opts.req != null ? opts.req.headers['user-agent'] : null };
   }
+
+  createdAt: any;
+  createdBy: any;
+  events: IAsunaEvent[];
+  name: string;
+  version: string;
 }
 
 const logger = new Logger('CqrsService');
