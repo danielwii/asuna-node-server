@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
-import { job } from 'cron';
 import * as _ from 'lodash';
 import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';

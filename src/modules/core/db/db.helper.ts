@@ -162,7 +162,7 @@ export class DBHelper {
     this.loadMetadatas();
 
     if (_.isString(entity)) {
-      const entityMetadata = this.getMetadata(this.getModelName(entity).model);
+      const entityMetadata = this.getMetadata(this.getModelName(entity as string).model);
       if (entityMetadata) {
         return getRepository(entityMetadata.target);
       }
