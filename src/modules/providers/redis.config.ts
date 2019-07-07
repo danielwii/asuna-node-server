@@ -60,7 +60,7 @@ export class RedisConfigObject {
     };
   }
 
-  getOptions(db: number): Redis.RedisOptions {
+  getOptions(db?: number): Redis.RedisOptions {
     return { ...this.options, db: db || this.db };
   }
 }

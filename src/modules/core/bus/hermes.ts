@@ -260,6 +260,8 @@ export class Hermes {
       const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);
       Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) });
+
+      logger.log(`sync status with redis.`);
     }
 
     Hermes.regInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD);
@@ -313,16 +315,18 @@ export class Hermes {
           logger.log(`job(${jobId}) call func in map ... data: ${r(data)}`);
           const status = Hermes.getInMemoryQueue(queueName).status[jobId];
           if (typeof data.process !== 'function') {
+            const message = `no processor registered for ${queueName}`;
+            logger.error(message);
             status.state = 'UN_READY';
             status.events.push({
               state: 'UN_READY',
               at: new Date().toUTCString(),
-              message: `no processor registered for ${queueName}`,
+              message,
             });
             return of({
               jobId,
               data,
-              result: { error: `no processor registered for ${queueName}` },
+              result: { error: message },
             });
           }
 
