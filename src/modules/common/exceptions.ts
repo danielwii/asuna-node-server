@@ -75,9 +75,6 @@ export class ValidationException extends AsunaException {
   }
 }
 
-/**
- * @deprecated use AsunaException directly
- */
 export class UploadException extends AsunaException {
   constructor(errors) {
     super(AsunaError.Unprocessable, 'upload file(s) error', errors);

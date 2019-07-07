@@ -84,7 +84,7 @@ export class HermesProcessManager {
       this.queue = Hermes.regInMemoryQueue(AsunaSystemQueue.IN_MEMORY_JOB);
       Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_JOB, (job: IAsunaJob) => {
         logger.log(`jobProcessor: ${r(job)}`);
-        return job.process();
+        return job.handle();
       });
     }
   }
@@ -120,7 +120,7 @@ export class HermesProcessManager {
                 logger.log(`send ${r(job)} to queue ${this.queue.name}`);
                 // this.queue.queue.next(job);
                 job.state = 'OPEN';
-                const { jobId } = this.queue.add(job);
+                const { jobId } = this.queue.next(job);
                 job.id = jobId;
               });
             }
@@ -140,7 +140,7 @@ export class AsunaDefaultEvent implements IAsunaEvent {
   source: string;
   type: string;
 
-  constructor(name: string, source: string, type: string, process: () => Promise<any>) {
+  constructor(name: string, source: string, type: string, handle: () => Promise<any>) {
     this.name = name;
     this.rules = [
       new (class implements IAsunaRule {
@@ -172,10 +172,10 @@ export class AsunaDefaultEvent implements IAsunaEvent {
                     payload: any;
                     source: string;
                     type: string;
-                    process: () => Promise<any>;
+                    handle: () => Promise<any>;
 
                     constructor() {
-                      this.process = process;
+                      this.handle = handle;
                     }
                   })(),
                 ];
@@ -212,7 +212,7 @@ export class HermesExchange {
 export interface InMemoryAsunaQueue {
   name: string;
   queue: Subject<any>;
-  add: (data: any) => { jobId: string };
+  next: (data: any) => { jobId: string };
   process?: (payload: any) => Promise<any>;
   status?: { [jobId: string]: { state: string; events: any[] } };
 }
@@ -255,7 +255,7 @@ export class Hermes {
     );
 
     const configObject = RedisConfigObject.loadOr('job');
-    logger.log(`init queues...${r(configObject, true)}`);
+    logger.log(`init queues with redis: ${r(configObject, true)}`);
     if (configObject && configObject.enable) {
       const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);
@@ -365,14 +365,14 @@ export class Hermes {
             at: new Date().toUTCString(),
           });
         },
-        ({ jobId, message }) => {
-          logger.warn(`job(${jobId}) error occurred in ${queueName}: ${r(message)}`);
+        ({ jobId, data, result }) => {
+          logger.warn(`job(${jobId}) error occurred in ${queueName}: ${r(data)}`);
           const status = this.getInMemoryQueue(queueName).status[jobId];
           status.state = 'ERROR';
           status.events.push({
             state: 'ERROR',
             at: new Date().toUTCString(),
-            message,
+            message: data,
           });
         },
       );
@@ -382,7 +382,7 @@ export class Hermes {
       name: queueName,
       queue: subject,
       status,
-      add(data) {
+      next(data) {
         const jobId = random(6);
         this.status[jobId] = {
           state: 'PENDING',
@@ -427,7 +427,7 @@ export class Hermes {
    * @param queueName
    * @param process
    */
-  static setupJobProcessor(queueName: string, process: (payload: any) => Promise<any>): void {
+  static setupJobProcessor(queueName: string, handle: (payload: any) => Promise<any>): void {
     assert.strictEqual(isBlank(queueName), false, 'queue name must not be empty');
 
     let queue;
@@ -438,7 +438,7 @@ export class Hermes {
       logger.error(`queue(${queueName}) not found`);
       return;
     }
-    queue.process = process;
+    queue.handle = handle;
   }
 
   static subscribe(

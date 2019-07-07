@@ -50,9 +50,7 @@ export class UploaderController {
         const supportedImage = validator.isEnum(file.mimetype, ImageMimeType);
         const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);
         const supportedDoc = validator.isEnum(file.mimetype, DocMimeType);
-        logger.log(
-          `validate file ${JSON.stringify({ supportedImage, supportedVideo, supportedDoc })}`,
-        );
+        logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
         if (!(supportedImage || supportedVideo || supportedDoc)) {
           // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
           logger.warn(`unsupported mime type: ${file.mimetype}, save as normal file.`);
@@ -70,16 +68,17 @@ export class UploaderController {
     @Req() req,
     @UploadedFiles() files,
   ) {
-    logger.log(JSON.stringify({ bucket, prefix, files, err: req.fileValidationError }));
+    logger.log(r({ bucket, prefix, files, err: req.fileValidationError }));
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
     }
     const results = await bluebird
       .map(files, (file: any) => {
         if (local === '1') {
-          logger.log(
-            `save file[${file.mimetype}] to local storage [${bucket}-${prefix}]...${file.filename}`,
-          );
+          logger.log(oneLineTrim`
+            save file[${file.mimetype}] to local storage 
+            ${r({ bucket, prefix, filename: file.filename })}
+          `);
           return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
         }
 
@@ -97,14 +96,14 @@ export class UploaderController {
         }
         logger.log(oneLineTrim`
           no storage engine defined for file type [${file.mimetype}]
-          to bucket(${bucket})/prefix(${prefix}) - ${file.filename}, 
+          to ${r({ bucket, prefix, filename: file.filename })}, 
           using normal file storage engine.
         `);
         return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       })
       .catch(error => {
-        logger.error(error.message, error.trace);
-        throw new AsunaException(AsunaError.Unprocessable, error.message);
+        logger.error(r(error));
+        throw new UploadException(error);
       });
     logger.log(`results is ${r(results)}`);
     return results.map(saved => ({

@@ -2,7 +2,7 @@ import { Expose, Transform } from 'class-transformer';
 import { configLoader } from '../config.helper';
 
 export const QiniuConfigKeys = {
-  STORAGE: 'STORAGE',
+  QINIU_ENABLE: 'QINIU_ENABLE',
   QINIU_ACCESS_KEY: 'QINIU_ACCESS_KEY',
   QINIU_SECRET_KEY: 'QINIU_SECRET_KEY',
   QINIU_BUCKET_NAME: 'QINIU_BUCKET_NAME',
@@ -11,6 +11,7 @@ export const QiniuConfigKeys = {
 };
 
 export class QiniuConfigObject {
+  enable: boolean;
   bucket: string;
   prefix: string;
   domain: string;
@@ -26,6 +27,7 @@ export class QiniuConfigObject {
 
   static load(type: 'video' | 'image' | 'file'): QiniuConfigObject {
     return new QiniuConfigObject({
+      enable: configLoader.loadBoolConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_ENABLE}`),
       bucket: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_BUCKET_NAME}`),
       prefix: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_PREFIX}`),
       domain: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_DOMAIN}`),

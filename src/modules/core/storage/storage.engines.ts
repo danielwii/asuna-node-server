@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common';
-import { Job } from 'bull';
 import { classToPlain } from 'class-transformer';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
@@ -8,7 +7,6 @@ import * as minio from 'minio';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import * as sharp from 'sharp';
-import * as util from 'util';
 import { ErrorException, r } from '../../common';
 import { AsunaSystemQueue, Hermes } from '../bus';
 import { AsunaContext } from '../context';
@@ -92,7 +90,7 @@ export class LocalStorage implements IStorageEngine {
     const prefix = opts.prefix || yearMonthStr();
     const filename = convertFilename(file.filename);
     const dest = join(this.storagePath, bucket, prefix, filename);
-    LocalStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
+    LocalStorage.logger.log(`file is '${r({ file, dest })}'`);
 
     fsExtra.moveSync(file.path, dest);
     return Promise.resolve({
@@ -109,9 +107,7 @@ export class LocalStorage implements IStorageEngine {
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }
-    LocalStorage.logger.log(
-      util.inspect({ filename, prefix, bucket, thumbnailConfig, jpegConfig }, { colors: true }),
-    );
+    LocalStorage.logger.log(r({ filename, prefix, bucket, thumbnailConfig, jpegConfig }));
 
     const ext = _.last(fullFilePath.split('.'));
     const fullFileDir = fullFilePath.slice(0, -1 - ext.length);
@@ -150,10 +146,7 @@ export class LocalStorage implements IStorageEngine {
     imageProcess.toFile(outputPath, (err, info) => {
       if (err) {
         LocalStorage.logger.error(
-          `create outputPath image error ${util.inspect(
-            { outputPath, err: err.stack, info },
-            { colors: true },
-          )}`,
+          `create outputPath image error ${r({ outputPath, err: err.stack, info })}`,
         );
         res.status(404).send(err.message);
       } else {
@@ -219,7 +212,7 @@ export class BucketStorage {
     const prefix = `${now.getFullYear()}/${now.getMonth()}`;
     const filename = convertFilename(file.filename);
     const dest = join(this.storagePath, bucketName, prefix, filename);
-    BucketStorage.logger.log(`file is '${JSON.stringify({ file, dest }, null, 2)}'`);
+    BucketStorage.logger.log(`file is '${r({ file, dest })}'`);
 
     fsExtra.moveSync(file.path, dest);
     return Promise.resolve({
@@ -242,8 +235,17 @@ export class MinioStorage implements IStorageEngine {
     opts: { defaultBucket?: string } = {},
   ) {
     this.defaultBucket = opts.defaultBucket || 'default';
+    const configObject = configLoader();
+    if (configObject.enable !== true) {
+      throw new Error(
+        `minio must enable when using minio storage engine: ${r({
+          configs: classToPlain(configObject),
+          opts,
+        })}`,
+      );
+    }
     MinioStorage.logger.log(
-      `[constructor] init ${r({ configs: classToPlain(configLoader()), opts })}`,
+      `[constructor] init ${r({ configs: classToPlain(configObject), opts })}`,
     );
     /*
     Hermes.setupJobProcessor(AsunaSystemQueue.UPLOAD, (job: Job) => {
@@ -324,7 +326,7 @@ export class MinioStorage implements IStorageEngine {
     const prefix = opts.prefix || yearMonthStr();
     const region = opts.region || 'local';
     const items: minio.BucketItemFromList[] = await this.client.listBuckets();
-    MinioStorage.logger.log(`found buckets: ${r(items)}`);
+    MinioStorage.logger.log(`found buckets: ${r(items)} current is ${bucket}`);
     if (!(items && items.find(item => item.name === bucket))) {
       MinioStorage.logger.log(`create bucket [${bucket}] for region [${region}]`);
       await this.client.makeBucket(bucket, region);
@@ -363,8 +365,11 @@ export class MinioStorage implements IStorageEngine {
       put ${r(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
       and bucket [${bucket}], add upload job to queue(${AsunaSystemQueue.IN_MEMORY_UPLOAD})
     `);
-    const { queue } = Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD);
-    queue.next({ bucket, filenameWithPrefix, file });
+    Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD).next({
+      bucket,
+      filenameWithPrefix,
+      file,
+    });
     /*
     const { queue } = Hermes.getQueue(AsunaSystemQueue.UPLOAD);
     queue
@@ -396,12 +401,22 @@ export class QiniuStorage implements IStorageEngine {
   private readonly mac: qiniu.auth.digest.Mac;
 
   constructor(private configLoader: () => QiniuConfigObject) {
-    const config = configLoader();
+    const configObject = configLoader();
     QiniuStorage.logger.log(
-      `[constructor] init [${config.bucket}] with default prefix:${config.prefix} ...`,
+      `[constructor] init [${configObject.bucket}] with default prefix:${configObject.prefix} ...`,
     );
+
+    if (configObject.enable !== true) {
+      throw new Error(
+        `qiniu must enable when using qiniu storage engine: ${r({
+          configs: classToPlain(configObject),
+        })}`,
+      );
+    }
+    QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(configObject) })}`);
+
     // this.temp = fsExtra.mkdtempSync('temp');
-    this.mac = new qiniu.auth.digest.Mac(config.accessKey, config.secretKey);
+    this.mac = new qiniu.auth.digest.Mac(configObject.accessKey, configObject.secretKey);
   }
 
   public saveEntity(
@@ -432,9 +447,7 @@ export class QiniuStorage implements IStorageEngine {
             throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
           }
           if (info.statusCode === 200) {
-            QiniuStorage.logger.log(
-              `upload file '${JSON.stringify({ key, info, body }, null, 2)}'`,
-            );
+            QiniuStorage.logger.log(`upload file '${r({ key, info, body })}'`);
             resolve({
               prefix,
               bucket: config.bucket,
