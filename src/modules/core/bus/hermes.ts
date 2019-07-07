@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
+import { job } from 'cron';
 import * as _ from 'lodash';
 import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
@@ -59,7 +60,7 @@ export type AsunaQueue = {
   name: string;
   opts?: QueueOptions;
   queue: Queue;
-  process?: (payload: any) => Promise<any>;
+  handle?: (payload: any) => Promise<any>;
 };
 
 export type EventRuleResolver = {
@@ -83,8 +84,13 @@ export class HermesProcessManager {
       logger.log('initialize process manager');
       this.queue = Hermes.regInMemoryQueue(AsunaSystemQueue.IN_MEMORY_JOB);
       Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_JOB, (job: IAsunaJob) => {
-        logger.log(`jobProcessor: ${r(job)}`);
-        return job.handle();
+        logger.log(`jobProcessor job: ${r(job)}`);
+        if (!job) {
+          throw new Error(
+            `no job received in processor at queue: ${AsunaSystemQueue.IN_MEMORY_JOB}`,
+          );
+        }
+        return job.process(job.payload);
       });
     }
   }
@@ -140,7 +146,13 @@ export class AsunaDefaultEvent implements IAsunaEvent {
   source: string;
   type: string;
 
-  constructor(name: string, source: string, type: string, handle: () => Promise<any>) {
+  constructor(
+    name: string,
+    source: string,
+    type: string,
+    data: any,
+    process: (data) => Promise<any>,
+  ) {
     this.name = name;
     this.rules = [
       new (class implements IAsunaRule {
@@ -172,10 +184,11 @@ export class AsunaDefaultEvent implements IAsunaEvent {
                     payload: any;
                     source: string;
                     type: string;
-                    handle: () => Promise<any>;
+                    process: (data) => Promise<any>;
 
                     constructor() {
-                      this.handle = handle;
+                      this.payload = data;
+                      this.process = process;
                     }
                   })(),
                 ];
@@ -213,7 +226,7 @@ export interface InMemoryAsunaQueue {
   name: string;
   queue: Subject<any>;
   next: (data: any) => { jobId: string };
-  process?: (payload: any) => Promise<any>;
+  handle?: (payload: any) => Promise<any>;
   status?: { [jobId: string]: { state: string; events: any[] } };
 }
 
@@ -261,7 +274,7 @@ export class Hermes {
       logger.log(`init job with redis db: ${db}`);
       Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) });
 
-      logger.log(`sync status with redis.`);
+      logger.log('sync status with redis.');
     }
 
     Hermes.regInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD);
@@ -313,9 +326,10 @@ export class Hermes {
       .pipe(
         map(({ jobId, data }) => {
           logger.log(`job(${jobId}) call func in map ... data: ${r(data)}`);
-          const status = Hermes.getInMemoryQueue(queueName).status[jobId];
-          if (typeof data.process !== 'function') {
-            const message = `no processor registered for ${queueName}`;
+          const inMemoryQueue = Hermes.getInMemoryQueue(queueName);
+          const status = inMemoryQueue.status[jobId];
+          if (typeof inMemoryQueue.handle !== 'function') {
+            const message = `no handler registered for ${queueName}`;
             logger.error(message);
             status.state = 'UN_READY';
             status.events.push({
@@ -340,13 +354,13 @@ export class Hermes {
             // execute the function and then examine the returned value.
             // if the returned value is *not* an Rx.Observable, then
             // wrap it using Observable.return
-            const result = data.process();
+            const result = inMemoryQueue.handle(data);
             const isPromise = typeof result.then === 'function';
             logger.log(
               `job(${jobId}) call func in defer ... result is ${r(result)} ${typeof result}`,
             );
             return isPromise
-              ? fromPromise(result.then(value => ({ result: value, jobId, data })))
+              ? fromPromise<any>(result.then(value => ({ result: value, jobId, data })))
               : result instanceof Observable
               ? of({ jobId, data, result })
               : of(result);
@@ -369,15 +383,18 @@ export class Hermes {
             at: new Date().toUTCString(),
           });
         },
-        ({ jobId, data, result }) => {
-          logger.warn(`job(${jobId}) error occurred in ${queueName}: ${r(data)}`);
-          const status = this.getInMemoryQueue(queueName).status[jobId];
-          status.state = 'ERROR';
-          status.events.push({
-            state: 'ERROR',
-            at: new Date().toUTCString(),
-            message: data,
-          });
+        error => {
+          const { jobId, data } = error;
+          logger.warn(`job(${jobId}) error occurred in ${queueName}: ${r(error)}`);
+          if (jobId && this.getInMemoryQueue(queueName).status[jobId]) {
+            const status = this.getInMemoryQueue(queueName).status[jobId];
+            status.state = 'ERROR';
+            status.events.push({
+              state: 'ERROR',
+              at: new Date().toUTCString(),
+              message: data,
+            });
+          }
         },
       );
 
@@ -414,8 +431,8 @@ export class Hermes {
     const queue = new Queue(queueName, opts);
     queue.process((job: Job) => {
       logger.log(`queue(${queueName}) run job ${job.name} with ${r(job.data)}`);
-      return this.getQueue(queueName).process != null
-        ? this.getQueue(queueName).process(job)
+      return this.getQueue(queueName).handle != null
+        ? this.getQueue(queueName).handle(job)
         : Promise.reject(`no processor registered for ${queueName}`);
     });
     this.queues[queueName] = { name: queueName, opts, queue };
@@ -429,7 +446,7 @@ export class Hermes {
   /**
    * return index
    * @param queueName
-   * @param process
+   * @param handle
    */
   static setupJobProcessor(queueName: string, handle: (payload: any) => Promise<any>): void {
     assert.strictEqual(isBlank(queueName), false, 'queue name must not be empty');

@@ -63,7 +63,7 @@ export interface IAsunaJob {
   payload: any;
   createdBy: any;
   createdAt: any;
-  handle: () => Promise<any>;
+  process: (data) => Promise<any>;
 
   id?: string;
   state?: string;

@@ -35,10 +35,17 @@ describe('Hermes', () => {
       resolve: command => {
         console.log(`resolve command to actions ${r(command)}`);
         return [
-          new AsunaDefaultEvent('default-upload-event', 'test', 'UploadEvent', () => {
-            console.log('--> process ...');
-            return Promise.resolve('done');
-          }),
+          new AsunaDefaultEvent(
+            'default-upload-event',
+            'test',
+            'UploadEvent',
+            { data: 'test' },
+            ({ payload }) => {
+              console.log({ payload });
+              return Promise.resolve('done');
+            },
+          ),
+          /*
           new (class UploadEvent implements IAsunaEvent {
             createdAt: any;
             createdBy: any;
@@ -47,10 +54,11 @@ describe('Hermes', () => {
             rules: IAsunaRule[];
             source: string;
             type: string;
-          })(),
+          })(),*/
         ];
       },
     });
+    /*
     HermesExchange.regEventRule('upload-event-rule-default', {
       identifier: { version: 'default/v1alpha', type: 'EventRule' },
       resolve: event => {
@@ -68,6 +76,7 @@ describe('Hermes', () => {
         ];
       },
     });
+*/
 
     HermesProcessManager.start();
     console.log(1, command);
