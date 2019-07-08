@@ -1,5 +1,4 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
 import { ClientModule } from './client/client.module';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';

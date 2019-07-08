@@ -48,7 +48,8 @@ export class EnumHelper {
 }
 
 export function isBlank(value) {
-  return (_.isEmpty(value) && !_.isNumber(value)) || (_.isNaN(value) && _.isString(value))
+  return (value && (_.isEmpty(value) && !_.isNumber(value))) ||
+    (_.isNaN(value) && _.isString(value))
     ? !!_.trim(value)
     : _.isEmpty(value);
 }

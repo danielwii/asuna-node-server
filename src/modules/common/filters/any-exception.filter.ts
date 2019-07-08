@@ -44,8 +44,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
     } else if (R.is(EntityNotFoundError, exception)) {
-      (<any>processed).status = 404;
-    } else {
+      (<any>processed).status = HttpStatus.NOT_FOUND;
+    } else if (processed.code) {
+      if (processed.code === 'ERR_ASSERTION') {
+        // TODO wrap with AsunaException
+        (<any>processed).status = HttpStatus.BAD_REQUEST;
+      }
       // logger.warn(`[unhandled exception] ${JSON.stringify(exception)}`);
     }
 
@@ -53,13 +57,13 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      logger.warn(`[bad_request] ${r(processed.message)}`);
+      logger.warn(`[bad_request] ${r(processed)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${r(processed.message)}`);
+      logger.warn(`[not_found] ${r(processed)}`);
     } else if (/40\d/.test(`${status}`)) {
-      logger.warn(`[unauthorized] ${r(processed.message)}`);
+      logger.warn(`[unauthorized] ${r(processed)}`);
     } else {
-      logger.error(`[unhandled exception] ${r(processed.message)}`, processed.stack);
+      logger.error(`[unhandled exception] ${r(processed)}`);
     }
 
     if (!response.finished && response.status) {

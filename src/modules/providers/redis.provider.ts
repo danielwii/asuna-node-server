@@ -56,21 +56,21 @@ export class RedisProvider {
     });
 
     process.on('SIGINT', () => {
-      client.quit().finally(() => {
-        logger.log('signal: SIGINT. Redis default connection disconnected');
+      client.quit((err: Error, res: string) => {
+        logger.log(`signal: SIGINT. Redis default connection disconnected ${r({ err, res })}`);
         process.exit(0);
       });
     });
 
     process.on('beforeExit', () => {
-      client.quit().finally(() => {
-        logger.log('beforeExit. Redis default connection disconnected');
+      client.quit((err: Error, res: string) => {
+        logger.log(`beforeExit. Redis default connection disconnected ${r({ err, res })}`);
       });
     });
 
     process.on('removeListener', () => {
-      client.quit().finally(() => {
-        logger.log('removeListener. Redis default connection disconnected');
+      client.quit((err: Error, res: string) => {
+        logger.log(`removeListener. Redis default connection disconnected ${r({ err, res })}`);
       });
     });
 

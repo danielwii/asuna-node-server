@@ -1,35 +1,26 @@
-import {
-  Logger,
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  OnModuleInit,
-  RequestMethod,
-} from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-
+import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { DBModule } from '../db';
+import { KvModule } from '../kv';
+import { TokenModule } from '../token';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthMiddleware } from './admin-auth.middleware';
+import { AdminAuthService } from './admin-auth.service';
 import { AuthService } from './auth.service';
+import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
 import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { AdminAuthService } from './admin-auth.service';
-import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
-import { KvModule } from '../kv';
-import { DBModule } from '../db';
-import { TokenModule } from '../token';
 
 const logger = new Logger('AuthModule');
 
 @Module({
-  // imports: [
-  //   PassportModule.register({ defaultStrategy: 'jwt' }),
-  //   JwtModule.register({
-  //     secretOrPrivateKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
-  //     signOptions: { expiresIn: 60 * 60 * 24 * 30 },
-  //   }),
-  // ],
+  /*
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({
+      secretOrPrivateKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
+      signOptions: { expiresIn: 60 * 60 * 24 * 30 },
+    }),
+  ],*/
   imports: [KvModule, DBModule, TokenModule],
   providers: [AuthService, AdminAuthService, JwtStrategy, AdminJwtStrategy, ApiKeyStrategy],
   controllers: [AdminAuthController],

@@ -11,6 +11,7 @@ export const ConfigKeys = {
   PORT: 'PORT',
   TRACING: 'TRACING',
   DB_TYPE: 'DB_TYPE',
+  UPLOADER_MAX_COUNT: 'UPLOADER_MAX_COUNT',
 
   /**
    * 用与访问上传文件的资源地址
@@ -20,6 +21,7 @@ export const ConfigKeys = {
   VIDEO_STORAGE: 'VIDEO_STORAGE',
   IMAGE_STORAGE: 'IMAGE_STORAGE',
   FILE_STORAGE: 'FILE_STORAGE',
+  CHUNK_STORAGE: 'CHUNK_STORAGE',
 
   MAIL_HOST: 'MAIL_HOST',
   MAIL_PORT: 'MAIL_PORT',

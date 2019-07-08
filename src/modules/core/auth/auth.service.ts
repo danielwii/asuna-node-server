@@ -26,6 +26,7 @@ export class AuthService {
   private readonly cryptor = new Cryptor();
 
   constructor(@InjectConnection() private readonly connection: Connection) {
+    // 获得用户继承的 AbstractAuthUser
     const entityMetadata = getConnection().entityMetadatas.find(metadata => {
       if (DBHelper.isValidEntity(metadata)) {
         return (
@@ -67,7 +68,7 @@ export class AuthService {
    */
   async createToken(user: AbstractAuthUser) {
     logger.log(`createToken >> ${user.email}`);
-    const expiresIn = 60 * 60 * 24 * 30;
+    const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload = { id: user.id, username: user.username, email: user.email };
     const token = jwt.sign(payload, secretOrKey, { expiresIn });

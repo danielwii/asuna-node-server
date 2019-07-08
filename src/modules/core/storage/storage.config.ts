@@ -25,7 +25,7 @@ export class QiniuConfigObject {
     Object.assign(this, partial);
   }
 
-  static load(type: 'video' | 'image' | 'file'): QiniuConfigObject {
+  static load(type: 'videos' | 'images' | 'files' | 'chunks'): QiniuConfigObject {
     return new QiniuConfigObject({
       enable: configLoader.loadBoolConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_ENABLE}`),
       bucket: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_BUCKET_NAME}`),

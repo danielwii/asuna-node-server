@@ -1,14 +1,13 @@
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import * as util from 'util';
-import * as _ from 'lodash';
 import * as GraphQLJSON from 'graphql-type-json';
+import * as _ from 'lodash';
 import { join } from 'path';
-
+import * as util from 'util';
 import { AppModule } from './app';
-import { DataLoaderInterceptor } from './dataloader';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
+import { DataLoaderInterceptor } from './dataloader';
 
 const logger = new Logger('GraphqlModule');
 
