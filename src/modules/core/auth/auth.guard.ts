@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/commo
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import * as passport from 'passport';
-import { Observable } from 'rxjs';
 import { AsunaError, AsunaException, r } from '../../common';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
@@ -32,40 +31,50 @@ export type AnyAuthRequest = Request & { user: any; authObject: any };
 export class AnyAuthGuard implements CanActivate {
   logger = new Logger('AnyAuthGuard');
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const res = context.switchToHttp().getResponse();
     const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.originalUrl}`);
-    let result = false;
+    let result;
     if (isApiKeyRequest(req)) {
-      passport.authenticate(
-        'api-key',
-        { userProperty: 'user', assignProperty: 'assign', session: false },
-        (err, user, info) => {
-          this.logger.log(`api-key auth: ${r({ user })}`);
-          if (err || info) {
-            throw new AsunaException(AsunaError.InsufficientPermissions, err || info);
-          }
-          req.authObject = user; // { apiKey: xxx }
-          result = true;
-        },
-      )(req, res, next);
+      result = await new Promise(resolve => {
+        passport.authenticate(
+          'api-key',
+          { userProperty: 'user', assignProperty: 'assign', session: false },
+          (err, user, info) => {
+            this.logger.log(`api-key auth: ${r({ user })}`);
+            if (err || info) {
+              this.logger.log(`api-key auth error: ${r({ err, info })}`);
+            } else {
+              req.authObject = user; // { apiKey: xxx }
+            }
+            resolve({ err, user, info });
+          },
+        )(req, res);
+      });
     } else {
-      passport.authenticate(
-        'jwt',
-        { userProperty: 'user', assignProperty: 'assign', session: false },
-        (err, user, info) => {
-          this.logger.log(`jwt auth ${r({ user })}`);
-          if (err || info) {
-            throw new AsunaException(AsunaError.InsufficientPermissions, err || info);
-          }
-          req.authObject = user;
-          req.user = user; // only inject client side user to req
-          result = true;
-        },
-      )(req, res, next);
+      result = await new Promise(resolve => {
+        passport.authenticate(
+          'jwt',
+          { userProperty: 'user', assignProperty: 'assign', session: false },
+          (err, user, info) => {
+            // this.logger.log(`jwt auth ${r({ user })}`);
+            if (err || info) {
+              this.logger.log(`jwt auth error: ${r({ err, info })}`);
+            } else {
+              req.authObject = user;
+              req.user = user; // only inject client side user to req
+            }
+            resolve({ err, user, info });
+          },
+        )(req, res);
+      });
+    }
+
+    if (!result.user) {
+      throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
     }
 
     return result;

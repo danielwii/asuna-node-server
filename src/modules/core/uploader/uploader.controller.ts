@@ -21,16 +21,20 @@ import {
 import * as bluebird from 'bluebird';
 import { Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
+import * as fsExtra from 'fs-extra';
+import * as highland from 'highland';
 import * as _ from 'lodash';
+import * as mime from 'mime-types';
 import * as multer from 'multer';
 import { join } from 'path';
 import * as uuid from 'uuid';
-import { isBlank, r, sha1, sha256, UploadException } from '../../common';
+import { AsunaError, AsunaException, isBlank, r, sha1, UploadException } from '../../common';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
 
+const os = require('os');
 const assert = require('assert');
 
 const logger = new Logger('UploaderController');
@@ -63,6 +67,58 @@ export class UploaderController {
   private context = AsunaContext.instance;
 
   @ApiBearerAuth()
+  @ApiOperation({ title: 'Stream upload chunked file' })
+  @ApiConsumes('multipart/form-data')
+  @ApiImplicitQuery({
+    name: 'chunk',
+    required: false,
+    description: 'chunked upload file index',
+  })
+  @UseGuards(AnyAuthGuard)
+  @Post('chunks-stream')
+  async streamChunkedUploader(
+    @Query('filename') filename: string,
+    @Query('chunk') chunk: number,
+    @Req() req: AnyAuthRequest,
+  ) {
+    assert.strictEqual(!isBlank(filename), true, 'filename needed');
+    assert.strictEqual(!isBlank(chunk), true, 'chunk needed');
+
+    const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
+    const stream = fsExtra.createWriteStream(tempFile);
+    req.pipe(stream);
+
+    await new Promise(resolve => {
+      req.on('end', () => {
+        logger.log(`save to ${tempFile} done.`);
+        resolve();
+      });
+    });
+    const file = { filename, path: tempFile, mimetype: 'application/octet-stream' /* default */ };
+
+    const { authObject } = req;
+    const fingerprint = sha1({ authObject, filename });
+    const chunkname = `${file.filename}.${chunk}`;
+    logger.log(
+      `upload chunk file ${r({ filename, chunkname, file, authObject, fingerprint, chunk })}`,
+    );
+
+    file.filename = chunkname;
+    const saved = await this.context.chunkStorageEngine.saveEntity(file, { prefix: fingerprint });
+
+    return {
+      ...saved,
+      // 用于访问的资源地址
+      fullpath: join(
+        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
+        saved.bucket,
+        saved.prefix,
+        saved.filename,
+      ),
+    };
+  }
+
+  @ApiBearerAuth()
   @ApiOperation({ title: 'Chunked upload file' })
   @ApiConsumes('multipart/form-data')
   @ApiImplicitFile({ name: 'file', required: true, description: 'chunked file block' })
@@ -80,8 +136,15 @@ export class UploaderController {
     @Req() req: AnyAuthRequest & { fileValidationError: any },
     @UploadedFile() file,
   ) {
-    assert.strictEqual(isBlank(filename), false, 'filename needed');
-    assert.strictEqual(isBlank(chunk), false, 'chunk needed');
+    assert.strictEqual(!isBlank(filename), true, 'filename needed');
+    assert.strictEqual(!isBlank(chunk), true, 'chunk needed');
+
+    const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
+    const stream = fsExtra.createWriteStream(tempFile);
+    req.pipe(stream);
+    req.on('end', () => {
+      logger.log(`save to ${tempFile} done.`);
+    });
 
     const { authObject } = req;
     if (req.fileValidationError) {
@@ -110,7 +173,83 @@ export class UploaderController {
 
   @UseGuards(AnyAuthGuard)
   @Post('merge-chunks')
-  async mergeChunks() {}
+  async mergeChunks(
+    @Query('filename') filename: string,
+    @Query('bucket') bucket: string = '',
+    @Query('prefix') prefix: string = '',
+    // @Query('totalChunks') totalChunks: number,
+    @Req() req: AnyAuthRequest,
+  ) {
+    assert.strictEqual(!isBlank(filename), true, 'filename needed');
+    // assert.strictEqual(totalChunks > 0, true, 'totalChunks count not received');
+
+    const { authObject } = req;
+    const fingerprint = sha1({ authObject, filename });
+    logger.log(`merge file ${filename} chunks... ${r({ prefix: fingerprint })}`);
+    const chunks = await this.context.chunkStorageEngine.listEntities({ prefix: fingerprint });
+    logger.log(`found chunks: ${r(chunks)}`);
+
+    // TODO task should bind with a token(OperationToken)
+    if (!(chunks && chunks.length)) {
+      throw new AsunaException(
+        AsunaError.Unprocessable,
+        `no chunks found for ${filename} with fingerprint: ${fingerprint}`,
+      );
+    }
+
+    // try to merge all chunks
+    logger.log(`try to merge chunks: ${r(chunks)}`);
+    const filepaths = await bluebird.all(
+      chunks.map(chunk =>
+        this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath),
+      ),
+    );
+    const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', fingerprint);
+    fsExtra.mkdirsSync(tempDirectory);
+    const dest = join(tempDirectory, filename);
+    logger.log(`merge files: ${r(filepaths)} to ${dest}`);
+    const writableStream = fsExtra.createWriteStream(dest);
+
+    highland(filepaths)
+      .map(fsExtra.createReadStream)
+      .flatMap(highland)
+      .pipe(writableStream);
+
+    await new Promise(resolve => {
+      writableStream.on('close', () => {
+        logger.log(`merge file done: ${dest}, clean chunks ...`);
+        resolve();
+        filepaths.forEach(filepath => {
+          logger.log(`remove ${filepath} ...`);
+          fsExtra
+            .remove(filepath)
+            .catch(reason => logger.warn(`remove ${filepath} error: ${r(reason)}`));
+        });
+      });
+    });
+
+    const mimetype = mime.lookup(filename) || 'application/octet-stream';
+    const saved = await this.context.fileStorageEngine.saveEntity(
+      {
+        filename,
+        path: dest,
+        mimetype,
+        extension: mime.extension(mimetype) || 'bin',
+      },
+      { bucket, prefix },
+    );
+
+    return {
+      ...saved,
+      // 用于访问的资源地址
+      fullpath: join(
+        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
+        saved.bucket,
+        saved.prefix,
+        saved.filename,
+      ),
+    };
+  }
 
   @ApiBearerAuth()
   @ApiOperation({ title: 'Upload files' })

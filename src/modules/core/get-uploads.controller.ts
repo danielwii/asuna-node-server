@@ -43,7 +43,7 @@ export class GetUploadsController {
         jpegConfig,
       })}`,
     );
-    const url = await this.context.defaultStorageEngine.resolve({
+    const url = await this.context.defaultStorageEngine.resolveUrl({
       filename: filenameWithPrefix,
       bucket,
       thumbnailConfig,
@@ -81,7 +81,7 @@ export class GetUploadsController {
   ) {
     const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
     if (fullFilePath.startsWith(this.context.uploadPath)) {
-      return this.context.defaultStorageEngine.resolve(
+      return this.context.defaultStorageEngine.resolveUrl(
         { filename, bucket, prefix, thumbnailConfig, jpegConfig },
         res,
       );
@@ -140,7 +140,7 @@ export class GetUploadsController {
         throw new NotFoundException();
       }
       res.sendFile(fullFilePath);
-      // return UploaderController.fileStorageEngine.resolve({ filename, bucket, prefix }, res);
+      // return UploaderController.fileStorageEngine.resolveUrl({ filename, bucket, prefix }, res);
     } else {
       res.send();
     }

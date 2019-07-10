@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
@@ -12,6 +13,8 @@ import {
   QiniuStorage,
   StorageMode,
 } from './storage';
+
+const fs = require('fs');
 
 const logger = new Logger('AsunaContext');
 
@@ -30,6 +33,7 @@ export class AsunaContext {
 
   public readonly dirname: string;
   public uploadPath: string;
+  public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
   public videoStorageEngine: IStorageEngine;
@@ -45,6 +49,8 @@ export class AsunaContext {
       // root: resolve(__dirname, '../..'),
     });
     this.initStorageEngine(`${process.cwd()}/uploads`);
+    this.tempPath = `${process.cwd()}/.temp`;
+    fsExtra.mkdirs(join(this.tempPath));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}) {

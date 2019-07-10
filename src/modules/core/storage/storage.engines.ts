@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { classToPlain } from 'class-transformer';
 import { oneLineTrim } from 'common-tags';
+import { Response } from 'express';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
 import * as minio from 'minio';
@@ -20,13 +21,69 @@ export enum StorageMode {
   MINIO = 'minio',
 }
 
+export class SavedFile {
+  bucket?: string; // default: 'default'
+  region?: string; // default: 'local'
+  prefix?: string;
+  mode: StorageMode;
+  mimetype?: string;
+  filename: string;
+
+  constructor({
+    bucket,
+    region,
+    prefix,
+    mode,
+    mimetype,
+    filename,
+  }: {
+    bucket?: string; // default: 'default'
+    region?: string; // default: 'local'
+    prefix?: string;
+    mode: StorageMode;
+    mimetype?: string;
+    filename: string;
+  }) {
+    this.bucket = bucket;
+    this.region = region;
+    this.prefix = prefix;
+    this.mode = mode;
+    this.mimetype = mimetype;
+    this.filename = filename;
+  }
+}
+
 export interface IStorageEngine {
+  /**
+   * 这里会创建一个上传任务，异步执行
+   * @param file
+   * @param opts
+   */
   saveEntity(
-    file: { filename: string; path: string; mimetype: string },
+    file: { filename: string; path: string; mimetype: string; extension?: string },
     opts: { bucket?: string; prefix?: string; region?: string },
   ): Promise<SavedFile>;
 
-  resolve(
+  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]>;
+
+  /**
+   * 如果是远程仓库，该命令应该先下载文件。然后和本地仓库一样，返回文件信息
+   * @param fileInfo
+   * @param toPath?   保存文件目录的一个可选项，对本地仓库来说，应该直接略过该参数
+   */
+  getEntity(fileInfo: SavedFile, toPath?: string): Promise<string>;
+
+  /**
+   * 返回相应的 url，在包含 res 时直接通过 res 返回相应的信息
+   * @param filename
+   * @param bucket
+   * @param prefix
+   * @param thumbnailConfig
+   * @param jpegConfig
+   * @param resolver 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
+   * @param res
+   */
+  resolveUrl(
     {
       filename,
       bucket,
@@ -42,17 +99,8 @@ export interface IStorageEngine {
       jpegConfig?: { opts: JpegParam; param?: string };
       resolver?: (url: string) => Promise<any>;
     },
-    res?,
+    res?: Response,
   ): Promise<any>;
-}
-
-export interface SavedFile {
-  bucket?: string; // default: 'default'
-  region?: string; // default: 'local'
-  prefix: string;
-  mode: StorageMode;
-  mimetype: string;
-  filename: string;
 }
 
 function yearMonthStr() {
@@ -66,10 +114,9 @@ function convertFilename(filename: string) {
 
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = new Logger(LocalStorage.name);
-
   private readonly storagePath: string;
-  private readonly bucket: string;
 
+  private readonly bucket: string;
   constructor(storagePath: string, defaultBucket: string = 'default') {
     this.bucket = defaultBucket || 'default';
     this.storagePath = storagePath;
@@ -102,7 +149,11 @@ export class LocalStorage implements IStorageEngine {
     });
   }
 
-  public resolve({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
+  getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
+  public resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
     const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
@@ -153,6 +204,13 @@ export class LocalStorage implements IStorageEngine {
         res.type(ext).sendFile(outputPath);
       }
     });
+  }
+
+  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+    // const directory =
+    // fs.readdirSync(join(AsunaContext.instance.uploadPath, opts.bucket, opts.prefix));
+    // return directory.map(file => new SavedFile());
+    throw new Error('not implemented'); // TODO not implemented
   }
 }
 
@@ -274,6 +332,25 @@ export class MinioStorage implements IStorageEngine {
         })
         .then(uploaded => {
           MinioStorage.logger.log(`[saveEntity] [${uploaded}] ...`);
+
+          MinioStorage.logger.log(`remove local file ${file.path}`);
+          fsExtra
+            .remove(file.path)
+            .then(value => {
+              const parent = join(file.path, '../');
+              MinioStorage.logger.log(`removed: ${value}, check parent: ${parent}`);
+              fsExtra.readdir(parent).then(files => {
+                if (files.length === 0) {
+                  MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
+                  fsExtra
+                    .remove(parent)
+                    .catch(reason =>
+                      MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
+                    );
+                }
+              });
+            })
+            .catch(reason => MinioStorage.logger.warn(`remove ${file.path} error: ${r(reason)}`));
           return uploaded;
         })
         .catch(error => {
@@ -297,7 +374,7 @@ export class MinioStorage implements IStorageEngine {
     });
   }
 
-  resolve(
+  resolveUrl(
     {
       filename,
       bucket,
@@ -392,14 +469,51 @@ export class MinioStorage implements IStorageEngine {
       filename,
     };
   }
+
+  listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+    const currentBucket = bucket || this.defaultBucket;
+    return new Promise<SavedFile[]>(resolve => {
+      const savedFiles: SavedFile[] = [];
+      const bucketStream = this.client.listObjectsV2(currentBucket, prefix, true);
+      bucketStream.on('data', item => {
+        MinioStorage.logger.log(`bucketStream on data ${r(item)}`);
+        savedFiles.push(
+          new SavedFile({
+            bucket: currentBucket,
+            prefix,
+            filename: item.name.slice(prefix.length + 1), // item.name 是包含 prefix 的完成名字
+            mode: StorageMode.MINIO,
+          }),
+        );
+      });
+      bucketStream.on('end', () => {
+        MinioStorage.logger.log('bucketStream on end');
+        return resolve(savedFiles);
+      });
+      bucketStream.on('error', error => {
+        MinioStorage.logger.log(`bucketStream on error ${r(error)}`);
+        throw new Error(r(error));
+      });
+    });
+  }
+
+  getEntity(fileInfo: SavedFile, destDirectory?: string): Promise<string> {
+    const bucket = fileInfo.bucket || this.defaultBucket;
+    const objectName = join(fileInfo.prefix, fileInfo.filename);
+    const filepath = join(
+      destDirectory || AsunaContext.instance.tempPath,
+      fileInfo.bucket,
+      objectName,
+    );
+    MinioStorage.logger.log(`get entity from ${r({ bucket, objectName, filepath })}`);
+    return this.client.fGetObject(bucket, objectName, filepath).then(() => filepath);
+  }
 }
 
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = new Logger(QiniuStorage.name);
-
   // private temp: string;
   private readonly mac: qiniu.auth.digest.Mac;
-
   constructor(private configLoader: () => QiniuConfigObject) {
     const configObject = configLoader();
     QiniuStorage.logger.log(
@@ -466,7 +580,15 @@ export class QiniuStorage implements IStorageEngine {
     });
   }
 
-  public resolve(
+  getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
+  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  public resolveUrl(
     {
       filename,
       bucket,

@@ -11,12 +11,12 @@ import {
   Repository,
   UpdateResult,
 } from 'typeorm';
-
+import { r } from '../../common/helpers';
+import { ConfigKeys, configLoader } from '../config.helper';
+import { DBHelper } from '../db';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
-import { DBHelper } from '../db';
-import { ConfigKeys, configLoader } from '../config.helper';
 
 const logger = new Logger('AuthService');
 
@@ -85,7 +85,7 @@ export class AuthService {
    */
   async validateUser(jwtPayload: IJwtPayload): Promise<boolean> {
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
-    logger.log(`validateUser >> ${JSON.stringify(jwtPayload)} expired in: ${left}s`);
+    logger.log(`validateUser >> ${r(jwtPayload)} expired in: ${left}s`);
 
     const user = await this.getUser(
       { email: jwtPayload.email, username: jwtPayload.username },
