@@ -4,8 +4,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import { join } from 'path';
-import * as util from 'util';
 import { AppModule } from './app';
+import { r } from './common/helpers';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
 import { DataLoaderInterceptor } from './dataloader';
 
@@ -20,7 +20,7 @@ export class GraphqlModule implements OnModuleInit {
       `${join(__dirname, '../../src')}/**/*.graphql`,
       `${join(dir, '../src')}/**/*.graphql`,
     ];
-    logger.log(`typePaths is ${JSON.stringify({ typePaths })}`);
+    logger.log(`typePaths is ${r({ typePaths })}`);
 
     return {
       module: GraphqlModule,
@@ -60,9 +60,9 @@ export class GraphqlModule implements OnModuleInit {
           ]),*/
           formatResponse: response => {
             if (response.errors) {
-              logger.warn(`response: ${util.inspect(response.errors, { colors: true })}`);
+              logger.warn(`response: ${r(response.errors)}`);
             }
-            logger.log(`response: ${util.inspect(response.data, { colors: true })}`);
+            logger.verbose(`response: ${r(response.data)}`);
             return response;
           },
         }),

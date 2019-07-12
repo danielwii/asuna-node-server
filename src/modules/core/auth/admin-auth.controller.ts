@@ -84,7 +84,7 @@ export class AdminAuthController extends RestCrudController {
       throw new SignException('wrong password');
     }
 
-    return await this.adminAuthService.createToken(user);
+    return this.adminAuthService.createToken(user);
   }
 
   @Get('authorized')

@@ -128,7 +128,7 @@ export function cachedDataLoader(segment, fn) {
           // logger.log(`delete (${segment}:${id})`);
           const key = `${segment}-${id}`;
           cacheMap.delete(key);
-          // return await client.drop({ segment, id });
+          // return client.drop({ segment, id });
         },
         clear: () => {
           // logger.log(`clear (${segment})`);

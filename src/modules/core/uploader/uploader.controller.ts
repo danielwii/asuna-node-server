@@ -185,7 +185,7 @@ export class UploaderController {
 
     const { authObject } = req;
     const fingerprint = sha1({ authObject, filename });
-    logger.log(`merge file ${filename} chunks... ${r({ prefix: fingerprint })}`);
+    logger.log(`merge file '${filename}' chunks... ${r({ prefix: fingerprint })}`);
     const chunks = await this.context.chunkStorageEngine.listEntities({ prefix: fingerprint });
     logger.log(`found chunks: ${r(chunks)}`);
 

@@ -14,8 +14,6 @@ import {
   StorageMode,
 } from './storage';
 
-const fs = require('fs');
-
 const logger = new Logger('AsunaContext');
 
 export interface IAsunaContextOpts {
@@ -49,8 +47,8 @@ export class AsunaContext {
       // root: resolve(__dirname, '../..'),
     });
     this.initStorageEngine(`${process.cwd()}/uploads`);
-    this.tempPath = `${process.cwd()}/.temp`;
-    fsExtra.mkdirs(join(this.tempPath));
+    this.tempPath = `${process.cwd()}/temp`;
+    fsExtra.mkdirs(join(this.tempPath)).catch(reason => logger.warn(r(reason)));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}) {

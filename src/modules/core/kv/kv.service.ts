@@ -130,7 +130,7 @@ export class KvService {
   ): Promise<KeyValuePair> {
     const keyValuePair = (await this.find(collection, key))[0];
     if (!keyValuePair && defaultPair) {
-      return await this.set(defaultPair);
+      return this.set(defaultPair);
     }
     return keyValuePair;
   }
