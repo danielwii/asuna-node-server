@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
 import { MetaInfo } from '../../common/decorators';
 
 export abstract class AbstractBaseEntity extends BaseEntity {

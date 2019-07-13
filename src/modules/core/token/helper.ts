@@ -1,18 +1,20 @@
 import { Logger } from '@nestjs/common';
 import * as moment from 'moment';
-import { OperationToken, OperationTokenType } from './token.entities';
-import { random } from '../helpers';
-import { AsunaError, AsunaException } from '../../common';
 import { UpdateResult } from 'typeorm';
+import { AsunaError, AsunaException, r } from '../../common';
+import { random } from '../helpers';
+import { OperationToken, OperationTokenType } from './entities';
 
-const logger = new Logger('TokenHelper');
+const logger = new Logger('OperationTokenHelper');
 
 export const SysTokenServiceName = {
   AdminLogin: 'admin#login',
   SysInvite: 'sys#sys-invite',
 };
 
-export class TokenHelper {
+export type TokenRule = 'sys' | 'app' | 'web' | 'operation' | 'other';
+
+export class OperationTokenHelper {
   /**
    * same { role, identifier, service } will return same token
    * @param payload
@@ -22,7 +24,7 @@ export class TokenHelper {
    * @param service 用于定位所使用的服务
    * @param remainingCount default: 1
    */
-  static async acquireToken({
+  static async obtainToken({
     type,
     payload,
     identifier,
@@ -34,19 +36,19 @@ export class TokenHelper {
     type: keyof typeof OperationTokenType;
     payload?: object;
     identifier: string;
-    role: 'sys' | 'app' | 'web' | 'other';
+    role: TokenRule;
     service: string;
     expiredInMinutes?: number;
     remainingCount?: number;
   }) {
-    const operationToken = await TokenHelper.getOperationToken({ role, identifier, service });
+    const operationToken = await OperationTokenHelper.redeemToken({ role, identifier, service });
     if (operationToken) {
       return operationToken;
     }
 
     const token = random(32);
 
-    let typeOptions: Partial<OperationToken> = {
+    const typeOptions: Partial<OperationToken> = {
       [OperationTokenType.OneTime]: { remainingCount: 1 },
       [OperationTokenType.MultiTimes]: { remainingCount },
       [OperationTokenType.Unlimited]: {},
@@ -63,7 +65,7 @@ export class TokenHelper {
       },
     }[type];
 
-    logger.log(`create token with type options ${JSON.stringify(typeOptions)}`);
+    logger.log(`create token with type options ${r(typeOptions)}`);
 
     return OperationToken.create({
       type,
@@ -87,13 +89,13 @@ export class TokenHelper {
    * @param identifier
    * @param service
    */
-  static async getOperationToken({
+  static async redeemToken({
     role,
     identifier,
     service,
   }: {
     identifier: string;
-    role: 'sys' | 'admin' | 'app' | 'web' | 'other';
+    role: TokenRule;
     service: string;
   }): Promise<OperationToken> {
     return OperationToken.findOne({
@@ -102,28 +104,28 @@ export class TokenHelper {
     });
   }
 
-  static async deprecateOperationTokens({
+  static async deprecateTokens({
     role,
     identifier,
     service,
   }: {
     identifier: string;
-    role: 'sys' | 'admin' | 'app' | 'web' | 'other';
+    role: TokenRule;
     service: string;
   }): Promise<UpdateResult> {
     return OperationToken.update({ role, identifier, service }, { isDeprecated: true });
   }
 
-  static async getOperationTokenByToken(token: string) {
+  static async redeemTokenByToken(token: string) {
     if (token) {
       return token.length === 9
-        ? TokenHelper.getOperationTokenByID({ shortId: token })
-        : TokenHelper.getOperationTokenByID({ token });
+        ? OperationTokenHelper.redeemTokenByID({ shortId: token })
+        : OperationTokenHelper.redeemTokenByID({ token });
     }
     return null;
   }
 
-  static async getOperationTokenByID({ token, shortId }: { token?: string; shortId?: string }) {
+  static async redeemTokenByID({ token, shortId }: { token?: string; shortId?: string }) {
     if ((token && token.trim()) || (shortId && shortId.trim())) {
       return OperationToken.findOne({
         where: {
@@ -135,20 +137,21 @@ export class TokenHelper {
     return null;
   }
 
-  static async useToken(token: string) {
-    const operationToken = await TokenHelper.getOperationTokenByToken(token);
-    if (TokenHelper.checkAvailable(operationToken)) {
-      if (operationToken.remainingCount) operationToken.remainingCount--;
+  static async consumeToken(token: string) {
+    const operationToken = await OperationTokenHelper.redeemTokenByToken(token);
+    if (OperationTokenHelper.checkAvailable(operationToken)) {
+      if (operationToken.remainingCount) operationToken.remainingCount -= 1;
       operationToken.usedCount = operationToken.usedCount ? operationToken.usedCount + 1 : 1;
 
       await operationToken.save();
-      await TokenHelper.checkAvailable(operationToken);
+      await OperationTokenHelper.checkAvailable(operationToken);
       return operationToken.reload();
     }
     throw new AsunaException(AsunaError.Unprocessable, 'invalid token');
   }
 
   static async checkAvailable(operationToken: OperationToken) {
+    // 标记废弃的 token
     if (
       !operationToken ||
       !operationToken.isActive ||
@@ -160,12 +163,15 @@ export class TokenHelper {
       return false;
     }
 
+    // 标记过期的 token
     if (operationToken.expiredAt && moment().isAfter(moment(operationToken.expiredAt))) {
       operationToken.isExpired = true;
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;
     }
+
+    // 标记已经用尽的 token
     if (operationToken.remainingCount === 0) {
       operationToken.isDeprecated = true;
       await operationToken.save();

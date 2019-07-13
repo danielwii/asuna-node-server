@@ -14,7 +14,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info) {
-    this.logger.log(`handleRequest ${JSON.stringify({ err, user, info })}`);
+    this.logger.log(`handleRequest ${r({ err, user, info })}`);
     if (err || !user) {
       if (this.opts.anonymousSupport) {
         return null;
@@ -25,7 +25,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 }
 
-export type AnyAuthRequest = Request & { user: any; authObject: any };
+export type AnyAuthRequest = Request & { user: any; identifier: any };
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
@@ -48,7 +48,7 @@ export class AnyAuthGuard implements CanActivate {
             if (err || info) {
               this.logger.log(`api-key auth error: ${r({ err, info })}`);
             } else {
-              req.authObject = user; // { apiKey: xxx }
+              req.identifier = user; // { apiKey: xxx }
             }
             resolve({ err, user, info });
           },
@@ -64,7 +64,7 @@ export class AnyAuthGuard implements CanActivate {
             if (err || info) {
               this.logger.log(`jwt auth error: ${r({ err, info })}`);
             } else {
-              req.authObject = user;
+              req.identifier = user;
               req.user = user; // only inject client side user to req
             }
             resolve({ err, user, info });

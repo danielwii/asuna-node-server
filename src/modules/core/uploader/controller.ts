@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Logger,
   Post,
@@ -19,7 +20,8 @@ import {
   ApiUseTags,
 } from '@nestjs/swagger';
 import * as bluebird from 'bluebird';
-import { Validator } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNumber, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as highland from 'highland';
@@ -29,15 +31,28 @@ import * as multer from 'multer';
 import { join } from 'path';
 import * as uuid from 'uuid';
 import { AsunaError, AsunaException, isBlank, r, sha1, UploadException } from '../../common';
+import { ControllerLoggerInterceptor } from '../../logger/logger.interceptor';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
+import { OperationTokenGuard, OperationTokenRequest } from '../token';
+import { UploaderHelper } from './helper';
+import { UploaderService } from './service';
 
 const os = require('os');
 const assert = require('assert');
 
 const logger = new Logger('UploaderController');
+
+class CreateChunksUploadTaskDTO {
+  @IsString()
+  @Transform(value => _.trim(value))
+  key: string;
+  @IsNumber()
+  @Min(1)
+  totalChunks: number;
+}
 
 const fileInterceptorOptions = {
   storage: multer.diskStorage({
@@ -62,9 +77,19 @@ const fileInterceptorOptions = {
 };
 
 @ApiUseTags('core')
+@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/uploader')
 export class UploaderController {
   private context = AsunaContext.instance;
+
+  constructor(private readonly uploaderService: UploaderService) {}
+
+  @UseGuards(AnyAuthGuard)
+  @Post('create-chunks-upload-task')
+  createChunksUploadTask(@Body() dto: CreateChunksUploadTaskDTO, @Req() req: AnyAuthRequest) {
+    const { identifier } = req;
+    return UploaderHelper.createChunksUploadTask(identifier, dto.key, dto.totalChunks);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({ title: 'Stream upload chunked file' })
@@ -74,16 +99,17 @@ export class UploaderController {
     required: false,
     description: 'chunked upload file index',
   })
-  @UseGuards(AnyAuthGuard)
+  @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks-stream')
   async streamChunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
-    @Req() req: AnyAuthRequest,
+    @Req() req: AnyAuthRequest & OperationTokenRequest,
   ) {
     assert.strictEqual(!isBlank(filename), true, 'filename needed');
     assert.strictEqual(!isBlank(chunk), true, 'chunk needed');
 
+    // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
     const stream = fsExtra.createWriteStream(tempFile);
     req.pipe(stream);
@@ -94,17 +120,9 @@ export class UploaderController {
         resolve();
       });
     });
-    const file = { filename, path: tempFile, mimetype: 'application/octet-stream' /* default */ };
 
-    const { authObject } = req;
-    const fingerprint = sha1({ authObject, filename });
-    const chunkname = `${file.filename}.${chunk}`;
-    logger.log(
-      `upload chunk file ${r({ filename, chunkname, file, authObject, fingerprint, chunk })}`,
-    );
-
-    file.filename = chunkname;
-    const saved = await this.context.chunkStorageEngine.saveEntity(file, { prefix: fingerprint });
+    const { token } = req;
+    const saved = await this.uploaderService.uploadChunks(token, filename, tempFile, chunk);
 
     return {
       ...saved,
@@ -146,14 +164,14 @@ export class UploaderController {
       logger.log(`save to ${tempFile} done.`);
     });
 
-    const { authObject } = req;
+    const { identifier } = req;
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
     }
-    const fingerprint = sha1({ authObject, filename });
+    const fingerprint = sha1({ identifier, filename });
     const chunkname = `${file.filename}.${chunk}`;
     logger.log(
-      `upload chunk file ${r({ filename, chunkname, file, authObject, fingerprint, chunk })}`,
+      `upload chunk file ${r({ filename, chunkname, file, identifier, fingerprint, chunk })}`,
     );
 
     file.filename = chunkname;
@@ -183,8 +201,8 @@ export class UploaderController {
     assert.strictEqual(!isBlank(filename), true, 'filename needed');
     // assert.strictEqual(totalChunks > 0, true, 'totalChunks count not received');
 
-    const { authObject } = req;
-    const fingerprint = sha1({ authObject, filename });
+    const { identifier } = req;
+    const fingerprint = sha1({ identifier, filename });
     logger.log(`merge file '${filename}' chunks... ${r({ prefix: fingerprint })}`);
     const chunks = await this.context.chunkStorageEngine.listEntities({ prefix: fingerprint });
     logger.log(`found chunks: ${r(chunks)}`);

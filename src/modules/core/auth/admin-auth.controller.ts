@@ -14,7 +14,7 @@ import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r, SignException } from '../../common';
 import { RestCrudController } from '../base/base.controllers';
-import { SysTokenServiceName, TokenHelper } from '../token';
+import { OperationTokenHelper, SysTokenServiceName } from '../token';
 import { AdminAuthService } from './admin-auth.service';
 import { SignDto } from './auth.dto';
 
@@ -40,8 +40,8 @@ export class AdminAuthController extends RestCrudController {
       identifier: `admin-username=${user.username}`,
       service: SysTokenServiceName.AdminLogin,
     };
-    await TokenHelper.deprecateOperationTokens(tokenOptions as any);
-    const operationToken = await TokenHelper.acquireToken(tokenOptions as any);
+    await OperationTokenHelper.deprecateTokens(tokenOptions as any);
+    const operationToken = await OperationTokenHelper.obtainToken(tokenOptions as any);
 
     const otpauth = otplib.authenticator.keyuri(
       operationToken.identifier,

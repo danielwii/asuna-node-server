@@ -38,6 +38,7 @@ export class AsunaEvent implements IAsunaEvent {
   createdAt: any;
   createdBy: any;
   rules: IAsunaRule[];
+  identifier: any;
 
   constructor(opts: {
     payload: any;
@@ -45,6 +46,7 @@ export class AsunaEvent implements IAsunaEvent {
     name: string;
     type: any;
     user: AbstractAuthUser;
+    identifier: any;
   }) {
     this.payload = opts.payload;
     this.source = opts.source;
@@ -52,6 +54,7 @@ export class AsunaEvent implements IAsunaEvent {
     this.type = opts.type;
     this.createdBy = opts.user;
     this.createdAt = Date.now();
+    this.identifier = opts.identifier;
   }
 }
 
@@ -230,11 +233,12 @@ export interface InMemoryAsunaQueue {
 }
 
 export class Hermes {
+  private static commandBus = new Subject<IAsunaCommand>();
   private static subject = new Subject<IAsunaEvent>();
   private static observers: IAsunaObserver[];
   private static initialized: boolean;
 
-  private static INSTNACE = new Hermes();
+  private static instance = new Hermes();
 
   private static queues: { [key: string]: AsunaQueue };
   private static inMemoryQueues: { [key: string]: InMemoryAsunaQueue };
@@ -280,14 +284,12 @@ export class Hermes {
   }
 
   static emitEvents(source: string, events: IAsunaEvent[]) {
-    logger.log(`emit events from [${source}]: ${JSON.stringify(events)}`);
+    logger.log(`emit events from [${source}]: ${r(events)}`);
     if (events && events.length) {
       events.forEach(async event => {
         const errors = await validate(event);
         if (errors && errors.length) {
-          return logger.warn(
-            `validate error. event: ${JSON.stringify(event)}, errors: ${JSON.stringify(errors)}`,
-          );
+          return logger.warn(`validate error. event: ${r(event)}, errors: ${r(errors)}`);
         }
         return event && this.subject.next(event);
       });
@@ -298,16 +300,17 @@ export class Hermes {
     source: string,
     event: string,
     payload: any,
-    extras?: { user?: AbstractAuthUser; type?: string },
+    extras: { identifier?: any; user?: AbstractAuthUser; type?: string } = {},
   ) {
-    logger.log(`emit events from [${source}]: {${event}}${JSON.stringify(payload)}`);
+    logger.log(`emit events from [${source}]: {${event}}${r(payload)}`);
     this.subject.next(
       new AsunaEvent({
         name: event,
         payload,
         source,
-        user: _.get(extras, 'user'),
-        type: _.get(extras, 'type'),
+        user: extras.user,
+        type: extras.type,
+        identifier: extras.identifier,
       }),
     );
   }

@@ -1,6 +1,6 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'body-parser';
 import * as compression from 'compression';
@@ -50,7 +50,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
-  const app = await NestFactory.create<NestExpressApplication>(appModule);
+  const app = await NestFactory.create<NestFastifyApplication>(appModule, new FastifyAdapter());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 

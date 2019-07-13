@@ -4,7 +4,6 @@ export * from './graphql.module';
 export * from './app';
 export * from './core/bus';
 export * from './client';
-export * from './cqrs';
 export * from './core/db';
 export * from './common';
 export * from './graphql';

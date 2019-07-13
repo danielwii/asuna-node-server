@@ -24,6 +24,8 @@ export interface IAsunaContextOpts {
   // root: string;
 }
 
+export type StorageEngineMode = 'chunks';
+
 export class AsunaContext {
   public static readonly instance = new AsunaContext();
 

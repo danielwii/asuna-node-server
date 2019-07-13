@@ -1,6 +1,7 @@
+import { html } from 'common-tags';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadJSON } from '../helpers';
 
 export const OperationTokenType = {
@@ -22,8 +23,15 @@ export class OperationToken extends AbstractBaseEntity {
     name: 'Type',
     type: 'Enum',
     enumData: OperationTokenType,
-    help:
-      '<ul>\n  <li>OneTime - 一次性，无时间限制</li>\n  <li>MultiTimes - 可有限次使用，无时间限制</li>\n  <li>TimeBased - 可任意使用，有时间限制</li>\n  <li>Unlimited - 可任意使用，无时间限制</li>\n  <li>Any - 可有限次使用，有时间限制</li>\n</ul>',
+    help: html`
+      <ul>
+        <li>OneTime - 一次性，无时间限制</li>
+        <li>MultiTimes - 可有限次使用，无时间限制</li>
+        <li>TimeBased - 可任意使用，有时间限制</li>
+        <li>Unlimited - 可任意使用，无时间限制</li>
+        <li>Any - 可有限次使用，有时间限制</li>
+      </ul>
+    `,
   })
   @Column('varchar', { nullable: false })
   type: keyof typeof OperationTokenType;

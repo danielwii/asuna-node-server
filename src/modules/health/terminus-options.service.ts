@@ -37,8 +37,9 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
       healthIndicators: [
         ...TerminusOptionsService.healthIndicators,
         async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
-        async () => this.typeorm.pingCheck('database', { timeout: 1 }),
+        async () => this.typeorm.pingCheck('database', { timeout: 1, connection: getConnection() }),
         /*
+        async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
         async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
         async () => this.memory.checkRSS('memory_rss', 3000 * 1024 * 1024),
         async () =>
