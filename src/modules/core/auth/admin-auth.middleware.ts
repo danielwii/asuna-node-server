@@ -16,20 +16,20 @@ export class AdminAuthMiddleware {
       const url = req.originalUrl;
       const matched = _.find(routeFilters, routeFilter => url.startsWith(routeFilter));
       logger.log(`check url: ${r({ url, routeFilters, matched })}`);
-      if (!_.find(routeFilters, routeFilter => url.startsWith(routeFilter))) {
-        next();
+      if (!matched) {
+        return next();
       }
       logger.log(`check url: ${url}`);
       if (['/admin/auth/reset-password', '/admin/auth/token'].includes(url)) {
-        next();
-      } else {
-        const result = await adminAuth(req, res);
-        if (!result.user) {
-          throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
-        }
-
-        next();
+        return next();
       }
+
+      const result = await adminAuth(req, res);
+      if (!result.user) {
+        throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
+      }
+
+      next();
     };
   }
 }
