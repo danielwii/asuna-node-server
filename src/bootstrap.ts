@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const pkg = require('../package.json');
+const isProduction = process.env.NODE_ENV === 'production';
 
 export interface IBootstrapOptions {
   root?: string;
@@ -85,7 +86,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
       message: 'Too many accounts created from this IP, please try again after 1474560 minutes.',
     }),
   );
-  app.use(morgan('dev'));
+  app.use(morgan('combined'));
   app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));
 
   // fastifyInstance.addHook('onError', (req, reply, error, done) => {
@@ -100,6 +101,9 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   } else if (options.redisMode === 'ws') {
     app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
   }
+
+  // app.use(csurf());
+  app.enableCors();
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
@@ -141,15 +145,14 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
  * @param options
  */
 export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
-  const isProduction = process.env.NODE_ENV === 'production';
   // const wasBuilt = __filename.endsWith('js');
   const dirname = options.dirname || __dirname;
   const root = options.root || __dirname;
   // const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
-  const entities = [`${resolve(dirname)}/**/*.entities.ts`, `${resolve(root)}/**/*.entities.ts`];
+  const entities = [`${resolve(dirname)}/**/*entities.ts`, `${resolve(root)}/**/*entities.ts`];
   const subscribers = [
-    `${resolve(dirname)}/**/*.subscriber.ts`,
-    `${resolve(root)}/**/*.subscriber.ts`,
+    `${resolve(dirname)}/**/*subscriber.ts`,
+    `${resolve(root)}/**/*subscriber.ts`,
   ];
   logger.log(
     `options is ${r({

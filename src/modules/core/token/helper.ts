@@ -41,9 +41,9 @@ export class OperationTokenHelper {
     expiredInMinutes?: number;
     remainingCount?: number;
   }) {
-    const operationToken = await OperationTokenHelper.redeemToken({ role, identifier, service });
-    if (operationToken) {
-      return operationToken;
+    const existToken = await OperationTokenHelper.redeemToken({ role, identifier, service });
+    if (existToken) {
+      return existToken;
     }
 
     const token = random(32);

@@ -15,9 +15,9 @@ export function adminAuth(req: AnyAuthRequest, res: Response): Promise<{ err; us
         'admin-api-key',
         { userProperty: 'user', assignProperty: 'assign', session: false },
         (err, user, info) => {
-          logger.log(`admin-api-key auth: ${r({ user })}`);
+          // logger.log(`admin-api-key auth: ${r({ user })}`);
           if (err || info) {
-            logger.warn(`api-key auth error: ${r({ err, info })}`);
+            logger.warn(`api-key auth error: ${r(err)}`);
           } else {
             req.identifier = user; // { apiKey: xxx }
           }
@@ -34,7 +34,7 @@ export function adminAuth(req: AnyAuthRequest, res: Response): Promise<{ err; us
       (err, user, info) => {
         // logger.log(`admin-jwt auth ${r({ user })}`);
         if (err || info) {
-          logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
+          logger.warn(`admin-jwt auth error: ${r(err)}`);
         } else {
           req.identifier = user;
           req.user = user; // only inject client side user to req
@@ -54,7 +54,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
         (err, user, info) => {
           // logger.log(`admin-api-key auth: ${r({ user })}`);
           if (err || info) {
-            logger.warn(`api-key auth error: ${r({ err, info })}`);
+            logger.warn(`api-key auth error: ${r(err)}`);
           } else {
             req.identifier = user; // { apiKey: xxx }
           }
@@ -71,7 +71,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
       (err, user, info) => {
         // logger.log(`jwt auth ${r({ user })}`);
         if (err || info) {
-          logger.warn(`jwt auth error: ${r({ err, info })}`);
+          logger.warn(`jwt auth error: ${r(err)}`);
         } else {
           req.identifier = user;
           req.user = user; // only inject client side user to req

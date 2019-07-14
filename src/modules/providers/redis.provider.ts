@@ -6,7 +6,7 @@ import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
 import { r } from '../common/helpers';
 import { RedisConfigObject } from './redis.config';
-import bluebird = require('bluebird');
+import * as bluebird from 'bluebird';
 
 const logger = new Logger('RedisProvider');
 

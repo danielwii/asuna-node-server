@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
+import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
 import { AnyAuthRequest, auth } from './helper';
 
@@ -36,8 +37,11 @@ export class AnyAuthGuard implements CanActivate {
     this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res).catch(reason => this.logger.warn(r(reason)));
 
-    if (result || (result && !result.user)) {
-      throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
+    if (!_.get(result, 'user')) {
+      throw new AsunaException(
+        AsunaError.InsufficientPermissions,
+        _.get(result, 'err') || _.get(result, 'info'),
+      );
     }
 
     return !!result;
