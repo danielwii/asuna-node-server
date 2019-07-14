@@ -1,12 +1,11 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import { FastifyReply } from 'fastify';
+import { Response } from 'express';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
-import { ServerResponse } from 'http';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -37,9 +36,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    // const reply = ctx.getResponse<ServerResponse>();
-    // new FastifyReply();
-    const reply = ctx.getResponse<FastifyReply<any>>();
+    const res = ctx.getResponse<Response>();
 
     let processed = exception;
 
@@ -68,11 +65,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
       logger.error(`[unhandled exception] ${r(processed)}`);
     }
 
-    logger.debug(`status: ${r({ send: reply.sent, status: reply.status })}`);
-    if (!reply.sent && reply.status) {
+    if (!res.finished && res.status) {
       if (R.is(HttpException, processed)) {
         const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
-        reply.status(status).send({
+        res.status(status).send({
           error: {
             status,
             name: exceptionResponse.error,
@@ -82,7 +78,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
           } as AsunaException,
         });
       } else if (R.is(Error, processed)) {
-        reply.status(status).send({
+        res.status(status).send({
           error: {
             status,
             name: AsunaError.Unexpected__do_not_use_it.name,
@@ -93,11 +89,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
         });
       } else {
         try {
-          reply.status(status).send({ error: processed as AsunaException });
+          res.status(status).send({ error: processed as AsunaException });
         } catch (e) {
-          reply
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .send({ error: processed as AsunaException });
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: processed as AsunaException });
         }
       }
     }

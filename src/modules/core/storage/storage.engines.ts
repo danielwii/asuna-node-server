@@ -1,4 +1,4 @@
-import { FastifyReply } from 'fastify';
+import { Response } from 'express';
 import * as _ from 'lodash';
 import * as mime from 'mime-types';
 import { JpegParam } from '../image/jpeg.pipe';
@@ -58,13 +58,14 @@ export interface IStorageEngine {
 
   /**
    * 返回相应的 url，在包含 res 时直接通过 res 返回相应的信息
+   * TODO need redesign
    * @param filename
    * @param bucket
    * @param prefix
    * @param thumbnailConfig
    * @param jpegConfig
    * @param resolver 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
-   * @param reply
+   * @param res
    */
   resolveUrl(
     {
@@ -82,8 +83,8 @@ export interface IStorageEngine {
       jpegConfig?: { opts: JpegParam; param?: string };
       resolver?: (url: string) => Promise<any>;
     },
-    reply?: FastifyReply<any>,
-  ): Promise<any> | FastifyReply<any>;
+    res?: Response,
+  );
 }
 
 export function yearMonthStr() {

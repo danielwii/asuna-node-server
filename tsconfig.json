@@ -13,13 +13,8 @@
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
     "declarationDir": "declaration",
-    "baseUrl": "src"
+    "baseUrl": "."
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "**/node_modules/*",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*", "index.ts"],
+  "exclude": ["**/node_modules/*", "**/*.spec.ts"]
 }

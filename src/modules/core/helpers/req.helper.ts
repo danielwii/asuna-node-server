@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import { Request } from 'express';
 import * as fsExtra from 'fs-extra';
 import * as os from 'os';
 import * as pump from 'pump';
@@ -13,13 +13,13 @@ export class ReqHelper {
    * @param req
    * @param filename
    */
-  static saveFileByReq(req: FastifyRequest, filename: string): Promise<string> {
+  static saveFileByReq(req: Request, filename: string): Promise<string> {
     const tempfile = `${os.tmpdir()}/${filename}`;
     const stream = fsExtra.createWriteStream(tempfile);
-    req.raw.pipe(stream);
+    req.pipe(stream);
 
     return new Promise(resolve => {
-      req.raw.on('end', () => {
+      req.on('end', () => {
         logger.log(`save to ${tempfile} done.`);
         resolve(tempfile);
       });

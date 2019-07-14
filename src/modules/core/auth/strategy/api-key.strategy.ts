@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { FastifyRequest } from 'fastify';
+import { Request } from 'express';
 import { Strategy } from 'passport-strategy';
 import { r } from '../../../common/helpers';
 
@@ -10,10 +10,10 @@ const API_KEY_HEADER = 'X-ApiKey';
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') {
-  public authenticate(req: FastifyRequest, options?: any): void {
+  public authenticate(req: Request, options?: any): void {
     logger.log(`validate ${r(options)}`);
     const self: Strategy = this as any;
-    const key = req.headers[API_KEY_HEADER.toLowerCase()];
+    const key = req.headers[API_KEY_HEADER] as string;
     if (key) {
       // TODO verify api key later
       self.success({ apiKey: key });
@@ -23,6 +23,6 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
   }
 }
 
-export function isApiKeyRequest(req: FastifyRequest) {
-  return req.headers[API_KEY_HEADER.toLowerCase()];
+export function isApiKeyRequest(req: Request) {
+  return !!req.headers[API_KEY_HEADER];
 }

@@ -129,7 +129,7 @@ export class MinioStorage implements IStorageEngine {
       resolver?: (url: string) => Promise<any>;
     },
     res,
-  ): Promise<any> {
+  ) {
     return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 

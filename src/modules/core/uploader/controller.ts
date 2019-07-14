@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -21,12 +22,14 @@ import {
 import * as assert from 'assert';
 import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsNumber, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
+import * as multer from 'multer';
 import * as os from 'os';
 import { join } from 'path';
+import * as uuid from 'uuid';
 import { isBlank, r, UploadException } from '../../common';
 import { ControllerLoggerInterceptor } from '../../logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
@@ -35,10 +38,29 @@ import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
 import { OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
-import { FastifyFileInterceptor, FastifyUploadedFile } from './interceptor';
 import { UploaderService } from './service';
 
 const logger = new Logger('UploaderController');
+
+const fileInterceptorOptions = {
+  storage: multer.diskStorage({
+    filename(req, file, cb) {
+      cb(null, `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`);
+    },
+  }),
+  fileFilter(req, file, cb) {
+    const validator = new Validator();
+    const supportedImage = validator.isEnum(file.mimetype, ImageMimeType);
+    const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);
+    const supportedDoc = validator.isEnum(file.mimetype, DocMimeType);
+    logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
+    if (!(supportedImage || supportedVideo || supportedDoc)) {
+      // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
+      logger.log(`unsupported mime type: ${file.mimetype}, save as normal file.`);
+    }
+    cb(null, true);
+  },
+};
 
 class CreateChunksUploadTaskDTO {
   @IsString()
@@ -85,10 +107,10 @@ export class UploaderController {
     // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
     const stream = fsExtra.createWriteStream(tempFile);
-    req.raw.pipe(stream);
+    req.pipe(stream);
 
     await new Promise(resolve => {
-      req.raw.on('end', () => {
+      req.on('end', () => {
         logger.log(`save to ${tempFile} done.`);
         resolve();
       });
@@ -110,14 +132,14 @@ export class UploaderController {
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
   @UseInterceptors(
-    // FileInterceptor('file', fileInterceptorOptions),
-    new FastifyFileInterceptor('file'),
+    FileInterceptor('file', fileInterceptorOptions),
+    // new FastifyFileInterceptor('file'),
   )
   async chunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
-    @UploadedFile() file: FastifyUploadedFile,
+    @UploadedFile() file,
   ) {
     assert(!isBlank(filename), 'filename needed');
     assert(!isBlank(chunk), 'chunk needed');
@@ -149,13 +171,12 @@ export class UploaderController {
   @UseGuards(AnyAuthGuard)
   @Post()
   @UseInterceptors(
-    new FastifyFileInterceptor('files'),
-    /*
+    // new FastifyFileInterceptor('files'),
     FilesInterceptor(
       'files',
       configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3),
       fileInterceptorOptions,
-    ),*/
+    ),
   )
   async uploader(
     @Query('bucket') bucket: string = '',
@@ -163,7 +184,7 @@ export class UploaderController {
     @Query('local') local: string, // 是否使用本地存储
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthGuard,
-    @UploadedFiles() files: FastifyUploadedFile[],
+    @UploadedFiles() files,
   ) {
     /*
     if (req.fileValidationError) {

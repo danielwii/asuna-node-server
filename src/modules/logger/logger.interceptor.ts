@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -12,8 +12,8 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
-    const request: FastifyRequest = context.switchToHttp().getRequest();
-    const reply: FastifyReply<any> = context.switchToHttp().getResponse();
+    const request = context.switchToHttp().getRequest<Request>();
+    const reply = context.switchToHttp().getResponse<Response>();
     const info = {
       body: request.body,
       query: request.query,
@@ -21,8 +21,8 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
       headers: request.headers,
       /*
       raw: request.raw,
-      */
       id: request.id,
+      */
       ip: request.ip,
       ips: request.ips,
       hostname: request.hostname,

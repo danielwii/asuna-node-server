@@ -114,7 +114,7 @@ export class QiniuStorage implements IStorageEngine {
       jpegConfig?: { opts: JpegParam; param?: string };
     },
     res,
-  ): Promise<any> {
+  ) {
     return Promise.resolve(join(bucket, prefix, filename));
   }
 }

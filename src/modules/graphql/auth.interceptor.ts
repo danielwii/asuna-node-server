@@ -1,8 +1,9 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { Observable } from 'rxjs';
+import { r } from '../common/helpers';
 
 const logger = new Logger('AuthInterceptor');
 
@@ -17,11 +18,8 @@ export class AuthInterceptor implements NestInterceptor {
     const http = context.switchToHttp();
     const ctx = GqlExecutionContext.create(context);
 
-    const result = this.jwtAuthenticator(
-      http.getRequest<FastifyRequest>(),
-      http.getResponse<FastifyReply<any>>(),
-    );
-    logger.log(`result is ${JSON.stringify(result)}`);
+    const result = this.jwtAuthenticator(http.getRequest<Request>(), http.getResponse<Response>());
+    logger.log(`result is ${r(result)}`);
     return next.handle().pipe(source => {
       logger.log(`piping source is ${JSON.stringify(source)}`);
       return result || null;

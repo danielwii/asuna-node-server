@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { oneLineTrim } from 'common-tags';
-import { FastifyReply } from 'fastify';
+import { Response } from 'express';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
 import { join } from 'path';
@@ -62,10 +62,7 @@ export class LocalStorage implements IStorageEngine {
     throw new Error('Method not implemented.');
   }
 
-  public resolveUrl(
-    { filename, bucket, prefix, thumbnailConfig, jpegConfig },
-    reply: FastifyReply<any>,
-  ): Promise<any> | FastifyReply<any> {
+  public resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res: Response) {
     const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
@@ -85,14 +82,14 @@ export class LocalStorage implements IStorageEngine {
 
     if (!['png', 'jpg', 'jpeg'].includes(ext)) {
       if (fsExtra.existsSync(outputPath)) {
-        return reply.type(ext).send(fsExtra.createReadStream(fullFilePath));
+        return res.type(ext).sendFile(fullFilePath);
       }
-      return reply.status(404).send();
+      return res.status(404).send();
     }
 
     LocalStorage.logger.log(`check if ${ext} file outputPath '${outputPath}' exists`);
     if (fsExtra.existsSync(outputPath)) {
-      return reply.type(ext).send(fsExtra.createReadStream(outputPath));
+      return res.type(ext).send(fsExtra.createReadStream(outputPath));
     }
 
     fsExtra.mkdirpSync(fullFileDir);
@@ -111,9 +108,9 @@ export class LocalStorage implements IStorageEngine {
         LocalStorage.logger.error(
           `create outputPath image error ${r({ outputPath, err: err.stack, info })}`,
         );
-        reply.status(404).send(err.message);
+        res.status(404).send(err.message);
       } else {
-        reply.type(ext).send(fsExtra.createReadStream(outputPath));
+        res.type(ext).sendFile(outputPath);
       }
     });
   }

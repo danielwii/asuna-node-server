@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { Request, Response } from 'express';
 import { AsunaError, AsunaException, r } from '../../common';
 import { auth } from './helper';
 
@@ -24,7 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 }
 
-export type AnyAuthRequest = FastifyRequest & { user: any; identifier: any };
+export type AnyAuthRequest = Request & { user: any; identifier: any };
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
@@ -32,11 +32,11 @@ export class AnyAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
-    const reply = context.switchToHttp().getResponse<FastifyReply<any>>();
+    const res = context.switchToHttp().getResponse<Response>();
     const next = context.switchToHttp().getNext();
 
-    this.logger.log(`check url: ${req.raw.url}`);
-    const result = await auth(req, reply)
+    this.logger.log(`check url: ${req.url}`);
+    const result = await auth(req, res)
       .then(value => {
         this.logger.log(`value is ${r(value)}`);
         return value;
