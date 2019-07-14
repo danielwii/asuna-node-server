@@ -8,7 +8,7 @@ import { DBModule } from './core/db';
 import { GetUploadsController } from './core/get-uploads.controller';
 import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
-import { UploaderController } from './core/uploader/controller';
+import { UploaderController, UploaderModule } from './core/uploader';
 import { FinderModule } from './finder';
 import { SchemaModules } from './graphql/schema.modules';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
@@ -26,6 +26,7 @@ const logger = new Logger('AdminModule');
     TokenModule,
     FinderModule,
     CqrsModule,
+    UploaderModule,
   ],
   controllers: [
     ApiController,

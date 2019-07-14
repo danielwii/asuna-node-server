@@ -5,6 +5,7 @@ export * from './app';
 export * from './core/bus';
 export * from './client';
 export * from './core/db';
+export * from './logger';
 export * from './common';
 export * from './graphql';
 export * from './core';

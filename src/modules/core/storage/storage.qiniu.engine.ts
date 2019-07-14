@@ -8,6 +8,7 @@ import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { QiniuConfigObject } from './storage.config';
 import {
   convertFilename,
+  FileInfo,
   IStorageEngine,
   SavedFile,
   StorageMode,
@@ -37,7 +38,7 @@ export class QiniuStorage implements IStorageEngine {
     this.mac = new qiniu.auth.digest.Mac(configObject.accessKey, configObject.secretKey);
   }
   public saveEntity(
-    file,
+    file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
     if (!file) {
@@ -65,13 +66,16 @@ export class QiniuStorage implements IStorageEngine {
           }
           if (info.statusCode === 200) {
             QiniuStorage.logger.log(`upload file '${r({ key, info, body })}'`);
-            resolve({
-              prefix,
-              bucket: config.bucket,
-              mimetype: file.mimetype,
-              mode: StorageMode.QINIU,
-              filename,
-            });
+            resolve(
+              new SavedFile({
+                prefix,
+                path: `${prefix}/${filename}`,
+                bucket: config.bucket,
+                mimetype: file.mimetype,
+                mode: StorageMode.QINIU,
+                filename,
+              }),
+            );
           } else {
             throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
               info,

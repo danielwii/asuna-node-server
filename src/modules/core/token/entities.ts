@@ -1,6 +1,6 @@
 import { html } from 'common-tags';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, Json, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadJSON } from '../helpers';
 
@@ -50,7 +50,7 @@ export class OperationToken extends AbstractBaseEntity {
 
   @MetaInfo({ name: 'Body' })
   @Column(jsonType(), { nullable: true, name: 'body' })
-  body: JSON;
+  body: Json;
 
   @MetaInfo({ name: 'Service', help: 'web-login / app-login / opt-secret / etc.' })
   @Column('varchar', { nullable: false, length: 50, name: 'service' })

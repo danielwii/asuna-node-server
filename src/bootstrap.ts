@@ -2,16 +2,10 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { json } from 'body-parser';
-import * as compression from 'compression';
-import * as helmet from 'helmet';
-import * as morgan from 'morgan';
 import { resolve } from 'path';
-import * as responseTime from 'response-time';
 import { AnyExceptionFilter, r } from './modules/common';
 import { AsunaContext, ConfigKeys, configLoader, IAsunaContextOpts } from './modules/core';
 
-const rateLimit = require('express-rate-limit');
 const logger = new Logger('bootstrap');
 const startAt = Date.now();
 
@@ -50,7 +44,9 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
-  const app = await NestFactory.create<NestFastifyApplication>(appModule, new FastifyAdapter());
+  const fastifyAdapter = new FastifyAdapter();
+  fastifyAdapter.register(require('fastify-multipart'));
+  const app = await NestFactory.create<NestFastifyApplication>(appModule, fastifyAdapter);
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
@@ -59,8 +55,18 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   } else if (options.redisMode === 'ws') {
     app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
   }
+  // TODO not supported with fastify
+  // helmet -> fastify-helmet
+  /*
+  import { json } from 'body-parser';
+  import * as compression from 'compression';
+  import * as helmet from 'helmet';
+  import * as morgan from 'morgan';
+  import * as responseTime from 'response-time';
 
-  app.use(helmet());
+  const rateLimit = require('express-rate-limit');
+
+  app.use(helmet()); // use fastify-helmet
   app.use(compression());
   app.use(responseTime());
   app.use(
@@ -71,7 +77,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     }),
   );
   app.use(morgan('dev'));
-  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));
+  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));*/
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {

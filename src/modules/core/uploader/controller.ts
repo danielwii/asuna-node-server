@@ -10,7 +10,6 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -19,62 +18,36 @@ import {
   ApiOperation,
   ApiUseTags,
 } from '@nestjs/swagger';
+import * as assert from 'assert';
 import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString, Min, Validator } from 'class-validator';
+import { IsNumber, IsString, Min } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
-import * as highland from 'highland';
 import * as _ from 'lodash';
-import * as mime from 'mime-types';
-import * as multer from 'multer';
+import * as os from 'os';
 import { join } from 'path';
-import * as uuid from 'uuid';
-import { AsunaError, AsunaException, isBlank, r, sha1, UploadException } from '../../common';
-import { ControllerLoggerInterceptor } from '../../logger/logger.interceptor';
+import { isBlank, r, UploadException } from '../../common';
+import { ControllerLoggerInterceptor } from '../../logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
 import { OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
+import { FastifyFileInterceptor, FastifyUploadedFile } from './interceptor';
 import { UploaderService } from './service';
-
-const os = require('os');
-const assert = require('assert');
 
 const logger = new Logger('UploaderController');
 
 class CreateChunksUploadTaskDTO {
   @IsString()
   @Transform(value => _.trim(value))
-  key: string;
+  filename: string;
   @IsNumber()
   @Min(1)
   totalChunks: number;
 }
-
-const fileInterceptorOptions = {
-  storage: multer.diskStorage({
-    filename(req, file, cb) {
-      cb(null, `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`);
-    },
-  }),
-  fileFilter(req, file, cb) {
-    const validator = new Validator();
-    const supportedImage = validator.isEnum(file.mimetype, ImageMimeType);
-    const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);
-    const supportedDoc = validator.isEnum(file.mimetype, DocMimeType);
-    logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
-    if (!(supportedImage || supportedVideo || supportedDoc)) {
-      // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
-      logger.log(`unsupported mime type: ${file.mimetype}, save as normal file.`);
-      cb(null, true);
-    } else {
-      cb(null, true);
-    }
-  },
-};
 
 @ApiUseTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
@@ -88,7 +61,7 @@ export class UploaderController {
   @Post('create-chunks-upload-task')
   createChunksUploadTask(@Body() dto: CreateChunksUploadTaskDTO, @Req() req: AnyAuthRequest) {
     const { identifier } = req;
-    return UploaderHelper.createChunksUploadTask(identifier, dto.key, dto.totalChunks);
+    return UploaderHelper.createChunksUploadTask(identifier, dto.filename, dto.totalChunks);
   }
 
   @ApiBearerAuth()
@@ -106,34 +79,23 @@ export class UploaderController {
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
   ) {
-    assert.strictEqual(!isBlank(filename), true, 'filename needed');
-    assert.strictEqual(!isBlank(chunk), true, 'chunk needed');
+    assert(!isBlank(filename), 'filename needed');
+    assert(!isBlank(chunk), 'chunk needed');
 
     // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
     const stream = fsExtra.createWriteStream(tempFile);
-    req.pipe(stream);
+    req.raw.pipe(stream);
 
     await new Promise(resolve => {
-      req.on('end', () => {
+      req.raw.on('end', () => {
         logger.log(`save to ${tempFile} done.`);
         resolve();
       });
     });
 
     const { token } = req;
-    const saved = await this.uploaderService.uploadChunks(token, filename, tempFile, chunk);
-
-    return {
-      ...saved,
-      // 用于访问的资源地址
-      fullpath: join(
-        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-        saved.bucket,
-        saved.prefix,
-        saved.filename,
-      ),
-    };
+    return this.uploaderService.uploadChunks(token, filename, tempFile, chunk);
   }
 
   @ApiBearerAuth()
@@ -145,128 +107,28 @@ export class UploaderController {
     required: false,
     description: 'chunked upload file index',
   })
-  @UseGuards(AnyAuthGuard)
+  @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
-  @UseInterceptors(FileInterceptor('file', fileInterceptorOptions))
+  @UseInterceptors(
+    // FileInterceptor('file', fileInterceptorOptions),
+    new FastifyFileInterceptor('file'),
+  )
   async chunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
-    @Req() req: AnyAuthRequest & { fileValidationError: any },
-    @UploadedFile() file,
+    @Req() req: AnyAuthRequest & OperationTokenRequest,
+    @UploadedFile() file: FastifyUploadedFile,
   ) {
-    assert.strictEqual(!isBlank(filename), true, 'filename needed');
-    assert.strictEqual(!isBlank(chunk), true, 'chunk needed');
+    assert(!isBlank(filename), 'filename needed');
+    assert(!isBlank(chunk), 'chunk needed');
 
-    const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
-    const stream = fsExtra.createWriteStream(tempFile);
-    req.pipe(stream);
-    req.on('end', () => {
-      logger.log(`save to ${tempFile} done.`);
-    });
-
-    const { identifier } = req;
-    if (req.fileValidationError) {
-      throw new UploadException(req.fileValidationError);
-    }
-    const fingerprint = sha1({ identifier, filename });
-    const chunkname = `${file.filename}.${chunk}`;
-    logger.log(
-      `upload chunk file ${r({ filename, chunkname, file, identifier, fingerprint, chunk })}`,
-    );
-
-    file.filename = chunkname;
-    const saved = await this.context.chunkStorageEngine.saveEntity(file, { prefix: fingerprint });
-
-    return {
-      ...saved,
-      // 用于访问的资源地址
-      fullpath: join(
-        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-        saved.bucket,
-        saved.prefix,
-        saved.filename,
-      ),
-    };
+    return this.uploaderService.uploadChunks(req.token, filename, file.path, chunk);
   }
 
-  @UseGuards(AnyAuthGuard)
+  @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  async mergeChunks(
-    @Query('filename') filename: string,
-    @Query('bucket') bucket: string = '',
-    @Query('prefix') prefix: string = '',
-    // @Query('totalChunks') totalChunks: number,
-    @Req() req: AnyAuthRequest,
-  ) {
-    assert.strictEqual(!isBlank(filename), true, 'filename needed');
-    // assert.strictEqual(totalChunks > 0, true, 'totalChunks count not received');
-
-    const { identifier } = req;
-    const fingerprint = sha1({ identifier, filename });
-    logger.log(`merge file '${filename}' chunks... ${r({ prefix: fingerprint })}`);
-    const chunks = await this.context.chunkStorageEngine.listEntities({ prefix: fingerprint });
-    logger.log(`found chunks: ${r(chunks)}`);
-
-    // TODO task should bind with a token(OperationToken)
-    if (!(chunks && chunks.length)) {
-      throw new AsunaException(
-        AsunaError.Unprocessable,
-        `no chunks found for ${filename} with fingerprint: ${fingerprint}`,
-      );
-    }
-
-    // try to merge all chunks
-    logger.log(`try to merge chunks: ${r(chunks)}`);
-    const filepaths = await bluebird.all(
-      chunks.map(chunk =>
-        this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath),
-      ),
-    );
-    const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', fingerprint);
-    fsExtra.mkdirsSync(tempDirectory);
-    const dest = join(tempDirectory, filename);
-    logger.log(`merge files: ${r(filepaths)} to ${dest}`);
-    const writableStream = fsExtra.createWriteStream(dest);
-
-    highland(filepaths)
-      .map(fsExtra.createReadStream)
-      .flatMap(highland)
-      .pipe(writableStream);
-
-    await new Promise(resolve => {
-      writableStream.on('close', () => {
-        logger.log(`merge file done: ${dest}, clean chunks ...`);
-        resolve();
-        filepaths.forEach(filepath => {
-          logger.log(`remove ${filepath} ...`);
-          fsExtra
-            .remove(filepath)
-            .catch(reason => logger.warn(`remove ${filepath} error: ${r(reason)}`));
-        });
-      });
-    });
-
-    const mimetype = mime.lookup(filename) || 'application/octet-stream';
-    const saved = await this.context.fileStorageEngine.saveEntity(
-      {
-        filename,
-        path: dest,
-        mimetype,
-        extension: mime.extension(mimetype) || 'bin',
-      },
-      { bucket, prefix },
-    );
-
-    return {
-      ...saved,
-      // 用于访问的资源地址
-      fullpath: join(
-        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-        saved.bucket,
-        saved.prefix,
-        saved.filename,
-      ),
-    };
+  async mergeChunks(@Req() req: AnyAuthRequest & OperationTokenRequest) {
+    return this.uploaderService.mergeChunks(req.token);
   }
 
   @ApiBearerAuth()
@@ -287,23 +149,26 @@ export class UploaderController {
   @UseGuards(AnyAuthGuard)
   @Post()
   @UseInterceptors(
+    new FastifyFileInterceptor('files'),
+    /*
     FilesInterceptor(
       'files',
       configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3),
       fileInterceptorOptions,
-    ),
+    ),*/
   )
   async uploader(
     @Query('bucket') bucket: string = '',
     @Query('prefix') prefix: string = '',
     @Query('local') local: string, // 是否使用本地存储
     @Query('chunk') chunk: number,
-    @Req() req,
-    @UploadedFiles() files,
+    @Req() req: AnyAuthGuard,
+    @UploadedFiles() files: FastifyUploadedFile[],
   ) {
+    /*
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
-    }
+    }*/
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
     const results = await bluebird
       .map(files, (file: any) => {

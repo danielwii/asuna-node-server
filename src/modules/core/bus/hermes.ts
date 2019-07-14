@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import * as assert from 'assert';
 import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
@@ -19,7 +20,6 @@ import {
   IAsunaRule,
 } from './interfaces';
 
-const assert = require('assert');
 const Queue = require('bull');
 
 const logger = new Logger('Hermes');
@@ -233,7 +233,6 @@ export interface InMemoryAsunaQueue {
 }
 
 export class Hermes {
-  private static commandBus = new Subject<IAsunaCommand>();
   private static subject = new Subject<IAsunaEvent>();
   private static observers: IAsunaObserver[];
   private static initialized: boolean;
@@ -316,7 +315,7 @@ export class Hermes {
   }
 
   static regInMemoryQueue(queueName: string): InMemoryAsunaQueue {
-    assert.strictEqual(isBlank(queueName), false, 'queue name must be defined');
+    assert(!isBlank(queueName), 'queue name must be defined');
 
     if (this.inMemoryQueues[queueName]) {
       return this.inMemoryQueues[name];
@@ -424,7 +423,7 @@ export class Hermes {
   }
 
   static regQueue(queueName: string, opts?: QueueOptions): AsunaQueue {
-    assert.strictEqual(isBlank(queueName), false, 'queue name must be defined');
+    assert(!isBlank(queueName), 'queue name must be defined');
 
     if (this.queues[queueName]) {
       return this.queues[name];
@@ -451,7 +450,7 @@ export class Hermes {
    * @param handle
    */
   static setupJobProcessor(queueName: string, handle: (payload: any) => Promise<any>): void {
-    assert.strictEqual(isBlank(queueName), false, 'queue name must not be empty');
+    assert(!isBlank(queueName), 'queue name must not be empty');
 
     let queue;
     queue = queueName.startsWith('IN_MEMORY_')

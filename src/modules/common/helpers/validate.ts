@@ -14,9 +14,3 @@ export function validateObject2(object) {
     throw new AsunaException(AsunaError.Unprocessable, `invalid settings ${r(errors)}`);
   }
 }
-
-export function assert(condition, message) {
-  if (!condition) {
-    throw new AsunaException(AsunaError.InvalidParameter, message);
-  }
-}

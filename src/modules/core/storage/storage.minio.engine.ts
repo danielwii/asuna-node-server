@@ -4,14 +4,15 @@ import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
+import { AsunaError, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
-import { AsunaSystemQueue, Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject } from './storage.config';
 import {
   convertFilename,
+  FileInfo,
   IStorageEngine,
   SavedFile,
   StorageMode,
@@ -59,6 +60,7 @@ export class MinioStorage implements IStorageEngine {
           return error;
         });
     });*/
+    /*
     Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_UPLOAD, payload => {
       MinioStorage.logger.log(`upload ${r(payload)}`);
       const { bucket, filenameWithPrefix, file } = payload;
@@ -96,7 +98,7 @@ export class MinioStorage implements IStorageEngine {
           );
           return error;
         });
-    });
+    })*/
   }
 
   get client() {
@@ -132,7 +134,7 @@ export class MinioStorage implements IStorageEngine {
   }
 
   async saveEntity(
-    file,
+    file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
     const bucket = opts.bucket || this.defaultBucket;
@@ -176,13 +178,57 @@ export class MinioStorage implements IStorageEngine {
 
     MinioStorage.logger.log(oneLineTrim`
       put ${r(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
-      and bucket [${bucket}], add upload job to queue(${AsunaSystemQueue.IN_MEMORY_UPLOAD})
+      and bucket [${bucket}].
     `);
+    return this.client
+      .fPutObject(bucket, filenameWithPrefix, file.path, {
+        'Content-Type': file.mimetype,
+      })
+      .then(etag => {
+        MinioStorage.logger.log(`[saveEntity] [${etag}] ...`);
+
+        MinioStorage.logger.log(`remove local file ${file.path}`);
+        fsExtra
+          .remove(file.path)
+          .then(() => {
+            const parent = join(file.path, '../');
+            MinioStorage.logger.log(`removed: ${file.path}, check parent: ${parent}`);
+            fsExtra.readdir(parent).then(files => {
+              if (files.length === 0) {
+                MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
+                fsExtra
+                  .remove(parent)
+                  .catch(reason =>
+                    MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
+                  );
+              }
+            });
+          })
+          .catch(reason => MinioStorage.logger.warn(`remove ${file.path} error: ${r(reason)}`));
+        return new SavedFile({
+          prefix: resolvedPrefix,
+          path: filenameWithPrefix,
+          bucket,
+          region,
+          mimetype: file.mimetype,
+          mode: StorageMode.MINIO,
+          filename,
+        });
+        // return etag;
+      })
+      .catch(error => {
+        MinioStorage.logger.error(
+          `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
+          error.trace,
+        );
+        throw new AsunaException(AsunaError.Unprocessable, error);
+      });
+    /*
     Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD).next({
       bucket,
       filenameWithPrefix,
       file,
-    });
+    });*/
     /*
     const { queue } = Hermes.getQueue(AsunaSystemQueue.UPLOAD);
     queue
@@ -196,6 +242,7 @@ export class MinioStorage implements IStorageEngine {
           `upload error: ${r(reason)}, should trigger an event later.`,
         );
       });*/
+    /*
     return {
       prefix: resolvedPrefix,
       bucket,
@@ -203,7 +250,7 @@ export class MinioStorage implements IStorageEngine {
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
       filename,
-    };
+    };*/
   }
 
   listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
@@ -217,6 +264,8 @@ export class MinioStorage implements IStorageEngine {
         savedFiles.push(
           new SavedFile({
             bucket: currentBucket,
+            path: `${item.prefix}/${item.name}`,
+            size: item.size,
             prefix,
             filename: item.name.slice(prefix.length + 1), // item.name 是包含 prefix 的完成名字
             mode: StorageMode.MINIO,

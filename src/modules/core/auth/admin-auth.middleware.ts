@@ -1,6 +1,5 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
-
+import { FastifyReply, FastifyRequest } from 'fastify';
 import * as passport from 'passport';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
@@ -15,16 +14,16 @@ export class AdminAuthMiddleware implements NestMiddleware {
   adminAuthenticator = passport.authenticate('api-key', { session: false });
   jwtAuthenticator = passport.authenticate('admin-jwt', { session: false });
 
-  use(req: Request, res: Response, next: () => void): any {
-    logger.log(`check url: ${req.originalUrl}`);
-    if (['/admin/auth/reset-password', '/admin/auth/token'].includes(req.originalUrl)) {
+  use(req: FastifyRequest, reply: FastifyReply<any>, next: () => void): any {
+    logger.log(`check url: ${req.raw.url}`);
+    if (['/admin/auth/reset-password', '/admin/auth/token'].includes(req.raw.url)) {
       next();
     } else {
       try {
         if (isApiKeyRequest(req)) {
-          this.adminAuthenticator(req, res, next);
+          this.adminAuthenticator(req, reply, next);
         } else {
-          this.jwtAuthenticator(req, res, next);
+          this.jwtAuthenticator(req, reply, next);
         }
       } catch (e) {
         logger.error(e.message);

@@ -1,5 +1,6 @@
-import { Response } from 'express';
+import { FastifyReply } from 'fastify';
 import * as _ from 'lodash';
+import * as mime from 'mime-types';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 
@@ -9,35 +10,27 @@ export enum StorageMode {
   MINIO = 'minio',
 }
 
-export class SavedFile {
-  bucket?: string; // default: 'default'
-  region?: string; // default: 'local'
-  prefix?: string;
-  mode: StorageMode;
-  mimetype?: string;
-  filename: string;
+export class FileInfo {
+  public readonly filename: string;
+  public readonly path: string;
+  public readonly mimetype?: string;
+  public readonly extension?: string;
+  constructor(o: FileInfo) {
+    this.mimetype = o.mimetype || mime.lookup(o.filename) || 'application/octet-stream';
+    this.extension = o.extension || mime.extension(this.mimetype) || 'bin';
+  }
+}
 
-  constructor({
-    bucket,
-    region,
-    prefix,
-    mode,
-    mimetype,
-    filename,
-  }: {
-    bucket?: string; // default: 'default'
-    region?: string; // default: 'local'
-    prefix?: string;
-    mode: StorageMode;
-    mimetype?: string;
-    filename: string;
-  }) {
-    this.bucket = bucket;
-    this.region = region;
-    this.prefix = prefix;
-    this.mode = mode;
-    this.mimetype = mimetype;
-    this.filename = filename;
+export class SavedFile extends FileInfo {
+  public readonly bucket: string; // default: 'default'
+  public readonly region?: string; // default: 'local'
+  public readonly prefix: string;
+  public readonly size?: number;
+  public readonly mode: StorageMode;
+
+  constructor(o: SavedFile) {
+    super(o);
+    Object.assign(this, o);
   }
 }
 
@@ -48,7 +41,7 @@ export interface IStorageEngine {
    * @param opts
    */
   saveEntity(
-    file: { filename: string; path: string; mimetype: string; extension?: string },
+    file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string },
   ): Promise<SavedFile>;
 
@@ -71,7 +64,7 @@ export interface IStorageEngine {
    * @param thumbnailConfig
    * @param jpegConfig
    * @param resolver 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
-   * @param res
+   * @param reply
    */
   resolveUrl(
     {
@@ -89,8 +82,8 @@ export interface IStorageEngine {
       jpegConfig?: { opts: JpegParam; param?: string };
       resolver?: (url: string) => Promise<any>;
     },
-    res?: Response,
-  ): Promise<any>;
+    reply?: FastifyReply<any>,
+  ): Promise<any> | FastifyReply<any>;
 }
 
 export function yearMonthStr() {

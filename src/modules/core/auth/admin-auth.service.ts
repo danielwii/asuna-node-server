@@ -3,12 +3,11 @@ import { InjectConnection } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { Connection, FindOneOptions, getManager, Repository, UpdateResult } from 'typeorm';
-
+import { ConfigKeys, configLoader } from '../config.helper';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
 import { IJwtPayload } from './auth.interfaces';
 import { RoleRepository } from './auth.repositories';
-import { ConfigKeys, configLoader } from '../config.helper';
 
 const logger = new Logger('AdminAuthService');
 

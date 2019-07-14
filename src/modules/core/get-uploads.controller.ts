@@ -1,18 +1,29 @@
-import { Controller, Get, Logger, NotFoundException, Param, Query, Res } from '@nestjs/common';
+// tslint:disable:max-line-length
+import {
+  Controller,
+  Get,
+  Logger,
+  NotFoundException,
+  Param,
+  Query,
+  Res,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
-
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
-
-import { JpegParam, JpegPipe } from './image/jpeg.pipe';
-import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
+import { r } from '../common/helpers';
+import { FinderService } from '../finder';
+import { ControllerLoggerInterceptor } from '../logger/logger.interceptor';
 import { ConfigKeys, configLoader } from './config.helper';
 import { AsunaContext } from './context';
-import { FinderService } from '../finder';
+import { JpegParam, JpegPipe } from './image/jpeg.pipe';
+import { ThumbnailParam, ThumbnailPipe } from './image/thumbnail.pipe';
 
 const logger = new Logger('GetUploadsController');
 
 @ApiUseTags('core')
+@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('uploads')
 export class GetUploadsController {
   private context = AsunaContext.instance;
@@ -38,7 +49,7 @@ export class GetUploadsController {
     @Res() res,
   ) {
     logger.log(
-      `get [${bucket}] file [${filenameWithPrefix}] by ${JSON.stringify({
+      `get [${bucket}] file [${filenameWithPrefix}] by ${r({
         thumbnailConfig,
         jpegConfig,
       })}`,
@@ -128,11 +139,12 @@ export class GetUploadsController {
 
   @Get('files/*')
   async getFiles(
-    @Param('0') filename: string,
+    @Param('*') filename: string,
     @Query('prefix') prefix: string = '',
     @Query('bucket') bucket: string = 'files',
     @Res() res,
   ) {
+    console.log(this.context.uploadPath, { bucket, prefix, filename });
     const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
     if (fullFilePath.startsWith(this.context.uploadPath)) {
       logger.log(`check if file '${fullFilePath}' exists`);

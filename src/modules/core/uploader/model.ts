@@ -11,8 +11,6 @@ export class ChunksUploadedEvent {
   constructor(public readonly token: OperationToken, public readonly key: string) {}
 }
 
-export class ChunksUploadPayload {}
-
 export class ChunkInfo {
   constructor(
     public readonly index: number,

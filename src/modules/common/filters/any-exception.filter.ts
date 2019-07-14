@@ -1,6 +1,6 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import { Request, Response } from 'express';
+import { FastifyReply } from 'fastify';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
@@ -36,8 +36,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const reply = ctx.getResponse<FastifyReply<any>>();
 
     let processed = exception;
 
@@ -59,17 +58,17 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (status && status === HttpStatus.BAD_REQUEST) {
       logger.warn(`[bad_request] ${r(processed)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${r(processed)}`);
+      logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40\d/.test(`${status}`)) {
       logger.warn(`[unauthorized] ${r(processed)}`);
     } else {
       logger.error(`[unhandled exception] ${r(processed)}`);
     }
 
-    if (!response.finished && response.status) {
+    if (!reply.sent && reply.status) {
       if (R.is(HttpException, processed)) {
         const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
-        response.status(status).json({
+        reply.status(status).send({
           error: {
             status,
             name: exceptionResponse.error,
@@ -79,7 +78,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
           } as AsunaException,
         });
       } else if (R.is(Error, processed)) {
-        response.status(status).json({
+        reply.status(status).send({
           error: {
             status,
             name: AsunaError.Unexpected__do_not_use_it.name,
@@ -90,11 +89,11 @@ export class AnyExceptionFilter implements ExceptionFilter {
         });
       } else {
         try {
-          response.status(status).json({ error: processed as AsunaException });
+          reply.status(status).send({ error: processed as AsunaException });
         } catch (e) {
-          response
+          reply
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .json({ error: processed as AsunaException });
+            .send({ error: processed as AsunaException });
         }
       }
     }

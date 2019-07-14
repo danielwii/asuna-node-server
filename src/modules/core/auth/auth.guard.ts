@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import * as passport from 'passport';
 import { AsunaError, AsunaException, r } from '../../common';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
@@ -25,18 +25,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 }
 
-export type AnyAuthRequest = Request & { user: any; identifier: any };
+export type AnyAuthRequest = FastifyRequest & { user: any; identifier: any };
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
   logger = new Logger('AnyAuthGuard');
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const res = context.switchToHttp().getResponse();
+    const req = context.switchToHttp().getRequest<AnyAuthRequest>();
+    const reply = context.switchToHttp().getResponse<FastifyReply<any>>();
     const next = context.switchToHttp().getNext();
 
-    this.logger.log(`check url: ${req.originalUrl}`);
+    this.logger.log(`check url: ${req.raw.url}`);
     let result;
     if (isApiKeyRequest(req)) {
       result = await new Promise(resolve => {
@@ -46,13 +46,13 @@ export class AnyAuthGuard implements CanActivate {
           (err, user, info) => {
             this.logger.log(`api-key auth: ${r({ user })}`);
             if (err || info) {
-              this.logger.log(`api-key auth error: ${r({ err, info })}`);
+              this.logger.warn(`api-key auth error: ${r({ err, info })}`);
             } else {
               req.identifier = user; // { apiKey: xxx }
             }
             resolve({ err, user, info });
           },
-        )(req, res);
+        )(req, reply);
       });
     } else {
       result = await new Promise(resolve => {
@@ -62,14 +62,14 @@ export class AnyAuthGuard implements CanActivate {
           (err, user, info) => {
             // this.logger.log(`jwt auth ${r({ user })}`);
             if (err || info) {
-              this.logger.log(`jwt auth error: ${r({ err, info })}`);
+              this.logger.warn(`jwt auth error: ${r({ err, info })}`);
             } else {
               req.identifier = user;
               req.user = user; // only inject client side user to req
             }
             resolve({ err, user, info });
           },
-        )(req, res);
+        )(req, reply);
       });
     }
 

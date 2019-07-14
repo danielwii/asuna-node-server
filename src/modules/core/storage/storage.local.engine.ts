@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { oneLineTrim } from 'common-tags';
+import { FastifyReply } from 'fastify';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
 import { join } from 'path';
@@ -8,6 +9,7 @@ import { ErrorException, r } from '../../common';
 import { AsunaContext } from '../context';
 import {
   convertFilename,
+  FileInfo,
   IStorageEngine,
   SavedFile,
   StorageMode,
@@ -31,7 +33,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   saveEntity(
-    file,
+    file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
     if (!file) {
@@ -44,20 +46,26 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(`file is '${r({ file, dest })}'`);
 
     fsExtra.moveSync(file.path, dest);
-    return Promise.resolve({
-      bucket,
-      prefix,
-      mimetype: file.mimetype,
-      mode: StorageMode.LOCAL,
-      filename,
-    });
+    return Promise.resolve(
+      new SavedFile({
+        bucket,
+        path: dest,
+        prefix,
+        mimetype: file.mimetype,
+        mode: StorageMode.LOCAL,
+        filename,
+      }),
+    );
   }
 
   getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  public resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res): Promise<any> {
+  public resolveUrl(
+    { filename, bucket, prefix, thumbnailConfig, jpegConfig },
+    reply: FastifyReply<any>,
+  ): Promise<any> | FastifyReply<any> {
     const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
@@ -77,14 +85,14 @@ export class LocalStorage implements IStorageEngine {
 
     if (!['png', 'jpg', 'jpeg'].includes(ext)) {
       if (fsExtra.existsSync(outputPath)) {
-        return res.type(ext).sendFile(fullFilePath);
+        return reply.type(ext).send(fsExtra.createReadStream(fullFilePath));
       }
-      return res.status(404).send();
+      return reply.status(404).send();
     }
 
     LocalStorage.logger.log(`check if ${ext} file outputPath '${outputPath}' exists`);
     if (fsExtra.existsSync(outputPath)) {
-      return res.type(ext).sendFile(outputPath);
+      return reply.type(ext).send(fsExtra.createReadStream(outputPath));
     }
 
     fsExtra.mkdirpSync(fullFileDir);
@@ -103,9 +111,9 @@ export class LocalStorage implements IStorageEngine {
         LocalStorage.logger.error(
           `create outputPath image error ${r({ outputPath, err: err.stack, info })}`,
         );
-        res.status(404).send(err.message);
+        reply.status(404).send(err.message);
       } else {
-        res.type(ext).sendFile(outputPath);
+        reply.type(ext).send(fsExtra.createReadStream(outputPath));
       }
     });
   }

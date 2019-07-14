@@ -1,11 +1,12 @@
-import { Controller, Get, Logger, Param, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
-import { Cryptor } from 'node-buffs';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
+import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { FinderService } from './finder.service';
 import { AsunaError, AsunaException } from '../common';
+import { ControllerLoggerInterceptor } from '../logger/logger.interceptor';
+import { FinderService } from './finder.service';
 
 const logger = new Logger('FinderController');
 
@@ -32,6 +33,7 @@ export class FinderAssetsSettings {
  * api/v1/finder?query=`querystring.stringify({name: "default"})`
  */
 @ApiUseTags('core')
+@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/finder')
 export class FinderController {
   constructor(private readonly finderService: FinderService) {}
@@ -94,7 +96,7 @@ export class ShortFinderController {
     }
 
     const queryParam = querystring.parse(
-      encrypt == true ? Cryptor.desDecrypt(query) : query,
+      encrypt === true ? Cryptor.desDecrypt(query) : query,
     ) as any;
     logger.log(`query ${JSON.stringify(queryParam)} with ${keyByType[type]}`);
 
