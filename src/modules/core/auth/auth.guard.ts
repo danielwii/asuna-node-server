@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AsunaError, AsunaException, r } from '../../common';
-import { auth } from './helper';
+import { AnyAuthRequest, auth } from './helper';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -23,8 +23,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return user;
   }
 }
-
-export type AnyAuthRequest = Request & { user: any; identifier: any };
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
