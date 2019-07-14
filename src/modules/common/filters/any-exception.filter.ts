@@ -6,6 +6,7 @@ import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
+import { ServerResponse } from 'http';
 
 const logger = new Logger('AnyExceptionFilter');
 
@@ -36,6 +37,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
+    // const reply = ctx.getResponse<ServerResponse>();
+    // new FastifyReply();
     const reply = ctx.getResponse<FastifyReply<any>>();
 
     let processed = exception;
@@ -65,6 +68,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       logger.error(`[unhandled exception] ${r(processed)}`);
     }
 
+    logger.debug(`status: ${r({ send: reply.sent, status: reply.status })}`);
     if (!reply.sent && reply.status) {
       if (R.is(HttpException, processed)) {
         const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';

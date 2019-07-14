@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { AsunaError, AsunaException } from '../../../common';
+import { AsunaError, AsunaException, r } from '../../../common';
 import { ConfigKeys, configLoader } from '../../config.helper';
 import { IJwtPayload } from '../auth.interfaces';
 import { AuthService } from '../auth.service';
@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: IJwtPayload) {
-    logger.log(`validate ${JSON.stringify(payload)}`);
+    logger.log(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {
       throw new AsunaException(AsunaError.InsufficientPermissions);

@@ -1,9 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import * as passport from 'passport';
 import { AsunaError, AsunaException, r } from '../../common';
-import { isApiKeyRequest } from './strategy/api-key.strategy';
+import { auth } from './helper';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -37,46 +36,18 @@ export class AnyAuthGuard implements CanActivate {
     const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.raw.url}`);
-    let result;
-    if (isApiKeyRequest(req)) {
-      result = await new Promise(resolve => {
-        passport.authenticate(
-          'api-key',
-          { userProperty: 'user', assignProperty: 'assign', session: false },
-          (err, user, info) => {
-            this.logger.log(`api-key auth: ${r({ user })}`);
-            if (err || info) {
-              this.logger.warn(`api-key auth error: ${r({ err, info })}`);
-            } else {
-              req.identifier = user; // { apiKey: xxx }
-            }
-            resolve({ err, user, info });
-          },
-        )(req, reply);
-      });
-    } else {
-      result = await new Promise(resolve => {
-        passport.authenticate(
-          'jwt',
-          { userProperty: 'user', assignProperty: 'assign', session: false },
-          (err, user, info) => {
-            // this.logger.log(`jwt auth ${r({ user })}`);
-            if (err || info) {
-              this.logger.warn(`jwt auth error: ${r({ err, info })}`);
-            } else {
-              req.identifier = user;
-              req.user = user; // only inject client side user to req
-            }
-            resolve({ err, user, info });
-          },
-        )(req, reply);
-      });
-    }
+    const result = await auth(req, reply)
+      .then(value => {
+        this.logger.log(`value is ${r(value)}`);
+        return value;
+      })
+      .catch(reason => this.logger.warn(r(reason)));
+    this.logger.log(`result is${r(result)}`);
 
-    if (!result.user) {
+    if (result || (result && !result.user)) {
       throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
     }
 
-    return result;
+    return !!result;
   }
 }

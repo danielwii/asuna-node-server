@@ -31,7 +31,7 @@ export class AuthModule implements NestModule, OnModuleInit {
 
   public configure(consumer: MiddlewareConsumer): void {
     logger.log('configure...');
-    consumer.apply(AdminAuthMiddleware).forRoutes('/admin', '/rest');
+    consumer.apply(AdminAuthMiddleware.forRoutes('/admin', '/rest')).forRoutes('*');
   }
 
   public onModuleInit(): any {

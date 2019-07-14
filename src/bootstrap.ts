@@ -1,10 +1,16 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { NestApplication, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json } from 'body-parser';
+import * as compression from 'compression';
+import * as helmet from 'helmet';
+import * as morgan from 'morgan';
 import { resolve } from 'path';
+import * as responseTime from 'response-time';
 import { AnyExceptionFilter, r } from './modules/common';
 import { AsunaContext, ConfigKeys, configLoader, IAsunaContextOpts } from './modules/core';
+
+const rateLimit = require('express-rate-limit');
 
 const logger = new Logger('bootstrap');
 const startAt = Date.now();
@@ -44,27 +50,30 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
-  const fastifyAdapter = new FastifyAdapter();
-  fastifyAdapter.register(require('fastify-multipart'));
-  const app = await NestFactory.create<NestFastifyApplication>(appModule, fastifyAdapter);
-  app.useGlobalFilters(new AnyExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-
-  if (options.redisMode === 'redis') {
-    app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter')).RedisIoAdapter(app));
-  } else if (options.redisMode === 'ws') {
-    app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
-  }
-  // TODO not supported with fastify
-  // helmet -> fastify-helmet
   /*
-  import { json } from 'body-parser';
-  import * as compression from 'compression';
-  import * as helmet from 'helmet';
-  import * as morgan from 'morgan';
-  import * as responseTime from 'response-time';
+  const fastifyInstance = fastify();
+  const fastifyAdapter = new FastifyAdapter(fastifyInstance);
+  fastifyAdapter.register(require('fastify-multipart'));
 
-  const rateLimit = require('express-rate-limit');
+  fastifyAdapter.use(require('cors')());
+  fastifyAdapter.use(require('dns-prefetch-control')());
+  fastifyAdapter.use(require('frameguard')());
+  fastifyAdapter.use(require('hide-powered-by')());
+  fastifyAdapter.use(require('hsts')());
+  fastifyAdapter.use(require('ienoopen')());
+  fastifyAdapter.use(require('x-xss-protection')());*/
+
+  const app = await NestFactory.create<NestApplication>(appModule);
+  /*
+  app.register(require('fastify-multipart'));
+
+  app.use(require('cors')());
+  app.use(require('dns-prefetch-control')());
+  app.use(require('frameguard')());
+  app.use(require('hide-powered-by')());
+  app.use(require('hsts')());
+  app.use(require('ienoopen')());
+  app.use(require('x-xss-protection')());*/
 
   app.use(helmet()); // use fastify-helmet
   app.use(compression());
@@ -77,7 +86,20 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     }),
   );
   app.use(morgan('dev'));
-  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));*/
+  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));
+
+  // fastifyInstance.addHook('onError', (req, reply, error, done) => {
+  //   logger.log(`error is ${r(error)}`);
+  //   done();
+  // });
+  app.useGlobalFilters(new AnyExceptionFilter());
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+
+  if (options.redisMode === 'redis') {
+    app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter')).RedisIoAdapter(app));
+  } else if (options.redisMode === 'ws') {
+    app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
+  }
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
@@ -133,7 +155,6 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
     `options is ${r({
       options,
       isProduction,
-      // isBuild: wasBuilt,
       dirname,
       root,
       // suffix,
