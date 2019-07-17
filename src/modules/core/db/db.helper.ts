@@ -314,10 +314,10 @@ export class DBHelper {
         // console.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field] as any;
 
-        if (_.isObject(elementCondition)) {
+        if (_.isPlainObject(elementCondition)) {
           let innerValue = elementCondition._value;
 
-          if (_.isObject(innerValue) && innerValue.toSql) {
+          if (_.isPlainObject(innerValue) && innerValue.toSql) {
             innerValue = elementCondition._value.toSql(
               getConnection(),
               `${field}.id`,
@@ -429,9 +429,9 @@ export class DBHelper {
     condition: { field: string; value: string | FindOperator<any> },
     suffix = '',
   ): any {
-    if (_.isObject(condition.value)) {
+    if (_.isPlainObject(condition.value)) {
       const elementCondition = condition.value as any;
-      if (_.isObject(elementCondition) && elementCondition.toSql) {
+      if (_.isPlainObject(elementCondition) && elementCondition.toSql) {
         let innerValue = elementCondition._value;
 
         // console.log({ elementCondition }, elementCondition._type);

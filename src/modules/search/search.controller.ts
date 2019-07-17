@@ -74,10 +74,10 @@ export class SearchController {
       // console.log('[innerJoinAndSelect]', { field, model, where });
       const elementCondition = where[field] as any;
 
-      if (_.isObject(elementCondition)) {
+      if (_.isPlainObject(elementCondition)) {
         let innerValue = elementCondition._value;
 
-        if (_.isObject(innerValue) && innerValue.toSql) {
+        if (_.isPlainObject(innerValue) && innerValue.toSql) {
           innerValue = elementCondition._value.toSql(
             getConnection(),
             `${field}.id`,
