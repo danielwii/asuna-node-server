@@ -10,8 +10,13 @@ export interface JpegParam {
   progressive?: boolean;
 }
 
+export type JpegPipeOptions = { opts: JpegParam; param?: string };
+
+/**
+ * jpeg 专用的配置信息处理器
+ */
 @Injectable()
-export class JpegPipe implements PipeTransform<any> {
+export class JpegPipe implements PipeTransform {
   async transform(value, { metatype }: ArgumentMetadata) {
     const param = _.find(_.keys(value), fp.startsWith('jpeg/'));
     if (!param) {

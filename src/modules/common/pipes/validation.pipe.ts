@@ -3,11 +3,13 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { ValidationException } from '..';
 
+/**
+ * app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true })) is used already.
+ */
 @Injectable()
 export class CustomValidationPipe implements PipeTransform<any> {
-  async transform(value, metadata: ArgumentMetadata) {
+  async transform(value: any, { metatype }: ArgumentMetadata) {
     if (value) {
-      const { metatype } = metadata;
       if (!metatype || !this.toValidate(metatype)) {
         return value;
       }
@@ -20,8 +22,8 @@ export class CustomValidationPipe implements PipeTransform<any> {
     return value;
   }
 
-  private toValidate(metatype): boolean {
-    const types = [String, Boolean, Number, Array, Object];
-    return !types.find(type => metatype === type);
+  private toValidate(metatype: Function): boolean {
+    const types: Function[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype);
   }
 }

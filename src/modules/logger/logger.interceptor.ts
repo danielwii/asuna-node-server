@@ -13,7 +13,7 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest<Request>();
-    const reply = context.switchToHttp().getResponse<Response>();
+    const response = context.switchToHttp().getResponse<Response>();
     const info = {
       body: request.body,
       query: request.query,

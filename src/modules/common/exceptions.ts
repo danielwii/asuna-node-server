@@ -66,9 +66,6 @@ export class ErrorException extends AsunaBaseException {
   }
 }
 
-/**
- * @deprecated use AsunaException directly
- */
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
     super(AsunaError.InvalidParameter, `validate '${model}' error`, errors);
