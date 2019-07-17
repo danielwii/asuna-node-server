@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import * as sharp from 'sharp';
 import { ErrorException, r } from '../../common';
+import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import {
   convertFilename,
@@ -54,6 +55,12 @@ export class LocalStorage implements IStorageEngine {
         mimetype: file.mimetype,
         mode: StorageMode.LOCAL,
         filename,
+        fullpath: join(
+          configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
+          bucket,
+          prefix,
+          filename,
+        ),
       }),
     );
   }

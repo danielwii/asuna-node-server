@@ -6,6 +6,7 @@ import * as minio from 'minio';
 import { join } from 'path';
 import { AsunaError, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
+import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
@@ -23,23 +24,21 @@ export class MinioStorage implements IStorageEngine {
   private static readonly logger = new Logger(MinioStorage.name);
 
   private readonly defaultBucket;
+  private readonly configObject: MinioConfigObject;
 
-  constructor(
-    private configLoader: () => MinioConfigObject,
-    opts: { defaultBucket?: string } = {},
-  ) {
+  constructor(configLoader: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
     this.defaultBucket = opts.defaultBucket || 'default';
-    const configObject = configLoader();
-    if (configObject.enable !== true) {
+    this.configObject = configLoader();
+    if (this.configObject.enable !== true) {
       throw new Error(
         `minio must enable when using minio storage engine: ${r({
-          configs: classToPlain(configObject),
+          configs: classToPlain(this.configObject),
           opts,
         })}`,
       );
     }
     MinioStorage.logger.log(
-      `[constructor] init ${r({ configs: classToPlain(configObject), opts })}`,
+      `[constructor] init ${r({ configs: classToPlain(this.configObject), opts })}`,
     );
     /*
     Hermes.setupJobProcessor(AsunaSystemQueue.UPLOAD, (job: Job) => {
@@ -102,13 +101,12 @@ export class MinioStorage implements IStorageEngine {
   }
 
   get client() {
-    const config = this.configLoader();
     return new minio.Client({
-      endPoint: config.endpoint,
-      port: config.port,
-      useSSL: config.useSSL,
-      accessKey: config.accessKey,
-      secretKey: config.secretKey,
+      endPoint: this.configObject.endpoint,
+      port: this.configObject.port,
+      useSSL: this.configObject.useSSL,
+      accessKey: this.configObject.accessKey,
+      secretKey: this.configObject.secretKey,
     });
   }
 
@@ -213,6 +211,12 @@ export class MinioStorage implements IStorageEngine {
           mimetype: file.mimetype,
           mode: StorageMode.MINIO,
           filename,
+          fullpath: join(
+            configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
+            bucket,
+            resolvedPrefix,
+            filename,
+          ),
         });
         // return etag;
       })
@@ -261,14 +265,21 @@ export class MinioStorage implements IStorageEngine {
       const bucketStream = this.client.listObjectsV2(currentBucket, prefix, true);
       bucketStream.on('data', item => {
         MinioStorage.logger.log(`bucketStream on data ${r(item)}`);
+        const filename = item.name.slice(prefix.length + 1);
         savedFiles.push(
           new SavedFile({
             bucket: currentBucket,
             path: `${item.prefix}/${item.name}`,
             size: item.size,
             prefix,
-            filename: item.name.slice(prefix.length + 1), // item.name 是包含 prefix 的完成名字
+            filename, // item.name 是包含 prefix 的完成名字
             mode: StorageMode.MINIO,
+            fullpath: join(
+              configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
+              currentBucket,
+              prefix,
+              filename,
+            ),
           }),
         );
       });

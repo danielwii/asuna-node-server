@@ -13,7 +13,7 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
   constructor(private readonly adminAuthService: AdminAuthService) {
     super(
       {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Mgmt'),
         // passReqToCallback: true,
         secretOrKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
       },

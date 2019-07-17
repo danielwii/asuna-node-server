@@ -1,47 +1,35 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import * as jwt from 'jsonwebtoken';
-import { Cryptor } from 'node-buffs';
-import { Connection, FindOneOptions, getManager, Repository, UpdateResult } from 'typeorm';
-import { ConfigKeys, configLoader } from '../config.helper';
+import { Connection, getManager } from 'typeorm';
+import { r } from '../../common/helpers';
+import { AbstractAuthService } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
-import { IJwtPayload } from './auth.interfaces';
 import { RoleRepository } from './auth.repositories';
 
 const logger = new Logger('AdminAuthService');
 
 @Injectable()
-export class AdminAuthService {
-  private readonly userRepository: Repository<AdminUser>;
+export class AdminAuthService extends AbstractAuthService<AdminUser> {
   private readonly roleRepository: RoleRepository;
-  private readonly cryptor = new Cryptor();
 
   constructor(
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    this.userRepository = connection.getRepository(AdminUser);
+    super(connection.getRepository(AdminUser));
     this.roleRepository = connection.getCustomRepository(RoleRepository);
-  }
-
-  encrypt(password: string) {
-    return this.cryptor.passwordEncrypt(password);
-  }
-
-  passwordVerify(password: string, user: AdminUser) {
-    return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 
   async createUser(username: string, email: string, password: string, roleNames: string[]) {
     const { hash, salt } = this.encrypt(password);
     const roles = await this.roleRepository.findByNames(roleNames);
 
-    let user = await this.getUser(email);
+    let user = await this.getUser({ username, email });
     if (!user) {
       user = this.userRepository.create({ email, username, isActive: true });
     }
-    logger.log(`found user ${JSON.stringify(user)}`);
+    logger.log(`found user ${r(user)}`);
     user.password = hash;
     user.salt = salt;
     user.roles = roles;
@@ -66,7 +54,7 @@ export class AdminAuthService {
       where: { name: SYS_ROLE },
       relations: ['users'],
     });
-    logger.log(`found sys role: ${JSON.stringify(sysRole)}`);
+    logger.log(`found sys role: ${r(sysRole)}`);
     const usersBySysRole = await sysRole.users;
     logger.log(`found users for sys role: ${usersBySysRole.length}`);
     if (!usersBySysRole.length) {
@@ -75,48 +63,5 @@ export class AdminAuthService {
         logger.warn('cannot create default SYS_ADMIN account', e);
       });
     }
-  }
-
-  async createToken(user: AdminUser) {
-    logger.log(`createToken >> ${user.email}`);
-    const expiresIn = 60 * 60 * 24 * 30;
-    const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-    const payload = { id: user.id, username: user.username, email: user.email };
-    const token = jwt.sign(payload, secretOrKey, { expiresIn });
-    return {
-      expiresIn,
-      accessToken: token,
-    };
-  }
-
-  /**
-   * TODO using db repo instead
-   * @param jwtPayload
-   * @returns {Promise<boolean>}
-   */
-  async validateUser(jwtPayload: IJwtPayload): Promise<boolean> {
-    const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
-    logger.log(`validateUser >> ${JSON.stringify(jwtPayload)} expired in: ${left}s`);
-
-    const user = await this.getUser(jwtPayload.email, true);
-
-    const validated = user != null && user.id === jwtPayload.id;
-    logger.log(`validateUser >> exists: ${!!user}, isValidated: ${validated}`);
-    return validated;
-  }
-
-  public getUser(email: string, isActive?: boolean, options?: FindOneOptions<AdminUser>) {
-    return this.userRepository.findOne({ email, isActive }, options);
-  }
-
-  public getUserWithPassword(email: string, isActive?: boolean) {
-    return this.userRepository.findOne(
-      { email, isActive },
-      { select: ['id', 'username', 'email', 'password', 'salt'] },
-    );
-  }
-
-  public updatePassword(id: number, password: string, salt: string): Promise<UpdateResult> {
-    return this.userRepository.update(id, { password, salt });
   }
 }

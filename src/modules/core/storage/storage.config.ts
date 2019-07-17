@@ -8,7 +8,7 @@ export const QiniuConfigKeys = {
   QINIU_ACCESS_KEY: 'QINIU_ACCESS_KEY',
   QINIU_SECRET_KEY: 'QINIU_SECRET_KEY',
   QINIU_BUCKET_NAME: 'QINIU_BUCKET_NAME',
-  QINIU_PREFIX: 'QINIU_PREFIX',
+  QINIU_PATH: 'QINIU_PATH',
   QINIU_DOMAIN: 'QINIU_DOMAIN',
 };
 
@@ -16,8 +16,12 @@ export class QiniuConfigObject {
   static logger = new Logger('QiniuConfigObject');
 
   enable: boolean;
+  // bucket 应该用 scope 来替换，用来明确概念
   bucket: string;
-  prefix: string;
+  /**
+   * 用来和 /uploads/ 后面的路径做匹配
+   */
+  path: string;
   domain: string;
 
   accessKey: string;
@@ -35,7 +39,7 @@ export class QiniuConfigObject {
     return new QiniuConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`),
       bucket: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_BUCKET_NAME}`),
-      prefix: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_PREFIX}`),
+      path: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_PATH}`),
       domain: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_DOMAIN}`),
       accessKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ACCESS_KEY}`),
       secretKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_SECRET_KEY}`),

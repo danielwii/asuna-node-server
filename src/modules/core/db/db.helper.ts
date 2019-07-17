@@ -352,6 +352,7 @@ export class DBHelper {
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);
         } else {
+          logger.log(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
           queryBuilder.leftJoinAndSelect(`${model}.${relation}`, relation);
         }
       });
@@ -420,7 +421,7 @@ export class DBHelper {
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         field => `${model}.${field}`,
       );
-      // logger.log(`wrapParsedFields '${util.inspect(selection)}'`);
+      logger.log(`wrapParsedFields '${r(selection)}'`);
       queryBuilder.select(selection);
     }
   }

@@ -3,6 +3,7 @@ import { classToPlain } from 'class-transformer';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import { ErrorException, r } from '../../common';
+import { ConfigKeys, configLoader } from '../config.helper';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { QiniuConfigObject } from './storage.config';
@@ -19,24 +20,27 @@ export class QiniuStorage implements IStorageEngine {
   private static readonly logger = new Logger(QiniuStorage.name);
   // private temp: string;
   private readonly mac: qiniu.auth.digest.Mac;
+  private readonly configObject: QiniuConfigObject;
 
-  constructor(private readonly configLoader: () => QiniuConfigObject) {
-    const configObject = configLoader();
+  constructor(configLoader: () => QiniuConfigObject) {
+    this.configObject = configLoader();
     QiniuStorage.logger.log(
-      `[constructor] init [${configObject.bucket}] with default prefix:${configObject.prefix} ...`,
+      `[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`,
     );
 
-    if (configObject.enable !== true) {
+    if (this.configObject.enable !== true) {
       throw new Error(
         `qiniu must enable when using qiniu storage engine: ${r({
-          configs: classToPlain(configObject),
+          configs: classToPlain(this.configObject),
         })}`,
       );
     }
-    QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(configObject) })}`);
+    QiniuStorage.logger.log(
+      `[constructor] init ${r({ configs: classToPlain(this.configObject) })}`,
+    );
 
     // this.temp = fsExtra.mkdtempSync('temp');
-    this.mac = new qiniu.auth.digest.Mac(configObject.accessKey, configObject.secretKey);
+    this.mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
   }
 
   public saveEntity(
@@ -48,14 +52,17 @@ export class QiniuStorage implements IStorageEngine {
     }
 
     return new Promise<SavedFile>(resolve => {
-      const config = this.configLoader();
-      const bucket = opts.bucket;
+      const bucket = opts.bucket || this.configObject.path;
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);
-      const key = join(bucket, filenameWithPrefix);
-      QiniuStorage.logger.log(`upload file to '${config.bucket}' as '${key}'`);
-      const uploadToken = new qiniu.rs.PutPolicy({ scope: config.bucket }).uploadToken(this.mac);
+      const key = join('/', bucket, filenameWithPrefix).slice(1);
+      QiniuStorage.logger.log(
+        `upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`,
+      );
+      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(
+        this.mac,
+      );
 
       new qiniu.form_up.FormUploader().putFile(
         uploadToken,
@@ -67,15 +74,20 @@ export class QiniuStorage implements IStorageEngine {
             throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
           }
           if (info.statusCode === 200) {
-            QiniuStorage.logger.log(`upload file '${r({ key, info, body })}'`);
+            QiniuStorage.logger.log(`upload file '${r({ key, /*info,*/ body })}'`);
+            const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
+            const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
+              ? join(this.configObject.path || '')
+              : join(resourcePath, this.configObject.path || '');
             resolve(
               new SavedFile({
                 prefix,
                 path: `${prefix}/${filename}`,
-                bucket: config.bucket,
+                bucket: this.configObject.bucket,
                 mimetype: file.mimetype,
                 mode: StorageMode.QINIU,
                 filename,
+                fullpath: join(appendPrefix, prefix, filename),
               }),
             );
           } else {
@@ -117,13 +129,12 @@ export class QiniuStorage implements IStorageEngine {
     },
     res,
   ) {
-    const configObject = this.configLoader();
     QiniuStorage.logger.log(`resolve url by ${r({ bucket, prefix, filename })}`);
-    // TODO 应该约定 filename 中不包含 prefix
-    let fixedPrefix = prefix;
-    if (!filename.startsWith(configObject.prefix)) {
-      fixedPrefix = prefix || configObject.prefix;
-    }
-    return Promise.resolve(`${configObject.domain}/${join(fixedPrefix, filename)}`);
+    const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
+    const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
+      ? join(this.configObject.path || '')
+      : join(resourcePath, this.configObject.path || '');
+    const path = join('/', appendPrefix, prefix || '', filename);
+    return Promise.resolve(`${this.configObject.domain}${path}`);
   }
 }

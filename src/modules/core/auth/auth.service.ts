@@ -1,53 +1,43 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { oneLineTrim } from 'common-tags';
-import * as jwt from 'jsonwebtoken';
-import { Cryptor } from 'node-buffs';
-import {
-  Connection,
-  FindOneOptions,
-  getConnection,
-  getManager,
-  getRepository,
-  Repository,
-  UpdateResult,
-} from 'typeorm';
+import { Connection, getConnection, getManager, getRepository, Repository } from 'typeorm';
 import { r } from '../../common/helpers';
-import { ConfigKeys, configLoader } from '../config.helper';
 import { DBHelper } from '../db';
+import { AbstractAuthService } from './abstract.auth.service';
 import { AdminUser } from './auth.entities';
-import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
 
 const logger = new Logger('AuthService');
 
 @Injectable()
-export class AuthService {
-  private readonly userRepository: Repository<AbstractAuthUser>;
-  private readonly cryptor = new Cryptor();
-
+export class AuthService extends AbstractAuthService<AbstractAuthUser> {
   constructor(@InjectConnection() private readonly connection: Connection) {
-    // 获得用户继承的 AbstractAuthUser
-    const entityMetadata = getConnection().entityMetadatas.find(metadata => {
-      if (DBHelper.isValidEntity(metadata)) {
-        return (
-          metadata.targetName !== AdminUser.name &&
-          Object.getPrototypeOf(metadata.target).name === AbstractAuthUser.name
-        );
-      }
-    });
-    if (entityMetadata) {
-      this.userRepository = getRepository(entityMetadata.target);
-    }
-  }
-
-  encrypt(password: string) {
-    return this.cryptor.passwordEncrypt(password);
-  }
-
-  passwordVerify(password: string, user: AbstractAuthUser) {
-    logger.log(`passwordVerify(${password}, ${JSON.stringify(user)})`);
-    return this.cryptor.passwordCompare(password, user.password, user.salt);
+    super(
+      ((): Repository<AbstractAuthUser> => {
+        // 获得用户继承的 AbstractAuthUser
+        const entityMetadata = getConnection().entityMetadatas.find(metadata => {
+          if (DBHelper.isValidEntity(metadata)) {
+            // logger.log(
+            //   `${r({
+            //     targetName: metadata.targetName,
+            //     adminName: AdminUser.name,
+            //     metadataTargetName: Object.getPrototypeOf(metadata.target).name,
+            //     abstractAuthName: AbstractAuthUser.name,
+            //   })}`,
+            // );
+            return (
+              metadata.targetName !== AdminUser.name &&
+              Object.getPrototypeOf(metadata.target).name === AbstractAuthUser.name
+            );
+          }
+        });
+        if (!entityMetadata) {
+          logger.warn('no auth user repo found.');
+          return;
+        }
+        return getRepository(entityMetadata.target);
+      })(),
+    );
   }
 
   async createUser(username: string, email: string, password: string) {
@@ -57,76 +47,9 @@ export class AuthService {
     if (!user) {
       user = this.userRepository.create({ email, username, isActive: true });
     }
-    logger.log(`found user ${JSON.stringify(user)}`);
+    logger.log(`found user ${r(user)}`);
     user.password = hash;
     user.salt = salt;
     return getManager().save(user);
-  }
-
-  /**
-   * TODO using env instead
-   * @returns {Promise<void>}
-   */
-  async createToken(user: AbstractAuthUser) {
-    logger.log(`createToken >> ${user.email}`);
-    const expiresIn = 60 * 60 * 24 * 30; // one month
-    const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-    const payload = { id: user.id, username: user.username, email: user.email };
-    const token = jwt.sign(payload, secretOrKey, { expiresIn });
-    return {
-      expiresIn,
-      accessToken: token,
-    };
-  }
-
-  /**
-   * TODO using db repo instead
-   * @param jwtPayload
-   * @returns {Promise<boolean>}
-   */
-  async validateUser(jwtPayload: IJwtPayload): Promise<boolean> {
-    const identifier = { email: jwtPayload.email, username: jwtPayload.username };
-    const user = await this.getUser(identifier, true);
-
-    const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
-    const validated = user != null && user.id === jwtPayload.id;
-    logger.debug(oneLineTrim`
-      validateUser >> identifier: ${r(identifier)} 
-      exists: ${!!user}, isValidated: ${validated}. left: ${left}ms
-    `);
-    return validated;
-  }
-
-  public getUser(
-    identifier: { email?: string; username?: string },
-    isActive: boolean = true,
-    options?: FindOneOptions<AbstractAuthUser>,
-  ) {
-    return this.userRepository.findOne(
-      {
-        ...(identifier.email ? { email: identifier.email } : null),
-        ...(identifier.username ? { username: identifier.username } : null),
-        isActive,
-      },
-      options,
-    );
-  }
-
-  public getUserWithPassword(
-    identifier: { email?: string; username?: string },
-    isActive: boolean = true,
-  ) {
-    return this.userRepository.findOne(
-      {
-        ...(identifier.email ? { email: identifier.email } : null),
-        ...(identifier.username ? { username: identifier.username } : null),
-        isActive,
-      },
-      { select: ['id', 'username', 'email', 'password', 'salt'] },
-    );
-  }
-
-  public updatePassword(id: number, password: string, salt: string): Promise<UpdateResult> {
-    return this.userRepository.update(id, { password, salt });
   }
 }

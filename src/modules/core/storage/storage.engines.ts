@@ -27,6 +27,8 @@ export class SavedFile extends FileInfo {
   public readonly prefix: string;
   public readonly size?: number;
   public readonly mode: StorageMode;
+  // 用于访问的资源地址
+  public readonly fullpath: string;
 
   constructor(o: SavedFile) {
     super(o);
@@ -93,5 +95,5 @@ export function yearMonthStr() {
 }
 
 export function convertFilename(filename: string) {
-  return filename.replace(/[^\w\._]+/g, '_');
+  return filename.replace(/[^\w._]+/g, '_');
 }

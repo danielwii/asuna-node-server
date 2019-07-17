@@ -225,15 +225,6 @@ export class UploaderController {
         throw new UploadException(error);
       });
     logger.log(`results is ${r(results)}`);
-    return results.map(saved => ({
-      ...saved,
-      // 用于访问的资源地址
-      fullpath: join(
-        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-        saved.bucket,
-        saved.prefix,
-        saved.filename,
-      ),
-    }));
+    return results;
   }
 }

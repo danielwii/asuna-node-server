@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
-import { adminAuth } from './helper';
+import { auth } from './helper';
 
 const logger = new Logger('AdminAuthMiddleware');
 
@@ -24,7 +24,7 @@ export class AdminAuthMiddleware {
         return next();
       }
 
-      const result = await adminAuth(req, res);
+      const result = await auth(req, res);
       if (!result.user) {
         throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
       }

@@ -74,15 +74,7 @@ export class UploaderService {
         const payload = token.body as Partial<ChunksUploadPayload>;
         payload.finished[chunk] = 1;
         token.save().catch(reason => logger.warn(r(reason)));
-        return new RemoteFileInfo({
-          ...saved,
-          fullpath: join(
-            configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-            saved.bucket,
-            saved.prefix,
-            saved.filename,
-          ),
-        });
+        return new RemoteFileInfo(saved);
       });
     /*
     return this.commandBus.execute(
@@ -149,15 +141,6 @@ export class UploaderService {
       prefix: payload.fingerprint,
     });
 
-    return new RemoteFileInfo({
-      ...saved,
-      // 用于访问的资源地址
-      fullpath: join(
-        configLoader.loadConfig(ConfigKeys.RESOURCE_PATH) || '/uploads',
-        saved.bucket,
-        saved.prefix,
-        saved.filename,
-      ),
-    });
+    return new RemoteFileInfo(saved);
   }
 }
