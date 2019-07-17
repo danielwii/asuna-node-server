@@ -27,7 +27,7 @@ export class RedisConfigObject {
   }
 
   static load(prefix: string = ''): RedisConfigObject {
-    const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
     logger.log(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     return new RedisConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`, false),

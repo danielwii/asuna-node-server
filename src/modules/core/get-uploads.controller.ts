@@ -35,9 +35,9 @@ export class GetUploadsController {
   @Get('options')
   async getOptions() {
     return {
-      image: { storage: configLoader.loadConfig(ConfigKeys.IMAGE_STORAGE) },
-      video: { storage: configLoader.loadConfig(ConfigKeys.VIDEO_STORAGE) },
-      file: { storage: configLoader.loadConfig(ConfigKeys.FILE_STORAGE) },
+      image: { storage: configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE) },
+      video: { storage: configLoader.loadConfig(ConfigKeys.VIDEOS_STORAGE) },
+      file: { storage: configLoader.loadConfig(ConfigKeys.FILES_STORAGE) },
     };
   }
 

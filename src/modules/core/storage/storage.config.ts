@@ -1,4 +1,6 @@
+import { Logger } from '@nestjs/common';
 import { Expose, Transform } from 'class-transformer';
+import * as _ from 'lodash';
 import { configLoader } from '../config.helper';
 
 export const QiniuConfigKeys = {
@@ -11,6 +13,8 @@ export const QiniuConfigKeys = {
 };
 
 export class QiniuConfigObject {
+  static logger = new Logger('QiniuConfigObject');
+
   enable: boolean;
   bucket: string;
   prefix: string;
@@ -25,19 +29,35 @@ export class QiniuConfigObject {
     Object.assign(this, partial);
   }
 
-  static load(type: 'videos' | 'images' | 'files' | 'chunks'): QiniuConfigObject {
+  static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
+    const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
+    this.logger.log(`load env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
     return new QiniuConfigObject({
-      enable: configLoader.loadBoolConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_ENABLE}`),
-      bucket: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_BUCKET_NAME}`),
-      prefix: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_PREFIX}`),
-      domain: configLoader.loadConfig(`${type.toUpperCase()}_${QiniuConfigKeys.QINIU_DOMAIN}`),
-      accessKey: configLoader.loadConfig(
-        `${type.toUpperCase()}_${QiniuConfigKeys.QINIU_ACCESS_KEY}`,
-      ),
-      secretKey: configLoader.loadConfig(
-        `${type.toUpperCase()}_${QiniuConfigKeys.QINIU_SECRET_KEY}`,
-      ),
+      enable: configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`),
+      bucket: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_BUCKET_NAME}`),
+      prefix: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_PREFIX}`),
+      domain: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_DOMAIN}`),
+      accessKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ACCESS_KEY}`),
+      secretKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_SECRET_KEY}`),
     });
+  }
+
+  static loadOr(
+    prefix: 'videos' | 'images' | 'files' | 'chunks' | string = '',
+  ): QiniuConfigObject | null {
+    const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    this.logger.log(`loadOr env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
+    const enable = configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
+    if (enable === true) {
+      return QiniuConfigObject.load(prefix);
+    }
+    if (enable === false) {
+      return null;
+    }
+    return Object.assign(
+      QiniuConfigObject.load(),
+      _.omitBy(QiniuConfigObject.load(prefix), _.isNull),
+    );
   }
 }
 
@@ -51,6 +71,8 @@ export const MinioConfigKeys = {
 };
 
 export class MinioConfigObject {
+  static logger = new Logger('MinioConfigObject');
+
   enable: boolean;
   endpoint: string;
   port: number;
