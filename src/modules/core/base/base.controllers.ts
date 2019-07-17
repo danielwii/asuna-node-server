@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiImplicitParam } from '@nestjs/swagger';
 import idx from 'idx';
@@ -23,14 +24,17 @@ import {
   parseOrder,
   parseWhere,
   Profile,
+  r,
   validateObject,
 } from '../../common';
+import { ControllerLoggerInterceptor } from '../../logger';
 import { DBHelper } from '../db';
 import { KeyValuePair, KvService } from '../kv';
 // import { AdminUser } from '../../core/auth';
 
 const logger = new Logger('RestCrudController');
 
+@UseInterceptors(ControllerLoggerInterceptor)
 export abstract class RestCrudController {
   @Inject('KvService')
   private readonly kvService: KvService;
