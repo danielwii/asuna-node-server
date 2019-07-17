@@ -12,16 +12,16 @@ import { oneLineTrim } from 'common-tags';
 const logger = new Logger('AbstractAuthService');
 
 @UseInterceptors(ControllerLoggerInterceptor)
-export abstract class AbstractAuthService<U extends AbstractAuthUser> {
+export abstract class AbstractAuthService {
   protected readonly cryptor = new Cryptor();
 
-  protected constructor(protected readonly userRepository: Repository<U>) {}
+  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
 
   encrypt(password: string) {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  passwordVerify(password: string, user: U) {
+  passwordVerify(password: string, user: AbstractAuthUser) {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 
@@ -63,7 +63,7 @@ export abstract class AbstractAuthService<U extends AbstractAuthUser> {
     identifier: { email?: string; username?: string },
     isActive: boolean = true,
     options?: FindOneOptions<AbstractAuthUser>,
-  ) {
+  ): Promise<AbstractAuthUser> {
     return this.userRepository.findOne(
       {
         ...(identifier.email ? { email: identifier.email } : null),
@@ -77,7 +77,7 @@ export abstract class AbstractAuthService<U extends AbstractAuthUser> {
   public getUserWithPassword(
     identifier: { email?: string; username?: string },
     isActive: boolean = true,
-  ) {
+  ): Promise<AbstractAuthUser> {
     return this.userRepository.findOne(
       {
         ...(identifier.email ? { email: identifier.email } : null),

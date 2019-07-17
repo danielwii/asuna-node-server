@@ -10,7 +10,7 @@ import { AbstractAuthUser } from './base.entities';
 const logger = new Logger('AuthService');
 
 @Injectable()
-export class AuthService extends AbstractAuthService<AbstractAuthUser> {
+export class AuthService extends AbstractAuthService {
   constructor(@InjectConnection() private readonly connection: Connection) {
     super(
       ((): Repository<AbstractAuthUser> => {

@@ -10,14 +10,14 @@ import { RoleRepository } from './auth.repositories';
 const logger = new Logger('AdminAuthService');
 
 @Injectable()
-export class AdminAuthService extends AbstractAuthService<AdminUser> {
+export class AdminAuthService extends AbstractAuthService {
   private readonly roleRepository: RoleRepository;
 
   constructor(
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    super(connection.getRepository(AdminUser));
+    super(connection.getRepository(AdminUser) as any);
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
@@ -25,9 +25,9 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     const { hash, salt } = this.encrypt(password);
     const roles = await this.roleRepository.findByNames(roleNames);
 
-    let user = await this.getUser({ username, email });
+    let user = (await this.getUser({ username, email })) as AdminUser;
     if (!user) {
-      user = this.userRepository.create({ email, username, isActive: true });
+      user = this.userRepository.create({ email, username, isActive: true }) as AdminUser;
     }
     logger.log(`found user ${r(user)}`);
     user.password = hash;
