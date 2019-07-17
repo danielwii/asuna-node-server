@@ -41,6 +41,11 @@ export class RedisProvider {
       isEnabled: configObject.enable,
       redisOptions,
     });
+
+    if (!configObject.enable) {
+      return redisClientObject;
+    }
+
     // https://github.com/NodeRedis/node_redis#bluebird-promises
     bluebird.promisifyAll(redis);
     const client = redis.createClient(redisOptions);

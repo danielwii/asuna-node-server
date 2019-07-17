@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
+import { oneLineTrim } from 'common-tags';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import {
@@ -11,6 +12,7 @@ import {
   Repository,
   UpdateResult,
 } from 'typeorm';
+import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { DBHelper } from '../db';
 import { AdminUser } from './auth.entities';
@@ -83,14 +85,15 @@ export class AuthService {
    * @returns {Promise<boolean>}
    */
   async validateUser(jwtPayload: IJwtPayload): Promise<boolean> {
-    const user = await this.getUser(
-      { email: jwtPayload.email, username: jwtPayload.username },
-      true,
-    );
+    const identifier = { email: jwtPayload.email, username: jwtPayload.username };
+    const user = await this.getUser(identifier, true);
 
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     const validated = user != null && user.id === jwtPayload.id;
-    logger.debug(`validateUser >> exists: ${!!user}, isValidated: ${validated}. left: ${left}ms`);
+    logger.debug(oneLineTrim`
+      validateUser >> identifier: ${r(identifier)} 
+      exists: ${!!user}, isValidated: ${validated}. left: ${left}ms
+    `);
     return validated;
   }
 
