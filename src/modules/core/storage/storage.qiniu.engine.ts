@@ -19,7 +19,8 @@ export class QiniuStorage implements IStorageEngine {
   private static readonly logger = new Logger(QiniuStorage.name);
   // private temp: string;
   private readonly mac: qiniu.auth.digest.Mac;
-  constructor(private configLoader: () => QiniuConfigObject) {
+
+  constructor(private readonly configLoader: () => QiniuConfigObject) {
     const configObject = configLoader();
     QiniuStorage.logger.log(
       `[constructor] init [${configObject.bucket}] with default prefix:${configObject.prefix} ...`,
@@ -37,6 +38,7 @@ export class QiniuStorage implements IStorageEngine {
     // this.temp = fsExtra.mkdtempSync('temp');
     this.mac = new qiniu.auth.digest.Mac(configObject.accessKey, configObject.secretKey);
   }
+
   public saveEntity(
     file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
@@ -115,6 +117,13 @@ export class QiniuStorage implements IStorageEngine {
     },
     res,
   ) {
-    return Promise.resolve(join(bucket, prefix, filename));
+    const configObject = this.configLoader();
+    QiniuStorage.logger.log(`resolve url by ${r({ bucket, prefix, filename })}`);
+    // TODO 应该约定 filename 中不包含 prefix
+    let fixedPrefix = prefix;
+    if (!filename.startsWith(configObject.prefix)) {
+      fixedPrefix = prefix || configObject.prefix;
+    }
+    return Promise.resolve(`${configObject.domain}/${join(fixedPrefix, filename)}`);
   }
 }

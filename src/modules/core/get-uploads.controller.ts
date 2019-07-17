@@ -12,7 +12,7 @@ import {
 import { ApiUseTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import * as fsExtra from 'fs-extra';
-import * as path from 'path';
+import { join } from 'path';
 import { r } from '../common/helpers';
 import { FinderService } from '../finder';
 import { ControllerLoggerInterceptor } from '../logger';
@@ -100,7 +100,7 @@ export class GetUploadsController {
   //   @Query('bucket') bucket: string = 'default',
   //   @Res() res: Response,
   // ) {
-  //   const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+  //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     return this.context.defaultStorageEngine.resolveUrl(
   //       { filename, bucket, prefix, thumbnailConfig, jpegConfig },
@@ -116,7 +116,7 @@ export class GetUploadsController {
   //   @Query('bucket') bucket: string = 'videos',
   //   @Res() res: Response,
   // ) {
-  //   const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+  //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
   //     if (!fsExtra.existsSync(fullFilePath)) {
@@ -135,7 +135,7 @@ export class GetUploadsController {
   //   @Query('bucket') bucket: string = 'attaches',
   //   @Res() res: Response,
   // ) {
-  //   const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+  //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
   //     if (!fsExtra.existsSync(fullFilePath)) {
@@ -155,7 +155,7 @@ export class GetUploadsController {
   //   @Res() res: Response,
   // ) {
   //   console.log(this.context.uploadPath, { bucket, prefix, filename });
-  //   const fullFilePath = path.join(this.context.uploadPath, bucket, prefix, filename);
+  //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
   //     if (!fsExtra.existsSync(fullFilePath)) {
