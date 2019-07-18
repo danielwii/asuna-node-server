@@ -1,9 +1,12 @@
 import { Logger } from '@nestjs/common';
+import { plainToClass, Transform } from 'class-transformer';
+import { IsDate, IsInt, IsString } from 'class-validator';
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r } from '../../common';
 import { random } from '../helpers';
-import { OperationToken, OperationTokenType } from './entities';
+import { OperationToken, OperationTokenType, TokenRule } from './entities';
 
 const logger = new Logger('OperationTokenHelper');
 
@@ -12,36 +15,88 @@ export const SysTokenServiceName = {
   SysInvite: 'sys#sys-invite',
 };
 
-export type TokenRule = 'sys' | 'app' | 'web' | 'operation' | 'other';
+export type CommonTokenOpts = {
+  payload?: object;
+  identifier: string;
+  role: keyof typeof TokenRule;
+  service: string;
+  key: string;
+};
+
+/**
+ * @param payload
+ * @param identifier id=user.id
+ * @param role 'sys' | 'app' | 'web' | 'other'
+ * @param expiredIn in minutes. default: 1 year
+ * @param service 用于定位所使用的服务
+ * @param remainingCount default: 1
+ */
+export type ObtainTokenOpts = (
+  | { type: 'Unlimited' }
+  | { type: 'OneTime' }
+  | { type: 'MultiTimes'; remainingCount: number }
+  | { type: 'TimeBased'; expiredAt: Date }
+  | { type: 'TimeBased'; expiredInMinutes: number }) &
+  CommonTokenOpts;
+
+export class OperationTokenOpts {
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly key: string;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly service: string;
+  readonly role: keyof typeof TokenRule;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly identifier: string;
+  readonly payload?: object;
+
+  readonly type: 'Unlimited' | 'OneTime' | 'MultiTimes' | 'TimeBased' | 'TimeBased';
+
+  @IsInt()
+  @Transform(value => Number(value))
+  readonly remainingCount?: number;
+
+  @IsDate()
+  readonly expiredAt?: Date;
+
+  @IsInt()
+  @Transform(value => Number(value))
+  readonly expiredInMinutes?: number;
+
+  constructor(o: OperationTokenOpts) {
+    if (o == null) {
+      return;
+    }
+
+    Object.assign(this, plainToClass(OperationTokenOpts, o, { enableImplicitConversion: true }));
+  }
+
+  static obtain(o: ObtainTokenOpts) {
+    return new OperationTokenOpts(o);
+  }
+}
+
+export type DeprecateTokenParams = {
+  identifier: string;
+  role: keyof typeof TokenRule;
+  service: string;
+  key: string;
+};
 
 export class OperationTokenHelper {
   /**
    * same { role, identifier, service } will return same token
-   * @param payload
-   * @param identifier id=user.id
-   * @param role 'sys' | 'app' | 'web' | 'other'
-   * @param expiredIn in minutes. default: 1 year
-   * @param service 用于定位所使用的服务
-   * @param remainingCount default: 1
    */
-  static async obtainToken({
-    type,
-    payload,
-    identifier,
-    role,
-    expiredInMinutes,
-    service,
-    remainingCount,
-  }: {
-    type: keyof typeof OperationTokenType;
-    payload?: object;
-    identifier: string;
-    role: TokenRule;
-    service: string;
-    expiredInMinutes?: number;
-    remainingCount?: number;
-  }) {
-    const existToken = await OperationTokenHelper.redeemToken({ role, identifier, service });
+  static async obtainToken(opts: ObtainTokenOpts) {
+    const { key, role, identifier, service, type, payload } = opts;
+    const existToken = _.first(
+      await OperationTokenHelper.redeemTokens({ key, role, identifier, service }),
+    );
+    logger.log(`found token: ${r(existToken)}`);
     if (existToken) {
       return existToken;
     }
@@ -50,24 +105,29 @@ export class OperationTokenHelper {
 
     const typeOptions: Partial<OperationToken> = {
       [OperationTokenType.OneTime]: { remainingCount: 1 },
-      [OperationTokenType.MultiTimes]: { remainingCount },
+      [OperationTokenType.MultiTimes]: { remainingCount: _.get(opts, 'remainingCount') },
       [OperationTokenType.Unlimited]: {},
-      [OperationTokenType.Any]: {
-        remainingCount,
-        expiredAt: moment()
-          .add(expiredInMinutes, 'minutes')
-          .toDate(),
-      },
+      // [OperationTokenType.Any]: {
+      //   remainingCount,
+      //   expiredAt:
+      //     expiredAt ||
+      //     moment()
+      //       .add(expiredInMinutes, 'minutes')
+      //       .toDate(),
+      // },
       [OperationTokenType.TimeBased]: {
-        expiredAt: moment()
-          .add(expiredInMinutes, 'minutes')
-          .toDate(),
+        expiredAt:
+          _.get(opts, 'expiredAt') ||
+          moment()
+            .add(_.get(opts, 'expiredInMinutes'), 'minutes')
+            .toDate(),
       },
     }[type];
 
     logger.log(`create token with type options ${r(typeOptions)}`);
 
     return OperationToken.create({
+      key,
       type,
       identifier,
       token,
@@ -84,48 +144,57 @@ export class OperationTokenHelper {
   }
 
   /**
-   * TODO same option should only has one activated token
+   * 同一个 key 下的 service 下只有一个可用的 token
+   * @param key
    * @param role
    * @param identifier
    * @param service
    */
-  static async redeemToken({
+  static redeemTokens({
+    key,
     role,
     identifier,
     service,
   }: {
+    key?: string;
     identifier: string;
-    role: TokenRule;
+    role: keyof typeof TokenRule;
     service: string;
-  }): Promise<OperationToken> {
-    return OperationToken.findOne({
-      where: { role, identifier, service, isActive: true, isDeprecated: false, isExpired: false },
+  }): Promise<OperationToken[]> {
+    logger.log(`redeem token: ${r({ key, role, identifier, service })}`);
+    return OperationToken.find({
+      where: {
+        ...(key ? { key } : null),
+        role,
+        identifier,
+        service,
+        isActive: true,
+        isDeprecated: false,
+        isExpired: false,
+      },
       order: { updatedAt: 'DESC' },
     });
   }
 
-  static async deprecateTokens({
+  static async deprecateToken({
+    key,
     role,
     identifier,
     service,
-  }: {
-    identifier: string;
-    role: TokenRule;
-    service: string;
-  }): Promise<UpdateResult> {
-    return OperationToken.update({ role, identifier, service }, { isDeprecated: true });
+  }: DeprecateTokenParams): Promise<UpdateResult> {
+    return OperationToken.update({ key, role, identifier, service }, { isDeprecated: true });
   }
 
-  static async redeemTokenByToken(token: string) {
-    if (token) {
-      return token.length === 9
-        ? OperationTokenHelper.redeemTokenByID({ shortId: token })
-        : OperationTokenHelper.redeemTokenByID({ token });
+  static async getTokenByToken(tokenOrShortId: string) {
+    if (tokenOrShortId) {
+      return tokenOrShortId.length === 9
+        ? OperationTokenHelper.getToken({ shortId: tokenOrShortId })
+        : OperationTokenHelper.getToken({ token: tokenOrShortId });
     }
     return null;
   }
 
-  static async redeemTokenByID({ token, shortId }: { token?: string; shortId?: string }) {
+  static async getToken({ token, shortId }: { token?: string; shortId?: string }) {
     if ((token && token.trim()) || (shortId && shortId.trim())) {
       return OperationToken.findOne({
         where: {
@@ -138,7 +207,7 @@ export class OperationTokenHelper {
   }
 
   static async consumeToken(token: string) {
-    const operationToken = await OperationTokenHelper.redeemTokenByToken(token);
+    const operationToken = await OperationTokenHelper.getTokenByToken(token);
     if (OperationTokenHelper.checkAvailable(operationToken)) {
       if (operationToken.remainingCount) operationToken.remainingCount -= 1;
       operationToken.usedCount = operationToken.usedCount ? operationToken.usedCount + 1 : 1;

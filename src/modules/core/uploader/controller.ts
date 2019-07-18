@@ -22,7 +22,7 @@ import {
 import * as assert from 'assert';
 import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString, Min, Validator } from 'class-validator';
+import { IsIn, IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
@@ -36,7 +36,7 @@ import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
-import { OperationTokenGuard, OperationTokenRequest } from '../token';
+import { OperationTokenGuard, OperationTokenRequest, TokenRule } from '../token';
 import { UploaderHelper } from './helper';
 import { UploaderService } from './service';
 
@@ -62,13 +62,30 @@ const fileInterceptorOptions = {
   },
 };
 
-class CreateChunksUploadTaskDTO {
+class CreateChunksUploadTaskDto {
   @IsString()
   @Transform(value => _.trim(value))
   filename: string;
+
   @IsNumber()
   @Min(1)
   totalChunks: number;
+}
+
+class CreateChunksUploadTaskQuery {
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly key: string;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly filename: string;
+
+  @IsNumber()
+  @Min(1)
+  @IsOptional()
+  @Transform(value => Number(value))
+  readonly totalChunks: number = 1;
 }
 
 @ApiUseTags('core')
@@ -81,9 +98,10 @@ export class UploaderController {
 
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
-  createChunksUploadTask(@Body() dto: CreateChunksUploadTaskDTO, @Req() req: AnyAuthRequest) {
+  createChunksUploadTask(@Query() query: CreateChunksUploadTaskQuery, @Req() req: AnyAuthRequest) {
     const { identifier } = req;
-    return UploaderHelper.createChunksUploadTask(identifier, dto.filename, dto.totalChunks);
+    logger.log(`createChunksUploadTask: ${r(query)}`);
+    return UploaderHelper.createChunksUploadTask({ ...query, identifier });
   }
 
   @ApiBearerAuth()
@@ -149,8 +167,11 @@ export class UploaderController {
 
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  async mergeChunks(@Req() req: AnyAuthRequest & OperationTokenRequest) {
-    return this.uploaderService.mergeChunks(req.token);
+  async mergeChunks(
+    @Query('filename') filename: string,
+    @Req() req: AnyAuthRequest & OperationTokenRequest,
+  ) {
+    return this.uploaderService.mergeChunks(req.token, filename);
   }
 
   @ApiBearerAuth()

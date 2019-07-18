@@ -8,7 +8,7 @@ export async function validateObject(object) {
   }
 }
 
-export function validateObject2(object) {
+export function validateObjectSync(object) {
   const errors = validateSync(object);
   if (errors.length) {
     throw new AsunaException(AsunaError.Unprocessable, `invalid settings ${r(errors)}`);

@@ -1,23 +1,42 @@
 import { html } from 'common-tags';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { EntityMetaInfo, Json, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, Json, JsonMap, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadJSON } from '../helpers';
+
+export const TokenRule = {
+  sys: 'sys',
+  auth: 'auth',
+  operation: 'operation',
+  other: 'other',
+};
 
 export const OperationTokenType = {
   OneTime: 'OneTime',
   MultiTimes: 'MultiTimes',
   TimeBased: 'TimeBased',
   Unlimited: 'Unlimited',
-  Any: 'Any',
+  // Any: 'Any',
 };
 
 @EntityMetaInfo({ name: 'sys_operation_tokens' })
 @Entity('sys__t_operation_tokens')
 export class OperationToken extends AbstractBaseEntity {
-  @MetaInfo({ name: 'Role', help: 'app / sys / web' })
-  @Column('varchar', { nullable: false, length: 50, name: 'role' })
-  role: string;
+  @MetaInfo({
+    name: 'Role',
+    type: 'Enum',
+    enumData: TokenRule,
+    help: html`
+      <ul>
+        <li>sys - 系统生成</li>
+        <li>auth - 认证专用</li>
+        <li>operation - 用户生成</li>
+        <li>other - 其他</li>
+      </ul>
+    `,
+  })
+  @Column('varchar', { nullable: false, length: 50 })
+  role: keyof typeof TokenRule;
 
   @MetaInfo({
     name: 'Type',
@@ -33,12 +52,16 @@ export class OperationToken extends AbstractBaseEntity {
       </ul>
     `,
   })
-  @Column('varchar', { nullable: false })
+  @Column('varchar', { nullable: false, length: 50 })
   type: keyof typeof OperationTokenType;
 
   @MetaInfo({ name: 'Identifier', help: 'user.id / admin.id' })
   @Column({ nullable: false, name: 'identifier' })
   identifier: string;
+
+  @MetaInfo({ name: 'Key', help: '同样的 service 下 key 应该是唯一的' })
+  @Column({ nullable: true, name: 'key' })
+  key: string;
 
   @MetaInfo({ name: 'Token' })
   @Column({ nullable: false, length: 32, name: 'token' })
@@ -50,7 +73,7 @@ export class OperationToken extends AbstractBaseEntity {
 
   @MetaInfo({ name: 'Body' })
   @Column(jsonType(), { nullable: true, name: 'body' })
-  body: Json;
+  body: any;
 
   @MetaInfo({ name: 'Service', help: 'web-login / app-login / opt-secret / etc.' })
   @Column('varchar', { nullable: false, length: 50, name: 'service' })

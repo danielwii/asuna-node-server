@@ -30,7 +30,9 @@ export class FinderService {
 
     if (type === 'assets') {
       const upstream = upstreams.value[name || 'default'];
-      const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream);
+      const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream, {
+        enableImplicitConversion: true,
+      });
       if (!finderAssetsSettings) {
         throw new AsunaException(
           AsunaError.Unprocessable,

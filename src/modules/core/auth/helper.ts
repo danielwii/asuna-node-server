@@ -6,7 +6,7 @@ import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = new Logger('AuthHelper');
 
-export type AnyAuthRequest = Request & Partial<{ user: any; identifier: any }>;
+export type AnyAuthRequest = Request & Partial<{ user: any; identifier: string }>;
 
 export function isAdminAuthRequest(req: Request) {
   const authorization = req.headers.authorization;
@@ -21,7 +21,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
         if (err || info) {
           logger.warn(`api-key auth error: ${r(err)}`);
         } else {
-          req.identifier = user; // { apiKey: xxx }
+          req.identifier = `api-key=${user.apiKey}`; // { apiKey: xxx }
         }
         resolve({ err, user, info });
       })(req, res);
@@ -35,7 +35,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
         if (err || info) {
           logger.warn(`admin-jwt auth error: ${r(err)}`);
         } else {
-          req.identifier = user;
+          req.identifier = `admin=${user.id}`;
           req.user = user; // only inject client side user to req
         }
         resolve({ err, user, info });
@@ -49,7 +49,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
       if (err || info) {
         logger.warn(`jwt auth error: ${r(err)}`);
       } else {
-        req.identifier = user;
+        req.identifier = `user=${user.id}`;
         req.user = user; // only inject client side user to req
       }
       resolve({ err, user, info });

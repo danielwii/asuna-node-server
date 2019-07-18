@@ -1,6 +1,9 @@
+import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
-
+import { r } from '../../common/helpers';
 import { jsonType } from './column.helper';
+
+const logger = new Logger('EntityHelper');
 
 export function safeReloadArray<Entity>(entity: Entity, column: keyof Entity) {
   if (jsonType() === 'simple-json') {
@@ -10,7 +13,7 @@ export function safeReloadArray<Entity>(entity: Entity, column: keyof Entity) {
           JSON.parse(entity[column] as any);
         }
       } catch (e) {
-        console.error(e);
+        logger.error(r(e));
         entity[column] = [] as any;
       }
     } else {
@@ -27,7 +30,7 @@ export function safeReloadObject<Entity>(entity: Entity, column: keyof Entity) {
           JSON.parse(entity[column] as any);
         }
       } catch (e) {
-        console.error(e);
+        logger.error(r(e));
         entity[column] = {} as any;
       }
     } else {
@@ -44,7 +47,7 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity) {
           JSON.parse(entity[column] as any);
         }
       } catch (e) {
-        console.error(e);
+        logger.error(r(e));
         entity[column] = null;
       }
     } else {

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as _ from 'lodash';
 import { configLoader } from '../config.helper';
 
@@ -29,8 +29,8 @@ export class QiniuConfigObject {
   @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;
 
-  constructor(partial: Partial<QiniuConfigObject>) {
-    Object.assign(this, partial);
+  constructor(o: Partial<QiniuConfigObject>) {
+    Object.assign(this, plainToClass(QiniuConfigObject, o, { enableImplicitConversion: true }));
   }
 
   static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
@@ -87,8 +87,8 @@ export class MinioConfigObject {
   @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;
 
-  constructor(partial: Partial<MinioConfigObject>) {
-    Object.assign(this, partial);
+  constructor(o: Partial<MinioConfigObject>) {
+    Object.assign(this, plainToClass(MinioConfigObject, o, { enableImplicitConversion: true }));
   }
 
   static load(): MinioConfigObject {

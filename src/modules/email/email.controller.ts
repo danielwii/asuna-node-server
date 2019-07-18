@@ -2,6 +2,7 @@ import { Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import * as util from 'util';
+import { r } from '../common/helpers';
 import { EmailService } from './email.service';
 
 const logger = new Logger('EmailController');
@@ -29,8 +30,8 @@ export class EmailController {
 
     this.mailService
       .send(body)
-      .then(console.log)
-      .catch(console.error);
+      .then(value => logger.log(r(value)))
+      .catch(reason => logger.warn(r(reason)));
 
     return;
   }

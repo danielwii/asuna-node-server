@@ -1,3 +1,5 @@
+import { plainToClass, Transform } from 'class-transformer';
+import { IsString } from 'class-validator';
 import { Response } from 'express';
 import * as _ from 'lodash';
 import * as mime from 'mime-types';
@@ -11,28 +13,45 @@ export enum StorageMode {
 }
 
 export class FileInfo {
-  public readonly filename: string;
-  public readonly path: string;
-  public readonly mimetype?: string;
-  public readonly extension?: string;
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly filename: string;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly path: string;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly mimetype?: string;
+
+  @IsString()
+  @Transform(value => _.trim(value))
+  readonly extension?: string;
+
   constructor(o: FileInfo) {
+    if (o == null) {
+      return;
+    }
+
+    Object.assign(this, plainToClass(FileInfo, o, { enableImplicitConversion: true }));
     this.mimetype = o.mimetype || mime.lookup(o.filename) || 'application/octet-stream';
     this.extension = o.extension || mime.extension(this.mimetype) || 'bin';
   }
 }
 
 export class SavedFile extends FileInfo {
-  public readonly bucket: string; // default: 'default'
-  public readonly region?: string; // default: 'local'
-  public readonly prefix: string;
-  public readonly size?: number;
-  public readonly mode: StorageMode;
+  readonly bucket: string; // default: 'default'
+  readonly region?: string; // default: 'local'
+  readonly prefix: string;
+  readonly size?: number;
+  readonly mode: StorageMode;
   // 用于访问的资源地址
-  public readonly fullpath: string;
+  readonly fullpath: string;
 
   constructor(o: SavedFile) {
     super(o);
-    Object.assign(this, o);
+    Object.assign(this, plainToClass(SavedFile, o, { enableImplicitConversion: true }));
   }
 }
 
@@ -92,8 +111,4 @@ export interface IStorageEngine {
 export function yearMonthStr() {
   const now = new Date();
   return `${now.getFullYear()}/${now.getMonth() + 1}`;
-}
-
-export function convertFilename(filename: string) {
-  return filename.replace(/[^\w._]+/g, '_');
 }

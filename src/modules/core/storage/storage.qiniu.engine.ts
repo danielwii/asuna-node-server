@@ -2,19 +2,12 @@ import { Logger } from '@nestjs/common';
 import { classToPlain } from 'class-transformer';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
-import { ErrorException, r } from '../../common';
+import { convertFilename, ErrorException, r } from '../../common';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { QiniuConfigObject } from './storage.config';
-import {
-  convertFilename,
-  FileInfo,
-  IStorageEngine,
-  SavedFile,
-  StorageMode,
-  yearMonthStr,
-} from './storage.engines';
+import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = new Logger(QiniuStorage.name);

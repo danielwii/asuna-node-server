@@ -2,7 +2,7 @@ import { Logger, UseInterceptors } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
-import { r } from '../../common/helpers';
+import { formatTime, r } from '../../common/helpers';
 import { ControllerLoggerInterceptor } from '../../logger';
 import { ConfigKeys, configLoader } from '../config.helper';
 import { IJwtPayload } from './auth.interfaces';
@@ -53,8 +53,8 @@ export abstract class AbstractAuthService {
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     const validated = user != null && user.id === jwtPayload.id;
     logger.debug(oneLineTrim`
-      validateUser >> identifier: ${r(identifier)} 
-      exists: ${!!user}, isValidated: ${validated}. left: ${left}ms
+      validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}. 
+      left: ${formatTime(left)}
     `);
     return validated;
   }

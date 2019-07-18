@@ -37,13 +37,14 @@ export class AnyAuthGuard implements CanActivate {
     this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res).catch(reason => this.logger.warn(r(reason)));
 
-    if (!_.get(result, 'user')) {
+    const user = _.get(result, 'user');
+    if (!user) {
       throw new AsunaException(
         AsunaError.InsufficientPermissions,
         _.get(result, 'err') || _.get(result, 'info'),
       );
     }
 
-    return !!result;
+    return !!user;
   }
 }

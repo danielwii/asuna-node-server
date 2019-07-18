@@ -134,7 +134,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
 
     // dataLoaderProxy()
     //   .preload()
-    //   .catch(console.error);
+    //   .catch(reason => logger.warn(r(reason)));
 
     return app;
   });

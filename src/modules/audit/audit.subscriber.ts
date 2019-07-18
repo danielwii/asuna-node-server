@@ -9,6 +9,7 @@ import {
   RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
+import { r } from '../common/helpers';
 import { AuditService } from './audit.service';
 
 const logger = new Logger('AuditSubscriber');
@@ -19,16 +20,14 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   private auditService: AuditService = new AuditService();
 
   constructor() {
-    logger.log(`init ...`);
+    logger.log('init ...');
   }
 
   afterInsert(event: InsertEvent<any>) {
     // console.log('afterInsert', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    logger.log(
-      `call afterInsert... ${event.entity.constructor.name} ${JSON.stringify(event.entity)}`,
-    );
+    logger.log(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',
@@ -38,7 +37,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         event.entity,
         null,
       )
-      .catch(console.error);
+      .catch(reason => logger.warn(r(reason)));
   }
 
   async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
@@ -49,9 +48,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
       loadRelationIds: true,
     });
     if (entity) {
-      logger.log(
-        `call beforeUpdate... ${event.entity.constructor.name} ${JSON.stringify(event.entity)}`,
-      );
+      logger.log(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
       this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity });
     }
   }
@@ -62,7 +59,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
     const from = this.map.get(`${event.entity.name}-${event.entity.id}`);
     logger.log(
-      `call afterUpdate... ${event.entity.constructor.name} ${JSON.stringify({
+      `call afterUpdate... ${event.entity.constructor.name} ${r({
         diff: diff(from, event.entity),
       })}`,
     );
@@ -76,16 +73,14 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
       )
       .then(() => this.map.delete(`${event.entity.name}-${event.entity.id}`))
-      .catch(console.error);
+      .catch(reason => logger.warn(r(reason)));
   }
 
   afterRemove(event: RemoveEvent<any>) {
     // console.log('afterRemove', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    logger.log(
-      `call afterRemove... ${event.entity.constructor.name} ${JSON.stringify(event.entity)}`,
-    );
+    logger.log(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',
@@ -95,6 +90,6 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
         null,
       )
-      .catch(console.error);
+      .catch(reason => logger.warn(r(reason)));
   }
 }

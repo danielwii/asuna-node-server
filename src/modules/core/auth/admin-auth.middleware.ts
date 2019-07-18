@@ -15,11 +15,10 @@ export class AdminAuthMiddleware {
     return async (req: Request, res: Response, next: () => void) => {
       const url = req.originalUrl;
       const matched = _.find(routeFilters, routeFilter => url.startsWith(routeFilter));
-      logger.log(`check url: ${r({ url, routeFilters, matched })}`);
       if (!matched) {
         return next();
       }
-      logger.log(`check url: ${url}`);
+      logger.log(`check url: ${r({ url, routeFilters, matched })}`);
       if (['/admin/auth/reset-password', '/admin/auth/token'].includes(url)) {
         return next();
       }

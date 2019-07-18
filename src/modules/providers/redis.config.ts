@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
 import { configLoader } from '../core/config.helper'; // TODO refactor
 
@@ -22,8 +22,8 @@ export class RedisConfigObject {
   db?: number;
   enable?: boolean;
 
-  constructor(partial: Partial<RedisConfigObject>) {
-    Object.assign(this, partial);
+  constructor(o: Partial<RedisConfigObject>) {
+    Object.assign(this, plainToClass(RedisConfigObject, o, { enableImplicitConversion: true }));
   }
 
   static load(prefix: string = ''): RedisConfigObject {

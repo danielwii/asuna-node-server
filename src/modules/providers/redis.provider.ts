@@ -35,12 +35,16 @@ export class RedisProvider {
     const configObject = RedisConfigObject.loadOr(prefix);
     const redisOptions = configObject.getOptions(db);
     logger.log(`init redis provider: ${r(configObject, true)} with ${r({ prefix, db })}`);
-    const redisClientObject = plainToClass(RedisClientObject, {
-      client: null,
-      isHealthy: false,
-      isEnabled: configObject.enable,
-      redisOptions,
-    });
+    const redisClientObject = plainToClass(
+      RedisClientObject,
+      {
+        client: null,
+        isHealthy: false,
+        isEnabled: configObject.enable,
+        redisOptions,
+      },
+      { enableImplicitConversion: true },
+    );
 
     if (!configObject.enable) {
       return redisClientObject;
