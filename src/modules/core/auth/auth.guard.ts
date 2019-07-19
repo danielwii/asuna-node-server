@@ -8,14 +8,14 @@ import { AnyAuthRequest, auth } from './helper';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  logger = LoggerFactory.getLogger('JwtAuthGuard');
+  static logger = LoggerFactory.getLogger('JwtAuthGuard');
 
   constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
   }
 
   handleRequest(err, user, info) {
-    this.logger.log(`handleRequest ${r({ err, user, info })}`);
+    JwtAuthGuard.logger.log(`handleRequest ${r({ err, user, info })}`);
     if (err || !user) {
       if (this.opts.anonymousSupport) {
         return null;
@@ -28,15 +28,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  logger = LoggerFactory.getLogger('AnyAuthGuard');
+  static logger = LoggerFactory.getLogger('AnyAuthGuard');
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();
     const next = context.switchToHttp().getNext();
 
-    this.logger.log(`check url: ${req.url}`);
-    const result = await auth(req, res).catch(reason => this.logger.warn(r(reason)));
+    AnyAuthGuard.logger.log(`check url: ${req.url}`);
+    const result = await auth(req, res).catch(reason => AnyAuthGuard.logger.warn(r(reason)));
 
     const user = _.get(result, 'user');
     if (!user) {

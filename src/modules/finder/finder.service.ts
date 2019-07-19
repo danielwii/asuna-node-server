@@ -37,14 +37,14 @@ export class FinderService {
       if (!finderAssetsSettings) {
         throw new AsunaException(
           AsunaError.Unprocessable,
-          `invalid upstream ${JSON.stringify(upstream)}`,
+          `invalid upstream ${JSON.stringify(upstream)} for finder`,
         );
       }
       const errors = await validate(finderAssetsSettings);
       if (errors.length) {
         throw new AsunaException(
           AsunaError.Unprocessable,
-          `invalid settings ${JSON.stringify(errors)}`,
+          `invalid settings ${JSON.stringify(errors)} for finder`,
         );
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');

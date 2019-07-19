@@ -4,6 +4,7 @@ import * as Email from 'email-templates';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
 import * as util from 'util';
+import { r } from '../common/helpers';
 import { configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
 import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core';
 import { LoggerFactory } from '../logger';
@@ -24,14 +25,11 @@ export class EmailService {
       configLoader.loadConfig('MAIL_PASSWORD')
     ) {
       logger.log(
-        `set ${util.inspect(
-          {
-            MAIL_HOST: configLoader.loadConfig('MAIL_HOST'),
-            MAIL_PORT: configLoader.loadNumericConfig('MAIL_PORT'),
-            MAIL_SSL: `${configLoader.loadConfig('MAIL_SSL')}`,
-          },
-          { colors: true },
-        )}`,
+        `set ${r({
+          MAIL_HOST: configLoader.loadConfig('MAIL_HOST'),
+          MAIL_PORT: configLoader.loadNumericConfig('MAIL_PORT'),
+          MAIL_SSL: `${configLoader.loadConfig('MAIL_SSL')}`,
+        })}`,
       );
       this.transport = nodemailer.createTransport({
         host: configLoader.loadConfig('MAIL_HOST'),

@@ -2,16 +2,15 @@ import * as clc from 'cli-color';
 import * as winston from 'winston';
 import { format, transports } from 'winston';
 import { fixedPath, r } from '../common/helpers';
-import { LoggerConfigObject, LogLevel } from './config';
 
 export class LoggerService {
   private logger: winston.Logger;
   private requestId: string;
   private context: string;
 
-  constructor(level?: LogLevel) {
+  constructor() {
     this.logger = winston.createLogger({
-      level: level || LoggerConfigObject.load().level,
+      // level: level || LoggerConfigObject.load().level,
       format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         this.getLoggerFormat(),

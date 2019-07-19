@@ -1,4 +1,3 @@
-import { diff } from 'jsondiffpatch';
 import * as _ from 'lodash';
 import {
   EntitySubscriberInterface,
@@ -27,7 +26,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('afterInsert', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    logger.log(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // logger.verbose(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',
@@ -48,7 +47,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
       loadRelationIds: true,
     });
     if (entity) {
-      logger.log(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
+      // logger.verbose(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
       this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity });
     }
   }
@@ -58,11 +57,11 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     const from = this.map.get(`${event.entity.name}-${event.entity.id}`);
-    logger.log(
-      `call afterUpdate... ${event.entity.constructor.name} ${r({
-        diff: diff(from, event.entity),
-      })}`,
-    );
+    // logger.verbose(
+    //   `call afterUpdate... ${event.entity.constructor.name} ${r({
+    //     diff: diff(from, event.entity),
+    //   })}`,
+    // );
     this.auditService
       .addRecord(
         'entity',
@@ -80,7 +79,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('afterRemove', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    logger.log(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // logger.verbose(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',

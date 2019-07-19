@@ -1,7 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
-import * as util from 'util';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../logger';
 import { EmailService } from './email.service';
@@ -27,7 +26,7 @@ export class EmailController {
 
   @Post()
   send(@Body() body: MailBody) {
-    logger.log(`send ${util.inspect(body, { colors: true })}`);
+    logger.log(`send ${r(body)}`);
 
     this.mailService
       .send(body)

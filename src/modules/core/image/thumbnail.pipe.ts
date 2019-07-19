@@ -2,7 +2,7 @@ import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { FitEnum } from 'sharp';
-import * as util from 'util';
+import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../logger';
 
 const logger = LoggerFactory.getLogger('ThumbnailPipe');
@@ -32,11 +32,11 @@ export class ThumbnailPipe implements PipeTransform {
         [thumbnail.width, thumbnail.height] = params[0]
           .split('x')
           .map(val => (val ? _.toNumber(val) : null));
-        logger.log(util.inspect({ value, metatype, param, thumbnail }, { colors: true }));
+        logger.log(r({ value, metatype, param, thumbnail }));
         return { opts: thumbnail, param };
       }
     } catch (e) {
-      logger.warn(e.message);
+      logger.warn(r(e));
       return { opts: thumbnail, param };
     }
     return {};

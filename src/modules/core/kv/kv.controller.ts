@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import * as util from 'util';
+import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../logger';
 import { KeyValuePair, ValueType } from './kv.entities';
 import { KvService } from './kv.service';
@@ -47,13 +48,13 @@ export class KvController {
 
   @Post('kv')
   async set(@Body() kvPair: KvPair) {
-    logger.log(`set ${util.inspect(kvPair, { colors: true })}`);
+    logger.log(`set ${r(kvPair)}`);
     return this.kvService.set(KeyValuePair.create(kvPair));
   }
 
   @Get('kv')
   get(@Query() query: GetKvPairRequest) {
-    logger.log(`get ${util.inspect(query, { colors: true })}`);
+    logger.log(`get ${r(query)}`);
     return this.kvService.get(query.collection, query.key);
   }
 

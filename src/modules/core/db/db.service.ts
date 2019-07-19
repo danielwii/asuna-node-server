@@ -1,6 +1,5 @@
 import { getConnection, getRepository, Repository } from 'typeorm';
-import * as util from 'util';
-import { Profile } from '../../common';
+import { Profile, r } from '../../common';
 import { LoggerFactory } from '../../logger';
 import { DBHelper, parseFields } from './db.helper';
 
@@ -23,7 +22,7 @@ export class DBService {
     const repository = DBHelper.repo(opts.entity);
     const parsedFields = parseFields(opts.fields);
 
-    logger.log(`get ${util.inspect({ opts, parsedFields }, { colors: true })}`);
+    logger.log(`get ${r({ opts, parsedFields })}`);
 
     const queryBuilder = repository.createQueryBuilder(opts.entity);
 

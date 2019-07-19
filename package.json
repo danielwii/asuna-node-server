@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "index.ts",
@@ -11,8 +11,8 @@
     "build": "yarn tsc",
     "prebuild": "yarn clean",
     "postinstall": "yarn build",
-    "test": "ENV=test jest",
-    "test:cov": "ENV=test jest --coverage --no-cache",
+    "test": "ENV=test jest --forceExit --detectOpenHandles",
+    "test:cov": "ENV=test jest --coverage --no-cache --forceExit --detectOpenHandles",
     "check:circular": "npx madge --circular --extensions ts ./"
   },
   "devDependencies": {
@@ -88,7 +88,6 @@
     "lru-cache": "^5.1.1",
     "mime-types": "^2.1.24",
     "minio": "^7.0.10",
-    "module-alias": "^2.2.0",
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
     "node-buffs": "^0.6.4",

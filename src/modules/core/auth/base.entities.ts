@@ -1,11 +1,12 @@
-import { IsEmail } from 'class-validator';
+import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
-  @Column({ nullable: true, unique: true })
   @IsEmail()
+  @IsOptional()
+  @Column({ nullable: true, unique: true })
   email: string;
 
   @Column({ nullable: false, unique: true, length: 100 })

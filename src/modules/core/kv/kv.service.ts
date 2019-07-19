@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
-import { ValidationException } from '../../common';
+import { r, ValidationException } from '../../common';
 import { LoggerFactory } from '../../logger';
 import { KeyValuePair, ValueType } from './kv.entities';
 
@@ -53,9 +53,7 @@ function recognizeTypeValue(type: string, value: any) {
       newValue = toJson(value);
     }
   }
-  // logger.log(
-  //   `recognizeTypeValue ${util.inspect({ type, value, newType, newValue }, { colors: true })}`,
-  // );
+  // logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
   return [newType || 'string', newValue];
 }
 
@@ -97,12 +95,12 @@ export class KvService {
       collection:
         collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    logger.log(`inspect ${JSON.stringify({ collection, key, type, name, value, stringifyValue })}`);
+    logger.log(`inspect ${r({ collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
-    logger.log(`set ${util.inspect({ entity, exists }, { colors: true })}`);
+    logger.log(`set ${r({ entity, exists })}`);
     return this.kvPairRepository.save({ ...(exists ? { id: exists.id } : null), ...entity });
 
-    // logger.log(`set ${util.inspect({ entity }, { colors: true })}`);
+    // logger.log(`set ${r({ entity })}`);
     // return this.kvPairRepository.save(entity);
   }
 
@@ -145,7 +143,7 @@ export class KvService {
       })
       .then(
         fp.map(item => {
-          // logger.log(`transform ${util.inspect(item, { colors: true })}`);
+          // logger.log(`transform ${r(item)}`);
           [, item.value] = recognizeTypeValue(item.type, item.value);
           return item;
         }),

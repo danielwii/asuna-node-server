@@ -95,7 +95,7 @@ export function cachedDataLoader(segment, fn) {
           // FIXME 采用 entity 的 AfterLoad 来激活清理函数，暂时关闭函数过期
           const isExpired = expires < now && false;
           // logger.log(
-          //   `get (${segment}:${id}) ${util.inspect(
+          //   `get (${segment}:${id}) ${r(
           //     {
           //       exists: !!value,
           //       expires: new Date(expires),
@@ -103,7 +103,6 @@ export function cachedDataLoader(segment, fn) {
           //       left: expires - now,
           //       isExpired,
           //     },
-          //     { colors: true },
           //   )}`,
           // );
           if (isExpired) {

@@ -1,5 +1,5 @@
 import { UseInterceptors } from '@nestjs/common';
-import { oneLineTrim } from 'common-tags';
+import { oneLine } from 'common-tags';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
@@ -52,10 +52,12 @@ export abstract class AbstractAuthService {
 
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     const validated = user != null && user.id === jwtPayload.id;
-    logger.debug(oneLineTrim`
-      validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}. 
-      left: ${formatTime(left)}
-    `);
+    if (!validated) {
+      logger.debug(oneLine`
+        validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
+        left: ${formatTime(left)}
+      `);
+    }
     return validated;
   }
 

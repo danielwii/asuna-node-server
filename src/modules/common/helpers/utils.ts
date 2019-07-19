@@ -3,9 +3,9 @@ import { inspect } from 'util';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-export const r = (o: any, transform: boolean = false) => {
+export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: boolean } = {}) => {
   const value = transform ? classToPlain(o) : o;
-  return isProduction ? JSON.stringify(value) : inspect(value, { colors: true });
+  return isProduction || plain ? JSON.stringify(value) : inspect(value, { colors: true });
 };
 
 export function fixedPath(name: string, length: number = 32, pos: number = 0) {

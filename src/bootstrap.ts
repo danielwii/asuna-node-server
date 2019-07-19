@@ -13,22 +13,22 @@ import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
 import { LoggerFactory, LoggerService } from './modules/logger';
 
+/*
+if (process.env.NODE_ENV === 'production') {
+  logger.log(`[X] run as production mode at ${__dirname}`);
+  const moduleAlias = require('module-alias');
+  moduleAlias.addPath(__dirname as any);
+} else {
+  logger.log(`[X] run as non-production mode at ${__dirname}`);
+}
+*/
+
 const startAt = Date.now();
-
-// if (process.env.NODE_ENV === 'production') {
-//   logger.log(`[X] run as production mode at ${__dirname}`);
-//   const moduleAlias = require('module-alias');
-//   moduleAlias.addPath(__dirname as any);
-// } else {
-//   logger.log(`[X] run as non-production mode at ${__dirname}`);
-// }
-
 const pkg = require('../package.json');
-const isProduction = process.env.NODE_ENV === 'production';
 
 export interface IBootstrapOptions {
   // server folder
-  root?: string;
+  // root?: string;
   // package folder
   // dirname?: string;
   version?: string;
@@ -42,7 +42,6 @@ export interface IBootstrapOptions {
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
-  const loggerService = new LoggerService();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
 
@@ -69,7 +68,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   fastifyAdapter.use(require('x-xss-protection')());*/
 
   const app = await NestFactory.create<NestApplication>(appModule, {
-    logger: loggerService,
+    logger: new LoggerService(),
   });
   /*
   app.register(require('fastify-multipart'));
@@ -155,7 +154,6 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(process.mainModule.filename);
   const packageDir = global.packageDir;
-  // const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
   const entities = [
     `${resolve(packageDir)}/**/*entities.ts`,
     `${resolve(rootDir)}/**/*entities.ts`,
@@ -167,8 +165,6 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
   logger.log(
     `options is ${r({
       options,
-      isProduction,
-      dirname,
       rootDir,
       // suffix,
       entities,

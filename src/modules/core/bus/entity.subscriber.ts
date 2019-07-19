@@ -23,67 +23,69 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
-    return undefined;
+    // tslint:disable-next-line:max-line-length
+    // logger.verbose(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
   }
 
   afterLoad(entity: BaseEntity): Promise<any> | void {
     // logger.verbose(`afterLoad ${entity.constructor.name} ${r(entity)}`);
-    return undefined;
   }
 
   afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(
-      `afterRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
-        entity: event.entity,
-        id: event.entityId,
-      })}`,
-    );
-    return undefined;
+    // logger.verbose(
+    //   `afterRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //     entity: event.entity,
+    //     id: event.entityId,
+    //   })}`,
+    // );
   }
 
   afterUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(
-      `afterUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
-        entity: event.entity,
-        updatedColumns: diff(event.entity, event.databaseEntity),
-        // updatedRelations: event.updatedRelations,
-      })}`,
-    );
+    // logger.verbose(
+    //   `afterUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //     entity: event.entity,
+    //     updatedColumns: diff(event.entity, event.databaseEntity),
+    //     name: event.metadata.name,
+    //     tableName: event.metadata.tableName,
+    //   })}`,
+    // );
+    if (!event.entity) {
+      return;
+    }
+
     Hermes.emit(EntitySubscriber.name, 'entity.afterUpdate', {
       entity: event.entity,
       updatedColumns: diff(event.entity, event.databaseEntity),
-      // updatedRelations: event.updatedRelations,
+      name: event.metadata.name,
+      tableName: event.metadata.tableName,
     });
     dataLoaderCleaner.clear(idx(event, _ => _.entity.constructor.name), _.get(event.entity, 'id'));
-    return undefined;
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    // tslint:disable-next-line:max-line-length
+    // logger.verbose(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
     validateObjectSync(event.entity);
-    return undefined;
   }
 
   beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(
-      `beforeRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
-        entity: event.entity,
-        id: event.entityId,
-      })}`,
-    );
-    return undefined;
+    // logger.verbose(
+    //   `beforeRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //     entity: event.entity,
+    //     id: event.entityId,
+    //   })}`,
+    // );
   }
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    logger.verbose(
-      `beforeUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
-        entity: event.entity,
-        updatedColumns: diff(event.entity, event.databaseEntity),
-        // updatedRelations: event.updatedRelations,
-      })}`,
-    );
+    // logger.verbose(
+    //   `beforeUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //     entity: event.entity,
+    //     updatedColumns: diff(event.entity, event.databaseEntity),
+    //     name: event.metadata.name,
+    //     tableName: event.metadata.tableName,
+    //   })}`,
+    // );
     validateObjectSync(event.entity);
-    return undefined;
   }
 }

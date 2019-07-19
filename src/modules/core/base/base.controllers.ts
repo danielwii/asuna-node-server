@@ -15,7 +15,6 @@ import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
-import * as util from 'util';
 import { CurrentUser, Profile, r, validateObject } from '../../common';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import {
@@ -125,9 +124,7 @@ export abstract class RestCrudController {
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
 
-    logger.log(
-      `get ${util.inspect({ profile, modelName, parsedFields, relationsStr }, { colors: true })}`,
-    );
+    logger.log(`get ${r({ profile, modelName, parsedFields, relationsStr })}`);
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
 
