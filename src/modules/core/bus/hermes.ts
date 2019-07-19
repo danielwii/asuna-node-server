@@ -270,7 +270,7 @@ export class Hermes {
     );
 
     const configObject = RedisConfigObject.loadOr('job');
-    logger.log(`init queues with redis: ${r(configObject, true)}`);
+    logger.log(`init queues with redis: ${r(configObject, { transform: true })}`);
     if (configObject && configObject.enable) {
       const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);

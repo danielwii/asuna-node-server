@@ -20,12 +20,14 @@ export class RedisIoAdapter extends IoAdapter {
       const configObject = RedisConfigObject.loadOr('ws');
 
       if (!(configObject && configObject.enable)) {
-        logger.warn(`no redis config found: ${r(configObject, true)}`);
+        logger.warn(`no redis config found: ${r(configObject, { transform: true })}`);
         return;
       }
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
-      logger.log(`init redis ws-adapter: ${r(configObject, true)} with ws db: ${db}`);
+      logger.log(
+        `init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`,
+      );
       RedisIoAdapter.redisAdapter = redisIoAdapter(
         {
           host: configObject.host,

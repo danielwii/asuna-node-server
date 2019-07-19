@@ -34,7 +34,9 @@ export class RedisProvider {
 
     const configObject = RedisConfigObject.loadOr(prefix);
     const redisOptions = configObject.getOptions(db);
-    logger.log(`init redis provider: ${r(configObject, true)} with ${r({ prefix, db })}`);
+    logger.log(
+      `init redis provider: ${r(configObject, { transform: true })} with ${r({ prefix, db })}`,
+    );
     const redisClientObject = plainToClass(
       RedisClientObject,
       {
@@ -56,7 +58,7 @@ export class RedisProvider {
     redisClientObject.client = client;
     client.on('connect', () => {
       redisClientObject.isHealthy = true;
-      logger.log(`Redis default connection open to ${r(configObject, true)}`);
+      logger.log(`Redis default connection open to ${r(configObject, { transform: true })}`);
     });
 
     client.on('error', err => {

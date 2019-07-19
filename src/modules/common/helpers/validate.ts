@@ -1,6 +1,6 @@
 import { validate, validateSync } from 'class-validator';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../logger/factory';
 
 const logger = LoggerFactory.getLogger('Validator');
 
