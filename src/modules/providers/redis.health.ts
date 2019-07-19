@@ -1,7 +1,7 @@
 import { HealthCheckError } from '@godaddy/terminus';
 import { Injectable } from '@nestjs/common';
 import { HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
-import { RedisProvider } from 'asuna-node-server';
+import { RedisProvider } from './redis.provider';
 
 @Injectable()
 export class RedisHealthIndicator extends HealthIndicator {
