@@ -11,8 +11,8 @@
     "build": "yarn tsc",
     "prebuild": "yarn clean",
     "postinstall": "yarn build",
-    "test": "ENV=test jest --forceExit --detectOpenHandles",
-    "test:cov": "ENV=test jest --coverage --no-cache --forceExit --detectOpenHandles",
+    "test": "ENV=test jest",
+    "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./"
   },
   "devDependencies": {
