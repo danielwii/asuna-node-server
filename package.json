@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "index.ts",
@@ -66,6 +66,7 @@
     "bull": "^3.10.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
+    "cli-color": "^1.4.0",
     "common-tags": "^1.8.0",
     "compression": "^1.7.4",
     "dataloader": "^1.4.0",
@@ -107,6 +108,7 @@
     "socket.io-redis": "^5.2.0",
     "swagger-ui-express": "^4.0.7",
     "type-graphql": "^0.17.4",
-    "typeorm": "^0.2.18"
+    "typeorm": "^0.2.18",
+    "winston": "^3.2.1"
   }
 }

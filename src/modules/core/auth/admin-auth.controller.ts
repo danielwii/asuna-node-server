@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Logger,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r, SignException } from '../../common';
+import { LoggerFactory } from '../../logger';
 import { RestCrudController } from '../base/base.controllers';
 import {
   DeprecateTokenParams,
@@ -23,7 +14,7 @@ import {
 import { AdminAuthService } from './admin-auth.service';
 import { SignDto } from './auth.dto';
 
-const logger = new Logger('AdminAuthController');
+const logger = LoggerFactory.getLogger('AdminAuthController');
 
 @ApiUseTags('sys-admin')
 @Controller('admin/auth')

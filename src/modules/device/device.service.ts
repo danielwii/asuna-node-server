@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Connection, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as LRU from 'lru-cache';
+import { Connection, Repository } from 'typeorm';
+import { LoggerFactory } from '../logger';
 
 import { Device } from './device.entities';
 
-const cacheLogger = new Logger('cache');
+const cacheLogger = LoggerFactory.getLogger('cache');
 
 const cache = new LRU({
   max: 2000,
@@ -21,7 +22,7 @@ const cache = new LRU({
 });
 
 class DeviceShadow {
-  private logger = new Logger('DeviceShadow');
+  private logger = LoggerFactory.getLogger('DeviceShadow');
 
   constructor(private readonly uuid: string) {}
 
@@ -32,7 +33,7 @@ class DeviceShadow {
 
 @Injectable()
 export class DeviceService {
-  private readonly logger = new Logger('DeviceService');
+  private readonly logger = LoggerFactory.getLogger('DeviceService');
   private readonly deviceRepository: Repository<Device>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {

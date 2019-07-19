@@ -1,12 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AsunaError, AsunaException, r } from '../../../common';
-import { ConfigKeys, configLoader } from '../../config.helper';
+import { ConfigKeys, configLoader } from '../../../config';
+import { LoggerFactory } from '../../../logger';
 import { IJwtPayload } from '../auth.interfaces';
 import { AuthService } from '../auth.service';
 
-const logger = new Logger('JwtStrategy');
+const logger = LoggerFactory.getLogger('JwtStrategy');
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {

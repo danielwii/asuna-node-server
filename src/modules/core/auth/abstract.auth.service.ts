@@ -1,15 +1,15 @@
-import { Logger, UseInterceptors } from '@nestjs/common';
+import { UseInterceptors } from '@nestjs/common';
+import { oneLineTrim } from 'common-tags';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { formatTime, r } from '../../common/helpers';
-import { ControllerLoggerInterceptor } from '../../logger';
-import { ConfigKeys, configLoader } from '../config.helper';
+import { ConfigKeys, configLoader } from '../../config';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
-import { oneLineTrim } from 'common-tags';
 
-const logger = new Logger('AbstractAuthService');
+const logger = LoggerFactory.getLogger('AbstractAuthService');
 
 @UseInterceptors(ControllerLoggerInterceptor)
 export abstract class AbstractAuthService {

@@ -1,8 +1,8 @@
-import { Logger } from '@nestjs/common';
 import { diff } from 'jsondiffpatch';
+import { LoggerFactory } from '../logger';
 import { AuditRecord, AuditType } from './audit.entities';
 
-const logger = new Logger('AuditService');
+const logger = LoggerFactory.getLogger('AuditService');
 
 export class AuditService {
   addRecord(

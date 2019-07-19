@@ -1,4 +1,4 @@
-import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { Response } from 'express';
 import * as _ from 'lodash';
@@ -6,8 +6,9 @@ import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
+import { LoggerFactory } from '../../logger/factory';
 
-const logger = new Logger('AnyExceptionFilter');
+const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
 export class AnyExceptionFilter implements ExceptionFilter {
   static handleSqlExceptions(exception) {

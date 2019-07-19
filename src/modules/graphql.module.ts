@@ -1,4 +1,4 @@
-import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
+import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import * as GraphQLJSON from 'graphql-type-json';
@@ -8,8 +8,9 @@ import { AppModule } from './app';
 import { r } from './common/helpers';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
 import { DataLoaderInterceptor } from './dataloader';
+import { LoggerFactory } from './logger';
 
-const logger = new Logger('GraphqlModule');
+const logger = LoggerFactory.getLogger('GraphqlModule');
 
 @Module({})
 export class GraphqlModule implements OnModuleInit {

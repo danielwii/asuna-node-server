@@ -1,10 +1,10 @@
-import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
-
-import { getRequestFromContext } from './utils';
+import { LoggerFactory } from '../logger';
 import { GenericDataLoader } from './dataloader';
+import { getRequestFromContext } from './utils';
 
-const logger = new Logger('DataLoaderInterceptor');
+const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
 const genericDataLoader = new GenericDataLoader();
 
@@ -16,7 +16,8 @@ export class DataLoaderInterceptor implements NestInterceptor {
   ): Observable<any> | Promise<Observable<any>> {
     const request = getRequestFromContext(context);
 
-    // If the request already has data loaders, then do not create them again or the benefits are negated.
+    // If the request already has data loaders,
+    // then do not create them again or the benefits are negated.
     if (request.dataLoaders) {
       // this.logger.debug('Data loaders exist', this.constructor.name);
     } else {

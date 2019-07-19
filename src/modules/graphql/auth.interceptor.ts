@@ -1,11 +1,12 @@
-import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { Observable } from 'rxjs';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('AuthInterceptor');
+const logger = LoggerFactory.getLogger('AuthInterceptor');
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {

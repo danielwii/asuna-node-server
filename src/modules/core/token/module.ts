@@ -1,7 +1,8 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../../logger';
 import { OperationTokenController } from './controller';
 
-const logger = new Logger('TokenModule');
+const logger = LoggerFactory.getLogger('TokenModule');
 
 @Module({
   controllers: [OperationTokenController],

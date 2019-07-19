@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { AbstractAuthService } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
 import { RoleRepository } from './auth.repositories';
 
-const logger = new Logger('AdminAuthService');
+const logger = LoggerFactory.getLogger('AdminAuthService');
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService {

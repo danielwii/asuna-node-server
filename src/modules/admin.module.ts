@@ -1,4 +1,4 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ClientModule } from './client/client.module';
 import { CommandController } from './core';
@@ -11,10 +11,11 @@ import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
 import { FinderModule } from './finder';
 import { SchemaModules } from './graphql/schema.modules';
+import { LoggerFactory } from './logger';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 
-const logger = new Logger('AdminModule');
+const logger = LoggerFactory.getLogger('AdminModule');
 
 @Module({
   imports: [

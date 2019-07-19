@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -9,10 +8,11 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server } from 'ws';
+import { LoggerFactory } from '../logger';
 
 const pkg = require('../../../package.json');
 
-const logger = new Logger('WSGateway');
+const logger = LoggerFactory.getLogger('WSGateway');
 
 @WebSocketGateway(3002, {
   path: '/',

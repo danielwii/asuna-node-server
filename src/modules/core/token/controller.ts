@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
   Param,
   Post,
   Query,
@@ -24,7 +23,7 @@ import {
 } from 'class-validator';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
-import { ControllerLoggerInterceptor } from '../../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenGuard } from './guard';
@@ -83,7 +82,7 @@ class GetParams {
   readonly token: string;
 }
 
-const logger = new Logger('OperationTokenController');
+const logger = LoggerFactory.getLogger('OperationTokenController');
 
 @ApiUseTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)

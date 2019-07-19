@@ -1,13 +1,13 @@
-import { Logger } from '@nestjs/common';
 import { plainToClass, Transform } from 'class-transformer';
 import { IsInt, IsString, Min } from 'class-validator';
 import { addMonths } from 'date-fns';
 import * as _ from 'lodash';
 import { r, sha1 } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { OperationToken, OperationTokenHelper } from '../token';
 import { UploaderTokenServiceName } from './model';
 
-const logger = new Logger('UploaderHelper');
+const logger = LoggerFactory.getLogger('UploaderHelper');
 
 export class ChunksUploadPayload {
   @IsString()

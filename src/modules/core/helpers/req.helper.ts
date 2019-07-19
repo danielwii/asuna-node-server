@@ -1,11 +1,11 @@
-import { Logger } from '@nestjs/common';
 import { Request } from 'express';
 import * as fsExtra from 'fs-extra';
 import * as os from 'os';
 import * as pump from 'pump';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 
-const logger = new Logger('ReqHelper');
+const logger = LoggerFactory.getLogger('ReqHelper');
 
 export class ReqHelper {
   /**

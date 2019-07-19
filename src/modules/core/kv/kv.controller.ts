@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import * as util from 'util';
+import { LoggerFactory } from '../../logger';
 import { KeyValuePair, ValueType } from './kv.entities';
 import { KvService } from './kv.service';
 
-const logger = new Logger('KvController');
+const logger = LoggerFactory.getLogger('KvController');
 
 class KvPair {
   @IsString()

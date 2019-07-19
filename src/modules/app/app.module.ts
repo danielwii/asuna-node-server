@@ -1,8 +1,8 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../logger';
 import { AppQueryResolver } from './app.resolver';
 
-const logger = new Logger('AppModule');
+const logger = LoggerFactory.getLogger('AppModule');
 
 @Module({
   providers: [AppQueryResolver],

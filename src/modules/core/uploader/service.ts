@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import * as bluebird from 'bluebird';
 import { plainToClass, Transform } from 'class-transformer';
@@ -9,6 +9,7 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import { AsunaError, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { FileInfo } from '../storage';
@@ -16,7 +17,7 @@ import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
 import { UploaderRoot } from './model';
 
-const logger = new Logger('UploaderService');
+const logger = LoggerFactory.getLogger('UploaderService');
 
 export class ChunkFileInfo {
   @IsString()

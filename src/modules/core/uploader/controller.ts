@@ -1,7 +1,5 @@
 import {
-  Body,
   Controller,
-  Logger,
   Post,
   Query,
   Req,
@@ -22,25 +20,24 @@ import {
 import * as assert from 'assert';
 import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
-import { IsIn, IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fsExtra from 'fs-extra';
 import * as _ from 'lodash';
 import * as multer from 'multer';
 import * as os from 'os';
-import { join } from 'path';
 import * as uuid from 'uuid';
 import { isBlank, r, UploadException } from '../../common';
-import { ControllerLoggerInterceptor } from '../../logger';
+import { ConfigKeys, configLoader } from '../../config';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
-import { ConfigKeys, configLoader } from '../config.helper';
 import { AsunaContext } from '../context';
 import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
-import { OperationTokenGuard, OperationTokenRequest, TokenRule } from '../token';
+import { OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
 import { UploaderService } from './service';
 
-const logger = new Logger('UploaderController');
+const logger = LoggerFactory.getLogger('UploaderController');
 
 const fileInterceptorOptions = {
   storage: multer.diskStorage({

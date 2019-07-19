@@ -1,20 +1,19 @@
-import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-
 import { getConnection } from 'typeorm';
-import { DBHelper } from '../core/db';
-
+import { Profile } from '../common';
 import {
+  DBHelper,
   parseListParam,
   parseNormalWhereAndRelatedFields,
   parseOrder,
   parseWhere,
-  Profile,
-} from '../common';
+} from '../core/db';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('SearchController');
+const logger = LoggerFactory.getLogger('SearchController');
 
 @ApiUseTags('core')
 @Controller('api/search')

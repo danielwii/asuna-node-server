@@ -1,9 +1,8 @@
-import { Logger } from '@nestjs/common';
 import * as fsExtra from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
-import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
-import { ConfigKeys, configLoader } from './config.helper';
+import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
+import { LoggerFactory } from '../logger';
 import {
   IStorageEngine,
   LocalStorage,
@@ -14,7 +13,7 @@ import {
   StorageMode,
 } from './storage';
 
-const logger = new Logger('AsunaContext');
+const logger = LoggerFactory.getLogger('AsunaContext');
 
 export interface IAsunaContextOpts {
   /**
@@ -29,7 +28,7 @@ export type StorageEngineMode = 'chunks';
 export class AsunaContext {
   public static readonly instance = new AsunaContext();
 
-  private opts: IAsunaContextOpts;
+  public opts: IAsunaContextOpts;
 
   public readonly dirname: string;
   public uploadPath: string;
@@ -57,6 +56,7 @@ export class AsunaContext {
     logger.log(`setup ${r(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
+      // root: opts.root,
       // root: opts.root || resolve(__dirname, '../..'),
     };
   }

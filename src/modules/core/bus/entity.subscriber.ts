@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import idx from 'idx';
 import { diff } from 'jsondiffpatch';
 import * as _ from 'lodash';
@@ -12,9 +11,10 @@ import {
 } from 'typeorm';
 import { r, validateObjectSync } from '../../common/helpers';
 import { dataLoaderCleaner } from '../../dataloader';
+import { LoggerFactory } from '../../logger';
 import { Hermes } from './hermes';
 
-const logger = new Logger('EntitySubscriber');
+const logger = LoggerFactory.getLogger('EntitySubscriber');
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {

@@ -1,10 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-strategy';
 import { getIgnoreCase, r } from '../../../common/helpers';
+import { LoggerFactory } from '../../../logger';
 
-const logger = new Logger('ApiKeyStrategy');
+const logger = LoggerFactory.getLogger('ApiKeyStrategy');
 
 const API_KEY_HEADER = 'X-ApiKey';
 

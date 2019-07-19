@@ -1,34 +1,36 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestApplication, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json } from 'body-parser';
 import * as compression from 'compression';
+import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { AnyExceptionFilter, r } from './modules/common';
-import { AsunaContext, ConfigKeys, configLoader, IAsunaContextOpts } from './modules/core';
+import { ConfigKeys, configLoader } from './modules/config';
+import { AsunaContext, IAsunaContextOpts } from './modules/core';
+import { LoggerFactory, LoggerService } from './modules/logger';
 
-const rateLimit = require('express-rate-limit');
-
-const logger = new Logger('bootstrap');
 const startAt = Date.now();
 
-if (process.env.NODE_ENV === 'production') {
-  logger.log(`[X] run as production mode at ${__dirname}`);
-  const moduleAlias = require('module-alias');
-  moduleAlias.addPath(__dirname as any);
-} else {
-  logger.log(`[X] run as non-production mode at ${__dirname}`);
-}
+// if (process.env.NODE_ENV === 'production') {
+//   logger.log(`[X] run as production mode at ${__dirname}`);
+//   const moduleAlias = require('module-alias');
+//   moduleAlias.addPath(__dirname as any);
+// } else {
+//   logger.log(`[X] run as non-production mode at ${__dirname}`);
+// }
 
 const pkg = require('../package.json');
 const isProduction = process.env.NODE_ENV === 'production';
 
 export interface IBootstrapOptions {
+  // server folder
   root?: string;
-  dirname?: string;
+  // package folder
+  // dirname?: string;
   version?: string;
   /**
    * io     - socket.io
@@ -40,6 +42,8 @@ export interface IBootstrapOptions {
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
+  const loggerService = new LoggerService();
+  const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
 
   AsunaContext.instance.setup(options.context);
@@ -64,7 +68,9 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   fastifyAdapter.use(require('ienoopen')());
   fastifyAdapter.use(require('x-xss-protection')());*/
 
-  const app = await NestFactory.create<NestApplication>(appModule);
+  const app = await NestFactory.create<NestApplication>(appModule, {
+    logger: loggerService,
+  });
   /*
   app.register(require('fastify-multipart'));
 
@@ -145,21 +151,25 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
  * @param options
  */
 export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
+  const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
-  const dirname = options.dirname || __dirname;
-  const root = options.root || __dirname;
+  const rootDir = dirname(process.mainModule.filename);
+  const packageDir = global.packageDir;
   // const suffix = isProduction ? 'js' : 'ts'; // used to detect files for caller
-  const entities = [`${resolve(dirname)}/**/*entities.ts`, `${resolve(root)}/**/*entities.ts`];
+  const entities = [
+    `${resolve(packageDir)}/**/*entities.ts`,
+    `${resolve(rootDir)}/**/*entities.ts`,
+  ];
   const subscribers = [
-    `${resolve(dirname)}/**/*subscriber.ts`,
-    `${resolve(root)}/**/*subscriber.ts`,
+    `${resolve(packageDir)}/**/*subscriber.ts`,
+    `${resolve(rootDir)}/**/*subscriber.ts`,
   ];
   logger.log(
     `options is ${r({
       options,
       isProduction,
       dirname,
-      root,
+      rootDir,
       // suffix,
       entities,
       subscribers,

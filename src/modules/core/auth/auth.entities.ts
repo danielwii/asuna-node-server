@@ -1,9 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
-
-import { AbstractAuthUser } from './base.entities';
-import { jsonType, safeReloadObject } from '../helpers';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
+import { jsonType, safeReloadObject } from '../helpers';
+import { AbstractAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__roles' })
 @Entity('auth__t_roles')

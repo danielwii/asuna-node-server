@@ -1,4 +1,5 @@
-import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../../logger';
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
 import { TokenModule } from '../token';
@@ -10,7 +11,7 @@ import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
 import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
-const logger = new Logger('AuthModule');
+const logger = LoggerFactory.getLogger('AuthModule');
 
 @Module({
   /*

@@ -1,9 +1,9 @@
-import { Logger } from '@nestjs/common';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
-import { configLoader } from '../core/config.helper'; // TODO refactor
+import { configLoader } from '../config';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('RedisConfig');
+const logger = LoggerFactory.getLogger('RedisConfig');
 
 export const RedisConfigKeys = {
   REDIS_ENABLE: 'REDIS_ENABLE',
@@ -16,11 +16,12 @@ export const RedisConfigKeys = {
 export class RedisConfigObject {
   host?: string;
   port?: number;
+  db?: number;
+  enable?: boolean;
+
   @Expose({ name: 'with-password', toPlainOnly: true })
   @Transform(value => !!value, { toPlainOnly: true })
   password?: string;
-  db?: number;
-  enable?: boolean;
 
   constructor(o: Partial<RedisConfigObject>) {
     Object.assign(this, plainToClass(RedisConfigObject, o, { enableImplicitConversion: true }));

@@ -1,5 +1,4 @@
 import { EntityRepository, Repository } from 'typeorm';
-
 import { Role } from './auth.entities';
 
 @EntityRepository(Role)

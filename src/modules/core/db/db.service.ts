@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common';
 import { getConnection, getRepository, Repository } from 'typeorm';
 import * as util from 'util';
-import { parseFields, Profile } from '../../common';
-import { DBHelper } from './db.helper';
+import { Profile } from '../../common';
+import { LoggerFactory } from '../../logger';
+import { DBHelper, parseFields } from './db.helper';
 
-const logger = new Logger('DBService');
+const logger = LoggerFactory.getLogger('DBService');
 
 export class DBService {
   repos(): Repository<any>[] {

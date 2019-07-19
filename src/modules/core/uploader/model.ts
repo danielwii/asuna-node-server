@@ -1,7 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { Hermes } from '../bus';
-import { OperationToken, OperationTokenHelper } from '../token';
-// import { UploaderFileInfo } from './service';
+import { OperationToken } from '../token';
 
 export class ChunksUploadEvent {
   constructor(public readonly token: OperationToken, public readonly chunk: ChunkInfo) {}

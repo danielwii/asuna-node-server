@@ -1,10 +1,11 @@
-import { Body, Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../logger';
 import { AnyAuthGuard, AnyAuthRequest } from './auth';
 import { Hermes } from './bus';
 
-const logger = new Logger('CommandController');
+const logger = LoggerFactory.getLogger('CommandController');
 
 // TODO TDB...
 export class CommandDTO {}

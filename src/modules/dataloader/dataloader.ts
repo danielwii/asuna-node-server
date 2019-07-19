@@ -1,12 +1,11 @@
-import { Logger } from '@nestjs/common';
+import * as DataLoader from 'dataloader';
+import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { GraphQLResolveInfo } from 'graphql';
-import * as DataLoader from 'dataloader';
-import * as Rx from 'rxjs';
 import { Hermes, IAsunaEvent } from '../core/bus';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('DataLoaderCache');
+const logger = LoggerFactory.getLogger('DataLoaderCache');
 
 const cacheMap = new Map();
 

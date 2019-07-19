@@ -1,11 +1,11 @@
-import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import * as redisIoAdapter from 'socket.io-redis';
 import { r } from '../common';
-import { ConfigKeys, configLoader } from '../core';
+import { ConfigKeys, configLoader } from '../config';
+import { LoggerFactory } from '../logger';
 import { RedisConfigObject } from '../providers';
 
-const logger = new Logger('RedisIoAdapter');
+const logger = LoggerFactory.getLogger('RedisIoAdapter');
 
 /**
  * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)

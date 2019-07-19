@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
-const logger = new Logger('AuthHelper');
+const logger = LoggerFactory.getLogger('AuthHelper');
 
 export type AnyAuthRequest = Request & Partial<{ user: any; identifier: string }>;
 

@@ -1,10 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
 import * as _ from 'lodash';
+import { Connection, Repository } from 'typeorm';
 import { DBHelper } from '../core/db';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('SortService');
+const logger = LoggerFactory.getLogger('SortService');
 
 /**
  * const SortServiceProvider: Provider = {

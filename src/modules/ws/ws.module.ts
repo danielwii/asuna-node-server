@@ -1,9 +1,9 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
-import { WSGateway } from './ws.gateway';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../logger';
 import { SocketIOGateway } from './socket-io.gateway';
+import { WSGateway } from './ws.gateway';
 
-const logger = new Logger('WSModule');
+const logger = LoggerFactory.getLogger('WSModule');
 
 @Module({
   providers: [SocketIOGateway, WSGateway],

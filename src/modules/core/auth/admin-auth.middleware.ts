@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
+import { LoggerFactory } from '../../logger';
 import { auth } from './helper';
 
-const logger = new Logger('AdminAuthMiddleware');
+const logger = LoggerFactory.getLogger('AdminAuthMiddleware');
 
 /**
  * 整合客户端和服务端验证，包含服务端头时进行服务端权限验证，否则进行客户端认证

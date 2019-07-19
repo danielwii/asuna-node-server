@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { diff } from 'jsondiffpatch';
 import * as _ from 'lodash';
 import {
@@ -10,9 +9,10 @@ import {
   UpdateEvent,
 } from 'typeorm';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../logger';
 import { AuditService } from './audit.service';
 
-const logger = new Logger('AuditSubscriber');
+const logger = LoggerFactory.getLogger('AuditSubscriber');
 
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {

@@ -1,12 +1,11 @@
-import { Logger } from '@nestjs/common';
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import * as util from 'util';
-
+import { LoggerFactory } from '../../logger';
 import { KvService } from './kv.service';
 
 @Resolver()
 export class KvQueryResolver {
-  logger = new Logger('KvQueryResolver');
+  logger = LoggerFactory.getLogger('KvQueryResolver');
 
   constructor(private readonly kvService: KvService) {}
 

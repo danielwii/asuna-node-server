@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import * as assert from 'assert';
 import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
@@ -7,9 +6,10 @@ import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
 import { isBlank, r } from '../../common';
+import { ConfigKeys, configLoader } from '../../config';
+import { LoggerFactory } from '../../logger';
 import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth';
-import { ConfigKeys, configLoader } from '../config.helper';
 import { random } from '../helpers';
 import {
   IAsunaAction,
@@ -22,7 +22,7 @@ import {
 
 const Queue = require('bull');
 
-const logger = new Logger('Hermes');
+const logger = LoggerFactory.getLogger('Hermes');
 
 export const AsunaSystemQueue = {
   UPLOAD: 'UPLOAD',

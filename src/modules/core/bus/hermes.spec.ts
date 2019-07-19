@@ -8,7 +8,7 @@ import {
   HermesExchange,
   HermesProcessManager,
 } from './hermes';
-import { IAsunaAction, IAsunaCommand, IAsunaEvent, IAsunaJob, IAsunaRule } from './interfaces';
+import { IAsunaCommand, IAsunaEvent } from './interfaces';
 
 describe('Hermes', () => {
   beforeAll(async () => {});

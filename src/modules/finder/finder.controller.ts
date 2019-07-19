@@ -1,14 +1,14 @@
-import { Controller, Get, Logger, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
 import { AsunaError, AsunaException, r } from '../common';
-import { ControllerLoggerInterceptor } from '../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../logger';
 import { FinderService } from './finder.service';
 
-const logger = new Logger('FinderController');
+const logger = LoggerFactory.getLogger('FinderController');
 
 export const keyByType = {
   zones: 'settings.finder.zones',

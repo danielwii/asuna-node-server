@@ -1,7 +1,7 @@
-import { Logger } from '@nestjs/common';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as _ from 'lodash';
-import { configLoader } from '../config.helper';
+import { configLoader } from '../../config';
+import { LoggerFactory } from '../../logger';
 
 export const QiniuConfigKeys = {
   QINIU_ENABLE: 'QINIU_ENABLE',
@@ -13,7 +13,7 @@ export const QiniuConfigKeys = {
 };
 
 export class QiniuConfigObject {
-  static logger = new Logger('QiniuConfigObject');
+  static logger = LoggerFactory.getLogger('QiniuConfigObject');
 
   enable: boolean;
   // bucket 应该用 scope 来替换，用来明确概念
@@ -75,7 +75,7 @@ export const MinioConfigKeys = {
 };
 
 export class MinioConfigObject {
-  static logger = new Logger('MinioConfigObject');
+  static logger = LoggerFactory.getLogger('MinioConfigObject');
 
   enable: boolean;
   endpoint: string;

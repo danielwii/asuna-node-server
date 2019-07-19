@@ -1,11 +1,12 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { Hermes } from '../bus';
 import { UploaderRoot } from './model';
 import { UploaderService } from './service';
 
-const logger = new Logger('UploaderModule');
+const logger = LoggerFactory.getLogger('UploaderModule');
 
 @Module({
   providers: [UploaderService],

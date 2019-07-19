@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
 import * as fsExtra from 'fs-extra';
@@ -6,12 +5,13 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import * as sharp from 'sharp';
 import { convertFilename, ErrorException, r } from '../../common';
-import { ConfigKeys, configLoader } from '../config.helper';
+import { ConfigKeys, configLoader } from '../../config';
+import { LoggerFactory } from '../../logger';
 import { AsunaContext } from '../context';
 import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class LocalStorage implements IStorageEngine {
-  private static readonly logger = new Logger(LocalStorage.name);
+  private static readonly logger = LoggerFactory.getLogger(LocalStorage.name);
   private readonly storagePath: string;
   private readonly bucket: string;
 

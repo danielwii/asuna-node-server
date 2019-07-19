@@ -1,8 +1,8 @@
-import { Logger } from '@nestjs/common';
+import { LoggerFactory } from '../logger';
 
 const pkg = require('../../../package.json');
 
-const logger = new Logger('AppContext');
+const logger = LoggerFactory.getLogger('AppContext');
 
 export class AppContext {
   public static instance = new AppContext();

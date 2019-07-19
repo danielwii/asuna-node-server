@@ -1,14 +1,14 @@
-import { Logger } from '@nestjs/common';
 import { plainToClass, Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r } from '../../common';
+import { LoggerFactory } from '../../logger';
 import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 
-const logger = new Logger('OperationTokenHelper');
+const logger = LoggerFactory.getLogger('OperationTokenHelper');
 
 export const SysTokenServiceName = {
   AdminLogin: 'admin#login',

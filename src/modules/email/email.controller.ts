@@ -1,11 +1,12 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import * as util from 'util';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../logger';
 import { EmailService } from './email.service';
 
-const logger = new Logger('EmailController');
+const logger = LoggerFactory.getLogger('EmailController');
 
 class MailBody {
   @IsArray({ always: false })

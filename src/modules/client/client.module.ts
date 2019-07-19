@@ -1,8 +1,8 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../logger';
 import { ClientService } from './client.service';
 
-const logger = new Logger('ClientModule');
+const logger = LoggerFactory.getLogger('ClientModule');
 
 @Module({
   providers: [ClientService],

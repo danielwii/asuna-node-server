@@ -6,5 +6,4 @@ export * from './token';
 export * from './storage';
 export * from './helpers';
 export * from './base';
-export * from './config.helper';
 export * from './command.controller';

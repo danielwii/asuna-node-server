@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   DiskHealthIndicator,
   DNSHealthIndicator,
@@ -8,10 +9,10 @@ import {
   TerminusOptionsFactory,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import { Injectable, Logger } from '@nestjs/common';
 import { getConnection } from 'typeorm';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('Terminus');
+const logger = LoggerFactory.getLogger('Terminus');
 
 @Injectable()
 export class TerminusOptionsService implements TerminusOptionsFactory {

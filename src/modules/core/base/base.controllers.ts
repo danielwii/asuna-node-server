@@ -3,7 +3,6 @@ import {
   Delete,
   Get,
   Inject,
-  Logger,
   Options,
   Param,
   Patch,
@@ -17,22 +16,19 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
 import * as util from 'util';
+import { CurrentUser, Profile, r, validateObject } from '../../common';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import {
-  CurrentUser,
+  DBHelper,
   parseFields,
   parseNormalWhereAndRelatedFields,
   parseOrder,
   parseWhere,
-  Profile,
-  r,
-  validateObject,
-} from '../../common';
-import { ControllerLoggerInterceptor } from '../../logger';
-import { DBHelper } from '../db';
+} from '../db';
 import { KeyValuePair, KvService } from '../kv';
 // import { AdminUser } from '../../core/auth';
 
-const logger = new Logger('RestCrudController');
+const logger = LoggerFactory.getLogger('RestCrudController');
 
 @UseInterceptors(ControllerLoggerInterceptor)
 export abstract class RestCrudController {

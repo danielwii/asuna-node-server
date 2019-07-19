@@ -1,15 +1,12 @@
-import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
-import * as bluebird from 'bluebird';
+import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 // import { FastifyRequest } from 'fastify';
 // import 'fastify-multipart';
 import { Observable } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
-import * as uuid from 'uuid';
-import { r } from '../../common/helpers';
-import { ReqHelper } from '../helpers/req.helper';
+import { LoggerFactory } from '../../logger';
 
-const logger = new Logger('FastifyFileInterceptor');
+const logger = LoggerFactory.getLogger('FastifyFileInterceptor');
 
 export type FastifyUploadedFile = {
   filename: string;

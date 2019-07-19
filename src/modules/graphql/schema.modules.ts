@@ -1,9 +1,9 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
+import { Module, OnModuleInit } from '@nestjs/common';
 import { DBService } from '../core/db';
+import { LoggerFactory } from '../logger';
 import { SchemaQueryResolver } from './schema.resolver';
 
-const logger = new Logger('SchemaModules');
+const logger = LoggerFactory.getLogger('SchemaModules');
 
 @Module({
   providers: [SchemaQueryResolver, DBService],

@@ -1,27 +1,16 @@
 // tslint:disable:max-line-length
-import {
-  Controller,
-  Get,
-  Logger,
-  NotFoundException,
-  Param,
-  Query,
-  Res,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import * as fsExtra from 'fs-extra';
-import { join } from 'path';
 import { r } from '../common/helpers';
+import { ConfigKeys, configLoader } from '../config';
 import { FinderService } from '../finder';
-import { ControllerLoggerInterceptor } from '../logger';
-import { ConfigKeys, configLoader } from './config.helper';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../logger';
 import { AsunaContext } from './context';
 import { JpegPipe, JpegPipeOptions } from './image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from './image/thumbnail.pipe';
 
-const logger = new Logger('GetUploadsController');
+const logger = LoggerFactory.getLogger('GetUploadsController');
 
 @ApiUseTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)

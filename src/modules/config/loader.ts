@@ -1,7 +1,7 @@
-import { Logger } from '@nestjs/common';
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
+import { LoggerFactory } from '../logger/factory';
 
-const logger = new Logger('ConfigLoader');
+const logger = LoggerFactory.getLogger('ConfigLoader');
 
 export const ConfigKeys = {
   ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',
@@ -12,6 +12,8 @@ export const ConfigKeys = {
   TRACING: 'TRACING',
   DB_TYPE: 'DB_TYPE',
   UPLOADER_MAX_COUNT: 'UPLOADER_MAX_COUNT',
+
+  LOGGER_LEVEL: 'LOGGER_LEVEL',
 
   /**
    * 用与访问上传文件的资源地址

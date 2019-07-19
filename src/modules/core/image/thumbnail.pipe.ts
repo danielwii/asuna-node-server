@@ -1,10 +1,11 @@
-import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { FitEnum } from 'sharp';
 import * as util from 'util';
+import { LoggerFactory } from '../../logger';
 
-const logger = new Logger('ThumbnailPipe');
+const logger = LoggerFactory.getLogger('ThumbnailPipe');
 
 export interface ThumbnailParam {
   width?: number;

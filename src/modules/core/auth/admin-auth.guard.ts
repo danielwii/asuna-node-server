@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AsunaError, AsunaException } from '../../common';
+import { LoggerFactory } from '../../logger';
 
-const logger = new Logger('JwtAuthGuard');
+const logger = LoggerFactory.getLogger('JwtAuthGuard');
 
 @Injectable()
 export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {

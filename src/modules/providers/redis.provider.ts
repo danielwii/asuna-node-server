@@ -1,14 +1,14 @@
-import { Logger } from '@nestjs/common';
 // tslint:disable-next-line:max-line-length
 import { RedisOptions } from '@nestjs/common/interfaces/microservices/microservice-configuration.interface';
 import { RedisClient } from '@nestjs/microservices/external/redis.interface';
+import * as bluebird from 'bluebird';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../logger';
 import { RedisConfigObject } from './redis.config';
-import * as bluebird from 'bluebird';
 
-const logger = new Logger('RedisProvider');
+const logger = LoggerFactory.getLogger('RedisProvider');
 
 export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })

@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common';
 import { Query, Resolver } from '@nestjs/graphql';
 import { DBHelper, DBService } from '../core/db';
+import { LoggerFactory } from '../logger';
 
 @Resolver()
 export class SchemaQueryResolver {
-  logger = new Logger('SchemaQueryResolver');
+  logger = LoggerFactory.getLogger('SchemaQueryResolver');
 
   constructor(private readonly dbService: DBService) {}
 

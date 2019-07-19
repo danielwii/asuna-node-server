@@ -1,13 +1,12 @@
-import { Logger } from '@nestjs/common';
 import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-
-import { AppInfo, AppRelease } from './app.entities';
 import { emptyPage, Pageable, PageRequest, toPage } from '../core';
+import { LoggerFactory } from '../logger';
+import { AppInfo, AppRelease } from './app.entities';
 
 @Resolver()
 export class AppQueryResolver {
-  logger = new Logger('AppQueryResolver');
+  logger = LoggerFactory.getLogger('AppQueryResolver');
 
   @Query()
   async app_releases(
@@ -22,9 +21,9 @@ export class AppQueryResolver {
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: true });
     if (!appInfo) return emptyPage(pageInfo);
 
-    let [items, total] = await AppRelease.findAndCount({
+    const [items, total] = await AppRelease.findAndCount({
       ...pageInfo,
-      where: { appInfo: appInfo },
+      where: { appInfo },
       order:
         pageRequest && pageRequest.orderBy
           ? { [pageRequest.orderBy.column]: pageRequest.orderBy.order }

@@ -1,4 +1,4 @@
-import { ConfigKeys, configLoader } from './config.helper';
+import { ConfigKeys, configLoader } from '../config';
 
 export class Global {
   static dbType: 'mysql56' | 'mysql57' | 'postgres' = configLoader.loadConfig(

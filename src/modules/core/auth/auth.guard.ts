@@ -1,13 +1,14 @@
-import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
+import { LoggerFactory } from '../../logger';
 import { AnyAuthRequest, auth } from './helper';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  logger = new Logger('JwtAuthGuard');
+  logger = LoggerFactory.getLogger('JwtAuthGuard');
 
   constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
@@ -27,7 +28,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  logger = new Logger('AnyAuthGuard');
+  logger = LoggerFactory.getLogger('AnyAuthGuard');
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();

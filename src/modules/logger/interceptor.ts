@@ -1,11 +1,12 @@
-import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { r } from '../common/helpers';
+import { LoggerFactory } from './factory';
 
-const logger = new Logger('ControllerLoggerInterceptor');
+const logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
 
 export class ControllerLoggerInterceptor implements NestInterceptor {
   intercept(

@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import { join } from 'path';
 import { AsunaError, AsunaException } from '../common';
 import { AsunaCollections, KvService } from '../core/kv';
+import { LoggerFactory } from '../logger';
 import { FinderAssetsSettings } from './finder.controller';
 
-const logger = new Logger('FinderService');
+const logger = LoggerFactory.getLogger('FinderService');
 
 @Injectable()
 export class FinderService {

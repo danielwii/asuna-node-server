@@ -1,7 +1,8 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../../logger';
 import { DBService } from './db.service';
 
-const logger = new Logger('DBModule');
+const logger = LoggerFactory.getLogger('DBModule');
 
 @Module({
   providers: [DBService],

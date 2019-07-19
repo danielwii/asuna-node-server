@@ -1,9 +1,9 @@
-import { Logger } from '@nestjs/common';
 import * as _ from 'lodash';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../logger';
 import { jsonType } from './column.helper';
 
-const logger = new Logger('EntityHelper');
+const logger = LoggerFactory.getLogger('EntityHelper');
 
 export function safeReloadArray<Entity>(entity: Entity, column: keyof Entity) {
   if (jsonType() === 'simple-json') {

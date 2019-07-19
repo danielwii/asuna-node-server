@@ -20,6 +20,7 @@
     "declarationDir": "declaration",
     "baseUrl": "."
   },
-  "include": ["src/**/*", "index.ts"],
+  "files": ["src/global.d.ts"],
+  "include": ["index.ts", "src/**/*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts"]
 }

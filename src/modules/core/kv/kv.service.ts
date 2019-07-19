@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
-import { KeyValuePair, ValueType } from './kv.entities';
 import { ValidationException } from '../../common';
+import { LoggerFactory } from '../../logger';
+import { KeyValuePair, ValueType } from './kv.entities';
 
-const logger = new Logger('KvService');
+const logger = LoggerFactory.getLogger('KvService');
 
 const castToBoolean = value => value === 'true';
 const isJson = value => {

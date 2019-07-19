@@ -1,6 +1,6 @@
 import { html } from 'common-tags';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
-import { EntityMetaInfo, Json, JsonMap, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadJSON } from '../helpers';
 

@@ -1,10 +1,10 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
-
+import { Module, OnModuleInit } from '@nestjs/common';
+import { KvModule } from '../core/kv';
+import { LoggerFactory } from '../logger';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderService } from './finder.service';
-import { KvModule } from '../core/kv';
 
-const logger = new Logger('FinderModule');
+const logger = LoggerFactory.getLogger('FinderModule');
 
 @Module({
   imports: [KvModule],

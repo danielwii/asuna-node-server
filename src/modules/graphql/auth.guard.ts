@@ -1,10 +1,11 @@
-import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { AbstractAuthUser } from '../core/auth';
+import { AuthGuard } from '@nestjs/passport';
 import { AsunaError, AsunaException } from '../common';
+import { AbstractAuthUser } from '../core/auth';
+import { LoggerFactory } from '../logger';
 
-const logger = new Logger('GqlAuthGuard');
+const logger = LoggerFactory.getLogger('GqlAuthGuard');
 
 /**
  * return null if anonymousSupport is true and user authenticate is failed

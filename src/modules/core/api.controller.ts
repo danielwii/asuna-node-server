@@ -1,10 +1,11 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
+import * as _ from 'lodash';
+import { LoggerFactory } from '../logger';
 import { AppContext } from './app.context';
 import { KvService } from './kv';
-import * as _ from 'lodash';
 
-const logger = new Logger('ApiController');
+const logger = LoggerFactory.getLogger('ApiController');
 
 @ApiUseTags('core')
 @Controller('api')

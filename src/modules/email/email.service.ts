@@ -1,13 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { oneLine } from 'common-tags';
 import * as Email from 'email-templates';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
 import * as util from 'util';
+import { configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
+import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core';
+import { LoggerFactory } from '../logger';
 
-import { configLoader, StorageMode, MinioConfigObject, QiniuConfigObject } from '../core';
-import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
-
-const logger = new Logger('EmailService');
+const logger = LoggerFactory.getLogger('EmailService');
 const env = process.env.ENV;
 
 @Injectable()
@@ -42,9 +43,10 @@ export class EmailService {
         },
       });
     } else {
-      logger.warn(
-        `MAIL_HOST && MAIL_PORT && MAIL_USERNAME && MAIL_PASSWORD must be set up to send mail in real world`,
-      );
+      logger.warn(oneLine`
+        MAIL_HOST && MAIL_PORT && MAIL_USERNAME && MAIL_PASSWORD
+        must be set up to send mail in real world
+      `);
       this.transport = {
         jsonTransport: true,
       };

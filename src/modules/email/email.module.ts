@@ -1,8 +1,9 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '../logger';
 import { EmailController } from './email.controller';
 import { EmailService } from './email.service';
 
-const logger = new Logger('EmailModule');
+const logger = LoggerFactory.getLogger('EmailModule');
 
 @Module({
   providers: [EmailService],
