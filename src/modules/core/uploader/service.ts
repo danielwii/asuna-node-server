@@ -123,7 +123,7 @@ export class UploaderService {
     const chunks = await this.context.chunkStorageEngine.listEntities({
       prefix: payload.fingerprint,
     });
-    logger.log(`found chunks: ${r(chunks)}`);
+    logger.debug(`found ${r(chunks.length)} chunks`);
 
     if (!(chunks && chunks.length)) {
       throw new AsunaException(
@@ -133,11 +133,14 @@ export class UploaderService {
     }
 
     // try to merge all chunks
-    logger.log(`try to merge chunks: ${r(chunks)}`);
-    const filepaths = await bluebird.all(
-      chunks.map(chunk =>
-        this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath),
+    logger.verbose(`try to merge chunks: ${r(chunks)}`);
+    const filepaths = _.sortBy(
+      await bluebird.all(
+        chunks.map(chunk =>
+          this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath),
+        ),
       ),
+      filename => +filename.slice(filename.lastIndexOf('.') + 1),
     );
     const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', payload.fingerprint);
     fsExtra.mkdirsSync(tempDirectory);

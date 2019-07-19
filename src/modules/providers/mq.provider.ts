@@ -34,6 +34,13 @@ export class MQProvider {
     return MQProvider._instance;
   }
 
+  get createChannel(): Promise<amqplib.Channel> {
+    if (MQProvider.enabled && this._connection != null) {
+      return this._connection.createChannel();
+    }
+    return Promise.reject();
+  }
+
   async send(topic, payload): Promise<boolean> {
     if (!this._connection) {
       logger.error(`cannot connect to MQ server, ${r({ topic, payload })}`);

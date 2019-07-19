@@ -57,7 +57,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const exceptionResponse = (<any>processed).response;
 
     if (status && status === HttpStatus.BAD_REQUEST) {
-      logger.warn(`[bad_request] ${r(processed)}`);
+      // logger.warn(`[bad_request] ${r(processed)}`);
+      logger.warn(`[bad_request] ${r(processed.message)}`);
     } else if (status && status === HttpStatus.NOT_FOUND) {
       logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40\d/.test(`${status}`)) {

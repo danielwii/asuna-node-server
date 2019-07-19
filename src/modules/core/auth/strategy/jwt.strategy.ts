@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: IJwtPayload) {
-    logger.log(`validate ${r(payload)}`);
+    // logger.log(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {
       throw new AsunaException(AsunaError.InsufficientPermissions);

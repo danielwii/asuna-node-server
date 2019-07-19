@@ -108,6 +108,7 @@
     "swagger-ui-express": "^4.0.7",
     "type-graphql": "^0.17.4",
     "typeorm": "^0.2.18",
+    "validator": "^11.1.0",
     "winston": "^3.2.1"
   }
 }
