@@ -6,4 +6,5 @@ module.exports = {
   testRegex: '.spec.tsx?$',
   moduleFileExtensions: ['js', 'json', 'ts', 'graphql'],
   setupFilesAfterEnv: ['./jest.setup.js'],
+  collectCoverage: true,
 };
