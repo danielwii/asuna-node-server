@@ -46,9 +46,16 @@ export class Cursured<T> {
   items: T[];
 }
 
+export type PageInfo = {
+  page: number;
+  size: number;
+  take: number;
+  skip: number;
+};
+
 export const emptyPage = (pageInfo): Pageable<any> => ({ ...pageInfo, items: [], total: 0 });
 
-export const toPage = (pageRequest: PageRequest) => {
+export const toPage = (pageRequest: PageRequest): PageInfo => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
   if (page < 0) {
     page = 0;

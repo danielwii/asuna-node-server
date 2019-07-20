@@ -2,6 +2,7 @@ import * as DataLoader from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { r } from '../common/helpers';
 import { Hermes, IAsunaEvent } from '../core/bus';
 import { LoggerFactory } from '../logger';
 
@@ -15,12 +16,11 @@ type DataLoaderFunction<T> = {
 
 function build<T>(loader): DataLoaderFunction<T> {
   return {
-    load: function(ids: any | any[]) {
+    load(ids: any | any[]) {
       if (_.isArray(ids)) {
         return !_.isEmpty(ids) ? loader.loadMany(ids).then(fp.compact) : null;
-      } else {
-        return ids ? loader.load(ids) : null;
       }
+      return ids ? loader.load(ids) : null;
     },
   };
 }
@@ -138,10 +138,17 @@ export function cachedDataLoader(segment, fn) {
   );
 }
 
-export function resolveRelationsFromInfo(info: GraphQLResolveInfo, path: string) {
+export function resolveRelationsFromInfo(
+  info: GraphQLResolveInfo,
+  path: string,
+): boolean | { relations: string[] } {
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
+    if (fieldNode == null) {
+      return true;
+    }
+
     let selectionNode;
     _.times(locations.length - 1).forEach(index => {
       selectionNode = (selectionNode || fieldNode).selectionSet.selections.find(
@@ -153,6 +160,7 @@ export function resolveRelationsFromInfo(info: GraphQLResolveInfo, path: string)
       .map(node => node.name.value);
     return { relations };
   } catch (e) {
+    logger.warn(`resolveRelationsFromInfo ${r(e)}`);
     return true;
   }
 }
