@@ -97,7 +97,7 @@ export class LoggerService {
 
   private getLoggerFormat() {
     return format.printf(info => {
-      const level = colorizeLevel(info.level);
+      const level = this.colorizeLevel(info.level);
       let message = info.message;
       if (typeof info.message === 'object') {
         message = r(message, { transform: true });
