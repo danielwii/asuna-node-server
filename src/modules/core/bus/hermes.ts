@@ -410,7 +410,7 @@ export class Hermes {
           state: 'PENDING',
           events: [{ state: 'PENDING', at: new Date().toUTCString() }],
         };
-        logger.log(`job(${jobId}) pending ... ${r(this)}`);
+        logger.log(`job(${jobId}) pending ... ${r({ data, status: this.status[jobId] })}`);
         subject.next({ jobId, data });
         return { jobId };
       },
