@@ -1,10 +1,12 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { Response } from 'express';
+import { GraphQLError } from 'graphql';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
+import { log } from 'winston';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
 import { LoggerFactory } from '../../logger/factory';
 
@@ -67,35 +69,48 @@ export class AnyExceptionFilter implements ExceptionFilter {
       logger.error(`[unhandled exception] ${r(processed)}`);
     }
 
-    if (!res.finished && res.status) {
-      if (R.is(HttpException, processed)) {
-        const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
-        res.status(status).send({
-          error: {
-            status,
-            name: exceptionResponse.error,
-            code: exceptionResponse.code,
-            [key]: exceptionResponse.message,
-            // raw: processed,
-          } as AsunaException,
-        });
-      } else if (R.is(Error, processed)) {
-        res.status(status).send({
-          error: {
-            status,
-            name: AsunaError.Unexpected__do_not_use_it.name,
-            code: processed.status || AsunaError.Unexpected__do_not_use_it.value,
-            message: processed.message,
-            // raw: processed,
-          } as AsunaException,
-        });
-      } else {
-        try {
-          res.status(status).send({ error: processed as AsunaException });
-        } catch (e) {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ error: processed as AsunaException });
-        }
-      }
+    if (res.finished) return;
+
+    let body;
+    let message;
+
+    if (R.is(HttpException, processed)) {
+      const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
+      message = exceptionResponse.message;
+      body = {
+        error: {
+          status,
+          name: exceptionResponse.error,
+          code: exceptionResponse.code,
+          [key]: message,
+          // raw: processed,
+        } as AsunaException,
+      };
+    } else if (R.is(Error, processed)) {
+      message = processed.message;
+      body = {
+        error: {
+          status,
+          name: AsunaError.Unexpected__do_not_use_it.name,
+          code: processed.status || AsunaError.Unexpected__do_not_use_it.value,
+          message,
+          // raw: processed,
+        } as AsunaException,
+      };
+    } else {
+      message = processed.message;
+      body = { error: processed as AsunaException };
+    }
+
+    // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
+    if (!res.status) {
+      throw new Error(JSON.stringify(body));
+    }
+
+    try {
+      return res.status(status).send(body);
+    } catch (e) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(body);
     }
   }
 }

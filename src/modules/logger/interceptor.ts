@@ -6,9 +6,9 @@ import { tap } from 'rxjs/operators';
 import { r } from '../common/helpers';
 import { LoggerFactory } from './factory';
 
-const logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
-
 export class ControllerLoggerInterceptor implements NestInterceptor {
+  logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
+
   intercept(
     context: ExecutionContext,
     next: CallHandler<any>,
@@ -36,13 +36,13 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(
         () =>
-          logger.debug(
+          this.logger.debug(
             `${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`,
           ),
         e => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {
-            logger.warn(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+            this.logger.warn(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
           }
         },
       ),

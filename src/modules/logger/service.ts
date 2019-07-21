@@ -1,7 +1,34 @@
 import * as clc from 'cli-color';
 import * as winston from 'winston';
-import { format, transports } from 'winston';
+import { format, level, transports } from 'winston';
 import { fixedPath, r } from '../common/helpers';
+import { LoggerConfigObject } from './config';
+import { LoggerFactory } from './factory';
+
+const logger = LoggerFactory.getLogger('Logger');
+
+// --------------------------------------------------------------
+//  Numerical         Severity
+//    Code
+//
+//     0       Emergency: system is unusable
+//     1       Alert: action must be taken immediately
+//     2       Critical: critical conditions
+//     3       Error: error conditions
+//     4       Warning: warning conditions
+//     5       Notice: normal but significant condition
+//     6       Informational: informational messages
+//     7       Debug: debug-level messages
+// --------------------------------------------------------------
+
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  verbose: 3,
+  debug: 4,
+  silly: 5,
+};
 
 export class LoggerService {
   private logger: winston.Logger;
@@ -9,14 +36,30 @@ export class LoggerService {
   private context: string;
 
   constructor() {
+    const level = LoggerConfigObject.load().level;
+    logger.log(`init with default level: ${level}`);
     this.logger = winston.createLogger({
-      // level: level || LoggerConfigObject.load().level,
+      level: 'info' || level, // fixme exchange verbose with debug
       format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         this.getLoggerFormat(),
       ),
       transports: [new transports.Console()],
     });
+  }
+
+  check() {
+    this.logger.log('silly', "127.0.0.1 - there's no place like home");
+    this.logger.log('debug', "127.0.0.1 - there's no place like home");
+    this.logger.log('verbose', "127.0.0.1 - there's no place like home");
+    this.logger.log('info', "127.0.0.1 - there's no place like home");
+    this.logger.log('warn', "127.0.0.1 - there's no place like home");
+    this.logger.log('error', "127.0.0.1 - there's no place like home");
+    this.logger.verbose("127.0.0.1 - there's no place like home");
+    this.logger.debug("127.0.0.1 - there's no place like home");
+    this.logger.info("127.0.0.1 - there's no place like home");
+    this.logger.warn("127.0.0.1 - there's no place like home");
+    this.logger.error("127.0.0.1 - there's no place like home");
   }
 
   setRequestId(id: string) {
@@ -49,12 +92,12 @@ export class LoggerService {
 
   error(msg: any, trace?: string, context?: string) {
     this.logger.error(msg, [{ context }]);
-    this.logger.error(trace, [{ context, reqId: this.requestId }]);
+    trace && this.logger.error(trace, [{ context, reqId: this.requestId }]);
   }
 
   private getLoggerFormat() {
     return format.printf(info => {
-      const level = this.colorizeLevel(info.level);
+      const level = colorizeLevel(info.level);
       let message = info.message;
       if (typeof info.message === 'object') {
         message = r(message, { transform: true });
@@ -95,6 +138,8 @@ export class LoggerService {
       case 'error':
         colorFunc = msg => clc.red(msg);
         break;
+      default:
+        colorFunc = msg => clc.magenta(msg);
     }
 
     // 17 because of the color bytes

@@ -59,6 +59,6 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 }
 
 // tslint:disable-next-line:class-name
-export interface getCurrentUser {
+export interface GetCurrentUser {
   (): AbstractAuthUser;
 }

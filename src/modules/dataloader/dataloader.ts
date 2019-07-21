@@ -27,7 +27,7 @@ function build<T>(loader): DataLoaderFunction<T> {
 
 export const dataLoaderCleaner = {
   clear(segment, id) {
-    logger.log(`remove ... ${segment}-${id}`);
+    logger.log(`remove loader cache ... ${segment}-${id}`);
     cacheMap.delete(`${segment}-${id}`);
   },
 };
@@ -141,7 +141,7 @@ export function cachedDataLoader(segment, fn) {
 export function resolveRelationsFromInfo(
   info: GraphQLResolveInfo,
   path: string,
-): boolean | { relations: string[] } {
+): boolean | { relations?: string[]; disableMixedMap?: boolean } {
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);

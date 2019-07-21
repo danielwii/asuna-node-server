@@ -38,7 +38,7 @@ export class MQProvider {
     if (MQProvider.enabled && this._connection != null) {
       return this._connection.createChannel();
     }
-    return Promise.reject();
+    return Promise.reject('mq is not enabled or connection not created.');
   }
 
   async send(topic, payload): Promise<boolean> {

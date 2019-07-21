@@ -47,7 +47,7 @@ export class GraphqlModule implements OnModuleInit {
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
             getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),
           }),
-          // tracing: true,
+          tracing: AsunaContext.isDebugMode,
           /*      extensions: _.compact([
             configLoader.loadConfig(ConfigKeys.TRACING)
               ? () =>
