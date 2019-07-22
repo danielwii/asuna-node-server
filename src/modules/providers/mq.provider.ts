@@ -8,44 +8,44 @@ const logger = LoggerFactory.getLogger('MQProvider');
 
 @Injectable()
 export class MQProvider {
-  private static _instance: MQProvider;
+  private static _instance: MQProvider = new MQProvider();
 
   private _connection: amqplib.Connection;
   private _channel: amqplib.Channel;
 
-  private constructor() {
-    if (MQProvider.enabled) {
-      const url = MQConfigObject.load().url;
-      logger.log(`connecting to ${url}`);
-      amqplib
-        .connect(url)
-        .then(connection => (this._connection = connection))
-        .catch(error => {
-          logger.error(`connect to mq error: ${r(error)}`);
-          process.exit(1);
-        });
-    }
+  private constructor() {}
+
+  private createConnection(): Promise<amqplib.Connection> {
+    return new Promise((resolve, reject) => {
+      if (MQProvider.enabled) {
+        const url = MQConfigObject.load().url;
+        logger.log(`connecting to ${url}`);
+        amqplib
+          .connect(url)
+          .then(connection => {
+            logger.log('connection established');
+            this._connection = connection;
+            resolve(connection);
+          })
+          .catch(error => {
+            logger.error(`connect to mq error: ${r(error)}`);
+            process.exit(1);
+          });
+      } else {
+        reject();
+      }
+    });
   }
 
   static get instance(): MQProvider {
-    if (MQProvider._instance == null) {
-      MQProvider._instance = new MQProvider();
-    }
     return MQProvider._instance;
-  }
-
-  get createChannel(): Promise<amqplib.Channel> {
-    if (MQProvider.enabled && this._connection != null) {
-      return this._connection.createChannel();
-    }
-    return Promise.reject('mq is not enabled or connection not created.');
   }
 
   async send(topic, payload): Promise<boolean> {
     if (!this._connection) {
-      logger.error(`cannot connect to MQ server, ${r({ topic, payload })}`);
-      return;
+      this._connection = await this.createConnection();
     }
+
     if (!this._channel) {
       this._channel = await this._connection.createChannel();
     }
@@ -60,7 +60,11 @@ export class MQProvider {
     return MQConfigObject.load().enable;
   }
 
-  get connection() {
-    return this._connection;
+  get connection(): Promise<amqplib.Connection> {
+    if (this._connection != null) {
+      return Promise.resolve(this._connection);
+    }
+
+    return this.createConnection();
   }
 }
