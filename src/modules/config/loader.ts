@@ -14,6 +14,7 @@ export const ConfigKeys = {
   UPLOADER_MAX_COUNT: 'UPLOADER_MAX_COUNT',
 
   LOGGER_LEVEL: 'LOGGER_LEVEL',
+  MASTER_ADDRESS: 'MASTER_ADDRESS',
 
   /**
    * 用与访问上传文件的资源地址

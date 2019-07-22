@@ -22,7 +22,7 @@ import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as multer from 'multer';
 import * as os from 'os';
@@ -121,7 +121,7 @@ export class UploaderController {
 
     // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
-    const stream = fsExtra.createWriteStream(tempFile);
+    const stream = fs.createWriteStream(tempFile);
     req.pipe(stream);
 
     await new Promise(resolve => {

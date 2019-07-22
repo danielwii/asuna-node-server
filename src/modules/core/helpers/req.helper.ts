@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as pump from 'pump';
 import { r } from '../../common/helpers';
@@ -15,7 +15,7 @@ export class ReqHelper {
    */
   static saveFileByReq(req: Request, filename: string): Promise<string> {
     const tempfile = `${os.tmpdir()}/${filename}`;
-    const stream = fsExtra.createWriteStream(tempfile);
+    const stream = fs.createWriteStream(tempfile);
     req.pipe(stream);
 
     return new Promise(resolve => {
@@ -30,7 +30,7 @@ export class ReqHelper {
     const tempfile = `${os.tmpdir()}/${filename}`;
     logger.log(`save file to ${r({ filename, tempfile })}`);
     return new Promise((resolve, reject) =>
-      pump(fileStream, fsExtra.createWriteStream(tempfile), err =>
+      pump(fileStream, fs.createWriteStream(tempfile), err =>
         err ? reject(err) : resolve(tempfile),
       ),
     );

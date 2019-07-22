@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import * as bluebird from 'bluebird';
 import { plainToClass, Transform } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as highland from 'highland';
 import * as _ from 'lodash';
 import { join } from 'path';
@@ -143,13 +143,13 @@ export class UploaderService {
       filename => +filename.slice(filename.lastIndexOf('.') + 1),
     );
     const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', payload.fingerprint);
-    fsExtra.mkdirsSync(tempDirectory);
+    fs.mkdirsSync(tempDirectory);
     const dest = join(tempDirectory, _filename);
     logger.log(`merge files: ${r(filepaths)} to ${dest}`);
-    const writableStream = fsExtra.createWriteStream(dest);
+    const writableStream = fs.createWriteStream(dest);
 
     highland(filepaths)
-      .map(fsExtra.createReadStream)
+      .map(fs.createReadStream)
       .flatMap(highland)
       .pipe(writableStream);
 
@@ -159,7 +159,7 @@ export class UploaderService {
         resolve();
         filepaths.forEach(filepath => {
           logger.log(`remove ${filepath} ...`);
-          fsExtra
+          fs
             .remove(filepath)
             .catch(reason => logger.warn(`remove ${filepath} error: ${r(reason)}`));
         });

@@ -1,4 +1,4 @@
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
 import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
@@ -49,7 +49,7 @@ export class AsunaContext {
     });
     this.initStorageEngine(`${process.cwd()}/uploads`);
     this.tempPath = `${process.cwd()}/temp`;
-    fsExtra.mkdirs(join(this.tempPath)).catch(reason => logger.warn(r(reason)));
+    fs.mkdirs(join(this.tempPath)).catch(reason => logger.warn(r(reason)));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}) {

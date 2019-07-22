@@ -1,6 +1,6 @@
 import { classToPlain } from 'class-transformer';
 import { oneLineTrim } from 'common-tags';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
 import { AsunaError, AsunaException, convertFilename } from '../../common';
@@ -64,15 +64,15 @@ export class MinioStorage implements IStorageEngine {
           MinioStorage.logger.log(`[saveEntity] [${etag}] ...`);
 
           MinioStorage.logger.log(`remove local file ${file.path}`);
-          fsExtra
+          fs
             .remove(file.path)
             .then(() => {
               const parent = join(file.path, '../');
               MinioStorage.logger.log(`removed: ${file.path}, check parent: ${parent}`);
-              fsExtra.readdir(parent).then(files => {
+              fs.readdir(parent).then(files => {
                 if (files.length === 0) {
                   MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
-                  fsExtra
+                  fs
                     .remove(parent)
                     .catch(reason =>
                       MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
@@ -179,15 +179,15 @@ export class MinioStorage implements IStorageEngine {
         MinioStorage.logger.log(`[saveEntity] [${etag}] ...`);
 
         MinioStorage.logger.log(`remove local file ${file.path}`);
-        fsExtra
+        fs
           .remove(file.path)
           .then(() => {
             const parent = join(file.path, '../');
             MinioStorage.logger.log(`removed: ${file.path}, check parent: ${parent}`);
-            fsExtra.readdir(parent).then(files => {
+            fs.readdir(parent).then(files => {
               if (files.length === 0) {
                 MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
-                fsExtra
+                fs
                   .remove(parent)
                   .catch(reason =>
                     MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),

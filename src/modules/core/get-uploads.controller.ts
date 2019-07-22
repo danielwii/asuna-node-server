@@ -108,7 +108,7 @@ export class GetUploadsController {
   //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
-  //     if (!fsExtra.existsSync(fullFilePath)) {
+  //     if (!fs.existsSync(fullFilePath)) {
   //       throw new NotFoundException();
   //     }
   //     res.sendFile(fullFilePath);
@@ -127,7 +127,7 @@ export class GetUploadsController {
   //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
-  //     if (!fsExtra.existsSync(fullFilePath)) {
+  //     if (!fs.existsSync(fullFilePath)) {
   //       throw new NotFoundException();
   //     }
   //     res.sendFile(fullFilePath);
@@ -147,7 +147,7 @@ export class GetUploadsController {
   //   const fullFilePath = join(this.context.uploadPath, bucket, prefix, filename);
   //   if (fullFilePath.startsWith(this.context.uploadPath)) {
   //     logger.log(`check if file '${fullFilePath}' exists`);
-  //     if (!fsExtra.existsSync(fullFilePath)) {
+  //     if (!fs.existsSync(fullFilePath)) {
   //       throw new NotFoundException();
   //     }
   //     res.sendFile(fullFilePath);

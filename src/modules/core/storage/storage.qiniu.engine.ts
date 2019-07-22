@@ -32,7 +32,7 @@ export class QiniuStorage implements IStorageEngine {
       `[constructor] init ${r({ configs: classToPlain(this.configObject) })}`,
     );
 
-    // this.temp = fsExtra.mkdtempSync('temp');
+    // this.temp = fs.mkdtempSync('temp');
     this.mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
   }
 

@@ -1,6 +1,6 @@
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
-import * as fsExtra from 'fs-extra';
+import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import { join } from 'path';
 import * as sharp from 'sharp';
@@ -21,7 +21,7 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(oneLineTrim`
       [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
     `);
-    fsExtra
+    fs
       .mkdirs(join(this.storagePath, this.bucket))
       .catch(reason => LocalStorage.logger.warn(r(reason)));
   }
@@ -39,7 +39,7 @@ export class LocalStorage implements IStorageEngine {
     const dest = join(this.storagePath, bucket, prefix, filename);
     LocalStorage.logger.log(`file is '${r({ file, dest })}'`);
 
-    fsExtra.moveSync(file.path, dest);
+    fs.moveSync(file.path, dest);
     return Promise.resolve(
       new SavedFile({
         bucket,
@@ -81,18 +81,18 @@ export class LocalStorage implements IStorageEngine {
     const outputPath = `${fullFileDir}/${outputFilename}.${ext}`;
 
     if (!['png', 'jpg', 'jpeg'].includes(ext)) {
-      if (fsExtra.existsSync(outputPath)) {
+      if (fs.existsSync(outputPath)) {
         return res.type(ext).sendFile(fullFilePath);
       }
       return res.status(404).send();
     }
 
     LocalStorage.logger.log(`check if ${ext} file outputPath '${outputPath}' exists`);
-    if (fsExtra.existsSync(outputPath)) {
-      return res.type(ext).send(fsExtra.createReadStream(outputPath));
+    if (fs.existsSync(outputPath)) {
+      return res.type(ext).send(fs.createReadStream(outputPath));
     }
 
-    fsExtra.mkdirpSync(fullFileDir);
+    fs.mkdirpSync(fullFileDir);
     LocalStorage.logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
     const imageProcess = sharp(fullFilePath);
     if (thumbnailConfig) {
