@@ -23,7 +23,7 @@ export class LoggerConfigObject {
       modules: Object.assign(
         {},
         ..._.chain(configLoader.loadConfigs())
-          .filter((v, k: string) => k.startsWith(ConfigKeys.LOGGER_LEVEL))
+          .filter((v, k: string) => k.startsWith(`${ConfigKeys.LOGGER_LEVEL}_`))
           .map((v, k: string) => ({
             [k
               .slice(ConfigKeys.LOGGER_LEVEL.length + 1)
