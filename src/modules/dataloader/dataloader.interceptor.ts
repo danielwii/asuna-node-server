@@ -19,9 +19,9 @@ export class DataLoaderInterceptor implements NestInterceptor {
     // If the request already has data loaders,
     // then do not create them again or the benefits are negated.
     if (request.dataLoaders) {
-      // this.logger.debug('Data loaders exist', this.constructor.name);
+      // this.logger.verbose('Data loaders exist', this.constructor.name);
     } else {
-      // this.logger.debug('Creating data loaders', this.constructor.name);
+      // this.logger.verbose('Creating data loaders', this.constructor.name);
 
       // Create new instances of DataLoaders per request
       request.dataLoaders = genericDataLoader.createLoaders();

@@ -19,7 +19,7 @@ export class LoggerConfigObject {
     logger.log(`try load env: ${ConfigKeys.LOGGER_LEVEL}`);
 
     return new LoggerConfigObject({
-      level: configLoader.loadConfig(ConfigKeys.LOGGER_LEVEL, 'debug'),
+      level: configLoader.loadConfig(ConfigKeys.LOGGER_LEVEL, 'info'),
       modules: Object.assign(
         {},
         ..._.chain(configLoader.loadConfigs())

@@ -75,11 +75,11 @@ export class LoggerService {
   }
 
   verbose(msg: any, context?: string) {
-    this.logger.verbose(msg, [{ context, reqId: this.requestId }]);
+    this.logger.debug(msg, [{ context, reqId: this.requestId }]);
   }
 
   debug(msg: any, context?: string) {
-    this.logger.debug(msg, [{ context, reqId: this.requestId }]);
+    this.logger.verbose(msg, [{ context, reqId: this.requestId }]);
   }
 
   log(msg: any, context?: string) {

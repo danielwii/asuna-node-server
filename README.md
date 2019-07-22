@@ -4,3 +4,7 @@
 [![Dependencies](https://img.shields.io/david/danielwii/asuna-node-server.svg?style=flat-square)](https://david-dm.org/danielwii/asuna-node-server)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![Greenkeeper badge](https://badges.greenkeeper.io/danielwii/asuna-node-server.svg)](https://greenkeeper.io/)
+
+### quickstart
+
+`ENV=dev yarn dev` or `ENV=dev yarn dev:watch`

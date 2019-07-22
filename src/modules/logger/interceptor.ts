@@ -30,13 +30,13 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     };
 
     /*
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
+    logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
     */
     const now = Date.now();
     return next.handle().pipe(
       tap(
         () =>
-          this.logger.debug(
+          this.logger.verbose(
             `${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`,
           ),
         e => {

@@ -24,15 +24,15 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
     // tslint:disable-next-line:max-line-length
-    // logger.verbose(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    // logger.debug(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
   }
 
   afterLoad(entity: BaseEntity): Promise<any> | void {
-    // logger.verbose(`afterLoad ${entity.constructor.name} ${r(entity)}`);
+    // logger.debug(`afterLoad ${entity.constructor.name} ${r(entity)}`);
   }
 
   afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    // logger.verbose(
+    // logger.debug(
     //   `afterRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     id: event.entityId,
@@ -41,7 +41,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   afterUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    // logger.verbose(
+    // logger.debug(
     //   `afterUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     updatedColumns: diff(event.entity, event.databaseEntity),
@@ -64,12 +64,12 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
     // tslint:disable-next-line:max-line-length
-    // logger.verbose(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    // logger.debug(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
     validateObjectSync(event.entity);
   }
 
   beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    // logger.verbose(
+    // logger.debug(
     //   `beforeRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     id: event.entityId,
@@ -78,7 +78,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    // logger.verbose(
+    // logger.debug(
     //   `beforeUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     updatedColumns: diff(event.entity, event.databaseEntity),

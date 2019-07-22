@@ -63,7 +63,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res: Response) {
-    const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix, filename);
+    const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix || '', filename);
     if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }

@@ -53,7 +53,7 @@ export abstract class AbstractAuthService {
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     const validated = user != null && user.id === jwtPayload.id;
     if (!validated) {
-      logger.debug(oneLine`
+      logger.verbose(oneLine`
         validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
         left: ${formatTime(left)}
       `);

@@ -63,7 +63,7 @@ export class GraphqlModule implements OnModuleInit {
             if (response.errors) {
               logger.warn(`response: ${r(response.errors)}`);
             }
-            logger.verbose(`response: ${r(response.data)}`);
+            logger.debug(`response: ${r(response.data)}`);
             return response;
           },
         }),

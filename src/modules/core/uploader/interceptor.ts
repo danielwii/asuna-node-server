@@ -28,7 +28,7 @@ export class FastifyFileInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request: FastifyUploadedFileRequest = context.switchToHttp().getRequest();
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
+    logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
 
     request.files = [];
 

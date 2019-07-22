@@ -698,6 +698,11 @@
   dependencies:
     "@types/ioredis" "*"
 
+"@types/cli-color@^0.3.29":
+  version "0.3.29"
+  resolved "https://registry.yarnpkg.com/@types/cli-color/-/cli-color-0.3.29.tgz#c83a71fe02c8c7e1ccec048dd6a2458d1f6c96ea"
+  integrity sha1-yDpx/gLIx+HM7ASN1qJFjR9sluo=
+
 "@types/common-tags@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.8.0.tgz#79d55e748d730b997be5b7fce4b74488d8b26a6b"
@@ -1570,10 +1575,11 @@ babel-jest@^24.8.0:
     slash "^2.0.0"
 
 babel-plugin-istanbul@^5.1.0:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-5.1.4.tgz#841d16b9a58eeb407a0ddce622ba02fe87a752ba"
-  integrity sha512-dySz4VJMH+dpndj0wjJ8JPs/7i1TdSPb1nRrn56/92pKOF9VKC1FMFJmMXjzlGGusnCAqujP6PBCiKq0sVA+YQ==
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-5.2.0.tgz#df4ade83d897a92df069c4d9a25cf2671293c854"
+  integrity sha512-5LphC0USA8t4i1zCtjbbNb6jJj/9+X6P37Qfirc/70EQ34xKlMW+a1RHGwxGI+SwWpNwZ27HqvzAobeqaXwiZw==
   dependencies:
+    "@babel/helper-plugin-utils" "^7.0.0"
     find-up "^3.0.0"
     istanbul-lib-instrument "^3.3.0"
     test-exclude "^5.2.3"
@@ -6363,10 +6369,10 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-buffs@^0.6.5:
-  version "0.6.5"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.5.tgz#6b9ea935338fc5509a023488f203969a401ac049"
-  integrity sha512-3b0rU+SP3Q4Xqhvx6OibgKz1TkRRxCy3KMi4/Z5guWc1Q8m6z1z8OZcV4NhKQGVswa+0EUPhWu2a5TNfmrKx/w==
+node-buffs@^0.6.7:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.7.tgz#6b150e6abc7cf0fd90a27659a49a101aff41d8f9"
+  integrity sha512-PVcLOITjjNf31sLcVSim8PyNhI+SDnHd3KIZKBofSfVAuWWd6gk21fMn5GmdlG7Lz7QByZza8ZHiNSUs+C9tuQ==
   dependencies:
     dotenv "^8.0.0"
     lodash "^4.17.15"
