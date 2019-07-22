@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { AsunaError, AsunaException } from '../common';
+import { AsunaError, AsunaException, r } from '../common';
 import { AbstractAuthUser } from '../core/auth';
 import { LoggerFactory } from '../logger';
 
@@ -16,16 +16,17 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  // jwtAuthenticator = passport.authenticate('jwt', { session: false });
+  /*
+  jwtAuthenticator = passport.authenticate('jwt', { session: false });
 
-  // canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-  //   const http = context.switchToHttp();
-  //   return this.jwtAuthenticator(http.getRequest(), http.getResponse());
-  // }
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    const http = context.switchToHttp();
+    return this.jwtAuthenticator(http.getRequest(), http.getResponse());
+  }*/
 
   handleRequest(err, user, info) {
-    logger.log(`handleRequest ${JSON.stringify({ err, user, info })}`);
     if (err || !user) {
+      logger.log(`handleRequest ${r({ err, user, info, anonymous: this.opts.anonymousSupport })}`);
       if (this.opts.anonymousSupport) {
         return null;
       }
@@ -41,7 +42,22 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
    */
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req;
+    const request = ctx.getContext().req;
+    const info = {
+      body: request.body,
+      query: request.query,
+      params: request.params,
+      headers: request.headers,
+      /*
+      raw: request.raw,
+      id: request.id,
+      */
+      ip: request.ip,
+      ips: request.ips,
+      hostname: request.hostname,
+    };
+    logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    return request;
   }
 
   /*

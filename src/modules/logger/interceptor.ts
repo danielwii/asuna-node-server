@@ -29,9 +29,8 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    /*
-    logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
-    */
+    // tslint:disable-next-line:max-line-length
+    // logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
     const now = Date.now();
     return next.handle().pipe(
       tap(

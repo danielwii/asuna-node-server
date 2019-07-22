@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { classToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { inspect } from 'util';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -43,4 +43,18 @@ export function fixedPath(name: string, length: number = 32, pos: number = 0) {
     }
   }
   return name;
+}
+
+// TODO make only safe dirs can be list
+export function traverseDir(dir) {
+  const dirs = [];
+  fs.readdirSync(dir).forEach(file => {
+    const fullPath = join(dir, file);
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      dirs.push(...traverseDir(fullPath));
+    } else {
+      dirs.push(fullPath);
+    }
+  });
+  return dirs;
 }

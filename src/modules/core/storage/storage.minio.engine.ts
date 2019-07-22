@@ -179,19 +179,16 @@ export class MinioStorage implements IStorageEngine {
         MinioStorage.logger.log(`[saveEntity] [${etag}] ...`);
 
         MinioStorage.logger.log(`remove local file ${file.path}`);
-        fs
-          .remove(file.path)
+        fs.remove(file.path)
           .then(() => {
             const parent = join(file.path, '../');
             MinioStorage.logger.log(`removed: ${file.path}, check parent: ${parent}`);
             fs.readdir(parent).then(files => {
               if (files.length === 0) {
                 MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
-                fs
-                  .remove(parent)
-                  .catch(reason =>
-                    MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
-                  );
+                fs.remove(parent).catch(reason =>
+                  MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
+                );
               }
             });
           })

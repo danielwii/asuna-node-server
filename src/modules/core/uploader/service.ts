@@ -159,9 +159,9 @@ export class UploaderService {
         resolve();
         filepaths.forEach(filepath => {
           logger.log(`remove ${filepath} ...`);
-          fs
-            .remove(filepath)
-            .catch(reason => logger.warn(`remove ${filepath} error: ${r(reason)}`));
+          fs.remove(filepath).catch(reason =>
+            logger.warn(`remove ${filepath} error: ${r(reason)}`),
+          );
         });
       });
     });

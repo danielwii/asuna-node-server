@@ -1,12 +1,10 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { Response } from 'express';
-import { GraphQLError } from 'graphql';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { log } from 'winston';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
 import { LoggerFactory } from '../../logger/factory';
 
@@ -102,15 +100,18 @@ export class AnyExceptionFilter implements ExceptionFilter {
       body = { error: processed as AsunaException };
     }
 
+    logger.error({ message, body });
+
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
     if (!res.status) {
       throw new Error(JSON.stringify(body));
     }
 
-    try {
-      return res.status(status).send(body);
-    } catch (e) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(body);
-    }
+    res.status(status).send(body);
+    // try {
+    // } catch (e) {
+    //   logger.log(`send status: ${status}`);
+    //   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(body);
+    // }
   }
 }

@@ -15,19 +15,19 @@ export enum StorageMode {
 export class FileInfo {
   @IsString()
   @Transform(value => _.trim(value))
-  readonly filename: string;
+  filename: string;
 
   @IsString()
   @Transform(value => _.trim(value))
-  readonly path: string;
+  path: string;
 
   @IsString()
   @Transform(value => _.trim(value))
-  readonly mimetype?: string;
+  mimetype?: string;
 
   @IsString()
   @Transform(value => _.trim(value))
-  readonly extension?: string;
+  extension?: string;
 
   constructor(o: FileInfo) {
     if (o == null) {

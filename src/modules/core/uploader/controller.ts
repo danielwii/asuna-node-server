@@ -26,13 +26,14 @@ import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as multer from 'multer';
 import * as os from 'os';
+import { join, dirname, basename } from 'path';
 import * as uuid from 'uuid';
 import { isBlank, r, UploadException } from '../../common';
 import { ConfigKeys, configLoader } from '../../config';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { AsunaContext } from '../context';
-import { DocMimeType, ImageMimeType, VideoMimeType } from '../storage';
+import { DocMimeType, FileInfo, ImageMimeType, VideoMimeType } from '../storage';
 import { OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
 import { UploaderService } from './service';
@@ -93,6 +94,11 @@ export class UploaderController {
 
   constructor(private readonly uploaderService: UploaderService) {}
 
+  /**
+   * 创建 chunk 上传任务
+   * @param query
+   * @param req
+   */
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
   createChunksUploadTask(@Query() query: CreateChunksUploadTaskQuery, @Req() req: AnyAuthRequest) {
@@ -101,6 +107,12 @@ export class UploaderController {
     return UploaderHelper.createChunksUploadTask({ ...query, identifier });
   }
 
+  /**
+   * 流式上传 chunk
+   * @param filename
+   * @param chunk
+   * @param req
+   */
   @ApiBearerAuth()
   @ApiOperation({ title: 'Stream upload chunked file' })
   @ApiConsumes('multipart/form-data')
@@ -135,6 +147,13 @@ export class UploaderController {
     return this.uploaderService.uploadChunks(token, filename, tempFile, chunk);
   }
 
+  /**
+   * 基于 operation-token 上传 chunk
+   * @param filename
+   * @param chunk
+   * @param req
+   * @param file
+   */
   @ApiBearerAuth()
   @ApiOperation({ title: 'Chunked upload file' })
   @ApiConsumes('multipart/form-data')
@@ -162,6 +181,11 @@ export class UploaderController {
     return this.uploaderService.uploadChunks(req.token, filename, file.path, chunk);
   }
 
+  /**
+   * 合并 chunks
+   * @param filename
+   * @param req
+   */
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
   async mergeChunks(
@@ -171,6 +195,14 @@ export class UploaderController {
     return this.uploaderService.mergeChunks(req.token, filename);
   }
 
+  /**
+   * 直接上传文件
+   * @param bucket
+   * @param prefix
+   * @param local 在某些可能需要同一个 server 执行任务时可能需要
+   * @param req
+   * @param files
+   */
   @ApiBearerAuth()
   @ApiOperation({ title: 'Upload files' })
   @ApiConsumes('multipart/form-data')
@@ -180,11 +212,6 @@ export class UploaderController {
     enum: ['1'],
     required: false,
     description: 'force use local storage',
-  })
-  @ApiImplicitQuery({
-    name: 'chunk',
-    required: false,
-    description: 'chunked upload files index',
   })
   @UseGuards(AnyAuthGuard)
   @Post()
@@ -200,7 +227,6 @@ export class UploaderController {
     @Query('bucket') bucket: string = '',
     @Query('prefix') prefix: string = '',
     @Query('local') local: string, // 是否使用本地存储
-    @Query('chunk') chunk: number,
     @Req() req: AnyAuthGuard,
     @UploadedFiles() files,
   ) {
@@ -209,40 +235,87 @@ export class UploaderController {
       throw new UploadException(req.fileValidationError);
     }*/
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
-    const results = await bluebird
-      .map(files, (file: any) => {
-        if (local === '1') {
-          logger.log(oneLineTrim`
+    const results = await this.saveFiles(bucket, prefix, local, files).catch(error => {
+      logger.error(r(error));
+      // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
+      throw new UploadException(error);
+    });
+    logger.log(`results is ${r(results)}`);
+    return results;
+  }
+
+  /**
+   * 流式上传
+   */
+  // @UseGuards(AnyAuthGuard)
+  @Post('stream')
+  async streamUpload(
+    @Query('bucket') bucket: string = '',
+    @Query('prefix') prefix: string = '',
+    @Query('filename') filename: string,
+    @Req() req, // : AnyAuthRequest,
+  ) {
+    // const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`;
+
+    const fixedPrefix = join(prefix, dirname(filename));
+    const fixedFilename = basename(filename);
+
+    const tempDir = join(AsunaContext.instance.tempPath, 'stream');
+    await fs.ensureDir(tempDir);
+    const tempFolder = await fs.mkdtemp(join(tempDir, 'temp-'));
+    logger.log(`create temp folder: ${tempFolder}`);
+    const tempFile = join(tempFolder, fixedFilename);
+    const stream = fs.createWriteStream(tempFile);
+    req.pipe(stream);
+
+    await new Promise(resolve => {
+      req.on('end', () => {
+        logger.log(`save to ${tempFile} done.`);
+        resolve();
+      });
+    });
+
+    const fileInfo = new FileInfo({ filename: fixedFilename, path: tempFile });
+    fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${fixedFilename}`;
+    const results = await this.saveFiles(bucket, fixedPrefix, 0, [fileInfo]).catch(error => {
+      logger.error(r(error));
+      // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
+      throw new UploadException(error);
+    });
+    // TODO remove temp files in storage engine now
+    // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
+    logger.log(`results is ${r(results)}`);
+    return _.first(results);
+  }
+
+  private saveFiles(bucket, prefix, local, files: FileInfo[]) {
+    return bluebird.map(files, (file: any) => {
+      if (local === '1') {
+        logger.log(oneLineTrim`
             save file[${file.mimetype}] to local storage 
             ${r({ bucket, prefix, filename: file.filename })}
           `);
-          return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
-        }
+        return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
+      }
 
-        if (_.includes(ImageMimeType, file.mimetype)) {
-          logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
-          return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
-        }
-        if (_.includes(VideoMimeType, file.mimetype)) {
-          logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
-          return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
-        }
-        if (_.includes(DocMimeType, file.mimetype)) {
-          logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
-          return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
-        }
-        logger.log(oneLineTrim`
+      if (_.includes(ImageMimeType, file.mimetype)) {
+        logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
+      }
+      if (_.includes(VideoMimeType, file.mimetype)) {
+        logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
+      }
+      if (_.includes(DocMimeType, file.mimetype)) {
+        logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
+      }
+      logger.log(oneLineTrim`
           no storage engine defined for file type [${file.mimetype}]
           to ${r({ bucket, prefix, filename: file.filename })}, 
           using normal file storage engine.
         `);
-        return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
-      })
-      .catch(error => {
-        logger.error(r(error));
-        throw new UploadException(error);
-      });
-    logger.log(`results is ${r(results)}`);
-    return results;
+      return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
+    });
   }
 }

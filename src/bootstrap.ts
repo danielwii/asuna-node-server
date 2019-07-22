@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestApplication, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { json } from 'body-parser';
+import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
@@ -67,9 +67,11 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   fastifyAdapter.use(require('ienoopen')());
   fastifyAdapter.use(require('x-xss-protection')());*/
 
+  const loggerService = new LoggerService();
   const app = await NestFactory.create<NestApplication>(appModule, {
-    logger: new LoggerService(),
+    logger: loggerService,
   });
+  // loggerService.check();
   /*
   app.register(require('fastify-multipart'));
 
@@ -92,7 +94,11 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     }),
   );
   app.use(morgan('combined'));
-  app.use(json({ limit: configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '1mb') }));
+
+  const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '2mb');
+  logger.log(`set json payload limit to ${limit}`);
+  app.use(bodyParser.json({ limit }));
+  app.use(bodyParser.urlencoded({ limit, extended: true }));
 
   // fastifyInstance.addHook('onError', (req, reply, error, done) => {
   //   logger.log(`error is ${r(error)}`);
