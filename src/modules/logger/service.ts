@@ -100,7 +100,7 @@ export class LoggerService {
       const level = this.colorizeLevel(info.level);
       let message = info.message;
       if (typeof info.message === 'object') {
-        message = r(message, { transform: true });
+        message = r(message);
         // message = JSON.stringify(message, null, 3);
       }
       let reqId: string = '';
