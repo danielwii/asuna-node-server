@@ -255,16 +255,14 @@ export class UploaderController {
     @Query('filename') filename: string,
     @Req() req, // : AnyAuthRequest,
   ) {
-    // const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`;
-
     const fixedPrefix = join(prefix, dirname(filename));
-    const fixedFilename = basename(filename);
+    const baseFilename = basename(filename);
 
     const tempDir = join(AsunaContext.instance.tempPath, 'stream');
     await fs.ensureDir(tempDir);
     const tempFolder = await fs.mkdtemp(join(tempDir, 'temp-'));
     logger.log(`create temp folder: ${tempFolder}`);
-    const tempFile = join(tempFolder, fixedFilename);
+    const tempFile = join(tempFolder, baseFilename);
     const stream = fs.createWriteStream(tempFile);
     req.pipe(stream);
 
@@ -275,8 +273,9 @@ export class UploaderController {
       });
     });
 
-    const fileInfo = new FileInfo({ filename: fixedFilename, path: tempFile });
-    fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${fixedFilename}`;
+    const fileInfo = new FileInfo({ filename: baseFilename, path: tempFile });
+    // tslint:disable-next-line:max-line-length
+    // fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${baseFilename}`;
     const results = await this.saveFiles(bucket, fixedPrefix, 0, [fileInfo]).catch(error => {
       logger.error(r(error));
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
