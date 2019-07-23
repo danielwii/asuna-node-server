@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { classToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
-import { dirname, join, resolve } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { inspect } from 'util';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -61,4 +61,11 @@ export function traverseDir(dir) {
     }
   });
   return dirs;
+}
+
+export function resolveBasename(path: string, withExt: boolean = false) {
+  if (!_.isString(path)) {
+    return path;
+  }
+  return withExt ? basename(path) : basename(path).replace(/\.[^/.]+$/, '');
 }
