@@ -1,4 +1,7 @@
+import { ClassTransformOptions, deserialize } from 'class-transformer';
+import { ClassType } from 'class-transformer/ClassTransformer';
 import { validate, validateSync } from 'class-validator';
+import * as _ from 'lodash';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
 import { LoggerFactory } from '../../logger/factory';
 
@@ -27,4 +30,19 @@ export function validateObjectSync(object) {
       errors,
     );
   }
+}
+
+export function deserializeSafely<T>(
+  cls: ClassType<T>,
+  json: string | T,
+  options: ClassTransformOptions = { enableCircularCheck: true },
+): T {
+  if (!_.isString(json)) {
+    validateObjectSync(json);
+    return json as T;
+  }
+  const o = deserialize(cls, json, options);
+  logger.log(`deserializeSafely: ${r({ cls, o, json, options })}`);
+  validateObjectSync(o);
+  return o;
 }

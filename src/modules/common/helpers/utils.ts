@@ -1,12 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
 import { classToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
-import { resolve, dirname, join } from 'path';
+import * as _ from 'lodash';
+import { dirname, join, resolve } from 'path';
 import { inspect } from 'util';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: boolean } = {}) => {
+  if (!_.isObjectLike(o)) {
+    return o;
+  }
   const value = transform ? classToPlain(o) : o;
   return isProduction || plain ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
 };

@@ -20,11 +20,11 @@
   "devDependencies": {
     "@nestjs/testing": "^6.5.3",
     "@types/bluebird": "^3.5.27",
-    "@types/bull": "^3.10.0",
+    "@types/bull": "^3.10.1",
     "@types/cli-color": "^0.3.29",
     "@types/common-tags": "^1.8.0",
     "@types/fs-extra": "^8.0.0",
-    "@types/graphql": "^14.2.2",
+    "@types/graphql": "^14.2.3",
     "@types/highland": "^2.12.3",
     "@types/jest": "^24.0.15",
     "@types/mime-types": "^2.1.0",
