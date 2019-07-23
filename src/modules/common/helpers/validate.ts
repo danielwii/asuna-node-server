@@ -41,8 +41,8 @@ export function deserializeSafely<T>(
     validateObjectSync(json);
     return json as T;
   }
-  const o = deserialize(cls, json, options);
-  logger.log(`deserializeSafely: ${r({ cls, o, json, options })}`);
+  const o = deserialize(cls, json as string, options);
+  logger.debug(`deserializeSafely: ${r({ cls, o, json, options })}`);
   validateObjectSync(o);
   return o;
 }
