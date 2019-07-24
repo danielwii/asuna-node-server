@@ -32,7 +32,7 @@ export class MQConfigObject {
 
   static load(prefix: string = ''): MQConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    logger.log(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
+    logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     return new MQConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`, false),
       url: configLoader.loadConfig(`${appendPrefix}${MQConfigKeys.MQ_URL}`, 'amqp://localhost'),
@@ -45,7 +45,7 @@ export class MQConfigObject {
 
   static loadOr(prefix: string = ''): MQConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
-    logger.log(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
+    logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     if (enable === true) {
       return MQConfigObject.load(prefix);

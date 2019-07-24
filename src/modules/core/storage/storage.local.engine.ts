@@ -21,9 +21,9 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(oneLineTrim`
       [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
     `);
-    fs
-      .mkdirs(join(this.storagePath, this.bucket))
-      .catch(reason => LocalStorage.logger.warn(r(reason)));
+    fs.mkdirs(join(this.storagePath, this.bucket)).catch(reason =>
+      LocalStorage.logger.warn(r(reason)),
+    );
   }
 
   saveEntity(

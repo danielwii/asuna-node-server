@@ -12,29 +12,42 @@ export class MQProvider {
 
   private _connection: amqplib.Connection;
   private _channel: amqplib.Channel;
+  private _retryLimit = 10;
 
   private constructor() {}
 
-  private createConnection(): Promise<amqplib.Connection> {
-    return new Promise((resolve, reject) => {
-      if (MQProvider.enabled) {
-        const url = MQConfigObject.load().url;
-        logger.log(`connecting to ${url}`);
-        amqplib
-          .connect(url)
-          .then(connection => {
-            logger.log('connection established');
-            this._connection = connection;
-            resolve(connection);
-          })
-          .catch(error => {
-            logger.error(`connect to mq error: ${r(error)}`);
-            process.exit(1);
-          });
-      } else {
-        reject();
+  private async createConnection(): Promise<amqplib.Connection> {
+    if (MQProvider.enabled) {
+      const url = MQConfigObject.load().url;
+      logger.log(`connecting to ${url}`);
+      const connection = await amqplib
+        .connect(url)
+        .catch(error => logger.error(`connect to mq error: ${r(error)}`));
+
+      if (connection == null) {
+        if (this._retryLimit < 1) {
+          process.exit(1);
+        }
+
+        setTimeout(
+          () =>
+            this.createConnection().catch(reason => {
+              this._retryLimit -= 1;
+              logger.error(`reconnect(${10 - this._retryLimit}) to mq error, retry in 10s.`);
+            }),
+          10000,
+        );
+        return Promise.reject();
       }
-    });
+
+      this._retryLimit = 10;
+      this._connection = connection as amqplib.Connection;
+      logger.log('connection established');
+      return Promise.resolve(this._connection);
+    }
+
+    logger.error(`mq not enabled: ${MQProvider.enabled}`);
+    return Promise.reject();
   }
 
   static get instance(): MQProvider {

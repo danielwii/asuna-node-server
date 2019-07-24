@@ -1,6 +1,6 @@
 import * as clc from 'cli-color';
 import * as winston from 'winston';
-import { format, level, transports } from 'winston';
+import { format, transports } from 'winston';
 import { fixedPath, r } from '../common/helpers';
 import { LoggerConfigObject } from './config';
 import { LoggerFactory } from './factory';
@@ -39,7 +39,7 @@ export class LoggerService {
     const level = LoggerConfigObject.load().level;
     logger.log(`init with default level: ${level}`);
     this.logger = winston.createLogger({
-      level: 'info' || level, // fixme exchange verbose with debug
+      level,
       format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         this.getLoggerFormat(),
@@ -74,11 +74,11 @@ export class LoggerService {
     this.context = ctx;
   }
 
-  verbose(msg: any, context?: string) {
+  debug(msg: any, context?: string) {
     this.logger.debug(msg, [{ context, reqId: this.requestId }]);
   }
 
-  debug(msg: any, context?: string) {
+  verbose(msg: any, context?: string) {
     this.logger.verbose(msg, [{ context, reqId: this.requestId }]);
   }
 

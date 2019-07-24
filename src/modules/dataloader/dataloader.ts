@@ -138,6 +138,11 @@ export function cachedDataLoader(segment, fn) {
   );
 }
 
+/**
+ * 解析出 graphql 参数中的关联字段
+ * @param info
+ * @param path
+ */
 export function resolveRelationsFromInfo(
   info: GraphQLResolveInfo,
   path: string,
