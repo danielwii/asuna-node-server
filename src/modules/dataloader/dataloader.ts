@@ -63,7 +63,7 @@ export class GenericDataLoader {
   }
 
   createLoaders() {
-    return _.memoize(() => GenericDataLoader.loaders);
+    return _.memoize(() => GenericDataLoader.loaders)();
   }
 }
 
