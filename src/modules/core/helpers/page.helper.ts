@@ -37,14 +37,16 @@ export class Pageable<T> {
   items: T[];
 }
 
-export class Cursured<T> {
+export class CursorPageable<T> {
   totalCount: number;
-  pageInfo: {
-    endCursor: string | number;
-    hasNextPage: boolean;
-  };
+  pageInfo: CursorPageInfo;
   items: T[];
 }
+
+export type CursorPageInfo = {
+  endCursor: string | number;
+  hasNextPage: boolean;
+};
 
 export type PageInfo = {
   page: number;

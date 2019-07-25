@@ -9,12 +9,23 @@ import {
   RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
-import { r, validateObjectSync } from '../../common/helpers';
+import { deserializeSafely, validateObjectSync } from '../../common/helpers';
 import { dataLoaderCleaner } from '../../dataloader';
 import { LoggerFactory } from '../../logger';
 import { Hermes } from './hermes';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
+
+export class BeforeAfterInsertPayload<T extends BaseEntity> {
+  readonly entity: T;
+  readonly updatedColumns: T;
+  readonly name: string;
+  readonly tableName: string;
+
+  constructor(o: BeforeAfterInsertPayload<T>) {
+    Object.assign(this, deserializeSafely(BeforeAfterInsertPayload, o));
+  }
+}
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
@@ -25,6 +36,18 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
     // tslint:disable-next-line:max-line-length
     // logger.debug(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    /*
+    Hermes.emit(
+      EntitySubscriber.name,
+      'entity.afterInsert',
+      new BeforeAfterInsertPayload({
+        entity: event.entity,
+        updatedColumns: event.entity,
+        name: event.metadata.name,
+        tableName: event.metadata.tableName,
+      }),
+    );
+*/
   }
 
   afterLoad(entity: BaseEntity): Promise<any> | void {
