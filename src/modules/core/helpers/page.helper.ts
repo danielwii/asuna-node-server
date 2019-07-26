@@ -1,3 +1,6 @@
+import { IsOptional } from 'class-validator';
+import { Field, ID, InputType, ObjectType } from 'type-graphql';
+
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 10;
 const MAX_PAGE_SIZE = 1000;
@@ -24,9 +27,18 @@ export class TimeCondition {
   after?: Date;
 }
 
-export class QueryCondition {
-  ids?: number[];
+@InputType()
+export class QueryConditionInput {
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  ids?: string[] | number[];
+
+  @Field({ nullable: true })
+  @IsOptional()
   random?: number;
+
+  @Field(() => ObjectType, { nullable: true })
+  @IsOptional()
   extra?: object;
 }
 
