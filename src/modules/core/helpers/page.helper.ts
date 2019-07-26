@@ -25,11 +25,13 @@ export class PageRequest {
 export class PageRequestInput {
   @Field(type => Int)
   @IsNumber()
-  page: number;
+  @IsOptional()
+  page?: number;
 
   @Field(type => Int)
   @IsNumber()
-  size: number;
+  @IsOptional()
+  size?: number;
 
   @IsOptional()
   orderBy?: { column: string; order?: Order };
