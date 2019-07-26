@@ -1,6 +1,6 @@
 import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-import { emptyPage, Pageable, PageRequest, toPage } from '../core';
+import { emptyPage, Pageable, PageRequestInput, toPage } from '../core';
 import { LoggerFactory } from '../logger';
 import { AppInfo, AppRelease } from './app.entities';
 
@@ -11,7 +11,7 @@ export class AppQueryResolver {
   @Query()
   async app_releases(
     @Args('key') key: string,
-    @Args({ name: 'pageRequest', type: () => PageRequest }) pageRequest,
+    @Args({ name: 'pageRequest', type: () => PageRequestInput }) pageRequest,
     // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
     // @Context('getDataLoaders') getDataLoaders,
     @Info() info: GraphQLResolveInfo,

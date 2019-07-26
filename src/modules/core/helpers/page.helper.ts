@@ -1,5 +1,5 @@
-import { IsOptional } from 'class-validator';
-import { Field, ID, InputType, ObjectType } from 'type-graphql';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Field, ID, InputType, Int, ObjectType } from 'type-graphql';
 
 const DEFAULT_PAGE = 0;
 const DEFAULT_SIZE = 10;
@@ -10,7 +10,7 @@ export enum Order {
   DESC = 'DESC',
 }
 
-export const DefaultPageRequest: PageRequest = {
+export const DefaultPageRequest: PageRequestInput = {
   page: DEFAULT_PAGE,
   size: DEFAULT_SIZE,
 };
@@ -18,6 +18,20 @@ export const DefaultPageRequest: PageRequest = {
 export class PageRequest {
   page: number;
   size: number;
+  orderBy?: { column: string; order?: Order };
+}
+
+@InputType()
+export class PageRequestInput {
+  @Field(type => Int)
+  @IsNumber()
+  page: number;
+
+  @Field(type => Int)
+  @IsNumber()
+  size: number;
+
+  @IsOptional()
   orderBy?: { column: string; order?: Order };
 }
 
@@ -40,6 +54,10 @@ export class QueryConditionInput {
   @Field(() => ObjectType, { nullable: true })
   @IsOptional()
   extra?: object;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
 }
 
 export class Pageable<T> {
@@ -69,7 +87,7 @@ export type PageInfo = {
 
 export const emptyPage = (pageInfo): Pageable<any> => ({ ...pageInfo, items: [], total: 0 });
 
-export const toPage = (pageRequest: PageRequest): PageInfo => {
+export const toPage = (pageRequest: PageRequestInput): PageInfo => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
   if (page < 0) {
     page = 0;
