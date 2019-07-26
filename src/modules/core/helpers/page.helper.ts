@@ -24,7 +24,7 @@ export class TimeCondition {
   after?: Date;
 }
 
-export interface QueryCondition {
+export class QueryCondition {
   ids?: number[];
   random?: number;
   extra?: object;
