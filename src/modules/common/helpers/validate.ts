@@ -14,6 +14,7 @@ export async function validateObject(object) {
   }
   const errors = await validate(object);
   if (errors.length) {
+    logger.warn(`async validate ${r(object)} error: ${r(errors)}`);
     throw new ValidationException(errors.map(error => error.property).join(','), errors);
   }
 }
@@ -24,7 +25,7 @@ export function validateObjectSync(object) {
   }
   const errors = validateSync(object);
   if (errors.length) {
-    logger.warn(r(errors));
+    logger.warn(`sync validate ${r(object)} error: ${r(errors)}`);
     throw new AsunaException(
       AsunaError.Unprocessable,
       `invalid object ${r(object, { plain: true })}`,
