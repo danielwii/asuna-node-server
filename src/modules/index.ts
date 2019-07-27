@@ -7,7 +7,6 @@ export * from './client';
 export * from './config';
 export * from './core/db';
 export * from './helper';
-export * from './logger';
 export * from './common';
 export * from './graphql';
 export * from './core';

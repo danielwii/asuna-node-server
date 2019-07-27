@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AsunaError, AsunaException, r } from '../../../common';
 import { ConfigKeys, configLoader } from '../../../config';
-import { LoggerFactory } from '../../../logger';
+import { LoggerFactory } from '../../../common/logger';
 import { IJwtPayload } from '../auth.interfaces';
 import { AuthService } from '../auth.service';
 

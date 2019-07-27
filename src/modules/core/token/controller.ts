@@ -23,7 +23,7 @@ import {
 } from 'class-validator';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenGuard } from './guard';

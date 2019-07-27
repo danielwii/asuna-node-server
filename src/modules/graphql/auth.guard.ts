@@ -2,8 +2,8 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { AsunaError, AsunaException, r } from '../common';
+import { LoggerFactory } from '../common/logger';
 import { AbstractAuthUser } from '../core/auth';
-import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('GqlAuthGuard');
 

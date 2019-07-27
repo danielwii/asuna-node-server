@@ -1,7 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { r } from '../common/helpers';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from './auth';
 import { Hermes } from './bus';
 

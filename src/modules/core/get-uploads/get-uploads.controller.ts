@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
 import { FinderService } from '../finder';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';

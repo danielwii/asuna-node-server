@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { KvController } from './kv.controller';
 import { KvQueryResolver } from './kv.resolver';
 import { KvService } from './kv.service';

@@ -1,7 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { r } from '../common/helpers';
-import { Hermes } from '../core/bus';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('TaskModule');
 

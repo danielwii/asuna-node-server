@@ -1,5 +1,5 @@
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
-import { LoggerFactory } from '../logger/factory';
+import { LoggerFactory } from '../common/logger/factory';
 
 const logger = LoggerFactory.getLogger('ConfigLoader');
 

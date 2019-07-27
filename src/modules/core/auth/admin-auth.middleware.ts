@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { auth } from './helper';
 
 const logger = LoggerFactory.getLogger('AdminAuthMiddleware');

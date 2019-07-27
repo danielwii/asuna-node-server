@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
 import { KvService } from './kv';
 

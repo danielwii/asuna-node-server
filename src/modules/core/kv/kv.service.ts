@@ -5,7 +5,7 @@ import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
 import * as util from 'util';
 import { r, ValidationException } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { KeyValuePair, ValueType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvService');

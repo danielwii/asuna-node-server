@@ -1,7 +1,7 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
 import { configLoader } from '../config';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('RedisConfig');
 

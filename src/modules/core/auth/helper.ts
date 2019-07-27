@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = LoggerFactory.getLogger('AuthHelper');

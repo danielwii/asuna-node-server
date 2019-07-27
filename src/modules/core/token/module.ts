@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { OperationTokenController } from './controller';
 
 const logger = LoggerFactory.getLogger('TokenModule');

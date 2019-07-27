@@ -10,7 +10,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { getConnection } from 'typeorm';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('Terminus');
 

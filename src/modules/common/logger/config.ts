@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import { ConfigKeys, configLoader } from '../config';
+import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from './factory';
 
 const logger = LoggerFactory.getLogger('LoggerConfig');

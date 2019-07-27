@@ -1,4 +1,4 @@
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const pkg = require('../../../package.json');
 

@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { download, r } from '../modules/common/helpers';
+import { LoggerFactory } from '../modules/common/logger';
 import { ConfigKeys, configLoader } from '../modules/config';
-import { LoggerFactory } from '../modules/logger';
 import { handleAxiosResponseError } from './helper';
 
 const logger = LoggerFactory.getLogger('Downloader');

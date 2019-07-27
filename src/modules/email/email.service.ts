@@ -3,11 +3,10 @@ import { oneLine } from 'common-tags';
 import * as Email from 'email-templates';
 import * as nodemailer from 'nodemailer';
 import * as path from 'path';
-import * as util from 'util';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
 import { configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
 import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core';
-import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('EmailService');
 const env = process.env.ENV;

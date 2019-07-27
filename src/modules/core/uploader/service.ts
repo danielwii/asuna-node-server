@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import { AsunaError, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { FileInfo } from '../storage';

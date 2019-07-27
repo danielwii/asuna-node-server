@@ -16,7 +16,7 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
 import { CurrentUser, Profile, r, validateObject } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import {
   DBHelper,
   parseFields,

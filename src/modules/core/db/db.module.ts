@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { DBService } from './db.service';
 
 const logger = LoggerFactory.getLogger('DBModule');

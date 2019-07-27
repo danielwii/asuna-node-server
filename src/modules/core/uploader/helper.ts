@@ -3,7 +3,7 @@ import { IsInt, IsString, Min } from 'class-validator';
 import { addMonths } from 'date-fns';
 import * as _ from 'lodash';
 import { r, sha1 } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { OperationToken, OperationTokenHelper } from '../token';
 import { UploaderTokenServiceName } from './model';
 

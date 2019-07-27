@@ -3,7 +3,7 @@ import { ApiUseTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r, SignException } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
 import {
   DeprecateTokenParams,

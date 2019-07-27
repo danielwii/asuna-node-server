@@ -31,7 +31,7 @@ export class GraphqlHelper {
       ...toPage(pageRequest),
       where,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
-      order: GraphqlHelper.resolveOrder<Entity>(pageRequest),
+      order: this.resolveOrder<Entity>(pageRequest),
     };
   }
 

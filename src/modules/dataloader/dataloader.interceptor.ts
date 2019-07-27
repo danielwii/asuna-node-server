@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 

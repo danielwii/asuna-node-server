@@ -1,6 +1,6 @@
 import { getConnection, getRepository, Repository } from 'typeorm';
 import { Profile, r } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { DBHelper, parseFields } from './db.helper';
 
 const logger = LoggerFactory.getLogger('DBService');

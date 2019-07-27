@@ -1,11 +1,15 @@
 import { Controller, Get, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
-import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { AsunaError, AsunaException, r } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import {
+  AsunaError,
+  AsunaException,
+  ControllerLoggerInterceptor,
+  LoggerFactory,
+  r,
+} from '../../common';
 import { FinderService } from './finder.service';
 
 const logger = LoggerFactory.getLogger('FinderController');
@@ -14,19 +18,6 @@ export const keyByType = {
   zones: 'settings.finder.zones',
   assets: 'settings.finder.assets',
 };
-
-export class FinderAssetsSettings {
-  @IsIn(['https', 'http'])
-  @IsOptional()
-  protocol: 'https' | 'http';
-
-  @IsString()
-  hostname: string;
-
-  @IsNumber()
-  @IsOptional()
-  port: number;
-}
 
 /**
  * 主要应用来定位资源，设计上，可以作为一个调度器，用来调度到其他的平台上

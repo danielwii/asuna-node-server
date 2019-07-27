@@ -3,8 +3,8 @@ import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
 import { Hermes, IAsunaEvent } from '../core/bus';
-import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('DataLoaderCache');
 

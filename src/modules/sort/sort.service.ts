@@ -3,7 +3,7 @@ import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { Connection, Repository } from 'typeorm';
 import { DBHelper } from '../core/db';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('SortService');
 

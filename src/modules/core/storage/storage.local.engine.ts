@@ -6,7 +6,7 @@ import { join } from 'path';
 import * as sharp from 'sharp';
 import { convertFilename, ErrorException, r } from '../../common';
 import { ConfigKeys, configLoader } from '../../config';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 

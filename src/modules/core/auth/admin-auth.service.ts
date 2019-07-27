@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { AbstractAuthService } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';

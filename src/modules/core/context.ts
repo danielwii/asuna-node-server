@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
 import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import {
   IStorageEngine,
   LocalStorage,

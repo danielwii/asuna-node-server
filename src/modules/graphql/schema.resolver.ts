@@ -1,6 +1,6 @@
 import { Query, Resolver } from '@nestjs/graphql';
 import { DBHelper, DBService } from '../core/db';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 @Resolver()
 export class SchemaQueryResolver {

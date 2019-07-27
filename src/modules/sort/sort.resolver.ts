@@ -1,6 +1,6 @@
 import { Args, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
 import * as util from 'util';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { SortService } from './sort.service';
 
 const logger = LoggerFactory.getLogger('SortResolver');

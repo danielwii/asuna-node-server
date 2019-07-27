@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { Strategy } from 'passport-strategy';
 import { getIgnoreCase, r } from '../../../common/helpers';
-import { LoggerFactory } from '../../../logger';
+import { LoggerFactory } from '../../../common/logger';
 
 const logger = LoggerFactory.getLogger('ApiKeyStrategy');
 

@@ -6,7 +6,7 @@ import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 import { AsunaError, AsunaException, r, ValidationException } from '..';
-import { LoggerFactory } from '../../logger/factory';
+import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 

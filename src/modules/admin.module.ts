@@ -10,7 +10,7 @@ import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
 import { FinderModule } from './core/finder';
 import { SchemaModules } from './graphql/schema.modules';
-import { LoggerFactory } from './logger';
+import { LoggerFactory } from './common/logger';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 

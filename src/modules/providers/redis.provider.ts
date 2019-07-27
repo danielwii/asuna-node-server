@@ -5,7 +5,7 @@ import * as bluebird from 'bluebird';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
 import { r } from '../common/helpers';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { RedisConfigObject } from './redis.config';
 
 const logger = LoggerFactory.getLogger('RedisProvider');

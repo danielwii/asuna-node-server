@@ -1,7 +1,7 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as _ from 'lodash';
 import { configLoader } from '../../config';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 
 export const QiniuConfigKeys = {
   QINIU_ENABLE: 'QINIU_ENABLE',

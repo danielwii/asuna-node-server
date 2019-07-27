@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { AnyAuthRequest, auth } from './helper';
 
 @Injectable()

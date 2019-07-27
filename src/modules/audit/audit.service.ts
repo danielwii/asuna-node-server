@@ -1,5 +1,5 @@
 import { diff } from 'jsondiffpatch';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { AuditRecord, AuditType } from './audit.entities';
 
 const logger = LoggerFactory.getLogger('AuditService');

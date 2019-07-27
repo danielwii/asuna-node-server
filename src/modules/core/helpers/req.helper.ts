@@ -3,7 +3,7 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as pump from 'pump';
 import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 
 const logger = LoggerFactory.getLogger('ReqHelper');
 

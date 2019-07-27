@@ -8,7 +8,7 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const pkg = require('../../../package.json');
 

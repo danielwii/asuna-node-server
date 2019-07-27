@@ -33,7 +33,14 @@ describe('FinderModule (e2e)', () => {
     await app.close();
   });
 
-  it('/GET /api/v1/finder', () => {
+  it('/GET /api/v1/finder', async () => {
+    await kvService.set({
+      collection: AsunaCollections.SYSTEM_SERVER,
+      key: keyByType.assets,
+      type: 'json',
+      value: { default: { endpoint: 'https://hostname' } },
+    });
+
     const query = querystring.stringify({
       query: querystring.stringify({ path: '1/2/3.png' }),
       type: 'assets',
@@ -48,7 +55,14 @@ describe('FinderModule (e2e)', () => {
       });
   });
 
-  it('/GET /f', () => {
+  it('/GET /f', async () => {
+    await kvService.set({
+      collection: AsunaCollections.SYSTEM_SERVER,
+      key: keyByType.assets,
+      type: 'json',
+      value: { default: { endpoint: 'https://hostname' } },
+    });
+
     const encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString(
       'base64',
     );
@@ -68,7 +82,7 @@ describe('FinderModule (e2e)', () => {
       collection: AsunaCollections.SYSTEM_SERVER,
       key: keyByType.assets,
       type: 'json',
-      value: { default: { hostname: '/s3' } },
+      value: { default: { endpoint: '/s3' } },
     });
 
     const query = querystring.stringify({

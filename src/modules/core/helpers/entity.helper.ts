@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger/factory';
 import { jsonType } from './column.helper';
 
 const logger = LoggerFactory.getLogger('EntityHelper');

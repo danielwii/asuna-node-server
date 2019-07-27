@@ -2,7 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
 import { AsunaCollections, KvModule, KvService } from '../kv';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderService } from './finder.service';
 

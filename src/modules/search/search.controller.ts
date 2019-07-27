@@ -11,7 +11,7 @@ import {
   parseOrder,
   parseWhere,
 } from '../core/db';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('SearchController');
 

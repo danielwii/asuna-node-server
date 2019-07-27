@@ -5,7 +5,7 @@ import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { formatTime, r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
 

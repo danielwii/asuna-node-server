@@ -11,7 +11,7 @@ import * as responseTime from 'response-time';
 import { AnyExceptionFilter, r } from './modules/common';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
-import { LoggerFactory, LoggerService } from './modules/logger';
+import { LoggerFactory, LoggerService } from './modules/common/logger';
 
 /*
 if (process.env.NODE_ENV === 'production') {

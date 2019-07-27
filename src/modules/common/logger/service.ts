@@ -1,7 +1,7 @@
 import * as clc from 'cli-color';
 import * as winston from 'winston';
 import { format, transports } from 'winston';
-import { fixedPath, r } from '../common/helpers';
+import { fixedPath, r } from '../helpers/utils';
 import { LoggerConfigObject } from './config';
 import { LoggerFactory } from './factory';
 

@@ -1,5 +1,5 @@
 import { r } from '../modules/common/helpers';
-import { LoggerFactory } from '../modules/logger';
+import { LoggerFactory } from '../modules/common/logger';
 
 const logger = LoggerFactory.getLogger('Helper');
 

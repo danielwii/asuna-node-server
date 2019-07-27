@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { DBService } from '../core/db';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { SchemaQueryResolver } from './schema.resolver';
 
 const logger = LoggerFactory.getLogger('SchemaModules');

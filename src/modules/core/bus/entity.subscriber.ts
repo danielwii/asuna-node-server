@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { deserializeSafely, validateObjectSync } from '../../common/helpers';
 import { dataLoaderCleaner } from '../../dataloader';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { Hermes } from './hermes';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');

@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { FinderModule } from '../finder';
 import { GetUploadsController } from './get-uploads.controller';
 

@@ -6,7 +6,7 @@ import { join } from 'path';
 import { AsunaError, AsunaException, convertFilename } from '../../common';
 import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';

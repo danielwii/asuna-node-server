@@ -3,9 +3,9 @@ import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
 import { r } from '../modules/common/helpers';
+import { LoggerFactory } from '../modules/common/logger';
 import { ConfigKeys, configLoader } from '../modules/config';
 import { Hermes, InMemoryAsunaQueue } from '../modules/core/bus';
-import { LoggerFactory } from '../modules/logger';
 import { handleAxiosResponseError } from './helper';
 
 const logger = LoggerFactory.getLogger('Uploader');

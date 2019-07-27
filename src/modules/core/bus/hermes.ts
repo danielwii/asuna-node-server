@@ -7,7 +7,7 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
 import { isBlank, r } from '../../common';
 import { ConfigKeys, configLoader } from '../../config';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth';
 import { random } from '../helpers';

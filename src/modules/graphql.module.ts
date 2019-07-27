@@ -6,9 +6,9 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import { AppModule } from './app';
 import { r } from './common/helpers';
+import { LoggerFactory } from './common/logger';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
 import { DataLoaderInterceptor } from './dataloader';
-import { LoggerFactory } from './logger';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 

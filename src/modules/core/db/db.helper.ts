@@ -29,7 +29,7 @@ import {
   Profile,
   r,
 } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 
 const logger = LoggerFactory.getLogger('DBHelper');

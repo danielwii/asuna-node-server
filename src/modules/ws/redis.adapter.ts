@@ -1,8 +1,8 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import * as redisIoAdapter from 'socket.io-redis';
-import { r } from '../common';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
-import { LoggerFactory } from '../logger';
 import { RedisConfigObject } from '../providers';
 
 const logger = LoggerFactory.getLogger('RedisIoAdapter');

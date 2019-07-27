@@ -1,6 +1,6 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import { configLoader } from '../config';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('MQConfig');
 

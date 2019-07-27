@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import { r } from '../common/helpers';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { EmailService } from './email.service';
 
 const logger = LoggerFactory.getLogger('EmailController');

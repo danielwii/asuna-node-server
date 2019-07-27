@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r } from '../../common';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 

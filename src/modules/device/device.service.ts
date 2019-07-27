@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as LRU from 'lru-cache';
 import { Connection, Repository } from 'typeorm';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 
 import { Device } from './device.entities';
 

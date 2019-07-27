@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { validate } from 'class-validator';
+import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { join } from 'path';
-import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
+import { AsunaError, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';
 import { AsunaCollections, KvService } from '../kv';
-import { LoggerFactory } from '../../logger';
-import { FinderAssetsSettings } from './finder.controller';
 
 const logger = LoggerFactory.getLogger('FinderService');
+
+export class FinderAssetsSettings {
+  @IsString()
+  endpoint: string;
+}
 
 @Injectable()
 export class FinderService {
@@ -49,13 +52,6 @@ export class FinderService {
           `invalid upstream ${JSON.stringify(upstream)} for finder`,
         );
       }
-      const errors = await validate(finderAssetsSettings);
-      if (errors.length) {
-        throw new AsunaException(
-          AsunaError.Unprocessable,
-          `invalid settings ${JSON.stringify(errors)} for finder`,
-        );
-      }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
       /*const portStr = upstream.port ? `:${upstream.port}` : '';
 
@@ -64,7 +60,7 @@ export class FinderService {
         return `${upstream.endpoint}${resourcePath}`;
       }
 */
-      return `${upstream.endpoint}${resourcePath}`;
+      return `${upstream.endpoint || ''}${resourcePath}`;
     } else {
       // TODO add other handlers later
       logger.warn('only type assets is available');

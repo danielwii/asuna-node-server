@@ -8,7 +8,7 @@ import {
   UpdateEvent,
 } from 'typeorm';
 import { r } from '../common/helpers';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { AuditService } from './audit.service';
 
 const logger = LoggerFactory.getLogger('AuditSubscriber');

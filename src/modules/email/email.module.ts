@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../common/logger';
 import { EmailController } from './email.controller';
 import { EmailService } from './email.service';
 

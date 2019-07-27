@@ -4,7 +4,7 @@ import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
-import { LoggerFactory } from '../../logger';
+import { LoggerFactory } from '../../common/logger';
 
 const logger = LoggerFactory.getLogger('FastifyFileInterceptor');
 
