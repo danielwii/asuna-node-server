@@ -5,7 +5,7 @@ import 'jest';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
 import { AdminModule, AsunaCollections, KvService } from '../src/modules';
-import { keyByType } from '../src/modules/finder';
+import { keyByType } from '../src/modules/core/finder';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;

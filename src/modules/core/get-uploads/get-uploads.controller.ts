@@ -2,13 +2,13 @@
 import { Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { r } from '../common/helpers';
-import { ConfigKeys, configLoader } from '../config';
+import { r } from '../../common/helpers';
+import { ConfigKeys, configLoader } from '../../config';
 import { FinderService } from '../finder';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../logger';
-import { AsunaContext } from './context';
-import { JpegPipe, JpegPipeOptions } from './image/jpeg.pipe';
-import { ThumbnailPipe, ThumbnailPipeOptions } from './image/thumbnail.pipe';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
+import { AsunaContext } from '../context';
+import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
+import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 
 const logger = LoggerFactory.getLogger('GetUploadsController');
 
@@ -40,6 +40,7 @@ export class GetUploadsController {
    * 2. /images/****.png?prefix=2018/4
    * @param bucket
    * @param filename
+   * @param internal 内部地址
    * @param thumbnailConfig
    * @param jpegConfig
    * @param res
@@ -48,19 +49,28 @@ export class GetUploadsController {
   async getUploads(
     @Param('bucket') bucket: string,
     @Param('0') filename: string,
+    @Query('internal') internal: boolean,
     @Query(ThumbnailPipe) thumbnailConfig: ThumbnailPipeOptions,
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ) {
-    logger.log(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig })}`);
+    logger.verbose(
+      `get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`,
+    );
     const url = await this.context.defaultStorageEngine.resolveUrl({
       filename,
       bucket,
       thumbnailConfig,
       jpegConfig,
-      resolver: url => this.finderService.getUrl('settings.finder.assets', 'assets', null, url),
+      resolver: url =>
+        this.finderService.getUrl({
+          key: 'settings.finder.assets',
+          type: 'assets',
+          path: url,
+          internal,
+        }),
     });
-    logger.log(`resolved url is ${url}`);
+    logger.verbose(`resolved url is ${url}`);
     return res.redirect(url);
   }
 

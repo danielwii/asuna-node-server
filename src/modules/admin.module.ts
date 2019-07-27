@@ -1,15 +1,14 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ClientModule } from './client/client.module';
-import { CommandController } from './core';
+import { CommandController, GetUploadsModule } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { DBModule } from './core/db';
-import { GetUploadsController } from './core/get-uploads.controller';
 import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
-import { FinderModule } from './finder';
+import { FinderModule } from './core/finder';
 import { SchemaModules } from './graphql/schema.modules';
 import { LoggerFactory } from './logger';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
@@ -25,6 +24,7 @@ const logger = LoggerFactory.getLogger('AdminModule');
     KvModule,
     DBModule,
     TokenModule,
+    GetUploadsModule,
     FinderModule,
     CqrsModule,
     UploaderModule,
@@ -35,7 +35,6 @@ const logger = LoggerFactory.getLogger('AdminModule');
     AdminRestController,
     AppRestController,
     SearchController,
-    GetUploadsController,
     UploaderController,
     CommandController,
   ],

@@ -168,15 +168,7 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
     `${resolve(packageDir)}/**/*subscriber.ts`,
     `${resolve(rootDir)}/**/*subscriber.ts`,
   ];
-  logger.log(
-    `options is ${r({
-      options,
-      rootDir,
-      // suffix,
-      entities,
-      subscribers,
-    })}`,
-  );
+  logger.log(`options is ${r({ options, rootDir, /*suffix,*/ entities, subscribers })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);

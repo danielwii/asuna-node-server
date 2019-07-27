@@ -3,6 +3,8 @@ export * from './auth';
 export * from './kv';
 export * from './db';
 export * from './token';
+export * from './finder';
+export * from './get-uploads';
 export * from './storage';
 export * from './helpers';
 export * from './base';

@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import { join } from 'path';
-import { AsunaError, AsunaException } from '../common';
-import { AsunaCollections, KvService } from '../core/kv';
-import { LoggerFactory } from '../logger';
+import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
+import { AsunaCollections, KvService } from '../kv';
+import { LoggerFactory } from '../../logger';
 import { FinderAssetsSettings } from './finder.controller';
 
 const logger = LoggerFactory.getLogger('FinderService');
@@ -14,13 +13,25 @@ const logger = LoggerFactory.getLogger('FinderService');
 export class FinderService {
   constructor(private readonly kvService: KvService) {}
 
-  async getUrl(key: string, type: 'assets' | 'zones', name: string, path: string) {
+  async getUrl({
+    key,
+    type,
+    name,
+    path,
+    internal,
+  }: {
+    key: string;
+    type: 'assets' | 'zones';
+    name?: string; // default is default
+    path: string;
+    internal?: boolean;
+  }) {
     if (!(key && type && path)) {
       throw new AsunaException(AsunaError.BadRequest, JSON.stringify({ type, name, path }));
     }
 
     const upstreams = await this.kvService.get(AsunaCollections.SYSTEM_SERVER, key);
-    logger.log(`upstreams ${JSON.stringify(upstreams)}`);
+    logger.debug(`upstreams ${r(upstreams)}`);
     if (!(upstreams && upstreams.value && _.isObject(upstreams.value))) {
       logger.warn(`${name || 'default'} not available in upstream ${key}`);
       throw new AsunaException(
@@ -30,10 +41,8 @@ export class FinderService {
     }
 
     if (type === 'assets') {
-      const upstream = upstreams.value[name || 'default'];
-      const finderAssetsSettings = plainToClass(FinderAssetsSettings, upstream, {
-        enableImplicitConversion: true,
-      });
+      const upstream = upstreams.value[`${internal ? 'internal-' : ''}${name || 'default'}`];
+      const finderAssetsSettings = deserializeSafely(FinderAssetsSettings, upstream);
       if (!finderAssetsSettings) {
         throw new AsunaException(
           AsunaError.Unprocessable,
@@ -48,14 +57,14 @@ export class FinderService {
         );
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
-      const portStr = upstream.port ? `:${upstream.port}` : '';
+      /*const portStr = upstream.port ? `:${upstream.port}` : '';
 
       // get same domain if hostname startswith /
       if (_.startsWith(upstream.hostname, '/')) {
-        return `${upstream.hostname}${portStr}${resourcePath}`;
+        return `${upstream.endpoint}${resourcePath}`;
       }
-
-      return `${upstream.protocol || 'https'}://${upstream.hostname}${portStr}${resourcePath}`;
+*/
+      return `${upstream.endpoint}${resourcePath}`;
     } else {
       // TODO add other handlers later
       logger.warn('only type assets is available');

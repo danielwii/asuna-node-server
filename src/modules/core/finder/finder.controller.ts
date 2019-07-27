@@ -4,8 +4,8 @@ import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { AsunaError, AsunaException, r } from '../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../logger';
+import { AsunaError, AsunaException, r } from '../../common';
+import { ControllerLoggerInterceptor, LoggerFactory } from '../../logger';
 import { FinderService } from './finder.service';
 
 const logger = LoggerFactory.getLogger('FinderController');
@@ -59,7 +59,7 @@ export class FinderController {
     logger.log(`query ${r(queryParam)} with ${keyByType[type]}`);
 
     const { name, path } = queryParam;
-    const url = await this.finderService.getUrl(keyByType[type], type, name, path);
+    const url = await this.finderService.getUrl({ key: keyByType[type], type, name, path });
     return res.redirect(url);
   }
 }
@@ -102,7 +102,7 @@ export class ShortFinderController {
     logger.log(`query ${r(queryParam)} with ${keyByType[type]}`);
 
     const { name, path } = queryParam;
-    const url = await this.finderService.getUrl(keyByType[type], type, name, path);
+    const url = await this.finderService.getUrl({ key: keyByType[type], type, name, path });
     return res.redirect(url);
   }
 }

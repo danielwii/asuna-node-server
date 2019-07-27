@@ -80,7 +80,7 @@ export class KvService {
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
 
     if (!key) {
-      throw new ValidationException('kv', 'key must not be blank');
+      throw new ValidationException('kv', 'key is required');
     }
 
     const { name, type, value } = pair;

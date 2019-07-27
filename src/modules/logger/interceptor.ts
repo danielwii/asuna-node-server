@@ -35,7 +35,7 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(
         () =>
-          this.logger.verbose(
+          this.logger.debug(
             `${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`,
           ),
         e => {
