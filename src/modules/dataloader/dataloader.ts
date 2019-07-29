@@ -147,6 +147,8 @@ export function resolveRelationsFromInfo(
   info: GraphQLResolveInfo,
   path: string,
 ): boolean | { relations?: string[]; disableMixedMap?: boolean } {
+  if (!info || !path) return true;
+
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);

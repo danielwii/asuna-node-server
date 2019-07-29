@@ -276,6 +276,14 @@ export class DBHelper {
     return _.get(metadata, 'target.entityInfo');
   }
 
+  public static getPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
+    return this.repo(entity).metadata.columns.map(column => column.propertyName);
+  }
+
+  public static getColumnNames<Entity>(entity: ObjectType<Entity>): string[] {
+    return this.repo(entity).metadata.columns.map(column => column.databaseName);
+  }
+
   public static repo<Entity>(entity: ObjectType<Entity> | string | ModelName): Repository<Entity> {
     this.loadMetadatas();
 

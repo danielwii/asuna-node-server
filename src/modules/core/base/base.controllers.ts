@@ -107,7 +107,7 @@ export abstract class RestCrudController {
       .skip(query.skip)
       .getMany();
 
-    console.log(r({ total, limit: query.take, offset: query.skip, length: items.length }));
+    logger.log({ total, limit: query.take, offset: query.skip, length: items.length });
 
     return { query, items, total, page: +page, size: +size };
   }
@@ -158,11 +158,11 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ) {
     const modelName = DBHelper.getModelName(model, this.module);
-    logger.log(`patch ${JSON.stringify({ user, modelName, updateTo })}`);
+    logger.log(`patch ${r({ user, modelName, updateTo })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (modelName.model === 'kv__pairs') {
       const pair = KeyValuePair.create(updateTo);
-      logger.log(`save by kvService... ${JSON.stringify(pair)}`);
+      logger.log(`save by kvService... ${r(pair)}`);
       return this.kvService.set(pair);
     }
 
@@ -194,7 +194,7 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ) {
     const modelName = DBHelper.getModelName(model, this.module);
-    logger.log(`patch ${JSON.stringify({ admin, modelName, id, updateTo })}`);
+    logger.log(`patch ${r({ admin, modelName, id, updateTo })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
       logger.log('update by kvService...');
@@ -210,12 +210,12 @@ export abstract class RestCrudController {
     );
     const relationIds = R.mapObjIndexed((value, relation) => {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
-      logger.log(`resolve ${JSON.stringify({ value, relationModelName: relation, primaryKeys })}`);
+      logger.log(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
         ? (value as any[]).map(id => ({ [_.first(primaryKeys)]: id }))
         : { [_.first(primaryKeys)]: value };
     })(R.pick(_.keys(relationKeys))(updateTo));
-    logger.log(`patch ${JSON.stringify({ id, relationKeys, relationIds })}`);
+    logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
     const entity = await repository.findOneOrFail(id);
 
@@ -224,7 +224,7 @@ export abstract class RestCrudController {
       ...relationIds,
       updatedBy: idx(admin, _ => _.username),
     });
-    logger.log(`patch ${JSON.stringify({ entityTo })}`);
+    logger.log(`patch ${r({ entityTo })}`);
     return repository.save(entityTo);
   }
 }
