@@ -1,11 +1,11 @@
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
-import { FindConditions, ObjectLiteral, FindManyOptions } from 'typeorm';
+import { FindConditions, ObjectLiteral, FindManyOptions, MoreThan, LessThan } from 'typeorm';
 import { LoggerFactory } from '../common/logger';
 import { AbstractBaseEntity } from '../core/base';
 import { DBHelper } from '../core/db';
-import { PageInfo, PageRequestInput, toPage } from '../core/helpers';
+import { PageInfo, PageRequestInput, TimeCondition, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo } from '../dataloader';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -32,20 +32,54 @@ export class GraphqlHelper {
     pageRequest,
     where,
     relationPath,
+    timeCondition,
   }: {
     cls: ClassType<Entity>;
     info?: GraphQLResolveInfo;
     pageRequest: PageRequestInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     relationPath?: string;
+    timeCondition?: TimeCondition;
   }): FindManyOptions<Entity> {
     const order = this.resolveOrder(cls, pageRequest);
+    let whereCondition;
+    if (timeCondition && typeof where === 'object') {
+      const afterCondition =
+        timeCondition && timeCondition.after
+          ? { [timeCondition.column]: MoreThan(timeCondition.after) }
+          : null;
+      const beforeCondition =
+        timeCondition && timeCondition.before
+          ? { [timeCondition.column]: LessThan(timeCondition.before) }
+          : null;
+      whereCondition = {
+        ...where,
+        ...afterCondition,
+        ...beforeCondition,
+      };
+    }
     return {
       ...toPage(pageRequest),
-      where,
+      where: whereCondition,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
       order,
     };
+  }
+
+  static async resolveProperty<Entity extends AbstractBaseEntity>(
+    cls: ClassType<Entity>,
+    instance: Entity,
+    key: keyof Entity,
+    loader: any,
+  ) {
+    if (!instance[key]) {
+      const result = await (cls as any).findOne(instance.id, {
+        loadRelationIds: { relations: [key] },
+        cache: true,
+      });
+      instance[key] = result[key];
+    }
+    return loader[key].load(instance[key]);
   }
 
   static pagedResult({
