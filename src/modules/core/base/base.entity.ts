@@ -54,3 +54,25 @@ export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
   @Column('text', { nullable: true, name: 'description' })
   description: string;
 }
+
+export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  name: string;
+
+  @MetaInfo({ name: '描述' })
+  @Column('text', { nullable: true, name: 'description' })
+  description: string;
+
+  @MetaInfo({ name: '是否发布？' })
+  @Column({ nullable: true, name: 'published' })
+  isPublished: boolean;
+
+  @MetaInfo({
+    name: '是否系统数据？',
+    type: 'Deletable',
+    help: '系统数据无法删除',
+  })
+  @Column({ nullable: true, name: 'system' })
+  isSystem: boolean;
+}
