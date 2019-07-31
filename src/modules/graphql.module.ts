@@ -35,6 +35,7 @@ export class GraphqlModule implements OnModuleInit {
           //   outputAs: 'class',
           // },
           typePaths,
+          // autoSchemaFile: 'schema.gql',
           resolvers: { JSON: GraphQLJSON },
           introspection: AsunaContext.isDebugMode,
           debug: AsunaContext.isDebugMode,
@@ -73,10 +74,6 @@ export class GraphqlModule implements OnModuleInit {
           provide: APP_INTERCEPTOR,
           useClass: DataLoaderInterceptor,
         },
-        // {
-        //   provide: APP_INTERCEPTOR,
-        //   useClass: AuthInterceptor,
-        // },
       ],
     };
   }

@@ -1,7 +1,14 @@
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
-import { FindConditions, ObjectLiteral, FindManyOptions, MoreThan, LessThan } from 'typeorm';
+import {
+  FindConditions,
+  ObjectLiteral,
+  FindManyOptions,
+  MoreThan,
+  LessThan,
+  BaseEntity,
+} from 'typeorm';
 import { LoggerFactory } from '../common/logger';
 import { AbstractBaseEntity } from '../core/base';
 import { DBHelper } from '../core/db';
