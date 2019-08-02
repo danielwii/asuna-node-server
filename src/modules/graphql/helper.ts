@@ -1,26 +1,20 @@
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
-import {
-  FindConditions,
-  ObjectLiteral,
-  FindManyOptions,
-  MoreThan,
-  LessThan,
-  BaseEntity,
-} from 'typeorm';
+import { FindConditions, FindManyOptions, LessThan, MoreThan, ObjectLiteral } from 'typeorm';
 import { LoggerFactory } from '../common/logger';
 import { AbstractBaseEntity } from '../core/base';
 import { DBHelper } from '../core/db';
-import { PageInfo, PageRequestInput, TimeCondition, toPage } from '../core/helpers';
+import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo } from '../dataloader';
+import { TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
 export class GraphqlHelper {
   static resolveOrder<Entity extends AbstractBaseEntity>(
     cls: ClassType<Entity>,
-    pageRequest: PageRequestInput,
+    pageRequest: PageRequest,
   ): {
     [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
   } {
@@ -43,10 +37,10 @@ export class GraphqlHelper {
   }: {
     cls: ClassType<Entity>;
     info?: GraphQLResolveInfo;
-    pageRequest: PageRequestInput;
+    pageRequest: PageRequest;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     relationPath?: string;
-    timeCondition?: TimeCondition;
+    timeCondition?: TimeConditionInput;
   }): FindManyOptions<Entity> {
     const order = this.resolveOrder(cls, pageRequest);
     let whereCondition;
@@ -95,7 +89,7 @@ export class GraphqlHelper {
     mapper,
     total,
   }: {
-    pageRequest: PageRequestInput;
+    pageRequest: PageRequest;
     items: any[];
     mapper?: (item: any) => any;
     total: number;

@@ -1,65 +1,21 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { Field, ID, InputType, Int, ObjectType } from 'type-graphql';
-
-const DEFAULT_PAGE = 0;
-const DEFAULT_SIZE = 10;
-const MAX_PAGE_SIZE = 1000;
+export const DEFAULT_PAGE = 0;
+export const DEFAULT_SIZE = 10;
+export const MAX_PAGE_SIZE = 1000;
 
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
 }
 
-export const DefaultPageRequest: PageRequestInput = {
+export const DefaultPageRequest: PageRequest = {
   page: DEFAULT_PAGE,
   size: DEFAULT_SIZE,
 };
 
-export class PageRequest {
-  page: number;
-  size: number;
-  orderBy?: { column: string; order?: Order };
-}
-
-@InputType()
-export class PageRequestInput {
-  @Field(type => Int)
-  @IsNumber()
-  @IsOptional()
+export interface PageRequest {
   page?: number;
-
-  @Field(type => Int)
-  @IsNumber()
-  @IsOptional()
   size?: number;
-
-  @IsOptional()
   orderBy?: { column: string; order?: Order };
-}
-
-export class TimeCondition {
-  column: string;
-  before?: Date;
-  after?: Date;
-}
-
-@InputType()
-export class QueryConditionInput {
-  @Field(() => ID, { nullable: true })
-  @IsOptional()
-  ids?: string[] | number[];
-
-  @Field({ nullable: true })
-  @IsOptional()
-  random?: number;
-
-  @Field(() => ObjectType, { nullable: true })
-  @IsOptional()
-  extra?: object;
-
-  @IsString()
-  @IsOptional()
-  category?: string;
 }
 
 export class Pageable<T> {
@@ -89,7 +45,7 @@ export type PageInfo = {
 
 export const emptyPage = (pageInfo): Pageable<any> => ({ ...pageInfo, items: [], total: 0 });
 
-export const toPage = (pageRequest: PageRequestInput): PageInfo => {
+export const toPage = (pageRequest: PageRequest): PageInfo => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
   if (page < 0) {
     page = 0;

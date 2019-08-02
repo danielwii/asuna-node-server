@@ -1,7 +1,8 @@
 import { Args, Info, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-import { emptyPage, Pageable, PageRequestInput, toPage } from '../core';
+import { emptyPage, Pageable, toPage } from '../core';
 import { LoggerFactory } from '../common/logger';
+import { PageRequestInput } from '../graphql';
 import { AppInfo, AppRelease } from './app.entities';
 
 @Resolver()
