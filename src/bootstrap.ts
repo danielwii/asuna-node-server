@@ -5,9 +5,11 @@ import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
+import * as _ from 'lodash';
 import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
+import { Connection } from 'typeorm';
 import { AnyExceptionFilter, r } from './modules/common';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
@@ -39,6 +41,7 @@ export interface IBootstrapOptions {
    */
   redisMode?: 'io' | 'redis' | 'ws';
   context?: IAsunaContextOpts;
+  renamer?: { from: string; to: string }[];
 }
 
 export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
@@ -51,6 +54,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   // --------------------------------------------------------------
   // Setup app
   // --------------------------------------------------------------
+
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
@@ -72,6 +76,40 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
     logger: loggerService,
   });
   // loggerService.check();
+
+  // --------------------------------------------------------------
+  // rename old tables to newer
+  // --------------------------------------------------------------
+
+  const connection = app.get<Connection>(Connection);
+  const queryRunner = connection.createQueryRunner();
+
+  await Promise.all(
+    _.map(
+      _.compact(
+        []
+          .concat(
+            { from: 'content__t_slides', to: 'www__t_slides' },
+            { from: 'content__t_slide_categories', to: 'www__t_slide_categories' },
+          )
+          .concat(options.renamer),
+      ),
+      async ({ from, to }) => {
+        const fromTable = await queryRunner.getTable(from);
+        if (fromTable) {
+          logger.log(`rename ${from} -> ${to}`);
+          await queryRunner.renameTable(fromTable, to);
+        }
+      },
+    ),
+  );
+
+  await connection.synchronize();
+
+  // --------------------------------------------------------------
+  // setup application
+  // --------------------------------------------------------------
+
   /*
   app.register(require('fastify-multipart'));
 
@@ -124,6 +162,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   // --------------------------------------------------------------
   // Setup Swagger
   // --------------------------------------------------------------
+
   if (configLoader.loadBoolConfig(ConfigKeys.SWAGGER)) {
     logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()

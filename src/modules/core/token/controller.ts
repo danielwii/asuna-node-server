@@ -50,7 +50,7 @@ class ObtainOperationTokenDto {
   @Transform(value => Number(value))
   readonly expiredInMinutes?: number;
 
-  @ValidateIf((o: Date) => Date.now() < o.getTime())
+  @ValidateIf((o, value: Date) => value == null || Date.now() < value.getTime())
   @IsDate()
   @IsOptional()
   readonly expiredAt?: Date;

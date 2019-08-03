@@ -54,7 +54,7 @@ export class GetUploadsController {
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ) {
-    logger.verbose(
+    logger.debug(
       `get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`,
     );
     const url = await this.context.defaultStorageEngine.resolveUrl({
@@ -70,7 +70,7 @@ export class GetUploadsController {
           internal,
         }),
     });
-    logger.verbose(`resolved url is ${url}`);
+    logger.debug(`resolved url is ${url}`);
     return res.redirect(url);
   }
 

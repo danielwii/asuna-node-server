@@ -50,6 +50,11 @@ interface PagedQuery {
   size: Int
 }
 
+interface PagedInfoQuery {
+  pageInfo: PageInfo
+  total: Int
+}
+
 type PageInfo {
   endCursor: String
   hasNextPage: Boolean

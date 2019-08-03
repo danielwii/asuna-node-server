@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { Connection, Repository } from 'typeorm';
-import { DBHelper } from '../core/db';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { DBHelper } from '../core/db';
 
 const logger = LoggerFactory.getLogger('SortService');
 
@@ -43,7 +44,7 @@ export class SortService {
         (a: any, b: any) => positions.indexOf(a[primaryKey]) - positions.indexOf(b[primaryKey]),
       );
     } else {
-      logger.warn(`sort not available: ${JSON.stringify(sort)}`);
+      logger.warn(`sort not available: ${r(sort)}`);
     }
 
     return items;
