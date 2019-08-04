@@ -24,6 +24,7 @@ export async function download(url: string, to: string): Promise<AxiosResponse> 
     url,
     method: 'GET',
     responseType: 'stream',
+    timeout: 60000,
   });
 
   response.data.pipe(writer);

@@ -2,6 +2,7 @@ import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import { FindConditions, FindManyOptions, LessThan, MoreThan, ObjectLiteral } from 'typeorm';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { AbstractBaseEntity } from '../core/base';
 import { DBHelper } from '../core/db';
@@ -43,7 +44,7 @@ export class GraphqlHelper {
     timeCondition?: TimeConditionInput;
   }): FindManyOptions<Entity> {
     const order = this.resolveOrder(cls, pageRequest);
-    let whereCondition;
+    let whereCondition = where;
     if (timeCondition && typeof where === 'object') {
       const afterCondition =
         timeCondition && timeCondition.after
@@ -59,12 +60,14 @@ export class GraphqlHelper {
         ...beforeCondition,
       };
     }
-    return {
+    const options = {
       ...toPage(pageRequest),
       where: whereCondition,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
       order,
     };
+    logger.debug(`resolved FindOptions is ${r(options)}`);
+    return options;
   }
 
   static async resolveProperty<Entity extends AbstractBaseEntity>(
