@@ -12,6 +12,9 @@ const logger = LoggerFactory.getLogger('GqlAuthGuard');
  */
 @Injectable()
 export class GqlAuthGuard extends AuthGuard('jwt') {
+  /**
+   * @param opts.anonymousSupport default false
+   */
   constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
   }

@@ -53,6 +53,8 @@ export class QueryConditionInput {
   @IsOptional()
   random?: number;
 
+  extra?: object;
+
   @IsString()
   @IsOptional()
   category?: string;

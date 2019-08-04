@@ -1,9 +1,8 @@
 import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
 import { ConfigKeys, configLoader } from '../../config';
-import { LoggerFactory } from './factory';
 
-const logger = LoggerFactory.getLogger('LoggerConfig');
+// const logger = LoggerFactory.getLogger('LoggerConfig'); dont't use it here
 
 export type LogLevel = 'info' | 'debug' | 'verbose' | 'warn' | 'error';
 
@@ -16,14 +15,12 @@ export class LoggerConfigObject {
   }
 
   static load(): LoggerConfigObject {
-    logger.log(`try load env: ${ConfigKeys.LOGGER_LEVEL}`);
-
     return new LoggerConfigObject({
       level: configLoader.loadConfig(ConfigKeys.LOGGER_LEVEL, 'info'),
       modules: Object.assign(
         {},
         ..._.chain(configLoader.loadConfigs())
-          .filter((v, k: string) => k.startsWith(`${ConfigKeys.LOGGER_LEVEL}_`))
+          .pickBy((v, k: string) => k.startsWith(`${ConfigKeys.LOGGER_LEVEL}_`))
           .map((v, k: string) => ({
             [k
               .slice(ConfigKeys.LOGGER_LEVEL.length + 1)
@@ -36,7 +33,15 @@ export class LoggerConfigObject {
   }
 
   static lv(module: string) {
-    const configObject = LoggerConfigObject.load();
-    // return _.get(configObject, )
+    const configObject = this.load();
+    if (_.has(configObject.modules, module)) {
+      return configObject.modules[module];
+    }
+    const end = module.lastIndexOf('.');
+    if (end === -1) {
+      return configObject.level;
+    }
+    const next = module.slice(0, end);
+    return this.lv(next);
   }
 }

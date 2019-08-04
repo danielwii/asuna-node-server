@@ -7,4 +7,12 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts', 'graphql'],
   setupFilesAfterEnv: ['./jest.setup.js'],
   collectCoverage: true,
+  globals: {
+    'ts-jest': {
+      // ...
+      diagnostics: {
+        ignoreCodes: [151001],
+      },
+    },
+  },
 };

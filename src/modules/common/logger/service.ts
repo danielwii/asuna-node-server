@@ -75,18 +75,22 @@ export class LoggerService {
   }
 
   debug(msg: any, context?: string) {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.debug) return;
     this.logger.debug(msg, [{ context, reqId: this.requestId }]);
   }
 
   verbose(msg: any, context?: string) {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.verbose) return;
     this.logger.verbose(msg, [{ context, reqId: this.requestId }]);
   }
 
   log(msg: any, context?: string) {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.info) return;
     this.logger.info(msg, [{ context, reqId: this.requestId }]);
   }
 
   warn(msg: any, context?: string) {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.warn) return;
     this.logger.warn(msg, [{ context, reqId: this.requestId }]);
   }
 
@@ -112,7 +116,8 @@ export class LoggerService {
         }
         const ctx = meta.context || this.context || null;
         if (ctx) {
-          context = clc.blackBright(`[${fixedPath(ctx, 26).substr(0, 26)}]`).padEnd(38);
+          const module = fixedPath(ctx, 26).substr(0, 26);
+          context = clc.blackBright(`[${module}]`).padEnd(38);
         }
       }
 
