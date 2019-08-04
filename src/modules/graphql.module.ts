@@ -8,7 +8,7 @@ import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
-import { DataLoaderInterceptor } from './dataloader';
+import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
@@ -43,7 +43,7 @@ export class GraphqlModule implements OnModuleInit {
           resolverValidationOptions: {
             requireResolversForResolveType: false,
           },
-          context: context => ({
+          context: (context): GraphqlContext<any> => ({
             ...context,
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
             getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),

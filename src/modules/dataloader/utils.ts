@@ -2,14 +2,18 @@ import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
 
-export interface Request {
+export type DataLoaderFunction<T> = {
+  load: (ids: any | any[]) => T[];
+};
+
+export type GraphqlRequest = Request & {
   id?: string;
   user?: string;
-  dataLoaders: object;
-}
+  dataLoaders: { [key: string]: DataLoaderFunction<any> };
+};
 
-export function getRequestFromContext(context: ExecutionContext): Request {
-  const request = context.switchToHttp().getRequest<Request>();
+export function getRequestFromContext(context: ExecutionContext): GraphqlRequest {
+  const request = context.switchToHttp().getRequest<GraphqlRequest>();
 
   // Graphql endpoints need a context creation
   if (!request) {

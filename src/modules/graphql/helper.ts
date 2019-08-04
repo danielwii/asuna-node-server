@@ -8,6 +8,7 @@ import { AbstractBaseEntity } from '../core/base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo } from '../dataloader';
+import { DataLoaderFunction } from '../dataloader/utils';
 import { TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -70,12 +71,15 @@ export class GraphqlHelper {
     return options;
   }
 
-  static async resolveProperty<Entity extends AbstractBaseEntity>(
+  static async resolveProperty<
+    Entity extends AbstractBaseEntity,
+    RelationEntity extends AbstractBaseEntity
+  >(
     cls: ClassType<Entity>,
     instance: Entity,
     key: keyof Entity,
-    loader: any,
-  ) {
+    loader: DataLoaderFunction<RelationEntity>,
+  ): Promise<RelationEntity[]> {
     if (!instance[key]) {
       const result = await (cls as any).findOne(instance.id, {
         loadRelationIds: { relations: [key] },
@@ -83,7 +87,7 @@ export class GraphqlHelper {
       });
       instance[key] = result[key];
     }
-    return loader[key].load(instance[key]);
+    return loader.load(instance[key]);
   }
 
   static pagedResult({

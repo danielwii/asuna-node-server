@@ -1,10 +1,16 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { LoggerFactory } from '../common/logger';
+import { AbstractAuthUser } from '../core/auth';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
+
+export type GraphqlContext<GetDataLoaders> = {
+  getDataLoaders: GetDataLoaders;
+  getCurrentUser: () => AbstractAuthUser;
+};
 
 const genericDataLoader = new GenericDataLoader();
 

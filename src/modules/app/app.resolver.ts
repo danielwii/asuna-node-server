@@ -13,7 +13,7 @@ export class AppQueryResolver {
   async app_releases(
     @Args('key') key: string,
     @Args({ name: 'pageRequest', type: () => PageRequestInput }) pageRequest,
-    // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
+    // @Context() ctx: GraphqlContext<GetDataLoaders>,
     // @Context('getDataLoaders') getDataLoaders,
     @Info() info: GraphQLResolveInfo,
   ): Promise<Pageable<AppRelease>> {
@@ -38,7 +38,7 @@ export class AppQueryResolver {
   @Query()
   async app_latestRelease(
     @Args('key') key: string,
-    // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
+    // @Context() ctx: GraphqlContext<GetDataLoaders>,
     // @Context('getDataLoaders') getDataLoaders,
   ): Promise<AppRelease> {
     this.logger.log(`app_latestRelease: ${JSON.stringify({ key })}`);
@@ -50,7 +50,7 @@ export class AppQueryResolver {
   @Query()
   async app_info(
     @Args('key') key: string,
-    // @Context('getDataLoaders') getDataLoaders: GetDataLoaders,
+    // @Context() ctx: GraphqlContext<GetDataLoaders>,
     // @Context('getDataLoaders') getDataLoaders,
   ): Promise<AppInfo> {
     this.logger.log(`app_info: ${JSON.stringify({ key })}`);
