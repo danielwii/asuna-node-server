@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('DataLoaderCache');
 
 const cacheMap = new Map();
 
-type DataLoaderFunction<T> = {
+export type DataLoaderFunction<T> = {
   load: (ids: any | any[]) => T[];
 };
 

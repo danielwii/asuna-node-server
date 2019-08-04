@@ -1,5 +1,5 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { Field, ID, InputType, Int, ObjectType } from 'type-graphql';
+import { Field, ID, InputType, Int } from 'type-graphql';
 import {
   DEFAULT_PAGE,
   DEFAULT_SIZE,
@@ -52,10 +52,6 @@ export class QueryConditionInput {
   @Field({ nullable: true })
   @IsOptional()
   random?: number;
-
-  @Field(() => ObjectType, { nullable: true })
-  @IsOptional()
-  extra?: object;
 
   @IsString()
   @IsOptional()
