@@ -29,10 +29,10 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 
   handleRequest(err, user, info) {
     if (err || !user) {
-      logger.log(`handleRequest ${r({ err, user, info, anonymous: this.opts.anonymousSupport })}`);
       if (this.opts.anonymousSupport) {
         return null;
       }
+      logger.log(`handleRequest(jwt) ${r({ err, user, info })}`);
       throw err || new AsunaException(AsunaError.InsufficientPermissions);
     }
     return user;
