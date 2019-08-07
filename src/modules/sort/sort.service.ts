@@ -30,14 +30,14 @@ export class SortService {
     const positions = sort.positions;
     if (sort && sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
-      logger.log(`resolve ${relation} for sorts.`);
+      logger.verbose(`resolve ${relation} for sorts.`);
       const withRelation = await this.sortRepository.findOne({
         where: { id: sort.id },
         relations: [relation],
         cache: true,
       });
       items = withRelation[relation];
-      logger.log(`load ${items.length} items.`);
+      logger.verbose(`loaded ${items.length} items.`);
 
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(relation)));
       items.sort(

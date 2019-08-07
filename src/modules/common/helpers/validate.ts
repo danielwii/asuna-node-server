@@ -1,4 +1,4 @@
-import { ClassTransformOptions, deserialize } from 'class-transformer';
+import { ClassTransformOptions, deserialize, plainToClass } from 'class-transformer';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { validate, validateSync } from 'class-validator';
 import * as _ from 'lodash';
@@ -36,14 +36,17 @@ export function validateObjectSync(object) {
 
 export function deserializeSafely<T>(
   cls: ClassType<T>,
-  json: string | T,
+  json: string | JSON | T,
   options: ClassTransformOptions = { enableCircularCheck: true },
 ): T {
-  if (!_.isString(json)) {
+  if (typeof cls === typeof json) {
     validateObjectSync(json);
     return json as T;
   }
-  const o = deserialize(cls, json as string, options);
+  const o = _.isPlainObject(json)
+    ? plainToClass(cls, json as JSON, options)
+    : deserialize(cls, json as string, options);
+
   logger.debug(`deserializeSafely: ${r({ cls, o, json, options })}`);
   validateObjectSync(o);
   return o;

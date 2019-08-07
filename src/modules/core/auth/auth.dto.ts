@@ -1,6 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import * as _ from 'lodash';
 
 export class ResetPasswordDto {
@@ -10,8 +10,8 @@ export class ResetPasswordDto {
   readonly username: string;
 
   @ApiModelProperty({ type: 'email' })
-  @IsString()
-  @Transform(value => _.trim(value))
+  @IsEmail()
+  @Transform(value => (value ? _.trim(value) : null))
   @IsOptional()
   readonly email: string;
 
@@ -47,16 +47,18 @@ export class SignInDto {
 }
 
 export class SignUpDto {
-  @IsString()
-  @Transform(value => _.trim(value))
+  @IsEmail()
+  @Transform(value => (value ? _.trim(value) : null))
   @IsOptional()
-  readonly email: string;
+  readonly email?: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
   @IsNotEmpty()
+  @Transform(value => _.trim(value))
   readonly username: string;
 
   @IsNotEmpty()
+  @Expose({ name: 'with-secret-key', toPlainOnly: true })
+  @Transform(value => !!value, { toPlainOnly: true })
   readonly password: string;
 }
