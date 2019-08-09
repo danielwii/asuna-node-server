@@ -1,15 +1,24 @@
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
-import { FindConditions, FindManyOptions, LessThan, MoreThan, ObjectLiteral } from 'typeorm';
+import * as fp from 'lodash/fp';
+import {
+  FindConditions,
+  FindManyOptions,
+  LessThan,
+  MoreThan,
+  ObjectLiteral,
+  Repository,
+} from 'typeorm';
+import { AsunaError, AsunaException } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { AbstractBaseEntity } from '../core/base';
+import { AbstractBaseEntity, AbstractCategoryEntity } from '../core/base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo } from '../dataloader';
 import { DataLoaderFunction } from '../dataloader/utils';
-import { TimeConditionInput } from './input';
+import { QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -29,20 +38,104 @@ export class GraphqlHelper {
         };
   }
 
+  static async handleDefaultQueryRequest<
+    Entity extends AbstractBaseEntity,
+    CategoryEntity extends AbstractCategoryEntity
+  >({
+    cls,
+    info,
+    query,
+    pageRequest,
+    categoryCls,
+  }: {
+    cls: ClassType<Entity>;
+    query: QueryConditionInput;
+    pageRequest: PageRequest;
+    info?: GraphQLResolveInfo;
+    categoryCls?: ClassType<CategoryEntity>;
+  }): Promise<Entity[]> {
+    const clsRepoAlike = (cls as any) as Repository<Entity>;
+    if (query.ids && query.ids.length) {
+      return clsRepoAlike.findByIds(query.ids);
+    }
+    if (query.random > 0) {
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
+      const top100 = await clsRepoAlike.find(
+        this.resolveFindOptions({
+          cls,
+          pageRequest: { size: 100 },
+          select: [primaryKey as any],
+        }),
+      );
+      logger.verbose(`load top100 for ${cls.name} is ${r(top100)}`);
+      const ids = _.chain(top100)
+        .map(fp.get(primaryKey))
+        .shuffle()
+        .take(query.random)
+        .value();
+      logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
+      return clsRepoAlike.findByIds(
+        ids,
+        this.resolveFindOptions({ cls, pageRequest: { size: ids.length }, info }),
+      );
+    }
+    if (query.category) {
+      if (categoryCls == null) {
+        throw new AsunaException(
+          AsunaError.Unprocessable,
+          `category class not defined for ${cls.name}`,
+        );
+      }
+
+      const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;
+      const category = await categoryClsRepoAlike.findOne({
+        name: query.category,
+        isPublished: true,
+      });
+
+      if (category == null) {
+        return null;
+      }
+
+      return clsRepoAlike.find(
+        this.resolveFindOptions({
+          cls,
+          pageRequest,
+          where: { category, isPublished: true },
+        }),
+      );
+    }
+    return null;
+  }
+
+  /**
+   * @param cls
+   * @param info
+   * @param select
+   * @param pageRequest
+   * @param where
+   * @param relationPath
+   * @param timeCondition
+   * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
+   */
   static resolveFindOptions<Entity extends AbstractBaseEntity>({
     cls,
     info,
+    select,
     pageRequest,
     where,
     relationPath,
     timeCondition,
+    cache,
   }: {
     cls: ClassType<Entity>;
-    info?: GraphQLResolveInfo;
     pageRequest: PageRequest;
+    select?: (keyof Entity)[];
+    info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     relationPath?: string;
     timeCondition?: TimeConditionInput;
+    cache?: boolean;
   }): FindManyOptions<Entity> {
     const order = this.resolveOrder(cls, pageRequest);
     let whereCondition = where;
@@ -63,6 +156,7 @@ export class GraphqlHelper {
     }
     const options = {
       ...toPage(pageRequest),
+      ...(select && select.length ? { select } : null),
       where: whereCondition,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
       order,
