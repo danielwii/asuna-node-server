@@ -58,28 +58,27 @@ export class GraphqlHelper {
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]> {
-    const clsRepoAlike = (cls as any) as Repository<Entity>;
+    const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length) {
-      return dataloader ? dataloader.load(query.ids) : clsRepoAlike.findByIds(query.ids);
+      return dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids);
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
-      const top100 = await clsRepoAlike.find(
+      const top100 = await entityRepo.find(
         this.resolveFindOptions({
           cls,
           pageRequest: { size: 100 },
           select: [primaryKey as any],
         }),
       );
-      logger.verbose(`load top100 for ${cls.name} is ${r(top100)}`);
       const ids = _.chain(top100)
         .map(fp.get(primaryKey))
         .shuffle()
         .take(query.random)
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
-      return dataloader ? dataloader.load(query.ids) : clsRepoAlike.findByIds(query.ids);
+      return dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids);
     }
     if (query.category) {
       if (categoryCls == null) {
@@ -99,7 +98,7 @@ export class GraphqlHelper {
         return null;
       }
 
-      return clsRepoAlike.find(
+      return entityRepo.find(
         this.resolveFindOptions({
           cls,
           pageRequest,
