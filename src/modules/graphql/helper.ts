@@ -16,7 +16,7 @@ import { LoggerFactory } from '../common/logger';
 import { AbstractBaseEntity, AbstractCategoryEntity } from '../core/base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { resolveRelationsFromInfo } from '../dataloader';
+import { GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
 import { DataLoaderFunction } from '../dataloader/utils';
 import { QueryConditionInput, TimeConditionInput } from './input';
 
@@ -47,16 +47,21 @@ export class GraphqlHelper {
     query,
     pageRequest,
     categoryCls,
+    ctx,
+    loader,
   }: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     pageRequest: PageRequest;
     info?: GraphQLResolveInfo;
     categoryCls?: ClassType<CategoryEntity>;
+    ctx?: GraphqlContext<any>;
+    loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]> {
     const clsRepoAlike = (cls as any) as Repository<Entity>;
+    const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length) {
-      return clsRepoAlike.findByIds(query.ids);
+      return dataloader ? dataloader.load(query.ids) : clsRepoAlike.findByIds(query.ids);
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
@@ -74,10 +79,7 @@ export class GraphqlHelper {
         .take(query.random)
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
-      return clsRepoAlike.findByIds(
-        ids,
-        this.resolveFindOptions({ cls, pageRequest: { size: ids.length }, info }),
-      );
+      return dataloader ? dataloader.load(query.ids) : clsRepoAlike.findByIds(query.ids);
     }
     if (query.category) {
       if (categoryCls == null) {
