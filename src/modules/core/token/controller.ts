@@ -47,7 +47,7 @@ export class ObtainOperationTokenDto {
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @Transform(value => Number(value))
+  @Transform(value => (value ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   @ValidateIf((o, value: Date) => value == null || Date.now() < value.getTime())
@@ -59,7 +59,7 @@ export class ObtainOperationTokenDto {
   @Max(999)
   @Min(1)
   @IsOptional()
-  @Transform(value => Number(value))
+  @Transform(value => (value ? Number(value) : null))
   readonly remainingCount?: number;
 
   constructor(o: ObtainOperationTokenDto) {
@@ -99,7 +99,7 @@ export class OperationTokenController {
     @Req() req: AnyAuthRequest,
   ): Promise<OperationToken> {
     const { identifier } = req;
-    logger.log(`get token ${r(dto)}`);
+    logger.log(`obtain token ${r(dto)}`);
     // TODO conflict validation for different types
     return OperationTokenHelper.obtainToken({ ...dto, role: 'operation', identifier } as any);
   }
@@ -120,7 +120,7 @@ export class OperationTokenController {
   @Get()
   redeem(@Query() query: RedeemQuery, @Req() req: AnyAuthRequest): Promise<OperationToken[]> {
     const { identifier } = req;
-    logger.log(`get token ${r(query)}`);
+    logger.log(`redeem token ${r(query)}`);
     return OperationTokenHelper.redeemTokens({ ...query, identifier });
   }
 }
