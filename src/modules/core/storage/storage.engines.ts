@@ -22,11 +22,11 @@ export class FileInfo {
   path: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(value => (value ? _.trim(value) : null))
   mimetype?: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(value => (value ? _.trim(value) : null))
   extension?: string;
 
   constructor(o: FileInfo) {

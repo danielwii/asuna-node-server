@@ -13,7 +13,7 @@ export class ResetPasswordDto {
   @IsEmail()
   @Transform(value => (value ? _.trim(value) : null))
   @IsOptional()
-  readonly email: string;
+  readonly email?: string;
 
   @ApiModelProperty({ minLength: 6 })
   @IsNotEmpty()
