@@ -22,14 +22,14 @@ import {
   ValidateIf,
 } from 'class-validator';
 import * as _ from 'lodash';
-import { AsunaError, AsunaException, r } from '../../common';
+import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenGuard } from './guard';
 import { OperationTokenHelper } from './helper';
 
-class ObtainOperationTokenDto {
+export class ObtainOperationTokenDto {
   @IsIn(_.keys(OperationTokenType))
   readonly type: keyof typeof OperationTokenType;
 
@@ -61,6 +61,10 @@ class ObtainOperationTokenDto {
   @IsOptional()
   @Transform(value => Number(value))
   readonly remainingCount?: number;
+
+  constructor(o: ObtainOperationTokenDto) {
+    Object.assign(this, deserializeSafely(ObtainOperationTokenDto, o));
+  }
 }
 
 class RedeemQuery {

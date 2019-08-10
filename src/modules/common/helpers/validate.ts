@@ -39,13 +39,21 @@ export function deserializeSafely<T>(
   json: string | JSON | T,
   options: ClassTransformOptions = { enableCircularCheck: true },
 ): T {
-  if (typeof cls === typeof json) {
+  if (!json) {
+    return;
+  }
+
+  if (json instanceof cls) {
     validateObjectSync(json);
     return json as T;
   }
-  const o = _.isPlainObject(json)
-    ? plainToClass(cls, json as JSON, options)
-    : deserialize(cls, json as string, options);
+
+  let o;
+  if (_.isPlainObject(json)) {
+    o = plainToClass(cls, json as JSON, options);
+  } else if (_.isString(json)) {
+    o = deserialize(cls, json as string, options);
+  }
 
   logger.debug(`deserializeSafely: ${r({ cls, o, json, options })}`);
   validateObjectSync(o);
