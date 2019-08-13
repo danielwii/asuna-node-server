@@ -28,6 +28,7 @@ module.exports = {
     // 'react/jsx-filename-extension': 'off',
     // Use function hoisting to improve code readability
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
+    "@typescript-eslint/no-parameter-properties": ['error', { "allows": ["private readonly"] }],
     // Makes no sense to allow type inferrence for expression parameters, but require typing the response
     '@typescript-eslint/explicit-function-return-type': [
       'error',

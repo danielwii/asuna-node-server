@@ -22,6 +22,7 @@ export const Mode = {
 @EntityMetaInfo({ name: 'app__infos' })
 @Entity('app__t_infos')
 export class AppInfo extends AbstractNameEntity {
+  @MetaInfo({ name: '唯一识别 Key' })
   @Column({ nullable: false, unique: true })
   key: string;
 
