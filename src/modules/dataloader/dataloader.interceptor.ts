@@ -7,15 +7,16 @@ import { getRequestFromContext } from './utils';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export type GraphqlContext<GetDataLoaders> = {
+export interface GraphqlContext<GetDataLoaders> {
   getDataLoaders: GetDataLoaders;
   getCurrentUser: () => AbstractAuthUser;
-};
+}
 
 const genericDataLoader = new GenericDataLoader();
 
 @Injectable()
 export class DataLoaderInterceptor implements NestInterceptor {
+  // eslint-disable-next-line class-methods-use-this
   public intercept(
     context: ExecutionContext,
     next: CallHandler<any>,

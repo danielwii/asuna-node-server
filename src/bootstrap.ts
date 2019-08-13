@@ -11,9 +11,9 @@ import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
 import { AnyExceptionFilter, r } from './modules/common';
+import { LoggerFactory, LoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
-import { LoggerFactory, LoggerService } from './modules/common/logger';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -177,14 +177,6 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
 
   return app.listen(port).then(opts => {
     logger.log(`started in ${Date.now() - startAt}ms, listening on ${port}`);
-
-    // --------------------------------------------------------------
-    // preload data
-    // --------------------------------------------------------------
-
-    // dataLoaderProxy()
-    //   .preload()
-    //   .catch(reason => logger.warn(r(reason)));
 
     return app;
   });
