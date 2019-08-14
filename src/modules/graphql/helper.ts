@@ -3,6 +3,7 @@ import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import {
+  BaseEntity,
   FindConditions,
   FindManyOptions,
   LessThan,
@@ -13,17 +14,34 @@ import {
 import { AsunaError, AsunaException } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { AbstractBaseEntity, AbstractCategoryEntity } from '../core/base';
+import { AbstractCategoryEntity } from '../core/base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
 import { DataLoaderFunction } from '../dataloader/utils';
-import { QueryConditionInput, TimeConditionInput } from './input';
+import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
+interface ResolveFindOptionsType<Entity extends BaseEntity> {
+  cls: ClassType<Entity>;
+  pageRequest: PageRequest;
+  select?: (keyof Entity)[];
+  info?: GraphQLResolveInfo;
+  where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+  relationPath?: string;
+  timeCondition?: TimeConditionInput;
+  cache?: boolean;
+}
+
+interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
+  categoryRef?: keyof Entity;
+  categoryCls: ClassType<AbstractCategoryEntity>;
+  query: CommonConditionInput;
+}
+
 export class GraphqlHelper {
-  static resolveOrder<Entity extends AbstractBaseEntity>(
+  public static resolveOrder<Entity extends BaseEntity>(
     cls: ClassType<Entity>,
     pageRequest: PageRequest,
   ): {
@@ -38,35 +56,36 @@ export class GraphqlHelper {
         };
   }
 
-  static async handleDefaultQueryRequest<
-    Entity extends AbstractBaseEntity,
+  /**
+   * 返回最大不超过 100 个元素
+   * @param cls
+   * @param query
+   * @param ctx
+   * @param loader
+   */
+  public static async handleDefaultQueryRequest<
+    Entity extends BaseEntity,
     CategoryEntity extends AbstractCategoryEntity
   >({
     cls,
-    info,
     query,
-    pageRequest,
-    categoryCls,
     ctx,
     loader,
   }: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
-    pageRequest: PageRequest;
-    info?: GraphQLResolveInfo;
-    categoryCls?: ClassType<CategoryEntity>;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
-    if (query.ids && query.ids.length) {
+    if (query.ids && query.ids.length > 0) {
       return dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids);
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const top100 = await entityRepo.find(
-        this.resolveFindOptions({
+        await this.resolveFindOptions({
           cls,
           pageRequest: { size: 100 },
           select: [primaryKey as any],
@@ -80,7 +99,52 @@ export class GraphqlHelper {
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
       return dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids);
     }
-    if (query.category) {
+    return null;
+  }
+
+  /**
+   * @param cls
+   * @param info
+   * @param select
+   * @param pageRequest
+   * @param where
+   * @param relationPath
+   * @param categoryRef 类型的引用字段，默认为 category
+   * @param categoryCls
+   * @param query
+   * @param timeCondition
+   * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
+   */
+  public static async resolveFindOptions<Entity extends BaseEntity>(
+    opts: ResolveFindOptionsType<Entity>,
+  ): Promise<FindManyOptions<Entity>>;
+
+  // eslint-disable-next-line no-dupe-class-members
+  public static async resolveFindOptions<Entity extends BaseEntity>(
+    opts: ResolveFindOptionsType<Entity> & ResolveCategoryOptionsType<Entity>,
+  ): Promise<FindManyOptions<Entity>>;
+
+  // eslint-disable-next-line no-dupe-class-members
+  public static async resolveFindOptions<Entity extends BaseEntity>(
+    opts: ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>,
+  ): Promise<FindManyOptions<Entity>> {
+    const {
+      cls,
+      info,
+      select,
+      pageRequest,
+      where,
+      relationPath,
+      categoryRef,
+      categoryCls,
+      query,
+      timeCondition,
+      cache,
+    } = opts;
+    const order = this.resolveOrder(cls, pageRequest);
+    const whereCondition = where;
+
+    if (opts.query && query.category) {
       if (categoryCls == null) {
         throw new AsunaException(
           AsunaError.Unprocessable,
@@ -94,52 +158,11 @@ export class GraphqlHelper {
         isPublished: true,
       });
 
-      if (category == null) {
-        return null;
+      if (category != null) {
+        Object.assign(whereCondition, { [categoryRef || 'category']: category.id });
       }
-
-      return entityRepo.find(
-        this.resolveFindOptions({
-          cls,
-          pageRequest,
-          where: { category, isPublished: true },
-        }),
-      );
     }
-    return null;
-  }
 
-  /**
-   * @param cls
-   * @param info
-   * @param select
-   * @param pageRequest
-   * @param where
-   * @param relationPath
-   * @param timeCondition
-   * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
-   */
-  static resolveFindOptions<Entity extends AbstractBaseEntity>({
-    cls,
-    info,
-    select,
-    pageRequest,
-    where,
-    relationPath,
-    timeCondition,
-    cache,
-  }: {
-    cls: ClassType<Entity>;
-    pageRequest: PageRequest;
-    select?: (keyof Entity)[];
-    info?: GraphQLResolveInfo;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    relationPath?: string;
-    timeCondition?: TimeConditionInput;
-    cache?: boolean;
-  }): FindManyOptions<Entity> {
-    const order = this.resolveOrder(cls, pageRequest);
-    let whereCondition = where;
     if (timeCondition && typeof where === 'object') {
       const afterCondition =
         timeCondition && timeCondition.after
@@ -149,43 +172,38 @@ export class GraphqlHelper {
         timeCondition && timeCondition.before
           ? { [timeCondition.column]: LessThan(timeCondition.before) }
           : null;
-      whereCondition = {
-        ...where,
-        ...afterCondition,
-        ...beforeCondition,
-      };
+      Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const options = {
       ...toPage(pageRequest),
-      ...(select && select.length ? { select } : null),
+      ...(select && select.length > 0 ? { select } : null),
       where: whereCondition,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
       order,
+      cache,
     };
     logger.debug(`resolved FindOptions is ${r(options)}`);
     return options;
   }
 
-  static async resolveProperty<
-    Entity extends AbstractBaseEntity,
-    RelationEntity extends AbstractBaseEntity
-  >(
+  public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     cls: ClassType<Entity>,
     instance: Entity,
     key: keyof Entity,
     loader: DataLoaderFunction<RelationEntity>,
   ): Promise<RelationEntity[]> {
     if (!instance[key]) {
-      const result = await (cls as any).findOne(instance.id, {
-        loadRelationIds: { relations: [key] },
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
+      const result = (await ((cls as any) as typeof BaseEntity).findOne(instance[primaryKey], {
+        loadRelationIds: { relations: [key as string] },
         cache: true,
-      });
-      instance[key] = result[key];
+      })) as Entity;
+      return loader.load(result[key]);
     }
-    return loader.load(instance[key]);
+    return null;
   }
 
-  static pagedResult({
+  public static pagedResult({
     pageRequest,
     items,
     mapper,

@@ -52,11 +52,10 @@ export class QueryConditionInput {
   @Field({ nullable: true })
   @IsOptional()
   random?: number;
+}
 
-  @Field(() => ObjectType, { nullable: true })
-  @IsOptional()
-  extra?: object;
-
+@InputType()
+export class CommonConditionInput {
   @IsString()
   @IsOptional()
   category?: string;

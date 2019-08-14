@@ -17,12 +17,15 @@ import { Hermes } from './hermes';
 const logger = LoggerFactory.getLogger('EntitySubscriber');
 
 export class BeforeAfterInsertPayload<T extends BaseEntity> {
-  readonly entity: T;
-  readonly updatedColumns: T;
-  readonly name: string;
-  readonly tableName: string;
+  public readonly entity: T;
 
-  constructor(o: BeforeAfterInsertPayload<T>) {
+  public readonly updatedColumns: T;
+
+  public readonly name: string;
+
+  public readonly tableName: string;
+
+  public constructor(o: BeforeAfterInsertPayload<T>) {
     Object.assign(this, deserializeSafely(BeforeAfterInsertPayload, o));
   }
 }
