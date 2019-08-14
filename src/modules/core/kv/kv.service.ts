@@ -75,6 +75,7 @@ export class KvService {
     name?: string;
     type: keyof typeof ValueType;
     value: any;
+    extra?: any;
   }): Promise<KeyValuePair> {
     const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
@@ -92,10 +93,11 @@ export class KvService {
       name,
       type: newType,
       value: stringifyValue as any,
+      extra: pair.extra,
       collection:
         collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    logger.log(`inspect ${r({ collection, key, type, name, value, stringifyValue })}`);
+    logger.log(`inspect ${r({ pair, collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
     logger.log(`set ${r({ entity, exists })}`);
     return this.kvPairRepository.save({ ...(exists ? { id: exists.id } : null), ...entity });

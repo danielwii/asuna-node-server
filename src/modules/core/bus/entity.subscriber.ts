@@ -9,9 +9,10 @@ import {
   RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
-import { deserializeSafely, validateObjectSync } from '../../common/helpers';
-import { dataLoaderCleaner } from '../../dataloader';
+import { deserializeSafely, r, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { dataLoaderCleaner } from '../../dataloader';
+import { jsonType, safeReloadJSON } from '../helpers';
 import { Hermes } from './hermes';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
@@ -91,6 +92,11 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
     // tslint:disable-next-line:max-line-length
     // logger.debug(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    event.metadata.columns.forEach(column => {
+      if (column.type === jsonType()) {
+        safeReloadJSON(event.entity as any, column.propertyName);
+      }
+    });
     validateObjectSync(event.entity);
   }
 
@@ -112,6 +118,11 @@ export class EntitySubscriber implements EntitySubscriberInterface {
     //     tableName: event.metadata.tableName,
     //   })}`,
     // );
+    event.metadata.columns.forEach(column => {
+      if (column.type === jsonType()) {
+        safeReloadJSON(event.entity as any, column.propertyName);
+      }
+    });
     validateObjectSync(event.entity);
   }
 }

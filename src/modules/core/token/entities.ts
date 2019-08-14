@@ -1,8 +1,8 @@
 import { html } from 'common-tags';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
-import { jsonType, safeReloadJSON } from '../helpers';
+import { jsonType } from '../helpers';
 
 export const TokenRule = {
   sys: 'sys',
@@ -106,10 +106,4 @@ export class OperationToken extends AbstractBaseEntity {
   @MetaInfo({ name: '是否已过期' })
   @Column({ nullable: true, name: 'is_expired', default: false })
   isExpired: boolean;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  preSave() {
-    safeReloadJSON(this, 'body');
-  }
 }

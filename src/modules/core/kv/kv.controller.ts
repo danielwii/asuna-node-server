@@ -26,6 +26,10 @@ class KvPair {
 
   @IsString()
   value: any;
+
+  @IsString()
+  @IsOptional()
+  extra?: any;
 }
 
 class GetKvPairRequest {
