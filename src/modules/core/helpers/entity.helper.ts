@@ -40,7 +40,7 @@ export function safeReloadObject<Entity>(entity: Entity, column: keyof Entity) {
 }
 
 export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity) {
-  if (jsonType() === 'simple-json') {
+  if (entity && column && jsonType() === 'simple-json') {
     if (entity[column]) {
       try {
         if (!_.isObject(entity[column])) {
