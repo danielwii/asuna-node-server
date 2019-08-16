@@ -9,8 +9,10 @@ export const ValueType = {
   json: 'json',
   boolean: 'boolean',
   number: 'number',
+  image: 'image',
   images: 'images',
   videos: 'videos',
+  video: 'video',
 };
 
 @EntityMetaInfo({ name: 'kv__pairs' })

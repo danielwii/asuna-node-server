@@ -63,10 +63,7 @@ export class GraphqlHelper {
    * @param ctx
    * @param loader
    */
-  public static async handleDefaultQueryRequest<
-    Entity extends BaseEntity,
-    CategoryEntity extends AbstractCategoryEntity
-  >({
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
     query,
     ctx,

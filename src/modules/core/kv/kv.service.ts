@@ -3,7 +3,6 @@ import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { Connection, Repository } from 'typeorm';
-import * as util from 'util';
 import { r, ValidationException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { KeyValuePair, ValueType } from './kv.entities';
