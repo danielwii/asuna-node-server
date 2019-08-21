@@ -10,6 +10,7 @@ import {
   MoreThan,
   ObjectLiteral,
   Repository,
+  JoinOptions,
 } from 'typeorm';
 import { AsunaError, AsunaException } from '../common';
 import { r } from '../common/helpers';
@@ -29,6 +30,7 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   select?: (keyof Entity)[];
   info?: GraphQLResolveInfo;
   where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+  join?: JoinOptions;
   relationPath?: string;
   timeCondition?: TimeConditionInput;
   cache?: boolean;
@@ -137,6 +139,7 @@ export class GraphqlHelper {
       query,
       timeCondition,
       cache,
+      join,
     } = opts;
     const order = this.resolveOrder(cls, pageRequest);
     const whereCondition = where;
@@ -171,10 +174,11 @@ export class GraphqlHelper {
           : null;
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
-    const options = {
+    const options: FindManyOptions<Entity> = {
       ...toPage(pageRequest),
       ...(select && select.length > 0 ? { select } : null),
       where: whereCondition,
+      join,
       loadRelationIds: resolveRelationsFromInfo(info, relationPath),
       order,
       cache,
@@ -189,12 +193,13 @@ export class GraphqlHelper {
     key: keyof Entity,
     loader: DataLoaderFunction<RelationEntity>,
   ): Promise<RelationEntity[]> {
-    if (!instance[key]) {
+    if (key in instance) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const result = (await ((cls as any) as typeof BaseEntity).findOne(instance[primaryKey], {
         loadRelationIds: { relations: [key as string] },
         cache: true,
       })) as Entity;
+      logger.log(`load key ${key}`);
       return loader.load(result[key]);
     }
     return null;

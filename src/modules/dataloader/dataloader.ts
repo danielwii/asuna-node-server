@@ -179,13 +179,13 @@ export function resolveRelationsFromInfo(
   info: GraphQLResolveInfo,
   path: string,
 ): boolean | { relations?: string[]; disableMixedMap?: boolean } {
-  if (!info || !path) return true;
+  if (!info || !path) return false;
 
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
     if (fieldNode == null) {
-      return true;
+      return false;
     }
 
     let selectionNode;
@@ -200,6 +200,6 @@ export function resolveRelationsFromInfo(
     return { relations };
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);
-    return true;
+    return false;
   }
 }
