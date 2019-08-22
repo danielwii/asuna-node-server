@@ -62,17 +62,20 @@ export class GraphqlHelper {
    * 返回最大不超过 100 个元素
    * @param cls
    * @param query
+   * @param where
    * @param ctx
    * @param loader
    */
   public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
     query,
+    where,
     ctx,
     loader,
   }: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
+    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]> {
@@ -88,6 +91,7 @@ export class GraphqlHelper {
           cls,
           pageRequest: { size: 100 },
           select: [primaryKey as any],
+          where,
         }),
       );
       const ids = _.chain(top100)
@@ -199,7 +203,7 @@ export class GraphqlHelper {
         loadRelationIds: { relations: [key as string] },
         cache: true,
       })) as Entity;
-      logger.log(`load key ${key}`);
+      // logger.log(`load key ${key}`);
       return loader.load(result[key]);
     }
     return null;

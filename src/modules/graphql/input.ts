@@ -1,5 +1,4 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { Field, ID, InputType, Int, ObjectType } from 'type-graphql';
 import {
   DEFAULT_PAGE,
   DEFAULT_SIZE,
@@ -9,19 +8,15 @@ import {
   PageRequest,
 } from '../core/helpers';
 
-@InputType()
 export class PageRequestInput implements PageRequest {
-  @Field(type => Int)
   @IsNumber()
   @IsOptional()
   page?: number;
 
-  @Field(type => Int)
   @IsNumber()
   @IsOptional()
   size?: number;
 
-  @IsOptional()
   orderBy?: { column: string; order?: Order };
 
   info(): PageInfo {
@@ -43,18 +38,14 @@ export class PageRequestInput implements PageRequest {
   }
 }
 
-@InputType()
 export class QueryConditionInput {
-  @Field(() => ID, { nullable: true })
   @IsOptional()
   ids?: string[] | number[];
 
-  @Field({ nullable: true })
   @IsOptional()
   random?: number;
 }
 
-@InputType()
 export class CommonConditionInput {
   @IsString()
   @IsOptional()
@@ -62,7 +53,14 @@ export class CommonConditionInput {
 }
 
 export class TimeConditionInput {
+  @IsString()
   column: string;
+
+  @IsString()
+  @IsOptional()
   before?: Date;
+
+  @IsString()
+  @IsOptional()
   after?: Date;
 }
