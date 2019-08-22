@@ -193,7 +193,7 @@ export class GraphqlHelper {
     key: keyof Entity,
     loader: DataLoaderFunction<RelationEntity>,
   ): Promise<RelationEntity[]> {
-    if (key in instance) {
+    if (DBHelper.getRelationPropertyNames(cls).includes(key as string)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const result = (await ((cls as any) as typeof BaseEntity).findOne(instance[primaryKey], {
         loadRelationIds: { relations: [key as string] },

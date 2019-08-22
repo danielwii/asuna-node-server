@@ -280,6 +280,10 @@ export class DBHelper {
     return this.repo(entity).metadata.columns.map(column => column.propertyName);
   }
 
+  public static getRelationPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
+    return this.repo(entity).metadata.relations.map(r => r.propertyName);
+  }
+
   public static getColumnNames<Entity>(entity: ObjectType<Entity>): string[] {
     return this.repo(entity).metadata.columns.map(column => column.databaseName);
   }
