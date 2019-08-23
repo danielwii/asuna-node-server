@@ -54,7 +54,8 @@ export class CommonConditionInput {
 
 export class TimeConditionInput {
   @IsString()
-  column: string;
+  @IsOptional()
+  column?: string;
 
   @IsString()
   @IsOptional()
