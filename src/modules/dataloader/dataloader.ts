@@ -29,9 +29,11 @@ function build<Entity extends BaseEntity>(
   return {
     load(ids: PrimaryKeyType | PrimaryKeyType[]) {
       if (_.isArray(ids)) {
-        return !_.isEmpty(ids) ? (dataloader.loadMany(ids).then(fp.compact) as any) : null;
+        return !_.isEmpty(ids)
+          ? (dataloader.loadMany(ids as PrimaryKeyType[]).then(fp.compact) as any)
+          : null;
       }
-      return ids ? dataloader.load(ids) : null;
+      return ids ? dataloader.load(ids as PrimaryKeyType) : null;
     },
   };
 }
@@ -88,7 +90,7 @@ export class GenericDataLoader {
     }
   }
 
-  initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }) {
+  initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
     GenericDataLoader.loaders = loaders;
   }
 
