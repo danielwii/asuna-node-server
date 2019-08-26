@@ -18,7 +18,7 @@ export class AdminAuthMiddleware {
       if (!matched) {
         return next();
       }
-      logger.log(`check url: ${r({ url, routeFilters, matched })}`);
+      logger.verbose(`check url: ${r({ url, routeFilters, matched })}`);
       if (['/admin/auth/reset-password', '/admin/auth/token'].includes(url)) {
         return next();
       }

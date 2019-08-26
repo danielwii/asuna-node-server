@@ -158,7 +158,7 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ) {
     const modelName = DBHelper.getModelName(model, this.module);
-    logger.log(`patch ${r({ user, modelName, updateTo })}`);
+    logger.verbose(`patch ${r({ user, modelName, updateTo })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (modelName.model === 'kv__pairs') {
       const pair = KeyValuePair.create(updateTo);
@@ -210,7 +210,7 @@ export abstract class RestCrudController {
     );
     const relationIds = R.mapObjIndexed((value, relation) => {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
-      logger.log(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
+      logger.verbose(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
         ? (value as any[]).map(id => ({ [_.first(primaryKeys)]: id }))
         : { [_.first(primaryKeys)]: value };

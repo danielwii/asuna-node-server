@@ -80,12 +80,14 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       return;
     }
 
+    /*
     Hermes.emit(EntitySubscriber.name, 'entity.afterUpdate', {
       entity: event.entity,
       updatedColumns: diff(event.entity, event.databaseEntity),
       name: event.metadata.name,
       tableName: event.metadata.tableName,
     });
+*/
     dataLoaderCleaner.clear(idx(event, _ => _.entity.constructor.name), _.get(event.entity, 'id'));
   }
 

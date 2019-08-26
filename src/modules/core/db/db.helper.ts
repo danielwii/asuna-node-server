@@ -254,7 +254,7 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    logger.log(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
+    logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
     const entityInfo = this.getEntityInfo(metadata);
     return {

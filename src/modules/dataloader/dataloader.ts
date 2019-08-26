@@ -23,27 +23,25 @@ function resolve(ids) {
   };
 }
 
-function build<Entity extends BaseEntity>(loader): DataLoaderFunction<Entity> {
+function build<Entity extends BaseEntity>(
+  dataloader: DataLoader<PrimaryKeyType, Entity>,
+): DataLoaderFunction<Entity> {
   return {
     load(ids: PrimaryKeyType | PrimaryKeyType[]) {
       if (_.isArray(ids)) {
-        return !_.isEmpty(ids) ? loader.loadMany(ids).then(fp.compact) : null;
+        return !_.isEmpty(ids) ? (dataloader.loadMany(ids).then(fp.compact) as any) : null;
       }
-      return ids ? loader.load(ids) : null;
+      return ids ? dataloader.load(ids) : null;
     },
   };
 }
 
 export function loader<RegisteredLoaders>(
-  name: keyof RegisteredLoaders,
   entity: typeof BaseEntity,
-  opts: {
-    isPublished?: boolean;
-    loadRelationIds?: boolean;
-  } = {},
+  opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<typeof entity & any> {
   return build<typeof entity & any>(
-    cachedDataLoader(name, ids =>
+    cachedDataLoader(entity.name, ids =>
       entity
         .findByIds(ids, {
           where: { isPublished: opts.isPublished },
@@ -145,7 +143,7 @@ export function cachedDataLoader(segment, fn) {
         },
         set: (id: string, value) => {
           const key = `${segment}-${id}`;
-          // console.log('cacheMap set', key);
+          logger.log(`dataloader set ${r({ key })}`);
           const now = Date.now();
           // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
           // if (!cacheMap.has(key)) {

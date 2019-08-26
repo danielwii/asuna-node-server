@@ -22,8 +22,8 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
     );
   }
 
-  async validate(payload: IJwtPayload) {
-    logger.log(`validate ${r(payload)}`);
+  async validate(payload: IJwtPayload): Promise<IJwtPayload> {
+    logger.verbose(`validate ${r(payload)}`);
     const isValid = await this.adminAuthService.validateUser(payload);
     if (!isValid) {
       throw new AsunaException(AsunaError.InsufficientPermissions);
