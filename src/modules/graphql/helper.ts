@@ -162,9 +162,9 @@ export class GraphqlHelper {
         isPublished: true,
       });
 
-      if (category != null) {
-        Object.assign(whereCondition, { [categoryRef || 'category']: category.id });
-      }
+      logger.verbose(`category is ${r(category)}`);
+      // if (category != null) {}
+      Object.assign(whereCondition, { [categoryRef || 'category']: _.get(category, 'id') });
     }
 
     if (timeCondition && typeof where === 'object') {
@@ -187,7 +187,7 @@ export class GraphqlHelper {
       order,
       cache,
     };
-    logger.debug(`resolved FindOptions is ${r(options)}`);
+    logger.verbose(`resolved FindOptions is ${r(options)}`);
     return options;
   }
 
