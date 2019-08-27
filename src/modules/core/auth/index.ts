@@ -6,3 +6,4 @@ export * from './auth.entities';
 export * from './base.entities';
 export * from './auth.service';
 export * from './helper';
+export * from './identifier';

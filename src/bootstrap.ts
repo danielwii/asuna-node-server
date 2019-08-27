@@ -33,6 +33,7 @@ export interface IBootstrapOptions {
   // root?: string;
   // package folder
   // dirname?: string;
+  typeormEntities?: string[];
   version?: string;
   /**
    * io     - socket.io
@@ -194,6 +195,7 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
   const entities = [
     `${resolve(packageDir)}/**/*entities.ts`,
     `${resolve(rootDir)}/**/*entities.ts`,
+    ...options.typeormEntities,
   ];
   const subscribers = [
     `${resolve(packageDir)}/**/*subscriber.ts`,

@@ -2,11 +2,14 @@ import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { IJwtPayload } from './auth.interfaces';
+import { AdminUserIdentifier, UserIdentifier } from './identifier';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
-export type AnyAuthRequest = Request & Partial<{ user: any; identifier: string }>;
+export type AnyAuthRequest<U extends IJwtPayload = IJwtPayload> = Request &
+  Partial<{ user: U; identifier: string }>;
 
 export function isAdminAuthRequest(req: Request) {
   const authorization = req.headers.authorization;
@@ -35,7 +38,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
         if (err || info) {
           logger.warn(`admin-jwt auth error: ${r(err)}`);
         } else {
-          req.identifier = `admin=${user.id}`;
+          req.identifier = new AdminUserIdentifier(user).identifier();
           req.user = user; // only inject client side user to req
         }
         resolve({ err, user, info });
@@ -49,7 +52,7 @@ export function auth(req: AnyAuthRequest, res: Response): Promise<{ err; user; i
       if (err || info) {
         logger.warn(`jwt auth error: ${r(err)}`);
       } else {
-        req.identifier = `user=${user.id}`;
+        req.identifier = new UserIdentifier(user).identifier();
         req.user = user; // only inject client side user to req
       }
       resolve({ err, user, info });

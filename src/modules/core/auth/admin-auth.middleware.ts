@@ -23,7 +23,7 @@ export class AdminAuthMiddleware {
         return next();
       }
 
-      const result = await auth(req, res);
+      const result = await auth(req as any, res);
       if (!result.user) {
         throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
       }
