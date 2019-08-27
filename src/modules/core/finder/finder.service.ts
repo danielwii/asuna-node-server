@@ -53,7 +53,7 @@ export class FinderService {
         );
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
-      /*const portStr = upstream.port ? `:${upstream.port}` : '';
+      /* const portStr = upstream.port ? `:${upstream.port}` : '';
 
       // get same domain if hostname startswith /
       if (_.startsWith(upstream.hostname, '/')) {
@@ -61,10 +61,9 @@ export class FinderService {
       }
 */
       return `${upstream.endpoint || ''}${resourcePath}`;
-    } else {
-      // TODO add other handlers later
-      logger.warn('only type assets is available');
-      throw new AsunaException(AsunaError.InvalidParameter, 'only type assets is available');
     }
+    // TODO add other handlers later
+    logger.warn('only type assets is available');
+    throw new AsunaException(AsunaError.InvalidParameter, 'only type assets is available');
   }
 }

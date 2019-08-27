@@ -2,8 +2,8 @@ import { classToPlain } from 'class-transformer';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import { convertFilename, ErrorException, r } from '../../common';
-import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from '../../common/logger';
+import { ConfigKeys, configLoader } from '../../config';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { QiniuConfigObject } from './storage.config';
@@ -11,12 +11,14 @@ import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from '
 
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(QiniuStorage.name);
+
   // private temp: string;
   private readonly mac: qiniu.auth.digest.Mac;
+
   private readonly configObject: QiniuConfigObject;
 
-  constructor(configLoader: () => QiniuConfigObject) {
-    this.configObject = configLoader();
+  constructor(configure: () => QiniuConfigObject) {
+    this.configObject = configure();
     QiniuStorage.logger.log(
       `[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`,
     );
@@ -67,7 +69,7 @@ export class QiniuStorage implements IStorageEngine {
             throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
           }
           if (info.statusCode === 200) {
-            QiniuStorage.logger.log(`upload file '${r({ key, /*info,*/ body })}'`);
+            QiniuStorage.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
             const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
             const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
               ? join(this.configObject.path || '')

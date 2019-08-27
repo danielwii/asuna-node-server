@@ -108,7 +108,7 @@ export interface IStorageEngine {
   );
 }
 
-export function yearMonthStr() {
+export function yearMonthStr(): string {
   const now = new Date();
   return `${now.getFullYear()}/${now.getMonth() + 1}`;
 }

@@ -12,17 +12,19 @@ import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from '
 
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(LocalStorage.name);
+
   private readonly storagePath: string;
+
   private readonly bucket: string;
 
-  constructor(storagePath: string, defaultBucket: string = 'default') {
+  constructor(storagePath: string, defaultBucket = 'default') {
     this.bucket = defaultBucket || 'default';
     this.storagePath = storagePath;
     LocalStorage.logger.log(oneLineTrim`
       [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
     `);
-    fs.mkdirs(join(this.storagePath, this.bucket)).catch(reason =>
-      LocalStorage.logger.warn(r(reason)),
+    fs.mkdirs(join(this.storagePath, this.bucket)).catch(error =>
+      LocalStorage.logger.warn(r(error)),
     );
   }
 

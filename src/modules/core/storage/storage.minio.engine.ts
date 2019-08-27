@@ -5,8 +5,8 @@ import * as minio from 'minio';
 import { join } from 'path';
 import { AsunaError, AsunaException, convertFilename } from '../../common';
 import { r } from '../../common/helpers';
-import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from '../../common/logger';
+import { ConfigKeys, configLoader } from '../../config';
 import { AsunaContext } from '../context';
 import { JpegParam } from '../image/jpeg.pipe';
 import { ThumbnailParam } from '../image/thumbnail.pipe';
@@ -17,11 +17,12 @@ export class MinioStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(MinioStorage.name);
 
   private readonly defaultBucket;
+
   private readonly configObject: MinioConfigObject;
 
-  constructor(configLoader: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
+  constructor(configure: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
     this.defaultBucket = opts.defaultBucket || 'default';
-    this.configObject = configLoader();
+    this.configObject = configure();
     if (this.configObject.enable !== true) {
       throw new Error(
         `minio must enable when using minio storage engine: ${r({
@@ -51,7 +52,7 @@ export class MinioStorage implements IStorageEngine {
           );
           return error;
         });
-    });*/
+    }); */
     /*
     Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_UPLOAD, payload => {
       MinioStorage.logger.log(`upload ${r(payload)}`);
@@ -90,7 +91,7 @@ export class MinioStorage implements IStorageEngine {
           );
           return error;
         });
-    })*/
+    }) */
   }
 
   get client() {
@@ -222,7 +223,7 @@ export class MinioStorage implements IStorageEngine {
       bucket,
       filenameWithPrefix,
       file,
-    });*/
+    }); */
     /*
     const { queue } = Hermes.getQueue(AsunaSystemQueue.UPLOAD);
     queue
@@ -235,7 +236,7 @@ export class MinioStorage implements IStorageEngine {
           // TODO trigger event when job failed
           `upload error: ${r(reason)}, should trigger an event later.`,
         );
-      });*/
+      }); */
     /*
     return {
       prefix: resolvedPrefix,
@@ -244,7 +245,7 @@ export class MinioStorage implements IStorageEngine {
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
       filename,
-    };*/
+    }; */
   }
 
   listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {

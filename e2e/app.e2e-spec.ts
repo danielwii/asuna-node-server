@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import 'jest';
 import * as supertest from 'supertest';
 import { AdminModule } from '../src/modules';
 
