@@ -20,6 +20,10 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: true, select: false })
   salt: string;
 
+  // --------------------------------------------------------------
+  // Status
+  // --------------------------------------------------------------
+
   @MetaInfo({ name: '是否启用？' })
   @Column({ nullable: true, name: 'active' })
   isActive: boolean;

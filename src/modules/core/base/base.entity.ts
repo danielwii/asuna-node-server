@@ -8,17 +8,17 @@ import {
 import { MetaInfo } from '../../common/decorators';
 
 export abstract class AbstractBaseEntity extends BaseEntity {
-  @PrimaryGeneratedColumn() id!: number;
+  @PrimaryGeneratedColumn() id?: number;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
-  updatedBy: string;
+  updatedBy?: string;
 }
 
 export abstract class AbstractNameEntity extends AbstractBaseEntity {
@@ -28,7 +28,7 @@ export abstract class AbstractNameEntity extends AbstractBaseEntity {
 
   @MetaInfo({ name: '描述' })
   @Column('text', { nullable: true, name: 'description' })
-  description: string;
+  description?: string;
 }
 
 export abstract class AbstractUUIDBaseEntity extends BaseEntity {
