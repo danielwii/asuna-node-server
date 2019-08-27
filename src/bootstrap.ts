@@ -195,7 +195,7 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
   const entities = [
     `${resolve(packageDir)}/**/*entities.ts`,
     `${resolve(rootDir)}/**/*entities.ts`,
-    ...options.typeormEntities,
+    ...(options.typeormEntities || []),
   ];
   const subscribers = [
     `${resolve(packageDir)}/**/*subscriber.ts`,
