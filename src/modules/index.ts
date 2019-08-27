@@ -9,6 +9,7 @@ export * from './core/db';
 export * from './common';
 export * from './graphql';
 export * from './core';
+export * from './ids';
 export * from './providers';
 export * from './core/auth/auth.module';
 export * from './core/auth/strategy/jwt.strategy';

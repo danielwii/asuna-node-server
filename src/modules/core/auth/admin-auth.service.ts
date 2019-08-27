@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
+import * as _ from 'lodash';
 import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
@@ -22,9 +23,14 @@ export class AdminAuthService extends AbstractAuthService {
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
-  async createUser(username: string, email: string, password: string, roleNames: string[]) {
+  async createUser(
+    username: string,
+    email: string,
+    password: string,
+    roleNames?: string[],
+  ): Promise<AdminUser> {
     const { hash, salt } = this.encrypt(password);
-    const roles = await this.roleRepository.findByNames(roleNames);
+    const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
 
     let user = (await this.getUser({ username, email })) as AdminUser;
     if (!user) {
