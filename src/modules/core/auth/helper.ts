@@ -8,6 +8,7 @@ import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
+// fixme IJwtPayload only for jwt auth, api-key not included
 export type AnyAuthRequest<U extends IJwtPayload = IJwtPayload> = Request &
   Partial<{ user: U; identifier: string }>;
 

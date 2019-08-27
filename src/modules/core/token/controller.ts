@@ -47,7 +47,7 @@ export class ObtainOperationTokenDto {
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @Transform(value => (value ? Number(value) : null))
+  @Transform(value => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   @ValidateIf((o, value: Date) => value == null || Date.now() < value.getTime())
@@ -59,7 +59,7 @@ export class ObtainOperationTokenDto {
   @Max(999)
   @Min(1)
   @IsOptional()
-  @Transform(value => (value ? Number(value) : null))
+  @Transform(value => (value || value === 0 ? Number(value) : null))
   readonly remainingCount?: number;
 
   constructor(o: ObtainOperationTokenDto) {

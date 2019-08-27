@@ -57,14 +57,14 @@ export class OperationTokenOpts {
   readonly type: 'Unlimited' | 'OneTime' | 'MultiTimes' | 'TimeBased' | 'TimeBased';
 
   @IsInt()
-  @Transform(value => (value ? Number(value) : null))
+  @Transform(value => (value || value === 0 ? Number(value) : null))
   readonly remainingCount?: number;
 
   @IsDate()
   readonly expiredAt?: Date;
 
   @IsInt()
-  @Transform(value => (value ? Number(value) : null))
+  @Transform(value => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   constructor(o: OperationTokenOpts) {
