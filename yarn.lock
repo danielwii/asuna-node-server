@@ -426,16 +426,6 @@
     express "4.17.1"
     multer "1.4.2"
 
-"@nestjs/platform-express@6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-6.6.0.tgz#cc32e85e8cc04016dd4c6998bf096988ee200921"
-  integrity sha512-lr+S77CX1cJr1f0dtWS/iuJzaSnVcq7O+iLAdV34XzK1qEx+nozfzFL/VgtatgnB7/A+G/SEwrGEvMWtcfL//A==
-  dependencies:
-    body-parser "1.19.0"
-    cors "2.8.5"
-    express "4.17.1"
-    multer "1.4.2"
-
 "@nestjs/platform-fastify@6.5.3":
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-6.5.3.tgz#18154b4b68f9c9b91b2ce55289a69cb991bc5d4f"
@@ -446,27 +436,27 @@
     fastify-formbody "3.1.0"
     path-to-regexp "3.0.0"
 
-"@nestjs/platform-fastify@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-6.6.0.tgz#c0751858e39022ca573720b2d39ad673e3265807"
-  integrity sha512-U7qCJ2d/5fDlZ6uihRXviK4gqQl0RQUs4tppbplstuUy3U8NAzM6T6hp2QY6yIF1DHLL4x65CBCVKgkOSWQQNQ==
+"@nestjs/platform-fastify@^6.6.2":
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-6.6.2.tgz#c9a0901dc15fd2bd8c665e9f4edfa8fa9de6470e"
+  integrity sha512-gMRiX3ocKUNKdIk5+7RdzTmc523uj7S2aO8qM/UQlFj9BVSboEORg+7grTGheAiJA/rALlaNovtHgVK0/MH/iQ==
   dependencies:
     fastify "2.7.1"
     fastify-cors "2.1.3"
     fastify-formbody "3.1.0"
     path-to-regexp "3.0.0"
 
-"@nestjs/platform-socket.io@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.6.0.tgz#04282c3d9cd4cae1bc6a09f74fe753ab89edc678"
-  integrity sha512-BmwGywAzJjhEqSu2OWIHMGum5N8atOypfAga556eYnsNyicq6hUKZ+jybGLq58vXQjC1ABfApmIwn4HvkTBtmg==
+"@nestjs/platform-socket.io@^6.6.2":
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.6.2.tgz#69207180ec53765f15257c65cb5153f9cf001183"
+  integrity sha512-arfPXExH/zJ8xsJPnfNTdDVIEsFQlifpk/ZyBbvLlEEHQILBOILx9c39oYkNS0oAiKQATkrN5pu0EG3bK1CUMg==
   dependencies:
     socket.io "2.2.0"
 
-"@nestjs/platform-ws@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.6.0.tgz#4aba6c6a0e26c7e8b57d1d94e3d676baed4cf113"
-  integrity sha512-HsVfmfU5TemHjWmAQqWGbW9kS7qLEIfm92ORzXMs81AMxEKJMyTNN7pXuvyqfIZECoppk6RX2PeQJIBObDx6ww==
+"@nestjs/platform-ws@^6.6.2":
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.6.2.tgz#36627d23a7496202899b335593dfb2a3b55d01e6"
+  integrity sha512-y3K5h4C86PCydqUhyz6V3IM9wqxOC2gA9rwhOJ2TYCQeeJLcyxGgdPkDe7vjxQ/s7WDhmBBr/IQCBqq/oJaW6A==
   dependencies:
     ws "7.1.2"
 
@@ -500,10 +490,10 @@
     redis "2.8.0"
     typeorm "0.2.18"
 
-"@nestjs/testing@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.6.0.tgz#f7ab689dba372d7cbb49b78f11a53c3a0eb9618e"
-  integrity sha512-Ulb+DbtRxh0Unl4egEJDMako/125MWNKyxQuQei5AJmF5rdVLZuy5KpoH/ymDHTx8s6YDGOin1dXQVZgbCFR/A==
+"@nestjs/testing@^6.6.2":
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.6.2.tgz#e6f614d5735b3f94325ebfb51ef4857b80d947ff"
+  integrity sha512-GRsCPMR+R6k2lVgcyvos+AKm6u5eERZwTlg7Qq7LYNKVK7ckrE/bjcU2FzZn5QYVcSJzUHyT3eV8LbyK9qHj3g==
   dependencies:
     optional "0.1.4"
 
@@ -514,10 +504,10 @@
   dependencies:
     uuid "3.3.2"
 
-"@nestjs/websockets@^6.6.0":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.6.0.tgz#60abb7d5d851941e5f10173d1ddc3f6ab493a038"
-  integrity sha512-T+ARP0HZIQHadiyXMWe5ccoRbdNCAD20yM1ckVog9jaJmcD2XVQEqfgvUa8P1FO+LIK5pjNnSo1Ov3mXsK6EdA==
+"@nestjs/websockets@^6.6.2":
+  version "6.6.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.6.2.tgz#13680ada4cc2a6e065a02213a7bd1cb8462dbea1"
+  integrity sha512-jXrb8gGhZuNVyU898VKqBDrurzYt6c04wIuuURMppfCbpy8DpqYb/tgNVocWcRubCHp047SgYxmuzQgUNADAaw==
   dependencies:
     iterare "1.2.0"
 
