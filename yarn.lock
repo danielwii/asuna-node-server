@@ -346,7 +346,7 @@
     qs "^6.6.0"
     underscore.string "^3.3.5"
 
-"@nestjs/common@^6.5.3":
+"@nestjs/common@6.5.3":
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-6.5.3.tgz#25a3916b53f1e681640641bdb96a40bb37a15515"
   integrity sha512-8d39grIMrUYGKM46BFWxB6csQFCu1S2aK7azPivg7gTRVSbvR84cVd6tgRVM0LwFpqQrtn3Q6G6Pa8FSk7Kh1w==
@@ -355,7 +355,7 @@
     cli-color "1.4.0"
     uuid "3.3.2"
 
-"@nestjs/core@^6.5.3":
+"@nestjs/core@6.5.3":
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-6.5.3.tgz#0cfd4388f07f15ab7b49aa0ff7ed594f51446378"
   integrity sha512-ZhYfH49sVmUUw02qsaGozCFOOehlEABakYzRShyDDq30/2+ek3KpE0DfvA9tXlzX2KVrac2qDTBxMOPoJ+zY+g==
@@ -416,7 +416,7 @@
   resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-6.1.0.tgz#80da326cc976a82530648d8025b04c8e2d41c10e"
   integrity sha512-V4KdtFFLsdZQ/HlIECpiK6byzGz57Y12TAc+Iatykk8jWuVFE1jq8RJbpTfB0zG0PTfcGm9crQ6Ut2Rwdmis4Q==
 
-"@nestjs/platform-express@6.5.3", "@nestjs/platform-express@^6.5.3":
+"@nestjs/platform-express@6.5.3":
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-6.5.3.tgz#0260f2c13e5914dc121dbd3a221afb5305b9f813"
   integrity sha512-c5n4XUbDDmF6MfBGYWM1jtsIDpVsOfOQtf3S0w3IeJNqm7dnmVAvO2Jk+RsYpt50tN4NAXntM3YTuTDqMb9uiA==
@@ -426,7 +426,17 @@
     express "4.17.1"
     multer "1.4.2"
 
-"@nestjs/platform-fastify@6.5.3", "@nestjs/platform-fastify@^6.5.3":
+"@nestjs/platform-express@6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-6.6.0.tgz#cc32e85e8cc04016dd4c6998bf096988ee200921"
+  integrity sha512-lr+S77CX1cJr1f0dtWS/iuJzaSnVcq7O+iLAdV34XzK1qEx+nozfzFL/VgtatgnB7/A+G/SEwrGEvMWtcfL//A==
+  dependencies:
+    body-parser "1.19.0"
+    cors "2.8.5"
+    express "4.17.1"
+    multer "1.4.2"
+
+"@nestjs/platform-fastify@6.5.3":
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-6.5.3.tgz#18154b4b68f9c9b91b2ce55289a69cb991bc5d4f"
   integrity sha512-RQwsx/N9Y0Hg4fR9gdHkUPEz/sp40cMN0uWKXffeGZul0UsvkgJSwwpS8IWNJbLuDirsM+8BbYvi3kKLrkWpOQ==
@@ -436,19 +446,29 @@
     fastify-formbody "3.1.0"
     path-to-regexp "3.0.0"
 
-"@nestjs/platform-socket.io@^6.5.3":
-  version "6.5.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.5.3.tgz#0c6968c34438ca6bc60b95b76057361d69930b04"
-  integrity sha512-SB9AsaG5Gs7I48YbacudIhU+AbEU6HbElvdx6JSroWlvG711TsNeVPGhe4//KgpZY8ZIMtEW8Ind13PA1rhB/A==
+"@nestjs/platform-fastify@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-fastify/-/platform-fastify-6.6.0.tgz#c0751858e39022ca573720b2d39ad673e3265807"
+  integrity sha512-U7qCJ2d/5fDlZ6uihRXviK4gqQl0RQUs4tppbplstuUy3U8NAzM6T6hp2QY6yIF1DHLL4x65CBCVKgkOSWQQNQ==
+  dependencies:
+    fastify "2.7.1"
+    fastify-cors "2.1.3"
+    fastify-formbody "3.1.0"
+    path-to-regexp "3.0.0"
+
+"@nestjs/platform-socket.io@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.6.0.tgz#04282c3d9cd4cae1bc6a09f74fe753ab89edc678"
+  integrity sha512-BmwGywAzJjhEqSu2OWIHMGum5N8atOypfAga556eYnsNyicq6hUKZ+jybGLq58vXQjC1ABfApmIwn4HvkTBtmg==
   dependencies:
     socket.io "2.2.0"
 
-"@nestjs/platform-ws@^6.5.3":
-  version "6.5.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.5.3.tgz#11fba17d039bd73bb73566b139797a2235d27d80"
-  integrity sha512-jYEggIOUpFzzsyWvRuYIIdcf8a0xr9axMxfZdOHLTY+cNFztlah0StJ48W20MAtZkDBAuXc+hSi6VCPz3MvUHQ==
+"@nestjs/platform-ws@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.6.0.tgz#4aba6c6a0e26c7e8b57d1d94e3d676baed4cf113"
+  integrity sha512-HsVfmfU5TemHjWmAQqWGbW9kS7qLEIfm92ORzXMs81AMxEKJMyTNN7pXuvyqfIZECoppk6RX2PeQJIBObDx6ww==
   dependencies:
-    ws "7.1.0"
+    ws "7.1.2"
 
 "@nestjs/swagger@^3.1.0":
   version "3.1.0"
@@ -480,10 +500,10 @@
     redis "2.8.0"
     typeorm "0.2.18"
 
-"@nestjs/testing@^6.5.3":
-  version "6.5.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.5.3.tgz#fcc2a9ed77ae2f5626e6472e67964a0c401edec6"
-  integrity sha512-W8tPhkNVhmX+jaDu4R7WUOtIl0PK3ZDso434rEm/b1+S6ZRgAKwNVHWM/rwIuTi5+erPTEULtTsZgrXFrzC1sA==
+"@nestjs/testing@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.6.0.tgz#f7ab689dba372d7cbb49b78f11a53c3a0eb9618e"
+  integrity sha512-Ulb+DbtRxh0Unl4egEJDMako/125MWNKyxQuQei5AJmF5rdVLZuy5KpoH/ymDHTx8s6YDGOin1dXQVZgbCFR/A==
   dependencies:
     optional "0.1.4"
 
@@ -494,10 +514,10 @@
   dependencies:
     uuid "3.3.2"
 
-"@nestjs/websockets@^6.5.3":
-  version "6.5.3"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.5.3.tgz#3da3e9d3da9a65483ea259a5e8247bf865faf75f"
-  integrity sha512-YrCvmLHTW0OBusTiUOPrG0PNrw/3Gatty/bh3ro5cEoiovcaJxGSMsTC+JSVXqPwRJjEtoHMCr5Qje2rAepIzQ==
+"@nestjs/websockets@^6.6.0":
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.6.0.tgz#60abb7d5d851941e5f10173d1ddc3f6ab493a038"
+  integrity sha512-T+ARP0HZIQHadiyXMWe5ccoRbdNCAD20yM1ckVog9jaJmcD2XVQEqfgvUa8P1FO+LIK5pjNnSo1Ov3mXsK6EdA==
   dependencies:
     iterare "1.2.0"
 
@@ -2862,10 +2882,10 @@ dateformat@~1.0.4-1.2.3:
     get-stdin "^4.0.1"
     meow "^3.3.0"
 
-dayjs@^1.8.15:
-  version "1.8.15"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.15.tgz#7121bc04e6a7f2621ed6db566be4a8aaf8c3913e"
-  integrity sha512-HYHCI1nohG52B45vCQg8Re3hNDZbMroWPkhz50yaX7Lu0ATyjGsTdoYZBpjED9ar6chqTx2dmSmM8A51mojnAg==
+dayjs@^1.8.16:
+  version "1.8.16"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.16.tgz#2a3771de537255191b947957af2fd90012e71e64"
+  integrity sha512-XPmqzWz/EJiaRHjBqSJ2s6hE/BUoCIHKgdS2QPtTQtKcS9E4/Qn0WomoH1lXanWCzri+g7zPcuNV4aTZ8PMORQ==
 
 debounce@^1.0.0:
   version "1.2.0"
@@ -4043,6 +4063,26 @@ fastify@2.6.0:
     light-my-request "^3.2.0"
     middie "^4.0.1"
     pino "^5.11.1"
+    proxy-addr "^2.0.4"
+    readable-stream "^3.1.1"
+    rfdc "^1.1.2"
+    secure-json-parse "^1.0.0"
+    tiny-lru "^6.0.1"
+
+fastify@2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-2.7.1.tgz#09ec9dfaa67b453f90537501a1e148b0d98486ac"
+  integrity sha512-ScKPXD84lkdCgz7q0zjyBr1aLxKbXRt9HYL3XIt/L8ZD2f3fAcsLEyQ2/rHxLUzLGjPlEjIvprWUL3RZvlLRLw==
+  dependencies:
+    abstract-logging "^1.0.0"
+    ajv "^6.10.2"
+    avvio "^6.1.1"
+    fast-json-stringify "^1.15.0"
+    find-my-way "^2.0.0"
+    flatstr "^1.0.12"
+    light-my-request "^3.4.1"
+    middie "^4.0.1"
+    pino "^5.13.1"
     proxy-addr "^2.0.4"
     readable-stream "^3.1.1"
     rfdc "^1.1.2"
@@ -6114,7 +6154,7 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-light-my-request@^3.2.0:
+light-my-request@^3.2.0, light-my-request@^3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/light-my-request/-/light-my-request-3.4.1.tgz#c30087005f6ae64ce5ef92c2484b1ab93c71ad3e"
   integrity sha512-E1zMvRWjqsaCS60dTkD7c//xKV1KOFD2zo92Ru3o3e95lCfQSDCC9aS8MZm1V+zXaA/SeKDwK9gvrfaCseTusg==
@@ -7651,7 +7691,7 @@ pino-std-serializers@^2.3.0:
   resolved "https://registry.yarnpkg.com/pino-std-serializers/-/pino-std-serializers-2.4.2.tgz#cb5e3e58c358b26f88969d7e619ae54bdfcc1ae1"
   integrity sha512-WaL504dO8eGs+vrK+j4BuQQq6GLKeCCcHaMB2ItygzVURcL1CycwNEUHTD/lHFHs/NL5qAz2UKrjYWXKSf4aMQ==
 
-pino@^5.11.1:
+pino@^5.11.1, pino@^5.13.1:
   version "5.13.2"
   resolved "https://registry.yarnpkg.com/pino/-/pino-5.13.2.tgz#773416c9764634276e7b2ae021357679ff7b5634"
   integrity sha512-WwOSCy36/gWhinsqWqAnuwIi2WtcH+jvoyeLm3bjUALIrzWIst0AovQjK4jVvSN2l64KFPfi3gd2fjsTovjdLQ==
@@ -10264,10 +10304,10 @@ write@1.0.3:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.1.0.tgz#0395646c6fcc3ac56abf61ce1a42039637a6bd98"
-  integrity sha512-Swie2C4fs7CkwlHu1glMePLYJJsWjzhl1vm3ZaLplD0h7OMkZyZ6kLTB/OagiU923bZrPFXuDTeEqaEN4NWG4g==
+ws@7.1.2:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.1.2.tgz#c672d1629de8bb27a9699eb599be47aeeedd8f73"
+  integrity sha512-gftXq3XI81cJCgkUiAVixA0raD9IVmXqsylCrjRygw4+UOOGzPoxnQ6r/CnVL9i+mDncJo94tSkyrtuuQVBmrg==
   dependencies:
     async-limiter "^1.0.0"
 

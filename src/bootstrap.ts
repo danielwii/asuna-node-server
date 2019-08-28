@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'production') {
 const startAt = Date.now();
 const pkg = require('../package.json');
 
-export interface IBootstrapOptions {
+export interface BootstrapOptions {
   // server folder
   // root?: string;
   // package folder
@@ -45,7 +45,7 @@ export interface IBootstrapOptions {
   renamer?: { from: string; to: string }[];
 }
 
-export async function bootstrap(appModule, options: IBootstrapOptions = {}): Promise<any> {
+export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<any> {
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
 
@@ -70,7 +70,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   fastifyAdapter.use(require('hide-powered-by')());
   fastifyAdapter.use(require('hsts')());
   fastifyAdapter.use(require('ienoopen')());
-  fastifyAdapter.use(require('x-xss-protection')());*/
+  fastifyAdapter.use(require('x-xss-protection')()); */
 
   const loggerService = new LoggerService();
   const app = await NestFactory.create<NestApplication>(appModule, {
@@ -120,7 +120,7 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
   app.use(require('hide-powered-by')());
   app.use(require('hsts')());
   app.use(require('ienoopen')());
-  app.use(require('x-xss-protection')());*/
+  app.use(require('x-xss-protection')()); */
 
   app.use(helmet()); // use fastify-helmet
   app.use(compression());
@@ -187,11 +187,11 @@ export async function bootstrap(appModule, options: IBootstrapOptions = {}): Pro
  * 根据环境变量调整要拉取的实体
  * @param options
  */
-export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
+export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(process.mainModule.filename);
-  const packageDir = global.packageDir;
+  const { packageDir } = global;
   const entities = [
     `${resolve(packageDir)}/**/*entities.ts`,
     `${resolve(rootDir)}/**/*entities.ts`,
@@ -201,7 +201,7 @@ export function resolveTypeormPaths(options: IBootstrapOptions = {}) {
     `${resolve(packageDir)}/**/*subscriber.ts`,
     `${resolve(rootDir)}/**/*subscriber.ts`,
   ];
-  logger.log(`options is ${r({ options, rootDir, /*suffix,*/ entities, subscribers })}`);
+  logger.log(`options is ${r({ options, rootDir, /* suffix, */ entities, subscribers })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);

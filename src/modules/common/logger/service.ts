@@ -1,6 +1,5 @@
 import * as clc from 'cli-color';
 import * as winston from 'winston';
-import { format, transports } from 'winston';
 import { fixedPath, r } from '../helpers/utils';
 import { LoggerConfigObject } from './config';
 import { LoggerFactory } from './factory';
@@ -32,83 +31,71 @@ const levels = {
 
 export class LoggerService {
   private logger: winston.Logger;
+
   private requestId: string;
+
   private context: string;
 
   constructor() {
-    const level = LoggerConfigObject.load().level;
+    const { level } = LoggerConfigObject.load();
     logger.log(`init with default level: ${level}`);
     this.logger = winston.createLogger({
       level,
-      format: format.combine(
-        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         this.getLoggerFormat(),
       ),
-      transports: [new transports.Console()],
+      transports: [new winston.transports.Console()],
     });
   }
 
-  check() {
-    this.logger.log('silly', "127.0.0.1 - there's no place like home");
-    this.logger.log('debug', "127.0.0.1 - there's no place like home");
-    this.logger.log('verbose', "127.0.0.1 - there's no place like home");
-    this.logger.log('info', "127.0.0.1 - there's no place like home");
-    this.logger.log('warn', "127.0.0.1 - there's no place like home");
-    this.logger.log('error', "127.0.0.1 - there's no place like home");
-    this.logger.verbose("127.0.0.1 - there's no place like home");
-    this.logger.debug("127.0.0.1 - there's no place like home");
-    this.logger.info("127.0.0.1 - there's no place like home");
-    this.logger.warn("127.0.0.1 - there's no place like home");
-    this.logger.error("127.0.0.1 - there's no place like home");
-  }
-
-  setRequestId(id: string) {
+  setRequestId(id: string): void {
     this.requestId = id;
   }
 
-  getRequestId() {
+  getRequestId(): string {
     return this.requestId;
   }
 
-  setContext(ctx: string) {
+  setContext(ctx: string): void {
     this.context = ctx;
   }
 
-  debug(msg: any, context?: string) {
+  debug(msg: any, context?: string): void {
     if (levels[LoggerConfigObject.lv(context)] <= levels.debug) return;
     this.logger.debug(msg, [{ context, reqId: this.requestId }]);
   }
 
-  verbose(msg: any, context?: string) {
+  verbose(msg: any, context?: string): void {
     if (levels[LoggerConfigObject.lv(context)] <= levels.verbose) return;
     this.logger.verbose(msg, [{ context, reqId: this.requestId }]);
   }
 
-  log(msg: any, context?: string) {
+  log(msg: any, context?: string): void {
     if (levels[LoggerConfigObject.lv(context)] <= levels.info) return;
     this.logger.info(msg, [{ context, reqId: this.requestId }]);
   }
 
-  warn(msg: any, context?: string) {
+  warn(msg: any, context?: string): void {
     if (levels[LoggerConfigObject.lv(context)] <= levels.warn) return;
     this.logger.warn(msg, [{ context, reqId: this.requestId }]);
   }
 
-  error(msg: any, trace?: string, context?: string) {
+  error(msg: any, trace?: string, context?: string): void {
     this.logger.error(msg, [{ context }]);
-    trace && this.logger.error(trace, [{ context, reqId: this.requestId }]);
+    if (trace) this.logger.error(trace, [{ context, reqId: this.requestId }]);
   }
 
-  private getLoggerFormat() {
-    return format.printf(info => {
+  private getLoggerFormat(): any {
+    return winston.format.printf(info => {
       const level = this.colorizeLevel(info.level);
-      let message = info.message;
+      let { message } = info;
       if (typeof info.message === 'object') {
         message = r(message);
         // message = JSON.stringify(message, null, 3);
       }
-      let reqId: string = '';
-      let context: string = '';
+      let reqId = '';
+      let context = '';
       if (info['0']) {
         const meta = info['0'];
         if (meta.reqId) {
@@ -125,7 +112,7 @@ export class LoggerService {
     });
   }
 
-  private colorizeLevel(level: string) {
+  private colorizeLevel(level: string): string {
     let colorFunc: (msg: string) => string;
     switch (level) {
       case 'verbose':

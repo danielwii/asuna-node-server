@@ -22,7 +22,7 @@ export class SortResolver {
   async sort(@Args('name') name: string, @Args('type') sortType: string) {
     logger.log(`sort: ${util.inspect({ name, sortType })}`);
     const sort = await this.Sort.findOne({ name }, { cache: true });
-    return sort ? sort : this.Sort.getRepository().save({ name, type: sortType });
+    return sort || this.Sort.getRepository().save({ name, type: sortType });
   }
 
   @ResolveProperty()
@@ -34,7 +34,6 @@ export class SortResolver {
 @Resolver('ResultItem')
 export class ResultItemResolver {
   @ResolveProperty('__resolveType')
-  // tslint:disable-next-line:function-name
   __resolveType(obj) {
     return obj.constructor.name;
   }
