@@ -64,6 +64,6 @@ export class TaskEvent extends AbstractBaseEntity {
   body: any;
 
   @ManyToOne(type => TaskRecord, record => record.events, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'video_region__id' })
+  @JoinColumn({ name: 'video_region__id' }) // fixme
   task: TaskRecord;
 }

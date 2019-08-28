@@ -6,6 +6,7 @@ const logger = LoggerFactory.getLogger('ConfigLoader');
 export const ConfigKeys = {
   ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',
   SECRET_KEY: 'SECRET_KEY',
+  AUDIT: 'AUDIT',
   DEBUG: 'DEBUG',
   SWAGGER: 'SWAGGER',
   PORT: 'PORT',

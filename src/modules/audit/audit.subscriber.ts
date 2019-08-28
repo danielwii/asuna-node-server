@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { ConfigKeys, configLoader } from '../config';
 import { AuditService } from './audit.service';
 
 const logger = LoggerFactory.getLogger('AuditSubscriber');
@@ -17,12 +18,14 @@ const logger = LoggerFactory.getLogger('AuditSubscriber');
 export class AuditSubscriber implements EntitySubscriberInterface {
   private map = new Map();
   private auditService: AuditService = new AuditService();
+  private enabled = configLoader.loadBoolConfig(ConfigKeys.AUDIT, false);
 
   constructor() {
-    logger.log('init ...');
+    logger.log(`init ... audit: ${this.enabled}`);
   }
 
   afterInsert(event: InsertEvent<any>) {
+    if (!this.enabled) return;
     // console.log('afterInsert', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
@@ -40,6 +43,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   }
 
   async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
+    if (!this.enabled) return;
     // console.log('beforeUpdate', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
@@ -53,6 +57,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   }
 
   afterUpdate(event: InsertEvent<any>) {
+    if (!this.enabled) return;
     // console.log('afterUpdate', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
@@ -76,6 +81,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   }
 
   afterRemove(event: RemoveEvent<any>) {
+    if (!this.enabled) return;
     // console.log('afterRemove', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
