@@ -87,7 +87,7 @@ export class GraphqlHelper {
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const top100 = await entityRepo.find(
-        await this.resolveFindOptions({
+        await this.resolveFindOptions<Entity>({
           cls,
           pageRequest: { size: 100 },
           select: [primaryKey as any],

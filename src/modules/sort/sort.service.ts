@@ -8,6 +8,12 @@ import { DBHelper } from '../core/db';
 
 const logger = LoggerFactory.getLogger('SortService');
 
+export type Sort = {
+  id: number;
+  positions: number[];
+  type: string;
+};
+
 /**
  * const SortServiceProvider: Provider = {
  *   provide: 'SortService',
@@ -22,12 +28,12 @@ export class SortService {
   private sortRepository: Repository<any>;
 
   constructor(@InjectConnection() private readonly connection: Connection, Sort) {
-    this.sortRepository = this.connection.getRepository(Sort);
+    this.sortRepository = this.connection.getRepository<any>(Sort);
   }
 
-  async findItems(sort): Promise<any[]> {
+  async findItems(sort: Sort): Promise<any[]> {
     let items = [];
-    const positions = sort.positions;
+    const { positions } = sort;
     if (sort && sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
       logger.verbose(`resolve ${relation} for sorts.`);

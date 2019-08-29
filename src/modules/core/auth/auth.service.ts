@@ -34,9 +34,9 @@ export class AuthService extends AbstractAuthService {
         });
         if (!entityMetadata) {
           logger.warn('no auth user repo found.');
-          return;
+          return null;
         }
-        return getRepository(entityMetadata.target);
+        return getRepository(entityMetadata.target) as any;
       })(),
     );
   }

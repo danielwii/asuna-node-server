@@ -69,8 +69,8 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
     try {
       const parsed = JSON.parse(value);
       return R.map(parseCondition)(parsed);
-    } catch (e) {
-      logger.warn(e);
+    } catch (error) {
+      logger.warn(error);
     }
   }
   return null;
@@ -158,7 +158,7 @@ export function parseFields(value: string | string[], allRelations?: string[]): 
   const fields = parseListParam(value);
   const relatedFieldsMap = _.chain(fields)
     .filter(str => str.includes('.'))
-    .filter(str => (allRelations ? allRelations.indexOf(str.split('.')[0]) > -1 : true))
+    .filter(str => (allRelations ? allRelations.includes(str.split('.')[0]) : true))
     .reduce((result, val) => {
       const subModel = val.split('.')[0];
       result[subModel] = [...(result[subModel] || []), val];
@@ -192,11 +192,11 @@ export class DBHelper {
         ? column.referencedColumn.entityMetadata
         : column.entityMetadata;
 
-      const entityInfo: EntityMetaInfoOptions = (entityMetadata.target as any).entityInfo;
+      const { entityInfo } = entityMetadata.target as any;
       if (entityInfo) {
         selectable = entityInfo.name;
       } else {
-        const tableName = entityMetadata.tableName;
+        const { tableName } = entityMetadata;
         const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
         selectable = opts.module !== 'app.graphql.graphql' ? opts.module + name : name;
       }
@@ -212,7 +212,7 @@ export class DBHelper {
     if ((relation.type as any).entityInfo) {
       selectable = ((relation.type as any).entityInfo as EntityMetaInfoOptions).name;
     } else {
-      const tableName = relation.inverseEntityMetadata.tableName;
+      const { tableName } = relation.inverseEntityMetadata;
       const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
       selectable = opts.module !== 'app.graphql.graphql' ? opts.module + name : name;
     }
@@ -294,13 +294,13 @@ export class DBHelper {
     if (_.isString(entity)) {
       const entityMetadata = this.getMetadata(this.getModelName(entity as string).model);
       if (entityMetadata) {
-        return getRepository(entityMetadata.target);
+        return getRepository<Entity>(entityMetadata.target);
       }
       throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
     } else if ((entity as ModelName).model) {
-      return getRepository((entity as ModelName).dbName);
+      return getRepository<Entity>((entity as ModelName).dbName);
     } else {
-      return getRepository(entity as ObjectType<Entity>);
+      return getRepository<Entity>(entity as ObjectType<Entity>);
     }
   }
 
@@ -316,7 +316,7 @@ export class DBHelper {
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}) {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata
       .target as Function).prototype;
-    const entityInfo: EntityMetaInfoOptions = (repository.metadata.target as any).entityInfo;
+    const { entityInfo } = repository.metadata.target as any;
     const parentEntityInfo: EntityMetaInfoOptions = idx(
       repository,
       _ => _.metadata.parentEntityMetadata.target.entityInfo,
@@ -547,7 +547,7 @@ export class DBHelper {
     }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
   ) {
     if (!_.isEmpty(parsedFields.fields)) {
-      const primaryKeyColumns = primaryKeys ? primaryKeys : ['id']; // id for default
+      const primaryKeyColumns = primaryKeys || ['id']; // id for default
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         field => `${model}.${field}`,
       );

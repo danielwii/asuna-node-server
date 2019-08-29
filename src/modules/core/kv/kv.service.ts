@@ -65,7 +65,7 @@ export class KvService {
   private readonly kvPairRepository: Repository<KeyValuePair>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {
-    this.kvPairRepository = connection.getRepository(KeyValuePair);
+    this.kvPairRepository = connection.getRepository<KeyValuePair>(KeyValuePair);
   }
 
   async set(pair: {

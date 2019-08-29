@@ -52,7 +52,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     });
     if (entity) {
       // logger.debug(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
-      this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity });
+      this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity as any });
     }
   }
 

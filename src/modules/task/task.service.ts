@@ -9,7 +9,7 @@ export class TaskService {
   private readonly taskRepository: Repository<TaskRecord>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {
-    this.taskRepository = connection.getRepository(TaskRecord);
+    this.taskRepository = connection.getRepository<TaskRecord>(TaskRecord);
   }
 
   add(task: TaskRecord) {

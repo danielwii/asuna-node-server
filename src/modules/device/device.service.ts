@@ -37,7 +37,7 @@ export class DeviceService {
   private readonly deviceRepository: Repository<Device>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {
-    this.deviceRepository = connection.getRepository(Device);
+    this.deviceRepository = connection.getRepository<Device>(Device);
   }
 
   getDeviceShadow(uuid: string) {

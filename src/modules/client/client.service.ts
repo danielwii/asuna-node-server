@@ -8,7 +8,7 @@ export class ClientService {
   private readonly clientUserRepository: Repository<ClientUser>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {
-    this.clientUserRepository = connection.getRepository(ClientUser);
+    this.clientUserRepository = connection.getRepository<ClientUser>(ClientUser);
   }
 
   createClient(uuid: string): Promise<ClientUser> {
@@ -17,6 +17,6 @@ export class ClientService {
 
   async getClient(uuid: string): Promise<ClientUser> {
     const client = await this.clientUserRepository.findOne({ uuid });
-    return client ? client : this.createClient(uuid);
+    return client || this.createClient(uuid);
   }
 }
