@@ -1,6 +1,10 @@
-import { Identifier, IdentifierHelper } from '../../common';
+import { Identifier, IdentifierHelper, IdentifierStatic } from '../../common';
 import { AdminUser } from './auth.entities';
 import { AbstractAuthUser } from './base.entities';
+
+function StaticImplements<T>() {
+  return (constructor: T) => {};
+}
 
 export class AdminUserIdentifierHelper implements IdentifierHelper<Partial<AdminUser>> {
   parse = (identifier: string): Partial<AdminUser> => ({ id: +identifier.slice(1) });
@@ -8,8 +12,9 @@ export class AdminUserIdentifierHelper implements IdentifierHelper<Partial<Admin
   stringify = (payload: Partial<AdminUser>): string => `admin=${payload.id}`;
 }
 
+@StaticImplements<IdentifierStatic>()
 export class AdminUserIdentifier implements Identifier<AdminUser> {
-  private readonly helper = new UserIdentifierHelper();
+  private readonly helper = new AdminUserIdentifierHelper();
 
   constructor(private readonly o: Partial<AdminUser>) {}
 
@@ -24,6 +29,14 @@ export class AdminUserIdentifier implements Identifier<AdminUser> {
   payload(): Partial<AdminUser> {
     return this.o;
   }
+
+  static resolve(identifier: string): { type: string; id: number | string } {
+    return { type: identifier.split('=')[0], id: identifier.split('=')[1] };
+  }
+
+  static identify(identifier: string): boolean {
+    return this.resolve(identifier).type === 'admin';
+  }
 }
 
 export class UserIdentifierHelper implements IdentifierHelper<Partial<AbstractAuthUser>> {
@@ -32,6 +45,7 @@ export class UserIdentifierHelper implements IdentifierHelper<Partial<AbstractAu
   stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
 }
 
+@StaticImplements<IdentifierStatic>()
 export class UserIdentifier implements Identifier<AbstractAuthUser> {
   private readonly helper = new UserIdentifierHelper();
 
@@ -47,5 +61,13 @@ export class UserIdentifier implements Identifier<AbstractAuthUser> {
 
   payload(): Partial<AbstractAuthUser> {
     return this.o;
+  }
+
+  static resolve(identifier: string): { type: string; id: number | string } {
+    return { type: identifier.split('=')[0], id: identifier.split('=')[1] };
+  }
+
+  static identify(identifier: string): boolean {
+    return this.resolve(identifier).type === 'u';
   }
 }
