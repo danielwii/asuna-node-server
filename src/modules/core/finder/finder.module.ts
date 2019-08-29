@@ -1,8 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AsunaCollections, KvModule, KvService } from '../kv';
-import { LoggerFactory } from '../../common/logger';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderService } from './finder.service';
 
@@ -17,7 +17,7 @@ const logger = LoggerFactory.getLogger('FinderModule');
 export class FinderModule implements OnModuleInit {
   constructor(private readonly kvService: KvService) {}
 
-  public onModuleInit() {
+  public async onModuleInit(): Promise<void> {
     logger.log('init...');
 
     const assetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
@@ -26,14 +26,22 @@ export class FinderModule implements OnModuleInit {
       default: { endpoint: assetsEndpoint },
       'internal-default': { endpoint: assetsInternalEndpoint },
     };
-    logger.log(`setup assets finder ${r(value)}`);
-    this.kvService
-      .set({
-        collection: AsunaCollections.SYSTEM_SERVER,
-        key: 'settings.finder.assets',
-        type: 'json',
-        value,
-      })
-      .catch(reason => logger.error(reason));
+    if (assetsEndpoint && assetsInternalEndpoint) {
+      const pair = await this.kvService.get(
+        AsunaCollections.SYSTEM_SERVER,
+        'settings.finder.assets',
+      );
+      if (!pair) {
+        logger.log(`setup assets finder ${r(value)}`);
+        this.kvService
+          .set({
+            collection: AsunaCollections.SYSTEM_SERVER,
+            key: 'settings.finder.assets',
+            type: 'json',
+            value,
+          })
+          .catch(error => logger.error(error));
+      }
+    }
   }
 }

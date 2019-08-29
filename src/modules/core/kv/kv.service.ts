@@ -14,15 +14,15 @@ const isJson = value => {
   try {
     JSON.parse(value);
     return true;
-  } catch (e) {
+  } catch (error) {
     return false;
   }
 };
 const toJson = value => {
   try {
     return JSON.parse(value);
-  } catch (e) {
-    logger.error(e);
+  } catch (error) {
+    logger.error(error);
     return value;
   }
 };
@@ -40,17 +40,15 @@ function recognizeTypeValue(type: string, value: any) {
         newValue = toJson(value);
       }
     }
-  } else {
-    if (value === 'true' || value === 'false') {
-      newType = 'boolean';
-      newValue = castToBoolean(value);
-    } else if (!_.isNaN(+value)) {
-      newType = 'number';
-      newValue = +value;
-    } else if (isJson(value)) {
-      newType = 'json';
-      newValue = toJson(value);
-    }
+  } else if (value === 'true' || value === 'false') {
+    newType = 'boolean';
+    newValue = castToBoolean(value);
+  } else if (!_.isNaN(+value)) {
+    newType = 'number';
+    newValue = +value;
+  } else if (isJson(value)) {
+    newType = 'json';
+    newValue = toJson(value);
   }
   // logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
   return [newType || 'string', newValue];

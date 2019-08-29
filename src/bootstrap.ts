@@ -1,5 +1,8 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable global-require,@typescript-eslint/no-var-requires */
 import { ValidationPipe } from '@nestjs/common';
 import { NestApplication, NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
@@ -11,7 +14,7 @@ import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
 import { AnyExceptionFilter, r } from './modules/common';
-import { LoggerFactory, LoggerService } from './modules/common/logger';
+import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
 
@@ -72,16 +75,16 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   fastifyAdapter.use(require('ienoopen')());
   fastifyAdapter.use(require('x-xss-protection')()); */
 
-  const loggerService = new LoggerService();
-  const app = await NestFactory.create<NestApplication>(appModule, {
-    logger: loggerService,
+  const app = await NestFactory.create<NestExpressApplication>(appModule, {
+    logger: new SimpleLoggerService(),
   });
-  // loggerService.check();
 
   // --------------------------------------------------------------
   // rename old tables to newer
   // --------------------------------------------------------------
 
+  const beforeSyncDB = Date.now();
+  logger.log('sync db ...');
   const connection = app.get<Connection>(Connection);
   const queryRunner = connection.createQueryRunner();
 
@@ -106,6 +109,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   );
 
   await connection.synchronize();
+  logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
   // --------------------------------------------------------------
   // setup application
@@ -176,7 +180,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const port = configLoader.loadNumericConfig(ConfigKeys.PORT, 5000);
 
-  return app.listen(port).then(opts => {
+  logger.log('bootstrap app ...');
+  return app.listenAsync(port).then(opts => {
     logger.log(`started in ${Date.now() - startAt}ms, listening on ${port}`);
 
     return app;

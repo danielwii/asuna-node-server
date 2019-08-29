@@ -4,10 +4,10 @@ import * as fp from 'lodash/fp';
 import { dirname, join } from 'path';
 
 const root = dirname(process.mainModule.filename);
-const packageDir = global.packageDir;
+const { packageDir } = global;
 
 export class LoggerFactory {
-  static getLogger(name: string) {
+  static getLogger(name: string): Logger {
     // --------------------------------------------------------------
     // get caller function from stack
     // --------------------------------------------------------------
@@ -16,8 +16,7 @@ export class LoggerFactory {
     {
       const aRegexResult = new Error().stack.match(/([^(]+)@|at ([^(]+) \([^)]+/g);
       caller = aRegexResult[1] || aRegexResult[2];
-      const callerResult = caller.match(/\/.+\//g);
-      callerPath = callerResult[0];
+      [callerPath] = caller.match(/\/.+\//g);
     }
 
     const context = _.flow(

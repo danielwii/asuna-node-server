@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import * as clc from 'cli-color';
 import * as winston from 'winston';
 import { fixedPath, r } from '../helpers/utils';
@@ -29,7 +30,34 @@ const levels = {
   silly: 5,
 };
 
-export class LoggerService {
+export class SimpleLoggerService extends Logger {
+  debug(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.debug) return;
+    super.debug(message, context);
+  }
+
+  error(message: any, trace?: string, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.error) return;
+    super.error(message, trace, context);
+  }
+
+  log(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.info) return;
+    super.log(message, context);
+  }
+
+  verbose(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.verbose) return;
+    super.verbose(message, context);
+  }
+
+  warn(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] <= levels.warn) return;
+    super.warn(message, context);
+  }
+}
+
+export class WinstonLoggerService {
   private logger: winston.Logger;
 
   private requestId: string;
@@ -112,6 +140,7 @@ export class LoggerService {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private colorizeLevel(level: string): string {
     let colorFunc: (msg: string) => string;
     switch (level) {

@@ -50,7 +50,7 @@ type PagedAppRelease implements PagedQuery {
   items: [AppRelease]
 }
 
-extend type Query {
+type Query {
   app_info(key: String): AppInfo
   app_releases(key: String, pageRequest: PageRequest): PagedAppRelease
   app_latestRelease(key: String): AppRelease

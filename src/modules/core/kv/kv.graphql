@@ -10,7 +10,7 @@ type KeyValuePair implements BaseEntity {
   value: Any
 }
 
-extend type Query {
+type Query {
   kv(collection: String, key: String): KeyValuePair
   kvs(collection: String): [KeyValuePair]
 }
