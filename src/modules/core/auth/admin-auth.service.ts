@@ -19,7 +19,7 @@ export class AdminAuthService extends AbstractAuthService {
     @InjectConnection()
     private readonly connection: Connection,
   ) {
-    super(connection.getRepository(AdminUser) as any);
+    super(connection.getRepository<AdminUser>(AdminUser) as any);
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
