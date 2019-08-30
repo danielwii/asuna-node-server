@@ -44,7 +44,7 @@
     "eslint-formatter-pretty": "^2.1.1",
     "eslint-plugin-eslint-comments": "^3.1.2",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jest": "^22.15.2",
+    "eslint-plugin-jest": "^22.16.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-unicorn": "^10.0.0",
