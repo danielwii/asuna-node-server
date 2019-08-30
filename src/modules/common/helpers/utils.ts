@@ -15,6 +15,23 @@ export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: b
   return isProduction || plain ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
 };
 
+/**
+ * https://www.typescriptlang.org/docs/handbook/mixins.html
+ * @param derivedCtor
+ * @param baseCtors
+ */
+function applyMixins(derivedCtor: any, baseCtors: any[]): void {
+  baseCtors.forEach(baseCtor => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+      Object.defineProperty(
+        derivedCtor.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype, name),
+      );
+    });
+  });
+}
+
 export async function download(url: string, to: string): Promise<AxiosResponse> {
   fs.ensureDirSync(dirname(to));
   const path = resolve(to);

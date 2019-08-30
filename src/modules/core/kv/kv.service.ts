@@ -22,7 +22,7 @@ const toJson = value => {
   try {
     return JSON.parse(value);
   } catch (error) {
-    logger.error(error);
+    logger.error(`${r({ value })} toJson error: ${r(error)}`);
     return value;
   }
 };
@@ -66,6 +66,9 @@ export class KvService {
     this.kvPairRepository = connection.getRepository<KeyValuePair>(KeyValuePair);
   }
 
+  /**
+   * @param pair noValueOnly 尽在值为空时或不存在时设置
+   */
   async set(pair: {
     collection?: string;
     key: string;
@@ -73,6 +76,7 @@ export class KvService {
     type: keyof typeof ValueType;
     value: any;
     extra?: any;
+    noValueOnly?: boolean;
   }): Promise<KeyValuePair> {
     const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
@@ -96,11 +100,12 @@ export class KvService {
     };
     logger.log(`inspect ${r({ pair, collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
+    // noValueOnly 打开时如果已经存在值不进行更新
+    if (exists && _.get(pair, 'noValueOnly') && exists.value) {
+      return exists;
+    }
     logger.log(`set ${r({ entity, exists })}`);
     return this.kvPairRepository.save({ ...(exists ? { id: exists.id } : null), ...entity });
-
-    // logger.log(`set ${r({ entity })}`);
-    // return this.kvPairRepository.save(entity);
   }
 
   async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {

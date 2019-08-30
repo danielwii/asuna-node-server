@@ -27,21 +27,16 @@ export class FinderModule implements OnModuleInit {
       'internal-default': { endpoint: assetsInternalEndpoint },
     };
     if (assetsEndpoint && assetsInternalEndpoint) {
-      const pair = await this.kvService.get(
-        AsunaCollections.SYSTEM_SERVER,
-        'settings.finder.assets',
-      );
-      if (!pair) {
-        logger.log(`setup assets finder ${r(value)}`);
-        this.kvService
-          .set({
-            collection: AsunaCollections.SYSTEM_SERVER,
-            key: 'settings.finder.assets',
-            type: 'json',
-            value,
-          })
-          .catch(error => logger.error(error));
-      }
+      logger.log(`setup assets finder ${r(value)} if not setup`);
+      this.kvService
+        .set({
+          collection: AsunaCollections.SYSTEM_SERVER,
+          key: 'settings.finder.assets',
+          type: 'json',
+          value,
+          noValueOnly: true,
+        })
+        .catch(error => logger.error(error));
     }
   }
 }
