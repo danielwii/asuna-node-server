@@ -65,7 +65,7 @@
     "@nestjs/graphql": "6.4.2",
     "@nestjs/jwt": "^6.1.1",
     "@nestjs/passport": "^6.1.0",
-    "@nestjs/platform-express": "6.6.3",
+    "@nestjs/platform-express": "6.6.4",
     "@nestjs/platform-fastify": "^6.6.3",
     "@nestjs/platform-socket.io": "^6.6.3",
     "@nestjs/platform-ws": "^6.6.3",
