@@ -11,6 +11,14 @@ export class NameValue {
   constructor(public readonly name: string, public readonly value: any) {}
 }
 
+export class NameDescValue<T = any> {
+  constructor(
+    public readonly name: string,
+    public readonly description: string,
+    public readonly value: T,
+  ) {}
+}
+
 export class EnumHelper {
   static names = nameValues => _.map(nameValues, fp.get('name'));
   static values = nameValues => _.map(nameValues, fp.get('value'));

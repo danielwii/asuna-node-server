@@ -20,7 +20,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (this.opts.anonymousSupport) {
         return null;
       }
-      throw err || new AsunaException(AsunaError.InsufficientPermissions);
+      throw err || new AsunaException(AsunaError.InsufficientPermissions, 'jwt auth failed');
     }
     return user;
   }

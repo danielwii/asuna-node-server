@@ -10,7 +10,7 @@ export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
   handleRequest(err, user, info) {
     logger.log(`handleRequest ${r({ err, user, info })}`);
     if (err || !user) {
-      throw err || new AsunaException(AsunaError.InsufficientPermissions);
+      throw err || new AsunaException(AsunaError.InsufficientPermissions, 'admin-jwt auth failed');
     }
     return user;
   }

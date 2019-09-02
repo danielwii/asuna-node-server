@@ -1,5 +1,5 @@
-import { Column, Entity } from 'typeorm';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 import { jsonType } from '../helpers';
 
@@ -40,5 +40,20 @@ export class KeyValuePair extends AbstractBaseEntity {
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(jsonType(), { nullable: true })
-  extra: JSON;
+  extra: JsonMap;
+
+  // @OneToOne(type => KeyValueModel, model => model.pair)
+  model: KeyValueModel;
+}
+
+@EntityMetaInfo({ name: 'kv__models' })
+@Entity('kv__t_models')
+export class KeyValueModel extends AbstractBaseEntity {
+  @OneToOne(type => KeyValuePair, pair => pair.model)
+  @JoinColumn({ name: 'pair__id' })
+  pair: KeyValuePair;
+
+  @MetaInfo({ name: 'Value', type: 'SimpleJSON', jsonType: 'any' })
+  @Column(jsonType(), { nullable: true })
+  value: JsonMap;
 }
