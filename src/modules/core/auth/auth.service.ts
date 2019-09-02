@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection, getConnection, getManager, getRepository, Repository } from 'typeorm';
+import { AsunaError, AsunaException } from '../../common/exceptions';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { Hermes } from '../bus';
 import { DBHelper } from '../db';
 import { AbstractAuthService } from './abstract.auth.service';
 import { AdminUser } from './auth.entities';
 import { AbstractAuthUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AuthService');
+
+export const HermesAuthEventKeys = {
+  userCreated: 'user.created',
+};
 
 @Injectable()
 export class AuthService extends AbstractAuthService {
@@ -45,12 +51,16 @@ export class AuthService extends AbstractAuthService {
     const { hash, salt } = this.encrypt(password);
 
     let user = await this.getUser({ email, username });
-    if (!user) {
-      user = this.userRepository.create({ email, username, isActive: true });
+    if (user) {
+      logger.log(`found user ${r(user)}`);
+      throw new AsunaException(AsunaError.Unprocessable, `user ${r({ username, email })} already exists.`);
     }
-    logger.log(`found user ${r(user)}`);
-    user.password = hash;
-    user.salt = salt;
-    return getManager().save(user);
+
+    return getManager()
+      .save(this.userRepository.create({ email, username, isActive: true, password: hash, salt }))
+      .then(result => {
+        Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, result);
+        return result;
+      });
   }
 }
