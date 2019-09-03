@@ -83,10 +83,11 @@ export class GenericDataLoader {
   constructor() {
     logger.log('init ...');
     if (!GenericDataLoader.subject) {
-      GenericDataLoader.subject = (event: IAsunaEvent) => {
-        // logger.log(`subscribe ${JSON.stringify(value)}`);
-      };
-      Hermes.subscribe(GenericDataLoader.name, 'fanout', GenericDataLoader.subject);
+      /*
+      Hermes.subscribe(GenericDataLoader.name, 'fanout', (event: IAsunaEvent) => {
+        logger.log(`subscribe ${event.name} ${r(event)}`);
+      });
+*/
     }
   }
 

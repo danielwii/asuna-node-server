@@ -301,7 +301,7 @@ export class Hermes {
     payload: any,
     extras: { identifier?: any; user?: AbstractAuthUser; type?: string } = {},
   ) {
-    logger.log(`emit events from [${source}]: {${event}}${r(payload)}`);
+    logger.log(`emit events from [${source}: ${event}] ${r(payload)}`);
     this.subject.next(
       new AsunaEvent({
         name: event,
