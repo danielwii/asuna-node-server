@@ -3,7 +3,7 @@ import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
-import { AsunaError, AsunaException, r } from '../../common';
+import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
@@ -39,6 +39,13 @@ export type ObtainTokenOpts = (
   | { type: 'TimeBased'; expiredInMinutes: number }) &
   CommonTokenOpts;
 
+export type RedeemTokenOpts = {
+  key?: string;
+  identifier: string;
+  role: keyof typeof TokenRule;
+  service: string;
+};
+
 export class OperationTokenOpts {
   @IsString()
   @Transform(value => _.trim(value))
@@ -68,11 +75,7 @@ export class OperationTokenOpts {
   readonly expiredInMinutes?: number;
 
   constructor(o: OperationTokenOpts) {
-    if (o == null) {
-      return;
-    }
-
-    Object.assign(this, plainToClass(OperationTokenOpts, o, { enableImplicitConversion: true }));
+    Object.assign(this, deserializeSafely(OperationTokenOpts, o));
   }
 
   static obtain(o: ObtainTokenOpts) {
@@ -155,12 +158,7 @@ export class OperationTokenHelper {
     role,
     identifier,
     service,
-  }: {
-    key?: string;
-    identifier: string;
-    role: keyof typeof TokenRule;
-    service: string;
-  }): Promise<OperationToken[]> {
+  }: RedeemTokenOpts): Promise<OperationToken[]> {
     logger.log(`redeem token: ${r({ key, role, identifier, service })}`);
     return OperationToken.find({
       where: {
@@ -185,16 +183,22 @@ export class OperationTokenHelper {
     return OperationToken.update({ key, role, identifier, service }, { isDeprecated: true });
   }
 
-  static async getTokenByToken(tokenOrShortId: string) {
+  static async getTokenByToken(tokenOrShortId: string): Promise<OperationToken | undefined> | null {
     if (tokenOrShortId) {
       return tokenOrShortId.length === 9
-        ? OperationTokenHelper.getToken({ shortId: tokenOrShortId })
-        : OperationTokenHelper.getToken({ token: tokenOrShortId });
+        ? await OperationTokenHelper.getToken({ shortId: tokenOrShortId })
+        : await OperationTokenHelper.getToken({ token: tokenOrShortId });
     }
     return null;
   }
 
-  static async getToken({ token, shortId }: { token?: string; shortId?: string }) {
+  static async getToken({
+    token,
+    shortId,
+  }: {
+    token?: string;
+    shortId?: string;
+  }): Promise<OperationToken | undefined> | null {
     if ((token && token.trim()) || (shortId && shortId.trim())) {
       return OperationToken.findOne({
         where: {

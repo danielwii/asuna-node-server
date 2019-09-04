@@ -1,10 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
+import { IJwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';
+
+export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user: U };
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -36,16 +39,12 @@ export class AnyAuthGuard implements CanActivate {
     const next = context.switchToHttp().getNext();
 
     AnyAuthGuard.logger.log(`check url: ${req.url}`);
-    const result = await auth(req, res).catch(reason => AnyAuthGuard.logger.warn(r(reason)));
+    const result = await auth(req, res);
 
-    const user = _.get(result, 'user');
-    if (!user) {
-      throw new AsunaException(
-        AsunaError.InsufficientPermissions,
-        _.get(result, 'err') || _.get(result, 'info'),
-      );
+    if (!result.user) {
+      throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
     }
 
-    return !!user;
+    return !!result.user;
   }
 }

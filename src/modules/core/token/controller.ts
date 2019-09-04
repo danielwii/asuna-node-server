@@ -116,7 +116,7 @@ export class OperationTokenController {
     return token;
   }
 
-  @UseGuards(AnyAuthGuard, OperationTokenGuard)
+  @UseGuards(AnyAuthGuard)
   @Get()
   redeem(@Query() query: RedeemQuery, @Req() req: AnyAuthRequest): Promise<OperationToken[]> {
     const { identifier } = req;

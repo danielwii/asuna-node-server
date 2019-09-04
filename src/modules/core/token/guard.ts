@@ -19,7 +19,7 @@ export class OperationTokenGuard implements CanActivate {
     return from(OperationTokenHelper.getTokenByToken(token)).pipe(
       map(operationToken => {
         if (operationToken == null) {
-          throw new AsunaException(AsunaError.InsufficientPermissions, 'operation token required.');
+          throw new AsunaException(AsunaError.Unprocessable, 'operation token required.');
         }
         req.token = operationToken;
         return true;
