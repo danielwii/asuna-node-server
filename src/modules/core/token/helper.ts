@@ -94,7 +94,7 @@ export class OperationTokenHelper {
   /**
    * same { role, identifier, service } will return same token
    */
-  static async obtainToken(opts: ObtainTokenOpts) {
+  static async obtainToken(opts: ObtainTokenOpts): Promise<OperationToken> {
     const { key, role, identifier, service, type, payload } = opts;
     const existToken = _.first(
       await OperationTokenHelper.redeemTokens({ key, role, identifier, service }),
@@ -210,9 +210,9 @@ export class OperationTokenHelper {
     return null;
   }
 
-  static async consumeToken(token: string) {
+  static async consumeToken(token: string): Promise<void> {
     const operationToken = await OperationTokenHelper.getTokenByToken(token);
-    if (OperationTokenHelper.checkAvailable(operationToken)) {
+    if (await OperationTokenHelper.checkAvailable(operationToken)) {
       if (operationToken.remainingCount) operationToken.remainingCount -= 1;
       operationToken.usedCount = operationToken.usedCount ? operationToken.usedCount + 1 : 1;
 
@@ -223,7 +223,7 @@ export class OperationTokenHelper {
     throw new AsunaException(AsunaError.Unprocessable, 'invalid token');
   }
 
-  static async checkAvailable(operationToken: OperationToken) {
+  static async checkAvailable(operationToken: OperationToken): Promise<boolean> {
     // 标记废弃的 token
     if (
       !operationToken ||
