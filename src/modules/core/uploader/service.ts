@@ -90,10 +90,10 @@ export class UploaderService {
 
     return this.context.chunkStorageEngine
       .saveEntity({ ...file, filename: chunkname }, { prefix: fingerprint })
-      .then(saved => {
+      .then(async (saved) => {
         const payload = new ChunksUploadPayload(token.body);
         payload.finished[chunk] = 1;
-        token.save().catch(reason => logger.warn(r(reason)));
+        await token.save();
         return new RemoteFileInfo(saved);
       });
     /*
@@ -114,7 +114,7 @@ export class UploaderService {
     if (_.sum(payload.finished) !== payload.totalChunks) {
       throw new AsunaException(
         AsunaError.Unprocessable,
-        `chunks not full uploaded. ${_.sum(payload.finished)}/${payload.totalChunks}`,
+        `chunks not fully uploaded. ${_.sum(payload.finished)}/${payload.totalChunks}`,
       );
     }
     const _filename = filename || payload.filename;
