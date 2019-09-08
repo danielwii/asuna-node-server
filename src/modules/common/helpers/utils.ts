@@ -1,11 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
 import { classToPlain } from 'class-transformer';
+import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import { basename, dirname, join, resolve } from 'path';
+import { Between } from 'typeorm';
 import { inspect } from 'util';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+export const AfterDate = (date: Date) => Between(date, addYears(date, 100));
+export const BeforeDate = (date: Date) => Between(subYears(date, 100), date);
 
 export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: boolean } = {}) => {
   if (!_.isObjectLike(o)) {
