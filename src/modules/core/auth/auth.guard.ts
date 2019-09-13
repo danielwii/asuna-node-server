@@ -1,8 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import * as _ from 'lodash';
-import { AsunaError, AsunaException, r } from '../../common';
+import { AsunaError, AsunaException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';

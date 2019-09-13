@@ -1,6 +1,9 @@
+import { Module, OnModuleInit } from '@nestjs/common';
+import { TerminusModule } from '@nestjs/terminus';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  AdminInternalModule,
   bootstrap,
-  AdminModule,
   GraphqlModule,
   LoggerFactory,
   MQHealthIndicator,
@@ -8,16 +11,13 @@ import {
   TerminusOptionsService,
   WSModule,
 } from '.';
-import { Module, OnModuleInit } from '@nestjs/common';
-import { TerminusModule } from '@nestjs/terminus';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 const logger = LoggerFactory.getLogger('ApplicationModule');
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(),
-    AdminModule,
+    AdminInternalModule,
     GraphqlModule.forRoot(__dirname),
     WSModule,
     TerminusModule.forRootAsync({

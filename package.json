@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "index.ts",

@@ -1,11 +1,41 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { AsunaError, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
-import { AbstractAuthUser } from '../core/auth';
+import { AbstractAuthUser, auth } from '../core/auth';
 
 const logger = LoggerFactory.getLogger('GqlAuthGuard');
+
+@Injectable()
+export class GqlAdminAuthGuard implements CanActivate {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const ctx = GqlExecutionContext.create(context);
+    const req = ctx.getContext().req;
+    const res = ctx.getContext().res;
+    const info = {
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      headers: req.headers,
+      /*
+      raw: req.raw,
+      id: req.id,
+      */
+      ip: req.ip,
+      ips: req.ips,
+      hostname: req.hostname,
+    };
+    logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    const result = await auth(req, res, 'admin');
+
+    if (!result.user) {
+      throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
+    }
+
+    return !!result.user;
+  }
+}
 
 /**
  * return null if anonymousSupport is true and user authenticate is failed
@@ -45,22 +75,22 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
    */
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
-    const request = ctx.getContext().req;
+    const req = ctx.getContext().req;
     const info = {
-      body: request.body,
-      query: request.query,
-      params: request.params,
-      headers: request.headers,
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      headers: req.headers,
       /*
-      raw: request.raw,
-      id: request.id,
+      raw: req.raw,
+      id: req.id,
       */
-      ip: request.ip,
-      ips: request.ips,
-      hostname: request.hostname,
+      ip: req.ip,
+      ips: req.ips,
+      hostname: req.hostname,
     };
     logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
-    return request;
+    return req;
   }
 
   /*

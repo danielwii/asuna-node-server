@@ -15,7 +15,7 @@ import { ImportExportModule } from './import-export/import-export.module';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
 
-const logger = LoggerFactory.getLogger('AdminModule');
+const logger = LoggerFactory.getLogger('AdminInternalModule');
 
 @Module({
   imports: [
@@ -42,7 +42,7 @@ const logger = LoggerFactory.getLogger('AdminModule');
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })
-export class AdminModule implements OnModuleInit {
+export class AdminInternalModule implements OnModuleInit {
   onModuleInit(): any {
     logger.log('init...');
   }
