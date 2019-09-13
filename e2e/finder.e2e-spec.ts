@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
-import { AdminModule, AsunaCollections, KvService } from '../src/modules';
+import { AdminInternalModule, AsunaCollections, KvService } from '../src/modules';
 import { keyByType } from '../src/modules/core/finder';
 
 describe('FinderModule (e2e)', () => {
@@ -12,7 +12,7 @@ describe('FinderModule (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(), AdminModule],
+      imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

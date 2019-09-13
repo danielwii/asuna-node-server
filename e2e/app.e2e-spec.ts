@@ -2,14 +2,14 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
-import { AdminModule } from '../src/modules';
+import { AdminInternalModule } from '../src/modules';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(), AdminModule],
+      imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();

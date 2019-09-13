@@ -3,14 +3,14 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
 import { Connection, getManager } from 'typeorm';
-import { AdminModule, AppInfo, resolveTypeormPaths } from '../src';
+import { AdminInternalModule, AppInfo, resolveTypeormPaths } from '../src';
 
 describe('Excel (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     resolveTypeormPaths();
     const module = await Test.createTestingModule({
-      imports: [TypeOrmModule.forRoot(), AdminModule],
+      imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
     app = module.createNestApplication();
