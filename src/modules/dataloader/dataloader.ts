@@ -5,22 +5,20 @@ import * as fp from 'lodash/fp';
 import { BaseEntity } from 'typeorm';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { Hermes, IAsunaEvent } from '../core/bus';
 
 const logger = LoggerFactory.getLogger('DataLoaderCache');
 
 const cacheMap = new Map();
 
-type PrimaryKeyType = string | number;
+export type PrimaryKeyType = string | number;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
-  load: (ids: PrimaryKeyType | PrimaryKeyType[]) => Entity[];
+  load(id: PrimaryKeyType): Promise<Entity>;
+  load(ids: PrimaryKeyType[]): Promise<Entity[]>;
 }
 
-function resolve(ids) {
-  return entities => {
-    return ids.map(id => entities.find(entity => (entity ? entity.id === id : false)));
-  };
+function resolve(ids: PrimaryKeyType[]) {
+  return entities => ids.map(id => entities.find(entity => (entity ? entity.id === id : false)));
 }
 
 function build<Entity extends BaseEntity>(
@@ -38,11 +36,11 @@ function build<Entity extends BaseEntity>(
   };
 }
 
-export function loader<RegisteredLoaders>(
+export function loader<Entity extends BaseEntity>(
   entity: typeof BaseEntity,
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
-): DataLoaderFunction<typeof entity & any> {
-  return build<typeof entity & any>(
+): DataLoaderFunction<Entity> {
+  return build<Entity>(
     cachedDataLoader(entity.name, ids =>
       entity
         .findByIds(ids, {
@@ -91,16 +89,18 @@ export class GenericDataLoader {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
     GenericDataLoader.loaders = loaders;
   }
 
-  createLoaders() {
+  // eslint-disable-next-line class-methods-use-this
+  createLoaders(): { [key: string]: DataLoaderFunction<any> } {
     return _.memoize(() => GenericDataLoader.loaders)();
   }
 }
 
-export function cachedDataLoader(segment, fn) {
+export function cachedDataLoader(segment, fn): DataLoader<PrimaryKeyType, any> {
   return new DataLoader(
     ids => {
       // logger.log(`load ${segment}: ${ids}`);

@@ -1,10 +1,7 @@
 import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-
-export type DataLoaderFunction<T> = {
-  load: (ids: any | any[]) => T[];
-};
+import { DataLoaderFunction } from './dataloader';
 
 export type GraphqlRequest = Request & {
   id?: string;

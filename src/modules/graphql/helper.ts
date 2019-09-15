@@ -6,11 +6,11 @@ import {
   BaseEntity,
   FindConditions,
   FindManyOptions,
+  JoinOptions,
   LessThan,
   MoreThan,
   ObjectLiteral,
   Repository,
-  JoinOptions,
 } from 'typeorm';
 import { AsunaError, AsunaException } from '../common';
 import { r } from '../common/helpers';
@@ -18,8 +18,7 @@ import { LoggerFactory } from '../common/logger';
 import { AbstractCategoryEntity } from '../core/base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
-import { DataLoaderFunction } from '../dataloader/utils';
+import { DataLoaderFunction, GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
 import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -196,7 +195,7 @@ export class GraphqlHelper {
     instance: Entity,
     key: keyof Entity,
     loader: DataLoaderFunction<RelationEntity>,
-  ): Promise<RelationEntity[]> {
+  ): Promise<RelationEntity> {
     if (DBHelper.getRelationPropertyNames(cls).includes(key as string)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const result = (await ((cls as any) as typeof BaseEntity).findOne(instance[primaryKey], {
@@ -204,7 +203,7 @@ export class GraphqlHelper {
         cache: true,
       })) as Entity;
       // logger.log(`load key ${key}`);
-      return loader.load(result[key]);
+      return loader.load(result[key] as any);
     }
     return null;
   }
