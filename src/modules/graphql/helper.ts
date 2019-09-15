@@ -93,7 +93,7 @@ export class GraphqlHelper {
           where,
         }),
       );
-      const ids = _.chain(top100)
+      const ids: any[] = _.chain(top100)
         .map(fp.get(primaryKey))
         .shuffle()
         .take(query.random)
