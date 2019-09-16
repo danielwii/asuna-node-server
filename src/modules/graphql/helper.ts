@@ -33,6 +33,9 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   relationPath?: string;
   timeCondition?: TimeConditionInput;
   cache?: boolean;
+  order?: {
+    [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
+  };
 }
 
 interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
@@ -40,6 +43,20 @@ interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
   categoryCls: ClassType<AbstractCategoryEntity>;
   query: CommonConditionInput;
 }
+
+type ResolvePropertyByTarget<Entity extends BaseEntity, RelationEntity extends BaseEntity> = {
+  cls: ClassType<Entity>;
+  instance: Entity;
+  key: keyof Entity;
+  targetCls: ClassType<RelationEntity>;
+};
+
+type ResolvePropertyByLoader<Entity extends BaseEntity, RelationEntity extends BaseEntity> = {
+  cls: ClassType<Entity>;
+  instance: Entity;
+  key: keyof Entity;
+  loader: DataLoaderFunction<RelationEntity>;
+};
 
 export class GraphqlHelper {
   public static resolveOrder<Entity extends BaseEntity>(
@@ -144,7 +161,7 @@ export class GraphqlHelper {
       cache,
       join,
     } = opts;
-    const order = this.resolveOrder(cls, pageRequest);
+    const order = opts.order || this.resolveOrder(cls, pageRequest);
     const whereCondition = where;
 
     if (opts.query && query.category) {
@@ -191,19 +208,27 @@ export class GraphqlHelper {
   }
 
   public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
-    cls: ClassType<Entity>,
-    instance: Entity,
-    key: keyof Entity,
-    loader: DataLoaderFunction<RelationEntity>,
+    opts:
+      | ResolvePropertyByLoader<Entity, RelationEntity>
+      | ResolvePropertyByTarget<Entity, RelationEntity>,
   ): Promise<RelationEntity> {
-    if (DBHelper.getRelationPropertyNames(cls).includes(key as string)) {
-      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
-      const result = (await ((cls as any) as typeof BaseEntity).findOne(instance[primaryKey], {
-        loadRelationIds: { relations: [key as string] },
-        cache: true,
-      })) as Entity;
-      // logger.log(`load key ${key}`);
-      return loader.load(result[key] as any);
+    if (DBHelper.getRelationPropertyNames(opts.cls).includes(opts.key as string)) {
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
+      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(
+        opts.instance[primaryKey],
+        {
+          loadRelationIds: { relations: [opts.key as string] },
+          cache: true,
+        },
+      )) as Entity;
+      if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
+        const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
+        return _opts.loader.load(result[_opts.key] as any);
+      } else {
+        const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+        const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+        return targetRepo.findOne(result[_opts.key]);
+      }
     }
     return null;
   }

@@ -198,6 +198,7 @@ export function resolveRelationsFromInfo(
     const relations = (selectionNode || fieldNode).selectionSet.selections
       .filter(node => node.selectionSet)
       .map(node => node.name.value);
+    logger.verbose(`resolved relations is ${r(relations)}`);
     return { relations };
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);
