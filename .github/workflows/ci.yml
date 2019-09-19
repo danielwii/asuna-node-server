@@ -1,0 +1,37 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install, build, and test
+        run: |
+          echo HOME: $HOME
+          echo GITHUB_WORKFLOW: $GITHUB_WORKFLOW
+          echo GITHUB_ACTION: $GITHUB_ACTION
+          echo GITHUB_ACTOR: $GITHUB_ACTOR
+          echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
+          echo GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME
+          echo GITHUB_EVENT_PATH: $GITHUB_EVENT_PATH
+          echo GITHUB_WORKSPACE: $GITHUB_WORKSPACE
+          echo GITHUB_SHA: $GITHUB_SHA
+          echo GITHUB_REF: $GITHUB_REF
+          echo GITHUB_HEAD_REF: $GITHUB_HEAD_REF
+          echo GITHUB_BASE_REF: $GITHUB_BASE_REF
+          npm install
+          npm run build --if-present
+          npm test
+        env:
+          CI: true
