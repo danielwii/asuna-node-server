@@ -196,17 +196,19 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(process.mainModule.filename);
+  logger.log(`main entrance is ${r(process.mainModule.filename)}`);
   const { packageDir } = global;
+  const suffix = packageDir.includes('node_modules') ? 'js' : 'ts';
   const entities = [
-    `${resolve(packageDir)}/**/*entities.ts`,
+    `${resolve(packageDir)}/**/*entities.${suffix}`,
     `${resolve(rootDir)}/**/*entities.ts`,
     ...(options.typeormEntities || []),
   ];
   const subscribers = [
-    `${resolve(packageDir)}/**/*subscriber.ts`,
+    `${resolve(packageDir)}/**/*subscriber.${suffix}`,
     `${resolve(rootDir)}/**/*subscriber.ts`,
   ];
-  logger.log(`options is ${r({ options, rootDir, /* suffix, */ entities, subscribers })}`);
+  logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
