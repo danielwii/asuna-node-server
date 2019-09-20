@@ -1,9 +1,8 @@
 {
   "name": "asuna-node-server",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
-  "main": "index.ts",
   "types": "declaration/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist && rm -rf ./declaration",
@@ -112,7 +111,7 @@
     "passport-jwt": "^4.0.0",
     "pump": "^3.0.0",
     "qiniu": "^7.2.2",
-    "qrcode": "^1.4.1",
+    "qrcode": "^1.4.2",
     "ramda": "^0.26.1",
     "response-time": "^2.3.2",
     "rxjs": "^6.5.3",
