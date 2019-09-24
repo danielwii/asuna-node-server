@@ -95,6 +95,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
           .concat(
             { from: 'content__t_slides', to: 'www__t_slides' },
             { from: 'content__t_slide_categories', to: 'www__t_slide_categories' },
+            { from: 'www__t_point_exchanges', to: 'property__t_point_exchanges' },
           )
           .concat(options.renamer),
       ),
@@ -110,6 +111,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   await connection.synchronize();
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
+
+  logger.log(`pending migrations: ${await connection.showMigrations()}`);
 
   // --------------------------------------------------------------
   // setup application

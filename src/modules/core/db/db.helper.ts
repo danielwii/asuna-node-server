@@ -146,7 +146,7 @@ export function parseListParam(
       ? (value as string[])
       : (value as string).split(',').map(_.trim)
     : undefined;
-  return list && map ? R.map(map, list) : list;
+  return _.uniq(list && map ? R.map(map, list) : list);
 }
 
 export type ParsedFields = {
