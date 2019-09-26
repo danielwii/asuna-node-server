@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
+import * as _ from 'lodash';
 import { Connection, getConnection, getManager, getRepository, Repository } from 'typeorm';
+
 import { AsunaError, AsunaException } from '../../common/exceptions';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
@@ -53,14 +55,17 @@ export class AuthService extends AbstractAuthService {
     let user = await this.getUser({ email, username });
     if (user) {
       logger.log(`found user ${r(user)}`);
-      throw new AsunaException(AsunaError.Unprocessable, `user ${r({ username, email })} already exists.`);
+      throw new AsunaException(
+        AsunaError.Unprocessable,
+        `user ${r({ username, email })} already exists.`,
+      );
     }
 
     return getManager()
       .save(this.userRepository.create({ email, username, isActive: true, password: hash, salt }))
       .then(result => {
         Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, result);
-        return result;
+        return this.userRepository.findOne(result.id);
       });
   }
 }
