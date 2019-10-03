@@ -46,6 +46,15 @@ interface BaseEntity {
   updatedAt: Date!
 }
 
+interface BaseNameEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+}
+
 interface PagedQuery {
   total: Int
   page: Int

@@ -25,7 +25,7 @@ const logger = LoggerFactory.getLogger('GraphqlHelper');
 
 interface ResolveFindOptionsType<Entity extends BaseEntity> {
   cls: ClassType<Entity>;
-  pageRequest: PageRequest;
+  pageRequest?: PageRequest;
   select?: (keyof Entity)[];
   info?: GraphQLResolveInfo;
   where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -166,10 +166,7 @@ export class GraphqlHelper {
 
     if (opts.query && query.category) {
       if (categoryCls == null) {
-        throw new AsunaException(
-          AsunaError.Unprocessable,
-          `category class not defined for ${cls.name}`,
-        );
+        throw new AsunaException(AsunaError.Unprocessable, `category class not defined for ${cls.name}`);
       }
 
       const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;
@@ -185,17 +182,13 @@ export class GraphqlHelper {
 
     if (timeCondition && typeof where === 'object') {
       const afterCondition =
-        timeCondition && timeCondition.after
-          ? { [timeCondition.column]: MoreThan(timeCondition.after) }
-          : null;
+        timeCondition && timeCondition.after ? { [timeCondition.column]: MoreThan(timeCondition.after) } : null;
       const beforeCondition =
-        timeCondition && timeCondition.before
-          ? { [timeCondition.column]: LessThan(timeCondition.before) }
-          : null;
+        timeCondition && timeCondition.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : null;
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const options: FindManyOptions<Entity> = {
-      ...toPage(pageRequest),
+      ...(pageRequest ? toPage(pageRequest) : null),
       ...(select && select.length > 0 ? { select } : null),
       where: whereCondition,
       join,
@@ -208,19 +201,14 @@ export class GraphqlHelper {
   }
 
   public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
-    opts:
-      | ResolvePropertyByLoader<Entity, RelationEntity>
-      | ResolvePropertyByTarget<Entity, RelationEntity>,
+    opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
   ): Promise<RelationEntity> {
     if (DBHelper.getRelationPropertyNames(opts.cls).includes(opts.key as string)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(
-        opts.instance[primaryKey],
-        {
-          loadRelationIds: { relations: [opts.key as string] },
-          cache: true,
-        },
-      )) as Entity;
+      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+        loadRelationIds: { relations: [opts.key as string] },
+        cache: true,
+      })) as Entity;
       if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
         const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
         return _opts.loader.load(result[_opts.key] as any);
