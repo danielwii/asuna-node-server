@@ -98,7 +98,7 @@ export class GraphqlHelper {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length > 0) {
-      return (dataloader ? dataloader.load : entityRepo.findByIds)(query.ids);
+      return dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids);
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
@@ -116,7 +116,7 @@ export class GraphqlHelper {
         .take(query.random)
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
-      return (dataloader ? dataloader.load : entityRepo.findByIds)(ids);
+      return dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids);
     }
     return null;
   }
