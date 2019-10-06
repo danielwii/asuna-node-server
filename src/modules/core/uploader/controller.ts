@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Query,
-  Req,
-  UploadedFile,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
@@ -165,10 +156,7 @@ export class UploaderController {
   })
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
-  @UseInterceptors(
-    FileInterceptor('file', fileInterceptorOptions),
-    // new FastifyFileInterceptor('file'),
-  )
+  @UseInterceptors(FileInterceptor('file', fileInterceptorOptions))
   async chunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
@@ -188,10 +176,7 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  async mergeChunks(
-    @Query('filename') filename: string,
-    @Req() req: AnyAuthRequest & OperationTokenRequest,
-  ) {
+  async mergeChunks(@Query('filename') filename: string, @Req() req: AnyAuthRequest & OperationTokenRequest) {
     return this.uploaderService.mergeChunks(req.token, filename);
   }
 
@@ -217,11 +202,7 @@ export class UploaderController {
   @Post()
   @UseInterceptors(
     // new FastifyFileInterceptor('files'),
-    FilesInterceptor(
-      'files',
-      configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3),
-      fileInterceptorOptions,
-    ),
+    FilesInterceptor('files', configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3), fileInterceptorOptions),
   )
   async uploader(
     @Query('bucket') bucket: string = '',

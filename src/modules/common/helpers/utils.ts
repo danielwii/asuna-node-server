@@ -7,7 +7,8 @@ import { basename, dirname, join, resolve } from 'path';
 import { Between } from 'typeorm';
 import { inspect } from 'util';
 
-const isProduction = process.env.NODE_ENV === 'production';
+export const isProductionEnv = process.env.NODE_ENV === 'production';
+export const isTestEnv = process.env.NODE_ENV === 'test';
 
 export const AfterDate = (date: Date) => Between(date, addYears(date, 100));
 export const BeforeDate = (date: Date) => Between(subYears(date, 100), date);
@@ -17,7 +18,7 @@ export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: b
     return o;
   }
   const value = transform ? classToPlain(o) : o;
-  return isProduction || plain ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
+  return isProductionEnv || plain ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
 };
 
 /**
