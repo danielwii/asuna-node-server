@@ -3,12 +3,11 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
-import { AdminInternalModule, AsunaCollections, KvService } from '../src/modules';
+import { AdminInternalModule, AsunaCollections, KvHelper } from '../src/modules';
 import { keyByType } from '../src/modules/core/finder';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
-  let kvService: KvService;
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
@@ -17,8 +16,7 @@ describe('FinderModule (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    kvService = app.get(KvService);
-    await kvService.set({
+    await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: keyByType.assets,
       type: 'json',
@@ -33,7 +31,7 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /api/v1/finder', async () => {
-    await kvService.set({
+    await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: keyByType.assets,
       type: 'json',
@@ -55,16 +53,14 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /f', async () => {
-    await kvService.set({
+    await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: keyByType.assets,
       type: 'json',
       value: { default: { endpoint: 'https://hostname' } },
     });
 
-    const encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString(
-      'base64',
-    );
+    const encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString('base64');
     const query = Buffer.from(`${encodedQuery}.0.assets`).toString('base64');
     expect(query).toBe('Y0dGMGFEMHhKVEpHTWlVeVJqTXVjRzVuLjAuYXNzZXRz');
     return supertest(app.getHttpServer())
@@ -77,7 +73,7 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /api/v1/finder with same domain', async () => {
-    await kvService.set({
+    await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: keyByType.assets,
       type: 'json',

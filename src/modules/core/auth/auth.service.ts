@@ -15,6 +15,7 @@ import { AbstractAuthUser } from './base.entities';
 const logger = LoggerFactory.getLogger('AuthService');
 
 export const HermesAuthEventKeys = {
+  // 新用户
   userCreated: 'user.created',
 };
 

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Delete,
-  Get,
-  Inject,
-  Options,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Delete, Get, Options, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
 import { ApiImplicitParam } from '@nestjs/swagger';
 import idx from 'idx';
 import * as _ from 'lodash';
@@ -17,23 +6,14 @@ import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
 import { CurrentUser, Profile, r, validateObject } from '../../common';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
-import {
-  DBHelper,
-  parseFields,
-  parseNormalWhereAndRelatedFields,
-  parseOrder,
-  parseWhere,
-} from '../db';
-import { KeyValuePair, KvService } from '../kv';
+import { DBHelper, parseFields, parseNormalWhereAndRelatedFields, parseOrder, parseWhere } from '../db';
+import { KeyValuePair, KvHelper } from '../kv';
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');
 
 @UseInterceptors(ControllerLoggerInterceptor)
 export abstract class RestCrudController {
-  @Inject('KvService')
-  private readonly kvService: KvService;
-
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {
     // this.module = this.module ? `${this.module}__` : '';
@@ -84,15 +64,7 @@ export abstract class RestCrudController {
 
     // console.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
-    DBHelper.wrapProfile(
-      modelName.model,
-      queryBuilder,
-      repository,
-      profile,
-      relationsStr,
-      parsedFields,
-      where,
-    );
+    DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, where);
 
     if (order) {
       queryBuilder.orderBy(order as any);
@@ -129,15 +101,7 @@ export abstract class RestCrudController {
     const queryBuilder = repository.createQueryBuilder(modelName.model);
 
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields });
-    DBHelper.wrapProfile(
-      modelName.model,
-      queryBuilder,
-      repository,
-      profile,
-      relationsStr,
-      parsedFields,
-      null,
-    );
+    DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, null);
 
     queryBuilder.whereInIds(id);
 
@@ -162,15 +126,15 @@ export abstract class RestCrudController {
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (modelName.model === 'kv__pairs') {
       const pair = KeyValuePair.create(updateTo);
-      logger.log(`save by kvService... ${r(pair)}`);
-      return this.kvService.set(pair);
+      logger.log(`save by kv... ${r(pair)}`);
+      return KvHelper.set(pair);
     }
 
     const repository = DBHelper.repo(modelName);
     const relationKeys = repository.metadata.relations.map(r => r.propertyName);
-    const relationIds = R.map(value =>
-      _.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value },
-    )(R.pick(relationKeys, updateTo));
+    const relationIds = R.map(value => (_.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value }))(
+      R.pick(relationKeys, updateTo),
+    );
 
     const entity = repository.create({
       ...updateTo,
@@ -197,8 +161,8 @@ export abstract class RestCrudController {
     logger.log(`patch ${r({ admin, modelName, id, updateTo })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
-      logger.log('update by kvService...');
-      return this.kvService.update(id, updateTo.name, updateTo.type, updateTo.value);
+      logger.log('update by kv...');
+      return KvHelper.update(id, updateTo.name, updateTo.type, updateTo.value);
     }
 
     const repository = DBHelper.repo(modelName);

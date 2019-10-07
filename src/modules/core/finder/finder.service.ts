@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { join } from 'path';
 import { AsunaError, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';
-import { AsunaCollections, KvService } from '../kv';
+import { AsunaCollections, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderService');
 
@@ -14,8 +14,6 @@ export class FinderAssetsSettings {
 
 @Injectable()
 export class FinderService {
-  constructor(private readonly kvService: KvService) {}
-
   async getUrl({
     key,
     type,
@@ -33,24 +31,18 @@ export class FinderService {
       throw new AsunaException(AsunaError.BadRequest, JSON.stringify({ type, name, path }));
     }
 
-    const upstreams = await this.kvService.get(AsunaCollections.SYSTEM_SERVER, key);
+    const upstreams = await KvHelper.get(AsunaCollections.SYSTEM_SERVER, key);
     logger.debug(`upstreams ${r(upstreams)}`);
     if (!(upstreams && upstreams.value && _.isObject(upstreams.value))) {
       logger.warn(`${name || 'default'} not available in upstream ${key}`);
-      throw new AsunaException(
-        AsunaError.Unprocessable,
-        `${name || 'default'} not available in upstream ${key}`,
-      );
+      throw new AsunaException(AsunaError.Unprocessable, `${name || 'default'} not available in upstream ${key}`);
     }
 
     if (type === 'assets') {
       const upstream = upstreams.value[`${internal ? 'internal-' : ''}${name || 'default'}`];
       const finderAssetsSettings = deserializeSafely(FinderAssetsSettings, upstream);
       if (!finderAssetsSettings) {
-        throw new AsunaException(
-          AsunaError.Unprocessable,
-          `invalid upstream ${JSON.stringify(upstream)} for finder`,
-        );
+        throw new AsunaException(AsunaError.Unprocessable, `invalid upstream ${JSON.stringify(upstream)} for finder`);
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
       /* const portStr = upstream.port ? `:${upstream.port}` : '';
