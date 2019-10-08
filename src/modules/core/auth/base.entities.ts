@@ -7,18 +7,21 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @IsEmail()
   @IsOptional()
   @Column({ nullable: true, unique: true })
-  email: string;
+  email?: string;
 
   @Column({ nullable: false, unique: true, length: 100 })
   username: string;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
-  password: string;
+  password?: string;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
-  salt: string;
+  salt?: string;
+
+  @Column({ nullable: true, name: 'last_login_at' })
+  lastLoginAt?: Date;
 
   // --------------------------------------------------------------
   // Status
@@ -26,5 +29,5 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
 
   @MetaInfo({ name: '是否启用？' })
   @Column({ nullable: true, name: 'active' })
-  isActive: boolean;
+  isActive?: boolean;
 }

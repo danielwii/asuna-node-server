@@ -1,7 +1,9 @@
 import { UseInterceptors } from '@nestjs/common';
 import { oneLine } from 'common-tags';
+import { differenceInCalendarDays, differenceInDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
+import { User } from 'server/src/domains/user/user.entities';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { formatTime, r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
@@ -59,6 +61,20 @@ export abstract class AbstractAuthService {
       `);
     }
     return validated;
+  }
+
+  async updateLastLoginDate(userId: string | number): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
+    const user = await this.userRepository.findOne(userId);
+    if (user) {
+      const currentDate = new Date();
+      if (user.lastLoginAt && differenceInCalendarDays(user.lastLoginAt, currentDate) < 1) {
+        return { sameDay: true, lastLoginAt: user.lastLoginAt };
+      }
+      user.lastLoginAt = currentDate;
+      await user.save();
+      return { sameDay: false, lastLoginAt: currentDate };
+    }
+    return {};
   }
 
   public getUser(
