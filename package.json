@@ -36,7 +36,7 @@
     "@types/sharp": "^0.22.3",
     "@types/socket.io": "^2.1.4",
     "@types/uuid": "^3.4.5",
-    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-typescript": "^5.0.0",
     "eslint-config-prettier": "^6.4.0",
