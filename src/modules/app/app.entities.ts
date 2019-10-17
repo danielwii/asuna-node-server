@@ -31,7 +31,7 @@ export class AppInfo extends AbstractNameEntity {
   mode: keyof typeof Mode;
 
   @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'published' })
+  @Column({ nullable: true, name: 'is_published' })
   isPublished: boolean;
 
   @OneToMany(type => AppRelease, release => release.appInfo)
@@ -63,7 +63,7 @@ export class AppRelease extends AbstractBaseEntity {
   paths: JsonArray;
 
   @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'published' })
+  @Column({ nullable: true, name: 'is_published' })
   isPublished: boolean;
 
   @MetaInfo({ name: '所属应用' })

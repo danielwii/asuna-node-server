@@ -65,7 +65,7 @@ export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'published' })
+  @Column({ nullable: true, name: 'is_published' })
   isPublished: boolean;
 
   @MetaInfo({
@@ -73,6 +73,6 @@ export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
     type: 'Deletable',
     help: '系统数据无法删除',
   })
-  @Column({ nullable: true, name: 'system' })
+  @Column({ nullable: true, name: 'is_system' })
   isSystem: boolean;
 }
