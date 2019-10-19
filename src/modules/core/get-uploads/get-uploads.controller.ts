@@ -4,9 +4,9 @@ import { ApiUseTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
-import { FinderService } from '../finder';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
+import { FinderHelper } from '../finder';
 import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 
@@ -17,8 +17,6 @@ const logger = LoggerFactory.getLogger('GetUploadsController');
 @Controller('uploads')
 export class GetUploadsController {
   private context = AsunaContext.instance;
-
-  constructor(private readonly finderService: FinderService) {}
 
   // TODO not finished yet
   @Get('options')
@@ -54,21 +52,13 @@ export class GetUploadsController {
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ) {
-    logger.debug(
-      `get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`,
-    );
+    logger.debug(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
     const url = await this.context.defaultStorageEngine.resolveUrl({
       filename,
       bucket,
       thumbnailConfig,
       jpegConfig,
-      resolver: url =>
-        this.finderService.getUrl({
-          key: 'settings.finder.assets',
-          type: 'assets',
-          path: url,
-          internal,
-        }),
+      resolver: url => FinderHelper.getUrl({ type: 'assets', path: url, internal }),
     });
     logger.debug(`resolved url is ${url}`);
     return res.redirect(url);

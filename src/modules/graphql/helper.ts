@@ -1,7 +1,7 @@
-import { ClassType } from "class-transformer/ClassTransformer";
-import { GraphQLResolveInfo } from "graphql";
-import * as _ from "lodash";
-import * as fp from "lodash/fp";
+import { ClassType } from 'class-transformer/ClassTransformer';
+import { GraphQLResolveInfo } from 'graphql';
+import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import {
   BaseEntity,
   FindConditions,
@@ -10,16 +10,16 @@ import {
   LessThan,
   MoreThan,
   ObjectLiteral,
-  Repository
-} from "typeorm";
-import { AsunaError, AsunaException } from "../common";
-import { r } from "../common/helpers";
-import { LoggerFactory } from "../common/logger";
-import { AbstractCategoryEntity } from "../core/base";
-import { DBHelper } from "../core/db";
-import { PageInfo, PageRequest, toPage } from "../core/helpers";
-import { DataLoaderFunction, GraphqlContext, resolveRelationsFromInfo } from "../dataloader";
-import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from "./input";
+  Repository,
+} from 'typeorm';
+import { AsunaError, AsunaException } from '../common';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
+import { AbstractCategoryEntity } from '../core/base';
+import { DBHelper } from '../core/db';
+import { PageInfo, PageRequest, toPage } from '../core/helpers';
+import { DataLoaderFunction, GraphqlContext, PrimaryKeyType, resolveRelationsFromInfo } from '../dataloader';
+import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -216,6 +216,29 @@ export class GraphqlHelper {
         const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
         const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
         return targetRepo.findOne(result[_opts.key]);
+      }
+    }
+    return null;
+  }
+
+  public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+    opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
+  ): Promise<RelationEntity[]> {
+    if (DBHelper.getRelationPropertyNames(opts.cls).includes(opts.key as string)) {
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
+      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+        loadRelationIds: { relations: [opts.key as string] },
+        cache: true,
+      })) as Entity;
+      if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
+        const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
+        const ids = result[_opts.key];
+        return _.isEmpty(ids) ? null : await _opts.loader.load((ids as any) as PrimaryKeyType[]);
+      } else {
+        const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+        const ids = result[_opts.key];
+        const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+        return _.isEmpty(ids) ? null : await targetRepo.find(ids);
       }
     }
     return null;

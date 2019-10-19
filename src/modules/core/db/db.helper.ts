@@ -21,14 +21,7 @@ import {
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import {
-  Condition,
-  EntityMetaInfoOptions,
-  ErrorException,
-  MetaInfoOptions,
-  Profile,
-  r,
-} from '../../common';
+import { Condition, EntityMetaInfoOptions, ErrorException, MetaInfoOptions, Profile, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 
@@ -76,10 +69,7 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
   return null;
 }
 
-export function parseNormalWhereAndRelatedFields(
-  where,
-  repository,
-): { normalWhere: any[]; relatedFields: string[] } {
+export function parseNormalWhereAndRelatedFields(where, repository): { normalWhere: any[]; relatedFields: string[] } {
   const allRelations = repository.metadata.relations.map(r => r.propertyName);
   const normalWhere = [];
   const relatedFields = [];
@@ -137,15 +127,8 @@ export function parseOrder(model: string, value: string) {
  * @param map
  * @returns {string[] | undefined}
  */
-export function parseListParam(
-  value: string | string[],
-  map?: (field: any) => any,
-): string[] | any | undefined {
-  const list = value
-    ? _.isArray(value)
-      ? (value as string[])
-      : (value as string).split(',').map(_.trim)
-    : undefined;
+export function parseListParam(value: string | string[], map?: (field: any) => any): string[] | any | undefined {
+  const list = value ? (_.isArray(value) ? (value as string[]) : (value as string).split(',').map(_.trim)) : undefined;
   return _.uniq(list && map ? R.map(map, list) : list);
 }
 
@@ -182,15 +165,10 @@ export class DBHelper {
     return !isRelation;
   }
 
-  private static extractSelectableByColumn(
-    column: ColumnMetadata,
-    opts: { module?: string; prefix?: string },
-  ) {
+  private static extractSelectableByColumn(column: ColumnMetadata, opts: { module?: string; prefix?: string }) {
     let selectable;
     if (column.isVirtual) {
-      const entityMetadata = column.referencedColumn
-        ? column.referencedColumn.entityMetadata
-        : column.entityMetadata;
+      const entityMetadata = column.referencedColumn ? column.referencedColumn.entityMetadata : column.entityMetadata;
 
       const { entityInfo } = entityMetadata.target as any;
       if (entityInfo) {
@@ -204,10 +182,7 @@ export class DBHelper {
     return selectable;
   }
 
-  private static extractSelectableByRelation(
-    relation: RelationMetadata,
-    opts: { module?: string; prefix?: string },
-  ) {
+  private static extractSelectableByRelation(relation: RelationMetadata, opts: { module?: string; prefix?: string }) {
     let selectable;
     if ((relation.type as any).entityInfo) {
       selectable = ((relation.type as any).entityInfo as EntityMetaInfoOptions).name;
@@ -308,14 +283,11 @@ export class DBHelper {
    * getPrimaryKeys
    */
   public static getPrimaryKeys(repository): string[] {
-    return repository.metadata.columns
-      .filter(column => column.isPrimary)
-      .map(column => column.propertyName);
+    return repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName);
   }
 
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}) {
-    const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata
-      .target as Function).prototype;
+    const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
     const parentEntityInfo: EntityMetaInfoOptions = idx(
       repository,
@@ -448,11 +420,7 @@ export class DBHelper {
           let innerValue = elementCondition._value;
 
           if (_.isObjectLike(innerValue) && innerValue.toSql) {
-            innerValue = elementCondition._value.toSql(
-              getConnection(),
-              `${field}.id`,
-              elementCondition._value._value,
-            );
+            innerValue = elementCondition._value.toSql(getConnection(), `${field}.id`, elementCondition._value._value);
           } else {
             innerValue = elementCondition.toSql(getConnection(), `${field}.id`, innerValue);
           }
@@ -468,12 +436,7 @@ export class DBHelper {
             queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, innerValue);
           }
         } else {
-          queryBuilder.innerJoinAndSelect(
-            `${model}.${field}`,
-            field,
-            `${field}.id = :${field}`,
-            where,
-          );
+          queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, `${field}.id = :${field}`, where);
         }
       });
       // 处理普通关联
@@ -540,11 +503,7 @@ export class DBHelper {
 
   public static wrapParsedFields(
     model: string,
-    {
-      queryBuilder,
-      parsedFields,
-      primaryKeys,
-    }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
+    { queryBuilder, parsedFields, primaryKeys }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
   ) {
     if (!_.isEmpty(parsedFields.fields)) {
       const primaryKeyColumns = primaryKeys || ['id']; // id for default
@@ -556,10 +515,7 @@ export class DBHelper {
     }
   }
 
-  public static toSqlValue(
-    condition: { field: string; value: string | FindOperator<any> },
-    suffix = '',
-  ): any {
+  public static toSqlValue(condition: { field: string; value: string | FindOperator<any> }, suffix = ''): any {
     if (_.isObjectLike(condition.value)) {
       const elementCondition = condition.value as any;
       if (_.isObjectLike(elementCondition) && elementCondition.toSql) {
@@ -591,11 +547,7 @@ export class DBHelper {
 
           // console.log('[strict]', { parameters });
 
-          innerValue = elementCondition.toSql(
-            getConnection(),
-            `${condition.field}${suffix}`,
-            parameters,
-          );
+          innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
         } else {
           const parameters = _.isArray(elementCondition._value)
             ? _.map(elementCondition._value, v => `'${v}'`)
@@ -603,11 +555,7 @@ export class DBHelper {
 
           // console.log('[strict]', { parameters });
 
-          innerValue = elementCondition.toSql(
-            getConnection(),
-            `${condition.field}${suffix}`,
-            parameters,
-          );
+          innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
         }
         // queryBuilder.andWhere(`${model}.${sqlValue}`);
         return innerValue;

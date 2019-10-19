@@ -44,6 +44,9 @@ export interface KVGroupFields {
   [groupKey: string]: {
     name?: string;
     fields: {
+      /**
+       * name 在整个 KVGroupFields 中必须唯一
+       */
       name: string;
       field: KVField;
     }[];
@@ -89,7 +92,7 @@ export const AsunaCollections = {
 @Injectable()
 export class KvHelper {
   /**
-   * @param pair noValueOnly 尽在值为空时或不存在时设置
+   * @param pair noValueOnly 仅在值为空时或不存在时设置
    */
   static async set(pair: {
     collection?: string;
@@ -98,7 +101,7 @@ export class KvHelper {
     type: keyof typeof ValueType;
     value: any;
     extra?: any;
-    noValueOnly?: boolean;
+    noUpdate?: boolean;
   }): Promise<KeyValuePair> {
     const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
@@ -121,10 +124,9 @@ export class KvHelper {
     };
     logger.log(`inspect ${r({ pair, collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
-    // noValueOnly 打开时如果已经存在值不进行更新
-    if (exists && _.get(pair, 'noValueOnly') && exists.value) {
-      return exists;
-    }
+    // noUpdate 打开时如果已经存在值不进行更新
+    if (exists && pair.noUpdate && exists.value) return exists;
+
     logger.log(`set ${r({ entity, exists })}`);
     return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any);
   }

@@ -81,7 +81,7 @@
     "common-tags": "^1.8.0",
     "compression": "^1.7.4",
     "dataloader": "^1.4.0",
-    "date-fns": "^2.5.0",
+    "date-fns": "^2.5.1",
     "dayjs": "^1.8.16",
     "email-templates": "^6.0.3",
     "express": "^4.17.1",
@@ -119,7 +119,7 @@
     "socket.io": "^2.3.0",
     "socket.io-redis": "^5.2.0",
     "swagger-ui-express": "^4.1.2",
-    "typeorm": "^0.2.19",
+    "typeorm": "^0.2.20",
     "validator": "^11.1.0",
     "winston": "^3.2.1",
     "xlsx": "^0.15.1"
