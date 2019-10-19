@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
 import { AdminInternalModule, AsunaCollections, KvHelper } from '../src/modules';
-import { keyByType } from '../src/modules/core/finder';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
@@ -18,7 +17,7 @@ describe('FinderModule (e2e)', () => {
 
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
-      key: keyByType.assets,
+      key: 'settings.finder.assets',
       type: 'json',
       value: { default: { hostname: 'hostname' } },
     });
@@ -33,7 +32,7 @@ describe('FinderModule (e2e)', () => {
   it('/GET /api/v1/finder', async () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
-      key: keyByType.assets,
+      key: 'settings.finder.assets',
       type: 'json',
       value: { default: { endpoint: 'https://hostname' } },
     });
@@ -55,7 +54,7 @@ describe('FinderModule (e2e)', () => {
   it('/GET /f', async () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
-      key: keyByType.assets,
+      key: 'settings.finder.assets',
       type: 'json',
       value: { default: { endpoint: 'https://hostname' } },
     });
@@ -75,7 +74,7 @@ describe('FinderModule (e2e)', () => {
   it('/GET /api/v1/finder with same domain', async () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
-      key: keyByType.assets,
+      key: 'settings.finder.assets',
       type: 'json',
       value: { default: { endpoint: '/s3' } },
     });
