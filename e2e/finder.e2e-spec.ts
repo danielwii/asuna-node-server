@@ -15,13 +15,6 @@ describe('FinderModule (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    await KvHelper.set({
-      collection: AsunaCollections.SYSTEM_SERVER,
-      key: 'settings.finder.assets',
-      type: 'json',
-      value: { default: { hostname: 'hostname' } },
-    });
-
     await app.init();
   });
 
@@ -34,7 +27,7 @@ describe('FinderModule (e2e)', () => {
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
       type: 'json',
-      value: { default: { endpoint: 'https://hostname' } },
+      value: { values: { endpoint: 'https://hostname' } },
     });
 
     const query = querystring.stringify({
@@ -56,7 +49,7 @@ describe('FinderModule (e2e)', () => {
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
       type: 'json',
-      value: { default: { endpoint: 'https://hostname' } },
+      value: { values: { endpoint: 'https://hostname' } },
     });
 
     const encodedQuery = Buffer.from(querystring.stringify({ path: '1/2/3.png' })).toString('base64');
@@ -76,7 +69,7 @@ describe('FinderModule (e2e)', () => {
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
       type: 'json',
-      value: { default: { endpoint: '/s3' } },
+      value: { values: { endpoint: '/s3' } },
     });
 
     const query = querystring.stringify({
