@@ -233,12 +233,12 @@ export class GraphqlHelper {
       if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
         const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
         const ids = result[_opts.key];
-        return _.isEmpty(ids) ? null : await _opts.loader.load((ids as any) as PrimaryKeyType[]);
+        return _opts.loader.load((ids as any) as PrimaryKeyType[]);
       } else {
         const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
         const ids = result[_opts.key];
         const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-        return _.isEmpty(ids) ? null : await targetRepo.find(ids);
+        return targetRepo.findByIds(ids as any);
       }
     }
     return null;
