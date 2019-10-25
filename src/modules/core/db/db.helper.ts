@@ -286,6 +286,10 @@ export class DBHelper {
     return repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName);
   }
 
+  public static getPrimaryKey(repository): string[] {
+    return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
+  }
+
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}) {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
