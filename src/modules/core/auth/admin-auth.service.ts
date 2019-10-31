@@ -15,20 +15,12 @@ const logger = LoggerFactory.getLogger('AdminAuthService');
 export class AdminAuthService extends AbstractAuthService {
   private readonly roleRepository: RoleRepository;
 
-  constructor(
-    @InjectConnection()
-    private readonly connection: Connection,
-  ) {
+  constructor(@InjectConnection() private readonly connection: Connection) {
     super(connection.getRepository<AdminUser>(AdminUser) as any);
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
-  async createUser(
-    username: string,
-    email: string,
-    password: string,
-    roleNames?: string[],
-  ): Promise<AdminUser> {
+  async createUser(username: string, email: string, password: string, roleNames?: string[]): Promise<AdminUser> {
     const { hash, salt } = this.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
 
@@ -48,7 +40,7 @@ export class AdminAuthService extends AbstractAuthService {
    * 如果没有则创建预设用户 admin@example.com - password
    * @returns {Promise<void>}
    */
-  async initSysAccount() {
+  async initSysAccount(): Promise<void> {
     const role = await this.roleRepository.findOne({ name: SYS_ROLE });
 
     if (!role) {
@@ -64,10 +56,10 @@ export class AdminAuthService extends AbstractAuthService {
     logger.log(`found sys role: ${r(sysRole)}`);
     const usersBySysRole = await sysRole.users;
     logger.log(`found users for sys role: ${usersBySysRole.length}`);
-    if (!usersBySysRole.length) {
+    if (usersBySysRole.length === 0) {
       logger.log('create SYS_ADMIN account: admin@example.com:password');
-      this.createUser('Admin', 'admin@example.com', 'password', [SYS_ROLE]).catch(e => {
-        logger.warn('cannot create default SYS_ADMIN account', e);
+      this.createUser('Admin', 'admin@example.com', 'password', [SYS_ROLE]).catch(error => {
+        logger.warn('cannot create default SYS_ADMIN account', error);
       });
     }
   }

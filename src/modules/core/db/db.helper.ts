@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-underscore-dangle */
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
@@ -70,7 +72,7 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
 }
 
 export function parseNormalWhereAndRelatedFields(where, repository): { normalWhere: any[]; relatedFields: string[] } {
-  const allRelations = repository.metadata.relations.map(r => r.propertyName);
+  const allRelations = repository.metadata.relations.map(relation => relation.propertyName);
   const normalWhere = [];
   const relatedFields = [];
   _.each(where, (value, field) => {
@@ -144,6 +146,7 @@ export function parseFields(value: string | string[], allRelations?: string[]): 
     .filter(str => (allRelations ? allRelations.includes(str.split('.')[0]) : true))
     .reduce((result, val) => {
       const subModel = val.split('.')[0];
+      // eslint-disable-next-line no-param-reassign
       result[subModel] = [...(result[subModel] || []), val];
       fields.splice(fields.indexOf(val), 1);
       return result;
@@ -165,7 +168,7 @@ export class DBHelper {
     return !isRelation;
   }
 
-  private static extractSelectableByColumn(column: ColumnMetadata, opts: { module?: string; prefix?: string }) {
+  private static extractSelectableByColumn(column: ColumnMetadata, opts: { module?: string; prefix?: string }): string {
     let selectable;
     if (column.isVirtual) {
       const entityMetadata = column.referencedColumn ? column.referencedColumn.entityMetadata : column.entityMetadata;
@@ -182,7 +185,10 @@ export class DBHelper {
     return selectable;
   }
 
-  private static extractSelectableByRelation(relation: RelationMetadata, opts: { module?: string; prefix?: string }) {
+  private static extractSelectableByRelation(
+    relation: RelationMetadata,
+    opts: { module?: string; prefix?: string },
+  ): string {
     let selectable;
     if ((relation.type as any).entityInfo) {
       selectable = ((relation.type as any).entityInfo as EntityMetaInfoOptions).name;
@@ -194,9 +200,9 @@ export class DBHelper {
     return selectable;
   }
 
-  private static loadMetadatas() {
+  private static loadMetadatas(): void {
     if (this.metadatas.length === 0) {
-      getConnection().entityMetadatas.find(metadata => {
+      getConnection().entityMetadatas.forEach(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
           this.metadatas.push(metadata);
         }
@@ -256,7 +262,7 @@ export class DBHelper {
   }
 
   public static getRelationPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.relations.map(r => r.propertyName);
+    return this.repo(entity).metadata.relations.map(relation => relation.propertyName);
   }
 
   public static getColumnNames<Entity>(entity: ObjectType<Entity>): string[] {
@@ -290,12 +296,12 @@ export class DBHelper {
     return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
   }
 
-  public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}) {
+  public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): any[] {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
     const parentEntityInfo: EntityMetaInfoOptions = idx(
       repository,
-      _ => _.metadata.parentEntityMetadata.target.entityInfo,
+      __ => __.metadata.parentEntityMetadata.target.entityInfo,
     ) as any;
 
     const columns = R.compose(
@@ -396,7 +402,7 @@ export class DBHelper {
     relationsStr: string | string[],
     parsedFields: ParsedFields,
     where: string[] | FindOperator<any>[] | null,
-  ) {
+  ): void {
     if (profile === Profile.ids) {
       const relations = relationsStr ? parseListParam(relationsStr) : [];
       queryBuilder.loadAllRelationIds({ relations });
@@ -411,7 +417,7 @@ export class DBHelper {
         .join(',');
       const relations =
         profile === Profile.detail
-          ? repository.metadata.relations.map(r => r.propertyName)
+          ? repository.metadata.relations.map(relation => relation.propertyName)
           : parseListParam(inputRelations);
 
       // 处理条件关联
@@ -456,7 +462,7 @@ export class DBHelper {
     }
   }
 
-  public static wrapNormalWhere(model: string, queryBuilder, normalWhere) {
+  public static wrapNormalWhere(model: string, queryBuilder, normalWhere): void {
     // console.log({ normalWhere });
     normalWhere.forEach(condition => {
       // console.log('condition', condition);
@@ -508,7 +514,7 @@ export class DBHelper {
   public static wrapParsedFields(
     model: string,
     { queryBuilder, parsedFields, primaryKeys }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
-  ) {
+  ): void {
     if (!_.isEmpty(parsedFields.fields)) {
       const primaryKeyColumns = primaryKeys || ['id']; // id for default
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(

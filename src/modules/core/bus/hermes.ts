@@ -9,7 +9,7 @@ import { isBlank, r } from '../../common';
 import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from '../../common/logger';
 import { RedisConfigObject } from '../../providers';
-import { AbstractAuthUser } from '../auth';
+import { AbstractAuthUser } from '../auth/base.entities';
 import { random } from '../helpers';
 import {
   IAsunaAction,

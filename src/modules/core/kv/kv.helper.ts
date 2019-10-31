@@ -7,8 +7,8 @@ import { KeyValuePair, ValueType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');
 
-const castToBoolean = value => value === 'true';
-const isJson = value => {
+const castToBoolean = (value): boolean => value === 'true';
+const isJson = (value): boolean => {
   try {
     JSON.parse(value);
     return true;
@@ -16,7 +16,7 @@ const isJson = value => {
     return false;
   }
 };
-const toJson = value => {
+const toJson = (value): JSON => {
   try {
     return JSON.parse(value);
   } catch (error) {
@@ -58,7 +58,7 @@ export interface KVGroupFieldsValue {
   values: { [key: string]: any };
 }
 
-function recognizeTypeValue(type: string, value: any) {
+function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof typeof ValueType, string] {
   let newType = type;
   let newValue = value;
   if (type) {
@@ -167,7 +167,7 @@ export class KvHelper {
       ...(key ? { key } : null),
     }).then(
       fp.map(item => {
-        // logger.log(`transform ${r(item)}`);
+        // eslint-disable-next-line no-param-reassign
         [, item.value] = recognizeTypeValue(item.type, item.value);
         return item;
       }),

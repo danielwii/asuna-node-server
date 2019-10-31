@@ -21,7 +21,7 @@ const logger = LoggerFactory.getLogger('AuthModule');
       secretOrPrivateKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
       signOptions: { expiresIn: 60 * 60 * 24 * 30 },
     }),
-  ],*/
+  ], */
   imports: [KvModule, DBModule, TokenModule],
   providers: [AuthService, AdminAuthService, JwtStrategy, AdminJwtStrategy, ApiKeyStrategy],
   controllers: [AdminAuthController],
@@ -30,12 +30,13 @@ const logger = LoggerFactory.getLogger('AuthModule');
 export class AuthModule implements NestModule, OnModuleInit {
   constructor(private readonly adminAuthService: AdminAuthService) {}
 
-  public configure(consumer: MiddlewareConsumer): void {
+  // eslint-disable-next-line class-methods-use-this
+  configure(consumer: MiddlewareConsumer): void {
     logger.log('configure...');
     consumer.apply(AdminAuthMiddleware.forRoutes('/admin', '/rest')).forRoutes('*');
   }
 
-  public onModuleInit(): any {
+  onModuleInit(): any {
     logger.log('init...');
     return this.adminAuthService.initSysAccount();
   }

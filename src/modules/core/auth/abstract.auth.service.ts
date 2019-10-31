@@ -16,13 +16,14 @@ const logger = LoggerFactory.getLogger('AbstractAuthService');
 export abstract class AbstractAuthService {
   protected readonly cryptor = new Cryptor();
 
+  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
   protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
 
-  encrypt(password: string) {
+  encrypt(password: string): { hash: string; salt: string } {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  passwordVerify(password: string, user: AbstractAuthUser) {
+  passwordVerify(password: string, user: AbstractAuthUser): boolean {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 
@@ -78,7 +79,7 @@ export abstract class AbstractAuthService {
 
   public getUser(
     identifier: { email?: string; username?: string },
-    isActive: boolean = true,
+    isActive = true,
     options?: FindOneOptions<AbstractAuthUser>,
   ): Promise<AbstractAuthUser> {
     return this.userRepository.findOne(
@@ -93,7 +94,7 @@ export abstract class AbstractAuthService {
 
   public getUserWithPassword(
     identifier: { email?: string; username?: string },
-    isActive: boolean = true,
+    isActive = true,
   ): Promise<AbstractAuthUser> {
     return this.userRepository.findOne(
       {

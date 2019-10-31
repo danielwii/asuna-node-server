@@ -1,7 +1,8 @@
-import { Args, Info, Query, Resolver } from '@nestjs/graphql';
-import { GraphQLResolveInfo } from 'graphql';
-import { emptyPage, Pageable, toPage } from '../core';
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @typescript-eslint/camelcase */
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { LoggerFactory } from '../common/logger';
+import { emptyPage, Pageable, toPage } from '../core';
 import { PageRequestInput } from '../graphql';
 import { AppInfo, AppRelease } from './app.entities';
 
@@ -15,7 +16,7 @@ export class AppQueryResolver {
     @Args({ name: 'pageRequest', type: () => PageRequestInput }) pageRequest,
     // @Context() ctx: GraphqlContext<GetDataLoaders>,
     // @Context('getDataLoaders') getDataLoaders,
-    @Info() info: GraphQLResolveInfo,
+    // @Info() info: GraphQLResolveInfo,
   ): Promise<Pageable<AppRelease>> {
     this.logger.log(`app_releases: ${JSON.stringify({ key, pageRequest })}`);
     const pageInfo = toPage(pageRequest);

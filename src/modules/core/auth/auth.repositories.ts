@@ -3,7 +3,7 @@ import { Role } from './auth.entities';
 
 @EntityRepository(Role)
 export class RoleRepository extends Repository<Role> {
-  findByNames(names: string[]) {
+  findByNames(names: string[]): Promise<Role[]> {
     return this.createQueryBuilder('role')
       .where('role.name IN (:names)', { names })
       .getMany();

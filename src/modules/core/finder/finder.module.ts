@@ -17,10 +17,11 @@ export class FinderModule implements OnModuleInit {
   public async onModuleInit(): Promise<void> {
     logger.log('init...');
 
-    this.initKV().catch(reason => logger.warn(reason));
+    this.initKV();
   }
 
-  async initKV() {
+  // eslint-disable-next-line class-methods-use-this
+  async initKV(): Promise<void> {
     const assetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     const assetsInternalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
 
@@ -52,6 +53,6 @@ export class FinderModule implements OnModuleInit {
         },
         values: {},
       } as KVGroupFieldsValue,
-    }).catch(reason => logger.warn(reason));
+    }).catch(error => logger.warn(error));
   }
 }

@@ -1,4 +1,4 @@
-import { AbstractAuthUser } from '../auth';
+import { AbstractAuthUser } from '../auth/base.entities';
 
 export interface IAsunaObserver {
   source: string;

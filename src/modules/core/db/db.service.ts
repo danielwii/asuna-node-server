@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable class-methods-use-this */
 import { getConnection, getRepository, Repository } from 'typeorm';
 import { Profile, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
@@ -27,15 +29,7 @@ export class DBService {
     const queryBuilder = repository.createQueryBuilder(opts.entity);
 
     DBHelper.wrapParsedFields(opts.entity, { queryBuilder, parsedFields });
-    DBHelper.wrapProfile(
-      opts.entity,
-      queryBuilder,
-      repository,
-      opts.profile,
-      opts.relationsStr,
-      parsedFields,
-      null,
-    );
+    DBHelper.wrapProfile(opts.entity, queryBuilder, repository, opts.profile, opts.relationsStr, parsedFields, null);
 
     queryBuilder.whereInIds(opts.id);
 

@@ -8,7 +8,8 @@ const logger = LoggerFactory.getLogger('AppModule');
   providers: [AppQueryResolver],
 })
 export class AppModule implements OnModuleInit {
-  onModuleInit(): any {
+  // eslint-disable-next-line class-methods-use-this
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

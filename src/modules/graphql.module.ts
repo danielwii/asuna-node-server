@@ -49,7 +49,7 @@ export class GraphqlModule implements OnModuleInit {
             getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),
           }),
           tracing: AsunaContext.isDebugMode,
-          /*      extensions: _.compact([
+          /*          extensions: _.compact([
             configLoader.loadConfig(ConfigKeys.TRACING)
               ? () =>
                   new OpenTracingExtension({
@@ -59,7 +59,7 @@ export class GraphqlModule implements OnModuleInit {
                     shouldTraceFieldResolver: (source, args, context, info) => true,
                   }) as any
               : undefined,
-          ]),*/
+          ]), */
           formatResponse: response => {
             if (response.errors) {
               logger.warn(`response: ${r(response.errors)}`);
@@ -78,7 +78,8 @@ export class GraphqlModule implements OnModuleInit {
     };
   }
 
-  onModuleInit() {
+  // eslint-disable-next-line class-methods-use-this
+  onModuleInit(): void {
     logger.log('init...');
   }
 }
