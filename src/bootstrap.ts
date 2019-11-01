@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable global-require,@typescript-eslint/no-var-requires */
 import { ValidationPipe } from '@nestjs/common';
-import { NestApplication, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
@@ -13,6 +13,7 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
+import { ConnectionHelper } from './connection.helper';
 import { AnyExceptionFilter, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
@@ -48,7 +49,7 @@ export interface BootstrapOptions {
   renamer?: { from: string; to: string }[];
 }
 
-export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<any> {
+export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
 
@@ -84,10 +85,11 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // --------------------------------------------------------------
 
   const beforeSyncDB = Date.now();
-  logger.log('sync db ...');
   const connection = app.get<Connection>(Connection);
-  const queryRunner = connection.createQueryRunner();
+  ConnectionHelper._.connection = connection;
 
+  logger.log('sync db ...');
+  const queryRunner = connection.createQueryRunner();
   await Promise.all(
     _.map(
       _.compact(
@@ -108,7 +110,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
       },
     ),
   );
-
   await connection.synchronize();
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
@@ -207,10 +208,7 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
     `${resolve(rootDir)}/**/*entities.ts`,
     ...(options.typeormEntities || []),
   ];
-  const subscribers = [
-    `${resolve(packageDir)}/**/*subscriber.${suffix}`,
-    `${resolve(rootDir)}/**/*subscriber.ts`,
-  ];
+  const subscribers = [`${resolve(packageDir)}/**/*subscriber.${suffix}`, `${resolve(rootDir)}/**/*subscriber.ts`];
   logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);

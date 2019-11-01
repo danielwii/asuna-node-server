@@ -123,11 +123,11 @@ export class AsunaContext {
     return join(this.uploadPath, '../', fullpath);
   }
 
-  get defaultModulePrefix() {
+  get defaultModulePrefix(): string {
     return this.opts.defaultModulePrefix || 'www';
   }
 
-  static get isDebugMode() {
+  static get isDebugMode(): boolean {
     return configLoader.loadConfig(ConfigKeys.DEBUG);
   }
 }

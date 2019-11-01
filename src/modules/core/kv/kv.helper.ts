@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { getConnectionManager } from 'typeorm';
+import { ConnectionHelper } from '../../../connection.helper';
 import { r, ValidationException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { KeyValuePair, ValueType } from './kv.entities';
@@ -89,7 +90,6 @@ export const AsunaCollections = {
   SYSTEM_SERVER: 'system.server',
 };
 
-@Injectable()
 export class KvHelper {
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
@@ -162,6 +162,22 @@ export class KvHelper {
   }
 
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
+    // fixme cannot get connection sometimes...
+    if (_.isEmpty(getConnectionManager().connections)) {
+      return ConnectionHelper._.connection
+        .getRepository(KeyValuePair)
+        .find({
+          collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
+          ...(key ? { key } : null),
+        })
+        .then(
+          fp.map(item => {
+            // eslint-disable-next-line no-param-reassign
+            [, item.value] = recognizeTypeValue(item.type, item.value);
+            return item;
+          }),
+        );
+    }
     return KeyValuePair.find({
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
       ...(key ? { key } : null),

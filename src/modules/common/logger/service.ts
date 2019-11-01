@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable max-classes-per-file */
 import { Logger } from '@nestjs/common';
 import * as clc from 'cli-color';
 import * as winston from 'winston';
@@ -38,7 +40,7 @@ export class SimpleLoggerService extends Logger {
 
   error(message: any, trace?: string, context?: string): any {
     if (levels[LoggerConfigObject.lv(context)] <= levels.error) return;
-    super.error(message, trace, context);
+    super.error(typeof message === 'object' ? r(message) : message, trace, context);
   }
 
   log(message: any, context?: string): any {
@@ -131,7 +133,7 @@ export class WinstonLoggerService {
         }
         const ctx = meta.context || this.context || null;
         if (ctx) {
-          const module = fixedPath(ctx, 26).substr(0, 26);
+          const module = fixedPath(ctx, 26).slice(0, 26);
           context = clc.blackBright(`[${module}]`).padEnd(38);
         }
       }
