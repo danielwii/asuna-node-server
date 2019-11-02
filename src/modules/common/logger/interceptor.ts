@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { r } from '../helpers';
+import { r } from '../helpers/utils';
 import { LoggerFactory } from './factory';
 
 export class ControllerLoggerInterceptor implements NestInterceptor {

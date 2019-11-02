@@ -13,7 +13,6 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
-import { ConnectionHelper } from './connection.helper';
 import { AnyExceptionFilter, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
@@ -86,7 +85,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const beforeSyncDB = Date.now();
   const connection = app.get<Connection>(Connection);
-  ConnectionHelper._.connection = connection;
 
   logger.log('sync db ...');
   const queryRunner = connection.createQueryRunner();
