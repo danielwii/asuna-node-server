@@ -105,7 +105,7 @@ export class GraphqlHelper {
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const count = await entityRepo.count({ where });
-      const skip = Math.floor(Math.random() * (count - query.random));
+      const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
         await this.resolveFindOptions<Entity>({
           cls,
