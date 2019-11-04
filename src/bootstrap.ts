@@ -108,7 +108,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
       },
     ),
   );
+  await connection.query('SET FOREIGN_KEY_CHECKS=0');
   await connection.synchronize();
+  await connection.query('SET FOREIGN_KEY_CHECKS=1');
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
   logger.log(`pending migrations: ${await connection.showMigrations()}`);

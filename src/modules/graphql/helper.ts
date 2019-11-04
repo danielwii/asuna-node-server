@@ -76,14 +76,34 @@ export class GraphqlHelper {
         };
   }
 
-  /**
-   * 返回最大不超过 100 个元素
-   * @param cls
-   * @param query
-   * @param where
-   * @param ctx
-   * @param loader
-   */
+  public static async handlePagedDefaultQueryRequest<Entity extends BaseEntity>({
+    cls,
+    query,
+    where,
+    ctx,
+    loader,
+    pageRequest,
+    mapper,
+  }: {
+    cls: ClassType<Entity>;
+    query: QueryConditionInput;
+    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    ctx?: GraphqlContext<any>;
+    loader?: (loaders) => DataLoaderFunction<Entity>;
+    pageRequest: PageRequest;
+    mapper?: (item: any) => any;
+  }): Promise<PageInfo & { items: any[]; total: number }> {
+    const entityRepo = (cls as any) as Repository<Entity>;
+    const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, loader });
+    const total = await entityRepo.count({ where });
+    return this.pagedResult({
+      pageRequest,
+      items,
+      mapper,
+      total,
+    });
+  }
+
   public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
     query,
