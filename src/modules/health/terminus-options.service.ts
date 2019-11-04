@@ -10,6 +10,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import { getConnection } from 'typeorm';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('Terminus');
@@ -31,7 +32,7 @@ export class TerminusOptionsService implements TerminusOptionsFactory {
   }
 
   createTerminusOptions(): TerminusModuleOptions {
-    logger.log(`init with indicators: ${JSON.stringify(TerminusOptionsService.healthIndicators)}`);
+    logger.log(`init with indicators: ${r(TerminusOptionsService.healthIndicators)}`);
     // TODO not secured by admin auth
     const healthEndpoint: TerminusEndpoint = {
       url: '/admin/health',

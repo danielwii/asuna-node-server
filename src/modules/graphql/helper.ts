@@ -33,6 +33,8 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   relationPath?: string;
   timeCondition?: TimeConditionInput;
   cache?: boolean;
+  skip?: number;
+  take?: number;
   order?: {
     [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
   };
@@ -102,15 +104,18 @@ export class GraphqlHelper {
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
-      const top100 = await entityRepo.find(
+      const count = await entityRepo.count({ where });
+      const skip = Math.floor(Math.random() * (count - query.random));
+      const randomIds = await entityRepo.find(
         await this.resolveFindOptions<Entity>({
           cls,
-          pageRequest: { size: 100 },
           select: [primaryKey as any],
           where,
+          skip,
+          take: query.random,
         }),
       );
-      const ids: any[] = _.chain(top100)
+      const ids: any[] = _.chain(randomIds)
         .map(fp.get(primaryKey))
         .shuffle()
         .take(query.random)
