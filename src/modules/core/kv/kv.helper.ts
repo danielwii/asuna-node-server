@@ -120,8 +120,8 @@ export class KvHelper {
       extra: pair.extra,
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    logger.log(`inspect ${r({ pair, collection, key, type, name, value, stringifyValue })}`);
     const exists = await this.get(entity.collection, entity.key);
+    logger.log(`inspect ${r({ pair, collection, key, type, name, value, exists })}`);
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && pair.noUpdate && exists.value) return exists;
 
