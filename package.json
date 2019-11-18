@@ -80,7 +80,7 @@
     "cli-color": "^2.0.0",
     "common-tags": "^1.8.0",
     "compression": "^1.7.4",
-    "dataloader": "^1.4.0",
+    "dataloader": "^2.0.0",
     "date-fns": "^2.7.0",
     "dayjs": "^1.8.17",
     "email-templates": "^6.0.3",
