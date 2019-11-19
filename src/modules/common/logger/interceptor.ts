@@ -9,10 +9,7 @@ import { LoggerFactory } from './factory';
 export class ControllerLoggerInterceptor implements NestInterceptor {
   logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
     const info = {
@@ -34,10 +31,7 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () =>
-          this.logger.debug(
-            `${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`,
-          ),
+        () => this.logger.debug(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
         e => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {

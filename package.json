@@ -22,7 +22,7 @@
     "@types/bull": "^3.10.6",
     "@types/cli-color": "^0.3.29",
     "@types/common-tags": "^1.8.0",
-    "@types/express": "4.17.2",
+    "@types/express": "4.17.0",
     "@types/fs-extra": "^8.0.1",
     "@types/graphql": "^14.5.0",
     "@types/highland": "^2.12.4",
