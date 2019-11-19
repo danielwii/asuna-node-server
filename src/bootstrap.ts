@@ -13,6 +13,7 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
+import { renameTables } from './migrations';
 import { AnyExceptionFilter, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
@@ -89,24 +90,13 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log('sync db ...');
   const queryRunner = connection.createQueryRunner();
   await Promise.all(
-    _.map(
-      _.compact(
-        []
-          .concat(
-            { from: 'content__t_slides', to: 'www__t_slides' },
-            { from: 'content__t_slide_categories', to: 'www__t_slide_categories' },
-            { from: 'www__t_point_exchanges', to: 'property__t_point_exchanges' },
-          )
-          .concat(options.renamer),
-      ),
-      async ({ from, to }) => {
-        const fromTable = await queryRunner.getTable(from);
-        if (fromTable) {
-          logger.log(`rename ${from} -> ${to}`);
-          await queryRunner.renameTable(fromTable, to);
-        }
-      },
-    ),
+    _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
+      const fromTable = await queryRunner.getTable(from);
+      if (fromTable) {
+        logger.log(`rename ${from} -> ${to}`);
+        await queryRunner.renameTable(fromTable, to);
+      }
+    }),
   );
   await connection.query('SET FOREIGN_KEY_CHECKS=0');
   await connection.synchronize();
@@ -155,9 +145,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   if (options.redisMode === 'redis') {
-    app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter')).RedisIoAdapter(app));
+    app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter').RedisIoAdapter)(app));
   } else if (options.redisMode === 'ws') {
-    app.useWebSocketAdapter(new (require('@nestjs/platform-ws')).WsAdapter(app));
+    app.useWebSocketAdapter(new (require('@nestjs/platform-ws').WsAdapter)(app));
   }
 
   // app.use(csurf());
