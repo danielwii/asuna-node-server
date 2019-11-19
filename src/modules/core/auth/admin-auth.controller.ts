@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable class-methods-use-this */
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
@@ -5,14 +7,11 @@ import { UpdateResult } from 'typeorm';
 import { AsunaError, AsunaException, r, SignException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
-import {
-  DeprecateTokenParams,
-  ObtainTokenOpts,
-  OperationTokenHelper,
-  SysTokenServiceName,
-} from '../token';
+import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { AdminAuthService } from './admin-auth.service';
 import { SignDto } from './auth.dto';
+import { AbstractAuthUser } from './base.entities';
+import { AnyAuthRequest } from './helper';
 
 const logger = LoggerFactory.getLogger('AdminAuthController');
 
@@ -24,7 +23,7 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Post('otp')
-  async otp(@Req() request, @Res() res) {
+  async otp(@Req() request, @Res() res): Promise<void> {
     const { user } = request;
     if (!user) {
       return res.status(HttpStatus.I_AM_A_TEAPOT).send();
@@ -68,7 +67,7 @@ export class AdminAuthController extends RestCrudController {
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  async getToken(@Body() signDto: SignDto) {
+  async getToken(@Body() signDto: SignDto): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`getToken() >> ${signDto.email}`);
     const user = await this.adminAuthService.getUserWithPassword({ email: signDto.email }, true);
 
@@ -86,20 +85,21 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Get('authorized')
-  async authorized() {
+  authorized(): void {
     logger.log('Authorized route...');
   }
 
   @Get('current')
-  async current(@Req() request) {
-    const { user } = request;
+  async current(@Req() req: AnyAuthRequest): Promise<AbstractAuthUser> {
+    const { user } = req;
     logger.log(`current... ${r(user)}`);
-    const currentUser = await this.adminAuthService.getUser(user.email, true, {
+    const currentUser = await this.adminAuthService.getUser(user, true, {
       relations: ['roles'],
     });
     if (!currentUser) {
       throw new AsunaException(AsunaError.InsufficientPermissions, `id '${user.id}' not exist.`);
     }
+    logger.log(`current... ${r(currentUser)}`);
     return currentUser;
   }
 }
