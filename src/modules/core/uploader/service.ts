@@ -23,6 +23,7 @@ export class ChunkFileInfo {
   @IsString()
   @Transform(value => _.trim(value))
   readonly chunkname: string;
+
   readonly file: FileInfo;
 
   @IsString()
@@ -99,7 +100,7 @@ export class UploaderService {
     /*
     return this.commandBus.execute(
       new UploadCommand(token, new UploadChunksData(filename, path), 'chunks', opts),
-    );*/
+    ); */
   }
 
   async mergeChunks(token: OperationToken, filename?: string): Promise<RemoteFileInfo> {
@@ -159,8 +160,8 @@ export class UploaderService {
         resolve();
         filepaths.forEach(filepath => {
           logger.log(`remove ${filepath} ...`);
-          fs.remove(filepath).catch(reason =>
-            logger.warn(`remove ${filepath} error: ${r(reason)}`),
+          fs.remove(filepath).catch(error =>
+            logger.warn(`remove ${filepath} error: ${r(error)}`),
           );
         });
       });

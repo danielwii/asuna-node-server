@@ -12,8 +12,8 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
           if (!_.isObject(entity[column])) {
             JSON.parse(entity[column] as any);
           }
-        } catch (e) {
-          logger.error(e);
+        } catch (error) {
+          logger.error(error);
           entity[column] = [] as any;
         }
       } else {
@@ -31,8 +31,8 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
           if (!_.isObject(entity[column])) {
             JSON.parse(entity[column] as any);
           }
-        } catch (e) {
-          logger.error(e);
+        } catch (error) {
+          logger.error(error);
           entity[column] = {} as any;
         }
       } else {
@@ -50,8 +50,8 @@ export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity
           if (!_.isObject(entity[column])) {
             JSON.parse(entity[column] as any);
           }
-        } catch (e) {
-          logger.error(e);
+        } catch (error) {
+          logger.error(error);
           entity[column] = null;
         }
       } else {

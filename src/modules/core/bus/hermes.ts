@@ -11,14 +11,7 @@ import { LoggerFactory } from '../../common/logger';
 import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth/base.entities';
 import { random } from '../helpers';
-import {
-  IAsunaAction,
-  IAsunaCommand,
-  IAsunaEvent,
-  IAsunaJob,
-  IAsunaObserver,
-  IAsunaRule,
-} from './interfaces';
+import { IAsunaAction, IAsunaCommand, IAsunaEvent, IAsunaJob, IAsunaObserver, IAsunaRule } from './interfaces';
 
 const Queue = require('bull');
 
@@ -32,12 +25,19 @@ export const AsunaSystemQueue = {
 
 export class AsunaEvent implements IAsunaEvent {
   payload: any;
+
   source: string;
+
   name: string;
+
   type: string;
+
   createdAt: any;
+
   createdBy: any;
+
   rules: IAsunaRule[];
+
   identifier: any;
 
   constructor(opts: {
@@ -77,6 +77,7 @@ export type CommandResolver = {
 
 export class HermesProcessManager {
   static initialized: boolean;
+
   static queue: InMemoryAsunaQueue;
 
   static start() {
@@ -88,9 +89,7 @@ export class HermesProcessManager {
       Hermes.setupJobProcessor(AsunaSystemQueue.IN_MEMORY_JOB, (job: IAsunaJob) => {
         logger.log(`jobProcessor job: ${r(job)}`);
         if (!job) {
-          throw new Error(
-            `no job received in processor at queue: ${AsunaSystemQueue.IN_MEMORY_JOB}`,
-          );
+          throw new Error(`no job received in processor at queue: ${AsunaSystemQueue.IN_MEMORY_JOB}`);
         }
         return job.process(job.payload);
       });
@@ -141,51 +140,69 @@ export class HermesProcessManager {
 
 export class AsunaDefaultEvent implements IAsunaEvent {
   createdAt: any;
+
   createdBy: any;
+
   name: string;
+
   payload: any;
+
   rules: IAsunaRule[];
+
   source: string;
+
   type: string;
 
-  constructor(
-    name: string,
-    source: string,
-    type: string,
-    data: any,
-    process: (data) => Promise<any>,
-  ) {
+  constructor(name: string, source: string, type: string, data: any, process: (data) => Promise<any>) {
     this.name = name;
     this.rules = [
       new (class implements IAsunaRule {
         actions: IAsunaAction[];
+
         createdAt: any;
+
         createdBy: any;
+
         name: string;
+
         payload: any;
+
         source: string;
+
         type: string;
 
         constructor() {
           this.actions = [
             new (class implements IAsunaAction {
               createdAt: any;
+
               createdBy: any;
+
               jobs: IAsunaJob[];
+
               name: string;
+
               payload: any;
+
               source: string;
+
               type: string;
 
               constructor() {
                 this.jobs = [
                   new (class implements IAsunaJob {
                     createdAt: any;
+
                     createdBy: any;
+
                     name: string;
+
                     payload: any;
+
                     source: string;
+
                     type: string;
+
                     process: (data) => Promise<any>;
 
                     constructor() {
@@ -209,6 +226,7 @@ export class HermesExchange {
   private static _commands: IAsunaCommand[];
 
   private static _resolvers: { [key: string]: CommandResolver } = {};
+
   private static _eventRules: { [key: string]: EventRuleResolver } = {};
 
   static get resolvers() {
@@ -234,12 +252,15 @@ export interface InMemoryAsunaQueue {
 
 export class Hermes {
   private static subject = new Subject<IAsunaEvent>();
+
   private static observers: IAsunaObserver[];
+
   private static initialized: boolean;
 
   private static instance = new Hermes();
 
   private static queues: { [key: string]: AsunaQueue };
+
   private static inMemoryQueues: { [key: string]: InMemoryAsunaQueue };
 
   constructor() {
@@ -357,9 +378,7 @@ export class Hermes {
             // wrap it using Observable.return
             const result = inMemoryQueue.handle(data);
             const isPromise = typeof result.then === 'function';
-            logger.log(
-              `job(${jobId}) call func in defer ... result is ${r(result)} ${typeof result}`,
-            );
+            logger.log(`job(${jobId}) call func in defer ... result is ${r(result)} ${typeof result}`);
             return isPromise
               ? fromPromise<any>(result.then(value => ({ result: value, jobId, data })))
               : result instanceof Observable
@@ -453,9 +472,7 @@ export class Hermes {
     assert(!isBlank(queueName), 'queue name must not be empty');
 
     let queue;
-    queue = queueName.startsWith('IN_MEMORY_')
-      ? this.getInMemoryQueue(queueName)
-      : this.getQueue(queueName);
+    queue = queueName.startsWith('IN_MEMORY_') ? this.getInMemoryQueue(queueName) : this.getQueue(queueName);
     if (!queue) {
       logger.error(`queue(${queueName}) not found`);
       return;
@@ -463,11 +480,7 @@ export class Hermes {
     queue.handle = handle;
   }
 
-  static subscribe(
-    source: string,
-    routePattern: 'fanout' | RegExp,
-    next?: (event: IAsunaEvent) => void,
-  ): void {
+  static subscribe(source: string, routePattern: 'fanout' | RegExp, next?: (event: IAsunaEvent) => void): void {
     logger.log(`subscribe from [${source}] ... total: ${this.observers.length + 1}`);
     this.observers.push({ source, routePattern, next });
     // this.subject.subscribe(observer);

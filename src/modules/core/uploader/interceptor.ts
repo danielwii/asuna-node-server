@@ -14,7 +14,7 @@ export type FastifyUploadedFile = {
   mimetype: string;
   encoding: string;
 };
-export type FastifyUploadedFileRequest = /*FastifyRequest &*/ any & {
+export type FastifyUploadedFileRequest = /* FastifyRequest & */ any & {
   file: FastifyUploadedFile;
   files: FastifyUploadedFile[];
 };

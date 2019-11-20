@@ -11,14 +11,16 @@ export class MQProvider {
   private static _instance: MQProvider = new MQProvider();
 
   private _connection: amqplib.Connection;
+
   private _channel: amqplib.Channel;
+
   private _retryLimit = 10;
 
   private constructor() {}
 
   private async createConnection(): Promise<amqplib.Connection> {
     if (MQProvider.enabled) {
-      const url = MQConfigObject.load().url;
+      const {url} = MQConfigObject.load();
       logger.log(`connecting to ${url}`);
       const connection = await amqplib
         .connect(url)
@@ -31,7 +33,7 @@ export class MQProvider {
 
         setTimeout(
           () =>
-            this.createConnection().catch(reason => {
+            this.createConnection().catch(error => {
               this._retryLimit -= 1;
               logger.error(`reconnect(${10 - this._retryLimit}) to mq error, retry in 10s.`);
             }),

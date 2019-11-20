@@ -12,6 +12,7 @@ const logger = LoggerFactory.getLogger('Uploader');
 
 export class Uploader {
   private asunaQueue: InMemoryAsunaQueue;
+
   private queueName = 'IN_MEMORY_CHUNKED_UPLOAD';
 
   private static instance = new Uploader();
@@ -25,12 +26,14 @@ export class Uploader {
   }
 
   // TODO not implemented
+  // eslint-disable-next-line class-methods-use-this
   private async fileToChunks(file: File, opts: { chunkSize?: number } = {}): Promise<any> {
+    // eslint-disable-next-line no-bitwise
     const chunkSize = _.get(opts, 'chunkSize', (2 * 1024) ^ 2);
     const totalChunks = Math.ceil(file.size / chunkSize);
   }
 
-  static async upload(bucket: string, prefix: string, path: string, filename) {
+  static async upload(bucket: string, prefix: string, path: string, filename): Promise<any> {
     const defaultPort = configLoader.loadConfig(ConfigKeys.PORT, 5000);
     const host = configLoader.loadConfig(
       ConfigKeys.MASTER_ADDRESS,
@@ -56,8 +59,8 @@ export class Uploader {
         headers: { 'content-type': 'multipart/form-data' },
         maxContentLength,
       })
-      .catch(reason => handleAxiosResponseError(endpoint, reason));
+      .catch(error => handleAxiosResponseError(endpoint, error));
   }
 
-  async uploadFolder(dir: string) {}
+  // TODO async uploadFolder(dir: string) {}
 }

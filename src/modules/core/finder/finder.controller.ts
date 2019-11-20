@@ -61,7 +61,7 @@ export class ShortFinderController {
         .toString('ascii')
         .split('.') as any;
       query = Buffer.from(encodedQuery, 'base64').toString('ascii');
-    } catch (e) {
+    } catch (error) {
       throw new AsunaException(AsunaError.BadRequest, 'decode error');
     }
 

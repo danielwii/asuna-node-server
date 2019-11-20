@@ -58,7 +58,7 @@ export async function download(url: string, to: string): Promise<AxiosResponse> 
   });
 }
 
-export function fixedPath(name: string, length: number = 32, pos: number = 0) {
+export function fixedPath(name: string, length = 32, pos = 0) {
   if (name.length > length && name.includes('.')) {
     const next = name.indexOf('.', pos);
     if (next !== -1) {
@@ -87,7 +87,7 @@ export function traverseDir(dir) {
   return dirs;
 }
 
-export function resolveBasename(path: string, withExt: boolean = false) {
+export function resolveBasename(path: string, withExt = false) {
   if (!_.isString(path)) {
     return path;
   }

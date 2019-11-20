@@ -20,14 +20,19 @@ export interface PageRequest {
 
 export class Pageable<T> {
   total: number;
+
   page: number;
+
   size: number;
+
   items: T[];
 }
 
 export class CursorPageable<T> {
   totalCount: number;
+
   pageInfo: CursorPageInfo;
+
   items: T[];
 }
 

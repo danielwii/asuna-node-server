@@ -12,8 +12,8 @@ const logger = LoggerFactory.getLogger('GqlAuthGuard');
 export class GqlAdminAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
-    const res = ctx.getContext().res;
+    const {req} = ctx.getContext();
+    const {res} = ctx.getContext();
     const info = {
       body: req.body,
       query: req.query,
@@ -56,7 +56,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const http = context.switchToHttp();
     return this.jwtAuthenticator(http.getRequest(), http.getResponse());
-  }*/
+  } */
 
   handleRequest(err, user, info) {
     if (err || !user) {
@@ -76,7 +76,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
    */
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
+    const {req} = ctx.getContext();
     const info = {
       body: req.body,
       query: req.query,

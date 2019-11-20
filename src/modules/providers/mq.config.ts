@@ -16,10 +16,13 @@ export const MQConfigKeys = {
 
 export class MQConfigObject {
   enable?: boolean;
+
   url?: string;
 
   host?: string;
+
   port?: number;
+
   username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
@@ -30,7 +33,7 @@ export class MQConfigObject {
     Object.assign(this, plainToClass(MQConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(prefix: string = ''): MQConfigObject {
+  static load(prefix = ''): MQConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
     logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     return new MQConfigObject({
@@ -43,7 +46,7 @@ export class MQConfigObject {
     });
   }
 
-  static loadOr(prefix: string = ''): MQConfigObject | null {
+  static loadOr(prefix = ''): MQConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
     logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);

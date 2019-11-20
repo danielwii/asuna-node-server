@@ -10,12 +10,17 @@ const logger = LoggerFactory.getLogger('EmailController');
 class MailBody {
   @IsArray({ always: false })
   to: string[];
+
   cc: string[];
+
   bcc: string[];
+
   @IsString()
   subject: string;
+
   @IsString()
   content: string;
+
   attachments: any[];
 }
 
@@ -31,8 +36,8 @@ export class EmailController {
     this.mailService
       .send(body)
       .then(value => logger.log(r(value)))
-      .catch(reason => logger.warn(r(reason)));
+      .catch(error => logger.warn(r(error)));
 
-    return;
+    
   }
 }

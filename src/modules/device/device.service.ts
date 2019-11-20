@@ -34,6 +34,7 @@ class DeviceShadow {
 @Injectable()
 export class DeviceService {
   private readonly logger = LoggerFactory.getLogger('DeviceService');
+
   private readonly deviceRepository: Repository<Device>;
 
   constructor(@InjectConnection() private readonly connection: Connection) {

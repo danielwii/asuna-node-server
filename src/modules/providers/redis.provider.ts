@@ -14,8 +14,11 @@ export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })
   @Transform(value => !!value, { toPlainOnly: true })
   client: RedisClient & { getAsync: (any) => Promise<any> };
+
   isEnabled: boolean;
+
   isHealthy: boolean;
+
   redisOptions: RedisOptions;
 }
 
@@ -26,7 +29,7 @@ export class RedisProvider {
 
   constructor() {}
 
-  getRedisClient(prefix: string = '', db: number = 0): RedisClientObject {
+  getRedisClient(prefix = '', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
     if (this.clients && this.clients[key]) {
       return this.clients[key];

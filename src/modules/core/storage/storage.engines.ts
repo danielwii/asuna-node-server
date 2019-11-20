@@ -41,11 +41,18 @@ export class FileInfo {
 }
 
 export class SavedFile extends FileInfo {
-  readonly bucket: string; // default: 'default'
-  readonly region?: string; // default: 'local'
+  readonly bucket: string;
+
+ // default: 'default'
+  readonly region?: string;
+
+ // default: 'local'
   readonly prefix: string;
+
   readonly size?: number;
+
   readonly mode: StorageMode;
+
   // 用于访问的资源地址
   readonly fullpath: string;
 

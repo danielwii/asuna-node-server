@@ -14,7 +14,7 @@ export type AnyAuthRequest<U extends IJwtPayload = IJwtPayload> = Request &
   Partial<{ user: U; identifier: string }>;
 
 export function isAdminAuthRequest(req: Request) {
-  const authorization = req.headers.authorization;
+  const {authorization} = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
 }
 

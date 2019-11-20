@@ -8,15 +8,20 @@ export class SimpleIdGenerator {
   private static startEpoch = 1_546_300_800_000; // 2019/1/1
   // private static startEpoch = 1_514_764_800_000; // 2018/1/1
 
-  private _lastStamp: number = -1;
+  private _lastStamp = -1;
+
   private _sequence = 0;
 
   private readonly _workerId: number;
+
   private readonly workerBits: number = 4;
+
   private readonly sequenceBits: number = 6;
+
   private readonly sequenceMask: number = ~(-1 << this.sequenceBits);
 
   private readonly workerShift: number = this.sequenceBits;
+
   private readonly timestampShift: number = this.workerBits + this.workerShift;
 
   constructor(workerId: number) {

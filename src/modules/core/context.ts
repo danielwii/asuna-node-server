@@ -31,13 +31,19 @@ export class AsunaContext {
   public opts: IAsunaContextOpts;
 
   public readonly dirname: string;
+
   public uploadPath: string;
+
   public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
+
   public videoStorageEngine: IStorageEngine;
+
   public fileStorageEngine: IStorageEngine;
+
   public localStorageEngine: IStorageEngine;
+
   public chunkStorageEngine: IStorageEngine;
 
   private constructor() {
@@ -49,7 +55,7 @@ export class AsunaContext {
     });
     this.initStorageEngine(`${process.cwd()}/uploads`);
     this.tempPath = `${process.cwd()}/temp`;
-    fs.mkdirs(join(this.tempPath)).catch(reason => logger.warn(r(reason)));
+    fs.mkdirs(join(this.tempPath)).catch(error => logger.warn(r(error)));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}) {

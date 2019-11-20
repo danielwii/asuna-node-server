@@ -31,7 +31,7 @@ export class ChunksUploadPayload {
     }
 
     Object.assign(this, plainToClass(ChunksUploadPayload, o, { enableImplicitConversion: true }), {
-      finished: o.finished || Array(o.totalChunks).fill(0),
+      finished: o.finished || new Array(o.totalChunks).fill(0),
     });
   }
 }

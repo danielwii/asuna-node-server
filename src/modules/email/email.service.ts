@@ -14,6 +14,7 @@ const env = process.env.ENV;
 @Injectable()
 export class EmailService {
   private readonly transport: any;
+
   private readonly email: any;
 
   constructor() {

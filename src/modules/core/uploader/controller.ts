@@ -205,8 +205,8 @@ export class UploaderController {
     FilesInterceptor('files', configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3), fileInterceptorOptions),
   )
   async uploader(
-    @Query('bucket') bucket: string = '',
-    @Query('prefix') prefix: string = '',
+    @Query('bucket') bucket = '',
+    @Query('prefix') prefix = '',
     @Query('local') local: string, // 是否使用本地存储
     @Req() req: AnyAuthGuard,
     @UploadedFiles() files,
@@ -214,7 +214,7 @@ export class UploaderController {
     /*
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
-    }*/
+    } */
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
     const results = await this.saveFiles(bucket, prefix, local, files).catch(error => {
       logger.error(r(error));
@@ -231,8 +231,8 @@ export class UploaderController {
   // @UseGuards(AnyAuthGuard)
   @Post('stream')
   async streamUpload(
-    @Query('bucket') bucket: string = '',
-    @Query('prefix') prefix: string = '',
+    @Query('bucket') bucket = '',
+    @Query('prefix') prefix = '',
     @Query('filename') filename: string,
     @Req() req, // : AnyAuthRequest,
   ) {

@@ -17,7 +17,9 @@ const logger = LoggerFactory.getLogger('AuditSubscriber');
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
   private map = new Map();
+
   private auditService: AuditService = new AuditService();
+
   private enabled = configLoader.loadBoolConfig(ConfigKeys.AUDIT, false);
 
   constructor() {
@@ -39,7 +41,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         event.entity,
         null,
       )
-      .catch(reason => logger.warn(r(reason)));
+      .catch(error => logger.warn(r(error)));
   }
 
   async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
@@ -77,7 +79,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
       )
       .then(() => this.map.delete(`${event.entity.name}-${event.entity.id}`))
-      .catch(reason => logger.warn(r(reason)));
+      .catch(error => logger.warn(r(error)));
   }
 
   afterRemove(event: RemoveEvent<any>) {
@@ -95,6 +97,6 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
         null,
       )
-      .catch(reason => logger.warn(r(reason)));
+      .catch(error => logger.warn(r(error)));
   }
 }

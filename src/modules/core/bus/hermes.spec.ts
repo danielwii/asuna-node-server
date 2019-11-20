@@ -18,15 +18,25 @@ describe('Hermes', () => {
   it('simulate user upload command', () => {
     const command = new (class UploadCommand implements IAsunaCommand {
       createdAt: any;
+
       createdBy: any;
-      events: IAsunaEvent[];
-      extra: object;
-      name: string = 'upload portrait';
+
+      events: IAsunaEvent[] = [];
+
+      extra?: object;
+
+      name = 'upload portrait';
+
       payload: any = { filepath: 'somewhere' };
-      service: string = 'user.upload';
-      tracking: object;
-      version: string = 'default/v1alpha';
-      type: string = 'Command';
+
+      service = 'user.upload';
+
+      tracking?: object;
+
+      version = 'default/v1alpha';
+
+      type = 'Command';
+
       user: AbstractAuthUser;
     })();
 
@@ -54,7 +64,7 @@ describe('Hermes', () => {
             rules: IAsunaRule[];
             source: string;
             type: string;
-          })(),*/
+          })(), */
         ];
       },
     });

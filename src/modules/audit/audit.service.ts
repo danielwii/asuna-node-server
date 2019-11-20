@@ -31,8 +31,8 @@ export class AuditService {
           logger.warn(`Not implemented: ${{ type, action }}`);
           return Promise.resolve(null);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     }
   }
 }

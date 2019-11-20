@@ -35,8 +35,8 @@ export class ThumbnailPipe implements PipeTransform {
         logger.log(r({ value, metatype, param, thumbnail }));
         return { opts: thumbnail, param };
       }
-    } catch (e) {
-      logger.warn(r(e));
+    } catch (error) {
+      logger.warn(r(error));
       return { opts: thumbnail, param };
     }
     return {};

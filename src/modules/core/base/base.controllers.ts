@@ -34,8 +34,8 @@ export abstract class RestCrudController {
   @Get(':model')
   async list(
     @Param('model') model: string,
-    @Query('page') page: number = 1,
-    @Query('size') size: number = 10,
+    @Query('page') page = 1,
+    @Query('size') size = 10,
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string | string[],
     @Query('where') whereStr?: string,

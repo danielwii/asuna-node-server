@@ -1,4 +1,4 @@
-/// <reference path="../@types/global.d.ts" />
+import "../@types/global.d";
 
 global.packageDir = __dirname;
 

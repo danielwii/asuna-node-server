@@ -16,15 +16,19 @@ export class QiniuConfigObject {
   static logger = LoggerFactory.getLogger('QiniuConfigObject');
 
   enable: boolean;
+
   // bucket 应该用 scope 来替换，用来明确概念
   bucket: string;
+
   /**
    * 用来和 /uploads/ 后面的路径做匹配
    */
   path: string;
+
   domain: string;
 
   accessKey: string;
+
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
   @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;
@@ -78,11 +82,15 @@ export class MinioConfigObject {
   static logger = LoggerFactory.getLogger('MinioConfigObject');
 
   enable: boolean;
+
   endpoint: string;
+
   port: number;
+
   useSSL: boolean;
 
   accessKey: string;
+
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
   @Transform(value => !!value, { toPlainOnly: true })
   secretKey: string;

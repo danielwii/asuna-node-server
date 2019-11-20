@@ -21,6 +21,7 @@ export class NameDescValue<T = any> {
 
 export class EnumHelper {
   static names = nameValues => _.map(nameValues, fp.get('name'));
+
   static values = nameValues => _.map(nameValues, fp.get('value'));
 }
 
@@ -40,7 +41,7 @@ export function formatTime(nbSeconds, hasHours = true) {
 
   if (hasHours) {
     s = 3600;
-    calc = calc / s;
+    calc /= s;
     time.push(format(Math.floor(calc))); // hour
   }
 

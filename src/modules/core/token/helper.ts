@@ -54,11 +54,13 @@ export class OperationTokenOpts {
   @IsString()
   @Transform(value => _.trim(value))
   readonly service: string;
+
   readonly role: keyof typeof TokenRule;
 
   @IsString()
   @Transform(value => _.trim(value))
   readonly identifier: string;
+
   readonly payload?: object;
 
   readonly type: 'Unlimited' | 'OneTime' | 'MultiTimes' | 'TimeBased' | 'TimeBased';

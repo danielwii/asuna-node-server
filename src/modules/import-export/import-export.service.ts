@@ -14,25 +14,26 @@ export class ImportExportService {
     return DBHelper.repo(modelName);
     // return DBHelper.extractAsunaSchemas(repository,{ module: 'www__', prefix: 't_' });
   }
+
   // 获取字段名称
   private async getSchemas(repository) {
     const schemas = DBHelper.extractAsunaSchemas(repository, { module: '', prefix: 't' });
     const res = [];
     schemas.forEach(value => {
       if (
-        value['name'] !== 'ordinal' &&
-        value['name'] !== 'logoAlt' &&
-        value['name'] !== 'videos' &&
-        value['name'] !== 'coverAlt' &&
-        value['name'] !== 'studentAlt' &&
-        value['name'] !== 'isPublished' &&
-        value['name'] !== 'isFeatured' &&
-        value['name'] !== 'offers' &&
-        value['config']['info'] !== null &&
-        value['config']['info'] !== undefined &&
-        value['config']['info']['type'] !== 'Image' &&
-        value['config']['info']['name'] !== null &&
-        value['config']['info']['name'] !== undefined
+        value.name !== 'ordinal' &&
+        value.name !== 'logoAlt' &&
+        value.name !== 'videos' &&
+        value.name !== 'coverAlt' &&
+        value.name !== 'studentAlt' &&
+        value.name !== 'isPublished' &&
+        value.name !== 'isFeatured' &&
+        value.name !== 'offers' &&
+        value.config.info !== null &&
+        value.config.info !== undefined &&
+        value.config.info.type !== 'Image' &&
+        value.config.info.name !== null &&
+        value.config.info.name !== undefined
       ) {
         res.push(value);
       }
@@ -50,14 +51,14 @@ export class ImportExportService {
     const status = [];
     for (let row = 1; row < jsonArray.length; row += 1) {
       const entity = repository.create();
-      for (let column = 0; column < schemas.length; column += 1) {
-        if (jsonArray[0][column] === schemas[column]['config']['info']['name']) {
-          const keyName = schemas[column]['name'];
+      for (const [column, element] of schemas.entries()) {
+        if (jsonArray[0][column] === element.config.info.name) {
+          const keyName = element.name;
           let value = jsonArray[row][column];
           // 如果是外键关系表，则需要处理外键表数据
-          if (schemas[column]['config']['selectable'] !== undefined) {
-            const tempRepo = await this.getRepository(schemas[column]['config']['selectable']);
-            if (!schemas[column]['config']['many']) {
+          if (element.config.selectable !== undefined) {
+            const tempRepo = await this.getRepository(element.config.selectable);
+            if (!element.config.many) {
               const res = await tempRepo.findOne({ name: jsonArray[row][column] });
               value = res;
             } else {
@@ -103,7 +104,7 @@ export class ImportExportService {
       // 定义 作文档
       SheetNames: ['sheet1'], // 定义表明
       Sheets: {
-        sheet1: Object.assign({}, ss, {}), // 表对象[注意表明]
+        sheet1: { ...ss, }, // 表对象[注意表明]
       },
     };
     const buf = write(workbook, { type: 'buffer', bookType: 'xlsx' });
@@ -117,7 +118,7 @@ export class ImportExportService {
     const json = [];
     schemas.forEach(value => {
       const temp = [];
-      temp[value['config']['info']['name']] = null;
+      temp[value.config.info.name] = null;
       json.push(temp);
     });
     const ss = utils.json_to_sheet(json); // 通过工具将json转表对象
@@ -127,7 +128,7 @@ export class ImportExportService {
       // 定义 作文档
       SheetNames: ['sheet1'], // 定义表明
       Sheets: {
-        sheet1: Object.assign({}, ss, {}), // 表对象[注意表明]
+        sheet1: { ...ss, }, // 表对象[注意表明]
       },
     };
     const buf = write(workbook, { type: 'buffer', bookType: 'xlsx' });

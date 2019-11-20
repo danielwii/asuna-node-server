@@ -15,8 +15,11 @@ export const RedisConfigKeys = {
 
 export class RedisConfigObject {
   host?: string;
+
   port?: number;
+
   db?: number;
+
   enable?: boolean;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
@@ -27,7 +30,7 @@ export class RedisConfigObject {
     Object.assign(this, plainToClass(RedisConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(prefix: string = ''): RedisConfigObject {
+  static load(prefix = ''): RedisConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
     logger.debug(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     return new RedisConfigObject({
@@ -39,7 +42,7 @@ export class RedisConfigObject {
     });
   }
 
-  static loadOr(prefix: string = ''): RedisConfigObject | null {
+  static loadOr(prefix = ''): RedisConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
     logger.debug(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);

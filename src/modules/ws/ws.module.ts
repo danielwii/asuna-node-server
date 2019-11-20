@@ -9,7 +9,8 @@ const logger = LoggerFactory.getLogger('WSModule');
   providers: [SocketIOGateway, WSGateway],
 })
 export class WSModule implements OnModuleInit {
-  public onModuleInit() {
+  // eslint-disable-next-line class-methods-use-this
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

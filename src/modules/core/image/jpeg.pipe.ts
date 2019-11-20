@@ -34,8 +34,8 @@ export class JpegPipe implements PipeTransform {
         logger.log(r({ value, metatype, param, params, jpegParam }));
         return { opts: jpegParam, param };
       }
-    } catch (e) {
-      logger.warn(r(e));
+    } catch (error) {
+      logger.warn(r(error));
       return { opts: jpegParam, param };
     }
     return {}; // for default

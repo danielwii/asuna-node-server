@@ -23,6 +23,7 @@ const logger = LoggerFactory.getLogger('SocketIOGateway');
 export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
+
   private readonly timestamp = Date.now();
 
   @SubscribeMessage('events')

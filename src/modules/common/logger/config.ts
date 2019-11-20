@@ -8,6 +8,7 @@ export type LogLevel = 'info' | 'debug' | 'verbose' | 'warn' | 'error';
 
 export class LoggerConfigObject {
   readonly level: LogLevel;
+
   readonly modules?: { [key: string]: LogLevel };
 
   constructor(o: LoggerConfigObject) {

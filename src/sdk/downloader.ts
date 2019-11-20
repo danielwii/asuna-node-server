@@ -16,5 +16,5 @@ export function fetchFile(url: string, to: string): Promise<any> {
   const fixedPath = join('/', url).replace(/^\/+/, '/');
   const endpoint = `${host}${fixedPath}?internal=1`;
   logger.log(`fetch file: ${r({ endpoint, url, to })}`);
-  return download(endpoint, to).catch(reason => handleAxiosResponseError(endpoint, reason));
+  return download(endpoint, to).catch(error => handleAxiosResponseError(endpoint, error));
 }

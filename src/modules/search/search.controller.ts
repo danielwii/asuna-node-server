@@ -22,8 +22,8 @@ export class SearchController {
   async search(
     @Param('model') model: string,
     @Query('keywords') keywords: string,
-    @Query('page') page: number = 1,
-    @Query('size') size: number = 10,
+    @Query('page') page = 1,
+    @Query('size') size = 10,
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string | string[],
     @Query('on') onFields?: string | string[],
