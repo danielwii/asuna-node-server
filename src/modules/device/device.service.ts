@@ -10,11 +10,11 @@ const cacheLogger = LoggerFactory.getLogger('cache');
 
 const cache = new LRU({
   max: 2000,
-  length: (n, key) => {
+  length: (n: any, key: string) => {
     cacheLogger.log(`calc length ${JSON.stringify({ n, key, length: n * 2 + key.length })}`);
     return n * 2 + key.length;
   },
-  dispose: (key, n) => {
+  dispose: (key: string, n: any) => {
     cacheLogger.log(`dispose ${JSON.stringify({ n, key })}`);
     return n.close();
   },
