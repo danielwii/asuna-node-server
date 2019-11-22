@@ -31,9 +31,9 @@ export class MQProvider {
 
         setTimeout(
           () =>
-            this.createConnection().catch(error => {
+            this.createConnection().catch(() => {
               this._retryLimit -= 1;
-              logger.error(`reconnect(${10 - this._retryLimit}) to mq error, retry in 10s. ${r(error)}`);
+              logger.error(`reconnect(${10 - this._retryLimit}) to mq error, retry in 10s.`);
             }),
           10000,
         );
