@@ -171,4 +171,26 @@ export class KvHelper {
       }),
     );
   }
+
+  static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<number> {
+    const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+    return field ? ((field.value || field.field.defaultValue) as number) : null;
+  }
+
+  private static async getGroupFieldsValueByFieldKV(
+    kvDef: { collection: string; key: string },
+    fieldKey: string,
+  ): Promise<{ field: KVField; value: number }> {
+    const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef.collection, kvDef.key)).value;
+    return {
+      value: fields.values[fieldKey],
+      field: _.get(
+        _.chain(fields.form)
+          .flatMap(fieldGroup => fieldGroup.fields)
+          .find(fieldDef => fieldDef.field.name === fieldKey)
+          .value(),
+        'field',
+      ),
+    };
+  }
 }

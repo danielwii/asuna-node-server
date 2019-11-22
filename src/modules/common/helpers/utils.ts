@@ -29,11 +29,7 @@ export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: b
 function applyMixins(derivedCtor: any, baseCtors: any[]): void {
   baseCtors.forEach(baseCtor => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
-      Object.defineProperty(
-        derivedCtor.prototype,
-        name,
-        Object.getOwnPropertyDescriptor(baseCtor.prototype, name),
-      );
+      Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
     });
   });
 }
@@ -92,4 +88,11 @@ export function resolveBasename(path: string, withExt = false) {
     return path;
   }
   return withExt ? basename(path) : basename(path).replace(/\.[^/.]+$/, '');
+}
+
+/**
+ * 在一个区间内取值，num 大于 max 时返回 max，num 小于 max 时返回 min
+ */
+export function numberInterval(min, max, num) {
+  return _.max([_.min([max, num]), min]);
 }

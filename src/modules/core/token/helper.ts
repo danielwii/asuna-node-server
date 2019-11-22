@@ -102,9 +102,7 @@ export class OperationTokenHelper {
       await OperationTokenHelper.redeemTokens({ key, role, identifier, service }),
     );
     logger.log(`found token: ${r(existToken)}`);
-    if (existToken) {
-      return existToken;
-    }
+    if (existToken) return existToken;
 
     const token = random(32);
 
