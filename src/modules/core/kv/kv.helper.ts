@@ -174,7 +174,7 @@ export class KvHelper {
 
   static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<number> {
     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    return field ? ((field.value || field.field.defaultValue) as number) : null;
+    return field ? ((field.value || _.get(field, 'field.defaultValue')) as number) : null;
   }
 
   private static async getGroupFieldsValueByFieldKV(
