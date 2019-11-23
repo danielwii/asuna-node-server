@@ -40,7 +40,11 @@ export class AuthService extends AbstractAuthService {
     );
   }
 
-  async createUser(username: string, email: string, password: string): Promise<AbstractAuthUser> {
+  async createUser<U extends AbstractAuthUser = AbstractAuthUser>(
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<U> {
     const { hash, salt } = this.encrypt(password);
 
     const user = await this.getUser({ email, username });
@@ -53,7 +57,7 @@ export class AuthService extends AbstractAuthService {
       .save(this.userRepository.create({ email, username, isActive: true, password: hash, salt }))
       .then(result => {
         Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, result);
-        return this.userRepository.findOne(result.id);
+        return this.userRepository.findOne(result.id) as any;
       });
   }
 }

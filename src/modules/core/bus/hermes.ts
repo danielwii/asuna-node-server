@@ -44,9 +44,9 @@ export class AsunaEvent implements IAsunaEvent {
     payload: any;
     source: string;
     name: string;
-    type: any;
-    user: AbstractAuthUser;
-    identifier: any;
+    type?: any;
+    user?: AbstractAuthUser;
+    identifier?: any;
   }) {
     this.payload = opts.payload;
     this.source = opts.source;
