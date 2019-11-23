@@ -40,7 +40,7 @@ export class AdminUserIdentifier implements Identifier<AdminUser> {
 }
 
 export class UserIdentifierHelper implements IdentifierHelper<Partial<AbstractAuthUser>> {
-  parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: +identifier.slice(1) });
+  parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: +identifier.split('=')[1] });
 
   stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
 }
