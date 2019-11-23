@@ -1,4 +1,4 @@
-import { plainToClass, Transform } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -36,7 +36,8 @@ export type ObtainTokenOpts = (
   | { type: 'OneTime' }
   | { type: 'MultiTimes'; remainingCount: number }
   | { type: 'TimeBased'; expiredAt: Date }
-  | { type: 'TimeBased'; expiredInMinutes: number }) &
+  | { type: 'TimeBased'; expiredInMinutes: number }
+) &
   CommonTokenOpts;
 
 export type RedeemTokenOpts = {
@@ -93,14 +94,14 @@ export type DeprecateTokenParams = {
 };
 
 export class OperationTokenHelper {
+  static resolver: { [key: string]: ({ identifier, user }) => Promise<OperationToken> } = {};
+
   /**
    * same { role, identifier, service } will return same token
    */
   static async obtainToken(opts: ObtainTokenOpts): Promise<OperationToken> {
     const { key, role, identifier, service, type, payload } = opts;
-    const existToken = _.first(
-      await OperationTokenHelper.redeemTokens({ key, role, identifier, service }),
-    );
+    const existToken = _.first(await OperationTokenHelper.redeemTokens({ key, role, identifier, service }));
     logger.log(`found token: ${r(existToken)}`);
     if (existToken) return existToken;
 
@@ -153,12 +154,7 @@ export class OperationTokenHelper {
    * @param identifier
    * @param service
    */
-  static redeemTokens({
-    key,
-    role,
-    identifier,
-    service,
-  }: RedeemTokenOpts): Promise<OperationToken[]> {
+  static redeemTokens({ key, role, identifier, service }: RedeemTokenOpts): Promise<OperationToken[]> {
     logger.log(`redeem token: ${r({ key, role, identifier, service })}`);
     return OperationToken.find({
       where: {
@@ -174,12 +170,7 @@ export class OperationTokenHelper {
     });
   }
 
-  static async deprecateToken({
-    key,
-    role,
-    identifier,
-    service,
-  }: DeprecateTokenParams): Promise<UpdateResult> {
+  static async deprecateToken({ key, role, identifier, service }: DeprecateTokenParams): Promise<UpdateResult> {
     return OperationToken.update({ key, role, identifier, service }, { isDeprecated: true });
   }
 
@@ -225,12 +216,7 @@ export class OperationTokenHelper {
 
   static async checkAvailable(operationToken: OperationToken): Promise<boolean> {
     // 标记废弃的 token
-    if (
-      !operationToken ||
-      !operationToken.isActive ||
-      operationToken.isExpired ||
-      operationToken.isDeprecated
-    ) {
+    if (!operationToken || !operationToken.isActive || operationToken.isExpired || operationToken.isDeprecated) {
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;

@@ -1,32 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  Req,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  IsDate,
-  IsIn,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-  ValidateIf,
-} from 'class-validator';
+import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
-import { OperationTokenGuard } from './guard';
 import { OperationTokenHelper } from './helper';
 
 export class ObtainOperationTokenDto {
@@ -94,14 +74,19 @@ const logger = LoggerFactory.getLogger('OperationTokenController');
 export class OperationTokenController {
   @UseGuards(AnyAuthGuard)
   @Post()
-  obtain(
-    @Body() dto: ObtainOperationTokenDto,
-    @Req() req: AnyAuthRequest,
-  ): Promise<OperationToken> {
+  obtain(@Body() dto: ObtainOperationTokenDto, @Req() req: AnyAuthRequest): Promise<OperationToken> {
     const { identifier } = req;
     logger.log(`obtain token ${r(dto)}`);
     // TODO conflict validation for different types
     return OperationTokenHelper.obtainToken({ ...dto, role: 'operation', identifier } as any);
+  }
+
+  @UseGuards(AnyAuthGuard)
+  @Post('resolver')
+  obtainByResolver(@Param() key: string, @Req() req: AnyAuthRequest): Promise<OperationToken> {
+    const { identifier, user } = req;
+    logger.log(`obtain token by resolver: ${r(key)}`);
+    return OperationTokenHelper.resolver[key]({ identifier, user });
   }
 
   @UseGuards(AnyAuthGuard)
