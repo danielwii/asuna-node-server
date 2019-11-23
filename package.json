@@ -122,7 +122,6 @@
     "swagger-ui-express": "^4.1.2",
     "typeorm": "^0.2.20",
     "validator": "^12.1.0",
-    "winston": "^3.2.1",
     "xlsx": "^0.15.2"
   }
 }

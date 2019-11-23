@@ -100,6 +100,7 @@ export class OperationTokenHelper {
    * same { role, identifier, service } will return same token
    */
   static async obtainToken(opts: ObtainTokenOpts): Promise<OperationToken> {
+    logger.verbose(`obtain token: ${r(opts)}`);
     const { key, role, identifier, service, type, payload } = opts;
     const existToken = _.first(await OperationTokenHelper.redeemTokens({ key, role, identifier, service }));
     logger.log(`found token: ${r(existToken)}`);

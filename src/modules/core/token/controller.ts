@@ -83,9 +83,12 @@ export class OperationTokenController {
 
   @UseGuards(AnyAuthGuard)
   @Post('resolver')
-  obtainByResolver(@Param() key: string, @Req() req: AnyAuthRequest): Promise<OperationToken> {
+  obtainByResolver(@Query('key') key: string, @Req() req: AnyAuthRequest): Promise<OperationToken> {
     const { identifier, user } = req;
-    logger.log(`obtain token by resolver: ${r(key)}`);
+    logger.log(`obtain token by resolver: ${key}`);
+    if (!OperationTokenHelper.resolver[key]) {
+      throw new AsunaException(AsunaError.Unprocessable, `invalid key for token resolver: ${key}`);
+    }
     return OperationTokenHelper.resolver[key]({ identifier, user });
   }
 
