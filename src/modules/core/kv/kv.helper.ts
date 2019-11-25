@@ -1,3 +1,4 @@
+import { CacheManager } from 'asuna-node-server';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { r, ValidationException } from '../../common';
@@ -173,8 +174,14 @@ export class KvHelper {
   }
 
   static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<any> {
-    const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    return field ? field.value || _.get(field, 'field.defaultValue') : null;
+    return CacheManager.cacheable(
+      { kvDef, fieldKey },
+      async () => {
+        const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+        if (field) return field.value || _.get(field, 'field.defaultValue');
+      },
+      60_000,
+    );
   }
 
   private static async getGroupFieldsValueByFieldKV(

@@ -3,6 +3,7 @@ export * from './admin.module';
 export * from './graphql.module';
 export * from './app';
 export * from './core/bus';
+export * from './cache';
 export * from './client';
 export * from './config';
 export * from './core/db';

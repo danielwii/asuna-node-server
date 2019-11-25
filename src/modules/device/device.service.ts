@@ -2,22 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as LRU from 'lru-cache';
 import { Connection, Repository } from 'typeorm';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 
 import { Device } from './device.entities';
 
-const cacheLogger = LoggerFactory.getLogger('cache');
+const logger = LoggerFactory.getLogger('cache');
 
 const cache = new LRU({
   max: 2000,
-  length: (n: any, key: string) => {
-    cacheLogger.log(`calc length ${JSON.stringify({ n, key, length: n * 2 + key.length })}`);
-    return n * 2 + key.length;
-  },
-  dispose: (key: string, n: any) => {
-    cacheLogger.log(`dispose ${JSON.stringify({ n, key })}`);
-    return n.close();
-  },
   maxAge: 60 * 60 * 1e3,
 });
 

@@ -39,7 +39,7 @@
     "@types/uuid": "^3.4.6",
     "@typescript-eslint/eslint-plugin": "^2.8.0",
     "eslint": "^6.7.1",
-    "eslint-config-airbnb-typescript": "^6.3.0",
+    "eslint-config-airbnb-typescript": "^6.3.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-formatter-pretty": "^3.0.1",
     "eslint-plugin-eslint-comments": "^3.1.2",
