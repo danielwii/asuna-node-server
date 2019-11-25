@@ -79,7 +79,7 @@ export abstract class RestCrudController {
       .skip(query.skip)
       .getMany();
 
-    logger.log({ total, limit: query.take, offset: query.skip, length: items.length });
+    logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
 
     return { query, items, total, page: +page, size: +size };
   }

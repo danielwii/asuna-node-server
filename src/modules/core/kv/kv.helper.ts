@@ -172,15 +172,15 @@ export class KvHelper {
     );
   }
 
-  static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<number> {
+  static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<any> {
     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    return field ? ((field.value || _.get(field, 'field.defaultValue')) as number) : null;
+    return field ? field.value || _.get(field, 'field.defaultValue') : null;
   }
 
   private static async getGroupFieldsValueByFieldKV(
     kvDef: { collection: string; key: string },
     fieldKey: string,
-  ): Promise<{ field: KVField; value: number }> {
+  ): Promise<{ field: KVField; value: any }> {
     const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef.collection, kvDef.key)).value;
     return {
       value: fields.values[fieldKey],

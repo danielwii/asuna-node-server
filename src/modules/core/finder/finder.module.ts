@@ -16,7 +16,6 @@ const logger = LoggerFactory.getLogger('FinderModule');
 export class FinderModule implements OnModuleInit {
   public async onModuleInit(): Promise<void> {
     logger.log('init...');
-
     this.initKV();
   }
 
