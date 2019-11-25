@@ -1,6 +1,6 @@
-import { CacheManager } from 'asuna-node-server';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { CacheManager } from '../../cache';
 import { r, ValidationException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { KeyValuePair, ValueType } from './kv.entities';
