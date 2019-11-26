@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiUseTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { JwtAdminAuthGuard } from '../auth';
 import { KeyValuePair, ValueType } from './kv.entities';
-import { KvHelper } from './kv.helper';
+import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';
 
 const logger = LoggerFactory.getLogger('KvController');
 
@@ -47,10 +48,21 @@ class GetKvPairRequest {
 @ApiUseTags('core')
 @Controller('api')
 export class KvController {
+  @UseGuards(new JwtAdminAuthGuard())
   @Post('kv')
   async set(@Body() kvPair: KvPair) {
     logger.log(`set ${r(kvPair)}`);
     return KvHelper.set(KeyValuePair.create(kvPair));
+  }
+
+  @UseGuards(new JwtAdminAuthGuard())
+  @Post('kv/destroy')
+  async destroy(@Body() kvDef: KvDef) {
+    logger.log(`destroy ${r(kvDef)}`);
+    await KvHelper.delete(kvDef);
+    const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
+    initializer && (await initializer());
+    return null;
   }
 
   @Get('kv')

@@ -1,7 +1,8 @@
+import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { CacheManager } from '../../cache';
-import { r, ValidationException } from '../../common';
+import { deserializeSafely, IdentifierHelper, r, StaticImplements, ValidationException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { KeyValuePair, ValueType } from './kv.entities';
 
@@ -27,7 +28,7 @@ const toJson = (value): JSON => {
 
 export type KVField = {
   name: string;
-  type: 'number' | 'string';
+  type: 'number' | 'string' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
@@ -89,7 +90,30 @@ export const AsunaCollections = {
   SYSTEM_SERVER: 'system.server',
 };
 
+export class KvDef {
+  @IsString()
+  collection: string;
+  @IsString()
+  key: string;
+
+  constructor(o: KvDef) {
+    Object.assign(this, deserializeSafely(KvDef, o));
+  }
+}
+
+@StaticImplements<IdentifierHelper<KvDef>>()
+export class KvDefIdentifierHelper {
+  static parse = (identifier: string): KvDef => ({
+    collection: identifier.split('#')[0],
+    key: identifier.split('#')[1],
+  });
+
+  static stringify = (payload: KvDef): string => `${payload.collection}#${payload.key}`;
+}
+
 export class KvHelper {
+  static initializers: { [key: string]: () => Promise<void> } = {};
+
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
    */
@@ -140,6 +164,13 @@ export class KvHelper {
       value: stringifyValue as any,
     });
     return KeyValuePair.save(entityTo);
+  }
+
+  static async delete(kvDef: KvDef): Promise<void> {
+    const exists = await this.get(kvDef.collection, kvDef.key);
+    if (exists) {
+      await KeyValuePair.delete(kvDef);
+    }
   }
 
   static async get(
