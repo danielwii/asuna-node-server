@@ -4,13 +4,7 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getConnection } from 'typeorm';
 import { Profile } from '../common';
-import {
-  DBHelper,
-  parseListParam,
-  parseNormalWhereAndRelatedFields,
-  parseOrder,
-  parseWhere,
-} from '../core/db';
+import { DBHelper, parseListParam, parseNormalWhereAndRelatedFields, parseOrder, parseWhere } from '../core/db';
 import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('SearchController');
@@ -77,11 +71,7 @@ export class SearchController {
         let innerValue = elementCondition._value;
 
         if (_.isObjectLike(innerValue) && innerValue.toSql) {
-          innerValue = elementCondition._value.toSql(
-            getConnection(),
-            `${field}.id`,
-            elementCondition._value._value,
-          );
+          innerValue = elementCondition._value.toSql(getConnection(), `${field}.id`, elementCondition._value._value);
         } else {
           innerValue = elementCondition.toSql(getConnection(), `${field}.id`, innerValue);
         }
@@ -97,12 +87,7 @@ export class SearchController {
           queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, innerValue);
         }
       } else {
-        queryBuilder.innerJoinAndSelect(
-          `${model}.${field}`,
-          field,
-          `${field}.id = :${field}`,
-          where,
-        );
+        queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, `${field}.id = :${field}`, where);
       }
     });
 
@@ -120,16 +105,15 @@ export class SearchController {
 
     queryBuilder
       .loadAllRelationIds({ relations: relations || [] })
-      .select(select)
+      .select(_.isEmpty(select) ? null : select)
       .where(`(${selectFilter})`, selectParams);
 
     DBHelper.wrapNormalWhere(model, queryBuilder, normalWhere);
 
-    const total = await queryBuilder.getCount();
-    const items = await queryBuilder
+    const [items, total] = await queryBuilder
       .take(query.take)
       .skip(query.skip)
-      .getMany();
+      .getManyAndCount();
 
     return { query, items, total, page: +page, size: +size };
   }
