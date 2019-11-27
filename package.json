@@ -17,10 +17,10 @@
     "check:circular": "npx madge --circular --extensions ts ./"
   },
   "devDependencies": {
-    "@nestjs/testing": "^6.10.1",
+    "@nestjs/testing": "^6.10.2",
     "@types/bluebird": "^3.5.29",
     "@types/bull": "^3.10.6",
-    "@types/cli-color": "^0.3.29",
+    "@types/cli-color": "^0.3.30",
     "@types/common-tags": "^1.8.0",
     "@types/express": "4.17.0",
     "@types/fs-extra": "^8.0.1",
@@ -44,7 +44,7 @@
     "eslint-formatter-pretty": "^3.0.1",
     "eslint-plugin-eslint-comments": "^3.1.2",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jest": "^23.0.4",
+    "eslint-plugin-jest": "^23.0.5",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-unicorn": "^13.0.0",
@@ -57,21 +57,20 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@godaddy/terminus": "^4.2.1",
-    "@nestjs/common": "^6.10.1",
-    "@nestjs/core": "^6.10.1",
+    "@godaddy/terminus": "^4.3.0",
+    "@nestjs/common": "^6.10.2",
+    "@nestjs/core": "^6.10.2",
     "@nestjs/cqrs": "^6.1.0",
     "@nestjs/graphql": "^6.5.3",
     "@nestjs/jwt": "^6.1.1",
     "@nestjs/passport": "^6.1.0",
-    "@nestjs/platform-express": "^6.10.1",
-    "@nestjs/platform-fastify": "^6.10.1",
-    "@nestjs/platform-socket.io": "^6.10.1",
-    "@nestjs/platform-ws": "^6.10.1",
+    "@nestjs/platform-express": "^6.10.2",
+    "@nestjs/platform-socket.io": "^6.10.2",
+    "@nestjs/platform-ws": "^6.10.2",
     "@nestjs/swagger": "^3.1.0",
     "@nestjs/terminus": "^6.5.3",
     "@nestjs/typeorm": "^6.2.0",
-    "@nestjs/websockets": "^6.10.1",
+    "@nestjs/websockets": "^6.10.2",
     "apollo-server-express": "^2.9.12",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
@@ -84,7 +83,7 @@
     "dataloader": "^2.0.0",
     "date-fns": "^2.8.1",
     "dayjs": "^1.8.17",
-    "email-templates": "^6.0.3",
+    "email-templates": "^6.0.4",
     "express": "^4.17.1",
     "express-rate-limit": "^5.0.0",
     "fastify-swagger": "^2.4.0",
@@ -122,6 +121,6 @@
     "swagger-ui-express": "^4.1.2",
     "typeorm": "^0.2.20",
     "validator": "^12.1.0",
-    "xlsx": "^0.15.2"
+    "xlsx": "^0.15.3"
   }
 }
