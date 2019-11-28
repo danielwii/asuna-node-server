@@ -112,7 +112,7 @@ export class KvDefIdentifierHelper {
 }
 
 export class KvHelper {
-  static initializers: { [key: string]: () => Promise<void> } = {};
+  static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
 
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
