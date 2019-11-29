@@ -14,7 +14,7 @@ const logger = LoggerFactory.getLogger('UploaderModule');
   exports: [UploaderService],
 })
 export class UploaderModule implements OnModuleInit {
-  onModuleInit(): any {
+  onModuleInit(): void {
     Hermes.subscribe(UploaderRoot.name, /^commands$/, event => {
       logger.log(r(event));
     });

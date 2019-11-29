@@ -22,14 +22,17 @@ module.exports = {
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'error',
-    'import/no-extraneous-dependencies': [
-      'error',
-      {
-        devDependencies: ['**/*test.ts', '**/*spec.ts'],
-        optionalDependencies: false,
-        peerDependencies: false,
-      },
-    ],
+    'max-classes-per-file': 'off',
+    'lines-between-class-members': 'off',
+    'import/no-extraneous-dependencies': 'off',
+    // 'import/no-extraneous-dependencies': [
+    //   'error',
+    //   {
+    //     devDependencies: ['**/*test.ts', '**/*spec.ts'],
+    //     optionalDependencies: false,
+    //     peerDependencies: false,
+    //   },
+    // ],
     'no-useless-constructor': 'off',
     // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
     // 'react/destructuring-assignment': 'off',
@@ -38,6 +41,7 @@ module.exports = {
     // Use function hoisting to improve code readability
     // 'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     '@typescript-eslint/no-parameter-properties': ['error', { allows: ['private readonly'] }],
+    '@typescript-eslint/camelcase': 'off',
     // Makes no sense to allow type inferrence for expression parameters, but require typing the response
     '@typescript-eslint/explicit-function-return-type': [
       'error',
@@ -49,5 +53,6 @@ module.exports = {
     ],
     // Common abbreviations are known and readable
     'unicorn/prevent-abbreviations': 'off',
+    'unicorn/catch-error-name': 'off',
   },
 };

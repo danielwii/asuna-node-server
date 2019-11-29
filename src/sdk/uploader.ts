@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as querystring from 'querystring';
@@ -33,20 +33,15 @@ export class Uploader {
     const totalChunks = Math.ceil(file.size / chunkSize);
   }
 
-  static async upload(bucket: string, prefix: string, path: string, filename): Promise<any> {
+  static async upload(bucket: string, prefix: string, path: string, filename): Promise<AxiosResponse<any> | string> {
     const defaultPort = configLoader.loadConfig(ConfigKeys.PORT, 5000);
-    const host = configLoader.loadConfig(
-      ConfigKeys.MASTER_ADDRESS,
-      `http://127.0.0.1:${defaultPort}`,
-    );
+    const host = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS, `http://127.0.0.1:${defaultPort}`);
     const endpoint = `${host}/api/v1/uploader/stream`;
 
     const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '2mb');
     const stat = await fs.stat(path);
     const maxContentLength = 1000 * 1000 * +limit.slice(0, -2);
-    logger.log(
-      `upload: ${r({ endpoint, path, bucket, prefix, filename, stat, maxContentLength })}`,
-    );
+    logger.log(`upload: ${r({ endpoint, path, bucket, prefix, filename, stat, maxContentLength })}`);
 
     if (stat.size > maxContentLength) {
       throw new Error(`file size is ${stat.size} large than maxContentLength ${maxContentLength}`);

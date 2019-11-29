@@ -1,25 +1,38 @@
 import axios, { AxiosResponse } from 'axios';
+import { ChildProcess } from 'child_process';
 import { classToPlain } from 'class-transformer';
 import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
-import { basename, dirname, join, resolve } from 'path';
-import { Between } from 'typeorm';
+import * as path from 'path';
+import { Between, FindOperator } from 'typeorm';
 import { inspect } from 'util';
 
 export const isProductionEnv = process.env.NODE_ENV === 'production';
 export const isTestEnv = process.env.NODE_ENV === 'test';
 
-export const AfterDate = (date: Date) => Between(date, addYears(date, 100));
-export const BeforeDate = (date: Date) => Between(subYears(date, 100), date);
+export function AfterDate(date: Date): FindOperator<any> {
+  return Between(date, addYears(date, 100));
+}
 
-export const r = (o: any, { transform, plain }: { transform?: boolean; plain?: boolean } = {}) => {
+export function BeforeDate(date: Date): FindOperator<any> {
+  return Between(subYears(date, 100), date);
+}
+
+export function execAsync(child: ChildProcess): Promise<void> {
+  return new Promise((resolve, reject) => {
+    child.addListener('error', reject);
+    child.addListener('exit', resolve);
+  });
+}
+
+export function r(o: any, { transform, plain }: { transform?: boolean; plain?: boolean } = {}): string {
   if (!_.isObjectLike(o)) {
     return o;
   }
   const value = transform ? classToPlain(o) : o;
   return isProductionEnv || plain ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
-};
+}
 
 /**
  * https://www.typescriptlang.org/docs/handbook/mixins.html
@@ -35,9 +48,9 @@ function applyMixins(derivedCtor: any, baseCtors: any[]): void {
 }
 
 export async function download(url: string, to: string): Promise<AxiosResponse> {
-  fs.ensureDirSync(dirname(to));
-  const path = resolve(to);
-  const writer = fs.createWriteStream(path);
+  fs.ensureDirSync(path.dirname(to));
+  const dir = path.resolve(to);
+  const writer = fs.createWriteStream(dir);
 
   const response = await axios({
     url,
@@ -54,7 +67,7 @@ export async function download(url: string, to: string): Promise<AxiosResponse> 
   });
 }
 
-export function fixedPath(name: string, length = 32, pos = 0) {
+export function fixedPath(name: string, length = 32, pos = 0): string {
   if (name.length > length && name.includes('.')) {
     const next = name.indexOf('.', pos);
     if (next !== -1) {
@@ -70,10 +83,10 @@ export function fixedPath(name: string, length = 32, pos = 0) {
 }
 
 // TODO make only safe dirs can be list
-export function traverseDir(dir) {
+export function traverseDir(dir: string): string[] {
   const dirs = [];
   fs.readdirSync(dir).forEach(file => {
-    const fullPath = join(dir, file);
+    const fullPath = path.join(dir, file);
     if (fs.lstatSync(fullPath).isDirectory()) {
       dirs.push(...traverseDir(fullPath));
     } else {
@@ -83,16 +96,16 @@ export function traverseDir(dir) {
   return dirs;
 }
 
-export function resolveBasename(path: string, withExt = false) {
-  if (!_.isString(path)) {
-    return path;
+export function resolveBasename(dir: string, withExt = false): string {
+  if (!_.isString(dir)) {
+    return dir;
   }
-  return withExt ? basename(path) : basename(path).replace(/\.[^/.]+$/, '');
+  return withExt ? path.basename(dir) : path.basename(dir).replace(/\.[^./]+$/, '');
 }
 
 /**
  * 在一个区间内取值，num 大于 max 时返回 max，num 小于 max 时返回 min
  */
-export function numberInterval(min, max, num) {
+export function numberInterval(min: number, max: number, num: number): number {
   return _.max([_.min([max, num]), min]);
 }

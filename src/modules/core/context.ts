@@ -53,7 +53,9 @@ export class AsunaContext {
       defaultModulePrefix: 'www',
       // root: resolve(__dirname, '../..'),
     });
-    this.initStorageEngine(`${process.cwd()}/uploads`);
+
+    if (configLoader.loadBoolConfig(ConfigKeys.UPLOADER_ENABLE, true))
+      this.initStorageEngine(`${process.cwd()}/uploads`);
     this.tempPath = `${process.cwd()}/temp`;
     fs.mkdirs(join(this.tempPath)).catch(error => logger.warn(r(error)));
   }
@@ -67,7 +69,7 @@ export class AsunaContext {
     };
   }
 
-  initStorageEngine(uploadPath: string) {
+  initStorageEngine(uploadPath: string): void {
     logger.log(`initStorageEngine ${r({ uploadPath })}`);
     this.uploadPath = uploadPath;
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE);

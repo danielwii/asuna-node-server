@@ -1,4 +1,3 @@
-// tslint:disable-next-line:max-line-length
 import { RedisOptions } from '@nestjs/common/interfaces/microservices/microservice-configuration.interface';
 import { RedisClient } from '@nestjs/microservices/external/redis.interface';
 import * as bluebird from 'bluebird';
@@ -16,9 +15,7 @@ export class RedisClientObject {
   client: RedisClient & { getAsync: (any) => Promise<any> };
 
   isEnabled: boolean;
-
   isHealthy: boolean;
-
   redisOptions: RedisOptions;
 }
 
@@ -27,7 +24,7 @@ export class RedisProvider {
 
   public static instance = new RedisProvider();
 
-  constructor() {}
+  private constructor() {}
 
   getRedisClient(prefix = '', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
@@ -37,9 +34,7 @@ export class RedisProvider {
 
     const configObject = RedisConfigObject.loadOr(prefix);
     const redisOptions = configObject.getOptions(db);
-    logger.log(
-      `init redis provider: ${r(configObject, { transform: true })} with ${r({ prefix, db })}`,
-    );
+    logger.log(`init redis provider: ${r(configObject, { transform: true })} with ${r({ prefix, db })}`);
     const redisClientObject = plainToClass(
       RedisClientObject,
       {

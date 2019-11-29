@@ -3,7 +3,7 @@ import { LoggerFactory } from '../modules/common/logger';
 
 const logger = LoggerFactory.getLogger('Helper');
 
-export function handleAxiosResponseError(endpoint: string, reason: any): void {
+export function handleAxiosResponseError(endpoint: string, reason: any): Promise<string> {
   if (reason.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx

@@ -185,10 +185,7 @@ export class KvHelper {
     },
   ): Promise<KeyValuePair> {
     const keyValuePair = (await this.find(collection, key))[0];
-    if (!keyValuePair && defaultPair) {
-      return this.set(defaultPair);
-    }
-    return keyValuePair;
+    return !keyValuePair && defaultPair ? this.set(defaultPair) : keyValuePair;
   }
 
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {

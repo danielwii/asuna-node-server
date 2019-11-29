@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as amqplib from 'amqplib';
+import * as amqp from 'amqplib';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQConfigObject } from './mq.config';
@@ -10,19 +10,19 @@ const logger = LoggerFactory.getLogger('MQProvider');
 export class MQProvider {
   private static _instance: MQProvider = new MQProvider();
 
-  private _connection: amqplib.Connection;
+  private _connectionFuture: amqp.Connection;
 
-  private _channel: amqplib.Channel;
+  private _channel: amqp.Channel;
 
   private _retryLimit = 10;
 
   private constructor() {}
 
-  private async createConnection(): Promise<amqplib.Connection> {
+  private async createConnection(): Promise<amqp.Connection> {
     if (MQProvider.enabled) {
       const { url } = MQConfigObject.load();
       logger.log(`connecting to ${url}`);
-      const connection = await amqplib.connect(url).catch(error => logger.error(`connect to mq error: ${r(error)}`));
+      const connection = await amqp.connect(url).catch(error => logger.error(`connect to mq error: ${r(error)}`));
 
       if (connection == null) {
         if (this._retryLimit < 1) {
@@ -41,9 +41,9 @@ export class MQProvider {
       }
 
       this._retryLimit = 10;
-      this._connection = connection as amqplib.Connection;
+      this._connectionFuture = connection as amqp.Connection;
       logger.log('connection established');
-      return Promise.resolve(this._connection);
+      return Promise.resolve(this._connectionFuture);
     }
 
     logger.error(`mq not enabled: ${MQProvider.enabled}`);
@@ -55,12 +55,12 @@ export class MQProvider {
   }
 
   async send(topic, payload): Promise<boolean> {
-    if (!this._connection) {
-      this._connection = await this.createConnection();
+    if (!this._connectionFuture) {
+      this._connectionFuture = await this.createConnection();
     }
 
     if (!this._channel) {
-      this._channel = await this._connection.createChannel();
+      this._channel = await this._connectionFuture.createChannel();
     }
 
     return this._channel.assertQueue(topic).then(ok => {
@@ -73,9 +73,9 @@ export class MQProvider {
     return MQConfigObject.load().enable;
   }
 
-  get connection(): Promise<amqplib.Connection> {
-    if (this._connection != null) {
-      return Promise.resolve(this._connection);
+  get connectionFuture(): Promise<amqp.Connection> {
+    if (this._connectionFuture != null) {
+      return Promise.resolve(this._connectionFuture);
     }
 
     return this.createConnection();

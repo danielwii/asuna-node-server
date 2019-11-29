@@ -33,12 +33,12 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   ],
   controllers: [
     ApiController,
-    WwwRestController,
     AdminRestController,
     AppRestController,
+    CommandController,
     SearchController,
     UploaderController,
-    CommandController,
+    WwwRestController,
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })
