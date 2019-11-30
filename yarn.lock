@@ -530,7 +530,7 @@
     redis "2.8.0"
     typeorm "0.2.20"
 
-"@nestjs/testing@^6.10.2":
+"@nestjs/testing@^6.10.3":
   version "6.10.3"
   resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.10.3.tgz#61c2bc15aa6f86f531003c5410fad345dd425c36"
   integrity sha512-qnOb8dET+rNgioka55deJnqEj1TxPyQwuWUf1DAk8gL5BrzOK7ZEsYhAS9mENPRJc8UnmhglcPC6IcozJ/mNyQ==
