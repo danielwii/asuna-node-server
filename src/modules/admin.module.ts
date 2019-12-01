@@ -14,6 +14,7 @@ import { SchemaModules } from './graphql/schema.modules';
 import { ImportExportModule } from './import-export/import-export.module';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
 import { SearchController } from './search/search.controller';
+import { TaskController } from './task/task.controller';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -37,6 +38,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AppRestController,
     CommandController,
     SearchController,
+    TaskController,
     UploaderController,
     WwwRestController,
   ],
