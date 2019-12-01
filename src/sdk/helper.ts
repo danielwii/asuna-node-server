@@ -9,10 +9,11 @@ export function handleAxiosResponseError(endpoint: string, reason: any): Promise
     // that falls out of the range of 2xx
     logger.error(
       `Error response for request ${endpoint}: ${r({
-        data: reason.response.data,
+        // data: reason.response.data,
         status: reason.response.status,
         headers: reason.response.headers,
-        message: reason.response.message,
+        // config: reason.config,
+        message: reason.message,
       })}`,
     );
   } else if (reason.request) {
