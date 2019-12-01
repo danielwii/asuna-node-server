@@ -37,4 +37,8 @@ export class TaskHelper {
     logger.log(`invoke ${r(task)}`);
     await this.mq.send(task.channel, task.body).catch(reason => logger.error(`send message to mq error: ${r(reason)}`));
   }
+
+  static search(type: string, service: string, identifier: string): Promise<TaskRecord> {
+    return TaskRecord.findOne({ type, service, identifier });
+  }
 }

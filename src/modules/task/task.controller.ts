@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable class-methods-use-this */
-import { Body, Controller, Param, Post, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
 import { IsDefined, IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../common/logger';
@@ -23,6 +23,15 @@ class CreateTaskDto {
   payload: any;
 }
 
+class SearchTaskDto {
+  @IsString()
+  identifier: string;
+  @IsString()
+  type: string;
+  @IsString()
+  service: string;
+}
+
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('admin/v1/tasks')
 export class TaskController {
@@ -32,6 +41,14 @@ export class TaskController {
     const { identifier } = req;
     logger.log(`create task ${r(body)} by ${identifier}`);
     return TaskHelper.create(identifier, body.id, body.type, body.service, body.channel, body.payload);
+  }
+
+  @UseGuards(new JwtAdminAuthGuard())
+  @Get()
+  async searchTask(@Query() query: SearchTaskDto, @Req() req: AnyAuthRequest): Promise<TaskRecord> {
+    const { identifier } = req;
+    logger.log(`search task ${r(query)} by ${identifier}`);
+    return TaskHelper.search(query.type, query.service, query.identifier);
   }
 
   @UseGuards(new JwtAdminAuthGuard())
