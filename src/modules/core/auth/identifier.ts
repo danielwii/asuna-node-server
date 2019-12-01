@@ -39,15 +39,16 @@ export class AdminUserIdentifier implements Identifier<AdminUser> {
   }
 }
 
-export class UserIdentifierHelper implements IdentifierHelper<Partial<AbstractAuthUser>> {
-  parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: +identifier.split('=')[1] });
+@StaticImplements<IdentifierHelper<Partial<AbstractAuthUser>>>()
+export class UserIdentifierHelper {
+  static parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: +identifier.split('=')[1] });
 
-  stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
+  static stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
 }
 
 @StaticImplements<IdentifierStatic>()
 export class UserIdentifier implements Identifier<AbstractAuthUser> {
-  private readonly helper = new UserIdentifierHelper();
+  private readonly helper = UserIdentifierHelper;
 
   constructor(private readonly o: Partial<AbstractAuthUser>) {}
 

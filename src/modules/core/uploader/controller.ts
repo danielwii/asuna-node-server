@@ -24,10 +24,10 @@ import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger'
 import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { AsunaContext } from '../context';
-import { DocMimeType, FileInfo, ImageMimeType, VideoMimeType } from '../storage';
-import { OperationTokenGuard, OperationTokenRequest } from '../token';
+import { DocMimeType, FileInfo, ImageMimeType, SavedFile, VideoMimeType } from '../storage';
+import { OperationToken, OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
-import { UploaderService } from './service';
+import { RemoteFileInfo, UploaderService } from './service';
 
 const logger = LoggerFactory.getLogger('UploaderController');
 
@@ -92,7 +92,11 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
-  createChunksUploadTask(@Query() query: CreateChunksUploadTaskQuery, @Req() req: AnyAuthRequest) {
+  // eslint-disable-next-line class-methods-use-this
+  createChunksUploadTask(
+    @Query() query: CreateChunksUploadTaskQuery,
+    @Req() req: AnyAuthRequest,
+  ): Promise<OperationToken> {
     const { identifier } = req;
     logger.log(`createChunksUploadTask: ${r(query)}`);
     return UploaderHelper.createChunksUploadTask({ ...query, identifier });
@@ -118,7 +122,7 @@ export class UploaderController {
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
-  ) {
+  ): Promise<RemoteFileInfo> {
     assert(!isBlank(filename), 'filename needed');
     assert(!isBlank(chunk), 'chunk needed');
 
@@ -162,7 +166,7 @@ export class UploaderController {
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
     @UploadedFile() file,
-  ) {
+  ): Promise<RemoteFileInfo> {
     assert(!isBlank(filename), 'filename needed');
     assert(!isBlank(chunk), 'chunk needed');
 
@@ -176,7 +180,10 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  async mergeChunks(@Query('filename') filename: string, @Req() req: AnyAuthRequest & OperationTokenRequest) {
+  async mergeChunks(
+    @Query('filename') filename: string,
+    @Req() req: AnyAuthRequest & OperationTokenRequest,
+  ): Promise<RemoteFileInfo> {
     return this.uploaderService.mergeChunks(req.token, filename);
   }
 
@@ -210,7 +217,7 @@ export class UploaderController {
     @Query('local') local: string, // 是否使用本地存储
     @Req() req: AnyAuthGuard,
     @UploadedFiles() files,
-  ) {
+  ): Promise<SavedFile[]> {
     /*
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
@@ -235,7 +242,7 @@ export class UploaderController {
     @Query('prefix') prefix = '',
     @Query('filename') filename: string,
     @Req() req, // : AnyAuthRequest,
-  ) {
+  ): Promise<SavedFile> {
     const fixedPrefix = join(prefix, dirname(filename));
     const baseFilename = basename(filename);
 
@@ -257,8 +264,8 @@ export class UploaderController {
     const fileInfo = new FileInfo({ filename: baseFilename, path: tempFile });
     // tslint:disable-next-line:max-line-length
     // fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${baseFilename}`;
-    const results = await this.saveFiles(bucket, fixedPrefix, 0, [fileInfo]).catch(error => {
-      logger.error(r(error));
+    const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch(error => {
+      logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
       throw new UploadException(error);
     });
@@ -268,8 +275,8 @@ export class UploaderController {
     return _.first(results);
   }
 
-  private saveFiles(bucket, prefix, local, files: FileInfo[]) {
-    return bluebird.map(files, (file: any) => {
+  private saveFiles(bucket: string, prefix: string, local: string, files: FileInfo[]): Promise<SavedFile[]> {
+    return bluebird.map(files, file => {
       if (local === '1') {
         logger.log(oneLineTrim`
             save file[${file.mimetype}] to local storage 
@@ -279,15 +286,15 @@ export class UploaderController {
       }
 
       if (_.includes(ImageMimeType, file.mimetype)) {
-        logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
         return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(VideoMimeType, file.mimetype)) {
-        logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
         return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(DocMimeType, file.mimetype)) {
-        logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}]...${file.filename}`);
+        logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
         return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       }
       logger.log(oneLineTrim`

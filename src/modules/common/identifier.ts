@@ -1,3 +1,5 @@
+export type PrimaryKey = number | string;
+
 export interface IdentifierHelper<T = object> {
   stringify: (payload: T) => string;
   parse: (identifier: string) => T;

@@ -5,8 +5,9 @@ import { AsunaError, AsunaException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';
+import { UserIdentifier } from './identifier';
 
-export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user: U };
+export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user: U; identifier: string };
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -16,7 +17,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  handleRequest(err, user, info) {
+  handleRequest(err, user, info, context: ExecutionContext) {
+    const req = context.switchToHttp().getRequest<JwtAuthRequest>();
     // JwtAuthGuard.logger.log(`handleRequest ${r({ err, user, info })}`);
     if (err || !user) {
       if (this.opts.anonymousSupport) {
@@ -24,6 +26,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
       throw err || new AsunaException(AsunaError.InsufficientPermissions, 'jwt auth failed', info);
     }
+    req.identifier = new UserIdentifier(user).identifier();
     return user;
   }
 }

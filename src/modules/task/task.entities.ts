@@ -1,8 +1,8 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity } from '../core/base';
 import { jsonType } from '../core/helpers';
 
@@ -33,37 +33,56 @@ export class TaskRecord extends AbstractBaseEntity {
   @IsString()
   @IsNotEmpty()
   @Transform(value => _.trim(value))
+  @MetaInfo({ name: 'type' })
+  @Column({ nullable: false, length: 50, name: 'type' })
+  type: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(value => _.trim(value))
+  @MetaInfo({ name: 'channel' })
+  @Column({ nullable: false, length: 50, name: 'channel' })
+  channel: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Transform(value => _.trim(value))
   @MetaInfo({ name: 'state' })
   @Column({ nullable: false, length: 20, name: 'state' })
   state: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(jsonType(), { nullable: true, name: 'body' })
-  body: any;
+  body: JsonMap;
 
   // --------------------------------------------------------------
   // Relations
   // --------------------------------------------------------------
 
-  @OneToMany(type => TaskEvent, event => event.task)
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => TaskEvent,
+    event => event.task,
+  )
   events: TaskEvent[];
 }
 
 @EntityMetaInfo({ name: 'sys_task_events' })
 @Entity('sys__t_task_events')
 export class TaskEvent extends AbstractBaseEntity {
-  @IsString()
-  @IsOptional()
-  @Transform(value => _.trim(value))
   @MetaInfo({ name: 'message' })
   @Column({ nullable: true, name: 'message' })
   message: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(jsonType(), { nullable: true, name: 'body' })
-  body: any;
+  body: JsonMap;
 
-  @ManyToOne(type => TaskRecord, record => record.events, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    type => TaskRecord,
+    record => record.events,
+    { onDelete: 'CASCADE' },
+  )
   @JoinColumn({ name: 'video_region__id' }) // fixme
   task: TaskRecord;
 }

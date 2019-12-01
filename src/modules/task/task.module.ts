@@ -3,16 +3,9 @@ import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('TaskModule');
 
-@Module({
-  // providers: [UploaderService],
-  // imports: [CqrsModule],
-  // exports: [UploaderService],
-})
+@Module({})
 export class TaskModule implements OnModuleInit {
-  onModuleInit(): any {
+  onModuleInit(): void {
     logger.log('init...');
-    // Hermes.subscribe(TaskModule.name, /^tasks$/, event => {
-    //   logger.log(r(event));
-    // });
   }
 }
