@@ -25,7 +25,6 @@
     "@types/common-tags": "^1.8.0",
     "@types/express": "4.17.0",
     "@types/fs-extra": "^8.0.1",
-    "@types/graphql": "^14.5.0",
     "@types/highland": "^2.12.4",
     "@types/jest": "^24.0.23",
     "@types/lru-cache": "^5.1.0",
