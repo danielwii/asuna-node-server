@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Query, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { r } from '../../common/helpers';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
@@ -45,7 +45,7 @@ class GetKvPairRequest {
   transform?: string;
 }
 
-@ApiUseTags('core')
+@ApiTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api')
 export class KvController {

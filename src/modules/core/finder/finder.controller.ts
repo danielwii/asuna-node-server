@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
@@ -13,7 +13,7 @@ const logger = LoggerFactory.getLogger('FinderController');
  * api/v1/finder?query=des-encoded-base64&useEncrypt=true
  * api/v1/finder?query=`querystring.stringify({name: "default"})`
  */
-@ApiUseTags('core')
+@ApiTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/finder')
 export class FinderController {
@@ -42,7 +42,7 @@ export class FinderController {
 /**
  * f/{base64-encoded-str} encoded-str.encrypted
  */
-@ApiUseTags('core')
+@ApiTags('core')
 @Controller('f')
 export class ShortFinderController {
   @Get(':q')

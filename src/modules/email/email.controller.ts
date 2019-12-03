@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -24,7 +24,7 @@ class MailBody {
   attachments: any[];
 }
 
-@ApiUseTags('core')
+@ApiTags('core')
 @Controller('api/email')
 export class EmailController {
   constructor(private readonly mailService: EmailService) {}
@@ -38,6 +38,6 @@ export class EmailController {
       .then(value => logger.log(r(value)))
       .catch(error => logger.warn(r(error)));
 
-    
+
   }
 }

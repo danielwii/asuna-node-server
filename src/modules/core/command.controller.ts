@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from './auth';
@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('CommandController');
 // TODO TDB...
 export class CommandDTO {}
 
-@ApiUseTags('core')
+@ApiTags('core')
 @Controller('api')
 export class CommandController {
   @UseGuards(AnyAuthGuard)

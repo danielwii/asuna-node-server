@@ -1,6 +1,6 @@
 // tslint:disable:max-line-length
 import { Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { ConfigKeys, configLoader } from '../../config';
@@ -12,7 +12,7 @@ import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 
 const logger = LoggerFactory.getLogger('GetUploadsController');
 
-@ApiUseTags('core')
+@ApiTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('uploads')
 export class GetUploadsController {

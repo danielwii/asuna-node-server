@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
@@ -68,7 +68,7 @@ class GetParams {
 
 const logger = LoggerFactory.getLogger('OperationTokenController');
 
-@ApiUseTags('core')
+@ApiTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/operation-token')
 export class OperationTokenController {

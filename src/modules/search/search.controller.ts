@@ -1,5 +1,5 @@
 import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getConnection } from 'typeorm';
@@ -9,7 +9,7 @@ import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('SearchController');
 
-@ApiUseTags('core')
+@ApiTags('core')
 @Controller('api/search')
 export class SearchController {
   @Get(':model')

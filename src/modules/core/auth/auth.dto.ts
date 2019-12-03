@@ -1,21 +1,21 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import * as _ from 'lodash';
 
 export class ResetPasswordDto {
-  @ApiModelProperty({ type: 'username' })
+  @ApiProperty({ type: 'username' })
   @IsString()
   @Transform(value => _.trim(value))
   readonly username: string;
 
-  @ApiModelProperty({ type: 'email' })
+  @ApiProperty({ type: 'email' })
   @IsEmail()
   @Transform(value => (value ? _.trim(value) : null))
   @IsOptional()
   readonly email?: string;
 
-  @ApiModelProperty({ minLength: 6 })
+  @ApiProperty({ minLength: 6 })
   @IsNotEmpty()
   @MinLength(6)
   readonly password: string;
@@ -25,13 +25,13 @@ export class ResetPasswordDto {
  * for admin auth currently
  */
 export class SignDto {
-  @ApiModelProperty({ type: 'email' })
+  @ApiProperty({ type: 'email' })
   @IsString()
   @Transform(value => _.trim(value))
   @IsNotEmpty()
   readonly email: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   readonly password: string;
 }

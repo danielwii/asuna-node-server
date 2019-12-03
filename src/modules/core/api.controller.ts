@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
@@ -7,7 +7,7 @@ import { KvHelper } from './kv';
 
 const logger = LoggerFactory.getLogger('ApiController');
 
-@ApiUseTags('core')
+@ApiTags('core')
 @Controller('api')
 export class ApiController {
   private readonly appContent = AppContext.instance;

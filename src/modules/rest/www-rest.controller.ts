@@ -1,9 +1,9 @@
 import { Controller } from '@nestjs/common';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { AsunaContext } from '../core';
 import { RestCrudController } from '../core/base/base.controllers';
 
-@ApiUseTags('sys-rest')
+@ApiTags('sys-rest')
 @Controller('rest')
 export class WwwRestController extends RestCrudController {
   constructor() {

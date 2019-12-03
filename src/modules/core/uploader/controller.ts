@@ -1,13 +1,6 @@
 import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import {
-  ApiBearerAuth,
-  ApiConsumes,
-  ApiImplicitFile,
-  ApiImplicitQuery,
-  ApiOperation,
-  ApiUseTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as assert from 'assert';
 import * as bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
@@ -77,7 +70,7 @@ class CreateChunksUploadTaskQuery {
   readonly totalChunks: number = 1;
 }
 
-@ApiUseTags('core')
+@ApiTags('core')
 @UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/uploader')
 export class UploaderController {
@@ -109,9 +102,9 @@ export class UploaderController {
    * @param req
    */
   @ApiBearerAuth()
-  @ApiOperation({ title: 'Stream upload chunked file' })
+  @ApiOperation({ summary: 'Stream upload chunked file' })
   @ApiConsumes('multipart/form-data')
-  @ApiImplicitQuery({
+  @ApiQuery({
     name: 'chunk',
     required: false,
     description: 'chunked upload file index',
@@ -150,10 +143,9 @@ export class UploaderController {
    * @param file
    */
   @ApiBearerAuth()
-  @ApiOperation({ title: 'Chunked upload file' })
+  @ApiOperation({ summary: 'Chunked upload file' })
   @ApiConsumes('multipart/form-data')
-  @ApiImplicitFile({ name: 'file', required: true, description: 'chunked file block' })
-  @ApiImplicitQuery({
+  @ApiQuery({
     name: 'chunk',
     required: false,
     description: 'chunked upload file index',
@@ -196,10 +188,9 @@ export class UploaderController {
    * @param files
    */
   @ApiBearerAuth()
-  @ApiOperation({ title: 'Upload files' })
+  @ApiOperation({ summary: 'Upload files' })
   @ApiConsumes('multipart/form-data')
-  @ApiImplicitFile({ name: 'files', required: true, description: 'List of files' })
-  @ApiImplicitQuery({
+  @ApiQuery({
     name: 'local',
     enum: ['1'],
     required: false,

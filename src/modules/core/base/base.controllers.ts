@@ -1,5 +1,5 @@
 import { Body, Delete, Get, Options, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
-import { ApiImplicitParam } from '@nestjs/swagger';
+import { ApiParam } from '@nestjs/swagger';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
@@ -21,7 +21,7 @@ export abstract class RestCrudController {
     logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
   }
 
-  @ApiImplicitParam({
+  @ApiParam({
     name: 'model',
     description: ['about_us', 'about_us_categories', 'videos', 'video_categories'].join(','),
   })
