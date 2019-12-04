@@ -1,3 +1,4 @@
+import * as util from 'util';
 import { r } from '../modules/common/helpers';
 import { LoggerFactory } from '../modules/common/logger';
 
@@ -25,6 +26,6 @@ export function handleAxiosResponseError(endpoint: string, reason: any): Promise
     // Something happened in setting up the request that triggered an Error
     logger.error(`Error for request ${endpoint} ${reason.message}`);
   }
-  logger.error(`request error: ${r(reason.config)}`);
+  logger.error(`request to ${endpoint} error: ${util.inspect(reason.config)}`);
   throw reason.message;
 }

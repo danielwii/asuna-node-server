@@ -12,9 +12,11 @@ import {
   QiniuStorage,
   StorageMode,
 } from './storage';
+import { UploaderConfig } from './uploader/config';
 
 const logger = LoggerFactory.getLogger('AsunaContext');
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IAsunaContextOpts {
   /**
    * default: app
@@ -60,7 +62,7 @@ export class AsunaContext {
     fs.mkdirs(join(this.tempPath)).catch(error => logger.warn(r(error)));
   }
 
-  setup(opts: Partial<IAsunaContextOpts> = {}) {
+  setup(opts: Partial<IAsunaContextOpts> = {}): void {
     logger.log(`setup ${r(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
@@ -71,6 +73,7 @@ export class AsunaContext {
 
   initStorageEngine(uploadPath: string): void {
     logger.log(`initStorageEngine ${r({ uploadPath })}`);
+    UploaderConfig.uploadPath = uploadPath;
     this.uploadPath = uploadPath;
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE);
     if (imageStorage === StorageMode.QINIU) {

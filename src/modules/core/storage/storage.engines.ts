@@ -43,10 +43,10 @@ export class FileInfo {
 export class SavedFile extends FileInfo {
   readonly bucket: string;
 
- // default: 'default'
+  // default: 'default'
   readonly region?: string;
 
- // default: 'local'
+  // default: 'local'
   readonly prefix: string;
 
   readonly size?: number;
@@ -62,16 +62,14 @@ export class SavedFile extends FileInfo {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IStorageEngine {
   /**
    * 这里会创建一个上传任务，异步执行
    * @param file
    * @param opts
    */
-  saveEntity(
-    file: FileInfo,
-    opts: { bucket?: string; prefix?: string; region?: string },
-  ): Promise<SavedFile>;
+  saveEntity(file: FileInfo, opts: { bucket?: string; prefix?: string; region?: string }): Promise<SavedFile>;
 
   listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]>;
 
@@ -112,7 +110,7 @@ export interface IStorageEngine {
       resolver?: (url: string) => Promise<any>;
     },
     res?: Response,
-  );
+  ): Promise<string>;
 }
 
 export function yearMonthStr(): string {

@@ -31,9 +31,7 @@ export class MinioStorage implements IStorageEngine {
         })}`,
       );
     }
-    MinioStorage.logger.log(
-      `[constructor] init ${r({ configs: classToPlain(this.configObject), opts })}`,
-    );
+    MinioStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject), opts })}`);
     /*
     Hermes.setupJobProcessor(AsunaSystemQueue.UPLOAD, (job: Job) => {
       const { bucket, filenameWithPrefix, file } = job.data;
@@ -94,7 +92,7 @@ export class MinioStorage implements IStorageEngine {
     }) */
   }
 
-  get client() {
+  get client(): minio.Client {
     return new minio.Client({
       endPoint: this.configObject.endpoint,
       port: this.configObject.port,
@@ -104,7 +102,7 @@ export class MinioStorage implements IStorageEngine {
     });
   }
 
-  resolveUrl(
+  async resolveUrl(
     {
       filename,
       bucket,
@@ -118,10 +116,10 @@ export class MinioStorage implements IStorageEngine {
       prefix?: string;
       thumbnailConfig?: { opts: ThumbnailParam; param?: string };
       jpegConfig?: { opts: JpegParam; param?: string };
-      resolver?: (url: string) => Promise<any>;
+      resolver?: (url: string) => Promise<string>;
     },
     res,
-  ) {
+  ): Promise<string> {
     return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 
@@ -187,9 +185,7 @@ export class MinioStorage implements IStorageEngine {
             fs.readdir(parent).then(files => {
               if (files.length === 0) {
                 MinioStorage.logger.log(`no more files in ${parent}, remove it.`);
-                fs.remove(parent).catch(reason =>
-                  MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`),
-                );
+                fs.remove(parent).catch(reason => MinioStorage.logger.warn(`remove ${parent} error: ${r(reason)}`));
               }
             });
           })
@@ -212,11 +208,8 @@ export class MinioStorage implements IStorageEngine {
         // return etag;
       })
       .catch(error => {
-        MinioStorage.logger.error(
-          `[saveEntity] [${filenameWithPrefix}] error: ${error}`,
-          error.trace,
-        );
-        throw new AsunaException(AsunaError.Unprocessable, error);
+        MinioStorage.logger.error(`[saveEntity] [${filenameWithPrefix}] error: ${error}`, error.trace);
+        throw new AsunaException(AsunaError.Unprocessable, `[saveEntity] [${filenameWithPrefix}] error: ${error}`);
       });
     /*
     Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD).next({
@@ -278,9 +271,7 @@ export class MinioStorage implements IStorageEngine {
         MinioStorage.logger.log('bucketStream on end');
         return resolve(
           savedFiles.sort(
-            (a, b) =>
-              +a.filename.slice(a.filename.lastIndexOf('.')) -
-              +b.filename.slice(b.filename.lastIndexOf('.')),
+            (a, b) => +a.filename.slice(a.filename.lastIndexOf('.')) - +b.filename.slice(b.filename.lastIndexOf('.')),
           ),
         );
       });
@@ -294,11 +285,7 @@ export class MinioStorage implements IStorageEngine {
   getEntity(fileInfo: SavedFile, destDirectory?: string): Promise<string> {
     const bucket = fileInfo.bucket || this.defaultBucket;
     const objectName = join(fileInfo.prefix, fileInfo.filename);
-    const filepath = join(
-      destDirectory || AsunaContext.instance.tempPath,
-      fileInfo.bucket,
-      objectName,
-    );
+    const filepath = join(destDirectory || AsunaContext.instance.tempPath, fileInfo.bucket, objectName);
     MinioStorage.logger.log(`get entity from ${r({ bucket, objectName, filepath })}`);
     return this.client.fGetObject(bucket, objectName, filepath).then(() => filepath);
   }
@@ -311,9 +298,9 @@ export class MinioStorage implements IStorageEngine {
     bucket?: string;
     prefix?: string;
     filename?: string;
-  }) {
+  }): Promise<void> {
     const currentBucket = bucket || this.defaultBucket;
-    MinioStorage.logger.log(`remove entities ${r({ bucket, prefix, filename })}`);
+    MinioStorage.logger.log(`remove entities ${r({ bucket, prefix, filename, currentBucket })}`);
     const fileInfos = await this.listEntities({ bucket, prefix: join(prefix, filename) });
     return this.client.removeObjects(
       bucket,

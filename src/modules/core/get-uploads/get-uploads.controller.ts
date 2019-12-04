@@ -3,7 +3,6 @@ import { Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/com
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
-import { ConfigKeys, configLoader } from '../../config';
 import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { FinderHelper } from '../finder';
@@ -17,16 +16,6 @@ const logger = LoggerFactory.getLogger('GetUploadsController');
 @Controller('uploads')
 export class GetUploadsController {
   private context = AsunaContext.instance;
-
-  // TODO not finished yet
-  @Get('options')
-  async getOptions() {
-    return {
-      image: { storage: configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE) },
-      video: { storage: configLoader.loadConfig(ConfigKeys.VIDEOS_STORAGE) },
-      file: { storage: configLoader.loadConfig(ConfigKeys.FILES_STORAGE) },
-    };
-  }
 
   /**
    * 1. /images/2018/4/****.png
@@ -51,14 +40,14 @@ export class GetUploadsController {
     @Query(ThumbnailPipe) thumbnailConfig: ThumbnailPipeOptions,
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     logger.debug(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
     const url = await this.context.defaultStorageEngine.resolveUrl({
       filename,
       bucket,
       thumbnailConfig,
       jpegConfig,
-      resolver: url => FinderHelper.getUrl({ type: 'assets', path: url, internal }),
+      resolver: path => FinderHelper.getUrl({ type: 'assets', path, internal }),
     });
     logger.debug(`resolved url is ${url}`);
     return res.redirect(url);

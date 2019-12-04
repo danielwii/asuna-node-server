@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable class-methods-use-this */
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
 import * as fs from 'fs-extra';
@@ -5,9 +7,9 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import * as sharp from 'sharp';
 import { convertFilename, ErrorException, r } from '../../common';
-import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from '../../common/logger';
-import { AsunaContext } from '../context';
+import { ConfigKeys, configLoader } from '../../config';
+import { UploaderConfig } from '../uploader/config';
 import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class LocalStorage implements IStorageEngine {
@@ -23,15 +25,10 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(oneLineTrim`
       [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
     `);
-    fs.mkdirs(join(this.storagePath, this.bucket)).catch(error =>
-      LocalStorage.logger.warn(r(error)),
-    );
+    fs.mkdirs(join(this.storagePath, this.bucket)).catch(error => LocalStorage.logger.warn(r(error)));
   }
 
-  saveEntity(
-    file: FileInfo,
-    opts: { bucket?: string; prefix?: string; region?: string } = {},
-  ): Promise<SavedFile> {
+  saveEntity(file: FileInfo, opts: { bucket?: string; prefix?: string; region?: string } = {}): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('LocalStorage', 'file must not be null.');
     }
@@ -50,12 +47,7 @@ export class LocalStorage implements IStorageEngine {
         mimetype: file.mimetype,
         mode: StorageMode.LOCAL,
         filename,
-        fullpath: join(
-          configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
-          bucket,
-          prefix,
-          filename,
-        ),
+        fullpath: join(configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'), bucket, prefix, filename),
       }),
     );
   }
@@ -64,9 +56,9 @@ export class LocalStorage implements IStorageEngine {
     throw new Error('Method not implemented.');
   }
 
-  public resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res: Response) {
-    const fullFilePath = join(AsunaContext.instance.uploadPath, bucket, prefix || '', filename);
-    if (!fullFilePath.startsWith(AsunaContext.instance.uploadPath)) {
+  resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res: Response): void {
+    const fullFilePath = join(UploaderConfig.uploadPath, bucket, prefix || '', filename);
+    if (!fullFilePath.startsWith(UploaderConfig.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }
     LocalStorage.logger.log(r({ filename, prefix, bucket, thumbnailConfig, jpegConfig }));
@@ -84,14 +76,17 @@ export class LocalStorage implements IStorageEngine {
 
     if (!['png', 'jpg', 'jpeg'].includes(ext)) {
       if (fs.existsSync(outputPath)) {
-        return res.type(ext).sendFile(fullFilePath);
+        res.type(ext).sendFile(fullFilePath);
+        return;
       }
-      return res.status(404).send();
+      res.status(404).send();
+      return;
     }
 
     LocalStorage.logger.log(`check if ${ext} file outputPath '${outputPath}' exists`);
     if (fs.existsSync(outputPath)) {
-      return res.type(ext).send(fs.createReadStream(outputPath));
+      res.type(ext).send(fs.createReadStream(outputPath));
+      return;
     }
 
     fs.mkdirpSync(fullFileDir);
@@ -107,9 +102,7 @@ export class LocalStorage implements IStorageEngine {
     }
     imageProcess.toFile(outputPath, (err, info) => {
       if (err) {
-        LocalStorage.logger.error(
-          `create outputPath image error ${r({ outputPath, err: err.stack, info })}`,
-        );
+        LocalStorage.logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
         res.status(404).send(err.message);
       } else {
         res.type(ext).sendFile(outputPath);
