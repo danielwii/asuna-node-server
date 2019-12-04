@@ -1,7 +1,12 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable import/no-duplicates */
 import { Injectable } from '@nestjs/common';
 import { oneLine } from 'common-tags';
-import * as Email from 'email-templates';
-import * as nodemailer from 'nodemailer';
+import EmailTemplate from 'email-templates';
+import * as mailer from 'nodemailer';
+import { SentMessageInfo } from 'nodemailer';
+import Mail from 'nodemailer/lib/mailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -13,9 +18,8 @@ const env = process.env.ENV;
 
 @Injectable()
 export class EmailService {
-  private readonly transport: any;
-
-  private readonly email: any;
+  private readonly transporter: Mail;
+  private readonly emailTemplate: EmailTemplate;
 
   constructor() {
     if (
@@ -28,40 +32,39 @@ export class EmailService {
         `set ${r({
           MAIL_HOST: configLoader.loadConfig('MAIL_HOST'),
           MAIL_PORT: configLoader.loadNumericConfig('MAIL_PORT'),
-          MAIL_SSL: `${configLoader.loadConfig('MAIL_SSL')}`,
+          MAIL_SSL: configLoader.loadBoolConfig('MAIL_SSL'),
         })}`,
       );
-      this.transport = nodemailer.createTransport({
+      const transport: SMTPTransport.Options = {
         host: configLoader.loadConfig('MAIL_HOST'),
         port: configLoader.loadNumericConfig('MAIL_PORT'),
-        secure: `${configLoader.loadConfig('MAIL_SSL')}`, // upgrade later with STARTTLS
+        secure: configLoader.loadBoolConfig('MAIL_SSL'), // upgrade later with STARTTLS
         auth: {
           user: configLoader.loadConfig('MAIL_USERNAME'),
           pass: configLoader.loadConfig('MAIL_PASSWORD'),
         },
-      });
+      };
+      this.transporter = mailer.createTransport(transport);
     } else {
       logger.warn(oneLine`
         MAIL_HOST && MAIL_PORT && MAIL_USERNAME && MAIL_PASSWORD
         must be set up to send mail in real world
       `);
-      this.transport = {
-        jsonTransport: true,
-      };
+      this.transporter = mailer.createTransport({ jsonTransport: true });
     }
 
-    this.email = new Email({
+    this.emailTemplate = new EmailTemplate({
       message: {
         from: configLoader.loadConfig('MAIL_FROM') || configLoader.loadConfig('MAIL_USERNAME'),
       },
       preview: false,
       send: true, // will send emails in development/test env
       subjectPrefix: env === 'production' ? false : `[${env.toUpperCase()}] `,
-      transport: this.transport,
+      transport: this.transporter,
     });
   }
 
-  async send({ to, cc, bcc, subject, content, attachments }) {
+  async send({ to, cc, bcc, subject, content, attachments }): Promise<SentMessageInfo> {
     const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
     let domain = '';
     if (storageConfigs.mode === StorageMode.QINIU) {
@@ -70,27 +73,25 @@ export class EmailService {
       // FIXME domain position for attachments may not correct
       domain = (storageConfigs.loader() as MinioConfigObject).endpoint;
     }
-    return this.email.send({
-      message: {
-        to,
-        cc,
-        bcc,
-        subject,
-        attachments: attachments
-          ? attachments.map(attachment => ({
-              filename: attachment.name,
-              path: `${domain}/${attachment.prefix}/${attachment.filename}`,
-            }))
-          : null,
-        ...(content ? { html: content } : null),
-      },
+    return this.transporter.sendMail({
+      to,
+      cc,
+      bcc,
+      subject,
+      attachments: attachments
+        ? attachments.map(attachment => ({
+            filename: attachment.name,
+            path: `${domain}/${attachment.prefix}/${attachment.filename}`,
+          }))
+        : null,
+      ...(content ? { html: content } : null),
     });
   }
 
-  async sendByTemplate(template, data, { to, cc, bcc, subject, content, attachments }) {
+  async sendByTemplate(template, data, { to, cc, bcc, subject, content, attachments }): Promise<any> {
     const templatePath = path.join(__dirname, 'emails', 'hello');
     logger.log(`found template for path: ${templatePath}`);
-    return this.email.send({
+    return this.emailTemplate.send({
       // text: body.content,
       template: templatePath,
       locals: data,
