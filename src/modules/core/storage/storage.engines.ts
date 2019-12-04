@@ -62,6 +62,16 @@ export class SavedFile extends FileInfo {
   }
 }
 
+export type ResolverOpts = {
+  filename: string;
+  bucket: string;
+  prefix?: string;
+  thumbnailConfig?: { opts: ThumbnailParam; param?: string };
+  jpegConfig?: { opts: JpegParam; param?: string };
+  // 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
+  resolver?: (url: string) => Promise<string>;
+};
+
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IStorageEngine {
   /**
@@ -85,32 +95,10 @@ export interface IStorageEngine {
   /**
    * 返回相应的 url，在包含 res 时直接通过 res 返回相应的信息
    * TODO need redesign
-   * @param filename
-   * @param bucket
-   * @param prefix
-   * @param thumbnailConfig
-   * @param jpegConfig
-   * @param resolver 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
-   * @param res
    */
-  resolveUrl(
-    {
-      filename,
-      bucket,
-      prefix,
-      thumbnailConfig,
-      jpegConfig,
-      resolver,
-    }: {
-      filename: string;
-      bucket: string;
-      prefix?: string;
-      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
-      jpegConfig?: { opts: JpegParam; param?: string };
-      resolver?: (url: string) => Promise<any>;
-    },
-    res?: Response,
-  ): Promise<string>;
+  resolveUrl(opts: ResolverOpts): Promise<string>;
+
+  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
 }
 
 export function yearMonthStr(): string {

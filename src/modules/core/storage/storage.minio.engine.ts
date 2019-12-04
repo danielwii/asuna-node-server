@@ -1,5 +1,8 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-dupe-class-members */
 import { classToPlain } from 'class-transformer';
 import { oneLineTrim } from 'common-tags';
+import { Response } from 'express';
 import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
@@ -8,10 +11,8 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AsunaContext } from '../context';
-import { JpegParam } from '../image/jpeg.pipe';
-import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { MinioConfigObject } from './storage.config';
-import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
+import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class MinioStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(MinioStorage.name);
@@ -102,24 +103,12 @@ export class MinioStorage implements IStorageEngine {
     });
   }
 
-  async resolveUrl(
-    {
-      filename,
-      bucket,
-      prefix,
-      thumbnailConfig,
-      jpegConfig,
-      resolver,
-    }: {
-      filename: string;
-      bucket?: string;
-      prefix?: string;
-      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
-      jpegConfig?: { opts: JpegParam; param?: string };
-      resolver?: (url: string) => Promise<string>;
-    },
-    res,
-  ): Promise<string> {
+  resolveUrl(opts: ResolverOpts): Promise<string>;
+  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
+    if (res) throw new AsunaException(AsunaError.Unprocessable, `not implemented.`);
+
+    const { filename, bucket, prefix, thumbnailConfig, jpegConfig, resolver } = opts;
     return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 

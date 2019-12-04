@@ -1,13 +1,14 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-dupe-class-members,class-methods-use-this */
 import { classToPlain } from 'class-transformer';
+import { Response } from 'express';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import { convertFilename, ErrorException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { JpegParam } from '../image/jpeg.pipe';
-import { ThumbnailParam } from '../image/thumbnail.pipe';
 import { QiniuConfigObject } from './storage.config';
-import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
+import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(QiniuStorage.name);
@@ -19,9 +20,7 @@ export class QiniuStorage implements IStorageEngine {
 
   constructor(configure: () => QiniuConfigObject) {
     this.configObject = configure();
-    QiniuStorage.logger.log(
-      `[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`,
-    );
+    QiniuStorage.logger.log(`[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`);
 
     if (this.configObject.enable !== true) {
       throw new Error(
@@ -30,9 +29,7 @@ export class QiniuStorage implements IStorageEngine {
         })}`,
       );
     }
-    QiniuStorage.logger.log(
-      `[constructor] init ${r({ configs: classToPlain(this.configObject) })}`,
-    );
+    QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject) })}`);
 
     // this.temp = fs.mkdtempSync('temp');
     this.mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
@@ -52,12 +49,8 @@ export class QiniuStorage implements IStorageEngine {
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);
       const key = join('/', bucket, filenameWithPrefix).slice(1);
-      QiniuStorage.logger.log(
-        `upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`,
-      );
-      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(
-        this.mac,
-      );
+      QiniuStorage.logger.log(`upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`);
+      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(this.mac);
 
       new qiniu.form_up.FormUploader().putFile(
         uploadToken,
@@ -108,22 +101,10 @@ export class QiniuStorage implements IStorageEngine {
     throw new Error('Method not implemented.');
   }
 
-  public resolveUrl(
-    {
-      filename,
-      bucket,
-      prefix,
-      thumbnailConfig,
-      jpegConfig,
-    }: {
-      filename: string;
-      bucket: string;
-      prefix?: string;
-      thumbnailConfig?: { opts: ThumbnailParam; param?: string };
-      jpegConfig?: { opts: JpegParam; param?: string };
-    },
-    res,
-  ) {
+  resolveUrl(opts: ResolverOpts): Promise<string>;
+  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
+    const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
     QiniuStorage.logger.log(`resolve url by ${r({ bucket, prefix, filename })}`);
     const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
     const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)

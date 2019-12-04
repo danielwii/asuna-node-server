@@ -1,16 +1,16 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable class-methods-use-this */
+/* eslint-disable class-methods-use-this,no-dupe-class-members */
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import { join } from 'path';
 import * as sharp from 'sharp';
-import { convertFilename, ErrorException, r } from '../../common';
+import { AsunaError, AsunaException, convertFilename, ErrorException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { UploaderConfig } from '../uploader/config';
-import { FileInfo, IStorageEngine, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
+import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class LocalStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(LocalStorage.name);
@@ -56,7 +56,23 @@ export class LocalStorage implements IStorageEngine {
     throw new Error('Method not implemented.');
   }
 
-  resolveUrl({ filename, bucket, prefix, thumbnailConfig, jpegConfig }, res: Response): void {
+  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+    // const directory =
+    // fs.readdirSync(join(AsunaContext.instance.uploadPath, opts.bucket, opts.prefix));
+    // return directory.map(file => new SavedFile());
+    throw new Error('not implemented'); // TODO not implemented
+  }
+
+  removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  resolveUrl(opts: ResolverOpts): Promise<string>;
+  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
+    if (!res) throw new AsunaException(AsunaError.Unprocessable, `not implemented.`);
+
+    const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
     const fullFilePath = join(UploaderConfig.uploadPath, bucket, prefix || '', filename);
     if (!fullFilePath.startsWith(UploaderConfig.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
@@ -108,16 +124,5 @@ export class LocalStorage implements IStorageEngine {
         res.type(ext).sendFile(outputPath);
       }
     });
-  }
-
-  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
-    // const directory =
-    // fs.readdirSync(join(AsunaContext.instance.uploadPath, opts.bucket, opts.prefix));
-    // return directory.map(file => new SavedFile());
-    throw new Error('not implemented'); // TODO not implemented
-  }
-
-  removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
-    throw new Error('Method not implemented.');
   }
 }
