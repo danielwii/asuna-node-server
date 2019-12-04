@@ -14,7 +14,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": false,
+    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
