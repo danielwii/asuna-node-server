@@ -23,7 +23,7 @@ export class DaprConfigObject {
   }
 
   static load(): DaprConfigObject {
-    const mode = configLoader.loadConfig(DaprConfigKeys.DAPR_MODE, 'http');
+    const mode = configLoader.loadConfig<any>(DaprConfigKeys.DAPR_MODE, 'http');
 
     if (mode === 'grpc') throw new Error(`grpc mode for dapr not supported.`);
 

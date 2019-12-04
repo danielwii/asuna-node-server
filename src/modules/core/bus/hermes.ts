@@ -293,7 +293,7 @@ export class Hermes {
     const configObject = RedisConfigObject.loadOr('job');
     logger.log(`init queues with redis: ${r(configObject, { transform: true })}`);
     if (configObject && configObject.enable) {
-      const db = configLoader.loadConfig(ConfigKeys.JOB_REDIS_DB, 1);
+      const db = configLoader.loadNumericConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);
       Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) });
 

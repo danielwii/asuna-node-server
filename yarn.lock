@@ -6920,10 +6920,10 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-buffs@^0.6.18:
-  version "0.6.18"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.18.tgz#f734995fecb0bde120943bcb8163e70c53fa49f7"
-  integrity sha512-UJV67l8MKXORJKJS/XzGYgkvEnr5wBnEwgEERJg/WfXSRTDpUEslexIXlqRTiIeucxRjOvHJTUm8IeSreA5Sng==
+node-buffs@^0.6.19:
+  version "0.6.19"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.6.19.tgz#967f196b89ed58e7687ec094680e114bdf4db4eb"
+  integrity sha512-loV/dB9L6QIbCJiV01+0cpFCGgHpkhlf82O4sW8iuN09/RMLhRoigphYmOgbQdwUgPiaWF3sIGBa4zWxmWCsUQ==
   dependencies:
     dotenv "^8.2.0"
     lodash "^4.17.15"
