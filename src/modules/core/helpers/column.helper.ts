@@ -12,7 +12,7 @@ export const jsonType = _.memoize((): 'simple-json' | 'json' | 'jsonb' => {
   return 'simple-json';
 });
 
-export const textType = (type: 'text' | 'mediumtext' | 'longtext'): 'text' | 'mediumtext' | 'longtext' => {
+export const textType = (type: 'text' | 'mediumtext' | 'longtext' = 'text'): 'text' | 'mediumtext' | 'longtext' => {
   const { dbType } = Global;
   if (dbType === 'sqlite') {
     return 'text';

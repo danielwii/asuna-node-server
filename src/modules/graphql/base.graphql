@@ -46,6 +46,12 @@ interface BaseEntity {
   updatedAt: Date!
 }
 
+interface BaseGenericEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
 interface BaseNameEntity {
   id: Int!
   createdAt: Date!

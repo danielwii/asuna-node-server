@@ -127,7 +127,7 @@ export class GraphqlHelper {
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
-        await this.resolveFindOptions<Entity>({
+        await this.genericFindOptions<Entity>({
           cls,
           select: [primaryKey as any],
           where,
@@ -159,17 +159,17 @@ export class GraphqlHelper {
    * @param timeCondition
    * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
    */
-  public static async resolveFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  public static async resolveFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & ResolveCategoryOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  public static async resolveFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>,
   ): Promise<FindManyOptions<Entity>> {
     const {
@@ -237,11 +237,11 @@ export class GraphqlHelper {
       if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
         const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
         return _opts.loader.load(result[_opts.key] as any);
-      } 
+      }
         const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
         const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
         return targetRepo.findOne(result[_opts.key]);
-      
+
     }
     return null;
   }
@@ -259,12 +259,12 @@ export class GraphqlHelper {
         const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
         const ids = result[_opts.key];
         return _opts.loader.load((ids as any) as PrimaryKeyType[]);
-      } 
+      }
         const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
         const ids = result[_opts.key];
         const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
         return targetRepo.findByIds(ids as any);
-      
+
     }
     return null;
   }
