@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import { Global } from '../global';
 
 export const jsonType = _.memoize((): 'simple-json' | 'json' | 'jsonb' => {
-  const {dbType} = Global;
+  const { dbType } = Global;
   if (dbType === 'mysql57') {
     return 'json';
   }
@@ -11,3 +11,11 @@ export const jsonType = _.memoize((): 'simple-json' | 'json' | 'jsonb' => {
   }
   return 'simple-json';
 });
+
+export const textType = (type: 'text' | 'mediumtext' | 'longtext'): 'text' | 'mediumtext' | 'longtext' => {
+  const { dbType } = Global;
+  if (dbType === 'sqlite') {
+    return 'text';
+  }
+  return type;
+};
