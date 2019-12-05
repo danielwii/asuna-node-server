@@ -2,14 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as LRU from 'lru-cache';
 import { Connection, Repository } from 'typeorm';
-import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 
 import { Device } from './device.entities';
 
 const logger = LoggerFactory.getLogger('cache');
 
-const cache = new LRU({
+const cache = new LRU<string, DeviceShadow>({
   max: 2000,
   maxAge: 60 * 60 * 1e3,
 });
@@ -19,7 +18,7 @@ class DeviceShadow {
 
   constructor(private readonly uuid: string) {}
 
-  sync() {
+  sync(): void {
     this.logger.log(`sync device ${this.uuid}`);
   }
 }
@@ -34,7 +33,7 @@ export class DeviceService {
     this.deviceRepository = connection.getRepository<Device>(Device);
   }
 
-  getDeviceShadow(uuid: string) {
+  getDeviceShadow(uuid: string): DeviceShadow {
     if (!uuid) {
       return null;
     }

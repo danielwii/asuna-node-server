@@ -27,11 +27,7 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     // 'import/no-extraneous-dependencies': [
     //   'error',
-    //   {
-    //     devDependencies: ['**/*test.ts', '**/*spec.ts'],
-    //     optionalDependencies: false,
-    //     peerDependencies: false,
-    //   },
+    //   { devDependencies: ['**/*test.ts', '**/*spec.ts'], optionalDependencies: false, peerDependencies: false },
     // ],
     'no-useless-constructor': 'off',
     // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
@@ -39,8 +35,8 @@ module.exports = {
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
     // 'react/jsx-filename-extension': 'off',
     // Use function hoisting to improve code readability
-    // 'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     '@typescript-eslint/no-parameter-properties': ['error', { allows: ['private readonly'] }],
+    '@typescript-eslint/no-inferrable-types': ['error', { ignoreParameters: true }],
     '@typescript-eslint/camelcase': 'off',
     // Makes no sense to allow type inferrence for expression parameters, but require typing the response
     '@typescript-eslint/explicit-function-return-type': [

@@ -1,11 +1,14 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
+import { SimpleIdGenerator } from '../../ids';
 
 export abstract class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
@@ -19,6 +22,27 @@ export abstract class AbstractBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   updatedBy?: string;
+}
+
+const idGenerator = new SimpleIdGenerator();
+
+export abstract class AbstractTimebasedBaseEntity extends BaseEntity {
+  @PrimaryColumn() id?: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt?: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt?: Date;
+
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 100, name: 'updated_by' })
+  updatedBy?: string;
+
+  @BeforeInsert()
+  beforeInsert(): void {
+    this.id = idGenerator.nextId();
+  }
 }
 
 export abstract class AbstractNameEntity extends AbstractBaseEntity {

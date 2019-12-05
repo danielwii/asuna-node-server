@@ -19,12 +19,16 @@ export class Role extends AbstractBaseEntity {
   @Column(jsonType(), { nullable: true })
   authorities: JsonMap;
 
-  @ManyToMany(type => AdminUser, user => user.roles)
+  @ManyToMany(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => AdminUser,
+    user => user.roles,
+  )
   users: AdminUser[];
 
   @BeforeInsert()
   @BeforeUpdate()
-  preSave() {
+  preSave(): void {
     safeReloadObject(this, 'authorities');
   }
 }
@@ -33,7 +37,11 @@ export class Role extends AbstractBaseEntity {
 @Entity('auth__t_users')
 export class AdminUser extends AbstractAuthUser {
   @MetaInfo({ name: '角色' })
-  @ManyToMany(type => Role, role => role.users, { primary: true })
+  @ManyToMany(
+    type => Role,
+    role => role.users,
+    { primary: true },
+  )
   @JoinTable({
     name: 'auth__tr_users_roles',
     joinColumn: { name: 'user__id' },

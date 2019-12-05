@@ -34,7 +34,11 @@ export class AppInfo extends AbstractNameEntity {
   @Column({ nullable: true, name: 'is_published' })
   isPublished: boolean;
 
-  @OneToMany(type => AppRelease, release => release.appInfo)
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => AppRelease,
+    release => release.appInfo,
+  )
   releases: AppRelease[];
 }
 
@@ -67,13 +71,17 @@ export class AppRelease extends AbstractBaseEntity {
   isPublished: boolean;
 
   @MetaInfo({ name: '所属应用' })
-  @ManyToOne(type => AppInfo, info => info.releases, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    type => AppInfo,
+    info => info.releases,
+    { onDelete: 'CASCADE' },
+  )
   appInfo: AppInfo;
 
   // TODO try reload in entity subscribers
   @BeforeInsert()
   @BeforeUpdate()
-  preSave() {
+  preSave(): void {
     safeReloadArray(this, 'paths');
   }
 }
