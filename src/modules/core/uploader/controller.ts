@@ -13,7 +13,7 @@ import * as os from 'os';
 import { basename, dirname, join } from 'path';
 import * as uuid from 'uuid';
 import { isBlank, r, UploadException } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { AsunaContext } from '../context';
@@ -71,7 +71,6 @@ class CreateChunksUploadTaskQuery {
 }
 
 @ApiTags('core')
-@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/uploader')
 export class UploaderController {
   private context = AsunaContext.instance;

@@ -1,17 +1,20 @@
 import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { Request } from 'express';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { r } from '../helpers/utils';
 import { LoggerFactory } from './factory';
 
-export class ControllerLoggerInterceptor implements NestInterceptor {
+export class LoggerInterceptor implements NestInterceptor {
   logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
 
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const response = context.switchToHttp().getResponse<Response>();
+    let request = context.switchToHttp().getRequest<Request>();
+    if (!request) {
+      request = GqlExecutionContext.create(context).getContext().req;
+    }
     const info = {
       path: request.url,
       body: request.body,

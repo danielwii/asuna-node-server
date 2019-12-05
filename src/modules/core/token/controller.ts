@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
 import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenHelper } from './helper';
@@ -69,7 +69,6 @@ class GetParams {
 const logger = LoggerFactory.getLogger('OperationTokenController');
 
 @ApiTags('core')
-@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/operation-token')
 export class OperationTokenController {
   @UseGuards(AnyAuthGuard)

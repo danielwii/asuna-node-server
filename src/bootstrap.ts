@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable global-require,@typescript-eslint/no-var-requires */
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
@@ -14,7 +14,7 @@ import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
 import { renameTables } from './migrations';
-import { AnyExceptionFilter, r } from './modules/common';
+import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
@@ -141,6 +141,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   //   logger.log(`error is ${r(error)}`);
   //   done();
   // });
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 

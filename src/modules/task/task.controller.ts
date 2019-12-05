@@ -1,9 +1,9 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable class-methods-use-this */
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IsDefined, IsString } from 'class-validator';
 import { r } from '../common/helpers';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '../common/logger';
 import { AnyAuthRequest, JwtAdminAuthGuard } from '../core/auth';
 import { TaskRecord } from './task.entities';
 import { TaskHelper } from './task.helper';
@@ -32,7 +32,6 @@ class SearchTaskDto {
   service: string;
 }
 
-@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('admin/v1/tasks')
 export class TaskController {
   @UseGuards(new JwtAdminAuthGuard())

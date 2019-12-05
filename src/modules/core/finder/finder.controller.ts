@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Query, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { AsunaError, AsunaException, ControllerLoggerInterceptor, LoggerFactory, r } from '../../common';
+import { AsunaError, AsunaException, LoggerFactory, r } from '../../common';
 import { FinderHelper } from './finder.helper';
 
 const logger = LoggerFactory.getLogger('FinderController');
@@ -14,7 +14,6 @@ const logger = LoggerFactory.getLogger('FinderController');
  * api/v1/finder?query=`querystring.stringify({name: "default"})`
  */
 @ApiTags('core')
-@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('api/v1/finder')
 export class FinderController {
   @Get()

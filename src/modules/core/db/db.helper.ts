@@ -96,7 +96,7 @@ function parseCondition(value: Condition) {
   if (_.has(value, '$like')) return Like(value.$like);
   if (_.has(value, '$notLike')) return Not(Like(value.$notLike));
   if (_.has(value, '$any')) return Any(value.$any);
-  if (_.has(value, '$in')) return In(value.$in);
+  if (_.has(value, '$in')) return In(_.isArray(value.$in) ? value.$in : [value.$in]);
   if (_.has(value, '$notIn')) return Not(In(value.$notIn));
   if (_.has(value, '$between')) return Between(value.$between[0], value.$between[1]);
   if (_.has(value, '$eq')) return Equal(value.$eq);
@@ -520,7 +520,7 @@ export class DBHelper {
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         field => `${model}.${field}`,
       );
-      logger.log(`wrapParsedFields '${r(selection)}'`);
+      logger.debug(`wrapParsedFields '${r(selection)}'`);
       queryBuilder.select(selection);
     }
   }

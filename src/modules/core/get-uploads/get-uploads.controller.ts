@@ -1,9 +1,9 @@
 // tslint:disable:max-line-length
-import { Controller, Get, Param, Query, Res, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { FinderHelper } from '../finder';
 import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
@@ -12,7 +12,6 @@ import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 const logger = LoggerFactory.getLogger('GetUploadsController');
 
 @ApiTags('core')
-@UseInterceptors(ControllerLoggerInterceptor)
 @Controller('uploads')
 export class GetUploadsController {
   private context = AsunaContext.instance;

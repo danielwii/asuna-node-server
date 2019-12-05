@@ -1,18 +1,16 @@
-import { UseInterceptors } from '@nestjs/common';
 import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { formatTime, r } from '../../common/helpers';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { IJwtPayload } from './auth.interfaces';
 import { AbstractAuthUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
-@UseInterceptors(ControllerLoggerInterceptor)
 export abstract class AbstractAuthService {
   protected readonly cryptor = new Cryptor();
 

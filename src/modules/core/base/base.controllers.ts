@@ -1,18 +1,18 @@
-import { Body, Delete, Get, Options, Param, Patch, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Delete, Get, Options, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
+import { classToPlain, plainToClass, serialize } from 'class-transformer';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
 import { CurrentUser, Profile, r, validateObject } from '../../common';
-import { ControllerLoggerInterceptor, LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { DBHelper, parseFields, parseNormalWhereAndRelatedFields, parseOrder, parseWhere } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');
 
-@UseInterceptors(ControllerLoggerInterceptor)
 export abstract class RestCrudController {
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {
@@ -55,14 +55,14 @@ export abstract class RestCrudController {
       take: +size,
     };
 
-    // console.log(`list ${r({ query, order })}`);
+    // logger.log(`list ${r({ query, order })}`);
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns
       .filter(column => column.isPrimary)
       .map(column => column.propertyName);
 
-    // console.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
+    // logger.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
     DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, where);
 
@@ -73,15 +73,14 @@ export abstract class RestCrudController {
     const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
     DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWhere);
 
-    const total = await queryBuilder.getCount();
-    const items = await queryBuilder
+    const [items, total] = await queryBuilder
       .take(query.take)
       .skip(query.skip)
-      .getMany();
+      .getManyAndCount();
 
     logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
 
-    return { query, items, total, page: +page, size: +size };
+    return { query, items: classToPlain(items) as any[], total, page: +page, size: +size };
   }
 
   @Get(':model/:id')

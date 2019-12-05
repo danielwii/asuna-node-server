@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   BeforeInsert,
@@ -8,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
-import { SimpleIdGenerator, SimpleIdGeneratorHelper } from '../../ids';
+import { SimpleIdGenerator } from '../../ids';
 
 export abstract class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
@@ -28,6 +29,9 @@ export abstract class AbstractBaseEntity extends BaseEntity {
  * 生成基于时间的 id，prefix 可以作为一个特殊的前缀用于识别不同的类型
  */
 export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
+  @Exclude()
+  private readonly idPrefix: string;
+  @Exclude()
   private readonly generator: SimpleIdGenerator;
 
   @PrimaryColumn() id?: string;
@@ -42,8 +46,9 @@ export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   updatedBy?: string;
 
-  constructor(private readonly idPrefix: string = '') {
+  constructor(idPrefix: string = '') {
     super();
+    this.idPrefix = idPrefix;
     this.generator = new SimpleIdGenerator(idPrefix);
   }
 
