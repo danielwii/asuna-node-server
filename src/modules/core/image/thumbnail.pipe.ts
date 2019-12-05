@@ -13,15 +13,15 @@ export interface ThumbnailParam {
   fit?: keyof FitEnum;
 }
 
-export type ThumbnailPipeOptions = { opts: ThumbnailParam; param?: string };
+export type ThumbnailPipeOptions = { opts?: ThumbnailParam; param?: string };
 
 @Injectable()
 export class ThumbnailPipe implements PipeTransform {
-  async transform(value: any, { metatype }: ArgumentMetadata) {
+  async transform(value: any, { metatype }: ArgumentMetadata): Promise<ThumbnailPipeOptions> {
     const param = _.find(_.keys(value), fp.startsWith('thumbnail/'));
     const thumbnail: ThumbnailParam = {};
     if (!param) {
-      return thumbnail;
+      return {};
     }
     try {
       if (param.includes('/')) {
@@ -29,9 +29,7 @@ export class ThumbnailPipe implements PipeTransform {
         thumbnail.fit = ['cover', 'contain', 'fill', 'inside', 'outside'].includes(params[1])
           ? (params[1] as any)
           : null;
-        [thumbnail.width, thumbnail.height] = params[0]
-          .split('x')
-          .map(val => (val ? _.toNumber(val) : null));
+        [thumbnail.width, thumbnail.height] = params[0].split('x').map(val => (val ? _.toNumber(val) : null));
         logger.log(r({ value, metatype, param, thumbnail }));
         return { opts: thumbnail, param };
       }

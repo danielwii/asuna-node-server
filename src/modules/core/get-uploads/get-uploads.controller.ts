@@ -42,15 +42,16 @@ export class GetUploadsController {
     @Res() res: Response,
   ): Promise<void> {
     logger.debug(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
-    const url = await this.context.defaultStorageEngine.resolveUrl({
-      filename,
-      bucket,
-      thumbnailConfig,
-      jpegConfig,
-      resolver: path => FinderHelper.getUrl({ type: 'assets', path, internal }),
-    });
-    logger.debug(`resolved url is ${url}`);
-    return res.redirect(url);
+    return this.context.defaultStorageEngine.resolveUrl(
+      {
+        filename,
+        bucket,
+        thumbnailConfig,
+        jpegConfig,
+        resolver: path => FinderHelper.getUrl({ type: 'assets', path, internal }),
+      },
+      res,
+    );
   }
 
   // /**

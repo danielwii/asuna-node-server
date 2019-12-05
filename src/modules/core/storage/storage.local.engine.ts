@@ -69,8 +69,8 @@ export class LocalStorage implements IStorageEngine {
 
   resolveUrl(opts: ResolverOpts): Promise<string>;
   resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
-    if (!res) throw new AsunaException(AsunaError.Unprocessable, `not implemented.`);
+  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+    if (!res) throw new AsunaException(AsunaError.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
     const fullFilePath = join(UploaderConfig.uploadPath, bucket, prefix || '', filename);
@@ -92,6 +92,7 @@ export class LocalStorage implements IStorageEngine {
 
     if (!['png', 'jpg', 'jpeg'].includes(ext)) {
       if (fs.existsSync(outputPath)) {
+        LocalStorage.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
         res.type(ext).sendFile(fullFilePath);
         return;
       }
@@ -99,9 +100,10 @@ export class LocalStorage implements IStorageEngine {
       return;
     }
 
-    LocalStorage.logger.log(`check if ${ext} file outputPath '${outputPath}' exists`);
+    LocalStorage.logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
     if (fs.existsSync(outputPath)) {
-      res.type(ext).send(fs.createReadStream(outputPath));
+      LocalStorage.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
+      res.type(ext).sendFile(outputPath);
       return;
     }
 
@@ -109,6 +111,7 @@ export class LocalStorage implements IStorageEngine {
     LocalStorage.logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
     const imageProcess = sharp(fullFilePath);
     if (thumbnailConfig) {
+      LocalStorage.logger.verbose(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
       imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
         fit: thumbnailConfig.opts.fit,
       });

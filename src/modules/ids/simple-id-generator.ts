@@ -1,5 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-bitwise,no-underscore-dangle */
+import { oneLineTrim } from 'common-tags';
+
 /**
  * ?????????????????? - 0000     - 000000
  * n:timestamp offset - 4:worker - 6:serial
@@ -51,6 +53,18 @@ export class SimpleDistributedIdGenerator {
   }
 }
 
+export class SimpleIdGeneratorHelper {
+  static registeredTypes: { [key: string]: string } = {};
+
+  static nextId(prefix?: string, workerId?: number): string {
+    return SimpleIdGenerator.nextId(prefix, workerId);
+  }
+
+  static nextIdByType(type: string, workerId?: number): string {
+    return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
+  }
+}
+
 export class SimpleIdGenerator {
   private static startEpoch = 1_546_300_800_000; // 2019/1/1
   private readonly workerId: number;
@@ -60,9 +74,26 @@ export class SimpleIdGenerator {
   }
 
   nextId(): string {
-    return `${this.prefix}${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 8)}${this.workerId}${process
-      .hrtime()[1]
-      .toString()
-      .slice(2, 6)}`;
+    return oneLineTrim`
+      ${this.prefix}
+      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 6)}
+      ${this.workerId}
+      ${process
+        .hrtime()[1]
+        .toString()
+        .slice(2, 6)}
+    `;
+  }
+
+  static nextId(prefix?: string, workerId?: number): string {
+    return oneLineTrim`
+      ${prefix}
+      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 6)}
+      ${workerId || 0}
+      ${process
+        .hrtime()[1]
+        .toString()
+        .slice(2, 6)}
+    `;
   }
 }

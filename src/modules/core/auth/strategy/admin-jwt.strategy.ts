@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AsunaError, AsunaException, r } from '../../../common';
-import { ConfigKeys, configLoader } from '../../../config';
 import { LoggerFactory } from '../../../common/logger';
+import { ConfigKeys, configLoader } from '../../../config';
 import { AdminAuthService } from '../admin-auth.service';
 import { IJwtPayload } from '../auth.interfaces';
 
@@ -23,13 +23,10 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
   }
 
   async validate(payload: IJwtPayload): Promise<IJwtPayload> {
-    logger.verbose(`validate ${r(payload)}`);
+    logger.debug(`validate ${r(payload)}`);
     const isValid = await this.adminAuthService.validateUser(payload);
     if (!isValid) {
-      throw new AsunaException(
-        AsunaError.InsufficientPermissions,
-        'admin-jwt auth strategy failed',
-      );
+      throw new AsunaException(AsunaError.InsufficientPermissions, 'admin-jwt auth strategy failed');
     }
     return payload;
   }

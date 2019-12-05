@@ -105,11 +105,14 @@ export class MinioStorage implements IStorageEngine {
 
   resolveUrl(opts: ResolverOpts): Promise<string>;
   resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
-    if (res) throw new AsunaException(AsunaError.Unprocessable, `not implemented.`);
+  async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+    if (!res) throw new AsunaException(AsunaError.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig, resolver } = opts;
-    return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
+    const url = await resolver(join(bucket || this.defaultBucket, prefix || '', filename));
+    return res.redirect(url);
+    // resolver(join(bucket || this.defaultBucket, prefix || '', filename)).then(url => res.redirect(url));
+    // return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 
   async saveEntity(
@@ -156,7 +159,7 @@ export class MinioStorage implements IStorageEngine {
     const filenameWithPrefix = join(resolvedPrefix, filename);
 
     MinioStorage.logger.log(oneLineTrim`
-      put ${r(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}] 
+      put ${r(file)} to [${filenameWithPrefix}] with prefix [${resolvedPrefix}]
       and bucket [${bucket}].
     `);
     return this.client

@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
-import { SimpleIdGenerator } from '../../ids';
+import { SimpleIdGenerator, SimpleIdGeneratorHelper } from '../../ids';
 
 export abstract class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
@@ -24,9 +24,12 @@ export abstract class AbstractBaseEntity extends BaseEntity {
   updatedBy?: string;
 }
 
-const idGenerator = new SimpleIdGenerator();
+/**
+ * 生成基于时间的 id，prefix 可以作为一个特殊的前缀用于识别不同的类型
+ */
+export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
+  private readonly generator: SimpleIdGenerator;
 
-export abstract class AbstractTimebasedBaseEntity extends BaseEntity {
   @PrimaryColumn() id?: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -39,9 +42,14 @@ export abstract class AbstractTimebasedBaseEntity extends BaseEntity {
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   updatedBy?: string;
 
+  constructor(private readonly idPrefix: string = '') {
+    super();
+    this.generator = new SimpleIdGenerator(idPrefix);
+  }
+
   @BeforeInsert()
   beforeInsert(): void {
-    this.id = idGenerator.nextId();
+    this.id = this.generator.nextId();
   }
 }
 

@@ -18,7 +18,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (exception.code === 'ER_DUP_ENTRY') {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
-      const {metadata} = getRepository(model);
+      const { metadata } = getRepository(model);
       const [index] = metadata.indices.filter(index => index.name === key);
       return new ValidationException(
         index.name,
@@ -108,10 +108,5 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
 
     res.status(status).send(body);
-    // try {
-    // } catch (e) {
-    //   logger.log(`send status: ${status}`);
-    //   return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(body);
-    // }
   }
 }

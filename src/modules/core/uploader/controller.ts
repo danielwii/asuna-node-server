@@ -270,27 +270,27 @@ export class UploaderController {
     return bluebird.map(files, file => {
       if (local === '1') {
         logger.log(oneLineTrim`
-            save file[${file.mimetype}] to local storage 
+            save file[${file.mimetype}] to local storage
             ${r({ bucket, prefix, filename: file.filename })}
           `);
         return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
       }
 
       if (_.includes(ImageMimeType, file.mimetype)) {
-        logger.log(`save image[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
+        logger.log(`save image[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(VideoMimeType, file.mimetype)) {
-        logger.log(`save video[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
+        logger.log(`save video[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(DocMimeType, file.mimetype)) {
-        logger.log(`save doc[${file.mimetype}] to [${bucket}-${prefix}] filename: ${file.filename}`);
+        logger.log(`save doc[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
       }
       logger.log(oneLineTrim`
           no storage engine defined for file type [${file.mimetype}]
-          to ${r({ bucket, prefix, filename: file.filename })}, 
+          to ${r({ bucket, prefix, filename: file.filename })},
           using normal file storage engine.
         `);
       return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });

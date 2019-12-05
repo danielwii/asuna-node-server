@@ -13,6 +13,7 @@ export class ControllerLoggerInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
     const info = {
+      path: request.url,
       body: request.body,
       query: request.query,
       params: request.params,

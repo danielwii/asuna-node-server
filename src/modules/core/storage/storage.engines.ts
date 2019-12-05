@@ -3,8 +3,8 @@ import { IsString } from 'class-validator';
 import { Response } from 'express';
 import * as _ from 'lodash';
 import * as mime from 'mime-types';
-import { JpegParam } from '../image/jpeg.pipe';
-import { ThumbnailParam } from '../image/thumbnail.pipe';
+import { JpegPipeOptions } from '../image/jpeg.pipe';
+import { ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 
 export enum StorageMode {
   LOCAL = 'local',
@@ -66,8 +66,8 @@ export type ResolverOpts = {
   filename: string;
   bucket: string;
   prefix?: string;
-  thumbnailConfig?: { opts: ThumbnailParam; param?: string };
-  jpegConfig?: { opts: JpegParam; param?: string };
+  thumbnailConfig?: ThumbnailPipeOptions;
+  jpegConfig?: JpegPipeOptions;
   // 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
   resolver?: (url: string) => Promise<string>;
 };

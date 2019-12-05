@@ -38,18 +38,20 @@ export const AsunaError = {
 /**
  * 该异常构造前端可以进行交互的格式
  */
-export class AsunaBaseException {
+export class AsunaBaseException extends Error {
   constructor(
     public status: HttpStatus,
     public code: string,
     public name: string,
-    public message?: string,
+    public message: string,
     public errors?: any,
-  ) {}
+  ) {
+    super(message);
+  }
 }
 
 export class AsunaException extends AsunaBaseException {
-  constructor(nameValue: NameValue, message?: string, errors?: any) {
+  constructor(nameValue: NameValue, message: string, errors?: any) {
     super(nameValue.value, null, nameValue.name, message, errors);
   }
 }

@@ -31,21 +31,14 @@ export class AsunaContext {
   public static readonly instance = new AsunaContext();
 
   public opts: IAsunaContextOpts;
-
   public readonly dirname: string;
-
   public uploadPath: string;
-
   public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
-
   public videoStorageEngine: IStorageEngine;
-
   public fileStorageEngine: IStorageEngine;
-
   public localStorageEngine: IStorageEngine;
-
   public chunkStorageEngine: IStorageEngine;
 
   private constructor() {

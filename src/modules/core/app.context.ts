@@ -5,7 +5,7 @@ const pkg = require('../../../package.json');
 const logger = LoggerFactory.getLogger('AppContext');
 
 export class AppContext {
-  public static instance = new AppContext();
+  public static readonly instance = new AppContext();
 
   private state = {
     version: pkg.version,
