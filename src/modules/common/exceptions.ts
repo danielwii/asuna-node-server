@@ -51,7 +51,7 @@ export class AsunaBaseException extends Error {
 }
 
 export class AsunaException extends AsunaBaseException {
-  constructor(nameValue: NameValue, message: string, errors?: any) {
+  constructor(nameValue: NameValue, message?: string, errors?: any) {
     super(nameValue.value, null, nameValue.name, message, errors);
   }
 }
