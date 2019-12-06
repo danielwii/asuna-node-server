@@ -433,31 +433,43 @@ export class DBHelper {
       const { relatedFields, relatedWhere } = parseNormalWhereAndRelatedFields(where, repository);
       logger.log(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach(field => {
+        const [relatedModel, relatedField] = _.split(field, '.');
         // console.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field];
-        logger.log(`'${model}' relation with field '${field}' with value is '${r(elementCondition)}'`);
+        logger.log(`'${model}' relation with field '${field}' with value is ${r(elementCondition)}`);
 
         if (_.isObjectLike(elementCondition)) {
           let innerValue = elementCondition._value;
 
           if (_.isObjectLike(innerValue) && innerValue.toSql) {
-            innerValue = elementCondition._value.toSql(getConnection(), `${field}.id`, elementCondition._value._value);
+            innerValue = elementCondition._value.toSql(
+              getConnection(),
+              `${relatedModel}.id`,
+              elementCondition._value._value,
+            );
+            logger.log(`create innerValue for '${relatedModel}.id' by ${r(elementCondition._value._value)}`);
           } else {
-            innerValue = elementCondition.toSql(getConnection(), `${field}.id`, innerValue);
+            // const v1 = elementCondition.toSql(getConnection(), `${relatedModel}.id`, innerValue);
+            // const v2 = elementCondition.toSql(getConnection(), `${relatedModel}.id`, [innerValue]);
+            // logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}' - ${r({ v1, v2 })}`);
+            innerValue = elementCondition.toSql(getConnection(), `${relatedModel}.${relatedField}`, [
+              `'${innerValue}'`,
+            ]);
+            logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}'`);
           }
+          logger.log(`innerValue is '${innerValue}'`);
 
           if (elementCondition._type === 'not') {
             const sqlList = innerValue.split(' ');
             sqlList.splice(1, 0, 'NOT');
             const sql = sqlList.join(' ');
-            // console.log({ field, sql });
+            // console.log({ relatedModel, sql });
 
-            queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, sql);
+            queryBuilder.innerJoinAndSelect(`${model}.${relatedModel}`, relatedModel, sql);
           } else {
-            queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, innerValue);
+            queryBuilder.innerJoinAndSelect(`${model}.${relatedModel}`, relatedModel, innerValue);
           }
         } else {
-          const [relatedModel, relatedField] = _.split(field, '.');
           // console.log({ 1: `${model}.${field}`, 2: field, 3: `${field}.id = :${field}`, 4: where });
           // queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, `${field}.id = :${field}`, where);
           // console.log({ 1: `${model}.${relatedModel}`, 2: relatedModel, 3: `${field} = :${field}`, 4: where });
