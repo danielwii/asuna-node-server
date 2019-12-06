@@ -1,6 +1,6 @@
 import { Body, Delete, Get, Options, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
-import { classToPlain, plainToClass, serialize } from 'class-transformer';
+import { classToPlain } from 'class-transformer';
 import idx from 'idx';
 import * as _ from 'lodash';
 import * as R from 'ramda';
@@ -55,7 +55,7 @@ export abstract class RestCrudController {
       take: +size,
     };
 
-    // logger.log(`list ${r({ query, order })}`);
+    // logger.log(`list ${r({ whereStr, query, order })}`);
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns

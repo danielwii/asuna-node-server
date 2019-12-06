@@ -21,10 +21,10 @@ describe('AppRestController (e2e)', () => {
     await app.init();
 
     const task = await TaskRecord.save(TaskRecord.create({ uniqueId: 'u1' }));
-    await TaskRecord.save(TaskRecord.create({ uniqueId: 'u2' }));
+    const task2 = await TaskRecord.save(TaskRecord.create({ uniqueId: 'u2' }));
     await TaskEvent.save(TaskEvent.create({ task, message: 'e11' }));
-    await TaskEvent.save(TaskEvent.create({ task, message: 'e112' }));
-    await TaskEvent.save(TaskEvent.create({ task, message: 'e13' }));
+    await TaskEvent.save(TaskEvent.create({ task, message: 'e12' }));
+    await TaskEvent.save(TaskEvent.create({ task: task2, message: 'e21' }));
 
     const authService = app.get<AdminAuthService>(AdminAuthService);
     token = (await authService.createToken(await authService.getUser({ email: 'admin@example.com' }))).accessToken;
@@ -61,16 +61,16 @@ describe('AppRestController (e2e)', () => {
     return supertest(app.getHttpServer())
       .get(
         `/admin/rest/sys/tasks?fields=id,uniqueId&relations=events&where=${JSON.stringify({
-          'events.message': { $like: '%e11%' },
+          'events.message': 'e11',
         })}`,
       )
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
       .expect(expected => {
         const response = JSON.parse(expected.text);
-        expect(response.total).toBe(2);
-        expect(response.items[0].uniqueId).toBe('u1');
-        expect(response.items[0].id).toContain('st');
+        expect(response.total).toBe(1);
+        expect(response.items[0].uniqueId).toEqual('u1');
+        expect(response.items[0].events[0].message).toEqual('e11');
       });
   });
 

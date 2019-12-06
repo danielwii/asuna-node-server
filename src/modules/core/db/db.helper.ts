@@ -434,7 +434,7 @@ export class DBHelper {
       logger.log(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach(field => {
         const [relatedModel, relatedField] = _.split(field, '.');
-        // console.log('[innerJoinAndSelect]', { field, model, where });
+        // logger.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field];
         logger.log(`'${model}' relation with field '${field}' with value is ${r(elementCondition)}`);
 
