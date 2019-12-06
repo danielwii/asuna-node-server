@@ -19,6 +19,7 @@ export const AsunaError = {
   BadRequest: new NameValue('Bad Request', 400),
   InvalidCredentials: new NameValue('Invalid Credentials', 401),
   InsufficientPermissions: new NameValue('Insufficient Permissions', 403),
+  NotFound: new NameValue('Not Found', 404),
   Conflict: new NameValue('Conflict', 409),
   Duplicate: new NameValue('Duplicate', 409),
   TooManyRequests: new NameValue('Too Many Requests', 429),

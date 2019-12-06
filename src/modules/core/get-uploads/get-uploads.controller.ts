@@ -40,7 +40,7 @@ export class GetUploadsController {
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ): Promise<void> {
-    logger.debug(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
+    logger.verbose(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
     return this.context.defaultStorageEngine.resolveUrl(
       {
         filename,

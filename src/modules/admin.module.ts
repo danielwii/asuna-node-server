@@ -13,6 +13,7 @@ import { UploaderController, UploaderModule } from './core/uploader';
 import { SchemaModules } from './graphql/schema.modules';
 import { ImportExportModule } from './import-export/import-export.module';
 import { AdminRestController, AppRestController, WwwRestController } from './rest';
+import { ContentRestController } from './rest/content-rest.controller';
 import { SearchController } from './search/search.controller';
 import { TaskController } from './task/task.controller';
 
@@ -36,11 +37,12 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ApiController,
     AdminRestController,
     AppRestController,
+    WwwRestController,
+    ContentRestController,
     CommandController,
     SearchController,
     TaskController,
     UploaderController,
-    WwwRestController,
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })

@@ -6,8 +6,8 @@ export const AuditType = {
   entity: 'entity',
 };
 
-@EntityMetaInfo({ name: 'audit__records' })
-@Entity('audit__t_records')
+@EntityMetaInfo({ name: 'sys__audit_records' })
+@Entity('sys__t_audit_records')
 export class AuditRecord extends AbstractBaseEntity {
   @Column('varchar', { nullable: true })
   type: keyof typeof AuditType;

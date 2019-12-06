@@ -3,7 +3,7 @@
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import * as mime from 'mime-types';
 import { join } from 'path';
 import * as sharp from 'sharp';
 import { AsunaError, AsunaException, convertFilename, ErrorException, r } from '../../common';
@@ -77,55 +77,85 @@ export class LocalStorage implements IStorageEngine {
     if (!fullFilePath.startsWith(UploaderConfig.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }
-    LocalStorage.logger.log(r({ filename, prefix, bucket, thumbnailConfig, jpegConfig }));
 
-    const ext = _.last(fullFilePath.split('.'));
-    const fullFileDir = fullFilePath.slice(0, -1 - ext.length);
-    let outputFilename = 'compressed';
-    if (thumbnailConfig.param) {
-      outputFilename += `@${thumbnailConfig.param.replace('/', ':')}`;
+    if (!fs.existsSync(fullFilePath)) {
+      throw new AsunaException(AsunaError.NotFound);
     }
-    if (jpegConfig.param) {
-      outputFilename += `@${jpegConfig.param.replace('/', ':')}`;
-    }
-    const outputPath = `${fullFileDir}/${outputFilename}.${ext}`;
 
-    if (!['png', 'jpg', 'jpeg'].includes(ext)) {
+    let type = mime.lookup(filename);
+    if (!type) {
+      // 无法识别的文件类型，直接返回
+      res.contentType('application/octet-stream').sendFile(fullFilePath);
+      return;
+    }
+    const ext = mime.extension(type);
+    if (!ext) {
+      // 无法识别的文件格式，直接返回
+      res.contentType('application/octet-stream').sendFile(fullFilePath);
+      return;
+    }
+
+    LocalStorage.logger.log(`resolveUrl ${r({ filename, prefix, type, ext, bucket, thumbnailConfig, jpegConfig })}`);
+
+    if (type.startsWith('video/')) {
+      LocalStorage.logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
+      res.type(ext).sendFile(fullFilePath);
+      return;
+    } else if (type.startsWith('image/')) {
+      // const ext = _.last(fullFilePath.split('.'));
+      const fullFileDir = fullFilePath.slice(0, -1 - ext.length);
+      let outputFilename = 'compressed';
+      if (thumbnailConfig.param) {
+        outputFilename += `@${thumbnailConfig.param.replace('/', ':')}`;
+      }
+      if (jpegConfig.param) {
+        outputFilename += `@${jpegConfig.param.replace('/', ':')}`;
+      }
+      const outputPath = `${fullFileDir}/${outputFilename}.${ext}`;
+
+      LocalStorage.logger.log(`check file type '${ext}' for '${outputPath}'`);
+      if (!['png', 'jpg', 'jpeg'].includes(ext)) {
+        if (fs.existsSync(outputPath)) {
+          LocalStorage.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
+          res.type(ext).sendFile(fullFilePath);
+          return;
+        }
+        throw new AsunaException(AsunaError.NotFound);
+      }
+
+      LocalStorage.logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
       if (fs.existsSync(outputPath)) {
         LocalStorage.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
+        res.type(ext).sendFile(outputPath);
+        return;
+      }
+
+      fs.mkdirpSync(fullFileDir);
+      LocalStorage.logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
+      const imageProcess = sharp(fullFilePath);
+      if (thumbnailConfig && thumbnailConfig.opts) {
+        LocalStorage.logger.verbose(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
+        imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
+          fit: thumbnailConfig.opts.fit,
+        });
+      }
+      if (['jpg', 'jpeg'].includes(ext)) {
+        imageProcess.jpeg(jpegConfig.opts);
+      }
+      imageProcess.toFile(outputPath, (err, info) => {
+        if (err) {
+          LocalStorage.logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
+          throw new AsunaException(AsunaError.NotFound, err.message);
+        } else {
+          res.type(ext).sendFile(outputPath);
+        }
+      });
+    } else {
+      if (fs.existsSync(fullFilePath)) {
+        LocalStorage.logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
         res.type(ext).sendFile(fullFilePath);
         return;
       }
-      res.status(404).send();
-      return;
     }
-
-    LocalStorage.logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
-    if (fs.existsSync(outputPath)) {
-      LocalStorage.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
-      res.type(ext).sendFile(outputPath);
-      return;
-    }
-
-    fs.mkdirpSync(fullFileDir);
-    LocalStorage.logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
-    const imageProcess = sharp(fullFilePath);
-    if (thumbnailConfig) {
-      LocalStorage.logger.verbose(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
-      imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
-        fit: thumbnailConfig.opts.fit,
-      });
-    }
-    if (['jpg', 'jpeg'].includes(ext)) {
-      imageProcess.jpeg(jpegConfig.opts);
-    }
-    imageProcess.toFile(outputPath, (err, info) => {
-      if (err) {
-        LocalStorage.logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
-        res.status(404).send(err.message);
-      } else {
-        res.type(ext).sendFile(outputPath);
-      }
-    });
   }
 }

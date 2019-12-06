@@ -23,9 +23,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       return new ValidationException(
         index.name,
         (index.givenColumnNames as string[]).map(name => ({
-          constraints: {
-            isUnique: `${name} must be unique`,
-          },
+          constraints: { isUnique: `${name} must be unique` },
           property: name,
           target: { [name]: value },
           value,
