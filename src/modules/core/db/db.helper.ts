@@ -71,18 +71,27 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
   return null;
 }
 
-export function parseNormalWhereAndRelatedFields(where, repository): { normalWhere: any[]; relatedFields: string[] } {
+export function parseNormalWhereAndRelatedFields(
+  where,
+  repository,
+): { normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
   const allRelations = repository.metadata.relations.map(relation => relation.propertyName);
+  logger.log(`all relations is ${r(allRelations)}`);
   const normalWhere = [];
   const relatedFields = [];
+  const relatedWhere = {};
   _.each(where, (value, field) => {
-    if (_.includes(allRelations, field)) {
+    const [extractedModel, extractedField] = _.split(field, '.');
+    let included = _.includes(allRelations, extractedModel);
+    logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
+    if (included) {
       relatedFields.push(field);
+      relatedWhere[extractedModel] = _.compact([...(relatedWhere[extractedModel] || []), extractedField]);
     } else {
       normalWhere.push({ field, value });
     }
   });
-  return { normalWhere, relatedFields };
+  return { normalWhere, relatedFields, relatedWhere };
 }
 
 function parseCondition(value: Condition) {
@@ -106,8 +115,8 @@ function parseCondition(value: Condition) {
   if (_.has(value, '$notNull')) return Not(IsNull());
   if (_.has(value, '$isNull')) return IsNull();
   if (_.has(value, '$not')) return Not(value.$not);
-  if (_.isBoolean(value)) return value;
-  logger.warn(`no handler found for ${r(value)}`);
+  if (_.isBoolean(value) || _.isString(value)) return value;
+  logger.warn(`no handler found for '${r(value)}'`);
   return value;
 }
 
@@ -421,10 +430,12 @@ export class DBHelper {
           : parseListParam(inputRelations);
 
       // 处理条件关联
-      const { relatedFields } = parseNormalWhereAndRelatedFields(where, repository);
+      const { relatedFields, relatedWhere } = parseNormalWhereAndRelatedFields(where, repository);
+      logger.log(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach(field => {
         // console.log('[innerJoinAndSelect]', { field, model, where });
-        const elementCondition = where[field] as any;
+        const elementCondition = where[field];
+        logger.log(`'${model}' relation with field '${field}' with value is '${r(elementCondition)}'`);
 
         if (_.isObjectLike(elementCondition)) {
           let innerValue = elementCondition._value;
@@ -446,11 +457,18 @@ export class DBHelper {
             queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, innerValue);
           }
         } else {
-          queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, `${field}.id = :${field}`, where);
+          const [relatedModel, relatedField] = _.split(field, '.');
+          // console.log({ 1: `${model}.${field}`, 2: field, 3: `${field}.id = :${field}`, 4: where });
+          // queryBuilder.innerJoinAndSelect(`${model}.${field}`, field, `${field}.id = :${field}`, where);
+          // console.log({ 1: `${model}.${relatedModel}`, 2: relatedModel, 3: `${field} = :${field}`, 4: where });
+          queryBuilder.innerJoinAndSelect(`${model}.${relatedModel}`, relatedModel, `${field} = :${field}`, where);
         }
       });
+
       // 处理普通关联
-      _.each(_.difference(relations, relatedFields), relation => {
+      const diff = _.difference(relations, _.keys(relatedWhere));
+      logger.log(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
+      _.each(diff, relation => {
         const select = parsedFields.relatedFieldsMap[relation];
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);

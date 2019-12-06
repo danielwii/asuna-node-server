@@ -71,6 +71,7 @@ export abstract class RestCrudController {
     }
 
     const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
+    logger.log(`list ${r({ where, normalWhere })}`);
     DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWhere);
 
     const [items, total] = await queryBuilder

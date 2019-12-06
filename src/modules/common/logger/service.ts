@@ -29,7 +29,7 @@ const levels = {
 
 export class SimpleLoggerService extends Logger {
   debug(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] < levels.debug) return;
+    if (levels[LoggerConfigObject.lv(context)] <= levels.debug) return;
     super.debug(message, context);
   }
 
@@ -38,17 +38,17 @@ export class SimpleLoggerService extends Logger {
   }
 
   log(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] < levels.info) return;
+    if (levels[LoggerConfigObject.lv(context)] <= levels.info) return;
     super.log(message, context);
   }
 
   verbose(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] < levels.verbose) return;
+    if (levels[LoggerConfigObject.lv(context)] <= levels.verbose) return;
     super.verbose(message, context);
   }
 
   warn(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] < levels.warn) return;
+    if (levels[LoggerConfigObject.lv(context)] <= levels.warn) return;
     super.warn(message, context);
   }
 }
