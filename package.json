@@ -23,7 +23,7 @@
     "@types/bull": "^3.10.6",
     "@types/cli-color": "^0.3.30",
     "@types/common-tags": "^1.8.0",
-    "@types/email-templates": "^6.0.1",
+    "@types/email-templates": "^6.0.2",
     "@types/express": "4.17.0",
     "@types/fs-extra": "^8.0.1",
     "@types/highland": "^2.12.4",
