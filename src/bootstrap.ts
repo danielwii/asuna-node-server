@@ -63,18 +63,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
-  /*
-  const fastifyInstance = fastify();
-  const fastifyAdapter = new FastifyAdapter(fastifyInstance);
-  fastifyAdapter.register(require('fastify-multipart'));
-
-  fastifyAdapter.use(require('cors')());
-  fastifyAdapter.use(require('dns-prefetch-control')());
-  fastifyAdapter.use(require('frameguard')());
-  fastifyAdapter.use(require('hide-powered-by')());
-  fastifyAdapter.use(require('hsts')());
-  fastifyAdapter.use(require('ienoopen')());
-  fastifyAdapter.use(require('x-xss-protection')()); */
 
   const app = await NestFactory.create<NestExpressApplication>(appModule, {
     logger: new SimpleLoggerService(),
@@ -109,18 +97,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // setup application
   // --------------------------------------------------------------
 
-  /*
-  app.register(require('fastify-multipart'));
-
-  app.use(require('cors')());
-  app.use(require('dns-prefetch-control')());
-  app.use(require('frameguard')());
-  app.use(require('hide-powered-by')());
-  app.use(require('hsts')());
-  app.use(require('ienoopen')());
-  app.use(require('x-xss-protection')()); */
-
-  app.use(helmet()); // use fastify-helmet
+  app.use(helmet());
   app.use(compression());
   app.use(responseTime());
   app.use(
@@ -137,10 +114,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(bodyParser.json({ limit }));
   app.use(bodyParser.urlencoded({ limit, extended: true }));
 
-  // fastifyInstance.addHook('onError', (req, reply, error, done) => {
-  //   logger.log(`error is ${r(error)}`);
-  //   done();
-  // });
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
@@ -153,7 +126,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   }
 
   // app.use(csurf());
-  app.enableCors();
+  // app.enableCors(); fixme temp disable for allow OPTIONS
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {

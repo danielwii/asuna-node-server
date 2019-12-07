@@ -1,7 +1,6 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-underscore-dangle */
 import idx from 'idx';
 import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 import {
   Any,
@@ -305,7 +304,15 @@ export class DBHelper {
     return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
   }
 
-  public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): any[] {
+  public static extractOriginAsunaSchemas(
+    repository,
+    opts: { module?: string; prefix?: string } = {},
+  ): {
+    columns: ColumnSchema[];
+    manyToManyRelations: ColumnSchema[];
+    manyToOneRelations: ColumnSchema[];
+    oneToManyRelations: ColumnSchema[];
+  } {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
     const parentEntityInfo: EntityMetaInfoOptions = idx(
@@ -371,7 +378,7 @@ export class DBHelper {
       R.filter(R.prop('isPrimary')),
     )(repository.metadata.manyToManyRelations);
 
-    // 加载 OneToMany 数据，没有 info 信息的不予显示
+    // 加载 OneToMany 数据
     const oneToManyRelations = R.compose(
       R.map(
         (relation: RelationMetadata): ColumnSchema => ({
@@ -385,10 +392,25 @@ export class DBHelper {
           },
         }),
       ),
-      R.filter((relation: RelationMetadata) => info[relation.propertyName]),
+      // R.filter((relation: RelationMetadata) => info[relation.propertyName]),
     )(repository.metadata.oneToManyRelations);
 
-    return [...columns, ...manyToManyRelations, ...manyToOneRelations, ...oneToManyRelations];
+    return { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations };
+  }
+
+  public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): ColumnSchema[] {
+    const { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations } = this.extractOriginAsunaSchemas(
+      repository,
+      opts,
+    );
+
+    return [
+      ...columns,
+      ...manyToManyRelations,
+      ...manyToOneRelations,
+      // 没有 info 信息的不予显示
+      ...(_.filter(oneToManyRelations, fp.get('config.info')) as ColumnSchema[]),
+    ];
   }
 
   /**
@@ -555,7 +577,10 @@ export class DBHelper {
     }
   }
 
-  public static toSqlValue(condition: { field: string; value: string | FindOperator<any> }, suffix = ''): any {
+  public static toSqlValue(
+    condition: { field: string; value: string | FindOperator<any> },
+    suffix = '',
+  ): string | { [key: string]: string | FindOperator<any> } {
     if (_.isObjectLike(condition.value)) {
       const elementCondition = condition.value as any;
       if (_.isObjectLike(elementCondition) && elementCondition.toSql) {

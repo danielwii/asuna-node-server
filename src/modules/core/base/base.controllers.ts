@@ -21,6 +21,10 @@ export abstract class RestCrudController {
     logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
   }
 
+  /**
+   * @deprecated {@see schema}
+   * @param model
+   */
   @ApiParam({
     name: 'model',
     description: ['about_us', 'about_us_categories', 'videos', 'video_categories'].join(','),
@@ -29,6 +33,12 @@ export abstract class RestCrudController {
   options(@Param('model') model: string) {
     const repository = DBHelper.repo(DBHelper.getModelName(model, this.module));
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
+  }
+
+  @Get('schema/:model')
+  schema(@Param('model') model: string) {
+    const repository = DBHelper.repo(DBHelper.getModelName(model, this.module));
+    return DBHelper.extractOriginAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
   @Get(':model')

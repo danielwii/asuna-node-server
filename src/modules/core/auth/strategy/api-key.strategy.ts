@@ -12,11 +12,12 @@ const API_KEY_HEADER = 'X-ApiKey';
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') {
   public authenticate(req: Request, options?: any): void {
-    logger.log(`validate ${r(options)}`);
+    logger.log(`validate request with options: ${r(options)}`);
     const self: Strategy = this as any;
     const key = getIgnoreCase(req.headers, API_KEY_HEADER) as string;
     if (key) {
       // TODO verify api key later
+      logger.warn(`skipped api-key validation... '${key}'`);
       self.success({ apiKey: key });
     } else {
       self.fail('ApiKey is required', 401);
