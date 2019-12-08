@@ -88,6 +88,7 @@ function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof ty
 
 export const AsunaCollections = {
   SYSTEM_SERVER: 'system.server',
+  WECHAT: 'wechat.settings',
 };
 
 export class KvDef {
