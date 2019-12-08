@@ -2,7 +2,7 @@ type AnyJson = boolean | number | string | null | JsonArray | JsonMap;
 export interface JsonMap {
   [key: string]: AnyJson;
 }
-export interface JsonArray extends Array<AnyJson> {}
+export type JsonArray = Array<AnyJson>;
 export type Json = JsonMap | JsonArray;
 
 export type EntityMetaInfoOptions = {
@@ -134,16 +134,16 @@ export type MetaInfoOptions =
  * @returns {Function}
  * @constructor
  */
-// tslint:disable-next-line:function-name
 export function MetaInfo(options: MetaInfoOptions): Function {
   return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+    // eslint-disable-next-line no-param-reassign
     target.info = { ...target.info, [propertyKey]: options };
   };
 }
 
-// tslint:disable-next-line:function-name
 export function EntityMetaInfo(options: EntityMetaInfoOptions): Function {
   return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+    // eslint-disable-next-line no-param-reassign
     target.entityInfo = options;
   };
 }

@@ -4,11 +4,13 @@ import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
+  @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
   @Column({ nullable: true, unique: true })
   email?: string;
 
+  @MetaInfo({ name: '用户名' })
   @Column({ nullable: false, unique: true, length: 100 })
   username: string;
 
@@ -20,6 +22,7 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: true, select: false })
   salt?: string;
 
+  @MetaInfo({ name: '最后登录时间' })
   @Column({ nullable: true, name: 'last_login_at' })
   lastLoginAt?: Date;
 

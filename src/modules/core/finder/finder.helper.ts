@@ -2,7 +2,7 @@ import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { join } from 'path';
 import { AsunaError, AsunaException, deserializeSafely, LoggerFactory } from '../../common';
-import { AsunaCollections, KVField, KVGroupFieldsValue, KvHelper } from '../kv';
+import { AsunaCollections, KvDef, KVField, KVGroupFieldsValue, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');
 
@@ -17,7 +17,7 @@ export class FinderAssetsSettings {
 }
 
 export class FinderHelper {
-  static kvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
+  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
 
   static async getValueByFieldKV(fieldKey: FinderFieldKey): Promise<string> {
     const field = await this.getByFieldKV(fieldKey);

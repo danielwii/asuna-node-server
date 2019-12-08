@@ -8,7 +8,7 @@ import { r } from '../helpers/utils';
 import { LoggerFactory } from './factory';
 
 export class LoggerInterceptor implements NestInterceptor {
-  logger = LoggerFactory.getLogger('ControllerLoggerInterceptor');
+  logger = LoggerFactory.getLogger('LoggerInterceptor');
 
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     let request = context.switchToHttp().getRequest<Request>();

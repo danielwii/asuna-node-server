@@ -81,7 +81,7 @@ export function parseNormalWhereAndRelatedFields(
   const relatedWhere = {};
   _.each(where, (value, field) => {
     const [extractedModel, extractedField] = _.split(field, '.');
-    let included = _.includes(allRelations, extractedModel);
+    const included = _.includes(allRelations, extractedModel);
     logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
     if (included) {
       relatedFields.push(field);
@@ -312,6 +312,7 @@ export class DBHelper {
     manyToManyRelations: ColumnSchema[];
     manyToOneRelations: ColumnSchema[];
     oneToManyRelations: ColumnSchema[];
+    oneToOneRelations: ColumnSchema[];
   } {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
@@ -395,7 +396,20 @@ export class DBHelper {
       // R.filter((relation: RelationMetadata) => info[relation.propertyName]),
     )(repository.metadata.oneToManyRelations);
 
-    return { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations };
+    // 加载 OneToOne 数据
+    const oneToOneRelations = R.compose(
+      R.map((relation: RelationMetadata) => ({
+        name: relation.propertyName,
+        config: {
+          selectable: DBHelper.extractSelectableByRelation(relation, opts),
+          type: R.is(String, relation.type) ? relation.type : (relation.type as Function).name,
+          info: info ? info[relation.propertyName] : undefined,
+        },
+      })),
+      // R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)),
+    )(repository.metadata.oneToOneRelations);
+
+    return { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations, oneToOneRelations };
   }
 
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): ColumnSchema[] {

@@ -25,6 +25,7 @@ module.exports = {
     'max-classes-per-file': 'off',
     'lines-between-class-members': 'off',
     'no-useless-constructor': 'off',
+    'no-underscore-dangle': 'off',
     'no-dupe-class-members': 'off',
     'class-methods-use-this': 'warn',
     'import/no-extraneous-dependencies': 'off',
