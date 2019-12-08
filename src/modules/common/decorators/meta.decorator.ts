@@ -2,7 +2,8 @@ type AnyJson = boolean | number | string | null | JsonArray | JsonMap;
 export interface JsonMap {
   [key: string]: AnyJson;
 }
-export type JsonArray = Array<AnyJson>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface JsonArray extends Array<AnyJson> {}
 export type Json = JsonMap | JsonArray;
 
 export type EntityMetaInfoOptions = {
