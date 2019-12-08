@@ -21,15 +21,17 @@ module.exports = {
     'no-prototype-builtins': 'off',
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
-    'import/no-default-export': 'error',
+    'import/no-default-export': 'warn',
     'max-classes-per-file': 'off',
     'lines-between-class-members': 'off',
+    'no-useless-constructor': 'off',
+    'no-dupe-class-members': 'off',
+    'class-methods-use-this': 'warn',
     'import/no-extraneous-dependencies': 'off',
     // 'import/no-extraneous-dependencies': [
     //   'error',
     //   { devDependencies: ['**/*test.ts', '**/*spec.ts'], optionalDependencies: false, peerDependencies: false },
     // ],
-    'no-useless-constructor': 'off',
     // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
     // 'react/destructuring-assignment': 'off',
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904

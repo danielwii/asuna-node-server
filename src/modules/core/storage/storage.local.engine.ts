@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable class-methods-use-this,no-dupe-class-members */
 import { oneLineTrim } from 'common-tags';
 import { Response } from 'express';
 import * as fs from 'fs-extra';
