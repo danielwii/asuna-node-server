@@ -1,4 +1,3 @@
-// tslint:disable:max-line-length
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';

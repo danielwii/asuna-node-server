@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as passport from 'passport';
-import { AsunaError, AsunaException } from '../../common';
+import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
@@ -69,5 +69,5 @@ export function auth(
     });
   }
 
-  throw new AsunaException(AsunaError.InvalidCredentials);
+  throw new AsunaException(AsunaErrorCode.InvalidCredentials);
 }

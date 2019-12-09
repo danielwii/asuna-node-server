@@ -252,7 +252,6 @@ export class UploaderController {
     });
 
     const fileInfo = new FileInfo({ filename: baseFilename, path: tempFile });
-    // tslint:disable-next-line:max-line-length
     // fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${baseFilename}`;
     const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch(error => {
       logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);

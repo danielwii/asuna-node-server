@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { AsunaError, AsunaException, LoggerFactory, r } from '../../common';
+import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../../common';
 import { FinderHelper } from './finder.helper';
 
 const logger = LoggerFactory.getLogger('FinderController');
@@ -26,7 +26,7 @@ export class FinderController {
   ) {
     logger.log(`find ${r({ encrypt, query, type })}`);
     if (!(_.isString(query) && query.length > 0) || !(_.isString(type) && ['zones', 'assets'].includes(type))) {
-      throw new AsunaException(AsunaError.BadRequest, 'params error');
+      throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
     }
 
     const queryParam = querystring.parse(encrypt ? Cryptor.desDecrypt(query) : query) as any;
@@ -48,7 +48,7 @@ export class ShortFinderController {
   async redirect(@Param('q') q: string, @Req() req, @Res() res) {
     logger.log(`find short ${r({ q })}`);
     if (!(_.isString(q) && q.length > 0)) {
-      throw new AsunaException(AsunaError.BadRequest, 'params error');
+      throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
     }
 
     let query;
@@ -61,11 +61,11 @@ export class ShortFinderController {
         .split('.') as any;
       query = Buffer.from(encodedQuery, 'base64').toString('ascii');
     } catch (error) {
-      throw new AsunaException(AsunaError.BadRequest, 'decode error');
+      throw new AsunaException(AsunaErrorCode.BadRequest, 'decode error');
     }
 
     if (!(_.isString(type) && ['zones', 'assets'].includes(type))) {
-      throw new AsunaException(AsunaError.InvalidParameter, 'invalid param');
+      throw new AsunaException(AsunaErrorCode.InvalidParameter, 'invalid param');
     }
 
     const queryParam = querystring.parse(encrypt === true ? Cryptor.desDecrypt(query) : query) as any;

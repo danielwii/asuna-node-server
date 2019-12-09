@@ -28,7 +28,6 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
   afterInsert(event: InsertEvent<any>) {
     if (!this.enabled) return;
-    // console.log('afterInsert', event.entity, idx(event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     // logger.debug(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
@@ -46,7 +45,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
   async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
     if (!this.enabled) return;
-    // console.log('beforeUpdate', event.entity, idx(event, _ => _.entity.constructor.name));
+    // console.log('beforeUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     const entity = await getRepository(event.entity.constructor.name).findOne(event.entity.id, {
@@ -60,7 +59,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
   afterUpdate(event: InsertEvent<any>) {
     if (!this.enabled) return;
-    // console.log('afterUpdate', event.entity, idx(event, _ => _.entity.constructor.name));
+    // console.log('afterUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     const from = this.map.get(`${event.entity.name}-${event.entity.id}`);
@@ -84,7 +83,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
 
   afterRemove(event: RemoveEvent<any>) {
     if (!this.enabled) return;
-    // console.log('afterRemove', event.entity, idx(event, _ => _.entity.constructor.name));
+    // console.log('afterRemove', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     // logger.debug(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);

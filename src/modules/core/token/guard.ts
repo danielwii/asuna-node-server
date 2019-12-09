@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AsunaError, AsunaException, getIgnoreCase } from '../../common';
+import { AsunaErrorCode, AsunaException, getIgnoreCase } from '../../common';
 import { OperationToken } from './entities';
 import { OperationTokenHelper } from './helper';
 
@@ -19,7 +19,7 @@ export class OperationTokenGuard implements CanActivate {
     return from(OperationTokenHelper.getTokenByToken(token)).pipe(
       map(operationToken => {
         if (operationToken == null) {
-          throw new AsunaException(AsunaError.Unprocessable, 'operation token required.');
+          throw new AsunaException(AsunaErrorCode.Unprocessable, 'operation token required.');
         }
         req.token = operationToken;
         return true;

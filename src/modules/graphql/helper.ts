@@ -12,7 +12,7 @@ import {
   ObjectLiteral,
   Repository,
 } from 'typeorm';
-import { AsunaError, AsunaException } from '../common';
+import { AsunaErrorCode, AsunaException } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { AbstractCategoryEntity } from '../core/base';
@@ -191,7 +191,7 @@ export class GraphqlHelper {
 
     if (opts.query && query.category) {
       if (categoryCls == null) {
-        throw new AsunaException(AsunaError.Unprocessable, `category class not defined for ${cls.name}`);
+        throw new AsunaException(AsunaErrorCode.Unprocessable, `category class not defined for ${cls.name}`);
       }
 
       const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;

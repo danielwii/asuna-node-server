@@ -7,7 +7,7 @@ import * as fs from 'fs-extra';
 import * as highland from 'highland';
 import * as _ from 'lodash';
 import { join } from 'path';
-import { AsunaError, AsunaException } from '../../common';
+import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
@@ -114,7 +114,7 @@ export class UploaderService {
     );
     if (_.sum(payload.finished) !== payload.totalChunks) {
       throw new AsunaException(
-        AsunaError.Unprocessable,
+        AsunaErrorCode.Unprocessable,
         `chunks not fully uploaded. ${_.sum(payload.finished)}/${payload.totalChunks}`,
       );
     }
@@ -128,7 +128,7 @@ export class UploaderService {
 
     if (!(chunks && chunks.length)) {
       throw new AsunaException(
-        AsunaError.Unprocessable,
+        AsunaErrorCode.Unprocessable,
         `no chunks found for ${_filename} with fingerprint: ${payload.fingerprint}`,
       );
     }

@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
 import { join } from 'path';
 import * as sharp from 'sharp';
-import { AsunaError, AsunaException, convertFilename, ErrorException, r } from '../../common';
+import { AsunaErrorCode, AsunaException, convertFilename, ErrorException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { UploaderConfig } from '../uploader/config';
@@ -68,7 +68,7 @@ export class LocalStorage implements IStorageEngine {
   resolveUrl(opts: ResolverOpts): Promise<string>;
   resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
   resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
-    if (!res) throw new AsunaException(AsunaError.Unprocessable, 'not implemented for non-res exists.');
+    if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
     const fullFilePath = join(UploaderConfig.uploadPath, bucket, prefix || '', filename);
@@ -77,7 +77,7 @@ export class LocalStorage implements IStorageEngine {
     }
 
     if (!fs.existsSync(fullFilePath)) {
-      throw new AsunaException(AsunaError.NotFound);
+      throw new AsunaException(AsunaErrorCode.NotFound);
     }
 
     let type = mime.lookup(filename);
@@ -118,7 +118,7 @@ export class LocalStorage implements IStorageEngine {
           res.type(ext).sendFile(fullFilePath);
           return;
         }
-        throw new AsunaException(AsunaError.NotFound);
+        throw new AsunaException(AsunaErrorCode.NotFound);
       }
 
       LocalStorage.logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
@@ -143,7 +143,7 @@ export class LocalStorage implements IStorageEngine {
       imageProcess.toFile(outputPath, (err, info) => {
         if (err) {
           LocalStorage.logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
-          throw new AsunaException(AsunaError.NotFound, err.message);
+          throw new AsunaException(AsunaErrorCode.NotFound, err.message);
         } else {
           res.type(ext).sendFile(outputPath);
         }

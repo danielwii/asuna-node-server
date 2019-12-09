@@ -30,7 +30,6 @@ export class LoggerInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    // tslint:disable-next-line:max-line-length
     // logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
     const now = Date.now();
     return next.handle().pipe(

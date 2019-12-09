@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
-import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
+import { AsunaErrorCode, AsunaException, deserializeSafely, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { AnyAuthGuard, AnyAuthRequest } from '../auth';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
@@ -86,7 +86,7 @@ export class OperationTokenController {
     const { identifier, user } = req;
     logger.log(`obtain token by resolver: ${key}`);
     if (!OperationTokenHelper.resolver[key]) {
-      throw new AsunaException(AsunaError.Unprocessable, `invalid key for token resolver: ${key}`);
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid key for token resolver: ${key}`);
     }
     return OperationTokenHelper.resolver[key]({ identifier, user });
   }
@@ -98,7 +98,7 @@ export class OperationTokenController {
     logger.log(`get token ${r(params)}`);
     const token = await OperationTokenHelper.getTokenByToken(params.token);
     if (token == null || token.identifier !== identifier) {
-      throw new AsunaException(AsunaError.InsufficientPermissions, 'invalid operation token');
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'invalid operation token');
     }
     return token;
   }

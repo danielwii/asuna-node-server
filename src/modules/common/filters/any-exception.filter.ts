@@ -5,13 +5,13 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { AsunaError, AsunaException, r, ValidationException } from '..';
+import { AsunaErrorCode, AsunaException, r, ValidationException } from '..';
 import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
 export class AnyExceptionFilter implements ExceptionFilter {
-  static handleSqlExceptions(exception) {
+  static handleSqlExceptions(exception): any {
     /*
      * 包装唯一性约束，用于前端检测
      */
@@ -19,7 +19,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = getRepository(model);
-      const [index] = metadata.indices.filter(index => index.name === key);
+      const [index] = metadata.indices.filter(i => i.name === key);
       return new ValidationException(
         index.name,
         (index.givenColumnNames as string[]).map(name => ({
@@ -33,7 +33,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     return exception;
   }
 
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
@@ -42,25 +42,26 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
     } else if (R.is(EntityNotFoundError, exception)) {
-      (<any>processed).status = HttpStatus.NOT_FOUND;
+      processed.httpStatus = HttpStatus.NOT_FOUND;
     } else if (processed.code) {
       if (processed.code === 'ERR_ASSERTION') {
         // TODO wrap with AsunaException
-        (<any>processed).status = HttpStatus.BAD_REQUEST;
+        processed.httpStatus = HttpStatus.BAD_REQUEST;
       }
-      // logger.warn(`[unhandled exception] ${JSON.stringify(exception)}`);
     }
 
-    const status: number = (<any>processed).status || HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse = (<any>processed).response;
+    const httpStatus: number = processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse = processed.response;
 
-    if (status && status === HttpStatus.BAD_REQUEST) {
+    if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
       // logger.warn(`[bad_request] ${r(processed)}`);
       logger.warn(`[bad_request] ${r(processed.message)}`);
-    } else if (status && status === HttpStatus.NOT_FOUND) {
+    } else if (httpStatus && httpStatus === HttpStatus.NOT_FOUND) {
       logger.warn(`[not_found] ${r(processed.message)}`);
-    } else if (/40\d/.test(`${status}`)) {
+    } else if (/40[13]/.test(`${httpStatus}`)) {
       logger.warn(`[unauthorized] ${r(processed)}`);
+    } else if (/4\d+/.test(`${httpStatus}`)) {
+      logger.warn(`[client_error] ${r(processed)}`);
     } else {
       logger.error(`[unhandled exception] ${r(processed)}`);
     }
@@ -75,36 +76,49 @@ export class AnyExceptionFilter implements ExceptionFilter {
       message = exceptionResponse.message;
       body = {
         error: {
-          status,
+          httpStatus,
           name: exceptionResponse.error,
           code: exceptionResponse.code,
           [key]: message,
           // raw: processed,
         } as AsunaException,
       };
-    } else if (R.is(Error, processed)) {
+    } else if (R.is(Error, processed) && !R.is(AsunaException, processed)) {
       message = processed.message;
       body = {
         error: {
-          status,
-          name: AsunaError.Unexpected__do_not_use_it.name,
-          code: processed.status || AsunaError.Unexpected__do_not_use_it.value,
+          httpStatus,
+          name: AsunaErrorCode.Unexpected__do_not_use_it.name,
+          code: processed.httpStatus || AsunaErrorCode.Unexpected__do_not_use_it.value,
           message,
           // raw: processed,
         } as AsunaException,
       };
     } else {
       message = processed.message;
-      body = { error: processed as AsunaException };
+      body = {
+        error: {
+          ...(processed as AsunaException),
+          message,
+          // code: processed.code || processed.httpStatus || AsunaErrorCode.Unexpected__do_not_use_it.value,
+        },
+      };
     }
 
-    logger.error({ message, body });
+    logger.error({
+      message,
+      body,
+      type: typeof exception,
+      isHttpException: exception instanceof HttpException,
+      isError: exception instanceof Error,
+      isAsunaException: exception instanceof AsunaException,
+    });
 
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
     if (!res.status) {
       throw new Error(JSON.stringify(body));
     }
 
-    res.status(status).send(body);
+    res.status(httpStatus).send(body);
   }
 }

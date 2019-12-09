@@ -4,7 +4,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@ne
 import { ApiTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-import { AsunaError, AsunaException, r, SignException } from '../../common';
+import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, r, SignException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
@@ -79,7 +79,7 @@ export class AdminAuthController extends RestCrudController {
     const isCorrect = this.adminAuthService.passwordVerify(signDto.password, user);
 
     if (!isCorrect) {
-      throw new SignException('wrong password');
+      throw AsunaExceptionHelper.genericException('wrong-password', []);
     }
 
     return this.adminAuthService.createToken(user);
@@ -94,11 +94,9 @@ export class AdminAuthController extends RestCrudController {
   async current(@Req() req: AnyAuthRequest): Promise<AbstractAuthUser> {
     const { user } = req;
     logger.log(`current... ${r(user)}`);
-    const currentUser = await this.adminAuthService.getUser(user, true, {
-      relations: ['roles'],
-    });
+    const currentUser = await this.adminAuthService.getUser(user, true, { relations: ['roles'] });
     if (!currentUser) {
-      throw new AsunaException(AsunaError.InsufficientPermissions, `id '${user.id}' not exist.`);
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, `id '${user.id}' not exist.`);
     }
     logger.log(`current... ${r(currentUser)}`);
     return currentUser;

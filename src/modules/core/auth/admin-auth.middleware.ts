@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
-import { AsunaError, AsunaException, r } from '../../common';
+import { AsunaErrorCode, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { auth } from './helper';
 
@@ -25,7 +25,7 @@ export class AdminAuthMiddleware {
 
       const result = await auth(req as any, res);
       if (!result.user) {
-        throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
+        throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
       }
 
       next();

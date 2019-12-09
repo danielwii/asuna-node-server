@@ -6,7 +6,7 @@ import { Response } from 'express';
 import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
-import { AsunaError, AsunaException, convertFilename } from '../../common';
+import { AsunaErrorCode, AsunaException, convertFilename } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
@@ -106,7 +106,7 @@ export class MinioStorage implements IStorageEngine {
   resolveUrl(opts: ResolverOpts): Promise<string>;
   resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
   async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
-    if (!res) throw new AsunaException(AsunaError.Unprocessable, 'not implemented for non-res exists.');
+    if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig, resolver } = opts;
     const url = await resolver(join(bucket || this.defaultBucket, prefix || '', filename));
@@ -201,7 +201,7 @@ export class MinioStorage implements IStorageEngine {
       })
       .catch(error => {
         MinioStorage.logger.error(`[saveEntity] [${filenameWithPrefix}] error: ${error}`, error.trace);
-        throw new AsunaException(AsunaError.Unprocessable, `[saveEntity] [${filenameWithPrefix}] error: ${error}`);
+        throw new AsunaException(AsunaErrorCode.Unprocessable, `[saveEntity] [${filenameWithPrefix}] error: ${error}`);
       });
     /*
     Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_UPLOAD).next({

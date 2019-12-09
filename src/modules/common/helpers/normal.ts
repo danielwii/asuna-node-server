@@ -25,7 +25,7 @@ export class EnumHelper {
   static values = nameValues => _.map(nameValues, fp.get('value'));
 }
 
-export function convertFilename(filename: string) {
+export function convertFilename(filename: string): string {
   return filename.replace(/[^\w._]+/g, '_');
 }
 
@@ -34,7 +34,7 @@ export function getIgnoreCase(o: object, key: string): any {
   return _.find(o, (v, k) => k.toLowerCase() === compareWith);
 }
 
-export function formatTime(nbSeconds, hasHours = true) {
+export function formatTime(nbSeconds, hasHours = true): string {
   const time = [];
   let s = 1;
   let calc = nbSeconds;
@@ -61,7 +61,7 @@ export function formatTime(nbSeconds, hasHours = true) {
   return time.join(':');
 }
 
-export function isBlank(value) {
+export function isBlank(value): boolean {
   return (value && (_.isEmpty(value) && !_.isNumber(value))) ||
     (_.isNaN(value) && _.isString(value))
     ? !!_.trim(value)

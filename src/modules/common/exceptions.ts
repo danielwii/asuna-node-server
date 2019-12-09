@@ -1,6 +1,10 @@
-// tslint:disable:max-line-length
 import { HttpStatus } from '@nestjs/common';
-import { NameValue } from './helpers';
+import * as _ from 'lodash';
+import { NameValue } from './helpers/normal';
+import { r } from './helpers/utils';
+import { LoggerFactory } from './logger';
+
+const logger = LoggerFactory.getLogger('exceptions');
 
 /**
  * 400  invalidParameter          Indicates that a request parameter has an invalid value.
@@ -8,13 +12,15 @@ import { NameValue } from './helpers';
  * 401  invalidCredentials        Indicates that the auth token is invalid or has expired.
  * 403  insufficientPermissions   Indicates that the user does not have sufficient permissions for the entity specified in the query.
  * 409  conflict                  Indicates that the request message conflicts with the current state of the resource.
- *                                The API request cannot be completed because the requested operation would conflict with an existing item. For example, a request that tries to create a duplicate item would create a conflict, though duplicate items are typically identified with more specific errors.
+ *                                The API request cannot be completed because the requested operation would conflict with an existing item.
+ *                                For example, a request that tries to create a duplicate item would create a conflict,
+ *                                though duplicate items are typically identified with more specific errors.
  * 409  duplicate                 The requested operation failed because it tried to create a resource that already exists.
  * 422  unprocessable             Indicates an issue with the request message considered in isolation.
  * 429  tooManyRequests
  * 500  unexpected                Better not use it.
  */
-export const AsunaError = {
+export const AsunaErrorCode = {
   InvalidParameter: new NameValue('Invalid Parameter', 400),
   BadRequest: new NameValue('Bad Request', 400),
   InvalidCredentials: new NameValue('Invalid Credentials', 401),
@@ -41,10 +47,11 @@ export const AsunaError = {
  */
 export class AsunaBaseException extends Error {
   constructor(
-    public status: HttpStatus,
+    public httpStatus: HttpStatus,
     public code: string,
     public name: string,
     public message: string,
+    public localeMessage?: string,
     public errors?: any,
   ) {
     super(message);
@@ -54,6 +61,13 @@ export class AsunaBaseException extends Error {
 export class AsunaException extends AsunaBaseException {
   constructor(nameValue: NameValue, message?: string, errors?: any) {
     super(nameValue.value, null, nameValue.name, message, errors);
+  }
+
+  static of(nameValue: NameValue, code?: string, message?: string, localeMessage?: string, errors?: any): AsunaException {
+    const exception = new AsunaException(nameValue, message, errors);
+    exception.code = code;
+    exception.localeMessage = localeMessage;
+    return exception;
   }
 }
 
@@ -65,19 +79,19 @@ export class AsunaCodeException extends AsunaBaseException {
 
 export class ErrorException extends AsunaBaseException {
   constructor(name: string, message?: string, errors?: any) {
-    super(AsunaError.Unprocessable.value, name, AsunaError.Unprocessable.name, message, errors);
+    super(AsunaErrorCode.Unprocessable.value, name, AsunaErrorCode.Unprocessable.name, message, errors);
   }
 }
 
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
-    super(AsunaError.InvalidParameter, `validate '${model}' error`, errors);
+    super(AsunaErrorCode.InvalidParameter, `validate '${model}' error`, errors);
   }
 }
 
 export class UploadException extends AsunaException {
   constructor(errors) {
-    super(AsunaError.Unprocessable, 'upload file(s) error', errors);
+    super(AsunaErrorCode.Unprocessable, 'upload file(s) error', errors);
   }
 }
 
@@ -86,6 +100,63 @@ export class UploadException extends AsunaException {
  */
 export class SignException extends AsunaException {
   constructor(message) {
-    super(AsunaError.InvalidCredentials, message);
+    super(AsunaErrorCode.InvalidCredentials, message);
+  }
+}
+
+type AsunaExceptionOpts = {
+  code: string;
+  nameValue: NameValue;
+  message: (...params) => string;
+  localMessage: (...params) => string;
+};
+
+export class AsunaExceptionHelper {
+  private static registers = {
+    'element-exists': {
+      code: 'E01001',
+      nameValue: AsunaErrorCode.Conflict,
+      message: (type: string, element: string) => `'${type}' '${r(element)}' already exists.`,
+      localMessage: (type: string, element: string) => `'${type}' '${r(element)}' 已存在`,
+    },
+    'wrong-password': {
+      code: 'E01002',
+      nameValue: AsunaErrorCode.InvalidCredentials,
+      message: () => `wrong password`,
+      localMessage: () => `密码错误`,
+    },
+    'auth-expired': {
+      code: 'E02001',
+      nameValue: AsunaErrorCode.InvalidCredentials,
+      message: () => `auth token expired`,
+      localMessage: params => `认证已过期`,
+    },
+  };
+
+  static reg(type: string, opts: AsunaExceptionOpts): void {
+    if (_.has(this.registers, type)) {
+      throw new Error(`already exists '${type}' in asuna exception registers.`);
+    }
+    this.registers[type] = opts;
+  }
+
+  static genericException<T extends keyof typeof AsunaExceptionHelper.registers>(
+    type: T,
+    params: Parameters<typeof AsunaExceptionHelper.registers[T]['message']>,
+    errors?: any,
+  ): AsunaException {
+    if (this.registers[type]) {
+      const opts = this.registers[type];
+      return AsunaException.of(
+        opts.nameValue,
+        opts.code,
+        _.spread(opts.message)(params),
+        _.spread(opts.localMessage)(params),
+        errors,
+      );
+    }
+
+    logger.error(`not found '${type}' in asuna exception registers.`);
+    return new AsunaException(AsunaErrorCode.Unexpected__do_not_use_it, errors, errors);
   }
 }

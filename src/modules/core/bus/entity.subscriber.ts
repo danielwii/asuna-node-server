@@ -38,8 +38,6 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    // tslint:disable-next-line:max-line-length
-    // logger.debug(`afterInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
     /*
     Hermes.emit(
       EntitySubscriber.name,
@@ -60,7 +58,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
     // logger.debug(
-    //   `afterRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //   `afterRemove ${(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     id: event.entityId,
     //   })}`,
@@ -69,7 +67,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
     // logger.debug(
-    //   `afterUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //   `afterUpdate ${(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     updatedColumns: diff(event.entity, event.databaseEntity),
     //     name: event.metadata.name,
@@ -88,12 +86,11 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       tableName: event.metadata.tableName,
     });
 */
-    dataLoaderCleaner.clear(idx(event, _ => _.entity.constructor.name), _.get(event.entity, 'id'));
+    dataLoaderCleaner.clear(event?.entity?.constructor?.name, _.get(event.entity, 'id'));
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    // tslint:disable-next-line:max-line-length
-    // logger.debug(`beforeInsert ${idx(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
+    // logger.debug(`beforeInsert ${(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
     event.metadata.columns.forEach(column => {
       if (column.type === jsonType()) {
         safeReloadJSON(event.entity as any, column.propertyName);
@@ -104,7 +101,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
     // logger.debug(
-    //   `beforeRemove ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //   `beforeRemove ${(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     id: event.entityId,
     //   })}`,
@@ -113,7 +110,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
     // logger.debug(
-    //   `beforeUpdate ${idx(event, _ => _.entity.constructor.name)} ${r({
+    //   `beforeUpdate ${(event, _ => _.entity.constructor.name)} ${r({
     //     entity: event.entity,
     //     updatedColumns: diff(event.entity, event.databaseEntity),
     //     name: event.metadata.name,

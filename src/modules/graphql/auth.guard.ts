@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { AsunaError, AsunaException, r } from '../common';
+import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { auth } from '../core/auth';
 import { IJwtPayload } from '../core/auth/auth.interfaces';
@@ -31,7 +31,7 @@ export class GqlAdminAuthGuard implements CanActivate {
     const result = await auth(req, res, 'admin');
 
     if (!result.user) {
-      throw new AsunaException(AsunaError.InsufficientPermissions, result.err || result.info);
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
     }
 
     return !!result.user;
@@ -64,7 +64,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
         return null;
       }
       logger.log(`handleRequest(jwt) ${r({ err, user, info })}`);
-      throw err || new AsunaException(AsunaError.InsufficientPermissions);
+      throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions);
     }
     return user;
   }
@@ -108,7 +108,6 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 */
 }
 
-// tslint:disable-next-line:class-name
 export interface GetCurrentUser {
   (): IJwtPayload;
 }

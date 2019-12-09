@@ -3,7 +3,7 @@ import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
-import { AsunaError, AsunaException, deserializeSafely, r } from '../../common';
+import { AsunaErrorCode, AsunaException, deserializeSafely, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
@@ -212,7 +212,7 @@ export class OperationTokenHelper {
       await OperationTokenHelper.checkAvailable(operationToken);
       return operationToken.reload();
     }
-    throw new AsunaException(AsunaError.Unprocessable, 'invalid token');
+    throw new AsunaException(AsunaErrorCode.Unprocessable, 'invalid token');
   }
 
   static async checkAvailable(operationToken: OperationToken): Promise<boolean> {

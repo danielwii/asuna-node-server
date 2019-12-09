@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import * as _ from 'lodash';
 
@@ -43,6 +43,7 @@ export class SignInDto {
   readonly username: string;
 
   @IsNotEmpty()
+  @Exclude({ toPlainOnly: true })
   readonly password: string;
 }
 
@@ -58,7 +59,8 @@ export class SignUpDto {
   readonly username: string;
 
   @IsNotEmpty()
-  @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
+  @Exclude({ toPlainOnly: true })
+  // @Expose({ name: 'with-password', toPlainOnly: true })
+  // @Transform(value => !!value, { toPlainOnly: true })
   readonly password: string;
 }

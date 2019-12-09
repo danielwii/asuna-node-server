@@ -38,8 +38,8 @@ module.exports = {
     // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
     // 'react/jsx-filename-extension': 'off',
     // Use function hoisting to improve code readability
-    '@typescript-eslint/no-parameter-properties': ['error', { allows: ['private readonly'] }],
-    '@typescript-eslint/no-inferrable-types': ['error', { ignoreParameters: true }],
+    '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/camelcase': 'off',
     // Makes no sense to allow type inferrence for expression parameters, but require typing the response
     '@typescript-eslint/explicit-function-return-type': [
