@@ -1,5 +1,3 @@
-import idx from 'idx';
-import { diff } from 'jsondiffpatch';
 import * as _ from 'lodash';
 import {
   BaseEntity,

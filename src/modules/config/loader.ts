@@ -54,6 +54,10 @@ export const ConfigKeys = {
   PAYLOAD_LIMIT: 'PAYLOAD_LIMIT',
 
   OTP_SECRET: 'OTP_SECRET',
+
+  // 系统默认用户
+  SYS_ADMIN_EMAIL: 'SYS_ADMIN_EMAIL',
+  SYS_ADMIN_PASSWORD: 'SYS_ADMIN_PASSWORD',
 };
 
 export const configLoader: ConfigLoader = createConfigLoader({

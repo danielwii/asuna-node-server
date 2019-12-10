@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
+import * as shortid from 'shortid';
 import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { ConfigKeys, configLoader } from '../../config';
 import { AbstractAuthService } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
@@ -41,6 +43,8 @@ export class AdminAuthService extends AbstractAuthService {
    * @returns {Promise<void>}
    */
   async initSysAccount(): Promise<void> {
+    const email = configLoader.loadConfig(ConfigKeys.SYS_ADMIN_EMAIL, 'admin@example.com');
+    const password = configLoader.loadConfig(ConfigKeys.SYS_ADMIN_PASSWORD, shortid.generate());
     const role = await this.roleRepository.findOne({ name: SYS_ROLE });
 
     if (!role) {
@@ -57,8 +61,10 @@ export class AdminAuthService extends AbstractAuthService {
     const usersBySysRole = await sysRole.users;
     logger.log(`found users for sys role: ${usersBySysRole.length}`);
     if (usersBySysRole.length === 0) {
-      logger.log('create SYS_ADMIN account: admin@example.com:password');
-      this.createUser('Admin', 'admin@example.com', 'password', [SYS_ROLE]).catch(error => {
+      logger.log(`---------------------------------------------------------------`);
+      logger.log(`create SYS_ADMIN account: ${email}:${password}`);
+      logger.log(`---------------------------------------------------------------`);
+      this.createUser('Administrator', email, password, [SYS_ROLE]).catch(error => {
         logger.warn('cannot create default SYS_ADMIN account', error);
       });
     }

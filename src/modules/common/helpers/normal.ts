@@ -19,7 +19,7 @@ export class NameDescValue<T = any> {
   ) {}
 }
 
-export class EnumHelper {
+export class NameValueHelper {
   static names = nameValues => _.map(nameValues, fp.get('name'));
 
   static values = nameValues => _.map(nameValues, fp.get('value'));

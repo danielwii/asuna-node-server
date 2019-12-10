@@ -1,4 +1,3 @@
-import idx from 'idx';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -316,10 +315,7 @@ export class DBHelper {
   } {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
-    const parentEntityInfo: EntityMetaInfoOptions = idx(
-      repository,
-      __ => __.metadata.parentEntityMetadata.target.entityInfo,
-    ) as any;
+    const parentEntityInfo: EntityMetaInfoOptions = repository?.metadata?.parentEntityMetadata?.target?.entityInfo;
 
     const columns = R.compose(
       // 更新可能的 STI 信息

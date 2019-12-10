@@ -16,6 +16,12 @@ export class CacheManager {
     maxAge: 1000 * 60, // 5 min
   });
 
+  /**
+   * 缓存工具，将 resolver 的结果按 ttl: [seconds] 保存在内存中，默认过期为 60 min
+   * @param key
+   * @param resolver
+   * @param seconds
+   */
   static async cacheable(key: string | object, resolver: () => Promise<string>, seconds?: number): Promise<string> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const cacheValue = this.cache.get(cacheKey);
