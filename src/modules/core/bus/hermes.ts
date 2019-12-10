@@ -6,8 +6,8 @@ import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
 import { isBlank, r } from '../../common';
-import { ConfigKeys, configLoader } from '../../config';
 import { LoggerFactory } from '../../common/logger';
+import { ConfigKeys, configLoader } from '../../config';
 import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth/base.entities';
 import { random } from '../helpers';
@@ -295,7 +295,8 @@ export class Hermes {
     if (configObject && configObject.enable) {
       const db = configLoader.loadNumericConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);
-      Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) });
+      // redis.ClientOpts have to convert to ioredis.RedisOptions
+      Hermes.regQueue(AsunaSystemQueue.UPLOAD, { redis: configObject.getOptions(db) as any });
 
       logger.log('sync status with redis.');
     }
