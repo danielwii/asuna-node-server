@@ -209,7 +209,7 @@ export class KvHelper {
         const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
         return field?.value || _.get(field, 'field.defaultValue');
       },
-      60_000,
+      60,
     );
   }
 

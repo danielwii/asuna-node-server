@@ -1,5 +1,4 @@
 import { RedisOptions } from '@nestjs/common/interfaces/microservices/microservice-configuration.interface';
-import { RedisClient } from '@nestjs/microservices/external/redis.interface';
 import * as bluebird from 'bluebird';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
@@ -12,7 +11,7 @@ const logger = LoggerFactory.getLogger('RedisProvider');
 export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })
   @Transform(value => !!value, { toPlainOnly: true })
-  client: RedisClient & { getAsync: (any) => Promise<any> };
+  client: redis.RedisClient;
 
   isEnabled: boolean;
   isHealthy: boolean;
@@ -22,7 +21,7 @@ export class RedisClientObject {
 export class RedisProvider {
   private clients: { [key: string]: RedisClientObject } = {};
 
-  public static instance = new RedisProvider();
+  public static readonly instance = new RedisProvider();
 
   private constructor() {}
 
