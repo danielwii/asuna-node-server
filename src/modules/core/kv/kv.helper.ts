@@ -207,7 +207,7 @@ export class KvHelper {
       { kvDef, fieldKey },
       async () => {
         const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-        if (field) return field.value || _.get(field, 'field.defaultValue');
+        return field?.value || _.get(field, 'field.defaultValue');
       },
       60_000,
     );
@@ -218,8 +218,8 @@ export class KvHelper {
     fieldKey: string,
   ): Promise<{ field: KVField; value: any }> {
     const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef.collection, kvDef.key)).value;
-    return {
-      value: fields.values[fieldKey],
+    const result = {
+      value: _.get(fields.values, fieldKey),
       field: _.get(
         _.chain(fields.form)
           .flatMap(fieldGroup => fieldGroup.fields)
@@ -228,5 +228,7 @@ export class KvHelper {
         'field',
       ),
     };
+    logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    return result;
   }
 }
