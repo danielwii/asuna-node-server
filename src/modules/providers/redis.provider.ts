@@ -23,6 +23,7 @@ export class RedisProvider {
 
   public static readonly instance = new RedisProvider();
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   getRedisClient(prefix = '', db = 0): RedisClientObject {

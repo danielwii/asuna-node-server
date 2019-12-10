@@ -1,7 +1,7 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
-import { configLoader } from '../config';
 import { LoggerFactory } from '../common/logger';
+import { configLoader } from '../config';
 
 const logger = LoggerFactory.getLogger('RedisConfig');
 
@@ -43,7 +43,7 @@ export class RedisConfigObject {
   }
 
   static loadOr(prefix = ''): RedisConfigObject | null {
-    const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     logger.debug(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     if (enable === true) {
@@ -55,7 +55,7 @@ export class RedisConfigObject {
     return RedisConfigObject.load();
   }
 
-  get options(): Redis.RedisOptions {
+  get options(): Redis.ClientOpts {
     return {
       host: this.host,
       port: this.port,
@@ -64,7 +64,7 @@ export class RedisConfigObject {
     };
   }
 
-  getOptions(db?: number): Redis.RedisOptions {
+  getOptions(db?: number): Redis.ClientOpts {
     return { ...this.options, db: db || this.db };
   }
 }
