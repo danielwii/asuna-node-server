@@ -7,7 +7,7 @@ function StaticImplements<T>() {
 }
 
 export class AdminUserIdentifierHelper implements IdentifierHelper<Partial<AdminUser>> {
-  parse = (identifier: string): Partial<AdminUser> => ({ id: +identifier.slice(1) });
+  parse = (identifier: string): Partial<AdminUser> => ({ id: identifier.slice(1) });
 
   stringify = (payload: Partial<AdminUser>): string => `admin=${payload.id}`;
 }
@@ -41,7 +41,7 @@ export class AdminUserIdentifier implements Identifier<AdminUser> {
 
 @StaticImplements<IdentifierHelper<Partial<AbstractAuthUser>>>()
 export class UserIdentifierHelper {
-  static parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: +identifier.split('=')[1] });
+  static parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: identifier.split('=')[1] });
 
   static stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
 }

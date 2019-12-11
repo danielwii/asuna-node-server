@@ -3,6 +3,7 @@ import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
+import { PrimaryKey } from '../../common';
 import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
@@ -104,7 +105,7 @@ export abstract class AbstractAuthService {
     );
   }
 
-  public updatePassword(id: number, password: string, salt: string): Promise<UpdateResult> {
+  public updatePassword(id: PrimaryKey, password: string, salt: string): Promise<UpdateResult> {
     return this.userRepository.update(id, { password, salt } as any);
   }
 }
