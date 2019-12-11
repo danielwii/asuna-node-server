@@ -17,6 +17,7 @@ import {
   AdminContentRestController,
   AdminRestController,
   AdminSysRestController,
+  AdminWxRestController,
   WwwRestController,
 } from './rest';
 import { SearchController } from './search/search.controller';
@@ -44,6 +45,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AdminAppRestController,
     AdminContentRestController,
     AdminSysRestController,
+    AdminWxRestController,
     WwwRestController,
     CommandController,
     SearchController,

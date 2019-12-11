@@ -6,9 +6,9 @@ import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { AbstractAuthService } from './abstract.auth.service';
+import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
-import { AdminUser, Role } from './auth.entities';
+import { AdminUser } from './auth.entities';
 import { RoleRepository } from './auth.repositories';
 
 const logger = LoggerFactory.getLogger('AdminAuthService');
@@ -23,7 +23,7 @@ export class AdminAuthService extends AbstractAuthService {
   }
 
   async createUser(username: string, email: string, password: string, roleNames?: string[]): Promise<AdminUser> {
-    const { hash, salt } = this.encrypt(password);
+    const { hash, salt } = PasswordHelper.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
 
     let user = (await this.getUser({ username, email })) as AdminUser;

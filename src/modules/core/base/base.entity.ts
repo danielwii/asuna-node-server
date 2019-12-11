@@ -11,6 +11,8 @@ import {
 import { MetaInfo } from '../../common/decorators';
 import { SimpleIdGenerator } from '../../ids';
 
+export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
+
 export abstract class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
 

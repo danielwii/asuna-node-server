@@ -12,19 +12,21 @@ import { AbstractAuthUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
-export abstract class AbstractAuthService {
-  protected readonly cryptor = new Cryptor();
+export class PasswordHelper {
+  static readonly cryptor = new Cryptor();
 
-  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
-
-  encrypt(password: string): { hash: string; salt: string } {
+  static encrypt(password: string): { hash: string; salt: string } {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  passwordVerify(password: string, user: AbstractAuthUser): boolean {
+  static passwordVerify(password: string, user: AbstractAuthUser): boolean {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
+}
+
+export abstract class AbstractAuthService {
+  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
+  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
 
   /**
    * TODO using env instead

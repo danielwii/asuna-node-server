@@ -33,3 +33,12 @@ export class AdminSysRestController extends RestCrudController {
     super('sys');
   }
 }
+
+// TODO admin 后的 module 路由应该可以自动化
+@ApiTags('sys-admin')
+@Controller('admin/rest/wx')
+export class AdminWxRestController extends RestCrudController {
+  constructor() {
+    super('wx');
+  }
+}
