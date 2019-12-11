@@ -7,7 +7,7 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
 import { DBHelper } from '../db';
-import { AbstractAuthService } from './abstract.auth.service';
+import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AdminUser } from './auth.entities';
 import { AbstractAuthUser } from './base.entities';
 
@@ -45,7 +45,7 @@ export class AuthService extends AbstractAuthService {
     email: string,
     password: string,
   ): Promise<U> {
-    const { hash, salt } = this.encrypt(password);
+    const { hash, salt } = PasswordHelper.encrypt(password);
 
     const user = await this.getUser({ email, username });
     if (user) {
