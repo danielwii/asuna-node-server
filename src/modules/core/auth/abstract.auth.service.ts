@@ -24,15 +24,12 @@ export class PasswordHelper {
   }
 }
 
-export abstract class AbstractAuthService {
-  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
-
+export class TokenHelper {
   /**
    * TODO using env instead
    * @returns {Promise<void>}
    */
-  async createToken(user: AbstractAuthUser): Promise<{ expiresIn: number; accessToken: string }> {
+  static async createToken(user: AbstractAuthUser): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -43,6 +40,11 @@ export abstract class AbstractAuthService {
       accessToken: token,
     };
   }
+}
+
+export abstract class AbstractAuthService {
+  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
+  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
 
   /**
    * TODO using db repo instead

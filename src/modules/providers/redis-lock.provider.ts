@@ -29,9 +29,18 @@ export class RedisLockProvider {
         });
       }
 
-      process.on('SIGINT', () => this.redLock.removeAllListeners());
-      process.on('beforeExit', () => this.redLock.removeAllListeners());
-      process.on('removeListener', () => this.redLock.removeAllListeners());
+      process.on('SIGINT', () => {
+        logger.log(`SIGINT ...`);
+        this.redLock.removeAllListeners();
+      });
+      process.on('beforeExit', () => {
+        logger.log(`beforeExit ...`);
+        this.redLock.removeAllListeners();
+      });
+      process.on('removeListener', () => {
+        logger.log(`removeListener ...`);
+        this.redLock.removeAllListeners();
+      });
     } else {
       logger.log(`skip setup redis, REDIS_ENABLE is ${redisClientObject.isEnabled}`);
     }

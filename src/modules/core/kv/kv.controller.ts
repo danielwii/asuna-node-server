@@ -65,6 +65,7 @@ export class KvController {
     return null;
   }
 
+  // fixme kv 的读取需要一定的权限
   @Get('kv')
   async get(@Query() query: GetKvPairRequest) {
     logger.log(`get ${r(query)}`);

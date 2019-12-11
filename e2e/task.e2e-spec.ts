@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
 
-import { AdminAuthService, AdminInternalModule } from '../src/modules';
+import { AdminAuthService, AdminInternalModule, TokenHelper } from "../src/modules";
 import { TaskEvent, TaskRecord } from '../src/modules/task';
 
 describe('AppRestController (e2e)', () => {
@@ -27,7 +27,7 @@ describe('AppRestController (e2e)', () => {
     await TaskEvent.save(TaskEvent.create({ task: task2, message: 'e21' }));
 
     const authService = app.get<AdminAuthService>(AdminAuthService);
-    token = (await authService.createToken(await authService.getUser({ email: 'admin@example.com' }))).accessToken;
+    token = (await TokenHelper.createToken(await authService.getUser({ email: 'admin@example.com' }))).accessToken;
   });
 
   afterAll(async () => {

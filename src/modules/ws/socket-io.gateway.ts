@@ -7,12 +7,26 @@ import {
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import * as _ from 'lodash';
+import { Client, Server } from 'socket.io';
 import { LoggerFactory } from '../common/logger';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../../package.json');
 
 const logger = LoggerFactory.getLogger('SocketIOGateway');
+
+export class WsHelper {
+  private static server: Server;
+
+  static get ws(): Server {
+    return this.server;
+  }
+
+  static set ws(server: Server) {
+    this.server = server;
+  }
+}
 
 @WebSocketGateway({
   namespace: 'admin',
@@ -22,12 +36,35 @@ const logger = LoggerFactory.getLogger('SocketIOGateway');
 })
 export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  private server: Server;
-
+  private readonly server?: Server;
   private readonly timestamp = Date.now();
+  // private readonly redis = RedisProvider.instance.getRedisClient('ws');
+
+  private views = 0;
+  private history = 0;
+
+  constructor() {
+    setInterval(() => {
+      if (this.views !== this.history) {
+        logger.log(`online: ${this.views}`);
+        this.history = this.views;
+        this.server?.volatile.emit('views', this.views);
+        // logger.verbose(
+        //   `clients: ${r({
+        //     namespace: (this.server?.clients()).name,
+        //     sids: (this.server?.clients()).adapter.sids,
+        //     rooms: (this.server?.clients()).adapter.rooms,
+        //   })}`,
+        // );
+
+        const id = _.head(_.keys((this.server?.clients()).adapter.sids));
+        this.server?.to(id).emit('first', 'hello world');
+      }
+    }, 2000);
+  }
 
   @SubscribeMessage('events')
-  onHeartbeat(client, data): WsResponse<string> {
+  onHeartbeat(client: Client, data: any): WsResponse<string> {
     const event = 'events';
     const response = `admin-${pkg.version}-${this.timestamp}`;
     return { event, data: response };
@@ -35,13 +72,17 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
   public afterInit(server: Server): any {
     logger.log('init...');
+    // SocketIOGateway.ws.next(server);
+    WsHelper.ws = server;
   }
 
-  public handleConnection(client: any): any {
-    logger.log(`connected... id: ${client.id}`);
+  public handleConnection(client: Client): any {
+    this.views += 1;
+    logger.log(`[${client.id}] connected (${this.views})`);
   }
 
-  public handleDisconnect(client: any): any {
-    logger.log(`disconnect... id: ${client.id}`);
+  public handleDisconnect(client: Client): any {
+    this.views -= 1;
+    logger.log(`[${client.id}] disconnect (${this.views})`);
   }
 }

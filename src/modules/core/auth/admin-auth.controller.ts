@@ -8,7 +8,7 @@ import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, r, SignException 
 import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
-import { PasswordHelper } from './abstract.auth.service';
+import { PasswordHelper, TokenHelper } from "./abstract.auth.service";
 import { AdminAuthService } from './admin-auth.service';
 import { SignDto } from './auth.dto';
 import { AbstractAuthUser } from './base.entities';
@@ -83,7 +83,7 @@ export class AdminAuthController extends RestCrudController {
       throw AsunaExceptionHelper.genericException('wrong-password', []);
     }
 
-    return this.adminAuthService.createToken(user);
+    return TokenHelper.createToken(user);
   }
 
   @Get('authorized')

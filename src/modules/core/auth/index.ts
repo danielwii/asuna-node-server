@@ -1,3 +1,4 @@
+export * from './abstract.auth.service';
 export * from './admin-auth.guard';
 export * from './admin-auth.service';
 export * from './auth.dto';
