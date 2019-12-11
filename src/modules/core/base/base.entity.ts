@@ -30,9 +30,9 @@ export abstract class AbstractBaseEntity extends BaseEntity {
  */
 export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
   @Exclude()
-  private readonly idPrefix: string;
+  readonly idPrefix: string;
   @Exclude()
-  private readonly generator: SimpleIdGenerator;
+  readonly generator: SimpleIdGenerator;
 
   @PrimaryColumn() id?: string;
 

@@ -13,7 +13,7 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
-import { renameTables } from './migrations';
+import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
@@ -87,7 +87,15 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     }),
   );
   await connection.query('SET FOREIGN_KEY_CHECKS=0');
+
+  logger.log(`synchronize ...`);
   await connection.synchronize();
+  logger.log(`synchronize ... done`);
+
+  logger.log(`run custom migrations ...`);
+  await runCustomMigrations();
+  logger.log(`run custom migrations ... done`);
+
   await connection.query('SET FOREIGN_KEY_CHECKS=1');
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 

@@ -36,6 +36,10 @@ export class Role extends AbstractBaseEntity {
 @EntityMetaInfo({ name: 'auth__users' })
 @Entity('auth__t_users')
 export class AdminUser extends AbstractAuthUser {
+  constructor() {
+    super('sa');
+  }
+
   @MetaInfo({ name: '角色' })
   @ManyToMany(
     type => Role,

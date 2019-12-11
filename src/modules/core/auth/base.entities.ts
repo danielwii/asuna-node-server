@@ -1,9 +1,9 @@
 import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
-import { AbstractBaseEntity } from '../base';
+import { AbstractTimeBasedBaseEntity } from '../base';
 
-export abstract class AbstractAuthUser extends AbstractBaseEntity {
+export abstract class AbstractAuthUser extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
@@ -31,6 +31,6 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   // --------------------------------------------------------------
 
   @MetaInfo({ name: '是否启用？' })
-  @Column({ nullable: true, name: 'active' })
+  @Column({ nullable: true, name: 'is_active' })
   isActive?: boolean;
 }

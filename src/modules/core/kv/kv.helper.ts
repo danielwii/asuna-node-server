@@ -87,6 +87,7 @@ function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof ty
 }
 
 export const AsunaCollections = {
+  SYSTEM_MIGRATIONS: 'system.migrations',
   SYSTEM_SERVER: 'system.server',
   WECHAT: 'wechat.settings',
 };
@@ -126,6 +127,8 @@ export class KvHelper {
     value: any;
     extra?: any;
     noUpdate?: boolean;
+    // 用于合并 KVGroupFieldsValue 中的表单
+    merge?: boolean;
   }): Promise<KeyValuePair> {
     const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
@@ -150,6 +153,10 @@ export class KvHelper {
     logger.log(`inspect ${r({ pair, collection, key, type, name, value, exists })}`);
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && pair.noUpdate && exists.value) return exists;
+    if (exists && pair.merge) {
+      exists.value = JSON.stringify({ ...exists.value, form: _.get(value, 'form') });
+      return exists.save();
+    }
 
     logger.log(`set ${r({ entity, exists })}`);
     return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any);
@@ -178,15 +185,13 @@ export class KvHelper {
     collection: string,
     key: string,
     defaultPair?: {
-      collection?: string;
-      key: string;
       name: string;
       type: keyof typeof ValueType;
       value: any;
     },
   ): Promise<KeyValuePair> {
     const keyValuePair = (await this.find(collection, key))[0];
-    return !keyValuePair && defaultPair ? this.set(defaultPair) : keyValuePair;
+    return !keyValuePair && defaultPair ? this.set({ ...defaultPair, collection, key }) : keyValuePair;
   }
 
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {

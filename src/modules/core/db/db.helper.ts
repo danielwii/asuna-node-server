@@ -74,7 +74,7 @@ export function parseNormalWhereAndRelatedFields(
   repository,
 ): { normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
   const allRelations = repository.metadata.relations.map(relation => relation.propertyName);
-  logger.log(`all relations is ${r(allRelations)}`);
+  logger.verbose(`all relations is ${r(allRelations)}`);
   const normalWhere = [];
   const relatedFields = [];
   const relatedWhere = {};
@@ -92,7 +92,7 @@ export function parseNormalWhereAndRelatedFields(
   return { normalWhere, relatedFields, relatedWhere };
 }
 
-function parseCondition(value: Condition) {
+function parseCondition(value: Condition): string | Condition | FindOperator<any> {
   if (_.has(value, '$and')) {
     return { $and: R.map(parseCondition)(value.$and) };
   }
@@ -463,7 +463,7 @@ export class DBHelper {
 
       // 处理条件关联
       const { relatedFields, relatedWhere } = parseNormalWhereAndRelatedFields(where, repository);
-      logger.log(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
+      logger.verbose(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach(field => {
         const [relatedModel, relatedField] = _.split(field, '.');
         // logger.log('[innerJoinAndSelect]', { field, model, where });
@@ -511,7 +511,7 @@ export class DBHelper {
 
       // 处理普通关联
       const diff = _.difference(relations, _.keys(relatedWhere));
-      logger.log(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
+      logger.verbose(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
       _.each(diff, relation => {
         const select = parsedFields.relatedFieldsMap[relation];
         if (select) {

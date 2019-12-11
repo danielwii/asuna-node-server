@@ -28,7 +28,7 @@ export class FinderModule implements OnModuleInit {
       ...FinderHelper.kvDef,
       name: '资源位置配置',
       type: 'json',
-      noUpdate: true,
+      merge: true,
       value: {
         form: {
           default: {

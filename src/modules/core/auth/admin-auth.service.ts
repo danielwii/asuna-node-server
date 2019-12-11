@@ -8,7 +8,7 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AbstractAuthService } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
-import { AdminUser } from './auth.entities';
+import { AdminUser, Role } from './auth.entities';
 import { RoleRepository } from './auth.repositories';
 
 const logger = LoggerFactory.getLogger('AdminAuthService');
@@ -58,9 +58,11 @@ export class AdminAuthService extends AbstractAuthService {
       relations: ['users'],
     });
     logger.log(`found sys role: ${r(sysRole)}`);
-    const usersBySysRole = await sysRole.users;
-    logger.log(`found users for sys role: ${usersBySysRole.length}`);
-    if (usersBySysRole.length === 0) {
+    logger.log(`found users for sys role: ${sysRole.users.length}`);
+    if (sysRole.users.length === 0) {
+      await AdminUser.delete({ email });
+      await AdminUser.delete({ email: 'admin@example.com' });
+
       logger.log(`---------------------------------------------------------------`);
       logger.log(`create SYS_ADMIN account: ${email}:${password}`);
       logger.log(`---------------------------------------------------------------`);
