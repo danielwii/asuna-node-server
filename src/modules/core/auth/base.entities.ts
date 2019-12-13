@@ -35,6 +35,9 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   isActive?: boolean;
 }
 
+/**
+ * @deprecated {@see AbstractTimeBasedAuthUser}
+ */
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
@@ -66,3 +69,5 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: true, name: 'is_active' })
   isActive?: boolean;
 }
+
+export type AuthUser = AbstractTimeBasedAuthUser | AbstractAuthUser;

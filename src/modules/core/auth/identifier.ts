@@ -1,6 +1,6 @@
 import { Identifier, IdentifierHelper, IdentifierStatic } from '../../common';
 import { AdminUser } from './auth.entities';
-import { AbstractAuthUser } from './base.entities';
+import { AuthUser } from './base.entities';
 
 function StaticImplements<T>() {
   return (constructor: T) => {};
@@ -39,18 +39,18 @@ export class AdminUserIdentifier implements Identifier<AdminUser> {
   }
 }
 
-@StaticImplements<IdentifierHelper<Partial<AbstractAuthUser>>>()
+@StaticImplements<IdentifierHelper<Partial<AuthUser>>>()
 export class UserIdentifierHelper {
-  static parse = (identifier: string): Partial<AbstractAuthUser> => ({ id: identifier.split('=')[1] });
+  static parse = (identifier: string): Partial<AuthUser> => ({ id: identifier.split('=')[1] });
 
-  static stringify = (payload: Partial<AbstractAuthUser>): string => `u=${payload.id}`;
+  static stringify = (payload: Partial<AuthUser>): string => `u=${payload.id}`;
 }
 
 @StaticImplements<IdentifierStatic>()
-export class UserIdentifier implements Identifier<AbstractAuthUser> {
+export class UserIdentifier implements Identifier<AuthUser> {
   private readonly helper = UserIdentifierHelper;
 
-  constructor(private readonly o: Partial<AbstractAuthUser>) {}
+  constructor(private readonly o: Partial<AuthUser>) {}
 
   identifier(): string {
     return this.helper.stringify(this.o);
@@ -60,7 +60,7 @@ export class UserIdentifier implements Identifier<AbstractAuthUser> {
     return { type: this.o.constructor.name, id: this.o.id };
   }
 
-  payload(): Partial<AbstractAuthUser> {
+  payload(): Partial<AuthUser> {
     return this.o;
   }
 

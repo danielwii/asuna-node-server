@@ -8,7 +8,7 @@ import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { IJwtPayload } from './auth.interfaces';
-import { AbstractAuthUser } from './base.entities';
+import { AuthUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -19,7 +19,7 @@ export class PasswordHelper {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  static passwordVerify(password: string, user: AbstractAuthUser): boolean {
+  static passwordVerify(password: string, user: AuthUser): boolean {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 }
@@ -29,7 +29,7 @@ export class TokenHelper {
    * TODO using env instead
    * @returns {Promise<void>}
    */
-  static async createToken(user: AbstractAuthUser): Promise<{ expiresIn: number; accessToken: string }> {
+  static async createToken(user: AuthUser): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -42,9 +42,9 @@ export class TokenHelper {
   }
 }
 
-export abstract class AbstractAuthService {
+export abstract class AbstractAuthService<U extends AuthUser> {
   // eslint-disable-next-line @typescript-eslint/no-parameter-properties
-  protected constructor(protected readonly userRepository: Repository<AbstractAuthUser>) {}
+  protected constructor(protected readonly userRepository: Repository<U>) {}
 
   /**
    * TODO using db repo instead
@@ -80,11 +80,11 @@ export abstract class AbstractAuthService {
     return {};
   }
 
-  public getUser(
+  async getUser(
     identifier: { email?: string; username?: string },
     isActive = true,
-    options?: FindOneOptions<AbstractAuthUser>,
-  ): Promise<AbstractAuthUser> {
+    options?: FindOneOptions<U>,
+  ): Promise<U> {
     return this.userRepository.findOne(
       {
         ...(identifier.email ? { email: identifier.email } : null),
@@ -95,10 +95,7 @@ export abstract class AbstractAuthService {
     );
   }
 
-  public getUserWithPassword(
-    identifier: { email?: string; username?: string },
-    isActive = true,
-  ): Promise<AbstractAuthUser> {
+  public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.userRepository.findOne(
       {
         ...(identifier.email ? { email: identifier.email } : null),
