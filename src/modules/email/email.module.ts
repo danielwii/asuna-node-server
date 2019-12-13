@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('EmailModule');
   controllers: [EmailController],
 })
 export class EmailModule implements OnModuleInit {
-  public onModuleInit() {
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

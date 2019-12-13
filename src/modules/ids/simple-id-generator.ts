@@ -1,5 +1,5 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-bitwise,no-underscore-dangle */
+/* eslint-disable no-bitwise */
 import { oneLineTrim } from 'common-tags';
 
 /**
@@ -53,18 +53,6 @@ export class SimpleDistributedIdGenerator {
   }
 }
 
-export class SimpleIdGeneratorHelper {
-  static registeredTypes: { [key: string]: string } = {};
-
-  static nextId(prefix?: string, workerId?: number): string {
-    return SimpleIdGenerator.nextId(prefix, workerId);
-  }
-
-  static nextIdByType(type: string, workerId?: number): string {
-    return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
-  }
-}
-
 export class SimpleIdGenerator {
   private static startEpoch = 1_546_300_800_000; // 2019/1/1
   private readonly workerId: number;
@@ -95,5 +83,17 @@ export class SimpleIdGenerator {
         .toString()
         .slice(2, 6)}
     `;
+  }
+}
+
+export class SimpleIdGeneratorHelper {
+  static registeredTypes: { [key: string]: string } = {};
+
+  static nextId(prefix?: string, workerId?: number): string {
+    return SimpleIdGenerator.nextId(prefix, workerId);
+  }
+
+  static nextIdByType(type: string, workerId?: number): string {
+    return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
   }
 }

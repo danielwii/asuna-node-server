@@ -5,7 +5,8 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { AsunaErrorCode, AsunaException, r, ValidationException } from '..';
+import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
+import { r } from '../helpers';
 import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
@@ -107,7 +108,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     logger.error({
       message,
-      body,
+      body: _.omit(body, 'error.message'),
       type: typeof exception,
       isHttpException: exception instanceof HttpException,
       isError: exception instanceof Error,

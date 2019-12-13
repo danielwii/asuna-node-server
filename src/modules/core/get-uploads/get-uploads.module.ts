@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('GetUploadsModule');
   controllers: [GetUploadsController],
 })
 export class GetUploadsModule implements OnModuleInit {
-  public onModuleInit() {
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

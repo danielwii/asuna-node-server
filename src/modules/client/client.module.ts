@@ -9,7 +9,7 @@ const logger = LoggerFactory.getLogger('ClientModule');
   // exports: [ClientService],
 })
 export class ClientModule implements OnModuleInit {
-  public onModuleInit(): any {
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

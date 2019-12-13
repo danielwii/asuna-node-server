@@ -18,6 +18,7 @@ import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AsunaContext, IAsunaContextOpts } from './modules/core';
+import { Global } from './modules/core/global';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -63,6 +64,12 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   resolveTypeormPaths(options);
 
   logger.log('create app ...');
+
+  const { dbType } = Global;
+  if (dbType === 'mysql56' || dbType === 'mysql57') {
+    logger.log('🐛fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA={"charset": "utf8mb4_unicode_ci"}');
+    process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
+  }
 
   const app = await NestFactory.create<NestExpressApplication>(appModule, {
     logger: new SimpleLoggerService(),

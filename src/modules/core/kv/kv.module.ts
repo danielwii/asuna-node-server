@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('KvModule');
   exports: [],
 })
 export class KvModule implements OnModuleInit {
-  public onModuleInit() {
+  onModuleInit(): void {
     logger.log('init...');
   }
 }

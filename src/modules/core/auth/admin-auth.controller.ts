@@ -4,11 +4,12 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@ne
 import { ApiTags } from '@nestjs/swagger';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
+import { AccessControl } from 'accesscontrol';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, r, SignException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
-import { PasswordHelper, TokenHelper } from "./abstract.auth.service";
+import { PasswordHelper, TokenHelper } from './abstract.auth.service';
 import { AdminAuthService } from './admin-auth.service';
 import { SignDto } from './auth.dto';
 import { AbstractAuthUser } from './base.entities';
@@ -89,6 +90,26 @@ export class AdminAuthController extends RestCrudController {
   @Get('authorized')
   authorized(): void {
     logger.log('Authorized route...');
+    const ac = new AccessControl();
+    // prettier-ignore
+    ac.grant('user') // define new or modify existing role. also takes an array.
+        .createOwn('video') // equivalent to .createOwn('video', ['*'])
+        .deleteOwn('video')
+        .readAny('video')
+      .grant('admin') // switch to another role without breaking the chain
+        .extend('user') // inherit role capabilities. also takes an array
+        .updateAny('video', ['title']) // explicitly defined attributes
+        .deleteAny('video');
+    logger.log(`access control is ${r({ ac })}`);
+    const permission1 = ac.can('user').createOwn('video');
+    console.log(permission1.granted); // —> true
+    console.log(permission1.attributes); // —> ['*'] (all attributes)
+
+    const permission2 = ac.can('admin').updateAny('video');
+    console.log(permission2.granted); // —> true
+    console.log(permission2.attributes); // —> ['title']
+
+    logger.log(`access control is ${r({ ac, permission1, permission2 })}`);
   }
 
   @Get('current')

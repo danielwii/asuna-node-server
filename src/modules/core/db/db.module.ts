@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('DBModule');
   exports: [DBService],
 })
 export class DBModule implements OnModuleInit {
-  public onModuleInit() {
+  onModuleInit(): void {
     logger.log('init...');
   }
 }
