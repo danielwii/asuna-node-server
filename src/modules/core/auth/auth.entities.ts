@@ -2,7 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } fro
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadObject } from '../helpers';
-import { AbstractAuthUser } from './base.entities';
+import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__roles' })
 @Entity('auth__t_roles')
@@ -35,7 +35,7 @@ export class Role extends AbstractBaseEntity {
 
 @EntityMetaInfo({ name: 'auth__users' })
 @Entity('auth__t_users')
-export class AdminUser extends AbstractAuthUser {
+export class AdminUser extends AbstractTimeBasedAuthUser {
   constructor() {
     super('sa');
   }

@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable class-methods-use-this */
 import { getConnection, getRepository, Repository } from 'typeorm';
 import { Profile, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';

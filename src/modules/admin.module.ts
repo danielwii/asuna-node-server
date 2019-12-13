@@ -55,7 +55,6 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })
 export class AdminInternalModule implements OnModuleInit {
-  // eslint-disable-next-line class-methods-use-this
   onModuleInit(): void {
     logger.log('init...');
   }

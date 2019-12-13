@@ -124,7 +124,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   );
   app.use(morgan('combined'));
 
-  const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '2mb');
+  const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '20mb');
   logger.log(`set json payload limit to ${limit}`);
   app.use(bodyParser.json({ limit }));
   app.use(bodyParser.urlencoded({ limit, extended: true }));

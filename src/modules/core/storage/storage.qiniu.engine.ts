@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-dupe-class-members,class-methods-use-this */
 import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
 import { join } from 'path';

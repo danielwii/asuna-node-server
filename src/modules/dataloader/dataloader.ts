@@ -89,12 +89,10 @@ export class GenericDataLoader {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
     GenericDataLoader.loaders = loaders;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   createLoaders(): { [key: string]: DataLoaderFunction<any> } {
     return _.memoize(() => GenericDataLoader.loaders)();
   }

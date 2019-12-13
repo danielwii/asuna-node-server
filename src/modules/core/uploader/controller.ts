@@ -84,7 +84,6 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
-  // eslint-disable-next-line class-methods-use-this
   createChunksUploadTask(
     @Query() query: CreateChunksUploadTaskQuery,
     @Req() req: AnyAuthRequest,

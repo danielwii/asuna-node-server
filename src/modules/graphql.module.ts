@@ -78,7 +78,6 @@ export class GraphqlModule implements OnModuleInit {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   onModuleInit(): void {
     logger.log('init...');
   }

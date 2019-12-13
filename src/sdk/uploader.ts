@@ -26,7 +26,6 @@ export class Uploader {
   }
 
   // TODO not implemented
-  // eslint-disable-next-line class-methods-use-this
   private async fileToChunks(file: File, opts: { chunkSize?: number } = {}): Promise<any> {
     // eslint-disable-next-line no-bitwise
     const chunkSize = _.get(opts, 'chunkSize', (2 * 1024) ^ 2);

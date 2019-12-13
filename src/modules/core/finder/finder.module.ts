@@ -19,7 +19,6 @@ export class FinderModule implements OnModuleInit {
     this.initKV();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async initKV(): Promise<void> {
     const assetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     const assetsInternalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);

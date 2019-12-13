@@ -15,7 +15,7 @@ export class RedisClientObject {
 
   isEnabled: boolean;
   isHealthy: boolean;
-  redisOptions: RedisOptions;
+  redisOptions: redis.ClientOpts;
 }
 
 export class RedisProvider {
@@ -34,7 +34,9 @@ export class RedisProvider {
 
     const configObject = RedisConfigObject.loadOr(prefix);
     const redisOptions = configObject.getOptions(db);
-    logger.log(`init redis provider: ${r(configObject, { transform: true })} with ${r({ prefix, db })}`);
+    logger.log(
+      `init redis provider: ${r({ configObject, redisOptions }, { transform: true })} with ${r({ prefix, db })}`,
+    );
     const redisClientObject = plainToClass(
       RedisClientObject,
       {
