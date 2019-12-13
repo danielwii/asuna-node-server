@@ -36,7 +36,7 @@ export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
   @Exclude()
   readonly generator: SimpleIdGenerator;
 
-  @PrimaryColumn() id?: string;
+  @PrimaryColumn({ length: 36 }) id?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
@@ -62,7 +62,7 @@ export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
 
 export abstract class AbstractNameEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
@@ -86,7 +86,7 @@ export abstract class AbstractUUIDBaseEntity extends BaseEntity {
 
 export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
@@ -96,7 +96,7 @@ export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
 
 export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })

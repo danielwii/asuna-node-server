@@ -7,11 +7,11 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
-  @Column({ nullable: true, unique: true })
+  @Column({ nullable: true, length: 50, unique: true })
   email?: string;
 
   @MetaInfo({ name: '用户名' })
-  @Column({ nullable: false, unique: true, length: 100 })
+  @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
   @MetaInfo({ ignore: true })
@@ -42,11 +42,11 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
-  @Column({ nullable: true, unique: true })
+  @Column({ nullable: true, length: 50, unique: true })
   email?: string;
 
   @MetaInfo({ name: '用户名' })
-  @Column({ nullable: false, unique: true, length: 100 })
+  @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
   @MetaInfo({ ignore: true })

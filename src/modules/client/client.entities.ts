@@ -5,7 +5,7 @@ import { AbstractBaseEntity } from '../core/base';
 @EntityMetaInfo({ name: 'client__users' })
 @Entity('client__t_users')
 export class ClientUser extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ length: 36 })
   uuid: string;
 
   @CreateDateColumn({ name: 'created_at' })

@@ -1,7 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 export class Device extends BaseEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ length: 36 })
   uuid: string;
 
   @Column({ nullable: true, length: 10 })

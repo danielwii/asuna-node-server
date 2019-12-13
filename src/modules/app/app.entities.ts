@@ -23,7 +23,7 @@ export const Mode = {
 @Entity('app__t_infos')
 export class AppInfo extends AbstractNameEntity {
   @MetaInfo({ name: '唯一识别 Key' })
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: false, length: 50, unique: true })
   key: string;
 
   @MetaInfo({ name: 'Mode', type: 'Enum', enumData: Mode })
