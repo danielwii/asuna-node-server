@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import * as bluebird from 'bluebird';
+import { Promise } from 'bluebird';
 import { plainToClass, Transform } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
@@ -71,12 +71,7 @@ export class UploaderService {
     });
   }
 
-  uploadChunks(
-    token: OperationToken,
-    filename: string,
-    path: string,
-    chunk: number,
-  ): Promise<RemoteFileInfo> {
+  uploadChunks(token: OperationToken, filename: string, path: string, chunk: number): Promise<RemoteFileInfo> {
     const file = new FileInfo({ filename, path });
     const fingerprint = UploaderHelper.calcFingerprint(token.identifier, filename);
     const chunkname = `${filename}.${chunk}`;
@@ -91,7 +86,7 @@ export class UploaderService {
 
     return this.context.chunkStorageEngine
       .saveEntity({ ...file, filename: chunkname }, { prefix: fingerprint })
-      .then(async (saved) => {
+      .then(async saved => {
         const payload = new ChunksUploadPayload(token.body);
         payload.finished[chunk] = 1;
         await token.save();
@@ -126,7 +121,7 @@ export class UploaderService {
     });
     logger.verbose(`found ${r(chunks.length)} chunks`);
 
-    if (!(chunks && chunks.length)) {
+    if (!(chunks && chunks.length > 0)) {
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
         `no chunks found for ${_filename} with fingerprint: ${payload.fingerprint}`,
@@ -136,12 +131,10 @@ export class UploaderService {
     // try to merge all chunks
     logger.debug(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
-      await bluebird.all(
-        chunks.map(chunk =>
-          this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath),
-        ),
+      await Promise.all(
+        chunks.map(chunk => this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath)),
       ),
-      filename => +filename.slice(filename.lastIndexOf('.') + 1),
+      name => +name.slice(name.lastIndexOf('.') + 1),
     );
     const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', payload.fingerprint);
     fs.mkdirsSync(tempDirectory);
@@ -160,9 +153,7 @@ export class UploaderService {
         resolve();
         filepaths.forEach(filepath => {
           logger.log(`remove ${filepath} ...`);
-          fs.remove(filepath).catch(error =>
-            logger.warn(`remove ${filepath} error: ${r(error)}`),
-          );
+          fs.remove(filepath).catch(error => logger.warn(`remove ${filepath} error: ${r(error)}`));
         });
       });
     });

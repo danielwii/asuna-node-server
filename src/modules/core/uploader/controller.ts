@@ -2,7 +2,7 @@ import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, U
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as assert from 'assert';
-import * as bluebird from 'bluebird';
+import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
@@ -264,7 +264,7 @@ export class UploaderController {
   }
 
   private saveFiles(bucket: string, prefix: string, local: string, files: FileInfo[]): Promise<SavedFile[]> {
-    return bluebird.map(files, file => {
+    return Promise.map(files, file => {
       if (local === '1') {
         logger.log(oneLineTrim`
             save file[${file.mimetype}] to local storage

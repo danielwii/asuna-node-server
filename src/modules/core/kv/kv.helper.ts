@@ -1,3 +1,4 @@
+import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -90,13 +91,12 @@ export const AsunaCollections = {
   SYSTEM_MIGRATIONS: 'system.migrations',
   SYSTEM_SERVER: 'system.server',
   WECHAT: 'wechat.settings',
+  TENANT: 'tenant.settings',
 };
 
 export class KvDef {
-  @IsString()
-  collection: string;
-  @IsString()
-  key: string;
+  @IsString() collection: string;
+  @IsString() key: string;
 
   constructor(o: KvDef) {
     Object.assign(this, deserializeSafely(KvDef, o));
@@ -207,7 +207,14 @@ export class KvHelper {
     );
   }
 
-  static async getValueByGroupFieldKV(kvDef: { collection: string; key: string }, fieldKey: string): Promise<any> {
+  static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
+    kvDef: KvDef,
+    keyValues: KeyValues,
+  ): Promise<{ [key in keyof KeyValues]: any }> {
+    return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
+  }
+
+  static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
     return CacheManager.cacheable(
       { kvDef, fieldKey },
       async () => {
@@ -219,7 +226,7 @@ export class KvHelper {
   }
 
   private static async getGroupFieldsValueByFieldKV(
-    kvDef: { collection: string; key: string },
+    kvDef: KvDef,
     fieldKey: string,
   ): Promise<{ field: KVField; value: any }> {
     const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef.collection, kvDef.key)).value;

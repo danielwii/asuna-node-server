@@ -22,6 +22,7 @@ import {
 } from './rest';
 import { SearchController } from './search/search.controller';
 import { TaskController } from './task/task.controller';
+import { TenantModule } from './tenant';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -38,6 +39,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     CqrsModule,
     UploaderModule,
     ImportExportModule,
+    TenantModule,
   ],
   controllers: [
     ApiController,

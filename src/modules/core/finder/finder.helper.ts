@@ -12,8 +12,7 @@ export enum FinderFieldKey {
 }
 
 export class FinderAssetsSettings {
-  @IsString()
-  endpoint: string;
+  @IsString() endpoint: string;
 }
 
 export class FinderHelper {
@@ -48,7 +47,7 @@ export class FinderHelper {
     name?: string; // default is default
     path: string;
     internal?: boolean;
-  }) {
+  }): Promise<string> {
     if (!(type && path)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, JSON.stringify({ type, name, path }));
     }
@@ -60,14 +59,20 @@ export class FinderHelper {
 
     if (!endpoint) {
       logger.warn(`${name || 'default'} not available in upstream ${endpoint}`);
-      throw new AsunaException(AsunaErrorCode.Unprocessable, `${name || 'default'} not available in upstream ${endpoint}`);
+      throw new AsunaException(
+        AsunaErrorCode.Unprocessable,
+        `${name || 'default'} not available in upstream ${endpoint}`,
+      );
     }
 
     if (type === 'assets') {
       // const upstream = upstreams.value[`${internal ? 'internal-' : ''}${name || 'default'}`];
       const finderAssetsSettings = deserializeSafely(FinderAssetsSettings, { endpoint });
       if (!finderAssetsSettings) {
-        throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid upstream ${JSON.stringify(endpoint)} for finder`);
+        throw new AsunaException(
+          AsunaErrorCode.Unprocessable,
+          `invalid upstream ${JSON.stringify(endpoint)} for finder`,
+        );
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
       /* const portStr = upstream.port ? `:${upstream.port}` : '';

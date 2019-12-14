@@ -1,5 +1,4 @@
-import { RedisOptions } from '@nestjs/common/interfaces/microservices/microservice-configuration.interface';
-import * as bluebird from 'bluebird';
+import { Promise } from 'bluebird';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
 import { r } from '../common/helpers';
@@ -53,7 +52,7 @@ export class RedisProvider {
     }
 
     // https://github.com/NodeRedis/node_redis#bluebird-promises
-    bluebird.promisifyAll(redis);
+    Promise.promisifyAll(redis);
     const client = redis.createClient(redisOptions);
     redisClientObject.client = client;
     client.on('connect', () => {
