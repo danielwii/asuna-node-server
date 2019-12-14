@@ -33,6 +33,11 @@ export class CacheManager {
     logger.log(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
+
+  static async clear(key: string | object): Promise<void> {
+    const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
+    return this.cache.del(cacheKey);
+  }
 }
 
 export function Cacheable(options: { type?: 'default' | 'short'; key: string }) {

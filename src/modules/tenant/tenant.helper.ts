@@ -19,7 +19,7 @@ export enum TenantFieldKeys {
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.TENANT, key: 'config' };
 
-  static async geConfig(): Promise<TenantConfig> {
+  static async getConfig(): Promise<TenantConfig> {
     return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, TenantFieldKeys));
   }
 }

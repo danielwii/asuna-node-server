@@ -34,6 +34,6 @@ export class TenantModule implements OnModuleInit {
         } as KVGroupFieldsValue,
       });
 
-    KvHelper.initializers[identifier]();
+    await KvHelper.initializers[identifier]();
   }
 }

@@ -154,7 +154,11 @@ export class KvHelper {
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && pair.noUpdate && exists.value) return exists;
     if (exists && pair.merge) {
-      exists.value = JSON.stringify({ ...exists.value, form: _.get(value, 'form') });
+      exists.value = JSON.stringify({
+        ...exists.value,
+        form: _.get(value, 'form'),
+        values: _.get(value, 'values') || _.get(exists.value, 'values'),
+      });
       return exists.save();
     }
 

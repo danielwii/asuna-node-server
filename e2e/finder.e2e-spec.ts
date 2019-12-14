@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
-import { AdminInternalModule, AsunaCollections, KvHelper } from '../src/modules';
+import { AdminInternalModule, AsunaCollections, CacheManager, FinderHelper, KvHelper } from '../src/modules';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
@@ -65,10 +65,12 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /api/v1/finder with same domain', async () => {
+    await CacheManager.clear({ kvDef: FinderHelper.kvDef, fieldKey: 'endpoint' });
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
       type: 'json',
+      // merge: true,
       value: { values: { endpoint: '/s3' } },
     });
 

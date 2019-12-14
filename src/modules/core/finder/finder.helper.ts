@@ -1,40 +1,26 @@
-import { IsString } from 'class-validator';
-import * as _ from 'lodash';
+import { Promise } from 'bluebird';
+import { IsOptional, IsString } from 'class-validator';
 import { join } from 'path';
-import { AsunaErrorCode, AsunaException, deserializeSafely, LoggerFactory } from '../../common';
-import { AsunaCollections, KvDef, KVField, KVGroupFieldsValue, KvHelper } from '../kv';
+import { AsunaErrorCode, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';
+import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');
 
-export enum FinderFieldKey {
+export enum FinderFieldKeys {
   endpoint = 'endpoint',
   internalEndpoint = 'internal-endpoint',
 }
 
 export class FinderAssetsSettings {
-  @IsString() endpoint: string;
+  @IsString() @IsOptional() endpoint?: string;
+  @IsString() @IsOptional() internalEndpoint?: string;
 }
 
 export class FinderHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
 
-  static async getValueByFieldKV(fieldKey: FinderFieldKey): Promise<string> {
-    const field = await this.getByFieldKV(fieldKey);
-    return field ? ((field.value || field.field.defaultValue) as string) : null;
-  }
-
-  private static async getByFieldKV(fieldKey: FinderFieldKey): Promise<{ field: KVField; value: string }> {
-    const fields: KVGroupFieldsValue = (await KvHelper.get(this.kvDef.collection, this.kvDef.key)).value;
-    return {
-      value: fields.values[fieldKey],
-      field: _.get(
-        _.chain(fields.form)
-          .flatMap(fieldGroup => fieldGroup.fields)
-          .find(fieldDef => fieldDef.field.name === fieldKey)
-          .value(),
-        'field',
-      ),
-    };
+  static async getConfig(): Promise<FinderAssetsSettings> {
+    return deserializeSafely(FinderAssetsSettings, await KvHelper.getConfigsByEnumKeys(this.kvDef, FinderFieldKeys));
   }
 
   static async getUrl({
@@ -52,10 +38,9 @@ export class FinderHelper {
       throw new AsunaException(AsunaErrorCode.BadRequest, JSON.stringify({ type, name, path }));
     }
 
-    const endpoint = internal
-      ? await this.getValueByFieldKV(FinderFieldKey.internalEndpoint)
-      : await this.getValueByFieldKV(FinderFieldKey.endpoint);
-    logger.debug(`endpoint ${endpoint}`);
+    const config = await this.getConfig();
+    const endpoint = internal ? config.internalEndpoint : config.endpoint;
+    logger.debug(`get endpoint ${r({ internal, config, endpoint })}`);
 
     if (!endpoint) {
       logger.warn(`${name || 'default'} not available in upstream ${endpoint}`);
@@ -66,23 +51,14 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
-      // const upstream = upstreams.value[`${internal ? 'internal-' : ''}${name || 'default'}`];
-      const finderAssetsSettings = deserializeSafely(FinderAssetsSettings, { endpoint });
-      if (!finderAssetsSettings) {
+      if (!config) {
         throw new AsunaException(
           AsunaErrorCode.Unprocessable,
           `invalid upstream ${JSON.stringify(endpoint)} for finder`,
         );
       }
       const resourcePath = join('/', path).replace(/\/+/g, '/');
-      /* const portStr = upstream.port ? `:${upstream.port}` : '';
-
-      // get same domain if hostname startswith /
-      if (_.startsWith(upstream.hostname, '/')) {
-        return `${upstream.endpoint}${resourcePath}`;
-      }
-*/
-      return `${finderAssetsSettings.endpoint || ''}${resourcePath}`;
+      return `${config.endpoint || ''}${resourcePath}`;
     }
     // TODO add other handlers later
     logger.warn('only type assets is available');
