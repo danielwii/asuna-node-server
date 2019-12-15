@@ -82,7 +82,7 @@ export class GenericDataLoader {
     logger.log('init ...');
     if (!GenericDataLoader.subject) {
       /*
-      Hermes.subscribe(GenericDataLoader.name, 'fanout', (event: IAsunaEvent) => {
+      Hermes.subscribe(this.constructor.name, 'fanout', (event: IAsunaEvent) => {
         logger.log(`subscribe ${event.name} ${r(event)}`);
       });
 */

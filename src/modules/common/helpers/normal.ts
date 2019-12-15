@@ -12,11 +12,7 @@ export class NameValue {
 }
 
 export class NameDescValue<T = any> {
-  constructor(
-    public readonly name: string,
-    public readonly description: string,
-    public readonly value: T,
-  ) {}
+  constructor(public readonly name: string, public readonly description: string, public readonly value: T) {}
 }
 
 export class NameValueHelper {
@@ -26,13 +22,18 @@ export class NameValueHelper {
 }
 
 export function convertFilename(filename: string): string {
-  return filename.replace(/[^\w._]+/g, '_');
+  return filename.replace(/[^\w.]+/g, '_');
 }
 
 export function getIgnoreCase(o: object, key: string): any {
   const compareWith = key.toLowerCase();
   return _.find(o, (v, k) => k.toLowerCase() === compareWith);
 }
+
+const format = (n: string | number): string => {
+  // it makes "0X"/"00"/"XX"
+  return (+n / 10).toFixed(1).replace('.', '');
+};
 
 export function formatTime(nbSeconds, hasHours = true): string {
   const time = [];
@@ -51,19 +52,13 @@ export function formatTime(nbSeconds, hasHours = true): string {
   calc = (calc - time[time.length - 1]) * 60;
   time.push(format(Math.round(calc))); // second
 
-  function format(n) {
-    // it makes "0X"/"00"/"XX"
-    return (+n / 10).toFixed(1).replace('.', '');
-  }
-
   // if (!hasHours) time.shift();//you can set only "min: sec"
 
   return time.join(':');
 }
 
 export function isBlank(value): boolean {
-  return (value && (_.isEmpty(value) && !_.isNumber(value))) ||
-    (_.isNaN(value) && _.isString(value))
+  return (value && _.isEmpty(value) && !_.isNumber(value)) || (_.isNaN(value) && _.isString(value))
     ? !!_.trim(value)
     : _.isEmpty(value);
 }

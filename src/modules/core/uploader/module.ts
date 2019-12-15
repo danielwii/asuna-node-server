@@ -3,7 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
-import { UploaderRoot } from './model';
 import { UploaderService } from './service';
 
 const logger = LoggerFactory.getLogger('UploaderModule');
@@ -15,7 +14,7 @@ const logger = LoggerFactory.getLogger('UploaderModule');
 })
 export class UploaderModule implements OnModuleInit {
   onModuleInit(): void {
-    Hermes.subscribe(UploaderRoot.name, /^commands$/, event => {
+    Hermes.subscribe(this.constructor.name, /^commands$/, event => {
       logger.log(r(event));
     });
   }

@@ -7,7 +7,7 @@ import { IJwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';
 import { UserIdentifier } from './identifier';
 
-export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user: U; identifier: string };
+export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user?: U; identifier?: string };
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

@@ -15,7 +15,6 @@ import { AsunaContext } from '../context';
 import { FileInfo } from '../storage';
 import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
-import { UploaderRoot } from './model';
 
 const logger = LoggerFactory.getLogger('UploaderService');
 
@@ -66,7 +65,7 @@ export class UploaderService {
   private readonly context = AsunaContext.instance;
 
   constructor(private readonly commandBus: CommandBus) {
-    Hermes.subscribe(UploaderRoot.name, /^commands$/, event => {
+    Hermes.subscribe(this.constructor.name, /^commands$/, event => {
       logger.log(r(event));
     });
   }

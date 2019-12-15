@@ -213,7 +213,7 @@ export class UploaderController {
     } */
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
     const results = await this.saveFiles(bucket, prefix, local, files).catch(error => {
-      logger.error(r(error));
+      logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
       throw new UploadException(error);
     });

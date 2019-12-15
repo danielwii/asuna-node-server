@@ -15,7 +15,7 @@ import { MinioConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class MinioStorage implements IStorageEngine {
-  private static readonly logger = LoggerFactory.getLogger(MinioStorage.name);
+  private static readonly logger = LoggerFactory.getLogger('MinioStorage');
 
   private readonly defaultBucket;
 

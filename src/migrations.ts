@@ -7,6 +7,6 @@ export const renameTables = [
   { from: 'audit__t_recordsHide', to: 'sys__t_audit_records' },
 ];
 
-export const runCustomMigrations = async () => {
+export const runCustomMigrations = async (): Promise<void> => {
   await AuthMigrations.migrate();
 };
