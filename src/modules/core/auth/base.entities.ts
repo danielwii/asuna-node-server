@@ -26,6 +26,10 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @Column({ nullable: true, name: 'last_signed_at' })
   lastSignedAt?: Date;
 
+  @MetaInfo({ name: '最后登录时间' })
+  @Column({ nullable: true, name: 'last_login_at' })
+  lastLoginAt?: Date;
+
   // --------------------------------------------------------------
   // Status
   // --------------------------------------------------------------
@@ -60,6 +64,10 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '最后获取登录凭证时间' })
   @Column({ nullable: true, name: 'last_signed_at' })
   lastSignedAt?: Date;
+
+  @MetaInfo({ name: '最后登录时间' })
+  @Column({ nullable: true, name: 'last_login_at' })
+  lastLoginAt?: Date;
 
   // --------------------------------------------------------------
   // Status
