@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity, AbstractNameEntity, jsonType, safeReloadArray } from '../core';
 
@@ -76,6 +76,7 @@ export class AppRelease extends AbstractBaseEntity {
     info => info.releases,
     { onDelete: 'CASCADE' },
   )
+  @JoinColumn({ name: 'app_info__id' })
   appInfo: AppInfo;
 
   // TODO try reload in entity subscribers
