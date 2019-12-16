@@ -96,7 +96,7 @@
     "dataloader": "^2.0.0",
     "date-fns": "^2.8.1",
     "dayjs": "^1.8.17",
-    "email-templates": "^6.0.6",
+    "email-templates": "^6.1.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.0.0",
     "file-type": "^12.4.0",
