@@ -14,6 +14,10 @@ export class TenantConfig {
 
 export enum TenantFieldKeys {
   enabled = 'enabled',
+  bindRoles = 'bindRoles',
+  // 进入页的待创建模型信息
+  firstModelName = 'first.model-name',
+  firstDisplayName = 'first.display-name',
 }
 
 export class TenantHelper {

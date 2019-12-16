@@ -115,6 +115,7 @@ export class KvDefIdentifierHelper {
 
 export class KvHelper {
   static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
+  // static registerForms: { [identifier: string]: any } = {};
 
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
@@ -157,7 +158,7 @@ export class KvHelper {
       exists.value = JSON.stringify({
         ...exists.value,
         form: _.get(value, 'form'),
-        values: _.get(value, 'values') || _.get(exists.value, 'values'),
+        // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
       return exists.save();
     }
