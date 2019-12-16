@@ -2,7 +2,7 @@ import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
-import { convertFilename, ErrorException, r } from '../../common';
+import { AsunaErrorCode, AsunaException, convertFilename, ErrorException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { QiniuConfigObject } from './storage.config';
@@ -101,14 +101,17 @@ export class QiniuStorage implements IStorageEngine {
 
   resolveUrl(opts: ResolverOpts): Promise<string>;
   resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string> | Promise<void> {
+  async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+    if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
+
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
-    QiniuStorage.logger.log(`resolve url by ${r({ bucket, prefix, filename })}`);
     const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
     const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
       ? join(this.configObject.path || '')
       : join(resourcePath, this.configObject.path || '');
     const path = join('/', appendPrefix, prefix || '', filename);
-    return Promise.resolve(`${this.configObject.domain}${path}`);
+    const url = `${this.configObject.domain}${path}`;
+    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename })}`);
+    return res.redirect(url);
   }
 }
