@@ -84,7 +84,7 @@ export class KvController {
     const { user, identifier } = req;
     logger.log(`get ${r({ query, user, identifier })}`);
     await KvHelper.checkPermission(query.toKvDef(), identifier);
-    return KvHelper.get(query.collection, query.key);
+    return KvHelper.get(query.toKvDef());
   }
 
   @UseGuards(AnyAuthGuard)

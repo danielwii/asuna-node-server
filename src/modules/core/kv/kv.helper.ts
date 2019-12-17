@@ -101,6 +101,7 @@ export const AsunaCollections = {
   SYSTEM_SERVER: 'system.server',
   SYSTEM_WECHAT: 'system.wechat',
   SYSTEM_TENANT: 'system.tenant',
+  SETTINGS: 'settings',
 };
 
 export class KvDef {
@@ -125,6 +126,14 @@ export class KvDefIdentifierHelper {
 export class KvHelper {
   static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
+  static constantMaps: { [key: string]: { [name: string]: string } } = {};
+  static constantKvDef: KvDef = { collection: AsunaCollections.SETTINGS, key: 'constants' };
+
+  static async mergeConstantMaps(key: string, constantMap: { [name: string]: string }): Promise<KeyValuePair> {
+    const pair = await this.get(this.constantKvDef);
+    pair.value = _.merge(pair.value, { [key]: constantMap });
+    return pair.save();
+  }
 
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
@@ -159,7 +168,7 @@ export class KvHelper {
       extra: pair.extra,
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    const exists = await this.get(entity.collection, entity.key);
+    const exists = await this.get(entity);
     logger.log(`inspect ${r({ pair, collection, key, type, name, value, exists })}`);
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && pair.noUpdate && exists.value) return exists;
@@ -189,23 +198,22 @@ export class KvHelper {
   }
 
   static async delete(kvDef: KvDef): Promise<void> {
-    const exists = await this.get(kvDef.collection, kvDef.key);
+    const exists = await this.get(kvDef);
     if (exists) {
       await KeyValuePair.delete(kvDef);
     }
   }
 
   static async get(
-    collection: string,
-    key: string,
+    kvDef: KvDef,
     defaultPair?: {
       name: string;
       type: keyof typeof ValueType;
       value: any;
     },
   ): Promise<KeyValuePair> {
-    const keyValuePair = (await this.find(collection, key))[0];
-    return !keyValuePair && defaultPair ? this.set({ ...defaultPair, collection, key }) : keyValuePair;
+    const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
+    return !keyValuePair && defaultPair ? this.set({ ...kvDef, ...defaultPair }) : keyValuePair;
   }
 
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
@@ -257,7 +265,7 @@ export class KvHelper {
     kvDef: KvDef,
     fieldKey: string,
   ): Promise<{ field: KVField; value: any }> {
-    const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef.collection, kvDef.key)).value;
+    const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef)).value;
     const result = {
       value: _.get(fields.values, fieldKey),
       field: _.get(

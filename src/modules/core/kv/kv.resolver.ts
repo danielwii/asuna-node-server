@@ -10,7 +10,7 @@ export class KvQueryResolver {
   @Query()
   async kv(@Args('collection') collection: string, @Args('key') key: string) {
     KvQueryResolver.logger.log(`kv: ${r({ collection, key })}`);
-    return KvHelper.get(collection, key);
+    return KvHelper.get({ collection, key });
   }
 
   @Query()
