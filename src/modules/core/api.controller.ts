@@ -19,7 +19,7 @@ export class ApiController {
 
   @Get('info')
   async info() {
-    const kv = await KvHelper.get('system.server', 'settings');
+    const kv = await KvHelper.get({ collection: 'system.server', key: 'settings' });
     return {
       settings: _.get(kv, 'value'),
       upTime: this.appContent.upTime.toISOString(),
