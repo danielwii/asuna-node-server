@@ -30,19 +30,19 @@ export class KeyValuePair extends AbstractBaseEntity {
 
   @MetaInfo({ name: 'Name' })
   @Column({ nullable: true, length: 255 })
-  name: string;
+  name?: string;
 
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: ValueType })
   @Column('varchar', { nullable: true })
-  type: keyof typeof ValueType;
+  type?: keyof typeof ValueType;
 
   @MetaInfo({ name: 'Value' })
   @Column('text', { nullable: true })
-  value: any;
+  value?: any;
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(jsonType(), { nullable: true })
-  extra: JsonMap;
+  extra?: JsonMap;
 
   // @OneToOne(type => KeyValueModel, model => model.pair)
   model: KeyValueModel;
@@ -51,7 +51,10 @@ export class KeyValuePair extends AbstractBaseEntity {
 @EntityMetaInfo({ name: 'kv__models' })
 @Entity('kv__t_models')
 export class KeyValueModel extends AbstractBaseEntity {
-  @OneToOne(type => KeyValuePair, pair => pair.model)
+  @OneToOne(
+    type => KeyValuePair,
+    pair => pair.model,
+  )
   @JoinColumn({ name: 'pair__id' })
   pair: KeyValuePair;
 

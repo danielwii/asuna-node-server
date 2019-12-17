@@ -101,7 +101,7 @@ export const AsunaCollections = {
   SYSTEM_SERVER: 'system.server',
   SYSTEM_WECHAT: 'system.wechat',
   SYSTEM_TENANT: 'system.tenant',
-  SETTINGS: 'settings',
+  APP_SETTINGS: 'app.settings',
 };
 
 export class KvDef {
@@ -126,29 +126,34 @@ export class KvDefIdentifierHelper {
 export class KvHelper {
   static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
-  static constantMaps: { [key: string]: { [name: string]: string } } = {};
-  static constantKvDef: KvDef = { collection: AsunaCollections.SETTINGS, key: 'constants' };
+  // static constantMaps: { [key: string]: { [name: string]: string } } = {};
+  static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
 
-  static async mergeConstantMaps(key: string, constantMap: { [name: string]: string }): Promise<KeyValuePair> {
-    const pair = await this.get(this.constantKvDef);
-    pair.value = _.merge(pair.value, { [key]: constantMap });
-    return pair.save();
+  static async mergeConstantMaps(
+    key: 'PointExchange' | 'FinancialTransaction',
+    constantMap: { [name: string]: string },
+  ): Promise<KeyValuePair> {
+    logger.log(`merge constants ${r({ key, constantMap })}`);
+    const value = { [key]: constantMap };
+    const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    pair.value = { ...pair.value, ...value };
+    return this.set(pair);
   }
 
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
    */
-  static async set(pair: {
-    collection?: string;
-    key: string;
-    name?: string;
-    type: keyof typeof ValueType;
-    value: any;
-    extra?: any;
-    noUpdate?: boolean;
-    // 用于合并 KVGroupFieldsValue 中的表单
-    merge?: boolean;
-  }): Promise<KeyValuePair> {
+  static async set(
+    pair: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: any; extra?: any },
+    {
+      merge,
+      noUpdate,
+    }: {
+      noUpdate?: boolean;
+      // 用于合并 KVGroupFieldsValue 中的表单
+      merge?: boolean;
+    } = {},
+  ): Promise<KeyValuePair> {
     const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
     const key = pair.key ? pair.key.replace('/\b+/', '') : null;
 
@@ -171,8 +176,8 @@ export class KvHelper {
     const exists = await this.get(entity);
     logger.log(`inspect ${r({ pair, collection, key, type, name, value, exists })}`);
     // noUpdate 打开时如果已经存在值不进行更新
-    if (exists && pair.noUpdate && exists.value) return exists;
-    if (exists && pair.merge) {
+    if (exists && noUpdate && exists.value) return exists;
+    if (exists && merge) {
       exists.value = JSON.stringify({
         ...exists.value,
         form: _.get(value, 'form'),
@@ -213,7 +218,11 @@ export class KvHelper {
     },
   ): Promise<KeyValuePair> {
     const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
-    return !keyValuePair && defaultPair ? this.set({ ...kvDef, ...defaultPair }) : keyValuePair;
+    if (!keyValuePair && defaultPair) {
+      return this.set({ ...kvDef, ...defaultPair });
+    }
+
+    return keyValuePair;
   }
 
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {

@@ -32,34 +32,36 @@ export class TenantModule implements OnModuleInit {
   async initKV(): Promise<void> {
     const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set({
-        ...TenantHelper.kvDef,
-        name: 'Tenant 配置',
-        type: 'json',
-        merge: true,
-        value: {
-          form: {
-            default: {
-              name: 'Default',
-              fields: [
-                { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
-                {
-                  name: 'Bind Roles',
-                  field: { name: TenantFieldKeys.bindRoles, type: 'string', help: "暂时设计为用','分割的角色数组" },
-                },
-              ],
+      KvHelper.set(
+        {
+          ...TenantHelper.kvDef,
+          name: 'Tenant 配置',
+          type: 'json',
+          value: {
+            form: {
+              default: {
+                name: 'Default',
+                fields: [
+                  { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
+                  {
+                    name: 'Bind Roles',
+                    field: { name: TenantFieldKeys.bindRoles, type: 'string', help: "暂时设计为用','分割的角色数组" },
+                  },
+                ],
+              },
+              first: {
+                name: 'First',
+                fields: [
+                  { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
+                  { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
+                ],
+              },
             },
-            first: {
-              name: 'First',
-              fields: [
-                { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
-                { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
-              ],
-            },
-          },
-          values: {},
-        } as KVGroupFieldsValue,
-      });
+            values: {},
+          } as KVGroupFieldsValue,
+        },
+        { merge: true },
+      );
 
     await KvHelper.initializers[identifier]();
   }

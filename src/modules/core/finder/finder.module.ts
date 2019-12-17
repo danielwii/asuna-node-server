@@ -25,35 +25,37 @@ export class FinderModule implements OnModuleInit {
 
     const identifier = KvDefIdentifierHelper.stringify(FinderHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set({
-        ...FinderHelper.kvDef,
-        name: '资源位置配置',
-        type: 'json',
-        merge: true,
-        value: {
-          form: {
-            default: {
-              name: '公网资源',
-              fields: [
-                {
-                  name: '端点',
-                  field: { name: 'endpoint', type: 'string', defaultValue: assetsEndpoint },
-                },
-              ],
+      KvHelper.set(
+        {
+          ...FinderHelper.kvDef,
+          name: '资源位置配置',
+          type: 'json',
+          value: {
+            form: {
+              default: {
+                name: '公网资源',
+                fields: [
+                  {
+                    name: '端点',
+                    field: { name: 'endpoint', type: 'string', defaultValue: assetsEndpoint },
+                  },
+                ],
+              },
+              'internal-default': {
+                name: '内网资源',
+                fields: [
+                  {
+                    name: '端点',
+                    field: { name: 'internal-endpoint', type: 'string', defaultValue: assetsInternalEndpoint },
+                  },
+                ],
+              },
             },
-            'internal-default': {
-              name: '内网资源',
-              fields: [
-                {
-                  name: '端点',
-                  field: { name: 'internal-endpoint', type: 'string', defaultValue: assetsInternalEndpoint },
-                },
-              ],
-            },
-          },
-          values: {},
-        } as KVGroupFieldsValue,
-      });
+            values: {},
+          } as KVGroupFieldsValue,
+        },
+        { merge: true },
+      );
 
     await KvHelper.initializers[identifier]();
   }
