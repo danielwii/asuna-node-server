@@ -35,7 +35,7 @@ export class AdminAuthController extends RestCrudController {
       key: `otp:${user.id}`,
       type: 'Unlimited',
       role: 'auth',
-      identifier: new AdminUserIdentifierHelper().stringify(user),
+      identifier: AdminUserIdentifierHelper.stringify(user),
       service: SysTokenServiceName.AdminLogin,
     };
     await OperationTokenHelper.deprecateToken(tokenOptions);
