@@ -4,17 +4,16 @@ import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
-import { AdminUserIdentifier, UserIdentifier } from './identifier';
+import { AdminUserIdentifierHelper, UserIdentifierHelper } from './identifier';
 import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
 // fixme IJwtPayload only for jwt auth, api-key not included
-export type AnyAuthRequest<U extends IJwtPayload = IJwtPayload> = Request &
-  Partial<{ user: U; identifier: string }>;
+export type AnyAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & Partial<{ user: U; identifier: string }>;
 
-export function isAdminAuthRequest(req: Request) {
-  const {authorization} = req.headers;
+export function isAdminAuthRequest(req: Request): boolean {
+  const { authorization } = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
 }
 
@@ -45,7 +44,7 @@ export function auth(
           if (err || info) {
             logger.warn(`admin-jwt auth error: ${r(err)}`);
           } else {
-            req.identifier = new AdminUserIdentifier(user).identifier();
+            req.identifier = AdminUserIdentifierHelper.stringify(user);
             req.user = user; // only inject client side user to req
           }
           resolve({ err, user, info });
@@ -61,7 +60,7 @@ export function auth(
         if (err || info) {
           logger.warn(`jwt auth error: ${r(err)}`);
         } else {
-          req.identifier = new UserIdentifier(user).identifier();
+          req.identifier = UserIdentifierHelper.stringify(user);
           req.user = user; // only inject client side user to req
         }
         resolve({ err, user, info });

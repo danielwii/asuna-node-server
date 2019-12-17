@@ -3,3 +3,7 @@ type Tenant implements BaseGenericEntity {
   createdAt: Date!
   updatedAt: Date!
 }
+
+type MgmtTenantInfo {
+  config: Any
+}

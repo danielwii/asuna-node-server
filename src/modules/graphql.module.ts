@@ -7,6 +7,7 @@ import { join } from 'path';
 import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
+import { ConfigKeys, configLoader } from './config';
 import { AbstractAuthUser, AsunaContext, KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 
@@ -39,7 +40,7 @@ export class GraphqlModule implements OnModuleInit {
           resolvers: { JSON: GraphQLJSON },
           introspection: AsunaContext.isDebugMode,
           debug: AsunaContext.isDebugMode,
-          playground: true,
+          playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
           resolverValidationOptions: {
             requireResolversForResolveType: false,
           },
@@ -69,12 +70,7 @@ export class GraphqlModule implements OnModuleInit {
           },
         }),
       ],
-      providers: [
-        {
-          provide: APP_INTERCEPTOR,
-          useClass: DataLoaderInterceptor,
-        },
-      ],
+      providers: [{ provide: APP_INTERCEPTOR, useClass: DataLoaderInterceptor }],
     };
   }
 

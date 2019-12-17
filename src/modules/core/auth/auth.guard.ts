@@ -5,7 +5,7 @@ import { AsunaErrorCode, AsunaException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { IJwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';
-import { UserIdentifier } from './identifier';
+import { UserIdentifierHelper } from './identifier';
 
 export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user?: U; identifier?: string };
 
@@ -26,7 +26,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }
-    req.identifier = new UserIdentifier(user).identifier();
+    req.identifier = UserIdentifierHelper.stringify(user);
     return user;
   }
 }

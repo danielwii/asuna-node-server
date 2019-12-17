@@ -3,8 +3,17 @@ import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { CacheManager } from '../../cache';
-import { deserializeSafely, IdentifierHelper, r, StaticImplements, ValidationException } from '../../common';
+import {
+  AsunaErrorCode,
+  AsunaException,
+  deserializeSafely,
+  IdentifierHelper,
+  r,
+  StaticImplements,
+  ValidationException,
+} from '../../common';
 import { LoggerFactory } from '../../common/logger';
+import { AdminUser, AdminUserIdentifierHelper } from '../auth';
 import { KeyValuePair, ValueType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');
@@ -90,8 +99,8 @@ function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof ty
 export const AsunaCollections = {
   SYSTEM_MIGRATIONS: 'system.migrations',
   SYSTEM_SERVER: 'system.server',
-  WECHAT: 'wechat.settings',
-  TENANT: 'tenant.settings',
+  SYSTEM_WECHAT: 'system.wechat',
+  SYSTEM_TENANT: 'system.tenant',
 };
 
 export class KvDef {
@@ -228,6 +237,20 @@ export class KvHelper {
       },
       60,
     );
+  }
+
+  static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
+    if (kvDef.collection.startsWith('system.')) {
+      if (AdminUserIdentifierHelper.identify(identifier)) {
+        const resolved = AdminUserIdentifierHelper.resolve(identifier);
+        const admin = await AdminUser.findOne(resolved.id);
+        if (!admin?.isActive) {
+          throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'admin is not active.');
+        }
+      }
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'unresolved identifier.');
+    }
+    // todo 非系统配置暂时直接略过权限，之后可通过 kv 本身提供更多待认证信息
   }
 
   private static async getGroupFieldsValueByFieldKV(

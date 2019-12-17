@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
+import { TenantController } from './tenant.controller';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 
 const logger = LoggerFactory.getLogger('TenantModule');
@@ -20,7 +21,7 @@ const logger = LoggerFactory.getLogger('TenantModule');
  */
 @Module({
   providers: [],
-  controllers: [],
+  controllers: [TenantController],
 })
 export class TenantModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
