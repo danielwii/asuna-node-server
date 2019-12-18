@@ -1,8 +1,11 @@
+import { Omit } from '@nestjs/graphql/dist/interfaces/gql-module-options.interface';
+import { ClassType } from 'class-transformer/ClassTransformer';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 import {
   Any,
+  BaseEntity,
   Between,
   EntityMetadata,
   Equal,
@@ -207,7 +210,7 @@ export class DBHelper {
     return selectable;
   }
 
-  private static loadMetadatas(): void {
+  private static loadMetadatas(): EntityMetadata[] {
     if (this.metadatas.length === 0) {
       getConnection().entityMetadatas.forEach(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
@@ -215,6 +218,22 @@ export class DBHelper {
         }
       });
     }
+    return this.metadatas;
+  }
+
+  public static getModelsHasRelation<E extends BaseEntity>(
+    entity: ClassType<E>,
+    excludes?: ClassType<any>[],
+  ): (ClassType<any> & { entityInfo: EntityMetaInfoOptions })[] {
+    const excludeNames = _.map(excludes, fp.get('name'));
+    return this.loadMetadatas()
+      .filter(metadata => {
+        const included = metadata.relations
+          .map(fp.get('type'))
+          .find((type: ClassType<any>) => type.name === entity.name && !excludeNames.includes(type.name));
+        return !_.isEmpty(included);
+      })
+      .map(fp.get('target') as any);
   }
 
   /**

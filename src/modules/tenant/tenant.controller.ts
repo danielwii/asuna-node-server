@@ -3,7 +3,7 @@ import { Promise } from 'bluebird';
 import { LoggerFactory } from '../common/logger';
 import { AnyAuthRequest, JwtAdminAuthGuard } from '../core/auth';
 import { Tenant } from './tenant.entities';
-import { TenantHelper } from './tenant.helper';
+import { TenantHelper, TenantInfo } from "./tenant.helper";
 
 const logger = LoggerFactory.getLogger('TenantController');
 
@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('TenantController');
 export class TenantController {
   @UseGuards(JwtAdminAuthGuard)
   @Get('info')
-  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<any> {
+  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
     const { user, identifier } = req;
     return TenantHelper.info(user.id);
   }

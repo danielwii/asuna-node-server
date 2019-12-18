@@ -33,7 +33,7 @@ export class Role extends AbstractBaseEntity {
   }
 }
 
-export enum AuthUserChannel {
+export enum AuthUserType {
   default = 'default',
   wechat = 'wechat',
 }
@@ -45,9 +45,9 @@ export class AdminUser extends AbstractTimeBasedAuthUser {
     super('sa');
   }
 
-  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
-  @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
-  channel: AuthUserChannel;
+  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
+  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
+  type: AuthUserType;
 
   @MetaInfo({ name: '角色' })
   @ManyToMany(

@@ -14,7 +14,7 @@ export class Tenant extends AbstractTimeBasedBaseEntity {
   // Relations
   // --------------------------------------------------------------
 
-  @OneToOne(type => AdminUser, { eager: true })
+  @OneToOne(type => AdminUser)
   @JoinColumn({ name: 'admin__id' })
   admin?: AdminUser;
 }

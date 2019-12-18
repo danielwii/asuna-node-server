@@ -1,7 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
+import { DBHelper } from '../core/db';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
 import { TenantController } from './tenant.controller';
+import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 
 const logger = LoggerFactory.getLogger('TenantModule');
@@ -30,6 +32,8 @@ export class TenantModule implements OnModuleInit {
   }
 
   async initKV(): Promise<void> {
+    const entities = await DBHelper.getModelsHasRelation(Tenant);
+
     const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
       KvHelper.set(
@@ -45,16 +49,23 @@ export class TenantModule implements OnModuleInit {
                   { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
                   {
                     name: 'Bind Roles',
-                    field: { name: TenantFieldKeys.bindRoles, type: 'string', help: "暂时设计为用','分割的角色数组" },
+                    field: { name: TenantFieldKeys.bindRoles, type: 'string', help: "绑定用户角色，暂时设计为用','分割的角色数组" },
                   },
                 ],
               },
               first: {
-                name: 'First',
+                name: '资源创建入口',
                 fields: [
                   { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
                   { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
                 ],
+              },
+              limit: {
+                name: '默认资源创建数量限制',
+                fields: entities.map(entity => ({
+                  name: entity.name,
+                  field: { name: `limit.${entity.entityInfo.name}`, type: 'number' },
+                })),
               },
             },
             values: {},

@@ -2,10 +2,11 @@ import { Promise } from 'bluebird';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
+import { AsunaErrorCode, AsunaException, LoggerFactory, PrimaryKey, r } from '../common';
 
 import { deserializeSafely } from '../common/helpers';
 import { AdminUser } from '../core/auth';
+import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
 import { Tenant } from './tenant.entities';
 
@@ -32,11 +33,20 @@ export enum TenantFieldKeys {
   firstDisplayName = 'first.display-name',
 }
 
+const logger = LoggerFactory.getLogger('TenantHelper');
+
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
   static async getConfig(): Promise<TenantConfig> {
-    return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, TenantFieldKeys));
+    const entities = await DBHelper.getModelsHasRelation(Tenant);
+    const keyValues = _.assign(
+      {},
+      TenantFieldKeys,
+      ...entities.map(entity => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
+    );
+    logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
+    return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
   }
 
   static async info(userId: PrimaryKey): Promise<TenantInfo> {
@@ -44,11 +54,20 @@ export class TenantHelper {
       config: TenantHelper.getConfig(),
       admin: AdminUser.findOne(userId, { relations: ['roles'] }),
     });
+
+    const tenant = await Tenant.findOne({ admin: { id: userId as string } });
+    const entities = await DBHelper.getModelsHasRelation(Tenant);
+    const recordCounts = await Promise.props(
+      _.assign({}, ...entities.map(entity => ({ [entity.entityInfo.name]: (entity as any).count({ tenant }) }))),
+    );
+
+    // console.log(DBHelper.getModelsHasRelation(Tenant).map(entity => console.log(entity.entityInfo)));
     // const config = await TenantHelper.getConfig();
     // const admin = await AdminUser.findOne(user.id, { relations: ['roles'] });
     return Promise.props({
       config,
-      tenant: Tenant.findOne({ admin: { id: userId as string } }),
+      recordCounts,
+      tenant,
       hasTenantRoles: _.remove(_.split(config.bindRoles, ','), fp.includes(_.map(admin.roles, fp.get('name'))) as any),
     });
   }
