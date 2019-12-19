@@ -3,7 +3,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { AccessControl } from 'accesscontrol';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, r, SignException } from '../../common';
+import {
+  AsunaErrorCode,
+  AsunaException,
+  AsunaExceptionHelper,
+  AsunaExceptionTypes,
+  r,
+  SignException,
+} from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { RestCrudController } from '../base/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
@@ -79,7 +86,7 @@ export class AdminAuthController extends RestCrudController {
     const isCorrect = PasswordHelper.passwordVerify(signDto.password, user);
 
     if (!isCorrect) {
-      throw AsunaExceptionHelper.genericException('wrong-password', []);
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.WrongPassword, []);
     }
 
     return TokenHelper.createToken(user);
