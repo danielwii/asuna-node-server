@@ -3,7 +3,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthGuard, AnyAuthRequest, JwtAdminAuthGuard } from '../auth';
+import { JwtAdminAuthGuard } from '../auth/admin-auth.guard';
+import { AnyAuthGuard } from '../auth/auth.guard';
+import { AnyAuthRequest } from '../auth/helper';
 import { KeyValuePair, ValueType } from './kv.entities';
 import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';
 

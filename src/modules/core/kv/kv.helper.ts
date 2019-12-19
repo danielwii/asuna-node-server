@@ -13,7 +13,8 @@ import {
   ValidationException,
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { AdminUser, AdminUserIdentifierHelper } from '../auth';
+import { AdminUser } from '../auth/auth.entities';
+import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValuePair, ValueType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');

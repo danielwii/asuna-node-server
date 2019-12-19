@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
-import { AdminUser } from '../core/auth';
+// eslint-disable-next-line import/no-cycle
+import { AdminUser } from '../core/auth/auth.entities';
 import { AbstractTimeBasedNameEntity } from '../core/base';
 
 @EntityMetaInfo({ name: 'sys__tenants' })

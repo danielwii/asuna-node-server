@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-await-in-loop,@typescript-eslint/explicit-function-return-type,no-restricted-syntax */
 import { Injectable } from '@nestjs/common';
 import { read, utils, write } from 'xlsx';
 import { LoggerFactory } from '../common/logger';
@@ -59,7 +61,7 @@ export class ImportExportService {
           if (element.config.selectable !== undefined) {
             const tempRepo = await this.getRepository(element.config.selectable);
             if (!element.config.many) {
-              const res = await tempRepo.findOne({ name: jsonArray[row][column] });
+              const res = await tempRepo.findOne({ name: jsonArray[row][column] } as any);
               value = res;
             } else {
               // 处理多对多关系
@@ -68,7 +70,7 @@ export class ImportExportService {
                 const contentArray = content.split('、');
                 const resArray = [];
                 contentArray.forEach(async temp => {
-                  const res = await tempRepo.findOne({ name: temp.trim() });
+                  const res = await tempRepo.findOne({ name: temp.trim() } as any);
                   if (res !== undefined) {
                     resArray.push(res);
                   }
@@ -79,7 +81,7 @@ export class ImportExportService {
           }
           // 如果表中已有该数据则删除
           if (keyName === 'name') {
-            const res = await repository.findOne({ name: jsonArray[row][column] });
+            const res = await repository.findOne({ name: jsonArray[row][column] } as any);
             if (res !== undefined) {
               await repository.remove(res);
             }

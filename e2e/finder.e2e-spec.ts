@@ -65,7 +65,7 @@ describe('FinderModule (e2e)', () => {
   });
 
   it('/GET /api/v1/finder with same domain', async () => {
-    await CacheManager.clear({ kvDef: FinderHelper.kvDef, fieldKey: 'endpoint' });
+    CacheManager.clearAll();
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',

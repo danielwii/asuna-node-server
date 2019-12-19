@@ -11,7 +11,7 @@ export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { us
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  static logger = LoggerFactory.getLogger('JwtAuthGuard');
+  logger = LoggerFactory.getLogger('JwtAuthGuard');
 
   constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
@@ -33,14 +33,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  static logger = LoggerFactory.getLogger('AnyAuthGuard');
+  logger = LoggerFactory.getLogger('AnyAuthGuard');
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();
     const next = context.switchToHttp().getNext();
 
-    AnyAuthGuard.logger.log(`check url: ${req.url}`);
+    this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res);
 
     if (!result.user) {

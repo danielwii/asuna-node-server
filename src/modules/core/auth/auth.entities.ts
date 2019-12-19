@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { Tenant } from '../../tenant';
+// eslint-disable-next-line import/no-cycle
+import { Tenant } from '../../tenant/tenant.entities';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadObject } from '../helpers';
 import { AbstractTimeBasedAuthUser } from './base.entities';

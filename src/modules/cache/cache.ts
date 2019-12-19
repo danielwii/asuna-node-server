@@ -34,6 +34,10 @@ export class CacheManager {
     return value;
   }
 
+  static clearAll(): void {
+    this.cache.reset();
+  }
+
   static async clear(key: string | object): Promise<void> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.del(cacheKey);

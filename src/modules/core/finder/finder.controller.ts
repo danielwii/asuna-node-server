@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
@@ -23,7 +24,7 @@ export class FinderController {
     @Query('type') type: 'zones' | 'assets',
     @Req() req,
     @Res() res,
-  ) {
+  ): Promise<void> {
     logger.log(`find ${r({ encrypt, query, type })}`);
     if (!(_.isString(query) && query.length > 0) || !(_.isString(type) && ['zones', 'assets'].includes(type))) {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
@@ -45,7 +46,7 @@ export class FinderController {
 @Controller('f')
 export class ShortFinderController {
   @Get(':q')
-  async redirect(@Param('q') q: string, @Req() req, @Res() res) {
+  async redirect(@Param('q') q: string, @Req() req: Request, @Res() res: Response): Promise<void> {
     logger.log(`find short ${r({ q })}`);
     if (!(_.isString(q) && q.length > 0)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
