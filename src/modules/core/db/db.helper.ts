@@ -1,5 +1,3 @@
-import { Omit } from '@nestjs/graphql/dist/interfaces/gql-module-options.interface';
-import { ClassType } from 'class-transformer/ClassTransformer';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -42,7 +40,7 @@ export interface ColumnSchema {
   };
 }
 
-export type ModelName = {
+export type ModelNameObject = {
   model: string;
   module: string;
   /**
@@ -165,6 +163,15 @@ export function parseFields(value: string | string[], allRelations?: string[]): 
   return { fields, relatedFieldsMap };
 }
 
+export type OriginSchema = {
+  info: EntityMetaInfoOptions;
+  columns: ColumnSchema[];
+  manyToManyRelations: ColumnSchema[];
+  manyToOneRelations: ColumnSchema[];
+  oneToManyRelations: ColumnSchema[];
+  oneToOneRelations: ColumnSchema[];
+};
+
 export class DBHelper {
   static metadatas: EntityMetadata[] = [];
 
@@ -221,16 +228,29 @@ export class DBHelper {
     return this.metadatas;
   }
 
+  public static hasRelation<R extends BaseEntity>(fullModelName: string, relation: ObjectType<R>): boolean {
+    const { metadata, target } = this.repo(fullModelName);
+    const included = metadata.relations
+      .map(fp.get('type'))
+      .find((type: ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions }) => {
+        return type.name === relation.name;
+      });
+    return !_.isEmpty(included);
+  }
+
   public static getModelsHasRelation<E extends BaseEntity>(
-    entity: ClassType<E>,
-    excludes?: ClassType<any>[],
-  ): (ClassType<any> & { entityInfo: EntityMetaInfoOptions })[] {
+    entity: ObjectType<E>,
+    excludes?: ObjectType<BaseEntity>[],
+  ): (ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions })[] {
     const excludeNames = _.map(excludes, fp.get('name'));
     return this.loadMetadatas()
       .filter(metadata => {
         const included = metadata.relations
           .map(fp.get('type'))
-          .find((type: ClassType<any>) => type.name === entity.name && !excludeNames.includes(type.name));
+          .find(
+            (type: ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions }) =>
+              type.name === entity.name && !excludeNames.includes(type.name),
+          );
         return !_.isEmpty(included);
       })
       .map(fp.get('target') as any);
@@ -242,7 +262,7 @@ export class DBHelper {
    * @param model
    * @param module 模块名称，不包括 __
    */
-  public static getModelName(model: string, module?: string): ModelName {
+  public static getModelName(model: string, module?: string): ModelNameObject {
     this.loadMetadatas();
 
     let parsedModel = model;
@@ -295,7 +315,9 @@ export class DBHelper {
     return this.repo(entity).metadata.columns.map(column => column.databaseName);
   }
 
-  public static repo<Entity>(entity: ObjectType<Entity> | string | ModelName): Repository<Entity> {
+  public static repo<Entity extends BaseEntity>(
+    entity: ObjectType<Entity> | string | ModelNameObject,
+  ): Repository<Entity> {
     this.loadMetadatas();
 
     if (_.isString(entity)) {
@@ -304,8 +326,8 @@ export class DBHelper {
         return getRepository<Entity>(entityMetadata.target);
       }
       throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
-    } else if ((entity as ModelName).model) {
-      return getRepository<Entity>((entity as ModelName).dbName);
+    } else if ((entity as ModelNameObject).model) {
+      return getRepository<Entity>((entity as ModelNameObject).dbName);
     } else {
       return getRepository<Entity>(entity as ObjectType<Entity>);
     }
@@ -322,16 +344,7 @@ export class DBHelper {
     return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
   }
 
-  public static extractOriginAsunaSchemas(
-    repository,
-    opts: { module?: string; prefix?: string } = {},
-  ): {
-    columns: ColumnSchema[];
-    manyToManyRelations: ColumnSchema[];
-    manyToOneRelations: ColumnSchema[];
-    oneToManyRelations: ColumnSchema[];
-    oneToOneRelations: ColumnSchema[];
-  } {
+  public static extractOriginAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): OriginSchema {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
     const parentEntityInfo: EntityMetaInfoOptions = repository?.metadata?.parentEntityMetadata?.target?.entityInfo;
@@ -424,7 +437,14 @@ export class DBHelper {
       // R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)),
     )(repository.metadata.oneToOneRelations);
 
-    return { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations, oneToOneRelations };
+    return {
+      info: entityInfo,
+      columns,
+      manyToManyRelations,
+      manyToOneRelations,
+      oneToManyRelations,
+      oneToOneRelations,
+    };
   }
 
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): ColumnSchema[] {

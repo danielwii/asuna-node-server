@@ -1,5 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinTable, ManyToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
+import { Tenant } from '../../tenant';
 import { AbstractBaseEntity } from '../base';
 import { jsonType, safeReloadObject } from '../helpers';
 import { AbstractTimeBasedAuthUser } from './base.entities';
@@ -33,11 +34,6 @@ export class Role extends AbstractBaseEntity {
   }
 }
 
-export enum AuthUserType {
-  default = 'default',
-  wechat = 'wechat',
-}
-
 @EntityMetaInfo({ name: 'auth__users' })
 @Entity('auth__t_users')
 export class AdminUser extends AbstractTimeBasedAuthUser {
@@ -45,9 +41,14 @@ export class AdminUser extends AbstractTimeBasedAuthUser {
     super('sa');
   }
 
-  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
-  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
-  type: AuthUserType;
+  @MetaInfo({ name: 'Tenant' })
+  @ManyToOne(
+    type => Tenant,
+    tenant => tenant.users,
+    { onDelete: 'SET NULL' },
+  )
+  @JoinColumn({ name: 'tennat__id' })
+  tenant: Tenant;
 
   @MetaInfo({ name: '角色' })
   @ManyToMany(

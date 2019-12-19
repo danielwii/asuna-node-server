@@ -22,7 +22,7 @@ export class CacheManager {
    * @param resolver
    * @param seconds
    */
-  static async cacheable(key: string | object, resolver: () => Promise<string>, seconds?: number): Promise<string> {
+  static async cacheable<T>(key: string | object, resolver: () => Promise<T>, seconds?: number): Promise<T> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const cacheValue = this.cache.get(cacheKey);
     // logger.debug(`cacheable ${r({ key, cacheKey, cacheValue })}`);

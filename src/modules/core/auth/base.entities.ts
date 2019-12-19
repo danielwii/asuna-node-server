@@ -3,6 +3,11 @@ import { Column } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
 
+export enum AuthUserType {
+  default = 'default',
+  wechat = 'wechat',
+}
+
 export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
@@ -17,6 +22,10 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
   password?: string;
+
+  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
+  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
+  type: AuthUserType;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
@@ -52,6 +61,10 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '用户名' })
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
+
+  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
+  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
+  type: AuthUserType;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })

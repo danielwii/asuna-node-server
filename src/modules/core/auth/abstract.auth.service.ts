@@ -33,7 +33,7 @@ export class TokenHelper {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-    const payload = { id: user.id, username: user.username, email: user.email };
+    const payload = { id: user.id, username: user.username, email: user.email, type: user.type };
     const token = jwt.sign(payload, secretOrKey, { expiresIn });
     return {
       expiresIn,
@@ -102,7 +102,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
         ...(identifier.username ? { username: identifier.username } : null),
         isActive,
       } as any,
-      { select: ['id', 'username', 'email', 'password', 'salt'] },
+      { select: ['id', 'username', 'email', 'type', 'password', 'salt'] },
     );
   }
 

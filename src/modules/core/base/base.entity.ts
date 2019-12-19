@@ -60,6 +60,16 @@ export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
   }
 }
 
+export abstract class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+  name: string;
+
+  @MetaInfo({ name: '描述' })
+  @Column('text', { nullable: true, name: 'description' })
+  description?: string;
+}
+
 export abstract class AbstractNameEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 50, unique: true, name: 'name' })

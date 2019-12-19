@@ -1,18 +1,16 @@
-import { IdentifierHelper } from '../../common';
-import { AdminUser } from './auth.entities';
-import { AuthUser } from './base.entities';
+import { IdentifierHelper, PrimaryKey } from '../../common';
 
 function StaticImplements<T>() {
   return (constructor: T) => {};
 }
 
-@StaticImplements<IdentifierHelper<Partial<AdminUser>>>()
+@StaticImplements<IdentifierHelper<Partial<{ id: PrimaryKey }>>>()
 export class AdminUserIdentifierHelper {
-  static parse = (identifier: string): Partial<AdminUser> => ({ id: identifier.slice(1) });
+  static parse = (identifier: string): Partial<{ id: PrimaryKey }> => ({ id: identifier.slice(1) });
 
-  static stringify = (payload: Partial<AdminUser>): string => `admin=${payload.id}`;
+  static stringify = (payload: Partial<{ id: PrimaryKey }>): string => `admin=${payload.id}`;
 
-  static resolve(identifier: string): { type: string; id: string } {
+  static resolve(identifier: string): { type: string; id: PrimaryKey } {
     return { type: identifier.split('=')[0], id: identifier.split('=')[1] };
   }
 
@@ -21,13 +19,13 @@ export class AdminUserIdentifierHelper {
   }
 }
 
-@StaticImplements<IdentifierHelper<Partial<AuthUser>>>()
+@StaticImplements<IdentifierHelper<Partial<{ id: PrimaryKey }>>>()
 export class UserIdentifierHelper {
-  static parse = (identifier: string): Partial<AuthUser> => ({ id: identifier.split('=')[1] });
+  static parse = (identifier: string): Partial<{ id: PrimaryKey }> => ({ id: identifier.split('=')[1] });
 
-  static stringify = (payload: Partial<AuthUser>): string => `u=${payload.id}`;
+  static stringify = (payload: Partial<{ id: PrimaryKey }>): string => `u=${payload.id}`;
 
-  static resolve(identifier: string): { type: string; id: string } {
+  static resolve(identifier: string): { type: string; id: PrimaryKey } {
     return { type: identifier.split('=')[0], id: identifier.split('=')[1] };
   }
 

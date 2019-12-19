@@ -1,20 +1,34 @@
-import { Entity, JoinColumn, OneToOne } from 'typeorm';
-import { EntityMetaInfo } from '../common/decorators';
+import { Column, Entity, OneToMany } from 'typeorm';
+import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AdminUser } from '../core/auth';
-import { AbstractTimeBasedBaseEntity } from '../core/base';
+import { AbstractTimeBasedNameEntity } from '../core/base';
 
 @EntityMetaInfo({ name: 'sys__tenants' })
 @Entity('sys__t_tenants')
-export class Tenant extends AbstractTimeBasedBaseEntity {
+export class Tenant extends AbstractTimeBasedNameEntity {
   constructor() {
     super('t');
   }
+  // --------------------------------------------------------------
+  // Status
+  // --------------------------------------------------------------
+
+  @MetaInfo({ name: '是否发布？' })
+  @Column({ nullable: true, name: 'is_published' })
+  isPublished: boolean;
 
   // --------------------------------------------------------------
   // Relations
   // --------------------------------------------------------------
 
-  @OneToOne(type => AdminUser)
-  @JoinColumn({ name: 'admin__id' })
-  admin?: AdminUser;
+  // @OneToOne(type => AdminUser)
+  // @JoinColumn({ name: 'admin__id' })
+  // admin?: AdminUser;
+
+  @MetaInfo({ name: '管理员' })
+  @OneToMany(
+    type => AdminUser,
+    admin => admin.tenant,
+  )
+  users: AdminUser[];
 }

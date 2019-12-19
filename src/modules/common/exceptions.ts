@@ -63,7 +63,13 @@ export class AsunaException extends AsunaBaseException {
     super(nameValue.value, null, nameValue.name, message, errors);
   }
 
-  static of(nameValue: NameValue, code?: string, message?: string, localeMessage?: string, errors?: any): AsunaException {
+  static of(
+    nameValue: NameValue,
+    code?: string,
+    message?: string,
+    localeMessage?: string,
+    errors?: any,
+  ): AsunaException {
     const exception = new AsunaException(nameValue, message, errors);
     exception.code = code;
     exception.localeMessage = localeMessage;
@@ -104,6 +110,15 @@ export class SignException extends AsunaException {
   }
 }
 
+export enum AsunaExceptionTypes {
+  ElementExists = 'ElementExists',
+  WrongPassword = 'WrongPassword',
+  AuthExpired = 'AuthExpired',
+  TenantNeeded = 'TenantNeeded',
+  Unpublished = 'Unpublished',
+  ResourceLimit = 'ResourceLimit',
+}
+
 type AsunaExceptionOpts = {
   code: string;
   nameValue: NameValue;
@@ -113,23 +128,41 @@ type AsunaExceptionOpts = {
 
 export class AsunaExceptionHelper {
   private static registers = {
-    'element-exists': {
+    [AsunaExceptionTypes.ElementExists]: {
       code: 'E01001',
       nameValue: AsunaErrorCode.Conflict,
       message: (type: string, element: string) => `'${type}' '${r(element)}' already exists.`,
       localMessage: (type: string, element: string) => `'${type}' '${r(element)}' 已存在`,
     },
-    'wrong-password': {
+    [AsunaExceptionTypes.WrongPassword]: {
       code: 'E01002',
       nameValue: AsunaErrorCode.InvalidCredentials,
       message: () => `wrong password`,
       localMessage: () => `密码错误`,
     },
-    'auth-expired': {
+    [AsunaExceptionTypes.Unpublished]: {
+      code: 'E01010',
+      nameValue: AsunaErrorCode.Unprocessable,
+      message: (source: string) => `unpublished resource: ${source}`,
+      localMessage: (source: string) => `资源 ${source} 未发布，暂不可用`,
+    },
+    [AsunaExceptionTypes.ResourceLimit]: {
+      code: 'E01011',
+      nameValue: AsunaErrorCode.Unprocessable,
+      message: (source: string, limit: number) => `${source} reached to limit: ${limit}`,
+      localMessage: (source: string, limit: number) => `资源 ${source} 达到限制：${limit}`,
+    },
+    [AsunaExceptionTypes.AuthExpired]: {
       code: 'E02001',
       nameValue: AsunaErrorCode.InvalidCredentials,
       message: () => `auth token expired`,
       localMessage: params => `认证已过期`,
+    },
+    [AsunaExceptionTypes.TenantNeeded]: {
+      code: 'E03001',
+      nameValue: AsunaErrorCode.Unprocessable,
+      message: () => `tenant needed`,
+      localMessage: () => '未找到必要的 tenant 信息',
     },
   };
 
