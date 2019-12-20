@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
-import { Promise } from "bluebird";
-import { IsOptional, IsString } from "class-validator";
-import { LoggerFactory } from "../common/logger";
-import { AnyAuthRequest, JwtAdminAuthGuard } from "../core/auth";
-import { TenantHelper, TenantInfo } from "./tenant.helper";
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Promise } from 'bluebird';
+import { IsOptional, IsString } from 'class-validator';
+import { LoggerFactory } from '../common/logger';
+import { AnyAuthRequest, JwtAdminAuthGuard } from '../core/auth';
+import { TenantHelper, TenantInfo } from './tenant.helper';
 
 const logger = LoggerFactory.getLogger('TenantController');
 
@@ -16,7 +16,7 @@ class RegisterTenantDto {
 export class TenantController {
   @UseGuards(JwtAdminAuthGuard)
   @Get('info')
-  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
+  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo | null> {
     const { user, identifier } = req;
     return TenantHelper.info(user.id);
   }

@@ -232,7 +232,7 @@ export class DBHelper {
     const { metadata, target } = this.repo(fullModelName);
     const included = metadata.relations
       .map(fp.get('type'))
-      .find((type: ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions }) => {
+      .find((type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => {
         return type.name === relation.name;
       });
     return !_.isEmpty(included);
@@ -240,15 +240,15 @@ export class DBHelper {
 
   public static getModelsHasRelation<E extends BaseEntity>(
     entity: ObjectType<E>,
-    excludes?: ObjectType<BaseEntity>[],
-  ): (ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions })[] {
+    excludes?: typeof BaseEntity[],
+  ): (typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[] {
     const excludeNames = _.map(excludes, fp.get('name'));
     return this.loadMetadatas()
       .filter(metadata => {
         const included = metadata.relations
           .map(fp.get('type'))
           .find(
-            (type: ObjectType<BaseEntity> & { entityInfo: EntityMetaInfoOptions }) =>
+            (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) =>
               type.name === entity.name && !excludeNames.includes(type.name),
           );
         return !_.isEmpty(included);

@@ -31,7 +31,7 @@ export type TenantInfo = {
   config: TenantConfig;
   tenant: Tenant;
   tenantRoles: string[];
-  recordCounts: { [name: string]: number };
+  tenantRecordCounts: { [name: string]: { total: number; published?: number } };
 };
 
 export enum TenantFieldKeys {
@@ -73,7 +73,7 @@ export class TenantHelper {
     // return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
   }
 
-  static async info(userId: PrimaryKey): Promise<TenantInfo> {
+  static async info(userId: PrimaryKey): Promise<TenantInfo | null> {
     const { config, admin } = await Promise.props({
       config: TenantHelper.getConfig(),
       admin: AdminUser.findOne(userId, { relations: ['roles', 'tenant'] }),
@@ -81,14 +81,38 @@ export class TenantHelper {
     });
 
     const { tenant } = admin;
+    if (!tenant) {
+      return null;
+    }
+
     const entities = await DBHelper.getModelsHasRelation(Tenant);
-    const recordCounts = await Promise.props<{ [name: string]: number }>(
+    /*
+    const tenantRecordCounts = await Promise.props<{ [name: string]: number }>(
       _.assign(
         {},
         // 仅在 tenant 存在时检测数量
         ...entities.map(entity => ({
-          [entity.entityInfo.name]: tenant ? (entity as any).count({ tenant }) : Number.NaN,
+          [entity.entityInfo.name]: tenant ? entity.count({ tenant } as any) : Number.NaN,
         })),
+      ),
+    );
+*/
+    const tenantRecordCounts = await Promise.props<{ [name: string]: { total: number; published?: number } }>(
+      _.assign(
+        {},
+        // 仅在 tenant 存在时检测数量
+        ...entities
+          .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
+          .map(entity => ({
+            [entity.entityInfo.name]: Promise.props({
+              // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
+              total: entity.count({ tenant } as any),
+              published: DBHelper.getPropertyNames(entity).includes('isPublished')
+                ? entity.count({ tenant, isPublished: true } as any)
+                : undefined,
+              // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
+            }),
+          })),
       ),
     );
 
@@ -97,7 +121,8 @@ export class TenantHelper {
     // const admin = await AdminUser.findOne(user.id, { relations: ['roles'] });
     return Promise.props({
       config,
-      recordCounts: _.omit(recordCounts, 'wx__users', 'auth__users'),
+      // tenantRecordCounts: _.omit(tenantRecordCounts, 'wx__users', 'auth__users'),
+      tenantRecordCounts,
       tenant,
       tenantRoles: this.getTenantRoles(admin.roles),
     });
@@ -134,7 +159,7 @@ export class TenantHelper {
 
   static async checkResourceLimit(userId: string, fullModelName: string): Promise<void> {
     const info = await this.info(userId);
-    const count = info.recordCounts[fullModelName];
+    const count = info.tenantRecordCounts[fullModelName];
     const limit = _.get(info.config, `limit.${fullModelName}`);
     logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
     if (count >= limit) {

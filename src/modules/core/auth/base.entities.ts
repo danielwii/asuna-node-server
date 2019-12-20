@@ -19,23 +19,23 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
-  @MetaInfo({ ignore: true })
-  @Column({ nullable: true, select: false })
-  password?: string;
-
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
   @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
   type: AuthUserType;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
+  password?: string;
+
+  @MetaInfo({ ignore: true })
+  @Column({ nullable: true, select: false })
   salt?: string;
 
-  @MetaInfo({ name: '最后获取登录凭证时间' })
+  @MetaInfo({ name: '最后获取登录凭证时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_signed_at' })
   lastSignedAt?: Date;
 
-  @MetaInfo({ name: '最后登录时间' })
+  @MetaInfo({ name: '最后登录时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_login_at' })
   lastLoginAt?: Date;
 
