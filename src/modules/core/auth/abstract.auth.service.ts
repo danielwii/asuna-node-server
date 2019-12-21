@@ -1,6 +1,6 @@
 import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
-import * as jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { PrimaryKey } from '../../common';
@@ -25,10 +25,6 @@ export class PasswordHelper {
 }
 
 export class TokenHelper {
-  /**
-   * TODO using env instead
-   * @returns {Promise<void>}
-   */
   static async createToken(user: AuthUser): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${user.email}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
@@ -39,6 +35,15 @@ export class TokenHelper {
       expiresIn,
       accessToken: token,
     };
+  }
+
+  static createCustomToken(
+    payload: string | Buffer | object,
+    secretOrPrivateKey: Secret,
+    options?: SignOptions,
+  ): string {
+    logger.log(`createCustomToken >> ${r(payload)}`);
+    return jwt.sign(payload, secretOrPrivateKey, options);
   }
 }
 
