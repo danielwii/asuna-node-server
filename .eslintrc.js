@@ -22,6 +22,7 @@ module.exports = {
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'warn',
+    'import/no-duplicates': 'off',
     'max-classes-per-file': 'off',
     'lines-between-class-members': 'off',
     'no-useless-constructor': 'off',

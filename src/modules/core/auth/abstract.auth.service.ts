@@ -1,6 +1,7 @@
 import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
-import jwt, { Secret, SignOptions } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
+import { Secret, SignOptions } from 'jsonwebtoken';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { PrimaryKey } from '../../common';
