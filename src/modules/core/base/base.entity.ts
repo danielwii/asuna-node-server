@@ -12,8 +12,32 @@ import { MetaInfo } from '../../common/decorators';
 import { SimpleIdGenerator } from '../../ids';
 
 export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
-export abstract class AbstractBaseEntity extends BaseEntity {
+export const Publishable = <TBase extends Constructor>(Base: TBase) => {
+  class ExtendableEntity extends Base {
+    @MetaInfo({ name: '是否发布？' })
+    @Column({ nullable: true, name: 'is_published' })
+    isPublished: boolean;
+  }
+
+  return ExtendableEntity;
+};
+
+export const NameDescAttachable = <TBase extends Constructor>(Base: TBase) => {
+  class ExtendableEntity extends Base {
+    @MetaInfo({ name: '名称' })
+    @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+    name: string;
+
+    @MetaInfo({ name: '描述' })
+    @Column('text', { nullable: true, name: 'description' })
+    description: string;
+  }
+  return ExtendableEntity;
+};
+
+export class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -30,7 +54,7 @@ export abstract class AbstractBaseEntity extends BaseEntity {
 /**
  * 生成基于时间的 id，prefix 可以作为一个特殊的前缀用于识别不同的类型
  */
-export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
+export class AbstractTimeBasedBaseEntity extends BaseEntity {
   @Exclude()
   readonly idPrefix: string;
   @Exclude()
@@ -60,7 +84,7 @@ export abstract class AbstractTimeBasedBaseEntity extends BaseEntity {
   }
 }
 
-export abstract class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
+export class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
@@ -70,7 +94,7 @@ export abstract class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseE
   description?: string;
 }
 
-export abstract class AbstractNameEntity extends AbstractBaseEntity {
+export class AbstractNameEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
@@ -104,7 +128,7 @@ export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
   description: string;
 }
 
-export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
+export class AbstractCategoryEntity extends Publishable(AbstractBaseEntity) {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 50, unique: true, name: 'name' })
   name: string;
@@ -112,10 +136,6 @@ export abstract class AbstractCategoryEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '描述' })
   @Column('text', { nullable: true, name: 'description' })
   description: string;
-
-  @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'is_published' })
-  isPublished: boolean;
 
   @MetaInfo({
     name: '是否系统数据？',

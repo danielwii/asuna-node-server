@@ -8,7 +8,7 @@ import { PrimaryKey } from '../../common';
 import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { IJwtPayload } from './auth.interfaces';
+import { JwtPayload } from './auth.interfaces';
 import { AuthUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
@@ -57,7 +57,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
    * @param jwtPayload
    * @returns {Promise<boolean>}
    */
-  async validateUser(jwtPayload: IJwtPayload): Promise<boolean> {
+  async validateUser(jwtPayload: JwtPayload): Promise<boolean> {
     const identifier = { email: jwtPayload.email, username: jwtPayload.username };
     const user = await this.getUser(identifier, true);
 

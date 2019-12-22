@@ -39,7 +39,7 @@ export function r(o: any, { transform, stringify }: { transform?: boolean; strin
  * @param derivedCtor
  * @param baseCtors
  */
-function applyMixins(derivedCtor: any, baseCtors: any[]): void {
+export function applyMixins(derivedCtor: any, baseCtors: any[]): void {
   baseCtors.forEach(baseCtor => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
       Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));

@@ -132,6 +132,16 @@ export class TenantHelper {
     return DBHelper.hasRelation(fullModelName, Tenant);
   }
 
+  static async hasTenantRole(roles: Role[]): Promise<boolean> {
+    return !_.isEmpty(await this.getTenantRoles(roles));
+  }
+
+  static async tenantSupport(fullModelName: string, roles: Role[]): Promise<boolean> {
+    const isTenantEntity = await this.isTenantEntity(fullModelName);
+    const hasTenantRoles = await this.hasTenantRole(roles);
+    return isTenantEntity && hasTenantRoles;
+  }
+
   static async getTenantRoles(roles: Role[]): Promise<string[]> {
     const config = await TenantHelper.getConfig();
     return _.remove(_.split(config.bindRoles, ','), fp.includes(_.map(roles, fp.get('name'))) as any);

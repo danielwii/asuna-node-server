@@ -3,11 +3,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { AsunaErrorCode, AsunaException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { IJwtPayload } from './auth.interfaces';
+import { JwtPayload } from './auth.interfaces';
 import { AnyAuthRequest, auth } from './helper';
 import { UserIdentifierHelper } from './identifier';
 
-export type JwtAuthRequest<U extends IJwtPayload = IJwtPayload> = Request & { user?: U; identifier?: string };
+export type JwtAuthRequest<U extends JwtPayload = JwtPayload> = Request & { user?: U; identifier?: string };
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

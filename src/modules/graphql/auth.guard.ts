@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { auth } from '../core/auth';
-import { IJwtPayload } from '../core/auth/auth.interfaces';
+import { JwtPayload } from '../core/auth/auth.interfaces';
 
 const logger = LoggerFactory.getLogger('GqlAuthGuard');
 
@@ -109,5 +109,5 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
 }
 
 export interface GetCurrentUser {
-  (): IJwtPayload;
+  (): JwtPayload;
 }

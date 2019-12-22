@@ -1,7 +1,7 @@
 import { PrimaryKey } from '../../common/identifier';
 import { AuthUserType } from './base.entities';
 
-export interface IJwtPayload {
+export interface JwtPayload {
   id: PrimaryKey;
   email: string;
   username: string;

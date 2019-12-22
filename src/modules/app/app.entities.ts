@@ -1,6 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { AbstractBaseEntity, AbstractNameEntity, jsonType, safeReloadArray } from '../core';
+import { AbstractBaseEntity, AbstractNameEntity, jsonType, Publishable, safeReloadArray } from '../core';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',
@@ -21,7 +21,7 @@ export const Mode = {
 
 @EntityMetaInfo({ name: 'app__infos' })
 @Entity('app__t_infos')
-export class AppInfo extends AbstractNameEntity {
+export class AppInfo extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '唯一识别 Key' })
   @Column({ nullable: false, length: 50, unique: true })
   key: string;
@@ -29,10 +29,6 @@ export class AppInfo extends AbstractNameEntity {
   @MetaInfo({ name: 'Mode', type: 'Enum', enumData: Mode })
   @Column('varchar', { nullable: true, name: 'mode' })
   mode: keyof typeof Mode;
-
-  @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'is_published' })
-  isPublished: boolean;
 
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -44,7 +40,7 @@ export class AppInfo extends AbstractNameEntity {
 
 @EntityMetaInfo({ name: 'app__releases' })
 @Entity('app__t_releases')
-export class AppRelease extends AbstractBaseEntity {
+export class AppRelease extends Publishable(AbstractBaseEntity) {
   @Column({ nullable: false, length: 10, name: 'version_code' })
   versionCode: string;
 
@@ -65,10 +61,6 @@ export class AppRelease extends AbstractBaseEntity {
   @MetaInfo({ name: 'File', type: 'File' })
   @Column(jsonType(), { nullable: false, name: 'paths' })
   paths: JsonArray;
-
-  @MetaInfo({ name: '是否发布？' })
-  @Column({ nullable: true, name: 'is_published' })
-  isPublished: boolean;
 
   @MetaInfo({ name: '所属应用' })
   @ManyToOne(

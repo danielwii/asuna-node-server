@@ -4,11 +4,11 @@ import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult, getManager } from 'typeorm';
-import { CurrentTenant, CurrentUser, Profile, r, validateObject } from '../../common';
+import { CurrentRoles, CurrentTenant, CurrentUser, Profile, r, validateObject } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { Tenant, TenantHelper } from '../../tenant';
-import { JwtAdminAuthGuard } from '../auth';
-import { IJwtPayload } from '../auth/auth.interfaces';
+import { JwtAdminAuthGuard, Role } from '../auth';
+import { JwtPayload } from '../auth/auth.interfaces';
 import {
   ColumnSchema,
   DBHelper,
@@ -56,8 +56,9 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model')
   async list(
-    @CurrentUser() admin: IJwtPayload,
+    @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
+    @CurrentRoles() roles: Role[],
     @Param('model') model: string,
     @Query('page') page = 1,
     @Query('size') size = 10,
@@ -100,7 +101,7 @@ export abstract class RestCrudController {
     logger.log(`list ${r(modelName)} with ${r({ where, normalWhere })}`);
     DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWhere);
 
-    if (await TenantHelper.isTenantEntity(modelName.entityName)) queryBuilder.andWhere({ tenant } as any);
+    if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 
     const [items, total] = await queryBuilder
       .take(query.take)
@@ -115,8 +116,9 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/:id')
   async get(
-    @CurrentUser() admin: IJwtPayload,
+    @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
+    @CurrentRoles() roles: Role[],
     @Param('model') model: string,
     @Param('id') id: number,
     @Query('profile') profile?: Profile,
@@ -136,7 +138,7 @@ export abstract class RestCrudController {
     DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, null);
 
     queryBuilder.whereInIds(id);
-    if (await TenantHelper.isTenantEntity(modelName.entityName)) queryBuilder.andWhere({ tenant } as any);
+    if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 
     return queryBuilder.getOne();
   }
@@ -144,7 +146,7 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Delete(':model/:id')
   async delete(
-    @CurrentUser() admin: IJwtPayload,
+    @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
     @Param('model') model: string,
     @Param('id') id: number,
@@ -158,8 +160,9 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Post(':model')
   async save(
-    @CurrentUser() admin: IJwtPayload,
+    @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
+    @CurrentRoles() roles: Role[],
     @Param('model') model: string,
     @Body() updateTo: { [member: string]: any },
   ): Promise<any> {
@@ -186,7 +189,7 @@ export abstract class RestCrudController {
       ...updateTo,
       ...relationIds,
       updatedBy: admin.username,
-      ...((await TenantHelper.isTenantEntity(modelName.entityName)) ? { tenant } : null),
+      ...((await TenantHelper.tenantSupport(modelName.entityName, roles)) ? { tenant } : null),
     });
     await validateObject(entity);
     /*
@@ -199,8 +202,9 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Patch(':model/:id')
   async patch(
-    @CurrentUser() admin: IJwtPayload,
+    @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
+    @CurrentRoles() roles: Role[],
     @Param('model') model: string,
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
@@ -230,7 +234,7 @@ export abstract class RestCrudController {
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
-    const entity = (await TenantHelper.isTenantEntity(modelName.entityName))
+    const entity = (await TenantHelper.tenantSupport(modelName.entityName, roles))
       ? await repository.findOneOrFail({ where: { id, tenant } })
       : await repository.findOneOrFail(id);
 

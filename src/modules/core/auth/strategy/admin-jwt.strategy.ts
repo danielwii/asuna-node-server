@@ -5,7 +5,7 @@ import { AsunaErrorCode, AsunaException, r } from '../../../common';
 import { LoggerFactory } from '../../../common/logger';
 import { ConfigKeys, configLoader } from '../../../config';
 import { AdminAuthService } from '../admin-auth.service';
-import { IJwtPayload } from '../auth.interfaces';
+import { JwtPayload } from '../auth.interfaces';
 
 const logger = LoggerFactory.getLogger('AdminJwtStrategy');
 
@@ -22,7 +22,7 @@ export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
     );
   }
 
-  async validate(payload: IJwtPayload): Promise<IJwtPayload> {
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
     logger.debug(`validate ${r(payload)}`);
     const isValid = await this.adminAuthService.validateUser(payload);
     if (!isValid) {

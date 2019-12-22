@@ -7,3 +7,7 @@ export const CurrentUser = createParamDecorator((data, req) => {
 export const CurrentTenant = createParamDecorator((data, req) => {
   return req.tenant;
 });
+
+export const CurrentRoles = createParamDecorator((data, req) => {
+  return req.roles;
+});
