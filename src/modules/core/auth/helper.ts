@@ -50,8 +50,8 @@ export async function auth(
             const admin = await AdminUser.findOne(user.id, { relations: ['roles', 'tenant'] });
             req.identifier = AdminUserIdentifierHelper.stringify(user);
             req.user = user; // only inject client side user to req
-            req.tenant = admin.tenant;
-            req.roles = admin.roles;
+            req.tenant = admin?.tenant;
+            req.roles = admin?.roles;
           }
           resolve({ err, user, info });
         })(req, res);
@@ -69,8 +69,8 @@ export async function auth(
           const admin = await AdminUser.findOne(user.id, { relations: ['roles', 'tenant'] });
           req.identifier = UserIdentifierHelper.stringify(user);
           req.user = user; // only inject client side user to req
-          req.tenant = admin.tenant;
-          req.roles = admin.roles;
+          req.tenant = admin?.tenant;
+          req.roles = admin?.roles;
         }
         resolve({ err, user, info });
       })(req, res);

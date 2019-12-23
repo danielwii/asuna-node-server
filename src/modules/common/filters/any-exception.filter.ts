@@ -51,7 +51,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       }
     }
 
-    const httpStatus: number = processed.status || HttpStatus.INTERNAL_SERVER_ERROR;
+    const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
 
     if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
@@ -106,20 +106,26 @@ export class AnyExceptionFilter implements ExceptionFilter {
       };
     }
 
-    logger.error({
-      message,
-      body: _.omit(body, 'error.message'),
-      type: typeof exception,
-      isHttpException: exception instanceof HttpException,
-      isError: exception instanceof Error,
-      isAsunaException: exception instanceof AsunaException,
-    });
+    const isGraphqlRes = !res.status;
+    logger.error(
+      `error: ${r({
+        isGraphqlRes,
+        message,
+        body: _.omit(body, 'error.message'),
+        type: typeof exception,
+        name: exception.constructor.name,
+        isHttpException: exception instanceof HttpException,
+        isError: exception instanceof Error,
+        isAsunaException: exception instanceof AsunaException,
+      })}`,
+    );
 
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
-    if (!res.status) {
+    if (isGraphqlRes) {
       throw new Error(JSON.stringify(body));
     }
 
+    // logger.error(`send ${r(body)} status: ${httpStatus}`);
     res.status(httpStatus).send(body);
   }
 }
