@@ -27,7 +27,7 @@ export const Publishable = <TBase extends Constructor>(Base: TBase) => {
 export const NameDescAttachable = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '名称' })
-    @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+    @Column({ nullable: false, length: 100, unique: true, name: 'name' })
     name: string;
 
     @MetaInfo({ name: '描述' })
@@ -86,7 +86,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
 
 export class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
@@ -96,7 +96,7 @@ export class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
 
 export class AbstractNameEntity extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
@@ -120,7 +120,7 @@ export abstract class AbstractUUIDBaseEntity extends BaseEntity {
 
 export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
@@ -130,7 +130,7 @@ export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
 
 export class AbstractCategoryEntity extends Publishable(AbstractBaseEntity) {
   @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 50, unique: true, name: 'name' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;
 
   @MetaInfo({ name: '描述' })
