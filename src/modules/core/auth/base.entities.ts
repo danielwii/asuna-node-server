@@ -3,7 +3,7 @@ import { Column } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
 
-export enum AuthUserType {
+export enum AuthUserChannel {
   default = 'default',
   wechat = 'wechat',
 }
@@ -19,9 +19,9 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
-  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
-  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
-  type: AuthUserType;
+  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
+  @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
+  channel: AuthUserChannel;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
@@ -62,9 +62,9 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: false, length: 100, unique: true })
   username: string;
 
-  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserType })
-  @Column('varchar', { nullable: true, name: 'type', default: AuthUserType.default })
-  type: AuthUserType;
+  @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
+  @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
+  channel: AuthUserChannel;
 
   @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
