@@ -1,13 +1,13 @@
-import { Body, Delete, Get, Options, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Delete, Get, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import * as R from 'ramda';
-import { DeleteResult, getManager } from 'typeorm';
-import { CurrentRoles, CurrentTenant, CurrentUser, Profile, r, validateObject } from '../../common';
+import { DeleteResult } from 'typeorm';
+import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, Profile, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { Tenant, TenantHelper } from '../../tenant';
-import { JwtAdminAuthGuard, Role } from '../auth';
+import { AnyAuthRequest, JwtAdminAuthGuard, Role } from '../auth';
 import { JwtPayload } from '../auth/auth.interfaces';
 import {
   ColumnSchema,
@@ -18,7 +18,8 @@ import {
   parseOrder,
   parseWhere,
 } from '../db';
-import { KeyValuePair, KvHelper } from '../kv';
+import { KvHelper } from '../kv';
+import { RestHelper } from './rest.helper';
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');
@@ -42,14 +43,14 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Options(':model')
   options(@Param('model') model: string): ColumnSchema[] {
-    const repository = DBHelper.repo(DBHelper.getModelName(model, this.module));
+    const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Get('schema/:model')
   schema(@Param('model') model: string): OriginSchema {
-    const repository = DBHelper.repo(DBHelper.getModelName(model, this.module));
+    const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractOriginAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
@@ -68,7 +69,7 @@ export abstract class RestCrudController {
     @Query('sort') sortStr?: string,
     @Query('relations') relationsStr?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
-    const modelName = DBHelper.getModelName(model, this.module);
+    const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
@@ -125,7 +126,7 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ): Promise<any> {
-    const modelName = DBHelper.getModelName(model, this.module);
+    const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
@@ -151,7 +152,7 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Param('id') id: number,
   ): Promise<DeleteResult> {
-    const modelName = DBHelper.getModelName(model, this.module);
+    const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     return repository.delete(id);
@@ -159,44 +160,8 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Post(':model')
-  async save(
-    @CurrentUser() admin: JwtPayload,
-    @CurrentTenant() tenant: Tenant,
-    @CurrentRoles() roles: Role[],
-    @Param('model') model: string,
-    @Body() updateTo: { [member: string]: any },
-  ): Promise<any> {
-    const modelName = DBHelper.getModelName(model, this.module);
-    if (tenant) {
-      await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
-      await TenantHelper.checkResourceLimit(admin.id as string, modelName.entityName);
-    }
-    logger.verbose(`save ${r({ admin, modelName, updateTo })}`);
-    // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
-    if (modelName.model === 'kv__pairs') {
-      const pair = KeyValuePair.create(updateTo);
-      logger.log(`save by kv... ${r(pair)}`);
-      return KvHelper.set(pair);
-    }
-
-    const repository = DBHelper.repo(modelName);
-    const relationKeys = repository.metadata.relations.map(relation => relation.propertyName);
-    const relationIds = R.map(value => (_.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value }))(
-      R.pick(relationKeys, updateTo),
-    );
-
-    const entity = repository.create({
-      ...updateTo,
-      ...relationIds,
-      updatedBy: admin.username,
-      ...((await TenantHelper.tenantSupport(modelName.entityName, roles)) ? { tenant } : null),
-    });
-    await validateObject(entity);
-    /*
-     * using getManger().save(entity) will trigger Entity Listener for entities
-     * but repo.save and getManger().save(target, object) will not
-     */
-    return getManager().save(entity);
+  async save(@Param('model') model: string, @Body() updateTo: JsonMap, @Req() req: AnyAuthRequest): Promise<any> {
+    return RestHelper.save({ model: DBHelper.getModelNameObject(model, this.module), body: updateTo }, req);
   }
 
   @UseGuards(JwtAdminAuthGuard)
@@ -209,7 +174,7 @@ export abstract class RestCrudController {
     @Param('id') id: number,
     @Body() updateTo: { [member: string]: any },
   ): Promise<any> {
-    const modelName = DBHelper.getModelName(model, this.module);
+    const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
     logger.log(`patch ${r({ admin, modelName, id, updateTo })}`);
     // TODO remove kv handler from default handler

@@ -12,7 +12,7 @@ const logger = LoggerFactory.getLogger('ImportExportService');
 export class ImportExportService {
   // 获取repo
   private async getRepository(model: string) {
-    const modelName = DBHelper.getModelName(model, '');
+    const modelName = DBHelper.getModelNameObject(model, '');
     return DBHelper.repo(modelName);
     // return DBHelper.extractAsunaSchemas(repository,{ module: 'www__', prefix: 't_' });
   }

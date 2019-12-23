@@ -30,7 +30,7 @@ export class CacheManager {
 
     const value = await resolver();
     this.cache.set(cacheKey, value, seconds ? seconds * 1000 : null);
-    logger.log(`cacheable set ${r({ cacheKey, value, seconds })}`);
+    logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 

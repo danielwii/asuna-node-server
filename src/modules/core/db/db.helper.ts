@@ -271,7 +271,7 @@ export class DBHelper {
    * @param model
    * @param module 模块名称，不包括 __
    */
-  public static getModelName(model: string, module?: string): ModelNameObject {
+  public static getModelNameObject(model: string, module?: string): ModelNameObject {
     this.loadMetadatas();
 
     let parsedModel = model;
@@ -333,7 +333,7 @@ export class DBHelper {
     this.loadMetadatas();
 
     if (_.isString(entity)) {
-      const entityMetadata = this.getMetadata(this.getModelName(entity as string).model);
+      const entityMetadata = this.getMetadata(this.getModelNameObject(entity as string).model);
       if (entityMetadata) {
         return getRepository<Entity>(entityMetadata.target);
       }

@@ -17,7 +17,7 @@ import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
-import { AsunaContext, IAsunaContextOpts } from './modules/core';
+import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from "./modules/core";
 import { Global } from './modules/core/global';
 
 /*
@@ -55,6 +55,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`options: ${r(options)}`);
 
   AsunaContext.instance.setup(options.context);
+  // may add bootstrap lifecycle for static initialize
+  AccessControlHelper.init();
   // AsunaContext.instance.setup(options.context || { root: options.root });
 
   // --------------------------------------------------------------
