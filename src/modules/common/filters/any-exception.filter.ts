@@ -43,15 +43,15 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
     } else if (R.is(EntityNotFoundError, exception)) {
-      processed.httpStatus = HttpStatus.NOT_FOUND;
+      processed.status = HttpStatus.NOT_FOUND;
     } else if (processed.code) {
       if (processed.code === 'ERR_ASSERTION') {
         // TODO wrap with AsunaException
-        processed.httpStatus = HttpStatus.BAD_REQUEST;
+        processed.status = HttpStatus.BAD_REQUEST;
       }
     }
 
-    const httpStatus: number = processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
+    const httpStatus: number = processed.status || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
 
     if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
@@ -90,7 +90,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
         error: {
           httpStatus,
           name: AsunaErrorCode.Unexpected__do_not_use_it.name,
-          code: processed.httpStatus || AsunaErrorCode.Unexpected__do_not_use_it.value,
+          code: processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
           message,
           // raw: processed,
         } as AsunaException,
@@ -101,7 +101,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
         error: {
           ...(processed as AsunaException),
           message,
-          // code: processed.code || processed.httpStatus || AsunaErrorCode.Unexpected__do_not_use_it.value,
+          // code: processed.code || processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
         },
       };
     }

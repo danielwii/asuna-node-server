@@ -73,18 +73,16 @@ export class TenantHelper {
     // return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
   }
 
-  static async info(userId: PrimaryKey): Promise<TenantInfo | null> {
+  static async info(userId: PrimaryKey): Promise<TenantInfo> {
     const { config, admin } = await Promise.props({
       config: TenantHelper.getConfig(),
       admin: AdminUser.findOne(userId, { relations: ['roles', 'tenant'] }),
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
-    const { tenant } = admin;
-    if (!tenant) {
-      return null;
-    }
+    logger.log(`tenant info for ${r(admin)}`);
 
+    const { tenant } = admin;
     const entities = await DBHelper.getModelsHasRelation(Tenant);
     /*
     const tenantRecordCounts = await Promise.props<{ [name: string]: number }>(
@@ -97,24 +95,26 @@ export class TenantHelper {
       ),
     );
 */
-    const tenantRecordCounts = await Promise.props<{ [name: string]: { total: number; published?: number } }>(
-      _.assign(
-        {},
-        // 仅在 tenant 存在时检测数量
-        ...entities
-          .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
-          .map(entity => ({
-            [entity.entityInfo.name]: Promise.props({
-              // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
-              total: entity.count({ tenant } as any),
-              published: DBHelper.getPropertyNames(entity).includes('isPublished')
-                ? entity.count({ tenant, isPublished: true } as any)
-                : undefined,
-              // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
-            }),
-          })),
-      ),
-    );
+    // 仅在 tenant 存在时检测数量
+    const tenantRecordCounts = tenant
+      ? await Promise.props<{ [name: string]: { total: number; published?: number } }>(
+          _.assign(
+            {},
+            ...entities
+              .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
+              .map(entity => ({
+                [entity.entityInfo.name]: Promise.props({
+                  // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
+                  total: entity.count({ tenant } as any),
+                  published: DBHelper.getPropertyNames(entity).includes('isPublished')
+                    ? entity.count({ tenant, isPublished: true } as any)
+                    : undefined,
+                  // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
+                }),
+              })),
+          ),
+        )
+      : {};
 
     // console.log(DBHelper.getModelsHasRelation(Tenant).map(entity => console.log(entity.entityInfo)));
     // const config = await TenantHelper.getConfig();

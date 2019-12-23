@@ -16,7 +16,7 @@ class RegisterTenantDto {
 export class TenantController {
   @UseGuards(JwtAdminAuthGuard)
   @Get('info')
-  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo | null> {
+  async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
     const { user, identifier } = req;
     return TenantHelper.info(user.id);
   }

@@ -22,7 +22,16 @@ import {
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import { Condition, EntityMetaInfoOptions, ErrorException, MetaInfoOptions, Profile, r } from '../../common';
+import {
+  AsunaErrorCode,
+  AsunaException,
+  Condition,
+  EntityMetaInfoOptions,
+  ErrorException,
+  MetaInfoOptions,
+  Profile,
+  r,
+} from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 
@@ -281,8 +290,11 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    logger.debug(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
+    logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
+    if (!metadata) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `model '${parsedModel}' not resolved`);
+    }
     const entityInfo = this.getEntityInfo(metadata);
     return {
       model,
