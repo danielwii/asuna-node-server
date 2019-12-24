@@ -59,7 +59,7 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   email?: string;
 
   @MetaInfo({ name: '用户名' })
-  @Column({ nullable: false, length: 100, unique: true })
+  @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
