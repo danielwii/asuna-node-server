@@ -49,7 +49,7 @@ export class AccessControlHelper {
   }
 
   static setup(fn: (ac: AccessControl) => Access): void {
-    fn(this.accessControl);
+    fn(this.ac);
   }
 
   static get ac(): AccessControl {
