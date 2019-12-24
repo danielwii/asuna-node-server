@@ -30,8 +30,8 @@ export class TenantConfig {
 export type TenantInfo = {
   config: TenantConfig;
   tenant: Tenant;
-  tenantRoles: string[];
-  tenantRecordCounts: { [name: string]: { total: number; published?: number } };
+  roles: string[];
+  recordCounts: { [name: string]: { total: number; published?: number } };
 };
 
 export enum TenantFieldKeys {
@@ -84,9 +84,11 @@ export class TenantHelper {
     logger.log(`tenant info for ${r({ admin, config })}`);
 
     const { tenant } = admin;
-    const entities = await DBHelper.getModelsHasRelation(Tenant);
+    const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
+      entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
+    );
     /*
-    const tenantRecordCounts = await Promise.props<{ [name: string]: number }>(
+    const recordCounts = await Promise.props<{ [name: string]: number }>(
       _.assign(
         {},
         // 仅在 tenant 存在时检测数量
@@ -97,22 +99,20 @@ export class TenantHelper {
     );
 */
     // 仅在 tenant 存在时检测数量
-    const tenantRecordCounts = tenant
+    const recordCounts = tenant
       ? await Promise.props<{ [name: string]: { total: number; published?: number } }>(
           _.assign(
             {},
-            ...entities
-              .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
-              .map(entity => ({
-                [entity.entityInfo.name]: Promise.props({
-                  // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
-                  total: entity.count({ tenant } as any),
-                  published: DBHelper.getPropertyNames(entity).includes('isPublished')
-                    ? entity.count({ tenant, isPublished: true } as any)
-                    : undefined,
-                  // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
-                }),
-              })),
+            ...entities.map(entity => ({
+              [entity.entityInfo.name]: Promise.props({
+                // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
+                total: entity.count({ tenant } as any),
+                published: DBHelper.getPropertyNames(entity).includes('isPublished')
+                  ? entity.count({ tenant, isPublished: true } as any)
+                  : undefined,
+                // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
+              }),
+            })),
           ),
         )
       : {};
@@ -121,11 +121,12 @@ export class TenantHelper {
     // const config = await TenantHelper.getConfig();
     // const admin = await AdminUser.findOne(user.id, { relations: ['roles'] });
     return Promise.props({
+      entities: _.assign({}, ...entities.map(entity => ({ [entity.entityInfo.name]: entity.entityInfo }))),
       config,
-      // tenantRecordCounts: _.omit(tenantRecordCounts, 'wx__users', 'auth__users'),
-      tenantRecordCounts,
+      // recordCounts: _.omit(recordCounts, 'wx__users', 'auth__users'),
+      recordCounts,
       tenant,
-      tenantRoles: this.getTenantRoles(admin.roles),
+      roles: this.getTenantRoles(admin.roles),
     });
   }
 
@@ -162,15 +163,15 @@ export class TenantHelper {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Unpublished, [`tenant: ${admin.tenant.id}`]);
     }
 
-    const tenantRoles = await this.getTenantRoles(admin.roles);
-    if (_.isEmpty(tenantRoles)) {
+    const roles = await this.getTenantRoles(admin.roles);
+    if (_.isEmpty(roles)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'tenant roles needed');
     }
   }
 
   static async checkResourceLimit(userId: string, fullModelName: string): Promise<void> {
     const info = await this.info(userId);
-    const count = info.tenantRecordCounts[fullModelName];
+    const count = info.recordCounts[fullModelName];
     const limit = _.get(info.config, `limit.${fullModelName}`);
     logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
     if (count >= limit) {
@@ -187,7 +188,7 @@ export class TenantHelper {
     const info = await this.info(userId);
     if (info.tenant) return info.tenant;
 
-    if (_.isEmpty(info.tenantRoles)) {
+    if (_.isEmpty(info.roles)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
@@ -201,7 +202,7 @@ export class TenantHelper {
     const info = await this.info(userId);
     if (info.tenant) return info.tenant;
 
-    if (_.isEmpty(info.tenantRoles)) {
+    if (_.isEmpty(info.roles)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
