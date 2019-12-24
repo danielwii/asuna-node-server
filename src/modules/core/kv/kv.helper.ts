@@ -134,10 +134,11 @@ export class KvHelper {
     key: 'PointExchange' | 'FinancialTransaction',
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
-    logger.log(`merge constants ${r({ key, constantMap })}`);
     const value = { [key]: constantMap };
     const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    pair.value = { ...pair.value, ...value };
+    const merged = { ...pair.value, ...value };
+    logger.log(`merge constants ${r({ key, constantMap, pair, merged })}`);
+    pair.value = merged;
     return this.set(pair);
   }
 
@@ -165,6 +166,7 @@ export class KvHelper {
     const { name, type, value } = pair;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
+    logger.log(`recognize ${r({ type, newType, value, stringifyValue })}`);
 
     const entity = {
       key,
@@ -175,7 +177,6 @@ export class KvHelper {
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
     const exists = await this.get(entity);
-    logger.log(`inspect ${r({ pair, collection, key, type, name, value, exists })}`);
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && noUpdate && exists.value) return exists;
     if (exists && merge) {
@@ -184,6 +185,7 @@ export class KvHelper {
         form: _.get(value, 'form'),
         // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
+      logger.log(`inspect ${r(exists)}`);
       return exists.save();
     }
 

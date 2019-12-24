@@ -131,8 +131,8 @@ export class AsunaExceptionHelper {
     [AsunaExceptionTypes.ElementExists]: {
       code: 'E01001',
       nameValue: AsunaErrorCode.Conflict,
-      message: (type: string, element: string) => `'${type}' '${r(element)}' already exists.`,
-      localMessage: (type: string, element: string) => `'${type}' '${r(element)}' 已存在`,
+      message: (type: string, element: any) => `'${type}' '${r(element)}' already exists.`,
+      localMessage: (type: string, element: any) => `'${type}' '${r(element)}' 已存在`,
     },
     [AsunaExceptionTypes.WrongPassword]: {
       code: 'E01002',
@@ -180,11 +180,12 @@ export class AsunaExceptionHelper {
   ): AsunaException {
     if (this.registers[type]) {
       const opts = this.registers[type];
+      const transformed = _.map(params, param => (_.isObject(param) ? JSON.stringify(param) : param));
       return AsunaException.of(
         opts.nameValue,
         opts.code,
-        _.spread(opts.message)(params),
-        _.spread(opts.localMessage)(params),
+        _.spread(opts.message)(transformed),
+        _.spread(opts.localMessage)(transformed),
         errors,
       );
     }
