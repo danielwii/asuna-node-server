@@ -56,6 +56,7 @@ export class TenantHelper {
           {},
           TenantFieldKeys,
           ...entities.map(entity => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
+          ...entities.map(entity => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
         logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
         return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
@@ -80,7 +81,7 @@ export class TenantHelper {
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
-    logger.log(`tenant info for ${r(admin)}`);
+    logger.log(`tenant info for ${r({ admin, config })}`);
 
     const { tenant } = admin;
     const entities = await DBHelper.getModelsHasRelation(Tenant);

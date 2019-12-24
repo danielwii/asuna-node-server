@@ -1,5 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import * as _ from 'lodash';
 import { LoggerFactory } from '../common/logger';
+import { AccessControlHelper, ACResource } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
 import { TenantController } from './tenant.controller';
@@ -29,10 +31,14 @@ export class TenantModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
     await this.initKV();
+    await this.initAC();
   }
 
-  async initKV(): Promise<void> {
-    const entities = await DBHelper.getModelsHasRelation(Tenant);
+  private async initKV(): Promise<void> {
+    const entities = _.filter(
+      await DBHelper.getModelsHasRelation(Tenant),
+      entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
+    );
 
     const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
@@ -49,7 +55,11 @@ export class TenantModule implements OnModuleInit {
                   { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
                   {
                     name: 'Bind Roles',
-                    field: { name: TenantFieldKeys.bindRoles, type: 'string', help: "绑定用户角色，暂时设计为用','分割的角色数组" },
+                    field: {
+                      name: TenantFieldKeys.bindRoles,
+                      type: 'string',
+                      help: "绑定用户角色，暂时设计为用','分割的角色数组",
+                    },
                   },
                 ],
               },
@@ -60,12 +70,20 @@ export class TenantModule implements OnModuleInit {
                   { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
                 ],
               },
-              limit: {
-                name: '默认资源创建数量限制',
-                fields: entities.map(entity => ({
-                  name: entity.name,
-                  field: { name: `limit.${entity.entityInfo.name}`, type: 'number' },
-                })),
+              models: {
+                name: '模型配置',
+                fields: entities.flatMap(entity => {
+                  const name = entity.entityInfo.displayName
+                    ? `${entity.name} / ${entity.entityInfo.displayName}`
+                    : entity.name;
+                  return [
+                    {
+                      name: `${name} 模型用户发布权限`,
+                      field: { name: `publish.${entity.entityInfo.name}`, type: 'boolean' },
+                    },
+                    { name: `${name} 模型数量限制`, field: { name: `limit.${entity.entityInfo.name}`, type: 'number' } },
+                  ];
+                }),
               },
             },
             values: {},
@@ -75,5 +93,20 @@ export class TenantModule implements OnModuleInit {
       );
 
     await KvHelper.initializers[identifier]();
+  }
+
+  private async initAC(): Promise<void> {
+    const entities = await DBHelper.getModelsHasRelation(Tenant);
+    const entityNames = entities
+      .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
+      .map(entity => entity.entityInfo.name);
+    AccessControlHelper.setup(ac =>
+      ac
+        .grant('hunter')
+        .createOwn([...entityNames, ACResource.draft])
+        .readOwn([...entityNames, ACResource.draft])
+        .updateOwn([...entityNames, ACResource.draft])
+        .deleteOwn([...entityNames, ACResource.draft]),
+    );
   }
 }
