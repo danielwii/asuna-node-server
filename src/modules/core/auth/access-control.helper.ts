@@ -53,6 +53,7 @@ export class AccessControlHelper {
   }
 
   static get ac(): AccessControl {
+    if (!this.accessControl) this.init();
     return this.accessControl;
   }
 
