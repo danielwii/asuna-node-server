@@ -64,7 +64,7 @@ export class SimpleIdGenerator {
   nextId(): string {
     return oneLineTrim`
       ${this.prefix}
-      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 6)}
+      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
       ${this.workerId}
       ${process
         .hrtime()[1]
@@ -76,7 +76,7 @@ export class SimpleIdGenerator {
   static nextId(prefix?: string, workerId?: number): string {
     return oneLineTrim`
       ${prefix}
-      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 6)}
+      ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
       ${workerId || 0}
       ${process
         .hrtime()[1]

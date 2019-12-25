@@ -11,11 +11,22 @@ import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
+type QueryFailedErrorType = QueryFailedError & {
+  message: string;
+  code: string;
+  errno: number;
+  sqlMessage: string;
+  sqlState: string;
+  index: number;
+  sql: string;
+  name: string;
+  query: string;
+  parameters: string[];
+};
+
 export class AnyExceptionFilter implements ExceptionFilter {
-  static handleSqlExceptions(exception): any {
-    /*
-     * 包装唯一性约束，用于前端检测
-     */
+  static handleSqlExceptions(exception: QueryFailedErrorType): ValidationException | QueryFailedErrorType {
+    // 包装唯一性约束，用于前端检测
     if (exception.code === 'ER_DUP_ENTRY') {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
@@ -31,6 +42,22 @@ export class AnyExceptionFilter implements ExceptionFilter {
         })),
       );
     }
+
+    // 未找到默认值
+    if (exception.code === 'ER_NO_DEFAULT_FOR_FIELD') {
+      const [, name] = exception.sqlMessage.match(/Field '(.+)' doesn't have a default value/);
+      const value = null;
+      return new ValidationException('ER_NO_DEFAULT_FOR_FIELD', [
+        {
+          constraints: { notNull: `${name} must not be empty` },
+          property: name,
+          target: { [name]: value },
+          value,
+        },
+      ]);
+    }
+
+    logger.error(`unresolved QueryFailedError: ${r(exception)}`);
     return exception;
   }
 
@@ -53,6 +80,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
+
+    // logger.log(`check status ${r({ httpStatus, processed })}`);
 
     if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
       // logger.warn(`[bad_request] ${r(processed)}`);
