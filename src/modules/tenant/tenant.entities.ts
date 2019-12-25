@@ -2,14 +2,11 @@ import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 // eslint-disable-next-line import/no-cycle
 import { AdminUser } from '../core/auth/auth.entities';
-import { AbstractTimeBasedNameEntity, Constructor, Publishable } from '../core/base';
+import { AbstractUUID2NameEntity, Constructor, Publishable } from '../core/base';
 
 @EntityMetaInfo({ name: 'sys__tenants' })
 @Entity('sys__t_tenants')
-export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
-  constructor() {
-    super('t');
-  }
+export class Tenant extends Publishable(AbstractUUID2NameEntity) {
   // --------------------------------------------------------------
   // Status
   // --------------------------------------------------------------
@@ -30,6 +27,7 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   users: AdminUser[];
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'readonly' })

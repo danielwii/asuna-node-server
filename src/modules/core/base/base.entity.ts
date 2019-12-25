@@ -1,5 +1,7 @@
 import { Exclude } from 'class-transformer';
+import { DateTime, Duration } from 'luxon';
 import {
+  AfterLoad,
   BaseEntity,
   BeforeInsert,
   Column,
@@ -14,6 +16,7 @@ import { SimpleIdGenerator } from '../../ids';
 export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
 export type Constructor<T = {}> = new (...args: any[]) => T;
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const Publishable = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '是否发布？' })
@@ -24,6 +27,7 @@ export const Publishable = <TBase extends Constructor>(Base: TBase) => {
   return ExtendableEntity;
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const NameDescAttachable = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '名称' })
@@ -49,6 +53,16 @@ export class AbstractBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   updatedBy?: string;
+
+  @AfterLoad()
+  afterLoad(): void {
+    this.createdAt = DateTime.fromJSDate(this.createdAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+  }
 }
 
 /**
@@ -82,6 +96,16 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   beforeInsert(): void {
     this.id = this.generator.nextId();
   }
+
+  @AfterLoad()
+  afterLoad(): void {
+    this.createdAt = DateTime.fromJSDate(this.createdAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+  }
 }
 
 export class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
@@ -104,7 +128,7 @@ export class AbstractNameEntity extends AbstractBaseEntity {
   description?: string;
 }
 
-export abstract class AbstractUUIDBaseEntity extends BaseEntity {
+export class AbstractUUIDBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') uuid!: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -116,9 +140,53 @@ export abstract class AbstractUUIDBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   updatedBy: string;
+
+  @AfterLoad()
+  afterLoad(): void {
+    this.createdAt = DateTime.fromJSDate(this.createdAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+  }
 }
 
-export abstract class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
+export class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
+  name: string;
+
+  @MetaInfo({ name: '描述' })
+  @Column('text', { nullable: true, name: 'description' })
+  description: string;
+}
+
+export class AbstractUUID2BaseEntity extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid') id!: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 100, name: 'updated_by' })
+  updatedBy: string;
+
+  @AfterLoad()
+  afterLoad(): void {
+    this.createdAt = DateTime.fromJSDate(this.createdAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
+      .plus(Duration.fromObject({ hours: 8 }))
+      .toJSDate();
+  }
+}
+
+export class AbstractUUID2NameEntity extends AbstractUUID2BaseEntity {
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 100, unique: true, name: 'name' })
   name: string;
