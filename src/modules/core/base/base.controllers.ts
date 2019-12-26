@@ -117,31 +117,17 @@ export abstract class RestCrudController {
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/:id')
   async get(
-    @CurrentUser() admin: JwtPayload,
-    @CurrentTenant() tenant: Tenant,
-    @CurrentRoles() roles: Role[],
     @Param('model') model: string,
     @Param('id') id: number,
+    @Req() req: AnyAuthRequest,
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ): Promise<any> {
-    const modelName = DBHelper.getModelNameObject(model, this.module);
-    if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
-    const repository = DBHelper.repo(modelName);
-    const parsedFields = parseFields(fields);
-
-    logger.log(`get ${r({ profile, modelName, parsedFields, relationsStr })}`);
-
-    const queryBuilder = repository.createQueryBuilder(modelName.model);
-
-    DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields });
-    DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, null);
-
-    queryBuilder.whereInIds(id);
-    if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
-
-    return queryBuilder.getOne();
+    return RestHelper.get(
+      { model: DBHelper.getModelNameObject(model, this.module), id, profile, fields, relationsStr },
+      req,
+    );
   }
 
   @UseGuards(JwtAdminAuthGuard)

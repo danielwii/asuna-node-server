@@ -128,7 +128,7 @@ function parseCondition(value: Condition): string | Condition | FindOperator<any
   return value;
 }
 
-export function parseOrder(model: string, value: string) {
+export function parseOrder(model: string, value: string): { [name: string]: string } {
   return value
     ? _.assign(
         {},
@@ -147,8 +147,11 @@ export function parseOrder(model: string, value: string) {
  * @returns {string[] | undefined}
  */
 export function parseListParam(value: string | string[], map?: (field: any) => any): string[] | any | undefined {
-  const list = value ? (_.isArray(value) ? (value as string[]) : (value as string).split(',').map(_.trim)) : undefined;
-  return _.uniq(list && map ? R.map(map, list) : list);
+  if (value) {
+    const list = _.isArray(value) ? (value as string[]) : (value as string).split(',').map(_.trim);
+    return _.compact(_.uniq(list && map ? R.map(map, list) : list));
+  }
+  return undefined;
 }
 
 export type ParsedFields = {
@@ -226,7 +229,7 @@ export class DBHelper {
     return selectable;
   }
 
-  private static loadMetadatas(): EntityMetadata[] {
+  public static loadMetadatas(): EntityMetadata[] {
     if (this.metadatas.length === 0) {
       getConnection().entityMetadatas.forEach(metadata => {
         if (DBHelper.isValidEntity(metadata)) {
@@ -290,7 +293,7 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
+    logger.debug(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
     if (!metadata) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `model '${parsedModel}' not resolved`);
@@ -352,7 +355,7 @@ export class DBHelper {
     return repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName);
   }
 
-  public static getPrimaryKey(repository): string[] {
+  public static getPrimaryKey(repository): string {
     return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
   }
 
@@ -568,7 +571,7 @@ export class DBHelper {
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);
         } else {
-          logger.log(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
+          logger.verbose(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
           queryBuilder.leftJoinAndSelect(`${model}.${relation}`, relation);
         }
       });

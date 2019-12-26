@@ -57,6 +57,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
       ]);
     }
 
+    if (exception.code === 'ER_PARSE_ERROR') {
+      return new AsunaException(AsunaErrorCode.Unprocessable, 'parse error');
+    }
+
     logger.error(`unresolved QueryFailedError: ${r(exception)}`);
     return exception;
   }

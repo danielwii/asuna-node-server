@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { AsunaErrorCode, AsunaException, r } from '../../../common';
-import { ConfigKeys, configLoader } from '../../../config';
+import { AsunaErrorCode, AsunaException } from '../../../common';
 import { LoggerFactory } from '../../../common/logger';
+import { ConfigKeys, configLoader } from '../../../config';
 import { JwtPayload } from '../auth.interfaces';
 import { AuthService } from '../auth.service';
 
@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     );
   }
 
-  async validate(payload: JwtPayload) {
+  async validate(payload: JwtPayload): Promise<JwtPayload> {
     // logger.log(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {

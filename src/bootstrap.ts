@@ -17,7 +17,7 @@ import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
-import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from "./modules/core";
+import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
 import { Global } from './modules/core/global';
 
 /*
@@ -55,8 +55,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`options: ${r(options)}`);
 
   AsunaContext.instance.setup(options.context);
-  // may add bootstrap lifecycle for static initialize
-  AccessControlHelper.init();
   // AsunaContext.instance.setup(options.context || { root: options.root });
 
   // --------------------------------------------------------------
@@ -109,6 +107,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
   logger.log(`pending migrations: ${await connection.showMigrations()}`);
+
+  // may add bootstrap lifecycle for static initialize
+  AccessControlHelper.init();
 
   // --------------------------------------------------------------
   // setup application

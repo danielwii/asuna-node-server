@@ -1,17 +1,44 @@
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
-import { LoggerFactory } from '../../common';
+import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
 import { Tenant, TenantHelper } from '../../tenant';
 import { Role } from '../auth';
 import { JwtPayload } from '../auth/auth.interfaces';
-import { DBHelper, ModelNameObject } from '../db';
+import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('RestHelper');
 
 export class RestHelper {
+  static async get<T extends BaseEntity | ObjectLiteral>(
+    {
+      model,
+      id,
+      profile,
+      fields,
+      relationsStr,
+    }: { model: ModelNameObject; id: PrimaryKey; profile?: Profile; fields?: string; relationsStr?: string | string[] },
+    { user, tenant, roles }: { user?: JwtPayload; tenant?: Tenant; roles?: Role[] },
+  ): Promise<T> {
+    if (tenant) await TenantHelper.checkPermission(user.id as string, model.entityName);
+    const repository = DBHelper.repo(model);
+    const parsedFields = parseFields(fields);
+
+    logger.log(`get ${r({ profile, model, parsedFields, relationsStr })}`);
+
+    const queryBuilder = repository.createQueryBuilder(model.model);
+
+    DBHelper.wrapParsedFields(model.model, { queryBuilder, parsedFields });
+    DBHelper.wrapProfile(model.model, queryBuilder, repository, profile, relationsStr, parsedFields, null);
+
+    queryBuilder.whereInIds(id);
+    if (await TenantHelper.tenantSupport(model.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
+
+    return (await queryBuilder.getOne()) as any;
+  }
+
   static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: { user?: JwtPayload; tenant?: Tenant; roles?: Role[] },
@@ -25,7 +52,7 @@ export class RestHelper {
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
       logger.log(`save by kv... ${r(pair)}`);
-      return await KvHelper.set(pair) as any;
+      return (await KvHelper.set(pair)) as any;
     }
 
     const repository = DBHelper.repo(model);
