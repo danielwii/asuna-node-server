@@ -3,9 +3,8 @@ import * as R from 'ramda';
 import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
-import { Tenant, TenantHelper } from '../../tenant';
-import { Role } from '../auth';
-import { JwtPayload } from '../auth/auth.interfaces';
+import { TenantHelper } from '../../tenant';
+import { AnyAuthRequest } from '../auth';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';
 
@@ -20,7 +19,7 @@ export class RestHelper {
       fields,
       relationsStr,
     }: { model: ModelNameObject; id: PrimaryKey; profile?: Profile; fields?: string; relationsStr?: string | string[] },
-    { user, tenant, roles }: { user?: JwtPayload; tenant?: Tenant; roles?: Role[] },
+    { user, tenant, roles }: AnyAuthRequest,
   ): Promise<T> {
     if (tenant) await TenantHelper.checkPermission(user.id as string, model.entityName);
     const repository = DBHelper.repo(model);
@@ -41,7 +40,7 @@ export class RestHelper {
 
   static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
-    { user, tenant, roles }: { user?: JwtPayload; tenant?: Tenant; roles?: Role[] },
+    { user, tenant, roles }: AnyAuthRequest,
   ): Promise<T> {
     if (tenant) {
       await TenantHelper.checkPermission(user.id as string, model.entityName);
