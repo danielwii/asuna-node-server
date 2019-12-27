@@ -5,6 +5,7 @@ export * from './db';
 export * from './token';
 export * from './finder';
 export * from './get-uploads';
+export * from './rest';
 export * from './storage';
 export * from './helpers';
 export * from './base';

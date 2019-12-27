@@ -19,7 +19,7 @@ import {
   parseWhere,
 } from '../db';
 import { KvHelper } from '../kv';
-import { RestHelper } from './rest.helper';
+import { RestHelper } from '../rest';
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');
