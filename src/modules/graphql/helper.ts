@@ -70,10 +70,7 @@ export class GraphqlHelper {
     const includeOrdinal = DBHelper.getPropertyNames(cls).includes('ordinal');
     return pageRequest && pageRequest.orderBy
       ? ({ [pageRequest.orderBy.column]: pageRequest.orderBy.order } as any)
-      : {
-          ...(includeOrdinal ? { ordinal: 'DESC' } : null),
-          createdAt: 'DESC',
-        };
+      : { ...(includeOrdinal ? { ordinal: 'DESC' } : null), createdAt: 'DESC' };
   }
 
   public static async handlePagedDefaultQueryRequest<Entity extends BaseEntity>({
@@ -96,14 +93,24 @@ export class GraphqlHelper {
     const entityRepo = (cls as any) as Repository<Entity>;
     const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, loader });
     const total = await entityRepo.count({ where });
-    return this.pagedResult({
-      pageRequest,
-      items,
-      mapper,
-      total,
-    });
+    return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>({
+    cls,
+    query,
+    where,
+    ctx,
+    loader,
+    mapper,
+  }: {
+    cls: ClassType<Entity>;
+    query: QueryConditionInput;
+    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    ctx?: GraphqlContext<any>;
+    loader?: (loaders) => DataLoaderFunction<Entity>;
+    mapper: (item: Entity) => MixedEntity;
+  }): Promise<MixedEntity[] | null>;
   public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
     query,
@@ -116,24 +123,34 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
-  }): Promise<Entity[] | null> {
+  }): Promise<Entity[] | null>;
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>({
+    cls,
+    query,
+    where,
+    ctx,
+    loader,
+    mapper,
+  }: {
+    cls: ClassType<Entity>;
+    query: QueryConditionInput;
+    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    ctx?: GraphqlContext<any>;
+    loader?: (loaders) => DataLoaderFunction<Entity>;
+    mapper?: (item: Entity) => MixedEntity;
+  }): Promise<Entity[] | MixedEntity[] | null> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length > 0) {
-      return dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids);
+      const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
+      return mapper ? _.map(items, mapper) : items;
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
-        await this.genericFindOptions<Entity>({
-          cls,
-          select: [primaryKey as any],
-          where,
-          skip,
-          take: query.random,
-        }),
+        await this.genericFindOptions<Entity>({ cls, select: [primaryKey as any], where, skip, take: query.random }),
       );
       const ids: any[] = _.chain(randomIds)
         .map(fp.get(primaryKey))
@@ -141,7 +158,8 @@ export class GraphqlHelper {
         .take(query.random)
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
-      return dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids);
+      const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
+      return mapper ? _.map(items, mapper) : items;
     }
     return null;
   }
@@ -195,10 +213,7 @@ export class GraphqlHelper {
       }
 
       const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;
-      const category = await categoryClsRepoAlike.findOne({
-        name: query.category,
-        isPublished: true,
-      });
+      const category = await categoryClsRepoAlike.findOne({ name: query.category, isPublished: true });
 
       logger.verbose(`category is ${r(category)}`);
       // if (category != null) {}
@@ -238,10 +253,9 @@ export class GraphqlHelper {
         const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
         return _opts.loader.load(result[_opts.key] as any);
       }
-        const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
-        const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-        return targetRepo.findOne(result[_opts.key]);
-
+      const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+      const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+      return targetRepo.findOne(result[_opts.key]);
     }
     return null;
   }
@@ -260,26 +274,45 @@ export class GraphqlHelper {
         const ids = result[_opts.key];
         return _opts.loader.load((ids as any) as PrimaryKeyType[]);
       }
-        const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
-        const ids = result[_opts.key];
-        const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-        return targetRepo.findByIds(ids as any);
-
+      const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+      const ids = result[_opts.key];
+      const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+      return targetRepo.findByIds(ids as any);
     }
     return null;
   }
 
-  public static pagedResult({
+  public static pagedResult<Entity>({
     pageRequest,
     items,
-    mapper,
     total,
   }: {
     pageRequest: PageRequest;
-    items: any[];
-    mapper?: (item: any) => any;
+    items: Entity[];
     total: number;
-  }): PageInfo & { items: any[]; total: number } {
-    return { ...toPage(pageRequest), items: _.map(items, mapper || (item => item)), total };
+  }): PageInfo & { items: Entity[]; total: number };
+  public static pagedResult<Entity, MixedEntity>({
+    pageRequest,
+    items,
+    total,
+    mapper,
+  }: {
+    pageRequest: PageRequest;
+    items: Entity[];
+    total: number;
+    mapper: (item: Entity) => MixedEntity;
+  }): PageInfo & { items: MixedEntity[]; total: number };
+  public static pagedResult<Entity, MixedEntity>({
+    pageRequest,
+    items,
+    total,
+    mapper,
+  }: {
+    pageRequest: PageRequest;
+    items: Entity[];
+    total: number;
+    mapper?: (item: Entity) => MixedEntity;
+  }): PageInfo & { items: Entity[] | MixedEntity[]; total: number } {
+    return { ...toPage(pageRequest), items: mapper ? _.map(items, mapper) : items, total };
   }
 }

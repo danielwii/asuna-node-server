@@ -21,15 +21,11 @@ function resolve(ids: PrimaryKeyType[]) {
   return entities => ids.map(id => entities.find(entity => (entity ? entity.id === id : false)));
 }
 
-function build<Entity extends BaseEntity>(
-  dataloader: DataLoader<PrimaryKeyType, Entity>,
-): DataLoaderFunction<Entity> {
+function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKeyType, Entity>): DataLoaderFunction<Entity> {
   return {
     load(ids: PrimaryKeyType | PrimaryKeyType[]) {
       if (_.isArray(ids)) {
-        return !_.isEmpty(ids)
-          ? (dataloader.loadMany(ids as PrimaryKeyType[]).then(fp.compact) as any)
-          : null;
+        return !_.isEmpty(ids) ? (dataloader.loadMany(ids as PrimaryKeyType[]).then(fp.compact) as any) : null;
       }
       return ids ? dataloader.load(ids as PrimaryKeyType) : null;
     },
@@ -142,16 +138,17 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKeyType, any> {
           }
           return value;
         },
-        set: (id: string, value) => {
+        set: async (id: string, value) => {
           const key = `${segment}-${id}`;
-          logger.log(`dataloader set ${r({ key })}`);
+          const promised = await value;
+          logger.verbose(`dataloader set ${key}`);
           const now = Date.now();
           // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
           // if (!cacheMap.has(key)) {
           //   cacheMap.set(key, { value, expires: now + 1 * 60 * 1000 });
           //   // console.log({ size: cacheMap.size });
           // }
-          cacheMap.set(key, { value, expires: now + 5 * 60 * 1000 });
+          cacheMap.set(key, { value: promised, expires: now + 5 * 60 * 1000 });
         },
         delete: (id: string) => {
           // logger.log(`delete (${segment}:${id})`);
@@ -162,7 +159,7 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKeyType, any> {
         clear: () => {
           // logger.log(`clear (${segment})`);
           cacheMap.clear();
-          // return logger.warn('clear is not implemented.');
+          // return logger.warn('not implemented.');
         },
       },
     },
@@ -183,9 +180,7 @@ export function resolveRelationsFromInfo(
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
-    if (fieldNode == null) {
-      return false;
-    }
+    if (fieldNode == null) return false;
 
     let selectionNode;
     _.times(locations.length - 1).forEach(index => {
