@@ -48,7 +48,7 @@ export class RedisLockProvider {
 
   isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE, true);
 
-  lockProcess(operate: string, handler: () => Promise<any>, options: { ttl: number }): Promise<any> {
+  lockProcess<T>(operate: string, handler: () => Promise<T | void>, options: { ttl: number }): Promise<T | void> {
     if (!this.redLock) {
       throw new Error('can not get redis instance');
     }
