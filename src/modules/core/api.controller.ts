@@ -1,9 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import * as _ from 'lodash';
 import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
-import { KvHelper } from './kv';
 
 const logger = LoggerFactory.getLogger('ApiController');
 
@@ -18,10 +16,8 @@ export class ApiController {
   }
 
   @Get('info')
-  async info() {
-    const kv = await KvHelper.get({ collection: 'system.server', key: 'settings' });
+  info() {
     return {
-      settings: _.get(kv, 'value'),
       upTime: this.appContent.upTime.toISOString(),
       version: this.appContent.version,
     };
