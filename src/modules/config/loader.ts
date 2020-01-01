@@ -61,6 +61,9 @@ export const ConfigKeys = {
   // 系统默认用户
   SYS_ADMIN_EMAIL: 'SYS_ADMIN_EMAIL',
   SYS_ADMIN_PASSWORD: 'SYS_ADMIN_PASSWORD',
+
+  // 修正 typeorm 时区
+  FIX_TZ: 'FIX_TZ',
 };
 
 export const configLoader: ConfigLoader = createConfigLoader({

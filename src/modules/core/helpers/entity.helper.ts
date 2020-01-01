@@ -1,10 +1,15 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-param-reassign */
 import * as _ from 'lodash';
+import { DateTime, Duration } from 'luxon';
+import { BaseEntity } from 'typeorm';
 import { LoggerFactory } from '../../common/logger/factory';
+import { ConfigKeys, configLoader } from '../../config';
 import { jsonType } from './column.helper';
 
 const logger = LoggerFactory.getLogger('EntityHelper');
 
-export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]) {
+export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
     if (jsonType() === 'simple-json') {
       if (entity[column]) {
@@ -23,7 +28,7 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
   });
 }
 
-export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]) {
+export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
     if (jsonType() === 'simple-json') {
       if (entity[column]) {
@@ -42,7 +47,7 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
   });
 }
 
-export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity)[]) {
+export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
     if (entity && column && jsonType() === 'simple-json') {
       if (entity[column]) {
@@ -59,4 +64,20 @@ export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity
       }
     }
   });
+}
+
+export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
+  const hours = configLoader.loadNumericConfig(ConfigKeys.FIX_TZ);
+  if (hours) {
+    if (entity.createdAt) {
+      entity.createdAt = DateTime.fromJSDate(entity.createdAt)
+        .plus(Duration.fromObject({ hours }))
+        .toJSDate();
+    }
+    if (entity.updatedAt) {
+      entity.updatedAt = DateTime.fromJSDate(entity.updatedAt)
+        .plus(Duration.fromObject({ hours }))
+        .toJSDate();
+    }
+  }
 }

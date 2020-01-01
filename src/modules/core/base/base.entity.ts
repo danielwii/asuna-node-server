@@ -1,5 +1,4 @@
 import { Exclude } from 'class-transformer';
-import { DateTime, Duration } from 'luxon';
 import {
   AfterLoad,
   BaseEntity,
@@ -12,6 +11,7 @@ import {
 } from 'typeorm';
 import { MetaInfo } from '../../common/decorators';
 import { SimpleIdGenerator } from '../../ids';
+import { fixTZ } from '../helpers/entity.helper';
 
 export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
 export type Constructor<T = {}> = new (...args: any[]) => T;
@@ -56,12 +56,7 @@ export class AbstractBaseEntity extends BaseEntity {
 
   @AfterLoad()
   afterLoad(): void {
-    this.createdAt = DateTime.fromJSDate(this.createdAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
-    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
+    fixTZ(this);
   }
 }
 
@@ -99,12 +94,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
 
   @AfterLoad()
   afterLoad(): void {
-    this.createdAt = DateTime.fromJSDate(this.createdAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
-    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
+    fixTZ(this);
   }
 }
 
@@ -143,12 +133,7 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
 
   @AfterLoad()
   afterLoad(): void {
-    this.createdAt = DateTime.fromJSDate(this.createdAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
-    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
+    fixTZ(this);
   }
 }
 
@@ -177,12 +162,7 @@ export class AbstractUUID2BaseEntity extends BaseEntity {
 
   @AfterLoad()
   afterLoad(): void {
-    this.createdAt = DateTime.fromJSDate(this.createdAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
-    this.updatedAt = DateTime.fromJSDate(this.updatedAt)
-      .plus(Duration.fromObject({ hours: 8 }))
-      .toJSDate();
+    fixTZ(this);
   }
 }
 
