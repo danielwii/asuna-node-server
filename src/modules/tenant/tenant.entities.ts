@@ -7,6 +7,9 @@ import { AbstractTimeBasedNameEntity, Constructor, Publishable } from '../core/b
 @EntityMetaInfo({ name: 'sys__tenants' })
 @Entity('sys__t_tenants')
 export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
+  constructor() {
+    super('t');
+  }
   // --------------------------------------------------------------
   // Status
   // --------------------------------------------------------------
