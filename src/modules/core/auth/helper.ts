@@ -11,9 +11,10 @@ import { isApiKeyRequest } from './strategy/api-key.strategy';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
+export type AuthedInfo<U> = Partial<{ user: U; identifier: string; tenant?: Tenant; roles: Role[] }>;
+
 // fixme IJwtPayload only for jwt auth, api-key not included
-export type AnyAuthRequest<U extends JwtPayload = JwtPayload> = Request &
-  Partial<{ user: U; identifier: string; tenant?: Tenant; roles: Role[] }>;
+export type AnyAuthRequest<U = JwtPayload> = Request & AuthedInfo<JwtPayload>;
 
 export function isAdminAuthRequest(req: Request): boolean {
   const { authorization } = req.headers;

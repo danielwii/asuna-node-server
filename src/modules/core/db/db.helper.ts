@@ -355,10 +355,23 @@ export class DBHelper {
     return repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName);
   }
 
+  public static getPrimaryKeyByModel(modelNameObject: ModelNameObject): string {
+    const repository = DBHelper.repo(modelNameObject);
+    return this.getPrimaryKey(repository);
+  }
+
   public static getPrimaryKey(repository): string {
     return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
   }
 
+  public static extractOriginAsunaSchemasByModel(modelNameObject: ModelNameObject): OriginSchema {
+    const repository = DBHelper.repo(modelNameObject);
+    return DBHelper.extractOriginAsunaSchemas(repository, { module: modelNameObject.module, prefix: 't' });
+  }
+
+  /**
+   * @see extractOriginAsunaSchemasByModel
+   */
   public static extractOriginAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): OriginSchema {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };

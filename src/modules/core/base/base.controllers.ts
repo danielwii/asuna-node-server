@@ -161,8 +161,14 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ): Promise<any> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
-    if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
-    logger.log(`patch ${r({ admin, modelName, id, updateTo })}`);
+    const whereOptions = { id };
+    if (tenant) {
+      await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
+      if (await TenantHelper.tenantSupport(modelName.entityName, roles)) {
+        _.assign(whereOptions, { tenant });
+      }
+    }
+    logger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
       logger.log('update by kv...');
@@ -185,9 +191,7 @@ export abstract class RestCrudController {
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
-    const entity = (await TenantHelper.tenantSupport(modelName.entityName, roles))
-      ? await repository.findOneOrFail({ where: { id, tenant } })
-      : await repository.findOneOrFail(id);
+    const entity = await repository.findOneOrFail({ where: whereOptions });
 
     const entityTo = repository.merge(entity, {
       ...updateTo,

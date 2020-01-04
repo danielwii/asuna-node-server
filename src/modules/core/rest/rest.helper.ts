@@ -4,7 +4,7 @@ import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
 import { TenantHelper } from '../../tenant/tenant.helper';
-import { AnyAuthRequest } from '../auth/helper';
+import { AnyAuthRequest, AuthedInfo } from '../auth/helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';
 
@@ -40,13 +40,31 @@ export class RestHelper {
 
   static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
-    { user, tenant, roles }: AnyAuthRequest,
+    { user, tenant, roles }: AuthedInfo<{ id: PrimaryKey; username: string }>,
   ): Promise<T> {
+    const tenantRelatedFields = {};
     if (tenant) {
       await TenantHelper.checkPermission(user.id as string, model.entityName);
       await TenantHelper.checkResourceLimit(user.id as string, model.entityName);
+      _.assign(tenantRelatedFields, (await TenantHelper.tenantSupport(model.entityName, roles)) ? { tenant } : null);
+      const config = await TenantHelper.getConfig();
+      if (config.firstModelBind && config.firstModelName) {
+        const originSchema = DBHelper.extractOriginAsunaSchemasByModel(model);
+        // console.log('one-2-one', originSchema.oneToOneRelations);
+        // console.log('many-2-one', originSchema.manyToOneRelations);
+        const relationSchema = originSchema.manyToOneRelations.find(
+          relation => relation.config.selectable === config.firstModelName,
+        );
+        const firsModel = DBHelper.getModelNameObject(config.firstModelName);
+        const primaryKey = DBHelper.getPrimaryKeyByModel(firsModel);
+        // 唯一标志使这里只应该拿到 0-1 个绑定实体
+        const entity = await DBHelper.repo(firsModel).findOne({ where: { tenant } });
+        if (relationSchema) {
+          _.assign(tenantRelatedFields, { [relationSchema.name]: { [primaryKey]: entity[primaryKey] } });
+        }
+      }
     }
-    logger.verbose(`save ${r({ user, model, body })}`);
+    logger.verbose(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
@@ -64,7 +82,7 @@ export class RestHelper {
       ...body,
       ...relationIds,
       updatedBy: user.username,
-      ...((await TenantHelper.tenantSupport(model.entityName, roles)) ? { tenant } : null),
+      ...tenantRelatedFields,
     });
     await validateObject(entity);
     /*

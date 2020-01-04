@@ -249,7 +249,7 @@ export class KvHelper {
     return CacheManager.cacheable(
       { kvDef, keyValues },
       async () => Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key))),
-      60,
+      10,
     );
     // return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
@@ -261,7 +261,7 @@ export class KvHelper {
         const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
         return field?.value || _.get(field, 'field.defaultValue');
       },
-      60,
+      10,
     );
   }
 

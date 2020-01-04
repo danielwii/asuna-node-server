@@ -10,6 +10,9 @@ const logger = LoggerFactory.getLogger('TenantController');
 class RegisterTenantDto {
   @IsString() name: string;
   @IsString() @IsOptional() description?: string;
+
+  @IsOptional()
+  payload?: any;
 }
 
 @Controller('admin/v1/tenant')
@@ -34,6 +37,6 @@ export class TenantController {
   @Post()
   async mgmtRegisterTenant(@Body() body: RegisterTenantDto, @Req() req: AnyAuthRequest) {
     const { user, identifier } = req;
-    return TenantHelper.registerTenant(user.id, body);
+    return TenantHelper.registerTenant(user.id, body, body.payload);
   }
 }

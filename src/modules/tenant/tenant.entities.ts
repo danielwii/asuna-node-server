@@ -2,11 +2,11 @@ import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 // eslint-disable-next-line import/no-cycle
 import { AdminUser } from '../core/auth/auth.entities';
-import { AbstractUUID2NameEntity, Constructor, Publishable } from '../core/base';
+import { AbstractTimeBasedNameEntity, Constructor, Publishable } from '../core/base';
 
 @EntityMetaInfo({ name: 'sys__tenants' })
 @Entity('sys__t_tenants')
-export class Tenant extends Publishable(AbstractUUID2NameEntity) {
+export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   // --------------------------------------------------------------
   // Status
   // --------------------------------------------------------------

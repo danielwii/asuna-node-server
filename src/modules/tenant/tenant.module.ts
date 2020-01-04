@@ -53,6 +53,7 @@ export class TenantModule implements OnModuleInit {
                 name: 'Default',
                 fields: [
                   { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
+                  { name: '默认激活状态', field: { name: TenantFieldKeys.activeByDefault, type: 'boolean' } },
                   {
                     name: 'Bind Roles',
                     field: {
@@ -66,6 +67,15 @@ export class TenantModule implements OnModuleInit {
               first: {
                 name: '资源创建入口',
                 fields: [
+                  {
+                    name: '绑定模型',
+                    field: {
+                      name: TenantFieldKeys.firstModelBind,
+                      type: 'boolean',
+                      help: '模型绑定会将 tenant 和该资源捆绑到一起，并且将限制该模型数量为 1，并自动在关联中设置',
+                    },
+                  },
+                  { name: '绑定字段', field: { name: TenantFieldKeys.firstModelField, type: 'string' } },
                   { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
                   { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
                 ],
@@ -81,7 +91,10 @@ export class TenantModule implements OnModuleInit {
                       name: `${name} 模型用户发布权限`,
                       field: { name: `publish.${entity.entityInfo.name}`, type: 'boolean' },
                     },
-                    { name: `${name} 模型数量限制`, field: { name: `limit.${entity.entityInfo.name}`, type: 'number' } },
+                    {
+                      name: `${name} 模型数量限制`,
+                      field: { name: `limit.${entity.entityInfo.name}`, type: 'number' },
+                    },
                   ];
                 }),
               },

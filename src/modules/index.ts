@@ -14,6 +14,7 @@ export * from './ids';
 export * from './providers';
 export * from './core/auth/auth.module';
 export * from './core/auth/strategy/jwt.strategy';
+export * from './store/store';
 export * from './tenant';
 export * from './ws';
 export * from './sort';

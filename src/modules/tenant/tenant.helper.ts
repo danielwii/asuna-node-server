@@ -16,11 +16,18 @@ import { deserializeSafely } from '../common/helpers';
 import { AdminUser, Role } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
+import { RestHelper } from '../core/rest';
 import { Tenant } from './tenant.entities';
 
 export class TenantConfig {
   @IsBoolean() @IsOptional() enabled?: boolean;
+  @IsBoolean() @IsOptional() activeByDefault?: boolean;
   @IsString() @IsOptional() bindRoles?: string;
+
+  @IsBoolean() @IsOptional() firstModelBind?: boolean;
+  @IsString() @IsOptional() firstModelField?: string;
+  @IsString() @IsOptional() firstModelName?: string;
+  @IsString() @IsOptional() firstDisplayName?: string;
 
   constructor(o: TenantConfig) {
     Object.assign(this, deserializeSafely(TenantConfig, o));
@@ -36,8 +43,11 @@ export type TenantInfo = {
 
 export enum TenantFieldKeys {
   enabled = 'enabled',
+  activeByDefault = 'active-by-default',
   bindRoles = 'bindRoles',
   // 进入页的待创建模型信息
+  firstModelField = 'first.bind-field',
+  firstModelBind = 'first.bind',
   firstModelName = 'first.model-name',
   firstDisplayName = 'first.display-name',
 }
@@ -59,7 +69,14 @@ export class TenantHelper {
           ...entities.map(entity => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
         logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
-        return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
+        const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
+
+        // bind 模式下的资源限制默认是 1
+        if (tenantConfig.firstModelBind && tenantConfig.firstModelName) {
+          tenantConfig[`limit.${tenantConfig.firstModelName}`] = 1;
+        }
+        logger.log(`tenant config is ${r(tenantConfig)}`);
+        return tenantConfig;
       },
       60,
     );
@@ -198,7 +215,10 @@ export class TenantHelper {
   }
 */
 
-  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>): Promise<Tenant> {
+  /**
+   * @param payload 用来新建需要绑定的核心模型数据
+   */
+  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, payload?: object): Promise<Tenant> {
     const info = await this.info(userId);
     if (info.tenant) return info.tenant;
 
@@ -211,8 +231,18 @@ export class TenantHelper {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, ['tenant', admin.tenant.name]);
     }
 
-    admin.tenant = await Tenant.create(body).save();
+    admin.tenant = await Tenant.create({ ...body, isPublished: info.config.activeByDefault }).save();
     await admin.save();
+
+    if (info.config.firstModelBind && info.config.firstModelName) {
+      logger.log(`bind ${info.config.firstModelName} with tenant ${admin.tenant.id}`);
+
+      await RestHelper.save(
+        { model: DBHelper.getModelNameObject(info.config.firstModelName), body: payload },
+        { user: admin as any, tenant: admin.tenant, roles: admin.roles },
+      );
+    }
+
     return admin.tenant;
   }
 }

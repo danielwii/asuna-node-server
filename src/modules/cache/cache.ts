@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as LRU from 'lru-cache';
-import { LoggerFactory } from '../common/logger';
 import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('CacheManager');
 
@@ -30,8 +30,13 @@ export class CacheManager {
 
     const value = await resolver();
     this.cache.set(cacheKey, value, seconds ? seconds * 1000 : null);
-    logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
+    logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
+  }
+
+  static get<T = any>(key: string | object): T {
+    const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
+    return this.cache.get(cacheKey);
   }
 
   static clearAll(): void {
