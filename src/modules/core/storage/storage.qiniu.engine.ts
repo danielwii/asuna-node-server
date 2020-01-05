@@ -105,13 +105,14 @@ export class QiniuStorage implements IStorageEngine {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
-    const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
-    const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
-      ? join(this.configObject.path || '')
-      : join(resourcePath, this.configObject.path || '');
+    // const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
+    const appendPrefix = this.configObject.path;
+    // const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
+    //   ? join(this.configObject.path || '')
+    //   : join(resourcePath, this.configObject.path || '');
     const path = join('/', appendPrefix, prefix || '', filename);
     const url = `${this.configObject.domain}${path}`;
-    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename })}`);
+    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, appendPrefix, prefix, filename })}`);
     return res.redirect(url);
   }
 }
