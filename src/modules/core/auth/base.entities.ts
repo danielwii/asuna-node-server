@@ -19,6 +19,10 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
+  @MetaInfo({ name: '头像', type: 'Image' })
+  @Column({ nullable: true, name: 'portrait' })
+  portrait: string;
+
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
   @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
   channel: AuthUserChannel;

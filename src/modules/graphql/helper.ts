@@ -1,3 +1,4 @@
+import { Promise } from 'bluebird';
 import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
@@ -109,7 +110,7 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
-    mapper: (item: Entity) => MixedEntity;
+    mapper: (item: Entity) => Promise<MixedEntity>;
   }): Promise<MixedEntity[] | null>;
   public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
@@ -137,13 +138,13 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
-    mapper?: (item: Entity) => MixedEntity;
+    mapper?: (item: Entity) => Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[] | null> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length > 0) {
       const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
-      return mapper ? _.map(items, mapper) : items;
+      return mapper ? Promise.map(items, mapper) : items;
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
@@ -159,7 +160,7 @@ export class GraphqlHelper {
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
-      return mapper ? _.map(items, mapper) : items;
+      return mapper ? Promise.map(items, mapper) : items;
     }
     return null;
   }
@@ -290,7 +291,7 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     items: Entity[];
     total: number;
-  }): PageInfo & { items: Entity[]; total: number };
+  }): Promise<PageInfo & { items: Entity[]; total: number }>;
   public static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
@@ -300,8 +301,8 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     items: Entity[];
     total: number;
-    mapper: (item: Entity) => MixedEntity;
-  }): PageInfo & { items: MixedEntity[]; total: number };
+    mapper: (item: Entity) => Promise<MixedEntity>;
+  }): Promise<PageInfo & { items: MixedEntity[]; total: number }>;
   public static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
@@ -311,8 +312,8 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     items: Entity[];
     total: number;
-    mapper?: (item: Entity) => MixedEntity;
-  }): PageInfo & { items: Entity[] | MixedEntity[]; total: number } {
-    return { ...toPage(pageRequest), items: mapper ? _.map(items, mapper) : items, total };
+    mapper?: (item: Entity) => Promise<MixedEntity>;
+  }): Promise<PageInfo & { items: Entity[] | MixedEntity[]; total: number }> {
+    return Promise.props({ ...toPage(pageRequest), items: mapper ? Promise.map(items, mapper) : items, total });
   }
 }

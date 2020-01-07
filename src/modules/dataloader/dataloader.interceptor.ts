@@ -7,19 +7,16 @@ import { getRequestFromContext } from './utils';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export interface GraphqlContext<GetDataLoaders> {
+export interface GraphqlContext<GetDataLoaders, U = AbstractAuthUser> {
   getDataLoaders: GetDataLoaders;
-  getCurrentUser: () => AbstractAuthUser;
+  getCurrentUser: () => U;
 }
 
 const genericDataLoader = new GenericDataLoader();
 
 @Injectable()
 export class DataLoaderInterceptor implements NestInterceptor {
-  public intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+  public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     const request = getRequestFromContext(context);
 
     // If the request already has data loaders,
