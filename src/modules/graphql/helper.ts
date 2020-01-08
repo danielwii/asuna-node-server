@@ -110,7 +110,7 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
-    mapper: (item: Entity) => Promise<MixedEntity>;
+    mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[] | null>;
   public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
     cls,
@@ -138,7 +138,7 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
     loader?: (loaders) => DataLoaderFunction<Entity>;
-    mapper?: (item: Entity) => Promise<MixedEntity>;
+    mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[] | null> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
@@ -301,7 +301,7 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     items: Entity[];
     total: number;
-    mapper: (item: Entity) => Promise<MixedEntity>;
+    mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: MixedEntity[]; total: number }>;
   public static pagedResult<Entity, MixedEntity>({
     pageRequest,
@@ -312,7 +312,7 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     items: Entity[];
     total: number;
-    mapper?: (item: Entity) => Promise<MixedEntity>;
+    mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: Entity[] | MixedEntity[]; total: number }> {
     return Promise.props({ ...toPage(pageRequest), items: mapper ? Promise.map(items, mapper) : items, total });
   }

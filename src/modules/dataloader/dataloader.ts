@@ -33,12 +33,12 @@ function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKeyType,
 }
 
 export function loader<Entity extends BaseEntity>(
-  entity: typeof BaseEntity,
+  entity: new () => Entity,
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
     cachedDataLoader(entity.name, ids =>
-      entity
+      ((entity as any) as typeof BaseEntity)
         .findByIds(ids, {
           where: { isPublished: opts.isPublished },
           loadRelationIds: opts.loadRelationIds,
