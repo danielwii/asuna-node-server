@@ -1,3 +1,4 @@
+export * from "./interfaces";
 export * from "./wechat.auth";
 export * from "./wechat.controller";
 export * from "./wechat.entities";

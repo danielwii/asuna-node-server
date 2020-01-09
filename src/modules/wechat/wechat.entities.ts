@@ -20,7 +20,7 @@ import { EntityConstructorObject } from '../core/base';
 import { fixTZ } from '../core/helpers';
 import { jsonType } from '../core/helpers/column.helper';
 import { InjectTenant } from '../tenant';
-import { WxSubscribeSceneType } from './wx.api';
+import { WxSubscribeSceneType } from './interfaces';
 
 @StaticImplements<IdentifierHelper<Partial<{ openId: string }>>>()
 export class WeChatUserIdentifierHelper {

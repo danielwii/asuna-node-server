@@ -1,3 +1,5 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
@@ -8,7 +10,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth/user.entities';
 import { Store } from '../store';
-import { WxCodeSession } from './wx.api';
+import { WxCodeSession } from './interfaces';
 
 const logger = LoggerFactory.getLogger('WXAuth');
 
@@ -34,7 +36,7 @@ export class WXAuthGuard implements CanActivate {
     const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
-    const result: { err; payload; info } = await new Promise<{ err: string | Error; payload: WXJwtPayload; info }>(
+    const result: { err: any; payload: any; info: any } = await new Promise<{ err: string | Error; payload: WXJwtPayload; info: any }>(
       resolve => {
         passport.authenticate(
           'wx-jwt',
@@ -81,7 +83,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
-  async handleRequest(err, payload: WXJwtPayload, info) {
+  async handleRequest(err: any, payload: WXJwtPayload, info: any) {
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
         return null;
