@@ -319,7 +319,15 @@ export class DBHelper {
   }
 
   public static getPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.columns.map(column => column.propertyName);
+    return this.getPropertyNamesByRepo(this.repo(entity));
+  }
+
+  public static getPropertyNamesByRepo<Entity>(repo: Repository<Entity>): string[] {
+    return this.getPropertyNamesByMetadata(repo.metadata);
+  }
+
+  public static getPropertyNamesByMetadata<Entity>(metadata: EntityMetadata): string[] {
+    return metadata.columns.map(column => column.propertyName);
   }
 
   public static getRelationPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {

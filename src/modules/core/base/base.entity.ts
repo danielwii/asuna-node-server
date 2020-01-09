@@ -13,6 +13,7 @@ import { MetaInfo } from '../../common/decorators';
 import { SimpleIdGenerator } from '../../ids';
 import { fixTZ } from '../helpers/entity.helper';
 
+export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
 export type Constructor<T = {}> = new (...args: any[]) => T;
 

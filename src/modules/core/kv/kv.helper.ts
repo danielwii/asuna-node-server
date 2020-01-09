@@ -131,7 +131,7 @@ export class KvHelper {
   static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
 
   static async mergeConstantMaps(
-    key: 'PointExchange' | 'FinancialTransaction',
+    key: 'PointExchange' | 'FinancialTransaction' | 'InteractionType',
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };

@@ -159,6 +159,8 @@ export class GraphqlHelper {
         .take(query.random)
         .value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
+      if (_.isEmpty(ids)) return null;
+
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
       return mapper ? Promise.map(items, mapper) : items;
     }
