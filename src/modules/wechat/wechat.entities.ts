@@ -1,3 +1,5 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable import/no-cycle */
 import { IsIn, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import {

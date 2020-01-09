@@ -1,3 +1,5 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable import/no-cycle */
 export * from "./interfaces";
 export * from "./wechat.auth";
 export * from "./wechat.controller";

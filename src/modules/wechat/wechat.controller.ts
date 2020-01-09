@@ -1,3 +1,6 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable import/no-cycle */
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IsString } from 'class-validator';
 import { Request } from 'express';
@@ -7,7 +10,7 @@ import { UserProfile } from '../core/auth/user.entities';
 import { WXAuthGuard, WXAuthRequest } from './wechat.auth';
 import { WXMiniAppUserInfo } from "./wechat.entities";
 import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';
-import { WxQrTicketInfo } from './wx.api';
+import { WxQrTicketInfo } from './interfaces';
 
 class ValidationDto {
   // 随机字符串
