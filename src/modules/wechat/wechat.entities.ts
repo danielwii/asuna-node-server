@@ -11,12 +11,12 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { EntityConstructorObject } from '../base/base.entity';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { deserializeSafely } from '../common/helpers/validate';
 import { IdentifierHelper, StaticImplements } from '../common/identifier';
 import { AdminUser } from '../core/auth/auth.entities';
 import { UserProfile } from '../core/auth/user.entities';
-import { EntityConstructorObject } from '../base/base.entity';
 import { jsonType } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
@@ -192,12 +192,6 @@ export class WXMiniAppUserInfo extends BaseEntity {
   // --------------------------------------------------------------
   // Relations
   // --------------------------------------------------------------
-
-  /*
-  @OneToOne(type => User)
-  @JoinColumn({ name: 'user__id' })
-  user: User;
-*/
 
   @OneToOne(type => UserProfile)
   @JoinColumn({ name: 'profile__id' })

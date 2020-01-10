@@ -1,5 +1,6 @@
 import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as assert from 'assert';
 import { Promise } from 'bluebird';
@@ -25,13 +26,16 @@ import { RemoteFileInfo, UploaderService } from './service';
 
 const logger = LoggerFactory.getLogger('UploaderController');
 
-const fileInterceptorOptions = {
+const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
-      cb(null, `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`);
+      const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`;
+      logger.verbose(`set filename ${filename}`);
+      cb(null, filename);
     },
   }),
   fileFilter(req, file, cb) {
+    logger.verbose(`validate file ${r(file)}`);
     const validator = new Validator();
     const supportedImage = validator.isEnum(file.mimetype, ImageMimeType);
     const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);

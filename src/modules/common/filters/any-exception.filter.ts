@@ -142,6 +142,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const isGraphqlRes = !res.status;
     logger.error(
       `error: ${r({
+        httpStatus,
         isGraphqlRes,
         message,
         body: _.omit(body, 'error.message'),
@@ -152,6 +153,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
         isAsunaException: exception instanceof AsunaException,
       })}`,
     );
+    if (exception instanceof Error && httpStatus !== 500) {
+      logger.error(exception);
+    }
 
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
     if (isGraphqlRes) {

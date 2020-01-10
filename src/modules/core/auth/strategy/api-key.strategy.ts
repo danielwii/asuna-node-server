@@ -25,6 +25,6 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
   }
 }
 
-export function isApiKeyRequest(req: Request) {
+export function isApiKeyRequest(req: Request): boolean {
   return !!getIgnoreCase(req.headers, API_KEY_HEADER);
 }

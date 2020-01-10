@@ -15,10 +15,10 @@ export class UpdatePortraitDto {
   portrait: string;
 }
 
-@Controller('api/v1/user')
+@Controller('api/v1')
 export class UserController {
   @UseGuards(new JwtAuthGuard())
-  @Put('portrait')
+  @Put('user/portrait')
   async updatePortrait(@Body() body: UpdatePortraitDto, @Req() request): Promise<void> {
     const { user } = request;
     logger.log(`save portrait(${r(body)}) for user(${user.id})`);
