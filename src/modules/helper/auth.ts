@@ -47,7 +47,7 @@ export async function auth<Payload>(
             req.payload = payload;
             req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
           }
-          resolve({ err, payload: payload as any, info });
+          resolve({ err: err || wrapErrorInfo(info), payload: payload as any, info });
         })(req, res);
       });
     }
@@ -60,7 +60,7 @@ export async function auth<Payload>(
           async (err, payload: JwtPayload, info) => {
             // logger.log(`admin-jwt auth ${r({ user })}`);
             if (err || info) {
-              logger.warn(`admin-jwt auth error: ${r(err)}`);
+              logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
             } else {
               const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
               req.identifier = AdminUserIdentifierHelper.stringify(payload);
@@ -69,7 +69,7 @@ export async function auth<Payload>(
               req.tenant = admin?.tenant;
               req.roles = admin?.roles;
             }
-            resolve({ err, payload: payload as any, info });
+            resolve({ err: err || wrapErrorInfo(info), payload: payload as any, info });
           },
         )(req, res);
       });
@@ -107,7 +107,7 @@ export async function auth<Payload>(
                 logger.verbose(`wx-jwt found user by ${r(req.user)}`);
               }
             }
-            resolve({ err, payload: payload as any, info });
+            resolve({ err: err || wrapErrorInfo(info), payload: payload as any, info });
           },
         )(req, res);
       });
@@ -125,10 +125,17 @@ export async function auth<Payload>(
           req.tenant = admin?.tenant;
           req.roles = admin?.roles;
         }
-        resolve({ err, payload: payload as any, info });
+        resolve({ err: err || wrapErrorInfo(info), payload: payload as any, info });
       })(req, res);
     });
   }
 
   throw new AsunaException(AsunaErrorCode.InvalidCredentials);
+}
+
+function wrapErrorInfo(info: any): any {
+  if (info instanceof Error) {
+    return new AsunaException(AsunaErrorCode.InvalidCredentials, info.message, info);
+  }
+  return info;
 }

@@ -24,6 +24,7 @@ export class AdminAuthMiddleware {
       }
 
       const result = await auth(req as any, res);
+
       if (!result.payload) {
         if (result.err instanceof Error) {
           throw result.err;

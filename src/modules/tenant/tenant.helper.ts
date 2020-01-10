@@ -17,6 +17,7 @@ import { AdminUser, Role } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RestHelper } from '../core/rest';
+import { WeChatHelper, WeChatUser } from '../wechat';
 import { Tenant } from './tenant.entities';
 
 export class TenantConfig {
@@ -216,6 +217,8 @@ export class TenantHelper {
 */
 
   /**
+   * @param userId
+   * @param body
    * @param payload 用来新建需要绑定的核心模型数据
    */
   static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, payload?: object): Promise<Tenant> {
@@ -241,6 +244,16 @@ export class TenantHelper {
         { model: DBHelper.getModelNameObject(info.config.firstModelName), body: payload },
         { user: admin as any, tenant: admin.tenant, roles: admin.roles },
       );
+    }
+
+    // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
+    const config = await WeChatHelper.getServiceConfig();
+    if (config.enabled && config.saveToAdmin) {
+      const weChatUser = await WeChatUser.findOne({ admin });
+      if (weChatUser) {
+        weChatUser.tenant = admin.tenant;
+        await weChatUser.save();
+      }
     }
 
     return admin.tenant;

@@ -296,6 +296,7 @@ export class DBHelper {
     logger.debug(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
     if (!metadata) {
+      logger.error(`no metadata found for ${r({ parsedModel, model, parsedModule, module })}`);
       throw new AsunaException(AsunaErrorCode.Unprocessable, `model '${parsedModel}' not resolved`);
     }
     const entityInfo = this.getEntityInfo(metadata);
