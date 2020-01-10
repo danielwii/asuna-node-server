@@ -3,8 +3,8 @@ import * as R from 'ramda';
 import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
+import { AnyAuthRequest, AuthedInfo } from '../../helper/auth';
 import { TenantHelper } from '../../tenant/tenant.helper';
-import { AnyAuthRequest, AuthedInfo } from '../auth/helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';
 
@@ -40,7 +40,7 @@ export class RestHelper {
 
   static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
-    { user, tenant, roles }: AuthedInfo<{ id: PrimaryKey; username: string }>,
+    { user, tenant, roles }: AuthedInfo<{}, { id: PrimaryKey; username: string }>,
   ): Promise<T> {
     const tenantRelatedFields = {};
     if (tenant) {

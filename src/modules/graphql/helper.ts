@@ -16,7 +16,7 @@ import {
 import { AsunaErrorCode, AsunaException } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { AbstractCategoryEntity } from '../core/base';
+import { AbstractCategoryEntity } from '../base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { DataLoaderFunction, GraphqlContext, PrimaryKeyType, resolveRelationsFromInfo } from '../dataloader';

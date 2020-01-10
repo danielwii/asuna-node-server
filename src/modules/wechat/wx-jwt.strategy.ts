@@ -6,7 +6,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { Store } from '../store';
-import { WXJwtPayload } from './wechat.auth';
+import { WXJwtPayload } from './interfaces';
 
 const logger = LoggerFactory.getLogger('WXJwtStrategy');
 

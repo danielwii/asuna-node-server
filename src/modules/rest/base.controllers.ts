@@ -4,11 +4,11 @@ import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { DeleteResult } from 'typeorm';
-import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, Profile, r } from '../../common';
-import { LoggerFactory } from '../../common/logger';
-import { Tenant, TenantHelper } from '../../tenant';
-import { AnyAuthRequest, JwtAdminAuthGuard, Role } from '../auth';
-import { JwtPayload } from '../auth/auth.interfaces';
+import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, Profile, r } from '../common';
+import { LoggerFactory } from '../common/logger';
+import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
+import { Role } from '../core/auth/auth.entities';
+import { JwtPayload } from '../core/auth/auth.interfaces';
 import {
   ColumnSchema,
   DBHelper,
@@ -17,9 +17,11 @@ import {
   parseNormalWhereAndRelatedFields,
   parseOrder,
   parseWhere,
-} from '../db';
-import { KvHelper } from '../kv';
-import { RestHelper } from '../rest';
+} from '../core/db';
+import { KvHelper } from '../core/kv';
+import { RestHelper } from '../core/rest';
+import { AnyAuthRequest } from '../helper/auth';
+import { Tenant, TenantHelper } from '../tenant';
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');

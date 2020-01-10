@@ -1,5 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable import/no-cycle */
 import { IsIn, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import {
@@ -14,15 +12,16 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { deserializeSafely } from '../common/helpers';
+import { deserializeSafely } from '../common/helpers/validate';
 import { IdentifierHelper, StaticImplements } from '../common/identifier';
-import { AdminUser } from '../core/auth';
+import { AdminUser } from '../core/auth/auth.entities';
 import { UserProfile } from '../core/auth/user.entities';
-import { EntityConstructorObject } from '../core/base';
-import { fixTZ } from '../core/helpers';
+import { EntityConstructorObject } from '../base/base.entity';
 import { jsonType } from '../core/helpers/column.helper';
-import { InjectTenant } from '../tenant';
-import { WxSubscribeSceneType } from './interfaces';
+import { fixTZ } from '../core/helpers/entity.helper';
+import { InjectTenant } from '../tenant/tenant.entities';
+// eslint-disable-next-line import/no-cycle
+import { WxSubscribeSceneType } from './wx.interfaces';
 
 @StaticImplements<IdentifierHelper<Partial<{ openId: string }>>>()
 export class WeChatUserIdentifierHelper {

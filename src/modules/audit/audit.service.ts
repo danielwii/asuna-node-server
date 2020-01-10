@@ -13,26 +13,22 @@ export class AuditService {
     to: object,
     by: any,
   ): Promise<any> {
-    try {
-      switch (type) {
-        case 'entity':
-          return identification.type !== 'AuditRecord'
-            ? AuditRecord.save({
-                type,
-                action,
-                identification,
-                from: { content: from },
-                to: { content: to },
-                diff: diff(from, to),
-                updatedBy: by,
-              } as AuditRecord)
-            : Promise.resolve(null);
-        default:
-          logger.warn(`Not implemented: ${{ type, action }}`);
-          return Promise.resolve(null);
-      }
-    } catch (error) {
-      console.error(error);
+    switch (type) {
+      case 'entity':
+        return identification.type !== 'AuditRecord'
+          ? AuditRecord.save({
+              type,
+              action,
+              identification,
+              from: { content: from },
+              to: { content: to },
+              diff: diff(from, to),
+              updatedBy: by,
+            } as AuditRecord)
+          : Promise.resolve(null);
+      default:
+        logger.warn(`Not implemented: ${{ type, action }}`);
+        return Promise.resolve(null);
     }
   }
 }

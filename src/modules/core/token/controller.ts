@@ -5,7 +5,8 @@ import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } fr
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, deserializeSafely, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthGuard, AnyAuthRequest } from '../auth';
+import { AnyAuthRequest } from '../../helper/auth';
+import { AnyAuthGuard } from '../auth/auth.guard';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenHelper } from './helper';
 

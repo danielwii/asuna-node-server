@@ -1,22 +1,19 @@
 import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../common';
-import {
-  AdminUser,
-  AdminUserIdentifierHelper,
-  JwtPayload,
-  Role,
-  UserIdentifierHelper,
-  UserProfile,
-} from '../core/auth';
+import { AdminUser, Role } from '../core/auth/auth.entities';
+import { JwtPayload } from '../core/auth/auth.interfaces';
+import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
 import { isApiKeyRequest } from '../core/auth/strategy';
+import { UserProfile } from '../core/auth/user.entities';
 import { Store } from '../store';
-import { Tenant } from '../tenant';
-import { WeChatUserIdentifierHelper, WxCodeSession, WXJwtPayload } from '../wechat';
+import { Tenant } from '../tenant/tenant.entities';
+import { WXJwtPayload } from '../wechat/interfaces';
+import { WxCodeSession } from '../wechat/wx.interfaces';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
-export type AuthedInfo<P, U> = Partial<{ payload: P; user: U; identifier: string; tenant?: Tenant; roles: Role[] }>;
+export type AuthedInfo<P, U> = Partial<{ payload: P; user: U; identifier: string; tenant?: Tenant; roles?: Role[] }>;
 export type AnyAuthRequest<P = any, U = any> = Request & AuthedInfo<P, U>;
 
 export interface ApiKeyPayload {
@@ -46,6 +43,8 @@ export async function auth<Payload>(
           if (err || info) {
             logger.warn(`api-key auth error: ${r(err)}`);
           } else {
+            req.user = null;
+            req.payload = payload;
             req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
           }
           resolve({ err, payload: payload as any, info });
@@ -65,7 +64,8 @@ export async function auth<Payload>(
             } else {
               const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
               req.identifier = AdminUserIdentifierHelper.stringify(payload);
-              req.user = payload; // only inject client side user to req
+              req.user = admin;
+              req.payload = payload;
               req.tenant = admin?.tenant;
               req.roles = admin?.roles;
             }
@@ -91,10 +91,13 @@ export async function auth<Payload>(
               logger.log(`wx-jwt load user by ${r(codeSession)}`);
               if (codeSession?.openid) {
                 req.payload = payload;
-                req.user = await UserProfile.findOne({ username: codeSession.openid });
+                const user = await UserProfile.findOne({ username: codeSession.openid });
+                req.user = user;
+                req.identifier = UserIdentifierHelper.stringify(user);
+                // req.tenant = user?.tenant;
+                // req.roles = user?.roles; // TODO 目前的 roles 属于后端角色
                 logger.verbose(`wx-jwt found user by ${r(req.user)}`);
               }
-              req.identifier = WeChatUserIdentifierHelper.stringify(req.user);
             }
             resolve({ err, payload: payload as any, info });
           },

@@ -1,9 +1,9 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { AbstractBaseEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-// eslint-disable-next-line import/no-cycle
 import { Tenant } from '../../tenant/tenant.entities';
-import { AbstractBaseEntity } from '../base';
-import { jsonType, safeReloadObject } from '../helpers';
+import { jsonType } from '../helpers/column.helper';
+import { safeReloadObject } from '../helpers/entity.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__roles' })

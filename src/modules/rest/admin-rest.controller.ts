@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { RestCrudController } from '../core/base/base.controllers';
+import { RestCrudController } from './base.controllers';
 
 @ApiTags('sys-admin')
 @Controller('admin/rest/admin')

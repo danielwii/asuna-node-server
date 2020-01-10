@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column } from 'typeorm';
+import { AbstractNameEntity } from '../base';
 import { JsonArray, MetaInfo } from '../common/decorators';
-import { AbstractNameEntity, jsonType, safeReloadArray } from '../core';
+import { jsonType, safeReloadArray } from '../core';
 
 export abstract class AbstractSort extends AbstractNameEntity {
   @MetaInfo({ type: 'SortPosition', accessible: 'readonly' })

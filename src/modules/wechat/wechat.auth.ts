@@ -1,25 +1,19 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
-import * as passport from 'passport';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth/user.entities';
+import { AnyAuthRequest, auth } from '../helper/auth';
 import { Store } from '../store';
-import { WxCodeSession } from './interfaces';
+import { WXJwtPayload } from './interfaces';
+import { WxCodeSession } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WXAuth');
 
-export interface WXJwtPayload {
-  key: string;
-  iat: number;
-}
-
-export type WXAuthRequest<U = any> = Request & { user?: U /* identifier?: string */ };
+export type WXAuthRequest = AnyAuthRequest<WXJwtPayload, UserProfile>;
 
 function isWXAuthRequest(req: Request): boolean {
   const { authorization } = req.headers;
@@ -36,29 +30,7 @@ export class WXAuthGuard implements CanActivate {
     const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
-    const result: { err: any; payload: any; info: any } = await new Promise<{ err: string | Error; payload: WXJwtPayload; info: any }>(
-      resolve => {
-        passport.authenticate(
-          'wx-jwt',
-          { session: false, authInfo: true },
-          async (err: string | Error, payload: WXJwtPayload, info) => {
-            logger.verbose(`wx-jwt auth ${r({ payload, err, info })}`);
-            if (err || info) {
-              logger.warn(`wx-jwt auth error: ${r(err)}`);
-            } else {
-              const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
-              logger.log(`wx-jwt load user by ${r(codeSession)}`);
-              if (codeSession?.openid) {
-                req.user = await UserProfile.findOne({ username: codeSession.openid });
-                logger.verbose(`wx-jwt found user by ${r(req.user)}`);
-              }
-              // req.identifier = WeChatUserIdentifierHelper.stringify(req.user);
-            }
-            resolve({ err, payload, info });
-          },
-        )(req, res, next);
-      },
-    );
+    const result = await auth(req, res, 'client');
 
     if (!result.payload) {
       if (result.err instanceof Error) {
@@ -83,6 +55,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async handleRequest(err: any, payload: WXJwtPayload, info: any) {
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
@@ -106,7 +79,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
    * you have to extend the built-in AuthGuard class and override getRequest() method.
    * @param context
    */
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     const { req } = ctx.getContext();

@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
-import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../core/base';
+import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
 import { jsonType } from '../core/helpers';
 
 @EntityMetaInfo({ name: 'sys__tasks' })

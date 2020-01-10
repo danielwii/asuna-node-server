@@ -1,13 +1,21 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable import/no-cycle */
 import { oneLineTrim } from 'common-tags';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
 import * as cloud from 'wx-server-sdk';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { LoggerFactory } from '../common/logger';
-import { TemplateData, MiniSubscribeData, WxAccessToken, WxCodeSession, WxUserInfo, WxSendTemplateInfo, SubscribeMessageInfo, WxQrTicketInfo } from './interfaces';
-import { WeChatServiceConfig, WeChatHelper } from './wechat.helper';
+// eslint-disable-next-line import/no-cycle
+import { WeChatHelper, WeChatServiceConfig } from './wechat.helper';
+import {
+  MiniSubscribeData,
+  SubscribeMessageInfo,
+  TemplateData,
+  WxAccessToken,
+  WxCodeSession,
+  WxQrTicketInfo,
+  WxSendTemplateInfo,
+  WxUserInfo,
+} from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 

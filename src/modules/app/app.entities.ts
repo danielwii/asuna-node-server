@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { AbstractBaseEntity, AbstractNameEntity, jsonType, Publishable, safeReloadArray } from '../core';
+import { jsonType, safeReloadArray } from '../core';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',

@@ -3,7 +3,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
-import { auth } from '../core/auth';
+import { auth } from '../helper/auth';
 import { JwtPayload } from '../core/auth/auth.interfaces';
 
 const logger = LoggerFactory.getLogger('GqlAuthGuard');
@@ -30,11 +30,15 @@ export class GqlAdminAuthGuard implements CanActivate {
     logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     const result = await auth(req, res, 'admin');
 
-    if (!result.user) {
-      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+    if (!result.payload) {
+      if (result.err instanceof Error) {
+        throw result.err;
+      } else {
+        throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+      }
     }
 
-    return !!result.user;
+    return !!result.payload;
   }
 }
 
@@ -58,6 +62,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     return this.jwtAuthenticator(http.getRequest(), http.getResponse());
   } */
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   handleRequest(err, user, info) {
     if (err || !user) {
       if (this.opts.anonymousSupport) {
@@ -74,6 +79,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
    * you have to extend the built-in AuthGuard class and override getRequest() method.
    * @param context
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     const {req} = ctx.getContext();

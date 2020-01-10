@@ -2,7 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
-import { CommandController, GetUploadsModule } from './core';
+import { CommandController, GetUploadsModule, UserController } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { DBModule } from './core/db';
@@ -50,6 +50,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AdminWxRestController,
     WwwRestController,
     CommandController,
+    UserController,
     SearchController,
     TaskController,
     UploaderController,

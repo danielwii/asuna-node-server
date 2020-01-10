@@ -1,5 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable import/no-cycle */
 import { Promise } from 'bluebird';
 import { classToPlain } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
@@ -22,17 +20,18 @@ import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import { Store } from '../store';
 import { WsHelper } from '../ws';
-import { WXJwtPayload } from './wechat.auth';
+import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
+// eslint-disable-next-line import/no-cycle
 import { WxApi } from './wx.api';
 import {
-  WxQrTicketInfo,
-  WxUserInfo,
-  TemplateData,
-  WxSendTemplateInfo,
   MiniSubscribeData,
   SubscribeMessageInfo,
-} from './interfaces';
+  TemplateData,
+  WxQrTicketInfo,
+  WxSendTemplateInfo,
+  WxUserInfo,
+} from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatHelper');
 

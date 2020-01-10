@@ -9,38 +9,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { MetaInfo } from '../../common/decorators/meta.decorator';
-import { SimpleIdGenerator } from '../../ids';
-import { fixTZ } from '../helpers/entity.helper';
+import { MetaInfo } from '../common/decorators/meta.decorator';
+import { fixTZ } from '../core/helpers/entity.helper';
+import { SimpleIdGenerator } from '../ids';
+import { Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
-export type Constructor<T = {}> = new (...args: any[]) => T;
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const Publishable = <TBase extends Constructor>(Base: TBase) => {
-  class ExtendableEntity extends Base {
-    @MetaInfo({ name: '是否发布？' })
-    @Column({ nullable: true, name: 'is_published' })
-    isPublished: boolean;
-  }
-
-  return ExtendableEntity;
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const NameDescAttachable = <TBase extends Constructor>(Base: TBase) => {
-  class ExtendableEntity extends Base {
-    @MetaInfo({ name: '名称' })
-    @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-    name: string;
-
-    @MetaInfo({ name: '描述' })
-    @Column('text', { nullable: true, name: 'description' })
-    description: string;
-  }
-  return ExtendableEntity;
-};
 
 export class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;

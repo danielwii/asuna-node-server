@@ -1,16 +1,12 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable import/no-cycle */
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IsString } from 'class-validator';
 import { Request } from 'express';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { UserProfile } from '../core/auth/user.entities';
 import { WXAuthGuard, WXAuthRequest } from './wechat.auth';
-import { WXMiniAppUserInfo } from "./wechat.entities";
+import { WXMiniAppUserInfo } from './wechat.entities';
 import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';
-import { WxQrTicketInfo } from './interfaces';
+import { WxQrTicketInfo } from './wx.interfaces';
 
 class ValidationDto {
   // 随机字符串
@@ -63,19 +59,23 @@ export class WeChatController {
     return WeChatHelper.getTicketByType(type, value);
   }
 
-  @UseGuards(new WXAuthGuard())
+  @UseGuards(WXAuthGuard)
   @Get('user-info')
-  async userInfo(@Body() userInfo: UserInfo, @Req() req: WXAuthRequest<UserProfile>): Promise<WXMiniAppUserInfo> {
-    const { user } = req;
-    logger.log(`update user-info ${r(userInfo)} for ${user.username}`);
+  async userInfo(@Req() req: WXAuthRequest): Promise<WXMiniAppUserInfo> {
+    const { payload, user, identifier } = req;
+    logger.log(`get user-info ${r({ payload, user, identifier })}`);
     return WXMiniAppUserInfo.findOne({ profile: { id: user.id } });
   }
 
-  @UseGuards(new WXAuthGuard())
+  @UseGuards(WXAuthGuard)
   @Post('user-info')
-  async updateUserInfo(@Body() userInfo: UserInfo, @Req() req: WXAuthRequest<UserProfile>): Promise<void> {
+  async updateUserInfo(@Body() userInfo: UserInfo, @Req() req: WXAuthRequest): Promise<void> {
     const { user } = req;
     logger.log(`update user-info ${r(userInfo)} for ${user.username}`);
     return WeChatHelper.updateUserProfile(user, userInfo);
   }
+
+  @UseGuards(WXAuthGuard)
+  @Get('authorized')
+  authorized(): void {}
 }

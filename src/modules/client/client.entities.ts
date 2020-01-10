@@ -1,6 +1,6 @@
 import { BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
-import { AbstractBaseEntity } from '../core/base';
+import { AbstractBaseEntity } from '../base';
 
 @EntityMetaInfo({ name: 'client__users' })
 @Entity('client__t_users')

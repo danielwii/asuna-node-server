@@ -8,5 +8,5 @@ export * from './get-uploads';
 export * from './rest';
 export * from './storage';
 export * from './helpers';
-export * from './base';
 export * from './command.controller';
+export * from './user.controller';

@@ -2,7 +2,8 @@ import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nest
 import { IsDefined, IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { AnyAuthRequest, JwtAdminAuthGuard } from '../core/auth';
+import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
+import { AnyAuthRequest } from '../helper/auth';
 import { TaskRecord } from './task.entities';
 import { TaskHelper } from './task.helper';
 
