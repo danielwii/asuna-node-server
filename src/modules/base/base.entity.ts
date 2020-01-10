@@ -15,7 +15,10 @@ import { SimpleIdGenerator } from '../ids';
 import { Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
-export type EntityConstructorObject<Entity> = Omit<Entity, keyof typeof BaseEntity | 'reload'>;
+export type EntityConstructorObject<Entity> = Omit<
+  Entity,
+  keyof typeof BaseEntity | 'reload' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
+>;
 
 export class AbstractBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn() id?: number;
@@ -65,7 +68,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
 
   @BeforeInsert()
   beforeInsert(): void {
-    this.id = this.generator.nextId();
+    if (!this.id) this.id = this.generator.nextId();
   }
 
   @AfterLoad()

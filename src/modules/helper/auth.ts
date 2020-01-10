@@ -92,6 +92,14 @@ export async function auth<Payload>(
               if (codeSession?.openid) {
                 req.payload = payload;
                 const user = await UserProfile.findOne({ username: codeSession.openid });
+                if (!user) {
+                  return resolve({
+                    err: new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session'),
+                    payload: null,
+                    info,
+                  });
+                }
+
                 req.user = user;
                 req.identifier = UserIdentifierHelper.stringify(user);
                 // req.tenant = user?.tenant;

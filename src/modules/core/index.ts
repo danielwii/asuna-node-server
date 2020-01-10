@@ -10,3 +10,4 @@ export * from './storage';
 export * from './helpers';
 export * from './command.controller';
 export * from './user.controller';
+export * from './user.register';
