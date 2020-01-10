@@ -25,9 +25,11 @@ import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 // eslint-disable-next-line import/no-cycle
 import { WxApi } from './wx.api';
 import {
+  GetPhoneNumber,
   MiniSubscribeData,
   SubscribeMessageInfo,
   TemplateData,
+  WxCodeSession,
   WxQrTicketInfo,
   WxSendTemplateInfo,
   WxUserInfo,
@@ -212,25 +214,6 @@ export enum WeChatFieldKeys {
   miniAppSecret = 'mini.appsecret',
 }
 
-export enum NoticeFieldKeys {
-  registrationEnabled = 'registration.enabled',
-  registrationTemplateId = 'registration.templateId',
-  jobApplicationEnabled = 'jobApplication.enabled',
-  jobApplicationTemplateId = 'jobApplication.templateId',
-  // companyAuditEnabled = 'companyAudit.enabled',
-  // companyAuditTemplateId = 'companyAudit.templateId',
-  // newResumeEnabled = 'newResume.enabled',
-  // newResumeTemplateId = 'newResume.templateId',
-  unReadMsgEnabled = 'unReadMsg.enabled',
-  unReadMsgSubscribeId = 'unReadMsg.subscribeId',
-  resumeAuditEnabled = 'resumeAudit.enabled',
-  resumeAuditSubscribeId = 'resumeAudit.subscribeId',
-  registrationAuditEnabled = 'registrationAudit.enabled',
-  registrationAuditSubscribeId = 'registrationAudit.subscribeId',
-  // activityMsgEnabled = 'activityMsg.enabled',
-  // activityMsgSubscribeId = 'unReadMsg.subscribeId',
-}
-
 export class WXEventMessageHelper {
   static isWXSubscribeMessage = (message: WXEventMessage): boolean =>
     message.MsgType === 'event' && ['subscribe', 'unsubscribe'].includes(message.Event);
@@ -245,10 +228,6 @@ export class WeChatHelper {
 
   static async getServiceConfig(): Promise<WeChatServiceConfig> {
     return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, WeChatFieldKeys));
-  }
-
-  static async getNoticeConfig(): Promise<NoticeConfig> {
-    return new NoticeConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, NoticeFieldKeys));
   }
 
   static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
@@ -362,7 +341,7 @@ export class WeChatHelper {
     return WeChatUser.save(userInfo.toWeChatUser());
   }
 
-  static async updateUserProfile(user: Pick<UserProfile, 'id' | 'username'>, userInfo: UserInfo): Promise<void> {
+  static async updateUserInfo(user: Pick<UserProfile, 'id' | 'username'>, userInfo: UserInfo): Promise<void> {
     await WXMiniAppUserInfo.create({
       openId: user.username,
       nickname: userInfo.nickName,
@@ -374,6 +353,51 @@ export class WeChatHelper {
       avatar: userInfo.avatarUrl,
       profile: { id: user.id },
     }).save();
+  }
+
+  static async getSessionKey(payload: WXJwtPayload): Promise<string> {
+    const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
+    return codeSession.session_key;
+  }
+
+  static async decryptData<T>(key: string, encryptedData: string, iv: string): Promise<T> {
+    // base64 decode
+    const sessionKey = Buffer.from(key, 'base64');
+    const encodedEncryptedData = Buffer.from(encryptedData, 'base64');
+    const encodedIV = Buffer.from(iv, 'base64');
+
+    let decoded;
+    try {
+      // 解密
+      const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, encodedIV);
+      // 设置自动 padding 为 true，删除填充补位
+      decipher.setAutoPadding(true);
+      decoded = decipher.update(encodedEncryptedData, 'binary', 'utf8');
+      decoded += decipher.final('utf8');
+
+      decoded = JSON.parse(decoded);
+    } catch (err) {
+      throw new Error('Illegal Buffer');
+    }
+
+    // if (decoded.watermark.appid !== this.appId) {
+    //   throw new Error('Illegal Buffer');
+    // }
+
+    return decoded;
+  }
+
+  static async updateUserPhoneNumber(
+    payload: WXJwtPayload,
+    user: UserProfile,
+    body: { encryptedData: string; errMsg: string; iv: string },
+  ): Promise<void> {
+    const key = await this.getSessionKey(payload);
+    const decoded = await this.decryptData<GetPhoneNumber>(key, body.encryptedData, body.iv);
+    // logger.verbose(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
+    const userInfo = await WXMiniAppUserInfo.findOne({ profile: { id: user.id } });
+    userInfo.mobile = decoded.phoneNumber;
+    await userInfo.save();
   }
 
   static async code2Session(code: string): Promise<string> {

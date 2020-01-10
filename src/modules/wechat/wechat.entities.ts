@@ -1,3 +1,4 @@
+import { Exclude, Expose, Transform } from "class-transformer";
 import { IsIn, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import {
@@ -136,6 +137,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
 @EntityMetaInfo({ name: 'wx__mini_app_users' })
 @Entity('wx__t_mini_app_users')
 export class WXMiniAppUserInfo extends BaseEntity {
+  @Exclude()
   @MetaInfo({ name: 'OpenId' })
   @PrimaryColumn({ nullable: false, length: 36, name: 'open_id' })
   openId: string;
@@ -155,6 +157,8 @@ export class WXMiniAppUserInfo extends BaseEntity {
   @Column({ nullable: true, name: 'language' })
   language: string;
 
+  @Expose({ name: 'with-phone-number', toPlainOnly: true })
+  @Transform(value => !!_.trim(value), { toPlainOnly: true })
   @MetaInfo({ name: '手机号' })
   @Column({ nullable: true, name: 'mobile' })
   mobile: string;
@@ -193,6 +197,8 @@ export class WXMiniAppUserInfo extends BaseEntity {
   // Relations
   // --------------------------------------------------------------
 
+  @Expose({ name: 'profile-id', toPlainOnly: true })
+  @Transform(value => value.id, { toPlainOnly: true })
   @OneToOne(type => UserProfile)
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;

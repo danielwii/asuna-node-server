@@ -20,6 +20,28 @@ export enum WxSubscribeSceneType {
   // 其他
   ADD_SCENE_OTHERS = 'ADD_SCENE_OTHERS',
 }
+
+/*
+{
+    "phoneNumber": "13580006666",
+    "purePhoneNumber": "13580006666",
+    "countryCode": "86",
+    "watermark":
+    {
+        "appid":"APPID",
+        "timestamp": TIMESTAMP
+    }
+}
+ */
+export type GetPhoneNumber = {
+  // 用户绑定的手机号（国外手机号会有区号）
+  phoneNumber: string;
+  // 没有区号的手机号
+  purePhoneNumber: string;
+  // 区号
+  countryCode: string;
+};
+
 export interface WxAccessToken {
   access_token: string;
   expires_in: number;

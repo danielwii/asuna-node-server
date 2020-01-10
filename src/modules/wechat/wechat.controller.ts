@@ -64,7 +64,18 @@ export class WeChatController {
   async userInfo(@Req() req: WXAuthRequest): Promise<WXMiniAppUserInfo> {
     const { payload, user, identifier } = req;
     logger.log(`get user-info ${r({ payload, user, identifier })}`);
-    return WXMiniAppUserInfo.findOne({ profile: { id: user.id } });
+    return WXMiniAppUserInfo.findOne({ profile: { id: user.id } }, { relations: ['profile'] });
+  }
+
+  @UseGuards(WXAuthGuard)
+  @Post('phone-number')
+  async updatePhoneNumber(
+    @Body() body: { encryptedData: string; errMsg: string; iv: string },
+    @Req() req: WXAuthRequest,
+  ): Promise<void> {
+    const { payload, user } = req;
+    logger.log(`update phone number for ${user.username}`);
+    return WeChatHelper.updateUserPhoneNumber(payload, user, body);
   }
 
   @UseGuards(WXAuthGuard)
@@ -72,7 +83,7 @@ export class WeChatController {
   async updateUserInfo(@Body() userInfo: UserInfo, @Req() req: WXAuthRequest): Promise<void> {
     const { user } = req;
     logger.log(`update user-info ${r(userInfo)} for ${user.username}`);
-    return WeChatHelper.updateUserProfile(user, userInfo);
+    return WeChatHelper.updateUserInfo(user, userInfo);
   }
 
   @UseGuards(WXAuthGuard)
