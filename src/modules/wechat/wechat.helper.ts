@@ -18,16 +18,21 @@ import { ConfigKeys, configLoader } from '../config';
 import { AdminUser, AuthUserChannel, TokenHelper } from '../core/auth';
 import { UserProfile } from '../core/auth/user.entities';
 import { Hermes } from '../core/bus';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
+import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import { Store } from '../store';
 import { WsHelper } from '../ws';
 import { WXJwtPayload } from './wechat.auth';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
+import { WxApi } from './wx.api';
 import {
-  WxApi,
-} from './wx.api';
-import { WxQrTicketInfo, WxUserInfo, TemplateData, WxSendTemplateInfo, MiniSubscribeData, SubscribeMessageInfo } from '.';
+  WxQrTicketInfo,
+  WxUserInfo,
+  TemplateData,
+  WxSendTemplateInfo,
+  MiniSubscribeData,
+  SubscribeMessageInfo,
+} from './interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatHelper');
 

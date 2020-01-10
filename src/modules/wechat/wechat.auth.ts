@@ -106,6 +106,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
    * you have to extend the built-in AuthGuard class and override getRequest() method.
    * @param context
    */
+  // eslint-disable-next-line class-methods-use-this
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
     const { req } = ctx.getContext();

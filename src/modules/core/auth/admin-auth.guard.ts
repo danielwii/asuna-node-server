@@ -7,6 +7,7 @@ const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');
 
 @Injectable()
 export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   handleRequest(err, user, info) {
     logger.verbose(`handleRequest ${r({ err, user, info })}`);
     if (err || !user) {

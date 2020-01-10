@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { auth } from './helper';
+import { auth } from '../../helper/auth';
 
 const logger = LoggerFactory.getLogger('AdminAuthMiddleware');
 
@@ -24,8 +24,12 @@ export class AdminAuthMiddleware {
       }
 
       const result = await auth(req as any, res);
-      if (!result.user) {
-        throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+      if (!result.payload) {
+        if (result.err instanceof Error) {
+          throw result.err;
+        } else {
+          throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+        }
       }
 
       next();

@@ -3,8 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { AsunaErrorCode, AsunaException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
+import { AnyAuthRequest, auth } from "../../helper/auth";
 import { JwtPayload } from './auth.interfaces';
-import { AnyAuthRequest, auth } from './helper';
 import { UserIdentifierHelper } from './identifier';
 
 export type JwtAuthRequest<U extends JwtPayload = JwtPayload> = Request & { user?: U; identifier?: string };
@@ -17,6 +17,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   handleRequest(err, user, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
     // JwtAuthGuard.logger.log(`handleRequest ${r({ err, user, info })}`);
@@ -43,10 +44,14 @@ export class AnyAuthGuard implements CanActivate {
     this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res);
 
-    if (!result.user) {
-      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+    if (!result.payload) {
+      if (result.err instanceof Error) {
+        throw result.err;
+      } else {
+        throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+      }
     }
 
-    return !!result.user;
+    return !!result.payload;
   }
 }

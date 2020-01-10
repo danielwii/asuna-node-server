@@ -89,11 +89,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   @Column({ nullable: true, name: 'subscribe_time' })
   subscribeTime: number;
 
-  @MetaInfo({
-    name: '用户关注的渠道来源',
-    type: 'EnumFilter',
-    enumData: WxSubscribeSceneType,
-  })
+  @MetaInfo({ name: '用户关注的渠道来源', type: 'EnumFilter', enumData: WxSubscribeSceneType })
   @IsOptional()
   @IsIn(_.keys(WxSubscribeSceneType))
   @Column('varchar', { nullable: true, name: 'subscribe_scene' })
