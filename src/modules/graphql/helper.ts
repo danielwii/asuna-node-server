@@ -13,10 +13,10 @@ import {
   ObjectLiteral,
   Repository,
 } from 'typeorm';
+import { AbstractCategoryEntity } from '../base';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { AbstractCategoryEntity } from '../base';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import { DataLoaderFunction, GraphqlContext, PrimaryKeyType, resolveRelationsFromInfo } from '../dataloader';
@@ -148,6 +148,10 @@ export class GraphqlHelper {
     }
     if (query.random > 0) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
+      const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
+      // eslint-disable-next-line no-param-reassign
+      where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : null) };
+      logger.verbose(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
