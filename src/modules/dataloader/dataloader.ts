@@ -33,7 +33,7 @@ function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKeyType,
 }
 
 export function loader<Entity extends BaseEntity>(
-  entity: new () => Entity,
+  entity: new (...args) => Entity,
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
