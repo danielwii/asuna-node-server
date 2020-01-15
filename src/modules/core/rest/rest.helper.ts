@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
@@ -90,5 +91,29 @@ export class RestHelper {
      * but repo.save and getManger().save(target, object) will not
      */
     return getManager().save(entity as any);
+  }
+
+  static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
+    const repository = DBHelper.repo(modelNameObject);
+    const raw = await repository
+      .createQueryBuilder(modelNameObject.model)
+      .select(`DISTINCT ${column}`)
+      // .groupBy(column)
+      .getRawMany();
+    const arr = _.flatMap(raw, fp.get(column));
+    logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
+    return arr;
+  }
+
+  static async groupCounts(modelNameObject: ModelNameObject, column: string): Promise<{ [name: string]: number }> {
+    const repository = DBHelper.repo(modelNameObject);
+    const raw = await repository
+      .createQueryBuilder()
+      .select(`${column}, COUNT(${column}) as count`)
+      .groupBy(column)
+      .getRawMany();
+    const stats = _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
+    logger.log(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r(stats)}`);
+    return stats;
   }
 }

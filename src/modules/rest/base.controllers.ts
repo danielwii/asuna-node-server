@@ -2,6 +2,7 @@ import { Body, Delete, Get, Options, Param, Patch, Post, Query, Req, UseGuards }
 import { ApiParam } from '@nestjs/swagger';
 import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
+import ow from 'ow';
 import * as R from 'ramda';
 import { DeleteResult } from 'typeorm';
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, Profile, r } from '../common';
@@ -54,6 +55,22 @@ export abstract class RestCrudController {
   schema(@Param('model') model: string): OriginSchema {
     const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractOriginAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
+  }
+
+  @UseGuards(JwtAdminAuthGuard)
+  @Get(':model/unique')
+  unique(@Param('model') model: string, @Query('column') column: string): Promise<string[]> {
+    ow(column, 'column', ow.string.nonEmpty);
+    const modelNameObject = DBHelper.getModelNameObject(model, this.module);
+    return RestHelper.unique(modelNameObject, column);
+  }
+
+  @UseGuards(JwtAdminAuthGuard)
+  @Get(':model/group-count')
+  groupCounts(@Param('model') model: string, @Query('column') column: string): Promise<{ [name: string]: number }> {
+    ow(column, 'column', ow.string.nonEmpty);
+    const modelNameObject = DBHelper.getModelNameObject(model, this.module);
+    return RestHelper.groupCounts(modelNameObject, column);
   }
 
   @UseGuards(JwtAdminAuthGuard)

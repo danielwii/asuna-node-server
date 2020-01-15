@@ -75,6 +75,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
     } else if (R.is(EntityNotFoundError, exception)) {
       processed.status = HttpStatus.NOT_FOUND;
+    } else if (exception.name === 'ArgumentError') {
+      processed.status = HttpStatus.BAD_REQUEST;
     } else if (processed.code) {
       if (processed.code === 'ERR_ASSERTION') {
         // TODO wrap with AsunaException
