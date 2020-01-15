@@ -1,4 +1,4 @@
-import { BaseEntity } from 'typeorm';
+import { BaseEntity, DeleteResult } from 'typeorm';
 import { Constructor } from '../base';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -21,14 +21,14 @@ export class UserRegister {
     this.onProfileCreate =
       onProfileCreate ||
       (profile => {
-        const entity = new Entity({ id: profile.id }, profile);
+        const entity = new Entity({ id: profile.id, profile });
         logger.verbose(`onProfileCreate save ${r({ profile, entity })}`);
         return DBHelper.repo(Entity).save(entity as any);
       });
     this.onProfileDelete = onProfileDelete || (profile => DBHelper.repo(Entity).delete(profile.id));
   }
 
-  static createUserByProfile(profile: UserProfile) {
+  static createUserByProfile(profile: UserProfile): Promise<any> {
     if (!this.Entity || !this.onProfileCreate) {
       logger.warn(`no core user registered for created.`);
     }
@@ -36,7 +36,7 @@ export class UserRegister {
     return this.onProfileCreate(profile);
   }
 
-  static removeUserByProfile(profile: UserProfile) {
+  static removeUserByProfile(profile: UserProfile): Promise<DeleteResult> {
     if (!this.Entity || !this.onProfileDelete) {
       logger.warn(`no core user registered for removed.`);
     }

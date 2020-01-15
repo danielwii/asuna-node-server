@@ -50,6 +50,12 @@ interface BaseEntity {
   updatedAt: Date!
 }
 
+interface BaseEntity2 {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
 interface BaseGenericEntity {
   id: String!
   createdAt: Date!
