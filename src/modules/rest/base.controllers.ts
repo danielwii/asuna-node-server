@@ -66,7 +66,7 @@ export abstract class RestCrudController {
   }
 
   @UseGuards(JwtAdminAuthGuard)
-  @Get(':model/group-count')
+  @Get(':model/group-counts')
   groupCounts(@Param('model') model: string, @Query('column') column: string): Promise<{ [name: string]: number }> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
