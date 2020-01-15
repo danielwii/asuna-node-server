@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
-import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
+import { BaseEntity, FindOperator, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
 import { AnyAuthRequest, AuthedInfo } from '../../helper/auth';
@@ -105,15 +105,20 @@ export class RestHelper {
     return arr;
   }
 
-  static async groupCounts(modelNameObject: ModelNameObject, column: string): Promise<{ [name: string]: number }> {
+  static async groupCounts(
+    modelNameObject: ModelNameObject,
+    where: string[] | FindOperator<any>[] | null,
+    column: string,
+  ): Promise<{ [name: string]: number }> {
     const repository = DBHelper.repo(modelNameObject);
     const raw = await repository
       .createQueryBuilder()
       .select(`${column}, COUNT(${column}) as count`)
+      .where(where)
       .groupBy(column)
       .getRawMany();
     const stats = _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
-    logger.log(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r(stats)}`);
+    logger.log(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
     return stats;
   }
 }

@@ -67,10 +67,14 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/group-counts')
-  groupCounts(@Param('model') model: string, @Query('column') column: string): Promise<{ [name: string]: number }> {
+  groupCounts(
+    @Param('model') model: string,
+    @Query('where') whereStr: string,
+    @Query('column') column: string,
+  ): Promise<{ [name: string]: number }> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
-    return RestHelper.groupCounts(modelNameObject, column);
+    return RestHelper.groupCounts(modelNameObject, parseWhere(whereStr), column);
   }
 
   @UseGuards(JwtAdminAuthGuard)
