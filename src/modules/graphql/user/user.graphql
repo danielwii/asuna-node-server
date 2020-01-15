@@ -1,0 +1,14 @@
+type UserProfile {
+  email: String
+  username: String
+  portrait: String
+  channel: String
+  password: String
+  salt: String
+  lastSignedAt: Date
+  lastLoginAt: Date
+  description: String
+  isActive: Boolean
+
+  miniAppUserInfo: WXMiniAppUserInfo
+}

@@ -1,4 +1,4 @@
-import { Exclude, Expose, Transform } from "class-transformer";
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsIn, IsOptional } from 'class-validator';
 import * as _ from 'lodash';
 import {
@@ -199,7 +199,10 @@ export class WXMiniAppUserInfo extends BaseEntity {
 
   @Expose({ name: 'profile-id', toPlainOnly: true })
   @Transform(value => value.id, { toPlainOnly: true })
-  @OneToOne(type => UserProfile)
+  @OneToOne(
+    type => UserProfile,
+    profile => profile.miniAppUserInfo,
+  )
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;
 

@@ -1,12 +1,5 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import {
-  DEFAULT_PAGE,
-  DEFAULT_SIZE,
-  MAX_PAGE_SIZE,
-  Order,
-  PageInfo,
-  PageRequest,
-} from '../core/helpers';
+import { DEFAULT_PAGE, DEFAULT_SIZE, MAX_PAGE_SIZE, Order, PageInfo, PageRequest } from '../core/helpers';
 
 export class PageRequestInput implements PageRequest {
   @IsNumber()
@@ -44,6 +37,11 @@ export class QueryConditionInput {
 
   @IsOptional()
   random?: number;
+}
+
+export class AdminQueryConditionInput {
+  @IsOptional()
+  ids?: string[] | number[];
 }
 
 export class CommonConditionInput {

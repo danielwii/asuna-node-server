@@ -18,7 +18,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
     if (key) {
       // TODO verify api key later
       logger.warn(`skipped api-key validation... '${key}'`);
-      self.success({ apiKey: key });
+      self.success({ apiKey: key }, null);
     } else {
       self.fail('ApiKey is required', 401);
     }

@@ -10,7 +10,7 @@ import { FinderModule } from './core/finder';
 import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
-import { SchemaModules } from './graphql/schema.modules';
+import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import {
   AdminAppRestController,
@@ -28,7 +28,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 
 @Module({
   imports: [
-    SchemaModules,
+    GraphqlQueryModule,
     AuthModule,
     ClientModule,
     KvModule,

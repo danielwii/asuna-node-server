@@ -1,0 +1,15 @@
+type WXMiniAppUserInfo {
+  openId: String
+  nickname: String
+  gender: Int
+  language: String
+  mobile: String
+  city: String
+  province: String
+  country: String
+  avatar: String
+  createdAt: Date
+  updatedAt: Date
+  updatedBy: String
+  profile: UserProfile
+}

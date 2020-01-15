@@ -36,6 +36,10 @@ input QueryCondition {
   random: Int
 }
 
+input AdminQueryCondition {
+  ids: [Any!]
+}
+
 input CommonCondition {
   category: String
 }
