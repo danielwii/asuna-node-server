@@ -518,10 +518,10 @@
   dependencies:
     ws "7.2.1"
 
-"@nestjs/swagger@^4.1.10":
-  version "4.1.10"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.1.10.tgz#1c85563e3c98c58017ec04aaed291c23a760de79"
-  integrity sha512-aMdYHMFsXuRx43JrQdYRMFpznxZsQCxD3y0dL1swwvpD4OGJJ3NRfLmd+KSbIslgYHphxSc7yMnmJFkWTZvUBg==
+"@nestjs/swagger@^4.1.12":
+  version "4.1.12"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.1.12.tgz#f97a302ac90dbc3c84825cfa1228770197c03eaa"
+  integrity sha512-ttqSBvLsNrJd5cIH9W4l+FtceDjdnEAU1d2LQ0kjQWE7Q4uojTuNDnWm2cEo5zpLqHW9ZhBoYeqMOTHSkLK5/A==
   dependencies:
     lodash "4.17.15"
     path-to-regexp "3.2.0"
@@ -926,10 +926,10 @@
   dependencies:
     "@types/express" "*"
 
-"@types/highland@^2.12.6":
-  version "2.12.6"
-  resolved "https://registry.yarnpkg.com/@types/highland/-/highland-2.12.6.tgz#01897935d003dd0fbda8c6dc14456d0f86017198"
-  integrity sha512-0WDehL1wxwSBgsYATl2t+1QQZuM2WILusZ0rXiyHhxM26WmAvbrgG5sZe8afoJfJ/2BTexRs4Wuh77Oqnp4+Hw==
+"@types/highland@^2.12.7":
+  version "2.12.7"
+  resolved "https://registry.yarnpkg.com/@types/highland/-/highland-2.12.7.tgz#d56a592c70b535fce3abb1fb2d200a72070cbfe1"
+  integrity sha512-ILsumVDOdtZeg6x73PLG+b5gM3ADRJDDMT2x926RAuDcVHuWSggQ2LM3F73b9WnJ48TxHwQrGJyokWTgjDCLKg==
   dependencies:
     "@types/node" "*"
 
@@ -970,10 +970,10 @@
     "@types/istanbul-lib-coverage" "*"
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@^24.0.25":
-  version "24.0.25"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.25.tgz#2aba377824ce040114aa906ad2cac2c85351360f"
-  integrity sha512-hnP1WpjN4KbGEK4dLayul6lgtys6FPz0UfxMeMQCv0M+sTnzN3ConfiO72jHgLxl119guHgI8gLqDOrRLsyp2g==
+"@types/jest@^24.9.0":
+  version "24.9.0"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.9.0.tgz#78c6991cd1734cf0d390be24875e310bb0a9fb74"
+  integrity sha512-dXvuABY9nM1xgsXlOtLQXJKdacxZJd7AtvLsKZ/0b57ruMXDKCOXAC/M75GbllQX6o1pcZ5hAG4JzYy7Z/wM2w==
   dependencies:
     jest-diff "^24.3.0"
 
@@ -4388,10 +4388,10 @@ file-entry-cache@^5.0.1:
   dependencies:
     flat-cache "^2.0.1"
 
-file-type@^13.0.3:
-  version "13.0.3"
-  resolved "https://registry.yarnpkg.com/file-type/-/file-type-13.0.3.tgz#38ec631acda18103da09d4f1750836932e6711c4"
-  integrity sha512-fe3+9mnMLbpP8nRQm/cJgehypv375SOFOXFdLYyYe7hWxdWgS5hkDpWnld5At/vvfVEN6rVqKA3EOKMP03tJGg==
+file-type@^13.1.0:
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/file-type/-/file-type-13.1.0.tgz#5cfeade4745fad9504bb1435b5b5003af272b5a8"
+  integrity sha512-nr4fSvwYSlQl7YmaWS8rsvDrAm6VgCeb2ysHh18+YBSH4RxewhPKUQrj2XRuEMBNnH6E4xw+yWTL7+jiMrh6GA==
   dependencies:
     readable-web-to-node-stream "^2.0.0"
     strtok3 "^5.0.1"
@@ -4663,11 +4663,6 @@ get-stdin@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-6.0.0.tgz#9e09bf712b360ab9225e812048f71fde9c89657b"
   integrity sha512-jp4tHawyV7+fkkSKyvjuLZswblUtz+SQKzSWnBbii16BuZksJlU1wuBYXY75r+duh/llF1ur6oNwi+2ZzjKZ7g==
-
-get-stdin@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/get-stdin/-/get-stdin-7.0.0.tgz#8d5de98f15171a125c5e516643c7a6d0ea8a96f6"
-  integrity sha512-zRKcywvrXlXsA0v0i9Io4KDRaAw7+a1ZpjRwl9Wox8PFlVCCHra7E9c4kqXCoCM9nR5tBkaTTZRBoCm60bFqTQ==
 
 get-stream@^3.0.0:
   version "3.0.0"
@@ -5225,15 +5220,14 @@ humanize-ms@^1.2.0, humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-husky@^4.0.7:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/husky/-/husky-4.0.7.tgz#cee4301d1db1d731be9c2aa2ac72b46439d30c91"
-  integrity sha512-ULivTOe0k+nNjZKIojoHxXjybtEycaba0EDuk1G8iNGD8wZgo8Sr3YiN8bKitXNpI1RvVKTJwRnh2GLysLbxMQ==
+husky@^4.0.10:
+  version "4.0.10"
+  resolved "https://registry.yarnpkg.com/husky/-/husky-4.0.10.tgz#659b52c404d3163b943a73f6c1d454708c0226d8"
+  integrity sha512-Ptm4k2DqOwxeK/kzu5RaJmNRoGvESrgDXObFcZ8aJZcyXyMBHhM2FqZj6zYKdetadmP3wCwxEHCBuB9xGlRp8A==
   dependencies:
     chalk "^3.0.0"
     ci-info "^2.0.0"
     cosmiconfig "^6.0.0"
-    get-stdin "^7.0.0"
     opencollective-postinstall "^2.0.2"
     pkg-dir "^4.2.0"
     please-upgrade-node "^3.2.0"
