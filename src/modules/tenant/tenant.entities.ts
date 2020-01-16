@@ -33,7 +33,7 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
-    @MetaInfo({ accessible: 'readonly' })
+    @MetaInfo({ name: '租户' /* , accessible: 'readonly' */ })
     @ManyToOne(type => Tenant)
     @JoinColumn({ name: 'tenant__id' })
     tenant?: Tenant;

@@ -16,6 +16,7 @@ import {
   WxSendTemplateInfo,
   WxUserInfo,
 } from './wx.interfaces';
+import { r } from '../common/helpers/utils';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 
@@ -133,7 +134,7 @@ export class WxApi {
         ?grant_type=client_credential
         &appid=${opts?.appId || config.appId}
         &secret=${opts?.appSecret || config.appSecret}`,
-      ).then(response => response.json()),
+      ),
     );
 
   static code2Session = (code: string): Promise<WxCodeSession> => {
@@ -145,7 +146,7 @@ export class WxApi {
         &secret=${config.miniAppSecret}
         &js_code=${code}
         &grant_type=authorization_code`,
-      ).then(response => response.json()),
+      ),
     );
   };
 
@@ -161,7 +162,7 @@ export class WxApi {
         &openid=${openId}
         &lang=zh_CN`),
     )
-      .then(response => response.json())
+
       .then(json => new WxUserInfo(json));
 
   // 服务号发送消息
@@ -169,12 +170,12 @@ export class WxApi {
     opts: TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo,
   ): Promise<WxSendTemplateInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${accessToken}`, {
+      WxApi.wrappedFetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`, {
         method: 'post',
         body: JSON.stringify(opts),
         headers: { 'Content-Type': 'application/json' },
       }),
-    ).then(response => response.json());
+    );
 
   // 小程序订阅消息发送
   static sendSubscribeMsg = (opts: MiniSubscribeInfo): Promise<SubscribeMessageInfo> =>
@@ -187,7 +188,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json' },
         },
       ),
-    ).then(response => response.json());
+    );
 
   static createQrTicket = (opts: QrScene | QrLimitScene): Promise<WxQrTicketInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
@@ -196,7 +197,7 @@ export class WxApi {
         body: JSON.stringify(opts),
         headers: { 'Content-Type': 'application/json' },
       }),
-    ).then(response => response.json());
+    );
 
   // call in client directly
   static getQrCodeByTicket = (ticket: string): Promise<any> =>
@@ -204,7 +205,7 @@ export class WxApi {
       WxApi.wrappedFetch(oneLineTrim`https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`),
     );
 
-  static wrappedFetch(url: RequestInfo, init?: RequestInit): Promise<Response> {
+  static wrappedFetch(url: RequestInfo, init?: RequestInit): Promise<any> {
     return fetch(url, init)
       .then(WxApi.logInterceptor)
       .catch(reason => {
@@ -213,10 +214,11 @@ export class WxApi {
       });
   }
 
-  static async logInterceptor<T extends Response>(response: T): Promise<T> {
+  static async logInterceptor<T extends Response>(response: T): Promise<object> {
     const { url, status } = response;
-    logger.verbose(`call '${url}' with status ${status}`);
-    return response;
+    const json = await response.json();
+    logger.verbose(`call '${url}' with status ${status}: ${r(json)}`);
+    return json;
   }
 
   static async withConfig<T>(call: (config: WeChatServiceConfig) => Promise<T>): Promise<T> {

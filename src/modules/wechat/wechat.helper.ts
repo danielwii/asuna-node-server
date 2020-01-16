@@ -483,7 +483,18 @@ export class WeChatHelper {
     templateId: string;
     payload: TemplateData;
   }): Promise<WxSendTemplateInfo> {
-    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, data: payload });
+    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, data: payload }).then(sendInfo => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      sendInfo.errcode
+        ? logger.error(
+            `send template message to ${openId} error: ${r({
+              sendInfo,
+              opts: { touser: openId, template_id: templateId, data: payload },
+            })}`,
+          )
+        : logger.verbose(`send template message to ${openId} done: ${r(sendInfo)}`);
+      return sendInfo;
+    });
   }
 
   static async sendMiniSubscribeMsg({
@@ -495,6 +506,17 @@ export class WeChatHelper {
     subscribeId: string;
     payload: MiniSubscribeData;
   }): Promise<SubscribeMessageInfo> {
-    return WxApi.sendSubscribeMsg({ touser: openId, subscribe_id: subscribeId, data: payload });
+    return WxApi.sendSubscribeMsg({ touser: openId, subscribe_id: subscribeId, data: payload }).then(messageInfo => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      messageInfo.errCode
+        ? logger.error(
+            `send subscribe message to ${openId} error: ${r({
+              messageInfo,
+              opts: { touser: openId, subscribe_id: subscribeId, data: payload },
+            })}`,
+          )
+        : logger.verbose(`send subscribe message to ${openId} done: ${r(messageInfo)}`);
+      return messageInfo;
+    });
   }
 }

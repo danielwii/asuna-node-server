@@ -182,7 +182,7 @@ export class KvHelper {
     if (exists && merge) {
       exists.value = JSON.stringify({
         ...exists.value,
-        form: _.get(value, 'form'),
+        form: value?.form,
         // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
       logger.log(`inspect ${r(exists)}`);
