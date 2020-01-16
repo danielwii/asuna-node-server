@@ -250,43 +250,53 @@ export class GraphqlHelper {
   public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
   ): Promise<RelationEntity> {
-    if (DBHelper.getRelationPropertyNames(opts.cls).includes(opts.key as string)) {
-      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
-        loadRelationIds: { relations: [opts.key as string] },
-        cache: true,
-      })) as Entity;
-      if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
-        const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
-        return _opts.loader.load(result[_opts.key] as any);
-      }
-      const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
-      const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-      return targetRepo.findOne(result[_opts.key]);
+    const relations = DBHelper.getRelationPropertyNames(opts.cls);
+    if (!relations.includes(opts.key as string)) {
+      logger.error(`no relation ${opts.key} exists in ${opts.cls.name}. list: ${relations}`);
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
     }
-    return null;
+
+    const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
+    const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+      // loadRelationIds: { relations: [opts.key as string] },
+      loadRelationIds: true,
+      cache: true,
+    })) as Entity;
+    const id = result[opts.key] as any;
+    // logger.verbose(`resolveProperty ${r({ result, opts, id })}`);
+    if (!id) return null;
+    if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
+      const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
+      return _opts.loader.load(id);
+    }
+    const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+    const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+    return targetRepo.findOne(id);
   }
 
   public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
   ): Promise<RelationEntity[]> {
-    if (DBHelper.getRelationPropertyNames(opts.cls).includes(opts.key as string)) {
-      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
-        loadRelationIds: { relations: [opts.key as string] },
-        cache: true,
-      })) as Entity;
-      if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
-        const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
-        const ids = result[_opts.key];
-        return _opts.loader.load((ids as any) as PrimaryKeyType[]);
-      }
-      const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
-      const ids = result[_opts.key];
-      const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-      return targetRepo.findByIds(ids as any);
+    const relations = DBHelper.getRelationPropertyNames(opts.cls);
+    if (!relations.includes(opts.key as string)) {
+      logger.error(`no relation ${opts.key} exists in ${opts.cls.name}. list: ${relations}`);
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
     }
-    return null;
+
+    const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
+    const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+      loadRelationIds: { relations: [opts.key as string] },
+      cache: true,
+    })) as Entity;
+    const ids = result[opts.key] as any;
+    if (_.isEmpty(ids)) return null;
+    if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
+      const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
+      return _opts.loader.load(ids as PrimaryKeyType[]);
+    }
+    const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+    const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+    return targetRepo.findByIds(ids);
   }
 
   public static pagedResult<Entity>({

@@ -3,6 +3,7 @@ import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
 import * as cloud from 'wx-server-sdk';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 // eslint-disable-next-line import/no-cycle
 import { WeChatHelper, WeChatServiceConfig } from './wechat.helper';
@@ -16,7 +17,6 @@ import {
   WxSendTemplateInfo,
   WxUserInfo,
 } from './wx.interfaces';
-import { r } from '../common/helpers/utils';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 
@@ -116,26 +116,28 @@ type TemplateInfo = {
 type MiniSubscribeInfo = {
   // 接收者 openid
   touser: string;
-  // 模板ID
-  subscribe_id: string;
-
+  // 订阅消息模版ID
+  template_id: string;
   data: MiniSubscribeData;
 };
 
 export class WxApi {
   /**
    * https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
-   * @param opts
+   * @param opts.mini 是否是小程序
    */
-  static getAccessToken = (opts?: { appId?: string; appSecret?: string }): Promise<WxAccessToken> =>
-    WxApi.withConfig(config =>
-      WxApi.wrappedFetch(
+  static getAccessToken = (opts?: { appId?: string; appSecret?: string; mini?: boolean }): Promise<WxAccessToken> =>
+    WxApi.withConfig(config => {
+      const appId = opts?.appId || (opts.mini ? config.miniAppId : config.appId);
+      const appSecret = opts?.appSecret || (opts.mini ? config.miniAppSecret : config.appSecret);
+      logger.verbose(`getAccessToken for app: ${appId}`);
+      return WxApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/token
-        ?grant_type=client_credential
-        &appid=${opts?.appId || config.appId}
-        &secret=${opts?.appSecret || config.appSecret}`,
-      ),
-    );
+          ?grant_type=client_credential
+          &appid=${appId}
+          &secret=${appSecret}`,
+      );
+    });
 
   static code2Session = (code: string): Promise<WxCodeSession> => {
     ow(code, ow.string.nonEmpty);
@@ -161,33 +163,36 @@ export class WxApi {
         ?access_token=${accessToken}
         &openid=${openId}
         &lang=zh_CN`),
-    )
-
-      .then(json => new WxUserInfo(json));
+    ).then(json => new WxUserInfo(json));
 
   // 服务号发送消息
   static sendTemplateMsg = (
     opts: TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo,
   ): Promise<WxSendTemplateInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`, {
-        method: 'post',
-        body: JSON.stringify(opts),
-        headers: { 'Content-Type': 'application/json' },
-      }),
-    );
-
-  // 小程序订阅消息发送
-  static sendSubscribeMsg = (opts: MiniSubscribeInfo): Promise<SubscribeMessageInfo> =>
-    WxApi.withAccessToken((config, { accessToken }) =>
       WxApi.wrappedFetch(
-        oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
+        oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`,
         {
           method: 'post',
           body: JSON.stringify(opts),
           headers: { 'Content-Type': 'application/json' },
         },
       ),
+    );
+
+  // 小程序订阅消息发送
+  static sendSubscribeMsg = (opts: MiniSubscribeInfo): Promise<SubscribeMessageInfo> =>
+    WxApi.withAccessToken(
+      (config, { accessToken }) =>
+        WxApi.wrappedFetch(
+          oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
+          {
+            method: 'post',
+            body: JSON.stringify(opts),
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
+      true,
     );
 
   static createQrTicket = (opts: QrScene | QrLimitScene): Promise<WxQrTicketInfo> =>
@@ -241,11 +246,12 @@ export class WxApi {
 
   static async withAccessToken<T>(
     call: (config: WeChatServiceConfig, opts: { accessToken: string }) => Promise<T>,
+    mini?: boolean,
   ): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const config = await WeChatHelper.getServiceConfig();
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const accessToken = await WeChatHelper.getAccessToken();
+    const accessToken = await WeChatHelper.getAccessToken(mini);
     return call(config, { accessToken });
   }
 }

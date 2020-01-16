@@ -1,4 +1,4 @@
-import { AfterInsert, AfterRemove, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { AfterInsert, AfterRemove, Entity, OneToOne } from 'typeorm';
 import { EntityMetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 import { UserRegister } from '../user.register';
@@ -15,7 +15,6 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
     type => WXMiniAppUserInfo,
     info => info.profile,
   )
-  @JoinColumn({ name: 'mini_app_user_info__id' })
   miniAppUserInfo: WXMiniAppUserInfo;
 
   @AfterInsert()

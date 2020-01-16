@@ -13,8 +13,8 @@ const cacheMap = new Map();
 export type PrimaryKeyType = string | number;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
-  load(id: PrimaryKeyType): Promise<Entity>;
-  load(ids: PrimaryKeyType[]): Promise<Entity[]>;
+  load(id?: PrimaryKeyType): Promise<Entity>;
+  load(ids?: PrimaryKeyType[]): Promise<Entity[]>;
 }
 
 function resolve(ids: PrimaryKeyType[]) {
@@ -23,7 +23,7 @@ function resolve(ids: PrimaryKeyType[]) {
 
 function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKeyType, Entity>): DataLoaderFunction<Entity> {
   return {
-    load(ids: PrimaryKeyType | PrimaryKeyType[]) {
+    load(ids?: PrimaryKeyType | PrimaryKeyType[]) {
       if (_.isArray(ids)) {
         return !_.isEmpty(ids) ? (dataloader.loadMany(ids as PrimaryKeyType[]).then(fp.compact) as any) : null;
       }

@@ -1,4 +1,5 @@
 type UserProfile {
+  id: String
   email: String
   username: String
   portrait: String

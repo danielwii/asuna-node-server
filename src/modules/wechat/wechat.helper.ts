@@ -427,29 +427,34 @@ export class WeChatHelper {
     );
   }
 
-  static async getAccessToken(): Promise<string> {
+  static async getAccessToken(mini?: boolean): Promise<string> {
+    const key = mini ? `${WxKeys.accessToken}#mini` : WxKeys.accessToken;
     const redis = RedisProvider.instance.getRedisClient('wx');
     // redis 未启用时将 token 保存到内存中，2h 后过期
     if (!redis.isEnabled) {
       return CacheManager.cacheable(
-        WxKeys.accessToken,
+        key,
         async () => {
-          logger.warn(`redis is not enabled, access token will store in memory and lost when app restarted.`);
-          return (await WxApi.getAccessToken()).access_token;
+          logger.warn(
+            `redis is not enabled, ${
+              mini ? 'mini' : ''
+            } access token will store in memory and lost when app restarted.`,
+          );
+          return (await WxApi.getAccessToken({ mini })).access_token;
         },
         2 * 3600,
       );
     }
 
     // redis 存在未过期的 token 时直接返回
-    const accessToken = await Promise.promisify(redis.client.get).bind(redis.client)(WxKeys.accessToken);
+    const accessToken = await Promise.promisify(redis.client.get).bind(redis.client)(key);
     if (accessToken) return accessToken;
 
     const token = await RedisLockProvider.instance.lockProcess(
-      WxKeys.accessToken,
+      key,
       async () => {
-        const result = await WxApi.getAccessToken();
-        logger.verbose(`getAccessToken ${r(result)}`);
+        const result = await WxApi.getAccessToken({ mini });
+        logger.verbose(`getAccessToken for ${mini ? 'mini' : ''}: ${r(result)}`);
         if (result.access_token) {
           // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
           await Promise.promisify(redis.client.setex).bind(redis.client)(
@@ -506,9 +511,9 @@ export class WeChatHelper {
     subscribeId: string;
     payload: MiniSubscribeData;
   }): Promise<SubscribeMessageInfo> {
-    return WxApi.sendSubscribeMsg({ touser: openId, subscribe_id: subscribeId, data: payload }).then(messageInfo => {
+    return WxApi.sendSubscribeMsg({ touser: openId, template_id: subscribeId, data: payload }).then(messageInfo => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      messageInfo.errCode
+      messageInfo.errcode
         ? logger.error(
             `send subscribe message to ${openId} error: ${r({
               messageInfo,
