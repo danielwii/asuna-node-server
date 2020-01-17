@@ -45,7 +45,7 @@
     "@types/redis": "^2.8.14",
     "@types/redlock": "^4.0.1",
     "@types/response-time": "^2.3.4",
-    "@types/sharp": "^0.23.1",
+    "@types/sharp": "^0.24.0",
     "@types/shortid": "^0.0.29",
     "@types/socket.io": "^2.1.4",
     "@types/supertest": "^2.0.8",
