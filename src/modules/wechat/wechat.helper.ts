@@ -454,7 +454,7 @@ export class WeChatHelper {
       key,
       async () => {
         const result = await WxApi.getAccessToken({ mini });
-        logger.verbose(`getAccessToken for ${mini ? 'mini' : ''}: ${r(result)}`);
+        logger.verbose(`getAccessToken with key(${key}): ${r(result)}`);
         if (result.access_token) {
           // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
           await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
