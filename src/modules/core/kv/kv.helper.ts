@@ -13,6 +13,7 @@ import {
   ValidationException,
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
+import { EnumValueStatic } from '../../enum-values';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValuePair, ValueType } from './kv.entities';
@@ -138,6 +139,15 @@ export class KvHelper {
     const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
     const merged = { ...pair.value, ...value };
     logger.log(`merge constants ${r({ key, constantMap, pair, merged })}`);
+    pair.value = merged;
+    return this.set(pair);
+  }
+
+  static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
+    const value = { [enumValue.key]: enumValue.data };
+    const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    const merged = { ...pair.value, ...value };
+    logger.log(`merge constants ${r({ enumValue, pair, merged })}`);
     pair.value = merged;
     return this.set(pair);
   }

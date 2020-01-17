@@ -2,7 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
-import { CommandController, GetUploadsModule, UserController } from './core';
+import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { DBModule } from './core/db';
@@ -10,6 +10,7 @@ import { FinderModule } from './core/finder';
 import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
+import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import {
@@ -58,7 +59,12 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   exports: [AuthModule, KvModule, DBModule, TokenModule],
 })
 export class AdminInternalModule implements OnModuleInit {
-  onModuleInit(): void {
+  async onModuleInit(): Promise<void> {
     logger.log('init...');
+    this.initConstants();
+  }
+
+  async initConstants(): Promise<void> {
+    await KvHelper.mergeConstantMapsForEnumValue(SexEnumValue);
   }
 }

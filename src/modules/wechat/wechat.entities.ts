@@ -13,9 +13,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { EntityConstructorObject } from '../base/base.entity';
-import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, IdentifierHelper, JsonArray, MetaInfo, StaticImplements } from '../common';
 import { deserializeSafely } from '../common/helpers/validate';
-import { IdentifierHelper, StaticImplements } from '../common/identifier';
 import { AdminUser } from '../core/auth/auth.entities';
 import { UserProfile } from '../core/auth/user.entities';
 import { jsonType } from '../core/helpers/column.helper';

@@ -1,8 +1,4 @@
-import { IdentifierHelper, PrimaryKey } from '../../common';
-
-function StaticImplements<T>() {
-  return (constructor: T) => {};
-}
+import { IdentifierHelper, PrimaryKey, StaticImplements } from '../../common';
 
 @StaticImplements<IdentifierHelper<Partial<{ id: PrimaryKey }>>>()
 export class AdminUserIdentifierHelper {

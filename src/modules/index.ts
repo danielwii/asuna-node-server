@@ -21,3 +21,4 @@ export * from './sort';
 export * from './health/terminus-options.service';
 export * from './wechat';
 export * from './ws';
+export * from './enum-values';
