@@ -38,6 +38,7 @@ input QueryCondition {
 
 input AdminQueryCondition {
   ids: [Any!]
+  where: JSON
 }
 
 input CommonCondition {

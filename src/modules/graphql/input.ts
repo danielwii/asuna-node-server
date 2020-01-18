@@ -42,6 +42,8 @@ export class QueryConditionInput {
 export class AdminQueryConditionInput {
   @IsOptional()
   ids?: string[] | number[];
+  @IsOptional()
+  where?: object;
 }
 
 export class CommonConditionInput {
