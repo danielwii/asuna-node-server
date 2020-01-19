@@ -120,6 +120,31 @@ type MiniSubscribeInfo = {
   data: MiniSubscribeData;
 };
 
+type CreateQRCode = {
+  // 扫码进入的小程序页面路径，最大长度 128 字节，不能为空；
+  // 对于小游戏，可以只传入 query 部分，来实现传参效果，
+  // 如：传入 "?foo=bar"，即可在 wx.getLaunchOptionsSync 接口中的 query 参数获取到 {foo:"bar"}。
+  path: string;
+  // default: 430. 二维码的宽度，单位 px。最小 280px，最大 1280px
+  width?: number;
+};
+
+type GetMiniCode = {
+  // 是	扫码进入的小程序页面路径，最大长度 128 字节，不能为空；
+  // 对于小游戏，可以只传入 query 部分，来实现传参效果，
+  // 如：传入 "?foo=bar"，即可在 wx.getLaunchOptionsSync 接口中的 query 参数获取到 {foo:"bar"}。
+  path: string;
+  // 430	否	二维码的宽度，单位 px。最小 280px，最大 1280px
+  width?: number;
+  // false	否	自动配置线条颜色，如果颜色依然是黑色，则说明不建议配置主色调
+  auto_color?: boolean;
+  // {"r":0,"g":0,"b":0}	否	auto_color 为 false 时生效，
+  // 使用 rgb 设置颜色 例如 {"r":"xxx","g":"xxx","b":"xxx"} 十进制表示
+  line_color?: object;
+  // false	否	是否需要透明底色，为 true 时，生成透明底色的小程序码
+  is_hyaline?: boolean;
+};
+
 export class WxApi {
   /**
    * https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
@@ -203,6 +228,36 @@ export class WxApi {
       }),
     );
 
+  /**
+   * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.createQRCode.html
+   * @param opts
+   */
+  static createQRCode = (opts: CreateQRCode): Promise<Buffer> =>
+    WxApi.withAccessToken(
+      (config, { accessToken }) =>
+        fetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=${accessToken}`, {
+          method: 'post',
+          body: JSON.stringify(opts),
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      true,
+    ).then(value => value.buffer());
+
+  /**
+   * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.get.html#HTTPS%20%E8%B0%83%E7%94%A8
+   * @param opts
+   */
+  static getMiniCode = (opts: GetMiniCode): Promise<Buffer> =>
+    WxApi.withAccessToken(
+      (config, { accessToken }) =>
+        fetch(oneLineTrim`https://api.weixin.qq.com/wxa/getwxacode?access_token=${accessToken}`, {
+          method: 'post',
+          body: JSON.stringify(opts),
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      true,
+    ).then(value => value.buffer());
+
   // call in client directly
   static getQrCodeByTicket = (ticket: string): Promise<any> =>
     WxApi.withAccessToken((config, opts) =>
@@ -213,7 +268,7 @@ export class WxApi {
     return fetch(url, init)
       .then(WxApi.logInterceptor)
       .catch(reason => {
-        logger.error(`fetch ${url} error: ${reason}`);
+        logger.error(`fetch ${url} with opts ${r(init)} error: ${reason}`);
         return reason;
       });
   }
@@ -221,7 +276,11 @@ export class WxApi {
   static async logInterceptor<T extends Response>(response: T): Promise<object> {
     const { url, status } = response;
     const json = await response.json();
-    logger.verbose(`call '${url}' with status ${status}: ${r(json)}`);
+    if (json.errcode) {
+      logger.error(`[${status}] call '${url}' error: ${r(json)}`);
+    } else {
+      logger.verbose(`[${status}] call '${url}': ${r(json)}`);
+    }
     return json;
   }
 

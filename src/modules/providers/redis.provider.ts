@@ -27,7 +27,7 @@ export class RedisProvider {
 
   getRedisClient(prefix = '', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
-    if (this.clients && this.clients[key]) {
+    if (this.clients && this.clients[key] && this.clients[key].isHealthy) {
       return this.clients[key];
     }
 
@@ -74,15 +74,19 @@ export class RedisProvider {
 
     process.on('beforeExit', () => {
       client.quit((err: Error, res: string) => {
+        redisClientObject.isHealthy = false;
         logger.log(`beforeExit. Redis default connection disconnected ${r({ err, res })}`);
       });
     });
 
+/*
     process.on('removeListener', () => {
       client.quit((err: Error, res: string) => {
+        redisClientObject.isHealthy = false;
         logger.log(`removeListener. Redis default connection disconnected ${r({ err, res })}`);
       });
     });
+*/
 
     this.clients = { ...this.clients, [key]: redisClientObject };
     return redisClientObject;

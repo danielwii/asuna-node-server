@@ -38,6 +38,9 @@ export interface BootstrapOptions {
   // root?: string;
   // package folder
   // dirname?: string;
+  staticAssets?: string;
+  viewsDir?: string;
+  // viewEngine?: string;
   typeormEntities?: string[];
   version?: string;
   /**
@@ -141,6 +144,16 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter').RedisIoAdapter)(app));
   } else if (options.redisMode === 'ws') {
     app.useWebSocketAdapter(new (require('@nestjs/platform-ws').WsAdapter)(app));
+  }
+
+  if (options.staticAssets) {
+    logger.log(`set static assets path to ${options.staticAssets}`);
+    app.useStaticAssets(options.staticAssets);
+  }
+
+  if (options.viewsDir) {
+    app.setBaseViewsDir(options.viewsDir);
+    app.setViewEngine('hbs');
   }
 
   // app.use(csurf());

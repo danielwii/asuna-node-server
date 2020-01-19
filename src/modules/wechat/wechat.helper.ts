@@ -482,7 +482,7 @@ export class WeChatHelper {
       },
       { ttl: 60_000 },
     );
-    logger.log(`access token is ${r(token)}`);
+    logger.verbose(`access token is ${r(token)}`);
     if (!token) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');
     }

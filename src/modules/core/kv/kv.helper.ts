@@ -138,7 +138,7 @@ export class KvHelper {
     const value = { [key]: constantMap };
     const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
     const merged = { ...pair.value, ...value };
-    logger.log(`merge constants ${r({ key, constantMap, pair, merged })}`);
+    logger.log(`merge constants ${r(merged)}`);
     pair.value = merged;
     return this.set(pair);
   }
@@ -147,7 +147,7 @@ export class KvHelper {
     const value = { [enumValue.key]: enumValue.data };
     const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
     const merged = { ...pair.value, ...value };
-    logger.log(`merge constants ${r({ enumValue, pair, merged })}`);
+    logger.log(`merge constants ${r({ enumValue, merged })}`);
     pair.value = merged;
     return this.set(pair);
   }
@@ -176,7 +176,7 @@ export class KvHelper {
     const { name, type, value } = pair;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
-    logger.log(`recognize ${r({ type, newType, value, stringifyValue })}`);
+    logger.debug(`recognize ${r({ type, newType, value, stringifyValue })}`);
 
     const entity = {
       key,
@@ -195,11 +195,11 @@ export class KvHelper {
         form: _.get(value, 'form'),
         // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
-      logger.log(`inspect ${r(exists)}`);
+      logger.verbose(`inspect ${r(exists)}`);
       return exists.save();
     }
 
-    logger.log(`set ${r({ entity, exists })}`);
+    logger.verbose(`set ${r(entity)}`);
     return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any);
   }
 
