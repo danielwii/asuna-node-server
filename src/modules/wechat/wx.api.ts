@@ -109,7 +109,6 @@ type TemplateInfo = {
   touser: string;
   // 模板ID
   template_id: string;
-  // 跳转小程序
   data: TemplateData;
 };
 

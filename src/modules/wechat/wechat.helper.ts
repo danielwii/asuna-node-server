@@ -3,6 +3,7 @@ import { classToPlain } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as crypto from 'crypto';
 import { Request } from 'express';
+import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as rawBody from 'raw-body';
@@ -169,6 +170,7 @@ export class NoticeConfig {
   // Server收到活动报名通知
   @IsBoolean() @IsOptional() registrationEnabled?: boolean;
   @IsString() @IsOptional() registrationTemplateId?: string;
+  @IsOptional() registrationTemplateData?: object;
 
   // 企业审核
   // @IsBoolean() @IsOptional() companyAuditEnabled?: boolean;
@@ -287,6 +289,22 @@ export class WeChatHelper {
     }
     Hermes.emit('WeChatHelper', 'wx', message);
     return 'success';
+  }
+
+  static parseTemplateData(data: object, context: object): TemplateData {
+    const tmplData = _.assign(
+      {},
+      ..._.chain(data)
+        .toPairs()
+        .groupBy(([key]) => key.split('-')[0])
+        .map(value => {
+          const values = _.assign({}, ...value.map(([k, v]) => ({ [k.split('-')[1]]: v })));
+          return { [values.key]: _.omit(values, 'key') };
+        })
+        .value(),
+    );
+    logger.verbose(`tmplData is ${r(tmplData)}`);
+    return _.mapValues(tmplData, tmpl => _.mapValues(tmpl, value => Handlebars.compile(value)(context))) as any;
   }
 
   static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {

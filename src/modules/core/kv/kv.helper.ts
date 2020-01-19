@@ -40,7 +40,7 @@ const toJson = (value): JSON => {
 
 export type KVField = {
   name: string;
-  type: 'number' | 'string' | 'boolean';
+  type: 'number' | 'string' | 'wx-tmpl-data' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
@@ -155,8 +155,8 @@ export class KvHelper {
   /**
    * @param pair noValueOnly 仅在值为空时或不存在时设置
    */
-  static async set(
-    pair: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: any; extra?: any },
+  static async set<V = any>(
+    pair: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: V; extra?: any },
     {
       merge,
       noUpdate,
@@ -192,7 +192,7 @@ export class KvHelper {
     if (exists && merge) {
       exists.value = JSON.stringify({
         ...exists.value,
-        form: value?.form,
+        form: _.get(value, 'form'),
         // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
       logger.log(`inspect ${r(exists)}`);
