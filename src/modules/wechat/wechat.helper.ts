@@ -166,41 +166,6 @@ export class WeChatServiceConfig {
     Object.assign(this, deserializeSafely(WeChatServiceConfig, o));
   }
 }
-export class NoticeConfig {
-  // Server收到活动报名通知
-  @IsBoolean() @IsOptional() registrationEnabled?: boolean;
-  @IsString() @IsOptional() registrationTemplateId?: string;
-  @IsOptional() registrationTemplateData?: object;
-
-  // 企业审核
-  // @IsBoolean() @IsOptional() companyAuditEnabled?: boolean;
-  // @IsString() @IsOptional() companyAuditTemplateId?: string;
-
-  @IsBoolean() @IsOptional() jobApplicationEnabled?: boolean;
-  @IsString() @IsOptional() jobApplicationTemplateId?: string;
-  //
-  // @IsBoolean() @IsOptional() newResumeEnabled?: boolean;
-  // @IsString() @IsOptional() newResumeTemplateId?: string;
-
-  // 关注未读消息通知
-  @IsBoolean() @IsOptional() unReadMsgEnabled?: boolean;
-  @IsString() @IsOptional() unReadMsgSubscribeId?: string;
-
-  // 简历审核通知
-  @IsBoolean() @IsOptional() resumeAuditEnabled?: boolean;
-  @IsString() @IsOptional() resumeAuditSubscribeId?: string;
-
-  // 报名确认结果通知
-  @IsBoolean() @IsOptional() registrationAuditEnabled?: boolean;
-  @IsString() @IsOptional() registrationAuditSubscribeId?: string;
-
-  // @IsBoolean() @IsOptional()activityMsgEnabled?:boolean;
-  // @IsString() @IsOptional()activityMsgSubscribeId?:string;
-
-  constructor(o: NoticeConfig) {
-    Object.assign(this, deserializeSafely(NoticeConfig, o));
-  }
-}
 
 export enum WeChatFieldKeys {
   login = 'wechat.login',
