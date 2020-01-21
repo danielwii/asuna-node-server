@@ -20,6 +20,8 @@ export const ConfigKeys = {
 
   GRAPHQL_PLAYGROUND_ENABLE: 'GRAPHQL_PLAYGROUND_ENABLE',
 
+  CHROMIUM_PATH: 'CHROMIUM_PATH',
+
   /**
    * 用与访问上传文件的资源地址
    */
