@@ -29,15 +29,15 @@ export class PasswordHelper {
 
 export class TokenHelper {
   static async createToken(
-    user: UserProfile,
+    user: AuthUser,
     transformUid?: boolean,
   ): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
-      id: user.id,
-      uid: transformUid ? +user.id.slice(1) : user.id,
+      id: user.id as string,
+      uid: transformUid ? +(user.id as string).slice(1) : user.id,
       username: user.username,
       email: user.email,
       channel: user.channel,

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
 
-import { AdminAuthService, AdminInternalModule, TokenHelper } from "../src/modules";
+import { AdminAuthService, AdminInternalModule, TokenHelper } from '../src/modules';
 import { TaskEvent, TaskRecord } from '../src/modules/task';
 
 describe('AppRestController (e2e)', () => {
