@@ -10,6 +10,7 @@ import { DBHelper } from '../db';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AdminUser } from './auth.entities';
 import { AbstractAuthUser, AbstractTimeBasedAuthUser, AuthUser } from './base.entities';
+import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AuthService');
 
@@ -20,6 +21,14 @@ export const HermesAuthEventKeys = {
 
 @Injectable()
 export class AuthService extends AbstractAuthService<AuthUser> {
+  /**
+   * 这里会根据继承 AbstractAuthUser / AbstractTimeBasedAuthUser 的实体来注册用户
+   * 目前服务端新建了 UserProfile 来接管用户认证，将业务与认证分离。
+   * 所以自定义的用户注册对象在这里无法被查询器查询到并注册。
+   *
+   * TODO 1 - 历史 User 对象的认证数据需要迁移到 UserProfile 中
+   * @param connection
+   */
   constructor(@InjectConnection() private readonly connection: Connection) {
     super(
       ((): Repository<AdminUser> => {
@@ -41,11 +50,7 @@ export class AuthService extends AbstractAuthService<AuthUser> {
     );
   }
 
-  async createUser<U extends AuthUser>(
-    username: string,
-    email: string,
-    password: string,
-  ): Promise<U> {
+  async createUser(username: string, email: string, password: string): Promise<UserProfile> {
     const { hash, salt } = PasswordHelper.encrypt(password);
 
     const user = await this.getUser({ email, username });

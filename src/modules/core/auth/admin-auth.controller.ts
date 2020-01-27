@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AccessControl } from 'accesscontrol';
+import * as _ from 'lodash';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
 import {
@@ -17,7 +18,7 @@ import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';
 import { AdminAuthService } from './admin-auth.service';
-import { ResetPasswordDto, SignDto } from './auth.dto';
+import { SignDto } from './auth.dto';
 import { AdminUser } from './auth.entities';
 import { AdminUserIdentifierHelper } from './identifier';
 
@@ -62,8 +63,10 @@ export class AdminAuthController extends RestCrudController {
   // FIXME type ResetPasswordDto not recognise email
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto): Promise<UpdateResult> {
-    logger.log(`reset password: ${r(resetPasswordDto)}`);
-    const user = await this.adminAuthService.getUser({ email: resetPasswordDto.email }, true);
+    // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
+    const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
+    logger.log(`reset password: ${r({ resetPasswordDto, data })}`);
+    const user = await this.adminAuthService.getUser(data, true);
 
     if (!user) {
       throw new SignException('account not exists or active');

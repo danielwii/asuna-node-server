@@ -10,3 +10,4 @@ export * from './auth.service';
 export * from './auth.interfaces';
 export * from './identifier';
 export * from './user.entities';
+export * from './user.helper';

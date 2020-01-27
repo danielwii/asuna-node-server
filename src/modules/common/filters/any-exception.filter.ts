@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
+
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
 import { r } from '../helpers';
 import { LoggerFactory } from '../logger';
@@ -76,7 +77,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
     } else if (R.is(EntityNotFoundError, exception)) {
       processed.status = HttpStatus.NOT_FOUND;
     } else if (exception.name === 'ArgumentError') {
-      processed.status = HttpStatus.BAD_REQUEST;
+      processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
+      logger.warn(`[ArgumentError] found ${r(processed)}, need to convert to 400 error body`);
     } else if (processed.code) {
       if (processed.code === 'ERR_ASSERTION') {
         // TODO wrap with AsunaException

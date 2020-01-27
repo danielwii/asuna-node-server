@@ -27,7 +27,7 @@ export class GqlAdminAuthGuard implements CanActivate {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    logger.debug(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     const result = await auth(req, res, 'admin');
 
     if (!result.payload) {
@@ -96,7 +96,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    logger.debug(`request info: ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     return req;
   }
 

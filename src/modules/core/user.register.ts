@@ -1,4 +1,4 @@
-import { BaseEntity, DeleteResult } from 'typeorm';
+import { BaseEntity } from 'typeorm';
 import { Constructor } from '../base';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -17,6 +17,8 @@ export class UserRegister {
     onProfileCreate?: (profile: UserProfile) => any,
     onProfileDelete?: (profile: UserProfile) => any,
   ): void {
+    logger.log(`reg user for profile create: ${Entity.name}`);
+
     this.Entity = Entity;
     this.onProfileCreate =
       onProfileCreate ||
@@ -28,19 +30,21 @@ export class UserRegister {
     this.onProfileDelete = onProfileDelete || (profile => DBHelper.repo(Entity).delete(profile.id));
   }
 
-  static createUserByProfile(profile: UserProfile): Promise<any> {
+  static createUserByProfile(profile: UserProfile): void {
+    logger.log(`create user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileCreate) {
-      logger.warn(`no core user registered for created.`);
+      console.warn(`no core user registered for created.`);
+    } else {
+      this.onProfileCreate(profile);
     }
-
-    return this.onProfileCreate(profile);
   }
 
-  static removeUserByProfile(profile: UserProfile): Promise<DeleteResult> {
+  static removeUserByProfile(profile: UserProfile): void {
+    logger.log(`remove user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileDelete) {
       logger.warn(`no core user registered for removed.`);
+    } else {
+      this.onProfileDelete(profile);
     }
-
-    return this.onProfileDelete(profile);
   }
 }
