@@ -34,7 +34,7 @@ export class TenantModule implements OnModuleInit {
     await this.initAC();
   }
 
-  private async initKV(): Promise<void> {
+  async initKV(): Promise<void> {
     const entities = _.filter(
       await DBHelper.getModelsHasRelation(Tenant),
       entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
@@ -42,7 +42,7 @@ export class TenantModule implements OnModuleInit {
 
     const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set(
+      KvHelper.set<KVGroupFieldsValue>(
         {
           ...TenantHelper.kvDef,
           name: 'Tenant 配置',
@@ -100,7 +100,7 @@ export class TenantModule implements OnModuleInit {
               },
             },
             values: {},
-          } as KVGroupFieldsValue,
+          },
         },
         { merge: true },
       );

@@ -25,7 +25,7 @@ export class FinderModule implements OnModuleInit {
 
     const identifier = KvDefIdentifierHelper.stringify(FinderHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set(
+      KvHelper.set<KVGroupFieldsValue>(
         {
           ...FinderHelper.kvDef,
           name: '资源位置配置',
@@ -52,7 +52,7 @@ export class FinderModule implements OnModuleInit {
               },
             },
             values: {},
-          } as KVGroupFieldsValue,
+          },
         },
         { merge: true },
       );

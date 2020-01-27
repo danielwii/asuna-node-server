@@ -1,8 +1,6 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable max-classes-per-file */
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { AbstractBaseEntity } from '../../base';
 import { jsonType } from '../helpers';
 
 export const ValueType = {
@@ -50,7 +48,7 @@ export class KeyValuePair extends AbstractBaseEntity {
 
 @EntityMetaInfo({ name: 'kv__models' })
 @Entity('kv__t_models')
-export class KeyValueModel extends AbstractBaseEntity {
+export class KeyValueModel extends Publishable(AbstractNameEntity) {
   @OneToOne(
     type => KeyValuePair,
     pair => pair.model,

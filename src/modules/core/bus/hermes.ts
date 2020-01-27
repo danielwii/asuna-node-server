@@ -1,11 +1,11 @@
-import * as assert from 'assert';
 import { Job, Queue, QueueOptions } from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
+import ow from 'ow';
 import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
-import { isBlank, r } from '../../common';
+import { r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { RedisConfigObject } from '../../providers';
@@ -337,7 +337,7 @@ export class Hermes {
   }
 
   static regInMemoryQueue(queueName: string): InMemoryAsunaQueue {
-    assert(!isBlank(queueName), 'queue name must be defined');
+    ow(queueName, 'queueName', ow.string.nonEmpty);
 
     if (this.inMemoryQueues[queueName]) {
       return this.inMemoryQueues[name];
@@ -443,7 +443,7 @@ export class Hermes {
   }
 
   static regQueue(queueName: string, opts?: QueueOptions): AsunaQueue {
-    assert(!isBlank(queueName), 'queue name must be defined');
+    ow(queueName, 'queueName', ow.string.nonEmpty);
 
     if (this.queues[queueName]) {
       return this.queues[name];
@@ -470,7 +470,7 @@ export class Hermes {
    * @param handle
    */
   static setupJobProcessor(queueName: string, handle: (payload: any) => Promise<any>): void {
-    assert(!isBlank(queueName), 'queue name must not be empty');
+    ow(queueName, 'queueName', ow.string.nonEmpty);
 
     let queue;
     queue = queueName.startsWith('IN_MEMORY_') ? this.getInMemoryQueue(queueName) : this.getQueue(queueName);

@@ -8,7 +8,7 @@ import { UserProfile } from './user.entities';
 
 export class AuthedUserHelper {
   static getProfileById(id: string | number): Promise<UserProfile> {
-    console.log(`AuthedUserHelper.getProfileById ${id}`);
+    // console.log(`AuthedUserHelper.getProfileById ${id}`);
     if (typeof id === 'number') {
       ow(id, 'id', ow.number.integer);
       return UserProfile.findOneOrFail(`u${id}`);

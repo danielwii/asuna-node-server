@@ -5,13 +5,13 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import * as compression from 'compression';
-import * as rateLimit from 'express-rate-limit';
-import * as helmet from 'helmet';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import * as _ from 'lodash';
-import * as morgan from 'morgan';
+import morgan from 'morgan';
 import { dirname, resolve } from 'path';
-import * as responseTime from 'response-time';
+import responseTime from 'response-time';
 import { Connection } from 'typeorm';
 import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
@@ -96,7 +96,10 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
       }
     }),
   );
-  await connection.query('SET FOREIGN_KEY_CHECKS=0');
+
+  if (Global.dbType !== 'sqlite') {
+    await connection.query('SET FOREIGN_KEY_CHECKS=0');
+  }
 
   logger.log(`synchronize ...`);
   await connection.synchronize();
@@ -106,7 +109,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   await runCustomMigrations();
   logger.log(`run custom migrations ... done`);
 
-  await connection.query('SET FOREIGN_KEY_CHECKS=1');
+  if (Global.dbType !== 'sqlite') {
+    await connection.query('SET FOREIGN_KEY_CHECKS=1');
+  }
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
   logger.log(`pending migrations: ${await connection.showMigrations()}`);

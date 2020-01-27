@@ -26,7 +26,7 @@ export class WeChatModule implements OnModuleInit {
   async initKV(): Promise<void> {
     const identifier = KvDefIdentifierHelper.stringify(WeChatHelper.kvDef);
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set(
+      KvHelper.set<KVGroupFieldsValue>(
         {
           ...WeChatHelper.kvDef,
           name: '微信配置',
@@ -62,7 +62,7 @@ export class WeChatModule implements OnModuleInit {
               },
             },
             values: {},
-          } as KVGroupFieldsValue,
+          },
         },
         { merge: true },
       );

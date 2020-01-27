@@ -102,6 +102,7 @@ export const AsunaCollections = {
   SYSTEM_MIGRATIONS: 'system.migrations',
   SYSTEM_SERVER: 'system.server',
   SYSTEM_WECHAT: 'system.wechat',
+  SYSTEM_DYNAMIC_ROUTER: 'system.dynamic-router',
   SYSTEM_TENANT: 'system.tenant',
   APP_SETTINGS: 'app.settings',
 };
