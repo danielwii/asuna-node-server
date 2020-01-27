@@ -2,6 +2,7 @@ import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Secret, SignOptions } from 'jsonwebtoken';
+import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { PrimaryKey } from '../../common';
@@ -10,6 +11,7 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { JwtPayload } from './auth.interfaces';
 import { AuthUser } from './base.entities';
+import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -27,7 +29,7 @@ export class PasswordHelper {
 
 export class TokenHelper {
   static async createToken(
-    user: AuthUser,
+    user: UserProfile,
     transformUid?: boolean,
   ): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${r(user)}`);
