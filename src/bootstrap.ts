@@ -5,14 +5,15 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import compression from 'compression';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
+import * as compression from 'compression';
+import * as rateLimit from 'express-rate-limit';
+import * as helmet from 'helmet';
 import * as _ from 'lodash';
-import morgan from 'morgan';
+import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
-import responseTime from 'response-time';
+import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
+import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
@@ -185,10 +186,12 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const port = configLoader.loadNumericConfig(ConfigKeys.PORT, 5000);
 
+  await AppLifecycle.beforeBootstrap(app);
   logger.log('bootstrap app ...');
-  return app.listenAsync(port).then(opts => {
+  return app.listenAsync(port).then(async () => {
     logger.log(`started in ${Date.now() - startAt}ms, listening on ${port}`);
 
+    await AppLifecycle.appStarted();
     return app;
   });
 }

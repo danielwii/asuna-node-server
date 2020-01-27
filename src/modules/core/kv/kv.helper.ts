@@ -46,6 +46,12 @@ export type KVField = {
   defaultValue?: boolean | number | string;
 };
 
+export interface KVFieldsList<V> {
+  type: string;
+  fields: { name?: string; field: KVField }[];
+  values: V[];
+}
+
 export interface KVFields {
   [key: string]: {
     name: string;
@@ -132,25 +138,56 @@ export class KvHelper {
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
   static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
 
+  private static constantMapsPair: KeyValuePair;
+  private static enumValueConstantMapsPair: KeyValuePair;
+
+  /**
+   * call syncMergedConstants to sync constants
+   * @param key
+   * @param constantMap
+   */
   static async mergeConstantMaps(
     key: 'PointExchange' | 'FinancialTransaction' | 'InteractionType' | 'WXMessageIds' | string,
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };
-    const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    const merged = { ...pair.value, ...value };
-    logger.log(`merge constants ${r(merged)}`);
-    pair.value = merged;
-    return this.set(pair);
+    if (!this.constantMapsPair) {
+      this.constantMapsPair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    }
+    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    this.constantMapsPair.value = { ...this.constantMapsPair.value, ...value };
+    // return this.set(pair);
+    return this.constantMapsPair;
   }
 
+  /**
+   * call syncMergedConstants to sync constants
+   * @param enumValue
+   */
   static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
     const value = { [enumValue.key]: enumValue.data };
-    const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    const merged = { ...pair.value, ...value };
-    logger.log(`merge constants ${r({ enumValue, merged })}`);
-    pair.value = merged;
-    return this.set(pair);
+    if (!this.enumValueConstantMapsPair) {
+      this.enumValueConstantMapsPair = await this.get(this.constantKvDef, {
+        name: '关键词中文映射表',
+        value,
+        type: 'json',
+      });
+    }
+    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    this.enumValueConstantMapsPair.value = { ...this.enumValueConstantMapsPair.value, ...value };
+    // return this.set(pair);
+    return this.enumValueConstantMapsPair;
+  }
+
+  static async syncMergedConstants(): Promise<void> {
+    logger.log(`merge constants ${r(this.constantMapsPair)}`);
+    if (this.constantMapsPair) {
+      await this.set(this.constantMapsPair);
+    }
+    logger.log(`merge enum constants ${r(this.enumValueConstantMapsPair)}`);
+    if (this.enumValueConstantMapsPair) {
+      await this.set(this.enumValueConstantMapsPair);
+    }
   }
 
   /**
@@ -193,7 +230,8 @@ export class KvHelper {
     if (exists && merge) {
       exists.value = JSON.stringify({
         ...exists.value,
-        form: _.get(value, 'form'),
+        ..._.omit(value as any, 'values'),
+        // form: _.get(value, 'form'),
         // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
       logger.verbose(`inspect ${r(exists)}`);

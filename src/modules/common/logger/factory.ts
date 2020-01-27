@@ -1,7 +1,7 @@
-import { Logger } from '@nestjs/common';
-import * as _ from 'lodash';
-import * as fp from 'lodash/fp';
-import { dirname, join } from 'path';
+import { Logger } from "@nestjs/common";
+import * as _ from "lodash";
+import * as fp from "lodash/fp";
+import { dirname, join } from "path";
 
 const root = dirname(process.mainModule.filename);
 const { packageDir } = global;

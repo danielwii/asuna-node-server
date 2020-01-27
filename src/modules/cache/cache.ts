@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import LRU from 'lru-cache';
+import * as LRU from 'lru-cache';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 
