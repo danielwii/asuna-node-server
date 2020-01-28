@@ -36,7 +36,7 @@ export class DynamicRouterModule implements NestModule, OnModuleInit {
             fields: [
               { name: '路径', field: { name: DynamicRouterFieldKeys.path, type: 'string' } },
               { name: '文本', field: { name: DynamicRouterFieldKeys.text, type: 'string' } },
-              { name: '说明', field: { name: DynamicRouterFieldKeys.text, type: 'string' } },
+              { name: '说明', field: { name: DynamicRouterFieldKeys.description, type: 'string' } },
             ],
             values: [],
           },
