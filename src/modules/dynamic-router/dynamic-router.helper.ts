@@ -6,6 +6,7 @@ import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
 export enum DynamicRouterFieldKeys {
   path = 'path',
   text = 'text',
+  description = 'description',
 }
 
 export class DynamicRouterConfig {
