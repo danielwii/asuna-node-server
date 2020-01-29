@@ -28,8 +28,8 @@ export class Pageable<T> {
   items: T[];
 }
 
-export class CursorPageable<T> {
-  totalCount: number;
+export class CursoredPageable<T> {
+  total: number;
 
   pageInfo: CursorPageInfo;
 

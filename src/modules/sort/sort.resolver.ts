@@ -1,6 +1,7 @@
 import { Args, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
 import * as util from 'util';
 import { LoggerFactory } from '../common/logger';
+import { UnionTypeResolver } from '../graphql';
 import { SortService } from './sort.service';
 
 const logger = LoggerFactory.getLogger('SortResolver');
@@ -32,9 +33,4 @@ export class SortResolver {
 }
 
 @Resolver('ResultItem')
-export class ResultItemResolver {
-  @ResolveProperty('__resolveType')
-  __resolveType(obj) {
-    return obj.constructor.name;
-  }
-}
+export class ResultItemResolver extends UnionTypeResolver {}
