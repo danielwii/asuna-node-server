@@ -41,7 +41,7 @@ export class QiniuStorage implements IStorageEngine {
       throw new ErrorException('QiniuStorage', 'file must not be null.');
     }
 
-    return new Promise<SavedFile>(resolve => {
+    return new Promise<SavedFile>((resolve, reject) => {
       const bucket = opts.bucket || this.configObject.path;
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
@@ -57,9 +57,10 @@ export class QiniuStorage implements IStorageEngine {
         new qiniu.form_up.PutExtra(),
         (err, body, info) => {
           if (err) {
-            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
-          }
-          if (info.statusCode === 200) {
+            reject(err);
+            // throw new AsunaException(AsunaErrorCode.Unprocessable, `upload file '${key}' error`, err);
+            // throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
+          } else {
             QiniuStorage.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
             const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
             const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
@@ -76,11 +77,15 @@ export class QiniuStorage implements IStorageEngine {
                 fullpath: join(appendPrefix, prefix, filename),
               }),
             );
-          } else {
-            throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
-              info,
-              body,
-            });
+            /*
+            if (info.statusCode === 200) {
+            } else {
+              throw new ErrorException('QiniuStorage', `upload file '${key}' error`, {
+                info,
+                body,
+              });
+            }
+*/
           }
         },
       );

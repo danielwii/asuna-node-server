@@ -17,7 +17,7 @@ import { Publishable } from './abilities';
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<
   Entity,
-  keyof typeof BaseEntity | 'reload' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
+  keyof typeof BaseEntity | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
 >;
 
 export class AbstractBaseEntity extends BaseEntity {
