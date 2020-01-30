@@ -256,6 +256,10 @@ export class WeChatHelper {
     return 'success';
   }
 
+  static injectContext(message: string, context: object): string {
+    return Handlebars.compile(message)(context);
+  }
+
   static parseTemplateData(data: object, context: object): TemplateData {
     const tmplData = _.assign(
       {},
@@ -269,7 +273,7 @@ export class WeChatHelper {
         .value(),
     );
     logger.verbose(`tmplData is ${r(tmplData)}`);
-    return _.mapValues(tmplData, tmpl => _.mapValues(tmpl, value => Handlebars.compile(value)(context))) as any;
+    return _.mapValues(tmplData, tmpl => _.mapValues(tmpl, value => this.injectContext(value, context))) as any;
   }
 
   static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {
