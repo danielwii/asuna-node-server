@@ -316,7 +316,7 @@ export class WeChatHelper {
     logger.log(`get user info ${r(userInfo)}`);
     if (await WeChatUser.findOne(openId)) {
       const weChatUser = classToPlain(userInfo.toWeChatUser());
-      const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isUndefined);
+      const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
       logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
       await WeChatUser.update(userInfo.openid, updatedTo);
       return WeChatUser.findOne(openId);
@@ -401,6 +401,7 @@ export class WeChatHelper {
         username: codeSession.openid,
         email: `${codeSession.openid}@wx.miniapp.openid`,
         channel: AuthUserChannel.wechat,
+        isActive: true,
       }).save();
     }
     return TokenHelper.createCustomToken(
