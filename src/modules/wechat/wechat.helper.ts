@@ -484,24 +484,28 @@ export class WeChatHelper {
 
   static async sendMiniSubscribeMsg({
     openId,
+    page,
     subscribeId,
     payload,
   }: {
     openId: string;
+    page?: string;
     subscribeId: string;
     payload: MiniSubscribeData;
   }): Promise<SubscribeMessageInfo> {
-    return WxApi.sendSubscribeMsg({ touser: openId, template_id: subscribeId, data: payload }).then(messageInfo => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      messageInfo.errcode
-        ? logger.error(
-            `send subscribe message to ${openId} error: ${r({
-              messageInfo,
-              opts: { touser: openId, subscribe_id: subscribeId, data: payload },
-            })}`,
-          )
-        : logger.verbose(`send subscribe message to ${openId} done: ${r(messageInfo)}`);
-      return messageInfo;
-    });
+    return WxApi.sendSubscribeMsg({ touser: openId, page, template_id: subscribeId, data: payload }).then(
+      messageInfo => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        messageInfo.errcode
+          ? logger.error(
+              `send subscribe message to ${openId} error: ${r({
+                messageInfo,
+                opts: { touser: openId, subscribe_id: subscribeId, data: payload },
+              })}`,
+            )
+          : logger.verbose(`send subscribe message to ${openId} done: ${r(messageInfo)}`);
+        return messageInfo;
+      },
+    );
   }
 }

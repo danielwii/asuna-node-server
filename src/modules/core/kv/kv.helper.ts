@@ -40,7 +40,7 @@ const toJson = (value): JSON => {
 
 export type KVField = {
   name: string;
-  type: 'number' | 'string' | 'wx-tmpl-data' | 'boolean';
+  type: 'number' | 'string' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
