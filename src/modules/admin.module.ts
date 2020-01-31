@@ -63,7 +63,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 export class AdminInternalModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
-    this.initConstants();
+    await this.initConstants();
   }
 
   async initConstants(): Promise<void> {
