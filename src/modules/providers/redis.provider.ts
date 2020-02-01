@@ -57,7 +57,7 @@ export class RedisProvider {
     redisClientObject.client = client;
     client.on('connect', () => {
       redisClientObject.isHealthy = true;
-      logger.log(`Redis default connection open to ${r(configObject, { transform: true })}`);
+      logger.log(`Redis default connection open to ${r({ redisClientObject, prefix, key }, { transform: true })}`);
     });
 
     client.on('error', err => {
@@ -79,7 +79,7 @@ export class RedisProvider {
       });
     });
 
-/*
+    /*
     process.on('removeListener', () => {
       client.quit((err: Error, res: string) => {
         redisClientObject.isHealthy = false;
