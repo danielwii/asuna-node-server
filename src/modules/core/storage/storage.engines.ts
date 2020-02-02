@@ -66,6 +66,7 @@ export type ResolverOpts = {
   filename: string;
   bucket: string;
   prefix?: string;
+  query?: object;
   thumbnailConfig?: ThumbnailPipeOptions;
   jpegConfig?: JpegPipeOptions;
   // 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下

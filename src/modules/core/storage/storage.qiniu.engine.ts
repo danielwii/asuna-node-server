@@ -1,5 +1,6 @@
 import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
+import * as _ from 'lodash';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 import { AsunaErrorCode, AsunaException, convertFilename, ErrorException, r } from '../../common';
@@ -109,16 +110,18 @@ export class QiniuStorage implements IStorageEngine {
   async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
-    const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
+    const { filename, bucket, prefix, thumbnailConfig, jpegConfig, query } = opts;
+    // 识别七牛的视频处理参数
+    const resolvedQuery = _.find(_.keys(query), key => key.startsWith('avthumb'));
     // const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
     // const appendPrefix = this.configObject.path;
     // const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
     //   ? join(this.configObject.path || '')
     //   : join(resourcePath, this.configObject.path || '');
-    const path = join('/', bucket, prefix || '', filename);
+    const path = `${join('/', bucket, prefix || '', filename)}?${resolvedQuery}`;
     // TODO 在非默认 storage 下访问会出现问题
     const url = `${this.configObject.domain}${path}`;
-    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename })}`);
+    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery })}`);
     return res.redirect(url);
   }
 }

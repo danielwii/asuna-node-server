@@ -26,6 +26,8 @@ export class GetUploadsController {
    * @param bucket
    * @param filename
    * @param internal 内部地址
+   * @param param
+   * @param query
    * @param thumbnailConfig
    * @param jpegConfig
    * @param res
@@ -35,17 +37,20 @@ export class GetUploadsController {
     @Param('bucket') bucket: string,
     @Param('0') filename: string,
     @Query('internal') internal: boolean,
+    @Param() param: object,
+    @Query() query: object,
     @Query(ThumbnailPipe) thumbnailConfig: ThumbnailPipeOptions,
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ): Promise<void> {
-    logger.verbose(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal })}`);
+    logger.verbose(`get [${bucket}] file [${filename}] by ${r({ thumbnailConfig, jpegConfig, internal, query, param })}`);
     return this.context.defaultStorageEngine.resolveUrl(
       {
         filename,
         bucket,
         thumbnailConfig,
         jpegConfig,
+        query,
         resolver: path => FinderHelper.getUrl({ type: 'assets', path, internal }),
       },
       res,
