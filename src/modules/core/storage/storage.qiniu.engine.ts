@@ -112,7 +112,7 @@ export class QiniuStorage implements IStorageEngine {
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig, query } = opts;
     // 识别七牛的视频处理参数
-    const resolvedQuery = _.find(_.keys(query), key => key.startsWith('avthumb'));
+    const resolvedQuery = _.find(_.keys(query), key => key.startsWith('avvod'));
     // const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
     // const appendPrefix = this.configObject.path;
     // const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
