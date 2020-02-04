@@ -6,7 +6,7 @@ import { Request } from 'express';
 import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import rawBody from 'raw-body';
+import * as rawBody from 'raw-body';
 import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
 import { CacheManager } from '../cache';
