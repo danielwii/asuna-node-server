@@ -6,6 +6,7 @@ import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
 import { AnyAuthRequest } from '../helper/auth';
 import { Tenant } from './tenant.entities';
 import { TenantHelper, TenantInfo } from './tenant.helper';
+import { TenantService } from './tenant.service';
 
 const logger = LoggerFactory.getLogger('TenantController');
 
@@ -39,6 +40,6 @@ export class TenantController {
   @Post()
   async mgmtRegisterTenant(@Body() body: RegisterTenantDto, @Req() req: AnyAuthRequest): Promise<Tenant> {
     const { user, identifier } = req;
-    return TenantHelper.registerTenant(user.id, body, body.payload);
+    return TenantService.registerTenant(user.id, body, body.payload);
   }
 }

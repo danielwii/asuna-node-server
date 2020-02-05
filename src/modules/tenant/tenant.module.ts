@@ -1,7 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import * as _ from 'lodash';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
+import { Hermes } from '../core/bus';
 import { DBHelper } from '../core/db';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
 import { TenantController } from './tenant.controller';
@@ -108,7 +110,7 @@ export class TenantModule implements OnModuleInit {
     await KvHelper.initializers[identifier]();
   }
 
-  private async initAC(): Promise<void> {
+  async initAC(): Promise<void> {
     const entities = await DBHelper.getModelsHasRelation(Tenant);
     const entityNames = entities
       .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))

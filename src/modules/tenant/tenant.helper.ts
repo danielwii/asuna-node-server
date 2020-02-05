@@ -16,8 +16,6 @@ import { deserializeSafely } from '../common/helpers';
 import { AdminUser, Role } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
-import { RestHelper } from '../core/rest';
-import { WeChatHelper, WeChatUser } from '../wechat';
 import { Tenant } from './tenant.entities';
 
 export class TenantConfig {
@@ -25,6 +23,9 @@ export class TenantConfig {
   @IsBoolean() @IsOptional() activeByDefault?: boolean;
   @IsString() @IsOptional() bindRoles?: string;
 
+  /**
+   * bind 的模型 limit 是 1，和 tenant 形成天然的指代关系。
+   */
   @IsBoolean() @IsOptional() firstModelBind?: boolean;
   @IsString() @IsOptional() firstModelField?: string;
   @IsString() @IsOptional() firstModelName?: string;
@@ -215,47 +216,4 @@ export class TenantHelper {
     return Tenant.create({ admin }).save();
   }
 */
-
-  /**
-   * @param userId
-   * @param body
-   * @param payload 用来新建需要绑定的核心模型数据
-   */
-  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, payload?: object): Promise<Tenant> {
-    const info = await this.info(userId);
-    if (info.tenant) return info.tenant;
-
-    if (_.isEmpty(info.roles)) {
-      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
-    }
-
-    const admin = await AdminUser.findOne(userId, { relations: ['tenant'] });
-    if (admin.tenant) {
-      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, ['tenant', admin.tenant.name]);
-    }
-
-    admin.tenant = await Tenant.create({ ...body, isPublished: info.config.activeByDefault }).save();
-    await admin.save();
-
-    if (info.config.firstModelBind && info.config.firstModelName) {
-      logger.log(`bind ${info.config.firstModelName} with tenant ${admin.tenant.id}`);
-
-      await RestHelper.save(
-        { model: DBHelper.getModelNameObject(info.config.firstModelName), body: payload },
-        { user: admin as any, tenant: admin.tenant, roles: admin.roles },
-      );
-    }
-
-    // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
-    const config = await WeChatHelper.getServiceConfig();
-    if (config.enabled && config.saveToAdmin) {
-      const weChatUser = await WeChatUser.findOne({ admin });
-      if (weChatUser) {
-        weChatUser.tenant = admin.tenant;
-        await weChatUser.save();
-      }
-    }
-
-    return admin.tenant;
-  }
 }
