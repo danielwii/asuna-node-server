@@ -3,6 +3,7 @@ import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { CacheManager } from '../../cache';
+import { CacheWrapper } from '../../cache/wrapper';
 import {
   AsunaErrorCode,
   AsunaException,
@@ -295,23 +296,25 @@ export class KvHelper {
     kvDef: KvDef,
     keyValues: KeyValues,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    return CacheManager.cacheable(
-      { kvDef, keyValues },
-      async () => Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key))),
-      10,
-    );
-    // return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
+    // return CacheManager.cacheable(
+    //   { kvDef, keyValues },
+    //   async () => Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key))),
+    //   10,
+    // );
+    return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 
   static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
-    return CacheManager.cacheable(
-      { kvDef, fieldKey },
-      async () => {
-        const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-        return field?.value || _.get(field, 'field.defaultValue');
-      },
-      10,
-    );
+    // return CacheManager.cacheable(
+    //   { kvDef, fieldKey },
+    //   async () => {
+    //     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+    //     return field?.value || _.get(field, 'field.defaultValue');
+    //   },
+    //   10,
+    // );
+    const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+    return field?.value || _.get(field, 'field.defaultValue');
   }
 
   static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
@@ -332,7 +335,12 @@ export class KvHelper {
     kvDef: KvDef,
     fieldKey: string,
   ): Promise<{ field: KVField; value: any }> {
-    const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef)).value;
+    const fields: KVGroupFieldsValue = await CacheWrapper.do({
+      prefix: 'kv',
+      key: kvDef,
+      resolver: () => KvHelper.get(kvDef).then(value => value.value),
+    });
+    // const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef)).value;
     const result = {
       value: _.get(fields.values, fieldKey),
       field: _.get(

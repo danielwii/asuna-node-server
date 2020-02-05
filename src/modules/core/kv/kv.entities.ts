@@ -1,5 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import * as _ from 'lodash';
+import { AfterUpdate, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
+import { CacheWrapper } from '../../cache/wrapper';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { jsonType } from '../helpers';
 
@@ -44,6 +46,11 @@ export class KeyValuePair extends AbstractBaseEntity {
 
   // @OneToOne(type => KeyValueModel, model => model.pair)
   model: KeyValueModel;
+
+  @AfterUpdate()
+  afterUpdate(): void {
+    CacheWrapper.clear({ prefix: 'kv', key: _.pick(this, 'collection', 'key') }).catch(console.error);
+  }
 }
 
 @EntityMetaInfo({ name: 'kv__models' })

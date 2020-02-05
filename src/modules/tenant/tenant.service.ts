@@ -113,7 +113,9 @@ export class TenantService {
           // });
           logger.log(`found tenant for relation ${firstModel} ${r(tenant)}`);
           if (!tenant) {
-            logger.error(`no tenant found for firstModelName: ${firstModel}`);
+            logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
+            // FIXME 创建租户同时需要用户，在 server 端孤立的资源没有对应的用户
+            // this.registerTenant()
             return;
           }
 

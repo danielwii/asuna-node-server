@@ -73,7 +73,7 @@ export class RedisLockProvider {
           );
       },
       err => {
-        logger.warn(`get lock lock.${operate} error:${err}`);
+        logger.warn(`get ${operate} lock. ${operate} error:${err}`);
       },
     );
   }

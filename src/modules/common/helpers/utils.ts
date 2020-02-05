@@ -109,3 +109,11 @@ export function resolveBasename(dir: string, withExt = false): string {
 export function numberInterval(min: number, max: number, num: number): number {
   return _.max([_.min([max, num]), min]);
 }
+
+export function parseJSONIfCould(value?: string): any {
+  try {
+    if (value) return JSON.parse(value);
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+  return value;
+}
