@@ -118,10 +118,13 @@ export class QiniuStorage implements IStorageEngine {
     // const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
     //   ? join(this.configObject.path || '')
     //   : join(resourcePath, this.configObject.path || '');
-    const path = `${join('/', bucket, prefix || '', filename)}?${resolvedQuery ?? ''}`;
+    const path = `${join('/', bucket, prefix || '', filename)}${resolvedQuery ? `?${resolvedQuery}` : ''}`;
+    const resolved = opts.resolver ? await opts.resolver(path) : path;
     // TODO 在非默认 storage 下访问会出现问题
-    const url = `${this.configObject.domain}${path}`;
-    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery })}`);
+    const url = resolved.startsWith('http') ? resolved : `${this.configObject.domain}${path}`;
+    QiniuStorage.logger.log(
+      `resolve url '${url}' by ${r({ config: this.configObject, bucket, prefix, filename, resolvedQuery, resolved })}`,
+    );
     return res.redirect(url);
   }
 }
