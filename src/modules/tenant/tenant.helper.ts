@@ -70,17 +70,17 @@ export class TenantHelper {
           ...entities.map(entity => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
           ...entities.map(entity => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
-        logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
+        // logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
         const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
 
         // bind 模式下的资源限制默认是 1
         if (tenantConfig.firstModelBind && tenantConfig.firstModelName) {
           tenantConfig[`limit.${tenantConfig.firstModelName}`] = 1;
         }
-        logger.log(`tenant config is ${r(tenantConfig)}`);
+        // logger.log(`tenant config is ${r(tenantConfig)}`);
         return tenantConfig;
       },
-      60,
+      5 * 60,
     );
 
     // const entities = await DBHelper.getModelsHasRelation(Tenant);

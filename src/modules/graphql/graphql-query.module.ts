@@ -2,12 +2,12 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
 import { DBService } from '../core/db';
 import { SchemaQueryResolver } from './schema.resolver';
-import { UserProfileResolver } from './user/user.resolver';
+import { UserProfileQueryResolver, UserProfileResolver } from './user/user.resolver';
 
 const logger = LoggerFactory.getLogger('GraphqlQueryModule');
 
 @Module({
-  providers: [SchemaQueryResolver, UserProfileResolver, DBService],
+  providers: [SchemaQueryResolver, UserProfileQueryResolver, UserProfileResolver, DBService],
 })
 export class GraphqlQueryModule implements OnModuleInit {
   onModuleInit(): any {
