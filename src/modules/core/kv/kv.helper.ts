@@ -338,8 +338,10 @@ export class KvHelper {
     const fields: KVGroupFieldsValue = await CacheWrapper.do({
       prefix: 'kv',
       key: kvDef,
-      resolver: () => KvHelper.get(kvDef).then(value => value?.value),
+      resolver: async () => (await KvHelper.get(kvDef))?.value,
     });
+    if (!fields) return null;
+
     // const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef)).value;
     const result = {
       value: _.get(fields.values, fieldKey),

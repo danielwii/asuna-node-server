@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
-import { Hermes } from '../core/bus';
 import { DBHelper } from '../core/db';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
 import { TenantController } from './tenant.controller';
