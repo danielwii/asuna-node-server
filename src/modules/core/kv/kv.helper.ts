@@ -2,7 +2,6 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { CacheManager } from '../../cache';
 import { CacheWrapper } from '../../cache/wrapper';
 import {
   AsunaErrorCode,
@@ -240,7 +239,9 @@ export class KvHelper {
     }
 
     logger.verbose(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any);
+    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any).finally(() => {
+      CacheWrapper.clear({ prefix: 'kv', key: { collection, key } }).catch(console.error);
+    });
   }
 
   static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {

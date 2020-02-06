@@ -16,6 +16,7 @@ export class CacheWrapper {
   }): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
+    logger.verbose(`get cache ${cacheKey}`);
 
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
@@ -46,6 +47,7 @@ export class CacheWrapper {
   static async clear(opts: { prefix?: string; key: string | object }): Promise<void> {
     const { key, prefix } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
+    logger.verbose(`remove cache ${cacheKey}`);
     const redis = RedisProvider.instance.getRedisClient(prefix);
     if (!redis.isEnabled) {
       return CacheManager.clear(cacheKey);

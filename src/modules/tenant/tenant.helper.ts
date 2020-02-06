@@ -80,7 +80,7 @@ export class TenantHelper {
         // logger.log(`tenant config is ${r(tenantConfig)}`);
         return tenantConfig;
       },
-      5 * 60,
+      60,
     );
 
     // const entities = await DBHelper.getModelsHasRelation(Tenant);
