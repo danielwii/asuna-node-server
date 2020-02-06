@@ -34,7 +34,7 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
 export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @Column({ nullable: true, length: 36, name: 'tenant__id' })
-    tenantId: string;
+    tenantId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
     @ManyToOne(type => Tenant)
