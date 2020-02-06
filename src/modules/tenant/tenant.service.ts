@@ -90,7 +90,7 @@ export class TenantService {
           o => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
         );
         if (!relation) {
-          logger.error(`no relation found for ${modelName} with ${config.firstModelName}`);
+          // logger.error(`no relation found for ${modelName} with ${config.firstModelName}`);
           return;
         }
 /*

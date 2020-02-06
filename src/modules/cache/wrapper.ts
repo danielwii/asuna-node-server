@@ -16,7 +16,7 @@ export class CacheWrapper {
   }): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
-    logger.verbose(`get cache ${cacheKey}`);
+    // logger.verbose(`get cache ${cacheKey}`);
 
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager

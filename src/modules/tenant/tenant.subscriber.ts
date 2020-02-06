@@ -9,11 +9,11 @@ const logger = LoggerFactory.getLogger('TenantSubscriber');
 @EventSubscriber()
 export class TenantSubscriber implements EntitySubscriberInterface {
   afterLoad(entity: any, event?: LoadEvent<any>): Promise<any> | void {
-    // logger.log(`afterLoad ${r(entity)}`);
     // console.log(inspect(event, false, 1));
     if (['kv__pairs', 'auth__users', 'auth__roles', 'wx__users'].includes(entity.constructor?.entityInfo?.name)) {
       return;
     }
+    // logger.log(`afterLoad ${r(entity)}`);
     TenantService.populate(entity || event.entity);
   }
 
