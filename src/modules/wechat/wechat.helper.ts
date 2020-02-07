@@ -257,7 +257,7 @@ export class WeChatHelper {
   }
 
   static injectContext(message: string, context: object): string {
-    return Handlebars.compile(message)(context);
+    return _.isString(message) ? Handlebars.compile(message)(context) : message;
   }
 
   static parseTemplateData(data: object, context: object): TemplateData {
