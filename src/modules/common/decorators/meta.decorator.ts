@@ -109,7 +109,7 @@ export interface EnumFilterMetaInfoOptions extends MetaInfoBaseOptions {
 
 export interface JSONMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'SimpleJSON';
-  jsonType: 'string-array' | 'textarea-array' | 'rich-array' | 'any';
+  jsonType: 'string-array' | 'tag-array' | 'textarea-array' | 'rich-array' | 'any';
 }
 
 export interface AddressMetaInfoOptions extends MetaInfoBaseOptions {
