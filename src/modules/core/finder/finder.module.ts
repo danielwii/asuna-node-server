@@ -34,12 +34,7 @@ export class FinderModule implements OnModuleInit {
             form: {
               default: {
                 name: '公网资源',
-                fields: [
-                  {
-                    name: '端点',
-                    field: { name: 'endpoint', type: 'string', defaultValue: assetsEndpoint },
-                  },
-                ],
+                fields: [{ name: '端点', field: { name: 'endpoint', type: 'string', defaultValue: assetsEndpoint } }],
               },
               'internal-default': {
                 name: '内网资源',

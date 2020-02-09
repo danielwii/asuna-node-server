@@ -10,7 +10,7 @@ export class AuthedUserHelper {
   static getProfileById(id: string | number): Promise<UserProfile> {
     // console.log(`AuthedUserHelper.getProfileById ${id}`);
     if (typeof id === 'number') {
-      ow(id, 'id', ow.number.integer);
+      // ow(id, 'id', ow.number.integer);
       return UserProfile.findOneOrFail(`u${id}`);
     }
     ow(id, 'id', ow.string.nonEmpty);
@@ -27,7 +27,7 @@ export class AuthedUserHelper {
 
   static getUserById<User>(id: string | number): Promise<User> {
     if (typeof id === 'number') {
-      ow(id, 'id', ow.number.integer);
+      // ow(id, 'id', ow.number.integer);
       return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(id) as any;
     }
     ow(id, 'id', ow.string.nonEmpty);

@@ -11,7 +11,7 @@ import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
 import { ConfigKeys, configLoader } from './config';
-import { AsunaContext, KvModule } from './core';
+import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { RedisProvider } from './providers';
 
@@ -47,9 +47,9 @@ export class GraphqlModule implements OnModuleInit {
           // autoSchemaFile: 'schema.gql',
           resolvers: { JSON: GraphQLJSON },
           playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
-          debug: AsunaContext.isDebugMode,
-          introspection: AsunaContext.isDebugMode,
-          tracing: AsunaContext.isDebugMode,
+          debug: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
+          introspection: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
+          tracing: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
           resolverValidationOptions: {
             requireResolversForResolveType: false,
           },

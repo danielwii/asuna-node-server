@@ -96,7 +96,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.debug(`request info: ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    // logger.debug(`request info: ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     return req;
   }
 
