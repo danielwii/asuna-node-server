@@ -37,7 +37,7 @@ export class RedisLockProvider {
         logger.log(`beforeExit ...`);
         this.redLock.removeAllListeners();
       });
-/*
+      /*
       process.on('removeListener', () => {
         logger.log(`removeListener ...`);
         this.redLock.removeAllListeners();
@@ -56,7 +56,7 @@ export class RedisLockProvider {
     }
     return this.redLock.lock(`lock:${operate}`, options ? options.ttl : null).then(
       lock => {
-        logger.debug(`lock ${operate}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))}`);
+        logger.verbose(`lock ${operate}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))}`);
         return handler()
           .then(
             value => {

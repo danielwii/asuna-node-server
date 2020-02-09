@@ -78,7 +78,9 @@ export class AsunaContext {
   }
 
   getStorageEngine(bucket: string): IStorageEngine {
-    const storageType = configLoader.loadConfig(`${bucket.toUpperCase()}_STORAGE`);
+    const KEY = `${bucket.toUpperCase()}_STORAGE`;
+    const storageType = configLoader.loadConfig(KEY);
+    logger.verbose(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
     if (storageType === StorageMode.QINIU) {
       return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
     }
@@ -89,11 +91,11 @@ export class AsunaContext {
   }
 
   initStorageEngine(uploadPath: string): void {
-    logger.log(`initStorageEngine ${r({ uploadPath })}`);
     UploaderConfig.uploadPath = uploadPath;
     this.uploadPath = uploadPath;
 
     const defaultStorage = configLoader.loadConfig(ConfigKeys.DEFAULT_STORAGE);
+    logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
     if (defaultStorage === StorageMode.QINIU) {
       this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr());
     } else if (defaultStorage === StorageMode.MINIO) {
@@ -102,6 +104,7 @@ export class AsunaContext {
       this.defaultStorageEngine = new LocalStorage(this.uploadPath);
     }
 
+/*
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE);
     if (imageStorage === StorageMode.QINIU) {
       this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('images'));
@@ -120,6 +123,7 @@ export class AsunaContext {
       this.defaultStorageEngine = new LocalStorage(this.uploadPath);
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, { mode: StorageMode.LOCAL });
     }
+*/
 
     const videoStorage = configLoader.loadConfig(ConfigKeys.VIDEOS_STORAGE);
     if (videoStorage === StorageMode.QINIU) {

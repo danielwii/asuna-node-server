@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
@@ -13,8 +14,6 @@ const logger = LoggerFactory.getLogger('GetUploadsController');
 @ApiTags('core')
 @Controller('uploads')
 export class GetUploadsController {
-  private context = AsunaContext.instance;
-
   /**
    * 1. /images/2018/4/****.png
    * 1.1 /images/2018/4/****.png?thumbnail/<Width>x<Height>
@@ -44,9 +43,16 @@ export class GetUploadsController {
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
     @Res() res: Response,
   ): Promise<void> {
-    const storageEngine = this.context[`${bucket}StorageEngine`] ?? this.context.defaultStorageEngine;
+    const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
     logger.verbose(
-      `get ${r({ bucket, filename })} by ${r({ storageEngine, thumbnailConfig, jpegConfig, internal, query, param })}`,
+      `get ${r({ bucket, filename })} by ${r({
+        storageEngine: classToPlain(storageEngine),
+        thumbnailConfig,
+        jpegConfig,
+        internal,
+        query,
+        param,
+      })}`,
     );
     return storageEngine.resolveUrl(
       {

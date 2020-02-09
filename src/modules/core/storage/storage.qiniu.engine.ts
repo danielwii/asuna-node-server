@@ -12,9 +12,6 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(QiniuStorage.name);
 
-  // private temp: string;
-  private readonly mac: qiniu.auth.digest.Mac;
-
   private readonly configObject: QiniuConfigObject;
 
   constructor(configure: () => QiniuConfigObject) {
@@ -29,9 +26,6 @@ export class QiniuStorage implements IStorageEngine {
       );
     }
     QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject) })}`);
-
-    // this.temp = fs.mkdtempSync('temp');
-    this.mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
   }
 
   public saveEntity(
@@ -43,13 +37,14 @@ export class QiniuStorage implements IStorageEngine {
     }
 
     return new Promise<SavedFile>((resolve, reject) => {
+      const mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
       const bucket = opts.bucket || this.configObject.path;
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);
       const key = join('/', bucket, filenameWithPrefix).slice(1);
       QiniuStorage.logger.log(`upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`);
-      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(this.mac);
+      const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(mac);
 
       new qiniu.form_up.FormUploader().putFile(
         uploadToken,
@@ -122,9 +117,7 @@ export class QiniuStorage implements IStorageEngine {
     const resolved = opts.resolver ? await opts.resolver(path) : path;
     // TODO 在非默认 storage 下访问会出现问题
     const url = resolved.startsWith('http') ? resolved : `${this.configObject.domain}${path}`;
-    QiniuStorage.logger.log(
-      `resolve url '${url}' by ${r({ config: this.configObject, bucket, prefix, filename, resolvedQuery, resolved })}`,
-    );
+    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery, resolved })}`);
     return res.redirect(url);
   }
 }
