@@ -26,12 +26,15 @@ export function execAsync(child: ChildProcess): Promise<void> {
   });
 }
 
-export function r(o: any, { transform, stringify }: { transform?: boolean; stringify?: boolean } = {}): string {
+export function r(
+  o: any,
+  { transform, stringify, depth }: { transform?: boolean; stringify?: boolean; depth?: number } = {},
+): string {
   if (!_.isObjectLike(o)) {
     return o;
   }
   const value = transform || stringify ? classToPlain(o) : o;
-  return isProductionEnv || stringify ? JSON.stringify(value) : inspect(value, { colors: true, depth: 5 });
+  return isProductionEnv || stringify ? JSON.stringify(value) : inspect(value, { colors: true, depth: depth ?? 5 });
 }
 
 /**

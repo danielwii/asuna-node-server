@@ -1,6 +1,9 @@
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { RedisCache } from 'apollo-server-cache-redis';
+import { InMemoryLRUCache } from 'apollo-server-caching';
+import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
 import * as GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import { join } from 'path';
@@ -8,8 +11,9 @@ import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
 import { ConfigKeys, configLoader } from './config';
-import { AbstractAuthUser, AsunaContext, KvModule } from './core';
+import { AsunaContext, KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
+import { RedisProvider } from './providers';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
@@ -23,6 +27,10 @@ export class GraphqlModule implements OnModuleInit {
       `${join(dir, '../src')}/**/*.graphql`,
     ];
     logger.log(`typePaths is ${r({ typePaths })}`);
+
+    const redis = RedisProvider.instance.getRedisClient('graphql');
+    const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
+    logger.log(`cache is ${r(cache, { depth: 1 })}`);
 
     return {
       module: GraphqlModule,
@@ -38,18 +46,33 @@ export class GraphqlModule implements OnModuleInit {
           typePaths,
           // autoSchemaFile: 'schema.gql',
           resolvers: { JSON: GraphQLJSON },
-          introspection: AsunaContext.isDebugMode,
-          debug: AsunaContext.isDebugMode,
           playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
+          debug: AsunaContext.isDebugMode,
+          introspection: AsunaContext.isDebugMode,
+          tracing: AsunaContext.isDebugMode,
           resolverValidationOptions: {
             requireResolversForResolveType: false,
+          },
+          persistedQueries: { cache },
+          plugins: [
+            (responseCachePlugin as any)({
+              sessionId: requestContext => {
+                const sessionID = requestContext.request.http.headers.get('sessionid') || null;
+                if (sessionID) logger.verbose(`cache sessionID: ${sessionID}`);
+                return sessionID;
+              },
+            }),
+          ],
+          cacheControl: {
+            defaultMaxAge: 5,
+            stripFormattedExtensions: false,
+            calculateHttpHeaders: true,
           },
           context: (context): GraphqlContext<any> => ({
             ...context,
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
-            getCurrentUser: (): AbstractAuthUser => _.get(context.req, 'user'),
+            getCurrentUser: () => _.get(context.req, 'user'),
           }),
-          tracing: AsunaContext.isDebugMode,
           /*          extensions: _.compact([
             configLoader.loadConfig(ConfigKeys.TRACING)
               ? () =>

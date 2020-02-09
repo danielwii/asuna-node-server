@@ -92,3 +92,18 @@ interface CursoredQuery {
   totalCount: Int
   pageInfo: PageInfo
 }
+
+# --------------------------------------------------------------
+# cache support
+# https://www.apollographql.com/docs/apollo-server/performance/caching/
+# --------------------------------------------------------------
+
+directive @cacheControl(
+  maxAge: Int,
+  scope: CacheControlScope
+) on OBJECT | FIELD | FIELD_DEFINITION
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
