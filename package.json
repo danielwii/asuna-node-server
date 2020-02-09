@@ -142,8 +142,8 @@
     "husky": "^4.2.1",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
-    "precise-commits": "^1.0.2",
     "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
     "sqlite3": "^4.1.1",
     "supertest": "^4.0.2",
     "ts-jest": "^25.2.0",
@@ -152,7 +152,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "precise-commits"
+      "pre-commit": "pretty-quick --staged"
     }
   }
 }
