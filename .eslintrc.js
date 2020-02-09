@@ -1,5 +1,6 @@
 module.exports = {
-  plugins: ['@typescript-eslint', 'eslint-comments', 'jest', 'promise', 'unicorn'],
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'eslint-comments', 'jest', 'promise', 'unicorn', 'prettier'],
   extends: [
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
@@ -7,8 +8,9 @@ module.exports = {
     'plugin:jest/recommended',
     'plugin:promise/recommended',
     'plugin:unicorn/recommended',
+    'plugin:prettier/recommended',
     'prettier',
-    // 'prettier/react',
+    'prettier/react',
     'prettier/@typescript-eslint',
   ],
   env: {
@@ -16,7 +18,12 @@ module.exports = {
     browser: false,
     jest: true,
   },
+  parserOptions: {
+    project: './tsconfig.json',
+    createDefaultProgram: true,
+  },
   rules: {
+    'prettier/prettier': 'warn',
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
     'no-prototype-builtins': 'off',
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html

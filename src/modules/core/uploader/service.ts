@@ -83,7 +83,7 @@ export class UploaderService {
     });
     logger.log(`upload chunk file ${r(chunkFileInfo)}`);
 
-    return this.context.chunkStorageEngine
+    return this.context.chunksStorageEngine
       .saveEntity({ ...file, filename: chunkname }, { prefix: fingerprint })
       .then(async saved => {
         const payload = new ChunksUploadPayload(token.body);
@@ -115,7 +115,7 @@ export class UploaderService {
     const _filename = filename || payload.filename;
     logger.log(`merge file '${_filename}' chunks... ${r(payload)}`);
 
-    const chunks = await this.context.chunkStorageEngine.listEntities({
+    const chunks = await this.context.chunksStorageEngine.listEntities({
       prefix: payload.fingerprint,
     });
     logger.verbose(`found ${r(chunks.length)} chunks`);
@@ -131,7 +131,7 @@ export class UploaderService {
     logger.debug(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
       await Promise.all(
-        chunks.map(chunk => this.context.chunkStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath)),
+        chunks.map(chunk => this.context.chunksStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath)),
       ),
       name => +name.slice(name.lastIndexOf('.') + 1),
     );
@@ -159,7 +159,7 @@ export class UploaderService {
 
     const fileInfo = new FileInfo({ filename: _filename, path: dest });
     // const mimetype = mime.lookup(filename) || 'application/octet-stream';
-    const saved = await this.context.fileStorageEngine.saveEntity(fileInfo, {
+    const saved = await this.context.filesStorageEngine.saveEntity(fileInfo, {
       prefix: payload.fingerprint,
     });
 

@@ -1,8 +1,8 @@
 import * as fs from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
-import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
 import { LoggerFactory } from '../common/logger';
+import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
 import {
   IStorageEngine,
   LocalStorage,
@@ -36,10 +36,23 @@ export class AsunaContext {
   public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
-  public videoStorageEngine: IStorageEngine;
-  public fileStorageEngine: IStorageEngine;
+  /**
+   * @see AsunaContext.defaultStorageEngine
+   * @deprecated
+   */
+  public videosStorageEngine: IStorageEngine;
+  /**
+   * @see AsunaContext.defaultStorageEngine
+   * @deprecated
+   */
+  public filesStorageEngine: IStorageEngine;
+  /**
+   * @see AsunaContext.defaultStorageEngine
+   * @deprecated
+   */
+  public chunksStorageEngine: IStorageEngine;
+
   public localStorageEngine: IStorageEngine;
-  public chunkStorageEngine: IStorageEngine;
 
   private constructor() {
     logger.log('init ...');
@@ -64,10 +77,31 @@ export class AsunaContext {
     };
   }
 
+  getStorageEngine(bucket: string): IStorageEngine {
+    const storageType = configLoader.loadConfig(`${bucket.toUpperCase()}_STORAGE`);
+    if (storageType === StorageMode.QINIU) {
+      return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
+    }
+    if (storageType === StorageMode.MINIO) {
+      return new MinioStorage(() => MinioConfigObject.load(), { defaultBucket: bucket });
+    }
+    return this.defaultStorageEngine;
+  }
+
   initStorageEngine(uploadPath: string): void {
     logger.log(`initStorageEngine ${r({ uploadPath })}`);
     UploaderConfig.uploadPath = uploadPath;
     this.uploadPath = uploadPath;
+
+    const defaultStorage = configLoader.loadConfig(ConfigKeys.DEFAULT_STORAGE);
+    if (defaultStorage === StorageMode.QINIU) {
+      this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr());
+    } else if (defaultStorage === StorageMode.MINIO) {
+      this.defaultStorageEngine = new MinioStorage(() => MinioConfigObject.load());
+    } else {
+      this.defaultStorageEngine = new LocalStorage(this.uploadPath);
+    }
+
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE);
     if (imageStorage === StorageMode.QINIU) {
       this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('images'));
@@ -89,37 +123,37 @@ export class AsunaContext {
 
     const videoStorage = configLoader.loadConfig(ConfigKeys.VIDEOS_STORAGE);
     if (videoStorage === StorageMode.QINIU) {
-      this.videoStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('videos'));
+      this.videosStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('videos'));
     } else if (videoStorage === StorageMode.MINIO) {
-      this.videoStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
+      this.videosStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
         defaultBucket: 'videos',
       });
     } else {
-      this.videoStorageEngine = new LocalStorage(this.uploadPath, 'videos');
+      this.videosStorageEngine = new LocalStorage(this.uploadPath, 'videos');
     }
 
     const fileStorage = configLoader.loadConfig(ConfigKeys.FILES_STORAGE);
     if (fileStorage === StorageMode.QINIU) {
-      this.fileStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('files'));
+      this.filesStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('files'));
     } else if (fileStorage === StorageMode.MINIO) {
-      this.fileStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
+      this.filesStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
         defaultBucket: 'files',
       });
     } else {
-      this.fileStorageEngine = new LocalStorage(this.uploadPath, 'files');
+      this.filesStorageEngine = new LocalStorage(this.uploadPath, 'files');
     }
 
     this.localStorageEngine = new LocalStorage(this.uploadPath, 'local');
 
     const chunkStorage = configLoader.loadConfig(ConfigKeys.CHUNKS_STORAGE);
     if (chunkStorage === StorageMode.QINIU) {
-      this.chunkStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('chunks'));
+      this.chunksStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('chunks'));
     } else if (chunkStorage === StorageMode.MINIO) {
-      this.chunkStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
+      this.chunksStorageEngine = new MinioStorage(() => MinioConfigObject.load(), {
         defaultBucket: 'chunks',
       });
     } else {
-      this.chunkStorageEngine = new LocalStorage(this.uploadPath, 'chunks');
+      this.chunksStorageEngine = new LocalStorage(this.uploadPath, 'chunks');
     }
   }
 

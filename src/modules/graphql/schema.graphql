@@ -3,6 +3,6 @@ type ModelSchema {
   schema: Any
 }
 
-extend type Query {
+type Query {
   sys_modelSchemas: [ModelSchema]
 }

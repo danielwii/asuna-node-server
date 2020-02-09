@@ -34,7 +34,7 @@ export class FinderController {
     logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
-    const url = await FinderHelper.getUrl({ type, name, path });
+    const url = await FinderHelper.resolveUrl({ type, name, path });
     return res.redirect(url);
   }
 }
@@ -73,7 +73,7 @@ export class ShortFinderController {
     logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
-    const url = await FinderHelper.getUrl({ type, name, path });
+    const url = await FinderHelper.resolveUrl({ type, name, path });
     return res.redirect(url);
   }
 }

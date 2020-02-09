@@ -30,10 +30,24 @@ export const ConfigKeys = {
   ASSETS_ENDPOINT: 'ASSETS_ENDPOINT',
   ASSETS_INTERNAL_ENDPOINT: 'ASSETS_INTERNAL_ENDPOINT',
 
+  /**
+   * @deprecated
+   */
   VIDEOS_STORAGE: 'VIDEOS_STORAGE',
+  /**
+   * @deprecated
+   */
   IMAGES_STORAGE: 'IMAGES_STORAGE',
+  /**
+   * @deprecated
+   */
   FILES_STORAGE: 'FILES_STORAGE',
+  /**
+   * @deprecated
+   */
   CHUNKS_STORAGE: 'CHUNKS_STORAGE',
+
+  DEFAULT_STORAGE: 'DEFAULT_STORAGE',
 
   MAIL_HOST: 'MAIL_HOST',
   MAIL_PORT: 'MAIL_PORT',

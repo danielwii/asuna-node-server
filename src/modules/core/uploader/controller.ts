@@ -2,7 +2,6 @@ import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, U
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import * as assert from 'assert';
 import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
@@ -11,9 +10,10 @@ import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as multer from 'multer';
 import * as os from 'os';
+import ow from 'ow';
 import { basename, dirname, join } from 'path';
 import * as uuid from 'uuid';
-import { isBlank, r, UploadException } from '../../common';
+import { r, UploadException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthRequest } from '../../helper/auth';
@@ -119,8 +119,8 @@ export class UploaderController {
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
   ): Promise<RemoteFileInfo> {
-    assert(!isBlank(filename), 'filename needed');
-    assert(!isBlank(chunk), 'chunk needed');
+    ow(filename, 'filename', ow.string.nonEmpty);
+    ow(chunk, 'chunk', ow.number.greaterThanOrEqual(0));
 
     // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
@@ -162,8 +162,8 @@ export class UploaderController {
     @Req() req: AnyAuthRequest & OperationTokenRequest,
     @UploadedFile() file,
   ): Promise<RemoteFileInfo> {
-    assert(!isBlank(filename), 'filename needed');
-    assert(!isBlank(chunk), 'chunk needed');
+    ow(filename, 'filename', ow.string.nonEmpty);
+    ow(chunk, 'chunk', ow.number.greaterThan(0));
 
     return this.uploaderService.uploadChunks(req.token, filename, file.path, chunk);
   }
@@ -284,18 +284,18 @@ export class UploaderController {
       }
       if (_.includes(VideoMimeType, file.mimetype)) {
         logger.log(`save video[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
-        return this.context.videoStorageEngine.saveEntity(file, { bucket, prefix });
+        return this.context.videosStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(DocMimeType, file.mimetype)) {
         logger.log(`save doc[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
-        return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
+        return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
       }
       logger.log(oneLineTrim`
           no storage engine defined for file type [${file.mimetype}]
           to ${r({ bucket, prefix, filename: file.filename })},
           using normal file storage engine.
         `);
-      return this.context.fileStorageEngine.saveEntity(file, { bucket, prefix });
+      return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
     });
   }
 }

@@ -23,13 +23,20 @@ export class FinderHelper {
     return deserializeSafely(FinderAssetsSettings, await KvHelper.getConfigsByEnumKeys(this.kvDef, FinderFieldKeys));
   }
 
-  static async getUrl({
+  static async resolveUrl({
     type,
     name,
     path,
     internal,
   }: {
-    type: 'assets' | 'zones';
+    type: /**
+     * 直接附件查询，默认模式
+     */
+    | 'assets'
+      /**
+       * 按区域查询
+       */
+      | 'zones';
     name?: string; // default is default
     path: string;
     internal?: boolean;

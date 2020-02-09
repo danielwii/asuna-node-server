@@ -25,7 +25,7 @@ export class UploaderHandler implements ICommandHandler<UploadCommand> {
     const { fileInfo, opts } = command;
     const mimetype = mime.lookup(fileInfo.filename) || 'application/octet-stream';
     UploaderHandler.logger.log(`handle command ${r(command)} with mimetype: ${mimetype}`);
-    const saved = await AsunaContext.instance.chunkStorageEngine.saveEntity(
+    const saved = await AsunaContext.instance.chunksStorageEngine.saveEntity(
       { ...fileInfo, mimetype },
       opts,
     );
