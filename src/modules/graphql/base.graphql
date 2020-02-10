@@ -104,6 +104,8 @@ directive @cacheControl(
 ) on OBJECT | FIELD | FIELD_DEFINITION
 
 enum CacheControlScope {
+  # 代理服务器缓存
   PUBLIC
+  # 浏览器缓存
   PRIVATE
 }

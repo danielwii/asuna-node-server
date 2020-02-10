@@ -38,7 +38,7 @@ export class QiniuStorage implements IStorageEngine {
 
     return new Promise<SavedFile>((resolve, reject) => {
       const mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
-      const bucket = opts.bucket || this.configObject.path || `${file.mimetype.split('/')[0]}s`;
+      const bucket = opts.bucket || this.configObject.path;
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);

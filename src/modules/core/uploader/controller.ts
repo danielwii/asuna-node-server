@@ -268,8 +268,9 @@ export class UploaderController {
     return _.first(results);
   }
 
-  private saveFiles(bucket: string, prefix: string, local: string, files: FileInfo[]): Promise<SavedFile[]> {
+  private saveFiles(defaultBucket: string, prefix: string, local: string, files: FileInfo[]): Promise<SavedFile[]> {
     return Promise.map(files, file => {
+      const bucket = defaultBucket || `${file.mimetype.split('/')[0]}s`;
       if (local === '1') {
         logger.log(oneLineTrim`
             save file[${file.mimetype}] to local storage
@@ -278,24 +279,26 @@ export class UploaderController {
         return this.context.localStorageEngine.saveEntity(file, { bucket, prefix });
       }
 
+      const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
       if (_.includes(ImageMimeType, file.mimetype)) {
         logger.log(`save image[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
-        return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
+        // return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(VideoMimeType, file.mimetype)) {
         logger.log(`save video[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
-        return this.context.videosStorageEngine.saveEntity(file, { bucket, prefix });
+        // return this.context.videosStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(DocMimeType, file.mimetype)) {
         logger.log(`save doc[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
-        return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
-      }
-      logger.log(oneLineTrim`
-          no storage engine defined for file type [${file.mimetype}]
-          to ${r({ bucket, prefix, filename: file.filename })},
-          using normal file storage engine.
+        // return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
+      } else {
+        // bucket = bucket || 'files';
+        logger.log(oneLineTrim`
+          unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.
         `);
-      return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
+        return storageEngine.saveEntity(file, { bucket, prefix });
+      }
+      return storageEngine.saveEntity(file, { bucket, prefix });
     });
   }
 }
