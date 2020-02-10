@@ -38,10 +38,11 @@ export class QiniuStorage implements IStorageEngine {
 
     return new Promise<SavedFile>((resolve, reject) => {
       const mac = new qiniu.auth.digest.Mac(this.configObject.accessKey, this.configObject.secretKey);
-      const bucket = opts.bucket || this.configObject.path;
+      const bucket = opts.bucket || this.configObject.path || `${file.mimetype.split('/')[0]}s`;
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);
+      QiniuStorage.logger.log(`generate key by '${r({ bucket, filenameWithPrefix, self: this.configObject, file })}`);
       const key = join('/', bucket, filenameWithPrefix).slice(1);
       QiniuStorage.logger.log(`upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`);
       const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(mac);
@@ -60,8 +61,8 @@ export class QiniuStorage implements IStorageEngine {
             QiniuStorage.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
             const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
             const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
-              ? join(this.configObject.path || '')
-              : join(resourcePath, this.configObject.path || '');
+              ? join(bucket)
+              : join(resourcePath, bucket);
             resolve(
               new SavedFile({
                 prefix,
