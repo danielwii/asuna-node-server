@@ -29,7 +29,7 @@ const logger = LoggerFactory.getLogger('UploaderController');
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
-      const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname}`;
+      const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname.toLowerCase()}`;
       logger.verbose(`set filename ${filename}`);
       cb(null, filename);
     },

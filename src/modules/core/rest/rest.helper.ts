@@ -118,7 +118,7 @@ export class RestHelper {
       .groupBy(column)
       .getRawMany();
     const stats = _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
-    logger.log(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
+    logger.verbose(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
     return stats;
   }
 }

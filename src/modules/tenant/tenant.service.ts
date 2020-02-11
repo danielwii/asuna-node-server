@@ -69,7 +69,7 @@ export class TenantService {
    * 2.🤔 如果没有绑定模型，应该指定 tenant，而 admin 端的管理用户也需要通过手动填写 tenant 来过滤下拉数据
    * @param entity
    */
-  static async populate<E extends { tenant: Tenant }>(entity: E): Promise<void> {
+  static async populate<E extends { tenant: Tenant, tenantId: string }>(entity: E): Promise<void> {
     const config = await TenantHelper.getConfig();
     if (config.enabled && config.firstModelBind) {
       const { entityInfo } = entity.constructor as any;
@@ -78,13 +78,14 @@ export class TenantService {
         return;
       }
 
-      // logger.log(`handle ${r(entityInfo)} ${r(entity)}`);
       const entities = await DBHelper.getModelsHasRelation(Tenant);
       // logger.log(`check entities: ${entities}`);
       const modelName = entityInfo?.name;
-      const found = entities.find(o => o.entityInfo.name === modelName);
+      const hasTenantField = entities.find(o => o.entityInfo.name === modelName);
+      // 模型包含 tenant 元素
       // 只处理不包含 tenant 信息的数据，但是 FIXME 可能存在 tenant 信息和 bindModel 对不上的问题
-      if (found && !entity.tenant) {
+      if (hasTenantField && !entity.tenantId) {
+        logger.log(`handle ${r(entityInfo)} ${r(entity)}`);
         const metadata = DBHelper.getMetadata(modelName);
         const relation = metadata.manyToOneRelations.find(
           o => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
