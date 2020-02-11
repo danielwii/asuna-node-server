@@ -1,28 +1,34 @@
 import * as _ from 'lodash';
-import { EntitySubscriberInterface, EventSubscriber } from 'typeorm';
+import { EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent } from 'typeorm';
 import { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
+import { TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
 const logger = LoggerFactory.getLogger('TenantSubscriber');
 
 @EventSubscriber()
 export class TenantSubscriber implements EntitySubscriberInterface {
-  async afterLoad(entity: any, event?: LoadEvent<any>): Promise<any> {
-    if (['kv__pairs', 'auth__users', 'auth__roles', 'wx__users'].includes(entity.constructor?.entityInfo?.name)) {
+  async handleTenant(entity, metadata) {
+    const config = await TenantHelper.getConfig();
+    if (!config.enabled && !config.firstModelBind) return;
+
+    const entityInfo = (metadata.target as any)?.entityInfo;
+    if (['kv__pairs', 'auth__users', 'auth__roles', 'wx__users', config.firstModelName].includes(entityInfo?.name)) {
       return;
     }
-    if (entity?.tenantId || event.entity?.tenantId) {
+
+    if (entity?.tenantId) {
       return;
     }
-    const properties = DBHelper.getPropertyNamesByMetadata(event.metadata);
+    const properties = DBHelper.getPropertyNamesByMetadata(metadata);
     if (properties.includes('tenantId')) {
-      let loaded = entity || event.entity;
+      let loaded = entity;
 
       if (!_.has(entity, 'tenantId')) {
-        loaded = await (event.metadata.target as any).findOne(entity.id, { select: ['id', 'tenantId'] });
+        loaded = await (metadata.target as any).findOne(entity.id, { select: ['id', 'tenantId'] });
         // const reloaded = await event.manager.createQueryBuilder('entity')
         // const reloaded = await entity.reload();
         // logger.log(`afterLoad reloaded: ${r(loaded)}`);
@@ -37,18 +43,18 @@ export class TenantSubscriber implements EntitySubscriberInterface {
     }
   }
 
-  // afterUpdate(event: UpdateEvent<any>): Promise<any> | void {
-  //   logger.log(`afterUpdate ${r(event.entity.constructor)}`);
-  //   if (['kv__pairs', 'auth__users', 'auth__roles', 'wx__users'].includes(event.entity.constructor?.entityInfo?.name)) {
-  //     return;
-  //   }
-  //   TenantService.populate(event.entity);
-  // }
-  // afterInsert(event: InsertEvent<any>): Promise<any> | void {
-  //   logger.log(`afterInsert ${r(event.entity.constructor)}`);
-  //   if (['kv__pairs', 'auth__users', 'auth__roles', 'wx__users'].includes(event.entity.constructor?.entityInfo?.name)) {
-  //     return;
-  //   }
-  //   TenantService.populate(event.entity);
-  // }
+  async afterLoad(entity: any, event?: LoadEvent<any>): Promise<any> {}
+
+  afterUpdate(event: UpdateEvent<any>): Promise<any> | void {
+    if (event.entity) {
+      logger.log(`afterUpdate ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
+      this.handleTenant(event.entity, event.metadata);
+    }
+  }
+  afterInsert(event: InsertEvent<any>): Promise<any> | void {
+    if (event.entity) {
+      logger.log(`afterInsert ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
+      this.handleTenant(event.entity, event.metadata);
+    }
+  }
 }
