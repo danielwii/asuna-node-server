@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as redis from 'redis';
 import * as RedLock from 'redlock';
-import { r } from '../common/helpers';
+import { promisify, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
 import { RedisConfigKeys } from './redis.config';
@@ -68,9 +68,9 @@ export class RedisLockProvider {
 
   isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE, true);
 
-  lockProcess<T>(
+  async lockProcess<T>(
     // the string identifier for the resource you want to lock
-    resource: string,
+    operation: string,
     handler: () => Promise<T | void>,
     options: {
       // the maximum amount of time you want the resource locked in milliseconds,
@@ -82,8 +82,18 @@ export class RedisLockProvider {
     if (!this.redLock) {
       throw new Error('can not get redis instance');
     }
+
     const ttl = options ? options.ttl : 1000;
-    return this.redLock.lock(`lock:${resource}`, ttl).then(
+    const resource = `lock:${operation}`;
+
+    // const exists = this.client.get
+    const exists = await promisify(this.client.get, this.client)(resource);
+    if (exists) {
+      logger.verbose(`lock resource ${resource} already exists: ${exists}`);
+      return;
+    }
+
+    return this.redLock.lock(resource, ttl).then(
       lock => {
         logger.verbose(`lock ${resource}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
         return handler()

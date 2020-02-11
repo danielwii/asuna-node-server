@@ -3,7 +3,6 @@ import { classToPlain } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as crypto from 'crypto';
 import { Request } from 'express';
-import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as rawBody from 'raw-body';
@@ -11,7 +10,7 @@ import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
 import { CacheManager } from '../cache';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
-import { deserializeSafely, r } from '../common/helpers';
+import { deserializeSafely, HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { AdminUser, AuthUserChannel, TokenHelper } from '../core/auth';
@@ -256,10 +255,6 @@ export class WeChatHelper {
     return 'success';
   }
 
-  static injectContext(message: string, context: object): string {
-    return _.isString(message) ? Handlebars.compile(message)(context) : message;
-  }
-
   static parseTemplateData(data: object, context: object): TemplateData {
     const tmplData = _.assign(
       {},
@@ -273,7 +268,9 @@ export class WeChatHelper {
         .value(),
     );
     logger.verbose(`tmplData is ${r(tmplData)}`);
-    return _.mapValues(tmplData, tmpl => _.mapValues(tmpl, value => this.injectContext(value, context))) as any;
+    return _.mapValues(tmplData, tmpl =>
+      _.mapValues(tmpl, value => HandlebarsHelper.injectContext(value, context)),
+    ) as any;
   }
 
   static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {
@@ -466,19 +463,21 @@ export class WeChatHelper {
   static async sendTemplateMsg({
     openId,
     templateId,
+    url,
     payload,
   }: {
     openId: string;
     templateId: string;
+    url?: string;
     payload: TemplateData;
   }): Promise<WxSendTemplateInfo> {
-    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, data: payload }).then(sendInfo => {
+    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, url, data: payload }).then(sendInfo => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       sendInfo.errcode
         ? logger.error(
             `send template message to ${openId} error: ${r({
               sendInfo,
-              opts: { touser: openId, template_id: templateId, data: payload },
+              opts: { touser: openId, template_id: templateId, url, data: payload },
             })}`,
           )
         : logger.verbose(`send template message to ${openId} done: ${r(sendInfo)}`);

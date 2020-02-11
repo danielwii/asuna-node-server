@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { Promise } from 'bluebird';
 import { ChildProcess } from 'child_process';
 import { classToPlain } from 'class-transformer';
 import { addYears, subYears } from 'date-fns';
@@ -119,4 +120,8 @@ export function parseJSONIfCould(value?: string): any {
     // eslint-disable-next-line no-empty
   } catch (e) {}
   return value;
+}
+
+export function promisify<T extends (...args) => R, R>(fn: T, bind?): (...args: Parameters<T>) => Promise<R> {
+  return Promise.promisify(fn).bind(bind);
 }

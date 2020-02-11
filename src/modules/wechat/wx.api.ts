@@ -77,11 +77,17 @@ type QrLimitScene =
       };
     };
 
-type MiniAppTemplateInfo = {
-  // 接收者openid
+type TemplateInfo = {
+  // 接收者 openid
   touser: string;
   // 模板ID
   template_id: string;
+  data: TemplateData;
+  // 模板内容字体颜色，不填默认为黑色
+  color?: string;
+};
+
+type MiniAppTemplateInfo = TemplateData & {
   // 跳小程序所需数据，不需跳小程序可不用传该数据
   miniprogram?: {
     // 跳转小程序
@@ -89,27 +95,13 @@ type MiniAppTemplateInfo = {
     // 跳转路由
     pagepath: string;
   };
-  // 模板数据
-  data: TemplateData;
+  // 所需跳转到小程序的具体页面路径，支持带参数,（示例index?foo=bar），要求该小程序已发布，暂不支持小游戏
+  pagepath?: string;
 };
 
-type UrlRedirectTemplateInfo = {
-  // 接收者 openid
-  touser: string;
-  // 模板ID
-  template_id: string;
-  // 跳转地址
+type UrlRedirectTemplateInfo = TemplateData & {
+  // 模板跳转链接（海外帐号没有跳转能力）
   url: string;
-  // 跳转小程序
-  data: TemplateData;
-};
-
-type TemplateInfo = {
-  // 接收者 openid
-  touser: string;
-  // 模板ID
-  template_id: string;
-  data: TemplateData;
 };
 
 type MiniSubscribeInfo = {
