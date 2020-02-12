@@ -4,7 +4,6 @@ import * as dayjs from 'dayjs';
 import * as calendar from 'dayjs/plugin/calendar';
 import * as relativeTime from 'dayjs/plugin/relativeTime';
 import * as _ from 'lodash';
-import { CustomConfigKeys } from 'server/src/constants';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
@@ -17,7 +16,6 @@ const logger = LoggerFactory.getLogger('CronHelper');
 
 export class CronHelper {
   private static readonly redis = RedisLockProvider.instance;
-  private static readonly isCronEnabled = configLoader.loadBoolConfig(CustomConfigKeys.CRON_ENABLE, true);
 
   static nextTime(cronTime: string) {
     const next = cronParser
@@ -36,7 +34,7 @@ export class CronHelper {
       ttl?: number;
     } = {},
   ): void {
-    if (!this.isCronEnabled) {
+    if (!configLoader.loadBoolConfig('CRON_ENABLE', true)) {
       return logger.warn(`skip ${operation} cron not enabled.`);
     }
 

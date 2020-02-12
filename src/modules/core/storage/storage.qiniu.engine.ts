@@ -20,9 +20,7 @@ export class QiniuStorage implements IStorageEngine {
 
     if (this.configObject.enable !== true) {
       throw new Error(
-        `qiniu must enable when using qiniu storage engine: ${r({
-          configs: classToPlain(this.configObject),
-        })}`,
+        `qiniu must enable when using qiniu storage engine: ${r({ configs: classToPlain(this.configObject) })}`,
       );
     }
     QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject) })}`);

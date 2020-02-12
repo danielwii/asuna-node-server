@@ -20,6 +20,7 @@ import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
 import { Global } from './modules/core/global';
+import { TracingInterceptor } from './modules/tracing';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -141,6 +142,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(bodyParser.json({ limit }));
   app.use(bodyParser.urlencoded({ limit, extended: true }));
 
+  app.useGlobalInterceptors(new TracingInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());

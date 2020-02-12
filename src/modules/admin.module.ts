@@ -25,6 +25,7 @@ import {
 import { SearchController } from './search/search.controller';
 import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
+import { TracingModule } from './tracing';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -43,6 +44,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     UploaderModule,
     ImportExportModule,
     TenantModule,
+    TracingModule,
   ],
   controllers: [
     ApiController,

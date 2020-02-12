@@ -23,6 +23,8 @@ module.exports = {
     // Too restrictive, writing ugly code to defend against a very unlikely scenario: https://eslint.org/docs/rules/no-prototype-builtins
     'no-prototype-builtins': 'off',
     // https://basarat.gitbooks.io/typescript/docs/tips/defaultIsBad.html
+    '@typescript-eslint/no-implied-eval': 'off',
+    '@typescript-eslint/no-throw-literal': 'off',
     'import/prefer-default-export': 'off',
     'import/no-default-export': 'warn',
     'import/no-duplicates': 'off',
@@ -47,7 +49,7 @@ module.exports = {
     '@typescript-eslint/camelcase': 'off',
     // Makes no sense to allow type inferrence for expression parameters, but require typing the response
     '@typescript-eslint/explicit-function-return-type': [
-      'error',
+      'warn',
       { allowExpressions: true, allowTypedFunctionExpressions: true },
     ],
     '@typescript-eslint/no-use-before-define': [

@@ -1,4 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
 import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth';
@@ -10,6 +11,7 @@ const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 export interface GraphqlContext<GetDataLoaders, U = UserProfile> {
   getDataLoaders: GetDataLoaders;
   getCurrentUser: () => U;
+  getTrace: () => SpanContext;
 }
 
 const genericDataLoader = new GenericDataLoader();
