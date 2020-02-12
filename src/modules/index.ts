@@ -1,5 +1,6 @@
 export * from './app';
 export * from './base';
+export * from './core';
 export * from './dataloader';
 export * from './admin.module';
 export * from './graphql.module';
@@ -9,8 +10,7 @@ export * from './client';
 export * from './config';
 export * from './common';
 export * from './graphql';
-export * from './core';
-export * from './helper/auth';
+export * from './helper';
 export * from './ids';
 export * from './providers';
 export * from './core/auth/auth.module';
