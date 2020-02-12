@@ -583,10 +583,10 @@
     tslib "1.10.0"
     ws "7.2.1"
 
-"@nestjs/swagger@^4.2.6":
-  version "4.2.6"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.6.tgz#a358ac5609f79c88fe165da2958d18c6460b43cc"
-  integrity sha512-bhFLXrDo8O0OU0GQ/uX0eOOFgKCwe2bPAHh7BI+zEF12r/VoA4IFWG8DywqYp7KnaLJN6oHtaOaVlYWPhPvoZQ==
+"@nestjs/swagger@^4.2.7":
+  version "4.2.7"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.7.tgz#6e1ecbe3b62b7f6c4014aaedcdb57f358401c378"
+  integrity sha512-VgFjNclajZHDAsvL3+XCaJE0wgPkzsasQ8eTTRakIdAfWcK6QX4dF0Nb5z+i2Zqvw0ZPwc7oWNRbhGACbVglsw==
   dependencies:
     lodash "4.17.15"
     path-to-regexp "3.2.0"
@@ -621,12 +621,19 @@
     optional "0.1.4"
     tslib "1.10.0"
 
-"@nestjs/typeorm@6.2.0", "@nestjs/typeorm@^6.2.0":
+"@nestjs/typeorm@6.2.0":
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/@nestjs/typeorm/-/typeorm-6.2.0.tgz#6b8e3d80e3fbd9dc5e0a9d1ebf3028f7adb1ace9"
   integrity sha512-CRDYV3oxTUa6mTDJfdW+RPLtVUpGx0RpigQdLlvMFLM56v+bYnrTuuy4vurKDgLNFC+AttL9JLZOgRhW8fGdgQ==
   dependencies:
     uuid "3.3.3"
+
+"@nestjs/typeorm@^6.3.1":
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/typeorm/-/typeorm-6.3.1.tgz#65e1a666a06290bfe3007293c6aa78152f109056"
+  integrity sha512-Au40kKTpRU8p0Z45psrGTdKKJeIIXNt/2iwSUtA1RODCQZfJQrr/Sg6aLo2373LU9FY4GHGTaI3hmadYCL5Pdg==
+  dependencies:
+    uuid "3.4.0"
 
 "@nestjs/websockets@^6.11.6":
   version "6.11.6"
@@ -1252,10 +1259,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
-"@types/redis@^2.8.14":
-  version "2.8.14"
-  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.14.tgz#2ed46d0f923f7ccd63fbe73a46a1241e606cf716"
-  integrity sha512-255dzsOLJdXFHBio9/aMHGozNkoiBUgc+g2nlNjbTSp5qcAlmpm4Z6Xs3pKOBLNIKdZbA2BkUxWvYSIwKra0Yw==
+"@types/redis@^2.8.15":
+  version "2.8.15"
+  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.15.tgz#60e178a116a2ce35b42cdd08787b40fa7fbeb3d6"
+  integrity sha512-kp05OQVXH6w2vPLd86t2y4Y64jjHClbciF3w2k1MHVs5uQu/zf0HM4ibUgFGDDogBloJkTYtfjZsXjKHlMBxqw==
   dependencies:
     "@types/node" "*"
 
@@ -1369,12 +1376,12 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^2.19.0":
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-2.19.0.tgz#bf743448a4633e4b52bee0c40148ba072ab3adbd"
-  integrity sha512-u7IcQ9qwsB6U806LupZmINRnQjC+RJyv36sV/ugaFWMHTbFm/hlLTRx3gGYJgHisxcGSTnf+I/fPDieRMhPSQQ==
+"@typescript-eslint/eslint-plugin@^2.19.2":
+  version "2.19.2"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-2.19.2.tgz#e279aaae5d5c1f2547b4cff99204e1250bc7a058"
+  integrity sha512-HX2qOq2GOV04HNrmKnTpSIpHjfl7iwdXe3u/Nvt+/cpmdvzYvY0NHSiTkYN257jHnq4OM/yo+OsFgati+7LqJA==
   dependencies:
-    "@typescript-eslint/experimental-utils" "2.19.0"
+    "@typescript-eslint/experimental-utils" "2.19.2"
     eslint-utils "^1.4.3"
     functional-red-black-tree "^1.0.1"
     regexpp "^3.0.0"
@@ -1387,6 +1394,15 @@
   dependencies:
     "@types/json-schema" "^7.0.3"
     "@typescript-eslint/typescript-estree" "2.19.0"
+    eslint-scope "^5.0.0"
+
+"@typescript-eslint/experimental-utils@2.19.2":
+  version "2.19.2"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-2.19.2.tgz#4611d44cf0f0cb460c26aa7676fc0a787281e233"
+  integrity sha512-B88QuwT1wMJR750YvTJBNjMZwmiPpbmKYLm1yI7PCc3x0NariqPwqaPsoJRwU9DmUi0cd9dkhz1IqEnwfD+P1A==
+  dependencies:
+    "@types/json-schema" "^7.0.3"
+    "@typescript-eslint/typescript-estree" "2.19.2"
     eslint-scope "^5.0.0"
 
 "@typescript-eslint/experimental-utils@^2.5.0":
@@ -1425,6 +1441,19 @@
   version "2.19.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-2.19.0.tgz#6bd7310b9827e04756fe712909f26956aac4b196"
   integrity sha512-n6/Xa37k0jQdwpUszffi19AlNbVCR0sdvCs3DmSKMD7wBttKY31lhD2fug5kMD91B2qW4mQldaTEc1PEzvGu8w==
+  dependencies:
+    debug "^4.1.1"
+    eslint-visitor-keys "^1.1.0"
+    glob "^7.1.6"
+    is-glob "^4.0.1"
+    lodash "^4.17.15"
+    semver "^6.3.0"
+    tsutils "^3.17.1"
+
+"@typescript-eslint/typescript-estree@2.19.2":
+  version "2.19.2"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-2.19.2.tgz#67485b00172f400474d243c6c0be27581a579350"
+  integrity sha512-Xu/qa0MDk6upQWqE4Qy2X16Xg8Vi32tQS2PR0AvnT/ZYS4YGDvtn2MStOh5y8Zy2mg4NuL06KUHlvCh95j9C6Q==
   dependencies:
     debug "^4.1.1"
     eslint-visitor-keys "^1.1.0"
@@ -1743,6 +1772,16 @@ apollo-link@^1.2.3:
     tslib "^1.9.3"
     zen-observable-ts "^0.8.20"
 
+apollo-server-cache-redis@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/apollo-server-cache-redis/-/apollo-server-cache-redis-1.1.5.tgz#dae4fef84d2527eb2f07a430a3b370b78d5caa12"
+  integrity sha512-RPhGbcwfWWgMvr8eHR0yU8H2Zu5n0nuV+M4b0srBxJRxU89r3/3vsr1aU43qZ0i7tsZ1MXZzwn30Vhx8boBtCw==
+  dependencies:
+    apollo-server-caching "^0.5.1"
+    apollo-server-env "^2.4.3"
+    dataloader "^1.4.0"
+    ioredis "^4.0.0"
+
 apollo-server-caching@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/apollo-server-caching/-/apollo-server-caching-0.5.1.tgz#5cd0536ad5473abb667cc82b59bc56b96fb35db6"
@@ -1818,6 +1857,15 @@ apollo-server-plugin-base@^0.6.10:
   integrity sha512-/xT7UT/tbCDIoTQ4lcEQsJ0ACh7h7QG0BDmeSlDXjwDuENRI50bQ2QoluCMPitZXGe+FCQfLhvzFgzbsZGT0IA==
   dependencies:
     apollo-server-types "^0.2.10"
+
+apollo-server-plugin-response-cache@^0.3.11:
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/apollo-server-plugin-response-cache/-/apollo-server-plugin-response-cache-0.3.11.tgz#dd00e379adbd3f08896a0fc92e05b548448e8cc9"
+  integrity sha512-shFZqhqa26mMHKRufObmKLujnkHjuJrOZ5c2vcJar9VCbitQIoFDUiLEiczOvaxwVj8XYnAron56f+s4Ia/9Xg==
+  dependencies:
+    apollo-cache-control "^0.8.11"
+    apollo-server-caching "^0.5.1"
+    apollo-server-plugin-base "^0.6.10"
 
 apollo-server-types@^0.2.10:
   version "0.2.10"
@@ -3224,6 +3272,11 @@ data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
+dataloader@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-1.4.0.tgz#bca11d867f5d3f1b9ed9f737bd15970c65dff5c8"
+  integrity sha512-68s5jYdlvasItOJnCuI2Q9s4q98g0pCyL3HrcKJu8KNugUl8ahgmZYg38ysLTgQjjXX3H8CJLkAvWrclWfcalw==
+
 dataloader@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-2.0.0.tgz#41eaf123db115987e21ca93c005cd7753c55fe6f"
@@ -3984,10 +4037,10 @@ eslint-plugin-promise@^4.2.1:
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-4.2.1.tgz#845fd8b2260ad8f82564c1222fce44ad71d9418a"
   integrity sha512-VoM09vT7bfA7D+upt+FjeBO5eHIJQBUWki1aPvB+vbNiHS3+oGIJGIeyBtKQTME6UPXXy3vV07OL1tHd3ANuDw==
 
-eslint-plugin-unicorn@^16.0.0:
-  version "16.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-unicorn/-/eslint-plugin-unicorn-16.0.0.tgz#5fc03d70b2944fa85099bf511c352b3d50201738"
-  integrity sha512-zqWMYzTopdixyqu0+3td4vIGmpBxwdBVeWBm3TzwnFMvHoAE6tTQ/w2Xv5RG/MklKkfQdHsRqa8CVsSpjSA4qQ==
+eslint-plugin-unicorn@^16.1.1:
+  version "16.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-unicorn/-/eslint-plugin-unicorn-16.1.1.tgz#012c598d71914ef30f5d386dd85110e59f2ef999"
+  integrity sha512-IMxCsntb0T8s660Irc40gtzXtxuXHcOn36G9G8OYKfiseBD/kNrA1cNJhsJ0xQteDASGrFwqdzBsYEkUvczhOA==
   dependencies:
     ci-info "^2.0.0"
     clean-regexp "^1.0.0"
@@ -5314,10 +5367,10 @@ humanize-ms@^1.2.0, humanize-ms@^1.2.1:
   dependencies:
     ms "^2.0.0"
 
-husky@^4.2.1:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/husky/-/husky-4.2.1.tgz#b09f1bd9129e6c323cc515dc17081d0615e2d7c1"
-  integrity sha512-Qa0lRreeIf4Tl92sSs42ER6qc3hzoyQPPorzOrFWfPEVbdi6LuvJEqWKPk905fOWIR76iBpp7ECZNIwk+a8xuQ==
+husky@^4.2.2:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/husky/-/husky-4.2.2.tgz#aa858a99ad685f13ab5f99fa71b60e0fe0cd9048"
+  integrity sha512-RAjZNO74zJyFJuRFESy+3LXTJvYbjGL+jhoSNJNF1DTKq2USrL5fEH70e1cJXEgvLaPyZt1NoGi0oNQQkPs4jA==
   dependencies:
     chalk "^3.0.0"
     ci-info "^2.0.0"
@@ -5488,7 +5541,7 @@ invert-kv@^1.0.0:
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-1.0.0.tgz#104a8e4aaca6d3d8cd157a8ef8bfab2d7a3ffdb6"
   integrity sha1-EEqOSqym09jNFXqO+L+rLXo//bY=
 
-ioredis@^4.14.1:
+ioredis@^4.0.0, ioredis@^4.14.1:
   version "4.14.1"
   resolved "https://registry.yarnpkg.com/ioredis/-/ioredis-4.14.1.tgz#b73ded95fcf220f106d33125a92ef6213aa31318"
   integrity sha512-94W+X//GHM+1GJvDk6JPc+8qlM7Dul+9K+lg3/aHixPN7ZGkW6qlvX0DG6At9hWtH2v3B32myfZqWoANUJYGJA==
