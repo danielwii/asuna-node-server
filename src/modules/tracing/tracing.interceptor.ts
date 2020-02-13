@@ -37,7 +37,6 @@ export class TracingInterceptor implements NestInterceptor {
     // logger.verbose(`[trace] start span ${serviceName}`);
     const span = TracingHelper.tracer.startSpan(serviceName);
     request.trace = span.context();
-    span.setTag(Tags.SAMPLING_PRIORITY, 1);
     return next.handle().pipe(
       tap(
         () => {

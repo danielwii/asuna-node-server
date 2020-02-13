@@ -11,7 +11,7 @@ export const ConfigKeys = {
   DEBUG: 'DEBUG',
   SWAGGER: 'SWAGGER',
   PORT: 'PORT',
-  TRACING: 'TRACING',
+  // TRACING: 'TRACING',
   DB_TYPE: 'DB_TYPE',
   UPLOADER_MAX_COUNT: 'UPLOADER_MAX_COUNT',
 

@@ -26,6 +26,7 @@ module.exports = {
     '@typescript-eslint/no-implied-eval': 'off',
     '@typescript-eslint/no-throw-literal': 'off',
     'import/prefer-default-export': 'off',
+    'import/no-named-default': 'off',
     'import/no-default-export': 'warn',
     'import/no-duplicates': 'off',
     'max-classes-per-file': 'off',

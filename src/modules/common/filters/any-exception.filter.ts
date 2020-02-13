@@ -1,5 +1,6 @@
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import * as Sentry from '@sentry/node';
 import { Response } from 'express';
 import * as _ from 'lodash';
 import * as R from 'ramda';
@@ -102,6 +103,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       logger.warn(`[client_error] ${r(processed)}`);
     } else {
       logger.error(`[unhandled exception] ${r(processed)}`);
+      Sentry.captureException(processed);
     }
 
     if (res.finished) return;

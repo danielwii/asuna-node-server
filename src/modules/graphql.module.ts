@@ -1,6 +1,7 @@
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+import { default as OpentracingExtension } from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -14,6 +15,7 @@ import { ConfigKeys, configLoader } from './config';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { RedisProvider } from './providers';
+import { TracingHelper } from './tracing';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
@@ -21,6 +23,8 @@ const logger = LoggerFactory.getLogger('GraphqlModule');
 export class GraphqlModule implements OnModuleInit {
   static forRoot(dir, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
+    const tracer = TracingHelper.init();
+
     const typePaths = [
       // '../**/*.graphql',
       `${join(__dirname, '../../src')}/**/*.graphql`,
@@ -55,6 +59,11 @@ export class GraphqlModule implements OnModuleInit {
           },
           persistedQueries: { cache },
           plugins: [
+            {
+              serverWillStart() {
+                logger.log('Server starting!');
+              },
+            },
             (responseCachePlugin as any)({
               sessionId: requestContext => {
                 const sessionID = requestContext.request.http.headers.get('sessionid') || null;
@@ -74,17 +83,25 @@ export class GraphqlModule implements OnModuleInit {
             getCurrentUser: () => _.get(context.req, 'user'),
             getTrace: () => _.get(context.req, 'trace'),
           }),
-          /*          extensions: _.compact([
-            configLoader.loadConfig(ConfigKeys.TRACING)
-              ? () =>
-                  new OpenTracingExtension({
+          extensions: [
+            () => {
+              const opentracingExtension = new OpentracingExtension({ server: tracer, local: tracer });
+              logger.log(`create opentracingExtension2 ${r(opentracingExtension, { depth: 1 })}`);
+              return opentracingExtension;
+            },
+            configLoader.loadBoolConfig('JAEGER_ENABLED', false)
+              ? () => {
+                  const opentracingExtension = new OpentracingExtension({
                     server: tracer,
-                    local: graphqlTracer,
-                    shouldTraceRequest: info => true,
-                    shouldTraceFieldResolver: (source, args, context, info) => true,
-                  }) as any
+                    local: tracer,
+                    // shouldTraceRequest: info => true,
+                    // shouldTraceFieldResolver: (source, args, context, info) => true,
+                  });
+                  logger.log(`create opentracingExtension ${r(opentracingExtension, { depth: 1 })}`);
+                  return opentracingExtension;
+                }
               : undefined,
-          ]), */
+          ],
           formatResponse: response => {
             if (response.errors) {
               logger.warn(`response: ${r(response.errors)}`);
