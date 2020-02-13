@@ -1,8 +1,9 @@
 import { INestApplication } from '@nestjs/common';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
-import { AdminInternalModule } from '../src/modules';
+import { AdminInternalModule, SimpleLoggerService } from '../src/modules';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -12,7 +13,7 @@ describe('AppController (e2e)', () => {
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
+    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: new SimpleLoggerService() });
     await app.init();
   });
 

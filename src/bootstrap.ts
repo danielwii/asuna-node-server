@@ -17,6 +17,7 @@ import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
+import { LoggerConfigObject } from './modules/common/logger/config';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
 import { Global } from './modules/core/global';
@@ -58,6 +59,13 @@ export interface BootstrapOptions {
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
+
+  logger.log(
+    `init logger: ${r({
+      config: LoggerConfigObject.load(),
+      envs: _.pickBy(configLoader.loadConfigs(), (v, k) => k.startsWith('LOGGER_')),
+    })}`,
+  );
 
   AsunaContext.instance.setup(options.context);
   // AsunaContext.instance.setup(options.context || { root: options.root });
