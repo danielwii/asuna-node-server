@@ -33,18 +33,22 @@ export class CronHelper {
       // ttl in seconds
       ttl?: number;
     } = {},
-  ): void {
+  ): CronJob {
     if (!configLoader.loadBoolConfig('CRON_ENABLE', true)) {
-      return logger.warn(`skip ${operation} cron not enabled.`);
+      logger.warn(`skip ${operation} cron not enabled.`);
+      return null;
     }
 
     const ttl = opts.ttl ?? 10;
     logger.verbose(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts })}`);
-    const promise = this.redis.isEnabled ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }) : handler();
-    new CronJob({
+    const callPromise = () =>
+      this.redis.isEnabled
+        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 })
+        : handler().catch(reason => logger.error(reason));
+    return new CronJob({
       cronTime,
       onTick: () =>
-        promise.finally(() =>
+        callPromise().finally(() =>
           logger.verbose(`${operation} done. next: ${r({ cronTime, ...this.nextTime(cronTime) })}`),
         ),
       onComplete: () => {

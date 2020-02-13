@@ -192,7 +192,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log('bootstrap app ...');
   return app.listenAsync(port).then(async () => {
     logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}`);
-    await AppLifecycle.appStarted();
+    await AppLifecycle.onAppStartListening();
     return app;
   });
 }
