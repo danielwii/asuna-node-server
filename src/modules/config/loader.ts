@@ -22,6 +22,7 @@ export const ConfigKeys = {
   GRAPHQL_DEBUG: 'GRAPHQL_DEBUG',
 
   CHROMIUM_PATH: 'CHROMIUM_PATH',
+  CRON_ENABLE: 'CRON_ENABLE',
 
   /**
    * 用与访问上传文件的资源地址
