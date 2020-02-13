@@ -21,6 +21,13 @@
     "@types/node" "^10.1.0"
     long "^4.0.0"
 
+"@apollographql/apollo-tools@^0.3.6":
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/@apollographql/apollo-tools/-/apollo-tools-0.3.7.tgz#3bc9c35b9fff65febd4ddc0c1fc04677693a3d40"
+  integrity sha512-+ertvzAwzkYmuUtT8zH3Zi6jPdyxZwOgnYaZHY7iLnMVJDhQKWlkyjLMF8wyzlPiEdDImVUMm5lOIBZo7LkGlg==
+  dependencies:
+    apollo-env "0.5.1"
+
 "@apollographql/apollo-tools@^0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@apollographql/apollo-tools/-/apollo-tools-0.4.3.tgz#938a50aea0935973a75155a73417f2f6fc7ac2ef"
@@ -1821,6 +1828,15 @@ apollo-engine-reporting@^1.5.0:
     async-retry "^1.2.1"
     graphql-extensions "^0.10.10"
 
+apollo-env@0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/apollo-env/-/apollo-env-0.5.1.tgz#b9b0195c16feadf0fe9fd5563edb0b9b7d9e97d3"
+  integrity sha512-fndST2xojgSdH02k5hxk1cbqA9Ti8RX4YzzBoAB4oIe1Puhq7+YlhXGXfXB5Y4XN0al8dLg+5nAkyjNAR2qZTw==
+  dependencies:
+    core-js "^3.0.1"
+    node-fetch "^2.2.0"
+    sha.js "^2.4.11"
+
 apollo-env@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/apollo-env/-/apollo-env-0.6.1.tgz#12cc869c4276a5f794edf5e5f243676038d4fb07"
@@ -1848,6 +1864,14 @@ apollo-link@^1.2.3:
     ts-invariant "^0.4.0"
     tslib "^1.9.3"
     zen-observable-ts "^0.8.20"
+
+apollo-opentracing@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/apollo-opentracing/-/apollo-opentracing-1.4.2.tgz#2c96af989685a4a72a173e683b8dd11fe7c79b31"
+  integrity sha512-5IgBIixqqmWWOo+TAsPYVRq9JbUgoPnRLckutgIgFpoSVxhM78nkAmwuXBF8lRveXWy113GnDEihAJ2nuOmF2Q==
+  dependencies:
+    apollo-server-types "^0.2.1"
+    graphql-extensions "^0.7.0"
 
 apollo-server-cache-redis@^1.1.5:
   version "1.1.5"
@@ -1892,6 +1916,14 @@ apollo-server-core@^2.10.0:
     sha.js "^2.4.11"
     subscriptions-transport-ws "^0.9.11"
     ws "^6.0.0"
+
+apollo-server-env@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/apollo-server-env/-/apollo-server-env-2.4.0.tgz#6611556c6b627a1636eed31317d4f7ea30705872"
+  integrity sha512-7ispR68lv92viFeu5zsRUVGP+oxsVI3WeeBNniM22Cx619maBUwcYTIC3+Y3LpXILhLZCzA1FASZwusgSlyN9w==
+  dependencies:
+    node-fetch "^2.1.2"
+    util.promisify "^1.0.0"
 
 apollo-server-env@^2.4.3:
   version "2.4.3"
@@ -1944,7 +1976,7 @@ apollo-server-plugin-response-cache@^0.3.11:
     apollo-server-caching "^0.5.1"
     apollo-server-plugin-base "^0.6.10"
 
-apollo-server-types@^0.2.10:
+apollo-server-types@^0.2.1, apollo-server-types@^0.2.10:
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/apollo-server-types/-/apollo-server-types-0.2.10.tgz#017ee0c812e70b0846826834eb2c9eda036c1c7a"
   integrity sha512-ke9ViPEWfW+2XLe66CaKGVZdS7duSLbamSKSprmmeMBd8s6tmjf0FumUVxV7X4quxPZi0OPo8x0LoLU7GWsmaA==
@@ -5092,6 +5124,14 @@ graphql-extensions@^0.10.10:
     apollo-server-env "^2.4.3"
     apollo-server-types "^0.2.10"
 
+graphql-extensions@^0.7.0:
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/graphql-extensions/-/graphql-extensions-0.7.7.tgz#19f4dea35391065de72b25def98f8396887bdf43"
+  integrity sha512-xiTbVGPUpLbF86Bc+zxI/v/axRkwZx3s+y2/kUb2c2MxNZeNhMZEw1dSutuhY2f2JkRkYFJii0ucjIVqPAQ/Lg==
+  dependencies:
+    "@apollographql/apollo-tools" "^0.3.6"
+    apollo-server-env "2.4.0"
+
 graphql-query-complexity@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/graphql-query-complexity/-/graphql-query-complexity-0.3.0.tgz#71a44e124b7591a185d9d8cde55205aa57680c5d"
@@ -8062,10 +8102,10 @@ otplib@^12.0.1:
     "@otplib/preset-default" "^12.0.1"
     "@otplib/preset-v11" "^12.0.1"
 
-ow@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/ow/-/ow-0.15.1.tgz#ad21bb4d4c46d4478b948522e36b214f6f13039d"
-  integrity sha512-rwiuvCnk3Ug9T4s5oKzw3QXQSiTXlTUiQgHmZ9Ozw/37YzeX8LycosVKOtO3v5+fuARGmCgz9rVhaBJeGV+2bQ==
+ow@^0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/ow/-/ow-0.16.0.tgz#c096cfbee8fe447577099598e8f04e002f2fc391"
+  integrity sha512-pJAkOEbRT7vhJZlkyKp/rQKR4YQ3qqdek6f3MnHMs7MRBKm5RfZq6GiLnqMRbQeYTwhMFXsTFuyhDrFuPu+yFQ==
   dependencies:
     type-fest "^0.8.1"
 
