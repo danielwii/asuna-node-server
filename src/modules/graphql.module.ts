@@ -64,7 +64,7 @@ export class GraphqlModule implements OnModuleInit {
             }),
           ],
           cacheControl: {
-            defaultMaxAge: 5,
+            // defaultMaxAge: 5,
             stripFormattedExtensions: false,
             calculateHttpHeaders: true,
           },
