@@ -79,6 +79,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   const app = await NestFactory.create<NestExpressApplication>(appModule, {
     logger: new SimpleLoggerService(),
   });
+  await AppLifecycle.onInit(app);
 
   // --------------------------------------------------------------
   // rename old tables to newer

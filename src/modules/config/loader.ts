@@ -23,6 +23,8 @@ export const ConfigKeys = {
 
   CHROMIUM_PATH: 'CHROMIUM_PATH',
   CRON_ENABLE: 'CRON_ENABLE',
+  SENTRY_ENABLE: 'SENTRY_ENABLE',
+  SENTRY_DSN: 'SENTRY_DSN',
 
   /**
    * 用与访问上传文件的资源地址
