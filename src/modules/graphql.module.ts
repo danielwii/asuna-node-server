@@ -83,12 +83,7 @@ export class GraphqlModule implements OnModuleInit {
             getCurrentUser: () => _.get(context.req, 'user'),
             getTrace: () => _.get(context.req, 'trace'),
           }),
-          extensions: [
-            () => {
-              const opentracingExtension = new OpentracingExtension({ server: tracer, local: tracer });
-              logger.log(`create opentracingExtension2 ${r(opentracingExtension, { depth: 1 })}`);
-              return opentracingExtension;
-            },
+          extensions: _.compact([
             configLoader.loadBoolConfig('JAEGER_ENABLED', false)
               ? () => {
                   const opentracingExtension = new OpentracingExtension({
@@ -101,7 +96,7 @@ export class GraphqlModule implements OnModuleInit {
                   return opentracingExtension;
                 }
               : undefined,
-          ],
+          ]),
           formatResponse: response => {
             if (response.errors) {
               logger.warn(`response: ${r(response.errors)}`);
