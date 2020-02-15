@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, Header, Param, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { classToPlain } from 'class-transformer';
 import { Response } from 'express';
@@ -32,6 +32,7 @@ export class GetUploadsController {
    * @param jpegConfig
    * @param res
    */
+  @Header('Cache-Control', 'max-age=31536000') // expired in 1 year
   @Get(':bucket/*')
   async getUploads(
     @Param('bucket') bucket: string,
