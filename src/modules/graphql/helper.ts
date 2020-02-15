@@ -33,7 +33,7 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   join?: JoinOptions;
   relationPath?: string;
   timeCondition?: TimeConditionInput;
-  cache?: boolean;
+  cache?: boolean | number;
   skip?: number;
   take?: number;
   order?: {

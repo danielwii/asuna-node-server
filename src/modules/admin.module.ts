@@ -1,5 +1,6 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import * as redisStore from 'cache-manager-redis-store';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
 import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
@@ -14,6 +15,7 @@ import { DynamicRouterModule } from './dynamic-router';
 import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
+import { RedisProvider } from './providers';
 import {
   AdminAppRestController,
   AdminContentRestController,
@@ -45,6 +47,11 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ImportExportModule,
     TenantModule,
     TracingModule,
+    CacheModule.register(
+      RedisProvider.instance.getRedisClient('cache-manager').isEnabled
+        ? { store: redisStore, ...RedisProvider.instance.getRedisClient('cache-manager') }
+        : null,
+    ),
   ],
   controllers: [
     ApiController,

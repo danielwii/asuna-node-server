@@ -38,11 +38,12 @@ export class TenantSubscriber implements EntitySubscriberInterface {
         return;
       }
 
-      logger.log(`afterLoad ${r({ entity, properties, loaded })}`);
+      logger.log(`afterLoad ${entity.id} ${r({ properties, loaded })}`);
       TenantService.populate(loaded);
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async afterLoad(entity: any, event?: LoadEvent<any>): Promise<any> {}
 
   afterUpdate(event: UpdateEvent<any>): Promise<any> | void {

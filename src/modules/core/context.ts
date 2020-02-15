@@ -104,7 +104,7 @@ export class AsunaContext {
       this.defaultStorageEngine = new LocalStorage(this.uploadPath);
     }
 
-/*
+    /*
     const imageStorage = configLoader.loadConfig(ConfigKeys.IMAGES_STORAGE);
     if (imageStorage === StorageMode.QINIU) {
       this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('images'));

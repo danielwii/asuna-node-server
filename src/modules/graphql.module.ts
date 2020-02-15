@@ -92,7 +92,7 @@ export class GraphqlModule implements OnModuleInit {
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
                   });
-                  logger.log(`create opentracingExtension ${r(opentracingExtension, { depth: 1 })}`);
+                  logger.log(`load opentracingExtension ...`);
                   return opentracingExtension;
                 }
               : undefined,
