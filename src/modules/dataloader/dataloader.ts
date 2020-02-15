@@ -1,8 +1,11 @@
+import { Promise } from 'bluebird';
 import * as DataLoader from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { LRUMap } from 'lru_map';
 import { BaseEntity } from 'typeorm';
+import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 
@@ -10,24 +13,22 @@ const logger = LoggerFactory.getLogger('DataLoaderCache');
 
 const cacheMap = new Map();
 
-export type PrimaryKeyType = string | number;
-
 export interface DataLoaderFunction<Entity extends BaseEntity> {
-  load(id?: PrimaryKeyType): Promise<Entity>;
-  load(ids?: PrimaryKeyType[]): Promise<Entity[]>;
+  load(id?: PrimaryKey): Promise<Entity>;
+  load(ids?: PrimaryKey[]): Promise<Entity[]>;
 }
 
-function resolve(ids: PrimaryKeyType[]) {
+function resolveIds(ids: PrimaryKey[]) {
   return entities => ids.map(id => entities.find(entity => (entity ? entity.id === id : false)));
 }
 
-function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKeyType, Entity>): DataLoaderFunction<Entity> {
+function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Entity>): DataLoaderFunction<Entity> {
   return {
-    load(ids?: PrimaryKeyType | PrimaryKeyType[]) {
+    load(ids?: PrimaryKey | PrimaryKey[]) {
       if (_.isArray(ids)) {
-        return !_.isEmpty(ids) ? (dataloader.loadMany(ids as PrimaryKeyType[]).then(fp.compact) as any) : null;
+        return !_.isEmpty(ids) ? (dataloader.loadMany(ids as PrimaryKey[]).then(fp.compact) as any) : null;
       }
-      return ids ? dataloader.load(ids as PrimaryKeyType) : null;
+      return ids ? dataloader.load(ids as PrimaryKey) : null;
     },
   };
 }
@@ -43,7 +44,7 @@ export function loader<Entity extends BaseEntity>(
           where: { isPublished: opts.isPublished },
           loadRelationIds: opts.loadRelationIds,
         })
-        .then(resolve(ids)),
+        .then(resolveIds(ids)),
     ),
   );
 }
@@ -72,17 +73,8 @@ export function createDataLoaderProxy(preloader?: () => any | Promise<any>) {
 export class GenericDataLoader {
   private static loaders;
 
-  private static subject;
-
   constructor() {
     logger.log('init ...');
-    if (!GenericDataLoader.subject) {
-      /*
-      Hermes.subscribe(this.constructor.name, 'fanout', (event: IAsunaEvent) => {
-        logger.log(`subscribe ${event.name} ${r(event)}`);
-      });
-*/
-    }
   }
 
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
@@ -94,75 +86,63 @@ export class GenericDataLoader {
   }
 }
 
-export function cachedDataLoader(segment, fn): DataLoader<PrimaryKeyType, any> {
-  return new DataLoader(
-    ids => {
-      // logger.log(`load ${segment}: ${ids}`);
-      return fn(ids);
-    },
-    {
-      // cacheKeyFn: (id: number) => {
-      //   logger.log(`cast (${segment}:${id})`);
-      //   return `${id}`;
-      // },
-      cacheMap: {
-        get: (id: string) => {
-          // const cachedObject = await client.get({ segment, id });
-          // logger.log(`get (${segment}:${id}) ${util.inspect(cachedObject)}`);
-          // return cachedObject;
-          const now = Date.now();
-          // console.log({ size: cacheMap.size });
-          const key = `${segment}-${id}`;
-          // console.log('cacheMap load', key);
-          const { value, expires } = cacheMap.get(key) || ({} as any);
-          // console.log('cacheMap load', { key, value });
-          if (!value) {
-            return null;
-          }
-          // FIXME 采用 EntitySubscriber 的 afterUpdate 来激活清理函数，暂时关闭函数过期
-          const isExpired = expires < now && false;
-          // logger.log(
-          //   `get (${segment}:${id}) ${r(
-          //     {
-          //       exists: !!value,
-          //       expires: new Date(expires),
-          //       now: new Date(now),
-          //       left: expires - now,
-          //       isExpired,
-          //     },
-          //   )}`,
-          // );
-          if (isExpired) {
-            cacheMap.delete(key);
-            return null;
-          }
-          return value;
-        },
-        set: async (id: string, value) => {
-          const key = `${segment}-${id}`;
-          const promised = await value;
-          logger.verbose(`dataloader set ${key}`);
-          const now = Date.now();
-          // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
-          // if (!cacheMap.has(key)) {
-          //   cacheMap.set(key, { value, expires: now + 1 * 60 * 1000 });
-          //   // console.log({ size: cacheMap.size });
-          // }
-          cacheMap.set(key, { value: promised, expires: now + 5 * 60 * 1000 });
-        },
-        delete: (id: string) => {
-          // logger.log(`delete (${segment}:${id})`);
-          const key = `${segment}-${id}`;
-          cacheMap.delete(key);
-          // return client.drop({ segment, id });
-        },
-        clear: () => {
-          // logger.log(`clear (${segment})`);
-          cacheMap.clear();
-          // return logger.warn('not implemented.');
+export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
+  /* dataloader is a internal cache, not support distributed
+  const redis = RedisProvider.instance.getRedisClient('dataloader');
+  if (redis.isEnabled) {
+    return new DataLoader(
+      ids => {
+        logger.log(`dataloader load ${segment}: ${ids}`);
+        return fn(ids);
+      },
+      {
+        batchScheduleFn: callback => setTimeout(callback, 100),
+        cacheMap: {
+          get: (id: PrimaryKey) => {
+            const key = `${segment}-${id}`;
+            const exists = redis.client.EXISTS(key);
+            logger.verbose(`dataloader exists ${key} ${exists}`);
+            if (!exists) return; // Not cached. Sorry.
+            // eslint-disable-next-line no-async-promise-executor
+            return new Promise(async resolve => {
+              const entry = await promisify(redis.client.GET, redis.client)(key);
+              logger.verbose(`dataloader get ${key} ${r(entry)}`);
+              if (!entry) {
+                promisify(redis.client.DEL, redis.client)(key);
+                const reload = await fn([id]).catch(reason => logger.error(reason));
+                logger.verbose(`dataloader reload ${key} ${r(reload)}`);
+                resolve(reload);
+              } else {
+                resolve(entry);
+              }
+            });
+          },
+          set: async (id: PrimaryKey, value: Promise<any>) => {
+            const key = `${segment}-${id}`;
+            const entry = await value;
+            logger.verbose(`dataloader set ${key}`);
+            Promise.promisify(redis.client.SET).bind(redis.client)(key, entry);
+          },
+          delete(id: PrimaryKey): void {
+            const key = `${segment}-${id}`;
+            logger.log(`dataloader delete $key`);
+            promisify(redis.client.DEL, redis.client)(key);
+          },
+          clear(): void {
+            logger.log(`dataloader clear (${segment})`);
+            Promise.promisify(redis.client.FLUSHDB).bind(redis.client)();
+          },
         },
       },
+    );
+  }
+*/
+  return new DataLoader(
+    ids => {
+      logger.log(`dataloader load ${segment}: ${ids}`);
+      return fn(ids);
     },
+    { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(1000) },
   );
 }
 

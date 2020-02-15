@@ -14,12 +14,12 @@ import {
   Repository,
 } from 'typeorm';
 import { AbstractCategoryEntity } from '../base';
-import { AsunaErrorCode, AsunaException } from '../common';
+import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { DataLoaderFunction, GraphqlContext, PrimaryKeyType, resolveRelationsFromInfo } from '../dataloader';
+import { DataLoaderFunction, GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
 import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -47,17 +47,18 @@ interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
   query: CommonConditionInput;
 }
 
-type ResolvePropertyByTarget<Entity extends BaseEntity, RelationEntity extends BaseEntity> = {
+type BaseResolveProperty<Entity extends BaseEntity> = {
   cls: ClassType<Entity>;
   instance: Entity;
   key: keyof Entity;
+  cache?: boolean | number;
+};
+
+type ResolvePropertyByTarget<RelationEntity extends BaseEntity> = {
   targetCls: ClassType<RelationEntity>;
 };
 
-type ResolvePropertyByLoader<Entity extends BaseEntity, RelationEntity extends BaseEntity> = {
-  cls: ClassType<Entity>;
-  instance: Entity;
-  key: keyof Entity;
+type ResolvePropertyByLoader<RelationEntity extends BaseEntity> = {
   loader: DataLoaderFunction<RelationEntity>;
 };
 
@@ -248,7 +249,8 @@ export class GraphqlHelper {
   }
 
   public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
-    opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
+    opts: BaseResolveProperty<Entity> &
+      (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity> {
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
@@ -260,22 +262,23 @@ export class GraphqlHelper {
     const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
       // loadRelationIds: { relations: [opts.key as string] },
       loadRelationIds: true,
-      cache: true,
+      cache: opts.cache,
     })) as Entity;
     const id = result[opts.key] as any;
     // logger.verbose(`resolveProperty ${r({ result, opts, id })}`);
     if (!id) return null;
-    if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
-      const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
+    if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
+      const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
       return _opts.loader.load(id);
     }
-    const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+    const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
     return targetRepo.findOne(id);
   }
 
   public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
-    opts: ResolvePropertyByLoader<Entity, RelationEntity> | ResolvePropertyByTarget<Entity, RelationEntity>,
+    opts: BaseResolveProperty<Entity> &
+      (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity[]> {
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
@@ -286,15 +289,15 @@ export class GraphqlHelper {
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
     const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
       loadRelationIds: { relations: [opts.key as string] },
-      cache: true,
+      cache: opts.cache,
     })) as Entity;
     const ids = result[opts.key] as any;
     if (_.isEmpty(ids)) return null;
-    if ((opts as ResolvePropertyByLoader<Entity, RelationEntity>).loader) {
-      const _opts = opts as ResolvePropertyByLoader<Entity, RelationEntity>;
-      return _opts.loader.load(ids as PrimaryKeyType[]);
+    if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
+      const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
+      return _opts.loader.load(ids as PrimaryKey[]);
     }
-    const _opts = opts as ResolvePropertyByTarget<Entity, RelationEntity>;
+    const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
     return targetRepo.findByIds(ids);
   }

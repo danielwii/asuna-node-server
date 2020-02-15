@@ -29,7 +29,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     if (configLoader.loadBoolConfig(ConfigKeys.SENTRY_ENABLE)) {
       const dsn = configLoader.loadConfig(ConfigKeys.SENTRY_DSN);
       logger.verbose(`[onInit] sentry ... ${dsn}`);
-      Sentry.init({ dsn, debug: true });
+      Sentry.init({ dsn, debug: configLoader.loadConfig(ConfigKeys.DEBUG) });
 
       // The request handler must be the first middleware on the app
       app.use(Sentry.Handlers.requestHandler());
