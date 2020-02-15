@@ -44,28 +44,26 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     logger.verbose(`[onInit] done`);
   }
   static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
-    logger.verbose(`[beforeBootstrap] run handlers...`);
+    logger.verbose(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
-      await handler.beforeBootstrap(app);
+      await handler?.beforeBootstrap?.(app);
     }
     logger.verbose(`[beforeBootstrap] done`);
   }
-  static async onAppStartListening(): Promise<void> {
-    logger.verbose(`[onAppStartListening] ...`);
-  }
   async onApplicationBootstrap() {
     logger.verbose(`[onApplicationBootstrap] ...`);
-    for (const handler of LifecycleRegister.handlers) {
-      await handler.appStarted();
-    }
     logger.verbose(`[onApplicationBootstrap] done`);
   }
-
-  beforeApplicationShutdown(signal?: string) {
+  static async onAppStartListening(app: NestExpressApplication): Promise<void> {
+    logger.verbose(`[onAppStartListening] ...`);
+    for (const handler of LifecycleRegister.handlers) {
+      await handler?.appStarted?.();
+    }
+  }
+  async beforeApplicationShutdown(signal?: string) {
     logger.verbose(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
-
-  onApplicationShutdown(signal?: string) {
+  async onApplicationShutdown(signal?: string) {
     logger.verbose(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }
