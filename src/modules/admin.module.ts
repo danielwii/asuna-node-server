@@ -47,11 +47,15 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ImportExportModule,
     TenantModule,
     TracingModule,
-    CacheModule.register(
-      RedisProvider.instance.getRedisClient('cache-manager').isEnabled
-        ? { store: redisStore, ...RedisProvider.instance.getRedisClient('cache-manager') }
-        : null,
-    ),
+    CacheModule.registerAsync({
+      useFactory: () => {
+        const redisClient = RedisProvider.instance.getRedisClient('cache-manager');
+        if (redisClient.isEnabled) {
+          return { store: redisStore, ...redisClient.redisOptions };
+        }
+        return {};
+      },
+    }),
   ],
   controllers: [
     ApiController,

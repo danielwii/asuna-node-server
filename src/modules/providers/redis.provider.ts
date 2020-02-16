@@ -38,12 +38,7 @@ export class RedisProvider {
     );
     const redisClientObject = plainToClass(
       RedisClientObject,
-      {
-        client: null,
-        isHealthy: false,
-        isEnabled: configObject.enable,
-        redisOptions,
-      },
+      { client: null, isHealthy: false, isEnabled: configObject.enable, redisOptions },
       { enableImplicitConversion: true },
     );
 
