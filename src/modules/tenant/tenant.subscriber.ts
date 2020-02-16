@@ -38,7 +38,7 @@ export class TenantSubscriber implements EntitySubscriberInterface {
         return;
       }
 
-      logger.log(`afterLoad ${entity.id} ${r({ properties, loaded })}`);
+      logger.log(`handle ${entity.id} ${r({ properties, loaded })}`);
       TenantService.populate(loaded);
     }
   }
@@ -48,13 +48,13 @@ export class TenantSubscriber implements EntitySubscriberInterface {
 
   afterUpdate(event: UpdateEvent<any>): Promise<any> | void {
     if (event.entity) {
-      logger.log(`afterUpdate ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
+      // logger.log(`afterUpdate ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
       this.handleTenant(event.entity, event.metadata);
     }
   }
   afterInsert(event: InsertEvent<any>): Promise<any> | void {
     if (event.entity) {
-      logger.log(`afterInsert ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
+      // logger.log(`afterInsert ${(event.metadata.target as any)?.entityInfo?.name} ${r(event.entity)}`);
       this.handleTenant(event.entity, event.metadata);
     }
   }

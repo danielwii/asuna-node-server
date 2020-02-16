@@ -30,6 +30,7 @@ export class PasswordHelper {
 export class TokenHelper {
   static async createToken(
     user: AuthUser,
+    // 用于兼容 uid 为 number 类型的情况
     transformUid?: boolean,
   ): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${r(user)}`);

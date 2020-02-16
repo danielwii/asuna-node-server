@@ -1,3 +1,6 @@
+import { Promise } from 'bluebird';
+import * as _ from 'lodash';
+
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_SIZE = 10;
 export const MAX_PAGE_SIZE = 1000;
@@ -16,6 +19,17 @@ export interface PageRequest {
   page?: number;
   size?: number;
   orderBy?: { column: string; order?: Order };
+}
+
+export class PageHelper {
+  static doPageSeries<T>(
+    total: number,
+    size: number,
+    handler: (page: number, totalPages: number) => Promise<T> | any,
+  ): Promise<T[]> {
+    const totalPages = Math.ceil(total / size);
+    return Promise.mapSeries(_.range(totalPages), page => handler(page + 1, totalPages));
+  }
 }
 
 export class Pageable<T> {
