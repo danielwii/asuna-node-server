@@ -44,7 +44,7 @@ export class AuthService extends AbstractAuthService<AuthUser> {
           logger.warn('no auth user repo found.');
           return null;
         }
-        logger.log(`entityMetadata is ${r(entityMetadata.target)}`);
+        logger.log(`reg auth user: ${entityMetadata.target.constructor.name}`);
         return connection.getRepository(entityMetadata.target) as any;
       })(),
     );

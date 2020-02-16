@@ -80,7 +80,7 @@ export class RedisLockProvider {
     },
   ): Promise<T | void> {
     if (!this.redLock) {
-      throw new Error('can not get redis instance');
+      throw new Error('can not get redLock instance');
     }
 
     const ttl = options ? options.ttl : 1000;

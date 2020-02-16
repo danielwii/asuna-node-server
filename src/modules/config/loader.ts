@@ -84,6 +84,7 @@ export const ConfigKeys = {
 
   // 修正 typeorm 时区
   FIX_TZ: 'FIX_TZ',
+  BATCH_SIZE: 'BATCH_SIZE',
 };
 
 export const configLoader: ConfigLoader = createConfigLoader({
