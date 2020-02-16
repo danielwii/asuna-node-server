@@ -3,7 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
-import { AdminInternalModule, SimpleLoggerService } from '../src/modules';
+import { AdminInternalModule, LoggerHelper } from '../src/modules';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -13,7 +13,7 @@ describe('AppController (e2e)', () => {
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: new SimpleLoggerService() });
+    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: LoggerHelper.getLoggerService() });
     await app.init();
   });
 

@@ -4,7 +4,7 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
-import { AdminInternalModule, AsunaCollections, CacheManager, KvHelper, SimpleLoggerService } from '../src/modules';
+import { AdminInternalModule, AsunaCollections, CacheManager, KvHelper, LoggerHelper } from '../src/modules';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
@@ -14,7 +14,7 @@ describe('FinderModule (e2e)', () => {
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: new SimpleLoggerService() });
+    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: LoggerHelper.getLoggerService() });
 
     await app.init();
   });

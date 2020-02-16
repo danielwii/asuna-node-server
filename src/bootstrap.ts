@@ -16,7 +16,7 @@ import { Connection } from 'typeorm';
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
-import { LoggerFactory, SimpleLoggerService } from './modules/common/logger';
+import { LoggerFactory, LoggerHelper } from './modules/common/logger';
 import { LoggerConfigObject } from './modules/common/logger/config';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
@@ -84,9 +84,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
   }
 
-  const app = await NestFactory.create<NestExpressApplication>(appModule, {
-    logger: new SimpleLoggerService(),
-  });
+  const app = await NestFactory.create<NestExpressApplication>(appModule, { logger: LoggerHelper.getLoggerService() });
   await AppLifecycle.onInit(app);
 
   // --------------------------------------------------------------
