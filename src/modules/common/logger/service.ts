@@ -34,7 +34,6 @@ const logger = LoggerFactory.getLogger('LoggerService');
 export class LoggerHelper {
   static getLoggerService(): LoggerService | LogLevel[] | boolean {
     if (process.env.NODE_ENV === 'production') {
-      process.env.NO_COLOR = 'true';
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return new WinstonLoggerService();
     }
