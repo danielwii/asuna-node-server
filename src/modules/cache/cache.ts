@@ -2,28 +2,14 @@ import * as _ from 'lodash';
 import * as LRU from 'lru-cache';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { configLoader } from '../config';
+import { CacheTTL } from './constants';
 
 const logger = LoggerFactory.getLogger('CacheManager');
 
-export class CacheTTL {
-  static FLASH = configLoader.loadNumericConfig('CACHE_FLASH_TTL', 60_000); // 1min
-  static SHORT = configLoader.loadNumericConfig('CACHE_SHORT_TTL', 600_000); // 10min
-  static MEDIUM = configLoader.loadNumericConfig('CACHE_MEDIUM_TTL', 1800_000); // 30min
-  static LONG_1 = configLoader.loadNumericConfig('CACHE_LONG_TTL', 3600_000); // 60min
-  static LONG_24 = configLoader.loadNumericConfig('CACHE_LONG_TTL', 24 * 3600_000); // 60min
-}
-
 export class CacheManager {
-  static cache = new LRU<string, any>({
-    max: 500,
-    maxAge: 1000 * 60 * 60, // 60 min
-  });
+  static cache = new LRU<string, any>({ max: 500, maxAge: CacheTTL.LONG_1 });
 
-  static shortCache = new LRU<string, any>({
-    max: 50,
-    maxAge: 1000 * 60, // 5 min
-  });
+  static shortCache = new LRU<string, any>({ max: 50, maxAge: CacheTTL.SHORT });
 
   /**
    * 缓存工具，将 resolver 的结果按 ttl: [seconds] 保存在内存中，默认过期为 60 min
@@ -41,6 +27,11 @@ export class CacheManager {
     this.cache.set(cacheKey, value, seconds ? seconds * 1000 : null);
     logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
+  }
+
+  static set(key: string | object, value, ttl?: number): void {
+    const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
+    this.cache.set(cacheKey, value, ttl ? ttl * 1000 : null);
   }
 
   static get<T = any>(key: string | object): T {

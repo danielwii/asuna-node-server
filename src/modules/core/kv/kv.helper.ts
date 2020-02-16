@@ -2,7 +2,7 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { CacheManager } from "../../cache";
+import { CacheUtils } from '../../cache';
 import { CacheWrapper } from '../../cache/wrapper';
 import {
   AsunaErrorCode,
@@ -241,8 +241,7 @@ export class KvHelper {
 
     logger.verbose(`set ${r(entity)}`);
     return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any).finally(() => {
-      CacheWrapper.clear({ prefix: 'kv', key: { collection, key } });
-      CacheManager.clear({ collection, key });
+      CacheUtils.clear({ prefix: 'kv', key: { collection, key } });
     });
   }
 

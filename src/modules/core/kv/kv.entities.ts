@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { AfterUpdate, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
-import { CacheManager } from '../../cache';
+import { CacheManager, CacheUtils } from '../../cache';
 import { CacheWrapper } from '../../cache/wrapper';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { jsonType } from '../helpers';
@@ -50,8 +50,7 @@ export class KeyValuePair extends AbstractBaseEntity {
 
   @AfterUpdate()
   afterUpdate(): void {
-    CacheWrapper.clear({ prefix: 'kv', key: _.pick(this, 'collection', 'key') });
-    CacheManager.clear(_.pick(this, 'collection', 'key'));
+    CacheUtils.clear({ prefix: 'kv', key: _.pick(this, 'collection', 'key') });
   }
 }
 

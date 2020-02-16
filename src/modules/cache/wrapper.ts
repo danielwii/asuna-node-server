@@ -1,21 +1,29 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
-import { LoggerFactory, parseJSONIfCould } from '../common';
+import { LoggerFactory, parseJSONIfCould, promisify } from '../common';
 import { r } from '../common/helpers';
 import { RedisProvider } from '../providers';
 import { CacheManager } from './cache';
+import { CacheTTL } from './constants';
 
 const logger = LoggerFactory.getLogger('CacheWrapper');
 
+type CacheWrapperDoOptions<V> = {
+  prefix?: string;
+  key: string | object;
+  resolver: () => Promise<V>;
+  expiresInSeconds?: number;
+  strategy?: 'default' | 'cache-first';
+};
+
 export class CacheWrapper {
-  static async do<V>(opts: {
-    prefix?: string;
-    key: string | object;
-    resolver: () => Promise<V>;
-    expiresInSeconds?: number;
-  }): Promise<V> {
-    const { key, prefix, resolver, expiresInSeconds } = opts;
-    const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
+  static calcKey({ prefix, key }: { prefix?: string; key: string | object }): string {
+    return `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
+  }
+
+  static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
+    const { key, prefix, resolver, expiresInSeconds, strategy } = opts;
+    const cacheKey = this.calcKey({ prefix, key });
     // logger.verbose(`get cache ${cacheKey}`);
 
     const redis = RedisProvider.instance.getRedisClient(prefix);
@@ -25,21 +33,32 @@ export class CacheWrapper {
       return CacheManager.cacheable(cacheKey, resolver, expiresInSeconds);
     }
 
+    const primeToRedis = async (): Promise<any> => {
+      value = await resolver();
+      if (value) {
+        // update
+        await promisify(redis.client.setex, redis.client)(
+          cacheKey,
+          expiresInSeconds ?? CacheTTL.SHORT,
+          _.isString(value) ? value : JSON.stringify(value),
+        );
+      } else {
+        // remove null just in case
+        await promisify(redis.client.del, redis.client)(cacheKey);
+      }
+      return value;
+    };
+
     // redis 存在未过期的值时直接返回
     let value = await Promise.promisify(redis.client.get).bind(redis.client)(cacheKey);
-    if (value) return parseJSONIfCould(value);
-
-    value = await resolver();
     if (value) {
-      await Promise.promisify(redis.client.setex).bind(redis.client)(
-        cacheKey,
-        expiresInSeconds ?? 2 * 3600,
-        _.isString(value) ? value : JSON.stringify(value),
-      );
-    } else {
-      await Promise.promisify(redis.client.del).bind(redis.client)(cacheKey);
+      // when in cache-first mode will populate data to store later and return value in cache at first time
+      if (strategy === 'cache-first') setTimeout(() => primeToRedis(), 0);
+      return parseJSONIfCould(value);
     }
-    // value = await RedisLockProvider.instance.lockProcess(cacheKey, resolver, { ttl: expiresInSeconds * 1000 });
+
+    value = await primeToRedis();
+
     logger.debug(`value is ${r(value)}`);
     return value;
   }
