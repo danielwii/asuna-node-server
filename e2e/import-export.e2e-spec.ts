@@ -1,19 +1,20 @@
 import { INestApplication } from '@nestjs/common';
+import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
 import { Connection, getManager } from 'typeorm';
-import { AdminInternalModule, AppInfo, resolveTypeormPaths } from '../src';
+import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
 
 describe('Excel (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     resolveTypeormPaths();
-    const module = await Test.createTestingModule({
+    const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = module.createNestApplication();
+    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: LoggerHelper.getLoggerService() });
     await app.init();
   });
 
