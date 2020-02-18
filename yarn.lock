@@ -7765,13 +7765,12 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
-node-buffs@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.0.tgz#66b9684cc1db7373263164ffbe855dab7bdf034d"
-  integrity sha512-EURK5VAZZdA/PLbEIxTM5YxzWad99U2MhNqqq3V1gTevbjIo67EGM+/vVVBGpCJ83cq5/jhT/A/Bj+lMiknrxQ==
+node-buffs@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.1.tgz#ab40f046eccbc4ed360be6e569e4c18eeb0c5ef3"
+  integrity sha512-3UG4PS7oVpGfA6Ge6Nmeb8ZV2Yi0cZzpWYyzpQQItB9b7HoiI2A9v8kxehuaXHqAIhH4JQg/lUSnWUEwXEsXCw==
   dependencies:
     dotenv "^8.2.0"
-    fs-extra "^8.1.0"
     js-yaml "^3.13.1"
     lodash "^4.17.15"
 
