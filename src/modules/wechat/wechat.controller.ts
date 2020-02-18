@@ -3,9 +3,10 @@ import { IsString } from 'class-validator';
 import { Request } from 'express';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { WXAuthGuard, WXAuthRequest } from './wechat.auth';
+import { WXAuthGuard } from './wechat.auth';
 import { WXMiniAppUserInfo } from './wechat.entities';
 import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';
+import { WXAuthRequest } from './wechat.interfaces';
 import { WxQrTicketInfo } from './wx.interfaces';
 
 class ValidationDto {

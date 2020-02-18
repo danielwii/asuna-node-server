@@ -4,12 +4,12 @@ import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../common';
 import { AdminUser, Role } from '../core/auth/auth.entities';
 import { JwtPayload } from '../core/auth/auth.interfaces';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
-import { isApiKeyRequest } from '../core/auth/strategy';
+import { isApiKeyRequest } from '../core/auth/strategy/interfaces';
 import { UserProfile } from '../core/auth/user.entities';
 import { Store } from '../store';
 import { Tenant } from '../tenant/tenant.entities';
-import { isWXAuthRequest } from '../wechat';
 import { WXJwtPayload } from '../wechat/interfaces';
+import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
 
 const logger = LoggerFactory.getLogger('AuthHelper');

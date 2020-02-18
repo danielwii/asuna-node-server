@@ -4,12 +4,9 @@ import { Request } from 'express';
 import { Strategy } from 'passport-strategy';
 import { getIgnoreCase, r } from '../../../common/helpers';
 import { LoggerFactory } from '../../../common/logger';
-import { AnyAuthRequest, ApiKeyPayload } from '../../../helper';
-import { AdminUser } from '../auth.entities';
+import { API_KEY_HEADER } from './interfaces';
 
 const logger = LoggerFactory.getLogger('ApiKeyStrategy');
-
-const API_KEY_HEADER = 'X-ApiKey';
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') {
@@ -25,8 +22,4 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
       self.fail('ApiKey is required', 401);
     }
   }
-}
-
-export function isApiKeyRequest(req: Request): req is AnyAuthRequest<ApiKeyPayload, AdminUser> {
-  return !!getIgnoreCase(req.headers, API_KEY_HEADER);
 }

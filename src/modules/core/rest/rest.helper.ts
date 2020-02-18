@@ -41,7 +41,7 @@ export class RestHelper {
 
   static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
-    { user, tenant, roles }: AuthInfo<{}, { id: PrimaryKey; username: string }>,
+    { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
     const tenantRelatedFields = {};
     if (tenant) {
@@ -118,7 +118,7 @@ export class RestHelper {
       .groupBy(column)
       .getRawMany();
     const stats = _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
-    logger.verbose(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
+    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
     return stats;
   }
 }

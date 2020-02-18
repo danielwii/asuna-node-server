@@ -1,24 +1,18 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth/user.entities';
-import { AnyAuthRequest, auth } from '../helper/auth';
+import { auth } from '../helper/auth';
 import { Store } from '../store';
 import { WXJwtPayload } from './interfaces';
+import { WXAuthRequest } from './wechat.interfaces';
 import { WxCodeSession } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WXAuth');
-
-export type WXAuthRequest = AnyAuthRequest<WXJwtPayload, UserProfile>;
-
-export function isWXAuthRequest(req: Request): req is WXAuthRequest {
-  const { authorization } = req.headers;
-  return authorization ? authorization.startsWith('WX ') : false;
-}
 
 @Injectable()
 export class WXAuthGuard implements CanActivate {
