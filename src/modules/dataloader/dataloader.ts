@@ -3,7 +3,6 @@ import * as DataLoader from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { LRUMap } from 'lru_map';
 import { BaseEntity } from 'typeorm';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
@@ -139,10 +138,69 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
 */
   return new DataLoader(
     ids => {
-      logger.log(`dataloader load ${segment}: ${ids}`);
+      logger.verbose(`dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
-    { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(1000) },
+    {
+      batchScheduleFn: callback => setTimeout(callback, 10),
+      cacheMap: {
+        get: (id: string) => {
+          // const cachedObject = await client.get({ segment, id });
+          // logger.log(`get (${segment}:${id}) ${r(cachedObject)}`);
+          // return cachedObject;
+          const now = Date.now();
+          // console.log({ size: cacheMap.size });
+          const key = `${segment}-${id}`;
+          // console.log('cacheMap load', key);
+          const { value, expires } = cacheMap.get(key) || ({} as any);
+          // console.log('cacheMap load', { key, value });
+          logger.debug(
+            `get (${segment}:${id}) ${r({
+              exists: !!value,
+              expires: new Date(expires),
+              now: new Date(now),
+              left: expires - now,
+              isExpired: expires < now,
+            })}`,
+          );
+          if (!value) {
+            return null;
+          }
+          const isExpired = expires < now;
+          if (isExpired) {
+            cacheMap.delete(key);
+            return null;
+          }
+          return value;
+        },
+        set: async (id: string, value) => {
+          const key = `${segment}-${id}`;
+          const promised = await value;
+          if (promised) {
+            logger.verbose(`dataloader set ${key}`);
+            const now = Date.now();
+            // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
+            // if (!cacheMap.has(key)) {
+            //   cacheMap.set(key, { value, expires: now + 1 * 60 * 1000 });
+            //   // console.log({ size: cacheMap.size });
+            // }
+            cacheMap.set(key, { value: promised, expires: now + 5 * 60 * 1000 });
+          }
+        },
+        delete: (id: string) => {
+          // logger.log(`delete (${segment}:${id})`);
+          const key = `${segment}-${id}`;
+          cacheMap.delete(key);
+          // return client.drop({ segment, id });
+        },
+        clear: () => {
+          // logger.log(`clear (${segment})`);
+          cacheMap.clear();
+          // return logger.warn('not implemented.');
+        },
+      },
+    },
+    // { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(1000) },
   );
 }
 
