@@ -4,6 +4,8 @@ import { Request } from 'express';
 import { Strategy } from 'passport-strategy';
 import { getIgnoreCase, r } from '../../../common/helpers';
 import { LoggerFactory } from '../../../common/logger';
+import { AnyAuthRequest, ApiKeyPayload } from '../../../helper';
+import { AdminUser } from '../auth.entities';
 
 const logger = LoggerFactory.getLogger('ApiKeyStrategy');
 
@@ -25,6 +27,6 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
   }
 }
 
-export function isApiKeyRequest(req: Request): boolean {
+export function isApiKeyRequest(req: Request): req is AnyAuthRequest<ApiKeyPayload, AdminUser> {
   return !!getIgnoreCase(req.headers, API_KEY_HEADER);
 }

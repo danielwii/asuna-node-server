@@ -1,13 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
-import { AsunaErrorCode, AsunaException } from '../../common';
+import { Response } from 'express';
+import { AsunaErrorCode, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest, auth } from "../../helper/auth";
+import { AnyAuthRequest, auth } from '../../helper/auth';
+import { AdminUser } from './auth.entities';
 import { JwtPayload } from './auth.interfaces';
 import { UserIdentifierHelper } from './identifier';
+import { UserProfile } from './user.entities';
 
-export type JwtAuthRequest<U extends JwtPayload = JwtPayload> = Request & { user?: U; identifier?: string };
+export type JwtAuthRequest = AnyAuthRequest<JwtPayload, UserProfile>;
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -18,17 +20,22 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  handleRequest(err, user, info, context: ExecutionContext) {
+  async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
-    // JwtAuthGuard.logger.log(`handleRequest ${r({ err, user, info })}`);
-    if (err || !user) {
+    this.logger.log(`handleRequest ${r({ err, payload, info })}`);
+    if (err || !payload) {
       if (this.opts.anonymousSupport) {
         return null;
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }
-    req.identifier = UserIdentifierHelper.stringify(user);
-    return user;
+    const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
+    req.identifier = UserIdentifierHelper.stringify(payload);
+    req.payload = payload;
+    req.user = await UserProfile.findOne(payload.id);
+    req.tenant = admin?.tenant;
+    req.roles = admin?.roles;
+    return req.user;
   }
 }
 

@@ -15,7 +15,7 @@ const logger = LoggerFactory.getLogger('WXAuth');
 
 export type WXAuthRequest = AnyAuthRequest<WXJwtPayload, UserProfile>;
 
-function isWXAuthRequest(req: Request): boolean {
+export function isWXAuthRequest(req: Request): req is WXAuthRequest {
   const { authorization } = req.headers;
   return authorization ? authorization.startsWith('WX ') : false;
 }

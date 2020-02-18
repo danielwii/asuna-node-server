@@ -55,7 +55,7 @@ export class GetUploadsController {
         param,
       })}`,
     );
-    return storageEngine.resolveUrl(
+    return storageEngine?.resolveUrl(
       {
         filename,
         bucket,

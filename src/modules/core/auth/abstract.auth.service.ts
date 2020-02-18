@@ -2,7 +2,6 @@ import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Secret, SignOptions } from 'jsonwebtoken';
-import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { PrimaryKey } from '../../common';
@@ -11,7 +10,6 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { JwtPayload } from './auth.interfaces';
 import { AuthUser } from './base.entities';
-import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -36,9 +34,14 @@ export class TokenHelper {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
+    const uid = (user.id as string).startsWith('u')
+      ? transformUid
+        ? +(user.id as string).slice(1)
+        : user.id
+      : user.id;
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       id: user.id as string,
-      uid: transformUid ? +(user.id as string).slice(1) : user.id,
+      uid,
       username: user.username,
       email: user.email,
       channel: user.channel,
