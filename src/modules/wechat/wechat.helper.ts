@@ -13,6 +13,7 @@ import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely, HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
+import { AuthedUserHelper } from '../core';
 import { AdminUser, AuthUserChannel, TokenHelper } from '../core/auth';
 import { UserProfile } from '../core/auth/user.entities';
 import { Hermes } from '../core/bus';
@@ -398,12 +399,14 @@ export class WeChatHelper {
 
     const user = await UserProfile.findOne({ username: codeSession.openid });
     if (!user) {
-      await UserProfile.create({
-        username: codeSession.openid,
-        email: `${codeSession.openid}@wx.miniapp.openid`,
-        channel: AuthUserChannel.wechat,
-        isActive: true,
-      }).save();
+      await AuthedUserHelper.createProfile(
+        UserProfile.create({
+          username: codeSession.openid,
+          email: `${codeSession.openid}@wx.miniapp.openid`,
+          channel: AuthUserChannel.wechat,
+          isActive: true,
+        }),
+      );
     }
     return TokenHelper.createCustomToken(
       { key } as WXJwtPayload,

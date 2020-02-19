@@ -1,5 +1,6 @@
-import { AfterInsert, AfterRemove, Entity, OneToOne } from 'typeorm';
-import { EntityMetaInfo } from '../../common/decorators';
+import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Constructor } from '../../base';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
@@ -17,13 +18,31 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   )
   miniAppUserInfo: WXMiniAppUserInfo;
 
+  /* use AuthedUserHelper.createProfile
   @AfterInsert()
   afterInsert(): void {
-    UserRegister.createUserByProfile(this);
+    UserRegister.createUserByProfile(this).catch(console.error);
   }
+*/
 
   @AfterRemove()
   afterRemove(): void {
-    UserRegister.removeUserByProfile(this);
+    UserRegister.removeUserByProfile(this).catch(console.error);
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
+  class ExtendableEntity extends Base {
+    @MetaInfo({ accessible: 'hidden' })
+    @Column({ nullable: true, length: 36, name: 'profile__id' })
+    profileId?: string;
+
+    @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
+    @OneToOne(type => UserProfile)
+    @JoinColumn({ name: 'profile__id' })
+    profile?: UserProfile;
+  }
+
+  return ExtendableEntity;
+};

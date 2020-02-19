@@ -9,13 +9,13 @@ const logger = LoggerFactory.getLogger('UserRegister');
 
 export class UserRegister {
   static Entity: Constructor<any>;
-  static onProfileCreate: (profile: UserProfile) => any;
-  static onProfileDelete: (profile: UserProfile) => any;
+  static onProfileCreate: (profile: UserProfile) => Promise<any>;
+  static onProfileDelete: (profile: UserProfile) => Promise<any>;
 
   static regCoreUserCreator<User extends BaseEntity>(
     Entity: Constructor<User>,
-    onProfileCreate?: (profile: UserProfile) => any,
-    onProfileDelete?: (profile: UserProfile) => any,
+    onProfileCreate?: (profile: UserProfile) => Promise<any>,
+    onProfileDelete?: (profile: UserProfile) => Promise<any>,
   ): void {
     logger.log(`reg user for profile create: ${Entity.name}`);
 
@@ -30,21 +30,21 @@ export class UserRegister {
     this.onProfileDelete = onProfileDelete || (profile => DBHelper.repo(Entity).delete(profile.id));
   }
 
-  static createUserByProfile(profile: UserProfile): void {
+  static createUserByProfile(profile: UserProfile): Promise<any> {
     logger.log(`create user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileCreate) {
-      console.warn(`no core user registered for created.`);
-    } else {
-      this.onProfileCreate(profile);
+      logger.warn(`no core user registered for created.`);
+      return Promise.reject(new Error(`no core user registered for created.`));
     }
+    return this.onProfileCreate(profile);
   }
 
-  static removeUserByProfile(profile: UserProfile): void {
+  static removeUserByProfile(profile: UserProfile): Promise<any> {
     logger.log(`remove user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileDelete) {
       logger.warn(`no core user registered for removed.`);
-    } else {
-      this.onProfileDelete(profile);
+      return Promise.reject(new Error(`no core user registered for removed.`));
     }
+    return this.onProfileDelete(profile);
   }
 }

@@ -28,20 +28,14 @@ export class PasswordHelper {
 export class TokenHelper {
   static async createToken(
     user: AuthUser,
-    // 用于兼容 uid 为 number 类型的情况
-    transformUid?: boolean,
+    extra?: { uid: PrimaryKey },
   ): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-    const uid = (user.id as string).startsWith('u')
-      ? transformUid
-        ? +(user.id as string).slice(1)
-        : user.id
-      : user.id;
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       id: user.id as string,
-      uid,
+      ...extra,
       username: user.username,
       email: user.email,
       channel: user.channel,

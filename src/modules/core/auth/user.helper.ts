@@ -1,12 +1,20 @@
 import _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity } from 'typeorm';
-import { AsunaErrorCode, AsunaException } from '../../common';
+import { AsunaErrorCode, AsunaException, LoggerFactory } from '../../common';
 import { DBHelper } from '../db';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 
+const logger = LoggerFactory.getLogger('AuthedUserHelper');
+
 export class AuthedUserHelper {
+  static async createProfile(profile: UserProfile): Promise<any> {
+    const saved = await profile.save();
+    const user = await UserRegister.createUserByProfile(saved).catch(reason => logger.error(reason));
+    return [saved, user];
+  }
+
   static getProfileById(id: string | number): Promise<UserProfile> {
     // console.log(`AuthedUserHelper.getProfileById ${id}`);
     if (typeof id === 'number') {

@@ -196,6 +196,10 @@ export class WXMiniAppUserInfo extends BaseEntity {
   // Relations
   // --------------------------------------------------------------
 
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 36, name: 'profile__id' })
+  profileId: string;
+
   @Expose({ name: 'profile-id', toPlainOnly: true })
   @Transform(value => value.id, { toPlainOnly: true })
   @OneToOne(
