@@ -471,10 +471,10 @@
     qs "^6.9.1"
     titleize "^2.1.0"
 
-"@nestjs/bull@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.0.2.tgz#a807f0238691a7777f5a903751cd43209f60e957"
-  integrity sha512-c0i8aZo0+0oZpVVuenTO9cdS6FeVBM3zQOqOCnBOJTKUNtleZKBoF3vejApHkhc6w8K9whbbsZfcF2lOhKr3oA==
+"@nestjs/bull@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.0.3.tgz#52f72285b87a95ae7cd15fc19666b5860257607a"
+  integrity sha512-wwQM5mb3mqMBqXFG/A/QIWv828CYjI1mChRs3wVufXGSvNnxPEqa495OsA3qk26Z04KtAiRXddLLwxpleoKfIA==
 
 "@nestjs/common@^6.11.7":
   version "6.11.7"
