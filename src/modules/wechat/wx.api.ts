@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/node';
 import { oneLineTrim } from 'common-tags';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
@@ -279,7 +278,6 @@ export class WxApi {
     const json = await response.json();
     if (json.errcode) {
       logger.error(`[${status}] call '${url}' error: ${r(json)}`);
-      Sentry.captureException(new Error(JSON.stringify(json)));
     } else {
       logger.verbose(`[${status}] call '${url}': ${r(json)}`);
     }
