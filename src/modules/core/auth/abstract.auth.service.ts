@@ -10,6 +10,7 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { JwtPayload } from './auth.interfaces';
 import { AuthUser } from './base.entities';
+import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -81,15 +82,23 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return validated;
   }
 
-  async updateLastLoginDate(userId: string | number): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
-    const user = await this.userRepository.findOne(userId);
-    if (user) {
+  createToken(profile: UserProfile, extra?: { uid: PrimaryKey }) {
+    // eslint-disable-next-line no-param-reassign
+    profile.lastSignedAt = new Date();
+    profile.save().catch(reason => logger.error(reason));
+    return TokenHelper.createToken(profile, extra);
+  }
+
+  async updateLastLoginDate(profileId: string | number): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
+    const profile = await this.userRepository.findOne(profileId);
+    if (profile) {
       const currentDate = new Date();
-      if (user.lastLoginAt && differenceInCalendarDays(user.lastLoginAt, currentDate) < 1) {
-        return { sameDay: true, lastLoginAt: user.lastLoginAt };
+      const calendarDays = differenceInCalendarDays(profile.lastLoginAt, currentDate);
+      if (profile.lastLoginAt && calendarDays < 1) {
+        return { sameDay: true, lastLoginAt: profile.lastLoginAt };
       }
-      user.lastLoginAt = currentDate;
-      await user.save();
+      profile.lastLoginAt = currentDate;
+      await profile.save();
       return { sameDay: false, lastLoginAt: currentDate };
     }
     return {};
