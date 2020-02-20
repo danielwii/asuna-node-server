@@ -13,6 +13,7 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
 import { AsunaContext } from '../context';
+import { Global } from '../global';
 import { FileInfo } from '../storage';
 import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
@@ -134,12 +135,10 @@ export class UploaderService {
     // try to merge all chunks
     logger.debug(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
-      await Promise.all(
-        chunks.map(chunk => this.context.chunksStorageEngine.getEntity(chunk, AsunaContext.instance.tempPath)),
-      ),
+      await Promise.all(chunks.map(chunk => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
       name => +name.slice(name.lastIndexOf('.') + 1),
     );
-    const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', payload.fingerprint);
+    const tempDirectory = join(Global.tempPath, 'chunks', payload.fingerprint);
 
     try {
       fs.mkdirsSync(tempDirectory);

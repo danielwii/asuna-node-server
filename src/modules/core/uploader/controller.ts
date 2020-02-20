@@ -19,6 +19,7 @@ import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthRequest } from '../../helper/auth';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { AsunaContext } from '../context';
+import { Global } from '../global';
 import { DocMimeType, FileInfo, ImageMimeType, SavedFile, VideoMimeType } from '../storage';
 import { OperationToken, OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
@@ -240,7 +241,7 @@ export class UploaderController {
     const fixedPrefix = join(prefix, dirname(filename));
     const baseFilename = basename(filename);
 
-    const tempDir = join(AsunaContext.instance.tempPath, 'stream');
+    const tempDir = join(Global.tempPath, 'stream');
     await fs.ensureDir(tempDir);
     const tempFolder = await fs.mkdtemp(join(tempDir, 'temp-'));
     logger.log(`create temp folder: ${tempFolder}`);

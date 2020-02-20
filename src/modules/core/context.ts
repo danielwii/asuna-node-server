@@ -2,7 +2,8 @@ import * as fs from 'fs-extra';
 import { join } from 'path';
 import { r } from '../common';
 import { LoggerFactory } from '../common/logger';
-import { ConfigKeys, configLoader, DynamicConfigKeys, DynamicConfigs } from '../config';
+import { ConfigKeys, configLoader } from '../config';
+import { Global } from './global';
 import {
   IStorageEngine,
   LocalStorage,
@@ -32,8 +33,8 @@ export class AsunaContext {
 
   public opts: IAsunaContextOpts;
   public readonly dirname: string;
-  public uploadPath: string;
-  public tempPath: string;
+  // public uploadPath: string;
+  // public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
   /**
@@ -64,8 +65,8 @@ export class AsunaContext {
 
     if (configLoader.loadBoolConfig(ConfigKeys.UPLOADER_ENABLE, true))
       this.initStorageEngine(`${process.cwd()}/uploads`);
-    this.tempPath = `${process.cwd()}/temp`;
-    fs.mkdirs(join(this.tempPath)).catch(error => logger.warn(r(error)));
+    // this.tempPath = `${process.cwd()}/temp`;
+    fs.mkdirs(join(Global.tempPath)).catch(error => logger.warn(r(error)));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}): void {
@@ -92,7 +93,7 @@ export class AsunaContext {
 
   initStorageEngine(uploadPath: string): void {
     UploaderConfig.uploadPath = uploadPath;
-    this.uploadPath = uploadPath;
+    Global.uploadPath = uploadPath;
 
     const defaultStorage = configLoader.loadConfig(ConfigKeys.DEFAULT_STORAGE);
     logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
@@ -101,7 +102,7 @@ export class AsunaContext {
     } else if (defaultStorage === StorageMode.MINIO) {
       this.defaultStorageEngine = new MinioStorage(() => MinioConfigObject.load());
     } else {
-      this.defaultStorageEngine = new LocalStorage(this.uploadPath);
+      this.defaultStorageEngine = new LocalStorage(Global.uploadPath);
     }
 
     /*
@@ -120,7 +121,7 @@ export class AsunaContext {
         loader: () => MinioConfigObject.load(),
       });
     } else {
-      this.defaultStorageEngine = new LocalStorage(this.uploadPath);
+      this.defaultStorageEngine = new LocalStorage(Global.uploadPath);
       DynamicConfigs.setup(DynamicConfigKeys.imageStorage, { mode: StorageMode.LOCAL });
     }
 */
@@ -133,7 +134,7 @@ export class AsunaContext {
         defaultBucket: 'videos',
       });
     } else {
-      this.videosStorageEngine = new LocalStorage(this.uploadPath, 'videos');
+      this.videosStorageEngine = new LocalStorage(Global.uploadPath, 'videos');
     }
 
     const fileStorage = configLoader.loadConfig(ConfigKeys.FILES_STORAGE);
@@ -144,10 +145,10 @@ export class AsunaContext {
         defaultBucket: 'files',
       });
     } else {
-      this.filesStorageEngine = new LocalStorage(this.uploadPath, 'files');
+      this.filesStorageEngine = new LocalStorage(Global.uploadPath, 'files');
     }
 
-    this.localStorageEngine = new LocalStorage(this.uploadPath, 'local');
+    this.localStorageEngine = new LocalStorage(Global.uploadPath, 'local');
 
     const chunkStorage = configLoader.loadConfig(ConfigKeys.CHUNKS_STORAGE);
     if (chunkStorage === StorageMode.QINIU) {
@@ -157,7 +158,7 @@ export class AsunaContext {
         defaultBucket: 'chunks',
       });
     } else {
-      this.chunksStorageEngine = new LocalStorage(this.uploadPath, 'chunks');
+      this.chunksStorageEngine = new LocalStorage(Global.uploadPath, 'chunks');
     }
 
     logger.log(
@@ -171,7 +172,7 @@ export class AsunaContext {
   }
 
   getFilePath(fullpath: string): string {
-    return join(this.uploadPath, '../', fullpath);
+    return join(Global.uploadPath, '../', fullpath);
   }
 
   get defaultModulePrefix(): string {

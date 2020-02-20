@@ -7,7 +7,7 @@ import * as sharp from 'sharp';
 import { AsunaErrorCode, AsunaException, convertFilename, ErrorException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { AsunaContext } from '../context';
+import { Global } from '../global';
 import { UploaderConfig } from '../uploader/config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
@@ -54,11 +54,11 @@ export class LocalStorage implements IStorageEngine {
 
   async getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
     logger.verbose(`getEntity ${r({ fileInfo, toPath })}`);
-    return join(AsunaContext.instance.uploadPath, fileInfo.bucket ?? '', fileInfo.prefix ?? '', fileInfo.path);
+    return join(Global.uploadPath, fileInfo.bucket ?? '', fileInfo.prefix ?? '', fileInfo.path);
   }
 
   async listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
-    const path = join(AsunaContext.instance.uploadPath, opts.bucket ?? '', opts.prefix ?? '');
+    const path = join(Global.uploadPath, opts.bucket ?? '', opts.prefix ?? '');
     const directory = fs.readdirSync(path);
     logger.verbose(`listEntities ${r({ opts, directory })}`);
     return directory.map(filename => {
