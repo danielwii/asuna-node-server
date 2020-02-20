@@ -116,11 +116,11 @@ export class UploaderController {
   @Post('chunks-stream')
   async streamChunkedUploader(
     @Query('filename') filename: string,
-    @Query('chunk') chunk: number,
+    @Query('chunk') chunk: string,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
   ): Promise<RemoteFileInfo> {
     ow(filename, 'filename', ow.string.nonEmpty);
-    ow(chunk, 'chunk', ow.number.greaterThanOrEqual(0));
+    ow(chunk, 'chunk', ow.string.numeric);
 
     // save uploaded file to temp dir
     const tempFile = `${os.tmpdir()}/${filename}.${chunk}`;
@@ -135,7 +135,7 @@ export class UploaderController {
     });
 
     const { token } = req;
-    return this.uploaderService.uploadChunks(token, filename, tempFile, chunk);
+    return this.uploaderService.uploadChunks(token, filename, tempFile, +chunk);
   }
 
   /**

@@ -6,6 +6,7 @@ import { IsNumber, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import * as highland from 'highland';
 import * as _ from 'lodash';
+import * as path from 'path';
 import { join } from 'path';
 import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
@@ -70,8 +71,8 @@ export class UploaderService {
     });
   }
 
-  uploadChunks(token: OperationToken, filename: string, path: string, chunk: number): Promise<RemoteFileInfo> {
-    const file = new FileInfo({ filename, path });
+  uploadChunks(token: OperationToken, filename: string, chunkPath: string, chunk: number): Promise<RemoteFileInfo> {
+    const file = new FileInfo({ filename, path: chunkPath });
     const fingerprint = UploaderHelper.calcFingerprint(token.identifier, filename);
     const chunkname = `${filename}.${chunk}`;
     const chunkFileInfo = new ChunkFileInfo({
@@ -115,8 +116,11 @@ export class UploaderService {
     const _filename = filename || payload.filename;
     logger.log(`merge file '${_filename}' chunks... ${r(payload)}`);
 
+    // TODO bucket 在 localStorage 中需要主动传递
+    logger.verbose(`chunks storage engine type is ${this.context.chunksStorageEngine.constructor.name}`);
     const chunks = await this.context.chunksStorageEngine.listEntities({
       prefix: payload.fingerprint,
+      bucket: this.context.chunksStorageEngine.constructor.name === 'LocalStorage' ? 'chunks' : null,
     });
     logger.verbose(`found ${r(chunks.length)} chunks`);
 
@@ -136,33 +140,40 @@ export class UploaderService {
       name => +name.slice(name.lastIndexOf('.') + 1),
     );
     const tempDirectory = join(AsunaContext.instance.tempPath, 'chunks', payload.fingerprint);
-    fs.mkdirsSync(tempDirectory);
-    const dest = join(tempDirectory, _filename);
-    logger.log(`merge files: ${r(filepaths)} to ${dest}`);
-    const writableStream = fs.createWriteStream(dest);
 
-    highland(filepaths)
-      .map(fs.createReadStream)
-      .flatMap(highland)
-      .pipe(writableStream);
+    try {
+      fs.mkdirsSync(tempDirectory);
+      const dest = join(tempDirectory, _filename);
+      logger.log(`merge files: ${r(filepaths)} to ${dest}`);
+      const writableStream = fs.createWriteStream(dest);
 
-    await new Promise(resolve => {
-      writableStream.on('close', () => {
-        logger.log(`merge file done: ${dest}, clean chunks ...`);
-        resolve();
-        filepaths.forEach(filepath => {
-          logger.log(`remove ${filepath} ...`);
-          fs.remove(filepath).catch(error => logger.warn(`remove ${filepath} error: ${r(error)}`));
+      highland(filepaths)
+        .map(fs.createReadStream)
+        .flatMap(highland)
+        .pipe(writableStream);
+
+      await new Promise(resolve => {
+        writableStream.on('close', () => {
+          logger.log(`merge file done: ${dest}, clean chunks ...`);
+          resolve();
+          const directory = path.dirname(filepaths[0]);
+          fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
+          // filepaths.forEach(filepath => {
+          //   logger.log(`remove ${filepath} ...`);
+          //   fs.removeSync(filepath);
+          // });
         });
       });
-    });
 
-    const fileInfo = new FileInfo({ filename: _filename, path: dest });
-    // const mimetype = mime.lookup(filename) || 'application/octet-stream';
-    const saved = await this.context.filesStorageEngine.saveEntity(fileInfo, {
-      prefix: payload.fingerprint,
-    });
+      const fileInfo = new FileInfo({ filename: _filename, path: dest });
+      // const mimetype = mime.lookup(filename) || 'application/octet-stream';
+      const saved = await this.context.filesStorageEngine.saveEntity(fileInfo, {
+        prefix: payload.fingerprint,
+      });
 
-    return new RemoteFileInfo(saved);
+      return new RemoteFileInfo(saved);
+    } catch (e) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, e);
+    }
   }
 }

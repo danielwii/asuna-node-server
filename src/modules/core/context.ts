@@ -159,6 +159,15 @@ export class AsunaContext {
     } else {
       this.chunksStorageEngine = new LocalStorage(this.uploadPath, 'chunks');
     }
+
+    logger.log(
+      `initStorageEngine ${r({
+        videos: this.videosStorageEngine,
+        chunks: this.chunksStorageEngine,
+        local: this.localStorageEngine,
+        files: this.filesStorageEngine,
+      })}`,
+    );
   }
 
   getFilePath(fullpath: string): string {
