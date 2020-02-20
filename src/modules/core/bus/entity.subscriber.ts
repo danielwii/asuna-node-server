@@ -1,12 +1,5 @@
 import * as _ from 'lodash';
-import {
-  BaseEntity,
-  EntitySubscriberInterface,
-  EventSubscriber,
-  InsertEvent,
-  RemoveEvent,
-  UpdateEvent,
-} from 'typeorm';
+import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { deserializeSafely, r, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { dataLoaderCleaner } from '../../dataloader';
@@ -84,7 +77,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       tableName: event.metadata.tableName,
     });
 */
-    dataLoaderCleaner.clear(event?.entity?.constructor?.name, _.get(event.entity, 'id'));
+    dataLoaderCleaner.clear(event.entity.constructor.name, _.get(event.entity, 'id'));
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {

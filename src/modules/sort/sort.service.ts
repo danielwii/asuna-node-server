@@ -34,7 +34,7 @@ export class SortService {
   async findItems(sort: Sort): Promise<any[]> {
     let items = [];
     const { positions } = sort;
-    if (sort && sort.id && sort.type) {
+    if (sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
       logger.verbose(`resolve ${relation} for sorts.`);
       const withRelation = await this.sortRepository.findOne({
@@ -46,9 +46,7 @@ export class SortService {
       logger.verbose(`loaded ${items.length} items.`);
 
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(relation)));
-      items.sort(
-        (a: any, b: any) => positions.indexOf(a[primaryKey]) - positions.indexOf(b[primaryKey]),
-      );
+      items.sort((a: any, b: any) => positions.indexOf(a[primaryKey]) - positions.indexOf(b[primaryKey]));
     } else {
       logger.warn(`sort not available: ${r(sort)}`);
     }

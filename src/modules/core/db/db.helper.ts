@@ -384,7 +384,7 @@ export class DBHelper {
   public static extractOriginAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): OriginSchema {
     const { info }: { info: { [key: string]: MetaInfoOptions } } = (repository.metadata.target as Function).prototype;
     const { entityInfo } = repository.metadata.target as { entityInfo: EntityMetaInfoOptions };
-    const parentEntityInfo: EntityMetaInfoOptions = repository?.metadata?.parentEntityMetadata?.target?.entityInfo;
+    const parentEntityInfo: EntityMetaInfoOptions = repository.metadata.parentEntityMetadata?.target?.entityInfo;
 
     const columns = R.compose(
       // 更新可能的 STI 信息

@@ -124,7 +124,7 @@ export class UploaderService {
     });
     logger.verbose(`found ${r(chunks.length)} chunks`);
 
-    if (!(chunks && chunks.length > 0)) {
+    if (chunks.length <= 0) {
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
         `no chunks found for ${_filename} with fingerprint: ${payload.fingerprint}`,

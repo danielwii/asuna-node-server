@@ -58,12 +58,14 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
+      /*
       if (!config) {
         throw new AsunaException(
           AsunaErrorCode.Unprocessable,
           `invalid upstream ${JSON.stringify(endpoint)} for finder`,
         );
       }
+*/
       const resourcePath = join('/', path).replace(/\/+/g, '/');
       return `${config.endpoint || ''}${resourcePath}`;
     }

@@ -57,8 +57,10 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         //   })}`,
         // );
 
-        const id = _.head(_.keys((this.server?.clients()).adapter.sids));
-        this.server?.to(id).emit('first', 'hello world');
+        if (this.server) {
+          const id = _.head(_.keys(this.server.clients().adapter.sids));
+          this.server.to(id).emit('first', 'hello world');
+        }
       }
     }, 2000);
   }

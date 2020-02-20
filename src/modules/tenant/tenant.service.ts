@@ -79,7 +79,7 @@ export class TenantService {
 
       const entities = await DBHelper.getModelsHasRelation(Tenant);
       // logger.log(`check entities: ${entities}`);
-      const modelName = entityInfo?.name;
+      const modelName = entityInfo.name;
       const hasTenantField = entities.find(o => o.entityInfo.name === modelName);
       // 模型包含 tenant 元素
       // 只处理不包含 tenant 信息的数据，但是 FIXME 可能存在 tenant 信息和 bindModel 对不上的问题

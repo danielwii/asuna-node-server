@@ -150,7 +150,7 @@ export class LocalStorage implements IStorageEngine {
       fs.mkdirpSync(fullFileDir);
       logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
       const imageProcess = sharp(fullFilePath);
-      if (thumbnailConfig && thumbnailConfig.opts) {
+      if (thumbnailConfig.opts) {
         logger.verbose(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
         imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
           fit: thumbnailConfig.opts.fit,

@@ -217,7 +217,10 @@ export class OperationTokenHelper {
 
   static async checkAvailable(operationToken: OperationToken): Promise<boolean> {
     // 标记废弃的 token
-    if (!operationToken || !operationToken.isActive || operationToken.isExpired || operationToken.isDeprecated) {
+    if (!operationToken) {
+      return false;
+    }
+    if (operationToken && (!operationToken.isActive || operationToken.isExpired || operationToken.isDeprecated)) {
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;
