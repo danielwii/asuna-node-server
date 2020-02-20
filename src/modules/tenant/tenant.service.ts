@@ -1,6 +1,5 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
-import { getManager } from 'typeorm';
 import {
   AsunaErrorCode,
   AsunaException,
@@ -69,7 +68,7 @@ export class TenantService {
    * 2.🤔 如果没有绑定模型，应该指定 tenant，而 admin 端的管理用户也需要通过手动填写 tenant 来过滤下拉数据
    * @param entity
    */
-  static async populate<E extends { tenant: Tenant, tenantId: string }>(entity: E): Promise<void> {
+  static async populate<E extends { tenant: Tenant; tenantId: string }>(entity: E): Promise<void> {
     const config = await TenantHelper.getConfig();
     if (config.enabled && config.firstModelBind) {
       const { entityInfo } = entity.constructor as any;
@@ -94,7 +93,7 @@ export class TenantService {
           // logger.error(`no relation found for ${modelName} with ${config.firstModelName}`);
           return;
         }
-/*
+        /*
         logger.log(
           `metadata is ${r([
             relation.propertyName,
@@ -112,7 +111,7 @@ export class TenantService {
           // const relationEntity = await (relation.inverseEntityMetadata.target as any).findOne(firstModel, {
           //   relations: ['tenant'],
           // });
-          logger.log(`found tenant for relation ${firstModel} ${r(tenant)}`);
+          logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
           if (!tenant) {
             logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
             // FIXME 创建租户同时需要用户，在 server 端孤立的资源没有对应的用户
@@ -122,7 +121,7 @@ export class TenantService {
 
           // eslint-disable-next-line no-param-reassign
           entity.tenant = tenant;
-          await getManager().save(entity);
+          await (entity as any).save(); // getManager().save(entity);
         } else {
           // logger.error(`tenant column found but firstModelName not detected.`);
         }

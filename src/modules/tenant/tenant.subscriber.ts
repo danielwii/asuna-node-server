@@ -39,7 +39,7 @@ export class TenantSubscriber implements EntitySubscriberInterface {
       }
 
       logger.log(`handle ${entity.id} ${r({ properties, loaded })}`);
-      TenantService.populate(loaded);
+      TenantService.populate(loaded).catch(reason => logger.error(reason));
     }
   }
 
