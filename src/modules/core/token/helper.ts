@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-param-reassign,no-return-await */
 import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
@@ -220,7 +222,7 @@ export class OperationTokenHelper {
     if (!operationToken) {
       return false;
     }
-    if (operationToken && (!operationToken.isActive || operationToken.isExpired || operationToken.isDeprecated)) {
+    if (!operationToken.isActive || operationToken.isExpired || operationToken.isDeprecated) {
       operationToken.isDeprecated = true;
       await operationToken.save();
       return false;
