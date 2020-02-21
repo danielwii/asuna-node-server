@@ -504,21 +504,22 @@
   resolved "https://registry.yarnpkg.com/@nestjs/cqrs/-/cqrs-6.1.0.tgz#84529cfcdffa43624e251b1a71d61591fd4c3cad"
   integrity sha512-J1csaa2LdodZtwXOoYNcnqvFzk+G3RAR+G0N8k1/dlP7GvDJT3OakS2YXPiOSl7fEMOD40eS4+9sQMs8xqiegw==
 
-"@nestjs/graphql@^6.5.4":
-  version "6.5.4"
-  resolved "https://registry.yarnpkg.com/@nestjs/graphql/-/graphql-6.5.4.tgz#4dc691ffc94d4ff86e10c9039cd303510e0afb7e"
-  integrity sha512-t+l8+2SgY7u3yUDyzuffMD5728hdK9E8wX/AjCbm5PKDEMdDgNuA9pAj/UoRZNaeXYVcFazQZztMRMzHnMjHQg==
+"@nestjs/graphql@^6.5.5":
+  version "6.5.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/graphql/-/graphql-6.5.5.tgz#eecd3f33b7797ad13b97bcbafe42c9adf96d7bbe"
+  integrity sha512-0Y2LkXPS6l0WJlhfq0Bqayu1X7O0ProJHsu5QE20GeBASYZc3yrwu6C959DIds4zQN2LChijykz6SMHelAZd1Q==
   dependencies:
     "@types/graphql" "14.2.3"
     chokidar "3.3.1"
-    fast-glob "3.1.1"
-    graphql-tools "4.0.6"
+    fast-glob "3.2.1"
+    graphql-tools "4.0.7"
     iterall "1.2.2"
     lodash "4.17.15"
     merge-graphql-schemas "1.7.6"
     normalize-path "3.0.0"
+    rimraf "3.0.2"
     ts-morph "5.0.0"
-    uuid "3.3.3"
+    uuid "3.4.0"
   optionalDependencies:
     type-graphql "^0.17.3"
 
@@ -544,10 +545,10 @@
   resolved "https://registry.yarnpkg.com/@nestjs/mongoose/-/mongoose-6.3.1.tgz#542b73a8a9b2b8d42c52c9738eb3e7450018bb93"
   integrity sha512-yILdv4ZNXUTNNvLC2qB6F30xsapv4U4xEttoP9S4p6xkK5bh9gbtAXOdnV/U7VH8oLKP29Rr6VRSRd3098+h5w==
 
-"@nestjs/passport@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-6.1.1.tgz#991b8736c0ebffabb85a6455f0288055e5b52755"
-  integrity sha512-wMhvi3Ru965nftCLUhFUqWNwyzSxVDmGgTEYVyWbOOmHFjNg5US47jzV2NresuUP2vjgg8J8S6DviKTVuLfkRw==
+"@nestjs/passport@^6.2.0":
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/passport/-/passport-6.2.0.tgz#de5bf9b20912d26e15a99c7478b2760e7c3ebc79"
+  integrity sha512-Wy8FeSCNxbfTKRe/mJk0w5hSLsqoNMehg6DUQOoDug+6Uaq+QLEy6wvGPUJbVqGKpJwFHGgUoWp2ag05zh4zpA==
 
 "@nestjs/platform-express@6.11.6":
   version "6.11.6"
@@ -606,10 +607,10 @@
     cron "1.8.2"
     uuid "3.4.0"
 
-"@nestjs/swagger@^4.2.11":
-  version "4.2.11"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.11.tgz#2b7a24fc42e4c38281e2e2fbbbf864a1575a23f7"
-  integrity sha512-8dyzXDOn1DSxF3hFowudEjB7oX8z5/wbgsqMwY5KrjGP2XZX3QS8+bf2/kUhvZQT4bjp6re9WfZz24Zx/pto/w==
+"@nestjs/swagger@^4.2.12":
+  version "4.2.12"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.12.tgz#5f68a97c45475d1ee48bb4eaf3638b69b2896959"
+  integrity sha512-+ewTeVFKlgVKhkg6ul1l4hWt/PatnIxMOLcpr5wM9MBZUN9Dh7p4Guv5ZWqRx2qWsttfYWPZbQzmNRfRFO9+nw==
   dependencies:
     lodash "4.17.15"
     path-to-regexp "3.2.0"
@@ -651,10 +652,10 @@
   dependencies:
     uuid "3.3.3"
 
-"@nestjs/typeorm@^6.3.1":
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/typeorm/-/typeorm-6.3.1.tgz#65e1a666a06290bfe3007293c6aa78152f109056"
-  integrity sha512-Au40kKTpRU8p0Z45psrGTdKKJeIIXNt/2iwSUtA1RODCQZfJQrr/Sg6aLo2373LU9FY4GHGTaI3hmadYCL5Pdg==
+"@nestjs/typeorm@^6.3.3":
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/@nestjs/typeorm/-/typeorm-6.3.3.tgz#a096d0fe7412eacea7a99d7c46f17ff7f11b0b47"
+  integrity sha512-N6rKvZfblmkMF3G93QilLRY8nhFwfqYRUwjcOMRxfffuyV9+don5MPG1P3p/SimWoWaizYMD5lfhEFOfRHMJ9g==
   dependencies:
     uuid "3.4.0"
 
@@ -4643,7 +4644,19 @@ fast-diff@^1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
-fast-glob@3.1.1, fast-glob@^3.0.3, fast-glob@^3.1.1:
+fast-glob@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.1.tgz#c5aaea632f92543b744bdcb19f11efd49e56c7b3"
+  integrity sha512-XObtOQLTl4EptWcBbO9O6wd17VlVf9YXYY/zuzuu7nZfTsv4BL3KupMAMUVzH88CUwWkI3uNHBfxtfU8PveVTQ==
+  dependencies:
+    "@nodelib/fs.stat" "^2.0.2"
+    "@nodelib/fs.walk" "^1.2.3"
+    glob-parent "^5.1.0"
+    merge2 "^1.3.0"
+    micromatch "^4.0.2"
+    picomatch "^2.2.1"
+
+fast-glob@^3.0.3, fast-glob@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.1.1.tgz#87ee30e9e9f3eb40d6f254a7997655da753d7c82"
   integrity sha512-nTCREpBY8w8r+boyFYAx21iL6faSsQynliPHM4Uf56SbkyohCNxpVPEH9xrF5TXKy+IsjkPUHDKiUkzBVRXn9g==
@@ -5253,7 +5266,18 @@ graphql-tag@^2.9.2:
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.10.3.tgz#ea1baba5eb8fc6339e4c4cf049dabe522b0edf03"
   integrity sha512-4FOv3ZKfA4WdOKJeHdz6B3F/vxBLSgmBcGeAFPf4n1F64ltJUvOOerNj0rsJxONQGdhUMynQIvd6LzB+1J5oKA==
 
-graphql-tools@4.0.6, graphql-tools@^4.0.0:
+graphql-tools@4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/graphql-tools/-/graphql-tools-4.0.7.tgz#743309b96cb657ff45b607ee0a07193cd987e43c"
+  integrity sha512-rApl8sT8t/W1uQRcwzxMYyUBiCl/XicluApiDkNze5TX/GR0BSTQMjM2UcRGdTmkbsb1Eqq6afkyyeG/zMxZYQ==
+  dependencies:
+    apollo-link "^1.2.3"
+    apollo-utilities "^1.0.1"
+    deprecated-decorator "^0.1.6"
+    iterall "^1.1.3"
+    uuid "^3.1.0"
+
+graphql-tools@^4.0.0:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/graphql-tools/-/graphql-tools-4.0.6.tgz#0e729e73db05ade3df10a2f92511be544972a844"
   integrity sha512-jHLQw8x3xmSNRBCsaZqelXXsFfUSUSktSCUP8KYHiX1Z9qEuwcMpAf+FkdBzk8aTAFqOlPdNZ3OI4DKKqGKUqg==
@@ -8530,7 +8554,7 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
-picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.0.7:
+picomatch@^2.0.4, picomatch@^2.0.5, picomatch@^2.0.7, picomatch@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.2.1.tgz#21bac888b6ed8601f831ce7816e335bc779f0a4a"
   integrity sha512-ISBaA8xQNmwELC7eOjqFKMESB2VIqt4PPDD0nsS95b/9dZXvVKOlz9keMSnoGGKcOHXfTvDD6WMaRoSc9UuhRA==
@@ -9449,17 +9473,17 @@ rimraf@2.6.3:
   dependencies:
     glob "^7.1.3"
 
+rimraf@3.0.2, rimraf@^3.0.0:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
+  integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
+  dependencies:
+    glob "^7.1.3"
+
 rimraf@^2.6.1:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.7.1.tgz#35797f13a7fdadc566142c29d4f07ccad483e3ec"
   integrity sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==
-  dependencies:
-    glob "^7.1.3"
-
-rimraf@^3.0.0:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
-  integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
   dependencies:
     glob "^7.1.3"
 
