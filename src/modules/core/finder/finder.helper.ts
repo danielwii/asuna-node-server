@@ -6,14 +6,19 @@ import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');
 
+export type HostExchange = { regex: string; endpoint: string };
+
 export enum FinderFieldKeys {
   endpoint = 'endpoint',
   internalEndpoint = 'internal-endpoint',
+  hostExchanges = 'host-exchanges',
 }
 
 export class FinderAssetsSettings {
   @IsString() @IsOptional() endpoint?: string;
   @IsString() @IsOptional() internalEndpoint?: string;
+
+  @IsOptional() hostExchanges?: string;
 }
 
 export class FinderHelper {
@@ -46,27 +51,33 @@ export class FinderHelper {
     }
 
     const config = await this.getConfig();
-    const endpoint = internal ? config.internalEndpoint : config.endpoint;
-    logger.debug(`get endpoint ${r({ internal, config, endpoint })}`);
+    const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
+    logger.debug(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
 
-    if (!endpoint) {
-      logger.warn(`${name || 'default'} not available in upstream ${endpoint}`);
+    if (!defaultEndpoint) {
+      logger.warn(`${name || 'default'} not available in upstream ${defaultEndpoint}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
-        `${name || 'default'} not available in upstream ${endpoint}`,
+        `${name || 'default'} not available in upstream ${defaultEndpoint}`,
       );
     }
 
-    if (type === 'assets') {
-      /*
-      if (!config) {
-        throw new AsunaException(
-          AsunaErrorCode.Unprocessable,
-          `invalid upstream ${JSON.stringify(endpoint)} for finder`,
-        );
+    const resourcePath = join('/', path).replace(/\/+/g, '/');
+    if (config.hostExchanges) {
+      try {
+        const exchanges: HostExchange[] = JSON.parse(config.hostExchanges);
+        logger.debug(`parse exchanges ${r({ exchanges })}`);
+        const exchange = exchanges.find(x => new RegExp(x.regex).test(path));
+        if (exchange) {
+          logger.verbose(`check exchange ${r({ exchange, path })}`);
+          return `${exchange.endpoint || ''}${resourcePath}`;
+        }
+      } catch (e) {
+        logger.error(`handle exchange error: ${e}`);
       }
-*/
-      const resourcePath = join('/', path).replace(/\/+/g, '/');
+    }
+
+    if (type === 'assets') {
       return `${config.endpoint || ''}${resourcePath}`;
     }
     // TODO add other handlers later

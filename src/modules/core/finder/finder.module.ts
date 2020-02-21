@@ -3,7 +3,7 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper, KvModule } from '../kv';
 import { FinderController, ShortFinderController } from './finder.controller';
-import { FinderHelper } from './finder.helper';
+import { FinderFieldKeys, FinderHelper } from './finder.helper';
 
 const logger = LoggerFactory.getLogger('FinderModule');
 
@@ -34,16 +34,29 @@ export class FinderModule implements OnModuleInit {
             form: {
               default: {
                 name: '公网资源',
-                fields: [{ name: '端点', field: { name: 'endpoint', type: 'string', defaultValue: assetsEndpoint } }],
+                fields: [
+                  {
+                    name: '端点',
+                    field: { name: FinderFieldKeys.endpoint, type: 'string', defaultValue: assetsEndpoint },
+                  },
+                ],
               },
               'internal-default': {
                 name: '内网资源',
                 fields: [
                   {
                     name: '端点',
-                    field: { name: 'internal-endpoint', type: 'string', defaultValue: assetsInternalEndpoint },
+                    field: {
+                      name: FinderFieldKeys.internalEndpoint,
+                      type: 'string',
+                      defaultValue: assetsInternalEndpoint,
+                    },
                   },
                 ],
+              },
+              exchanges: {
+                name: '地址转换',
+                fields: [{ name: 'json', field: { name: FinderFieldKeys.hostExchanges, type: 'text' } }],
               },
             },
             values: {},

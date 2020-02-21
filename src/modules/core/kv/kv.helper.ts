@@ -41,7 +41,7 @@ const toJson = (value): JSON => {
 
 export type KVField = {
   name: string;
-  type: 'number' | 'string' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'boolean';
+  type: 'number' | 'string' | 'text' | 'json' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
@@ -232,8 +232,6 @@ export class KvHelper {
       exists.value = JSON.stringify({
         ...exists.value,
         ..._.omit(value as any, 'values'),
-        // form: _.get(value, 'form'),
-        // values: _.get(value, 'values') || _.get(exists.value, 'values'),
       });
       logger.verbose(`inspect ${r(exists)}`);
       return exists.save();
@@ -298,23 +296,10 @@ export class KvHelper {
     kvDef: KvDef,
     keyValues: KeyValues,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    // return CacheManager.cacheable(
-    //   { kvDef, keyValues },
-    //   async () => Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key))),
-    //   10,
-    // );
     return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 
   static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
-    // return CacheManager.cacheable(
-    //   { kvDef, fieldKey },
-    //   async () => {
-    //     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    //     return field?.value || _.get(field, 'field.defaultValue');
-    //   },
-    //   10,
-    // );
     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
     return field?.value || _.get(field, 'field.defaultValue');
   }
@@ -344,7 +329,6 @@ export class KvHelper {
     });
     if (!fields) return null;
 
-    // const fields: KVGroupFieldsValue = (await KvHelper.get(kvDef)).value;
     const result = {
       value: _.get(fields.values, fieldKey),
       field: _.get(
