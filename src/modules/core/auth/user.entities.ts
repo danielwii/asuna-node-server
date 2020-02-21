@@ -1,4 +1,4 @@
-import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { AfterRemove, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';

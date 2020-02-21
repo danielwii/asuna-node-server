@@ -12,8 +12,7 @@ const logger = LoggerFactory.getLogger('GqlAuthGuard');
 export class GqlAdminAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const {req} = ctx.getContext();
-    const {res} = ctx.getContext();
+    const { req, res } = ctx.getContext();
     const info = {
       body: req.body,
       query: req.query,
@@ -54,14 +53,6 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  /*
-  jwtAuthenticator = passport.authenticate('jwt', { session: false });
-
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const http = context.switchToHttp();
-    return this.jwtAuthenticator(http.getRequest(), http.getResponse());
-  } */
-
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   handleRequest(err, user, info) {
     if (err || !user) {
@@ -82,7 +73,7 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   getRequest(context: ExecutionContext) {
     const ctx = GqlExecutionContext.create(context);
-    const {req} = ctx.getContext();
+    const { req } = ctx.getContext();
     const info = {
       body: req.body,
       query: req.query,
@@ -99,19 +90,6 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     // logger.debug(`request info: ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     return req;
   }
-
-  /*
-  /!**
-   * GraphQLModule.forRoot({
-   *   context: ({ req }) => ({ req }),
-   * });
-   * context value will have req property.
-   *!/
-  getRequest(context: ExecutionContext) {
-    const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req;
-  }
-*/
 }
 
 export interface GetCurrentUser {

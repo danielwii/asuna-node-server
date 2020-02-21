@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 import { AfterUpdate, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
-import { CacheManager, CacheUtils } from '../../cache';
-import { CacheWrapper } from '../../cache/wrapper';
+import { CacheUtils } from '../../cache';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { jsonType } from '../helpers';
 
@@ -64,7 +63,7 @@ export class KeyValueModel extends Publishable(AbstractNameEntity) {
   @JoinColumn({ name: 'pair__id' })
   pair: KeyValuePair;
 
-  @MetaInfo({ name: 'Value', type: 'SimpleJSON', jsonType: 'any' })
-  @Column(jsonType(), { nullable: true })
-  value: JsonMap;
+  @MetaInfo({ name: 'FormatType' })
+  @Column({ nullable: true, name: 'format_type' })
+  formatType?: string;
 }

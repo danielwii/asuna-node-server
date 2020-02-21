@@ -15,9 +15,10 @@ import {
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { EnumValueStatic } from '../../enum-values';
+import { auth } from '../../helper';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
-import { KeyValuePair, ValueType } from './kv.entities';
+import { KeyValueModel, KeyValuePair, ValueType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');
 
@@ -103,6 +104,13 @@ function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof ty
   }
   // logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
   return [newType || 'string', newValue];
+}
+
+export enum AsunaColletionPrefix {
+  // 限制只有管理员可以访问该前缀的 kv
+  SYSTEM = 'SYSTEM',
+  // 目前不限制权限
+  APP = 'APP',
 }
 
 export const AsunaCollections = {
@@ -191,28 +199,28 @@ export class KvHelper {
     }
   }
 
-  /**
-   * @param pair noValueOnly 仅在值为空时或不存在时设置
-   */
   static async set<V = any>(
-    pair: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: V; extra?: any },
+    opts: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: V; extra?: any },
     {
+      formatType,
       merge,
       noUpdate,
     }: {
+      // 用于 admin 中识别类型
+      formatType?: string;
       noUpdate?: boolean;
       // 用于合并 KVGroupFieldsValue 中的表单
       merge?: boolean;
     } = {},
   ): Promise<KeyValuePair> {
-    const collection = pair.collection ? pair.collection.replace('/\b+/', '') : null;
-    const key = pair.key ? pair.key.replace('/\b+/', '') : null;
+    const collection = opts.collection ? opts.collection.replace('/\b+/', '') : null;
+    const key = opts.key ? opts.key.replace('/\b+/', '') : null;
 
     if (!key) {
       throw new ValidationException('kv', 'key is required');
     }
 
-    const { name, type, value } = pair;
+    const { name, type, value } = opts;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
     logger.debug(`recognize ${r({ type, newType, value, stringifyValue })}`);
@@ -222,10 +230,19 @@ export class KvHelper {
       name,
       type: newType,
       value: stringifyValue as any,
-      extra: pair.extra,
+      extra: opts.extra,
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
     };
     const exists = await this.get(entity);
+    if (exists && opts.name) {
+      const model = await KeyValueModel.findOne({ name: opts.name });
+      logger.verbose(`found kv model ${r(model)}`);
+      if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
+      else {
+        model.formatType = formatType;
+        model.save();
+      }
+    }
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && noUpdate && exists.value) return exists;
     if (exists && merge) {
@@ -238,9 +255,16 @@ export class KvHelper {
     }
 
     logger.verbose(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any).finally(() => {
-      CacheUtils.clear({ prefix: 'kv', key: { collection, key } });
-    });
+    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any)
+      .then(pair => {
+        if (opts.name)
+          (async () => {
+            const model = await KeyValueModel.findOne({ name: opts.name });
+            if (!model) KeyValueModel.create({ name: opts.name, pair, formatType }).save();
+          })();
+        return pair;
+      })
+      .finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
   }
 
   static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
@@ -304,6 +328,11 @@ export class KvHelper {
     return field?.value || _.get(field, 'field.defaultValue');
   }
 
+  /**
+   * @deprecated
+   * @param kvDef
+   * @param identifier
+   */
   static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
     if (kvDef.collection.startsWith('system.')) {
       if (AdminUserIdentifierHelper.identify(identifier)) {
@@ -316,6 +345,12 @@ export class KvHelper {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'unresolved identifier.');
     }
     // todo 非系统配置暂时直接略过权限，之后可通过 kv 本身提供更多待认证信息
+  }
+
+  static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
+    if (collection.toUpperCase().startsWith(AsunaColletionPrefix.SYSTEM)) {
+      await auth(req, res, 'admin');
+    }
   }
 
   private static async getGroupFieldsValueByFieldKV(

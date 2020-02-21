@@ -62,9 +62,10 @@ export class FinderModule implements OnModuleInit {
             values: {},
           },
         },
-        { merge: true },
+        { merge: true, formatType: 'KVGroupFieldsValue' },
       );
 
+    // initialize
     await KvHelper.initializers[identifier]();
   }
 }

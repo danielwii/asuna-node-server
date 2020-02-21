@@ -110,12 +110,12 @@ export class AdminAuthController extends RestCrudController {
         .deleteAny('video');
     logger.log(`access control is ${r({ ac })}`);
     const permission1 = ac.can('user').createOwn('video');
-    console.log(permission1.granted); // —> true
-    console.log(permission1.attributes); // —> ['*'] (all attributes)
+    logger.log(permission1.granted); // —> true
+    logger.log(permission1.attributes); // —> ['*'] (all attributes)
 
     const permission2 = ac.can('admin').updateAny('video');
-    console.log(permission2.granted); // —> true
-    console.log(permission2.attributes); // —> ['title']
+    logger.log(permission2.granted); // —> true
+    logger.log(permission2.attributes); // —> ['title']
 
     logger.log(`access control is ${r({ ac, permission1, permission2 })}`);
   }
