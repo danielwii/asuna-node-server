@@ -42,7 +42,7 @@ export class LocalStorage implements IStorageEngine {
     return Promise.resolve(
       new SavedFile({
         bucket,
-        path: dest,
+        path: filename,
         prefix,
         mimetype: file.mimetype,
         mode: StorageMode.LOCAL,

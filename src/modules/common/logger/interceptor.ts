@@ -7,10 +7,10 @@ import { tap } from 'rxjs/operators';
 import { r } from '../helpers/utils';
 import { LoggerFactory } from './factory';
 
-export class LoggerInterceptor implements NestInterceptor {
-  logger = LoggerFactory.getLogger('LoggerInterceptor');
+const logger = LoggerFactory.getLogger('LoggerInterceptor');
 
-  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
+export class LoggerInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     let request = context.switchToHttp().getRequest<Request>();
     if (!request) {
       request = GqlExecutionContext.create(context).getContext().req;
@@ -30,15 +30,15 @@ export class LoggerInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    // logger.verbose(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
+    // logger.verbose(`${context.getClass().name}.${context.getHandler().name} info: ${r(info)}`);
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () => this.logger.debug(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
+        () => logger.verbose(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
         e => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {
-            this.logger.warn(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+            logger.warn(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
           }
         },
       ),

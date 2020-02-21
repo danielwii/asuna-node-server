@@ -476,25 +476,25 @@
   resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.0.3.tgz#52f72285b87a95ae7cd15fc19666b5860257607a"
   integrity sha512-wwQM5mb3mqMBqXFG/A/QIWv828CYjI1mChRs3wVufXGSvNnxPEqa495OsA3qk26Z04KtAiRXddLLwxpleoKfIA==
 
-"@nestjs/common@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-6.11.7.tgz#59b6e4a580b61f5d4964e4fca3a0cc8d52d73c5a"
-  integrity sha512-Rh3SYFAOLMlwZlWBsVNFo13Bt1NSoplOebs273w7ZRH8y3hTTsVcvJDKBAZ5a3RokEqYFZWjEXJpwRJ/7wzSNg==
+"@nestjs/common@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-6.11.8.tgz#2c7acb2aa312f111b39bedb8015891a7b6916834"
+  integrity sha512-Tnd0Uikrthv2Y2RVTEZvA8f9P2HE+G31tfq1tA7fNLz1af7YeU/gMBtvDlemStMKUOx26/aSP2IRCvKeYwRCFQ==
   dependencies:
     axios "0.19.2"
     cli-color "2.0.0"
     tslib "1.10.0"
     uuid "3.4.0"
 
-"@nestjs/core@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-6.11.7.tgz#b4e6d23674e95013eda3811f1965821c1117975a"
-  integrity sha512-91C6GPpMj/Zbnntxb9ANyBeFeZ3zIbYrUQgoYK6dHX38Fn/a0ptCuy7Rv9X8GGsTEt984+nhL18+IlglKHMNnw==
+"@nestjs/core@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-6.11.8.tgz#9c149d4aaf49fc94f0a61a58e9661b9aacd13cd7"
+  integrity sha512-QXsik+f0voaWmkMZhX3VDWB+q4jBBXwCJqJurK47h7ksTKJAcpHxV0SVOOrbWoZK0aHSMl3KMU/JNYL/p0mwNw==
   dependencies:
     "@nuxtjs/opencollective" "0.2.2"
     fast-safe-stringify "2.0.7"
     iterare "1.2.0"
-    object-hash "2.0.2"
+    object-hash "2.0.3"
     path-to-regexp "3.2.0"
     tslib "1.10.0"
     uuid "3.4.0"
@@ -560,10 +560,10 @@
     multer "1.4.2"
     tslib "1.10.0"
 
-"@nestjs/platform-express@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-6.11.7.tgz#9b9990ee47f5bcefaa75e0e6a4db50298f968507"
-  integrity sha512-V9+y2jw6TmoI/VPiBjMQNOUpT4ebfZwEwkSm+rtZpPiz5pU+g4vCmJdmEXjTrUGJuxsFHK7YYryM6umBkoQdlA==
+"@nestjs/platform-express@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-express/-/platform-express-6.11.8.tgz#5444b92d9d31842457bab5da85d4d8c39f90f7dc"
+  integrity sha512-nLyZEOAAUSxHX2lL3fuDAjoE1iaFJphFYCx4H09JwScYnurOYYCB3VaXqAoeib4JS1LIGglqHxirjTvNOBXAcA==
   dependencies:
     body-parser "1.19.0"
     cors "2.8.5"
@@ -582,18 +582,18 @@
     path-to-regexp "3.2.0"
     tslib "1.10.0"
 
-"@nestjs/platform-socket.io@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.11.7.tgz#e98380660475fd984073519708fee36c3bdc2f3a"
-  integrity sha512-cd74iReJ8fCX+2Y8xoVk6TmBaCwY+GP/HsHr+UJtlbJjhKGc0Qay4YWUmcOvoIoj42j87l3FE6opF4NbIABjLw==
+"@nestjs/platform-socket.io@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-socket.io/-/platform-socket.io-6.11.8.tgz#68fca1ad150ecba2d3b6c504ed3bc09f5dc26a67"
+  integrity sha512-3O3ZmVl9lv9flFpAkSCFivf0+ww/2FIZBBMUDtaqCb4I6Ef25KWKc6S8TX08VRWHIhDo42UhgDXJ1oDq3uq6HA==
   dependencies:
     socket.io "2.3.0"
     tslib "1.10.0"
 
-"@nestjs/platform-ws@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.11.7.tgz#05d20ef149ee71c40798190928215f1c5b138c79"
-  integrity sha512-CRg12xhDoU7gzzxjsFDpetTX6zhVLpbi8lC47zvDVVoK9Cqz66USEc7dY0Cl63H6bDlFGwqH2Tj4kaC8e0Lnyw==
+"@nestjs/platform-ws@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-6.11.8.tgz#5d4feac9053f747c2f6e7a866a0976c29b7b9a53"
+  integrity sha512-86ETmxDoak4CWhbl1zF4pgpVrpf/aBZsQK1VHTVSdquzYIaV1f1bkXgvMKTGF0sGkGiz4K2jYbea1X3TK75ulg==
   dependencies:
     tslib "1.10.0"
     ws "7.2.1"
@@ -606,10 +606,10 @@
     cron "1.8.2"
     uuid "3.4.0"
 
-"@nestjs/swagger@^4.2.10":
-  version "4.2.10"
-  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.10.tgz#1966fed55cedeb184b296a12db146f9b40677412"
-  integrity sha512-CH9n/ewpjMOX1IgYpHgjnL/WFGuFXV6/N5wsNQbJ+Dqac7R/u8yzrOZxJLm580lfebhd2lcPEy9Rpgl3HpZzxg==
+"@nestjs/swagger@^4.2.11":
+  version "4.2.11"
+  resolved "https://registry.yarnpkg.com/@nestjs/swagger/-/swagger-4.2.11.tgz#2b7a24fc42e4c38281e2e2fbbbf864a1575a23f7"
+  integrity sha512-8dyzXDOn1DSxF3hFowudEjB7oX8z5/wbgsqMwY5KrjGP2XZX3QS8+bf2/kUhvZQT4bjp6re9WfZz24Zx/pto/w==
   dependencies:
     lodash "4.17.15"
     path-to-regexp "3.2.0"
@@ -636,10 +636,10 @@
     redis "2.8.0"
     typeorm "0.2.22"
 
-"@nestjs/testing@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.11.7.tgz#bece1beddfb41c30baba80ba015ddfa8d401b6b6"
-  integrity sha512-VuciM/LfkX3PQkG5ILDCjf/FQD6mykMuU9wqmreeeO+Tigkcirst9Di7l55aWWIYiwlOBP2VBscFi68Njwrc0w==
+"@nestjs/testing@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/testing/-/testing-6.11.8.tgz#79bf0bc858aaffe2d8b6e9e7d638634298764b24"
+  integrity sha512-BuqaqVWVNtRR00NGXiXD2O8Lxbtuv9o+x+7mDfzNFCedy9v1BSfkXpGnbVk9C4Phf9oFhsBnRqZm3kmfXvdlpw==
   dependencies:
     optional "0.1.4"
     tslib "1.10.0"
@@ -658,10 +658,10 @@
   dependencies:
     uuid "3.4.0"
 
-"@nestjs/websockets@^6.11.7":
-  version "6.11.7"
-  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.11.7.tgz#d42f420011a557383746c343d59ec011f4cdcba9"
-  integrity sha512-ScE7F7j+cgGfYOb3M1pwQ4fQH/G6BaD9bzB+tOreQOVDJpF+3Zlxcue95vMYoh0LUQ6WXLj9dT8ucHBxF98ooQ==
+"@nestjs/websockets@^6.11.8":
+  version "6.11.8"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-6.11.8.tgz#4c19fc55ef088097fe87b6af8959903b1ba55c60"
+  integrity sha512-tuoV/cd904ng8cBcG8No7/cseKWlEpV2nqnYZbZBvLk9CBPCIDpmT5gazcU0Bb38imSYoPN6FzwoRTLNNvOYJw==
   dependencies:
     iterare "1.2.0"
     tslib "1.10.0"
@@ -7452,10 +7452,10 @@ minimist@~0.0.1:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-0.0.10.tgz#de3f98543dbf96082be48ad1a0c7cda836301dcf"
   integrity sha1-3j+YVD2/lggr5IrRoMfNqDYwHc8=
 
-minio@^7.0.13:
-  version "7.0.13"
-  resolved "https://registry.yarnpkg.com/minio/-/minio-7.0.13.tgz#34979dcf9c769fa6da5fe623613be335853d9270"
-  integrity sha512-49t0Xk+I2cZriI9pOJhIkF2BDNj95Xq8YyG/6to0POfk6MGIRHptjJyyucOnaRFfZ3Nr6KKwxaGzMGnv3axqfQ==
+minio@^7.0.14:
+  version "7.0.14"
+  resolved "https://registry.yarnpkg.com/minio/-/minio-7.0.14.tgz#e9d87346fb32286c55a5fbd00a8ef132c442dade"
+  integrity sha512-rXY8EdUNbmImwhiIdid0HePuaxBL6WtMG+tZZKuBaiY0vx7c/DmljldH8xZUSjh9jl4hIDh35Ifu4W35yGOL/g==
   dependencies:
     async "^3.1.0"
     block-stream2 "^2.0.0"
@@ -8030,10 +8030,10 @@ object-copy@^0.1.0:
     define-property "^0.2.5"
     kind-of "^3.0.3"
 
-object-hash@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.2.tgz#f7b2212dbe07d07e340ccd6004c59504fc4015cf"
-  integrity sha512-b+2AKjAf6uQlxxv8ChHdM+VT4eeX+ZSwv+pk2xIXZWbo+yxn4/En1iC+GHe/OFYa9on0AhFF2PvuAcFHoiiHaA==
+object-hash@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/object-hash/-/object-hash-2.0.3.tgz#d12db044e03cd2ca3d77c0570d87225b02e1e6ea"
+  integrity sha512-JPKn0GMu+Fa3zt3Bmr66JhokJU5BaNBIh4ZeTlaCBzrBsOeXzwcKKAK1tbLiPKgvwmPXsDvvLHoWh5Bm7ofIYg==
 
 object-inspect@^1.7.0:
   version "1.7.0"
@@ -10801,7 +10801,12 @@ typeorm@0.2.22, typeorm@^0.2.22:
     yargonaut "^1.1.2"
     yargs "^13.2.1"
 
-typescript@^3.7.5, typescript@~3.7.2:
+typescript@^3.8.2:
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.2.tgz#91d6868aaead7da74f493c553aeff76c0c0b1d5a"
+  integrity sha512-EgOVgL/4xfVrCMbhYKUQTdF37SQn4Iw73H5BgCrF1Abdun7Kwy/QZsE/ssAy0y4LxBbvua3PIbFsbRczWWnDdQ==
+
+typescript@~3.7.2:
   version "3.7.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.7.5.tgz#0692e21f65fd4108b9330238aac11dd2e177a1ae"
   integrity sha512-/P5lkRXkWHNAbcJIiHPfRoKqyd7bsyCma1hZNUGfn20qm64T6ZBlrzprymeu918H+mB/0rIg2gGK/BXkhhYgBw==

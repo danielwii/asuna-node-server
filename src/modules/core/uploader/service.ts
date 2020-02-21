@@ -140,39 +140,31 @@ export class UploaderService {
     );
     const tempDirectory = join(Global.tempPath, 'chunks', payload.fingerprint);
 
-    try {
-      fs.mkdirsSync(tempDirectory);
-      const dest = join(tempDirectory, _filename);
-      logger.log(`merge files: ${r(filepaths)} to ${dest}`);
-      const writableStream = fs.createWriteStream(dest);
+    logger.log(`create temp folder: ${tempDirectory}`);
+    fs.mkdirpSync(tempDirectory);
+    const dest = join(tempDirectory, _filename);
+    logger.log(`merge files: ${r(filepaths)} to ${dest}`);
+    const writableStream = fs.createWriteStream(dest);
 
-      highland(filepaths)
-        .map(fs.createReadStream)
-        .flatMap(highland)
-        .pipe(writableStream);
+    highland(filepaths)
+      .map(fs.createReadStream)
+      .flatMap(highland)
+      .pipe(writableStream);
 
-      await new Promise(resolve => {
-        writableStream.on('close', () => {
-          logger.log(`merge file done: ${dest}, clean chunks ...`);
-          resolve();
-          const directory = path.dirname(filepaths[0]);
-          fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
-          // filepaths.forEach(filepath => {
-          //   logger.log(`remove ${filepath} ...`);
-          //   fs.removeSync(filepath);
-          // });
-        });
+    await new Promise(resolve => {
+      writableStream.on('close', () => {
+        const directory = path.dirname(filepaths[0]);
+        logger.log(`merge file done: ${dest}, clean chunks in ${directory} ...`);
+        resolve();
+        // fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
       });
+    }).catch(reason => logger.error(reason));
 
-      const fileInfo = new FileInfo({ filename: _filename, path: dest });
-      // const mimetype = mime.lookup(filename) || 'application/octet-stream';
-      const saved = await this.context.filesStorageEngine.saveEntity(fileInfo, {
-        prefix: payload.fingerprint,
-      });
+    const fileInfo = new FileInfo({ filename: _filename, path: dest });
+    // const mimetype = mime.lookup(filename) || 'application/octet-stream';
+    const storageEngine = AsunaContext.instance.getStorageEngine('files');
+    const saved = await storageEngine.saveEntity(fileInfo, { prefix: payload.fingerprint });
 
-      return new RemoteFileInfo(saved);
-    } catch (e) {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, e);
-    }
+    return new RemoteFileInfo(saved);
   }
 }

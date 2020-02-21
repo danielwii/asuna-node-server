@@ -98,7 +98,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     } else if (httpStatus && httpStatus === HttpStatus.NOT_FOUND) {
       logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40[13]/.test(`${httpStatus}`)) {
-      logger.warn(`[unauthorized] ${r(processed)}`);
+      // logger.warn(`[unauthorized] ${r(processed)}`);
     } else if (/4\d+/.test(`${httpStatus}`)) {
       logger.warn(`[client_error] ${r(processed)}`);
     } else {

@@ -47,12 +47,8 @@ export class AsunaContext {
    * @deprecated
    */
   public filesStorageEngine: IStorageEngine;
-  /**
-   * @see AsunaContext.defaultStorageEngine
-   * @deprecated
-   */
-  public chunksStorageEngine: IStorageEngine;
 
+  public chunksStorageEngine: IStorageEngine;
   public localStorageEngine: IStorageEngine;
 
   private constructor() {
