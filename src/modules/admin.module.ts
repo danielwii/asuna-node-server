@@ -1,6 +1,7 @@
 import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
+import { AdminController } from './admin.controller';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
 import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
@@ -59,6 +60,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   ],
   controllers: [
     ApiController,
+    AdminController,
     AdminRestController,
     AdminAppRestController,
     AdminContentRestController,
