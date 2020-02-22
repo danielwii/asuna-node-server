@@ -43,7 +43,7 @@
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "bull": "^3.13.0",
-    "cache-manager": "^2.11.1",
+    "cache-manager": "^3.0.0",
     "cache-manager-redis-store": "^2.0.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.11.0",

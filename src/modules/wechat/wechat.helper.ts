@@ -362,12 +362,9 @@ export class WeChatHelper {
 
       decoded = JSON.parse(decoded);
     } catch (err) {
+      logger.error(`decrypt data error: ${err}`);
       throw new Error('Illegal Buffer');
     }
-
-    // if (decoded.watermark.appid !== this.appId) {
-    //   throw new Error('Illegal Buffer');
-    // }
 
     return decoded;
   }
