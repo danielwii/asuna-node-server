@@ -4,7 +4,14 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
 import * as supertest from 'supertest';
-import { AdminInternalModule, AsunaCollections, CacheManager, KvHelper, LoggerHelper } from '../src/modules';
+import {
+  AdminInternalModule,
+  AsunaCollections,
+  CacheManager,
+  KeyValueType,
+  KvHelper,
+  LoggerHelper,
+} from '../src/modules';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
@@ -27,7 +34,7 @@ describe('FinderModule (e2e)', () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
-      type: 'json',
+      type: KeyValueType.json,
       value: { values: { endpoint: 'https://hostname' } },
     });
 
@@ -49,7 +56,7 @@ describe('FinderModule (e2e)', () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
-      type: 'json',
+      type: KeyValueType.json,
       value: { values: { endpoint: 'https://hostname' } },
     });
 
@@ -70,7 +77,7 @@ describe('FinderModule (e2e)', () => {
     await KvHelper.set({
       collection: AsunaCollections.SYSTEM_SERVER,
       key: 'settings.finder.assets',
-      type: 'json',
+      type: KeyValueType.json,
       // merge: true,
       value: { values: { endpoint: '/s3' } },
     });

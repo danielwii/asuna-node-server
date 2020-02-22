@@ -6,7 +6,7 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { AnyAuthRequest } from '../../helper/auth';
 import { JwtAdminAuthGuard } from '../auth/admin-auth.guard';
-import { KeyValuePair, ValueType } from './kv.entities';
+import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';
 
 const logger = LoggerFactory.getLogger('KvController');
@@ -24,7 +24,7 @@ class KvPair {
   name?: string;
 
   @IsOptional()
-  type?: keyof typeof ValueType;
+  type?: KeyValueType;
 
   @IsString()
   value: any;

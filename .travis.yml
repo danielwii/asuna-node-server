@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "10"
-  - "12"
-sudo: false
+  - '10'
+  - '12'
+os: linux
 install:
   - yarn
   - yarn global add codecov
