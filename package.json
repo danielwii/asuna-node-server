@@ -81,7 +81,7 @@
     "nodemailer": "^6.4.2",
     "opentracing": "^0.14.4",
     "otplib": "^12.0.1",
-    "ow": "^0.16.0",
+    "ow": "^0.17.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pump": "^3.0.0",
