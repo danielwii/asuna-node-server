@@ -3,12 +3,12 @@ import { AppLifecycleType, LifecycleRegister } from '../../../lifecycle';
 import { LoggerFactory } from '../../common/logger';
 import { KvController } from './kv.controller';
 import { KvHelper } from './kv.helper';
-import { KvQueryResolver } from './kv.resolver';
+import { KeyValueModelResolver, KvQueryResolver } from './kv.resolver';
 
 const logger = LoggerFactory.getLogger('KvModule');
 
 @Module({
-  providers: [KvQueryResolver],
+  providers: [KvQueryResolver, KeyValueModelResolver],
   controllers: [KvController],
   exports: [],
 })

@@ -3,7 +3,14 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { AdminUser } from '../core/auth';
 import { Hermes } from '../core/bus';
-import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
+import {
+  KeyValuePair,
+  KvDefIdentifierHelper,
+  KVGroupFieldsValue,
+  KvHelper,
+  KeyValueType,
+  KVModelFormatType
+} from "../core/kv";
 import { WeChatController } from './wechat.controller';
 import { WeChatFieldKeys, WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
@@ -30,7 +37,7 @@ export class WeChatModule implements OnModuleInit {
         {
           ...WeChatHelper.kvDef,
           name: '微信配置',
-          type: 'json',
+          type: KeyValueType.json,
           value: {
             form: {
               default: {
@@ -64,7 +71,7 @@ export class WeChatModule implements OnModuleInit {
             values: {},
           },
         },
-        { merge: true },
+        { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
       );
 
     KvHelper.initializers[identifier]();

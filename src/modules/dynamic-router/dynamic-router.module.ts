@@ -1,6 +1,13 @@
 import { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
-import { KeyValuePair, KvDefIdentifierHelper, KVFieldsList, KvHelper } from '../core/kv';
+import {
+  KeyValuePair,
+  KeyValueType,
+  KvDefIdentifierHelper,
+  KVFieldsList,
+  KvHelper,
+  KVModelFormatType,
+} from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
 import { DynamicRouterMiddleware } from './dynamic-router.middleware';
 
@@ -30,7 +37,7 @@ export class DynamicRouterModule implements NestModule, OnModuleInit {
         {
           ...DynamicRouterHelper.kvDef,
           name: '文本路由配置',
-          type: 'json',
+          type: KeyValueType.json,
           value: {
             type: 'list',
             fields: [
@@ -41,7 +48,7 @@ export class DynamicRouterModule implements NestModule, OnModuleInit {
             values: [],
           },
         },
-        { merge: true },
+        { merge: true, formatType: KVModelFormatType.LIST },
       );
 
     KvHelper.initializers[identifier]();

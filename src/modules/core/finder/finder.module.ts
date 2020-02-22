@@ -1,7 +1,15 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper, KvModule } from '../kv';
+import {
+  KeyValuePair,
+  KeyValueType,
+  KvDefIdentifierHelper,
+  KVGroupFieldsValue,
+  KvHelper,
+  KVModelFormatType,
+  KvModule,
+} from '../kv';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderFieldKeys, FinderHelper } from './finder.helper';
 
@@ -29,7 +37,7 @@ export class FinderModule implements OnModuleInit {
         {
           ...FinderHelper.kvDef,
           name: '资源位置配置',
-          type: 'json',
+          type: KeyValueType.json,
           value: {
             form: {
               default: {
@@ -62,7 +70,7 @@ export class FinderModule implements OnModuleInit {
             values: {},
           },
         },
-        { merge: true, formatType: 'KVGroupFieldsValue' },
+        { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
       );
 
     // initialize

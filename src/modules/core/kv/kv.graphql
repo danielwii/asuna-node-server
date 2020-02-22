@@ -1,3 +1,33 @@
+enum KVModelFormatType {
+  KVGroupFieldsValue
+  LIST
+}
+
+enum KeyValueType {
+  string
+  text
+  json
+  boolean
+  number
+  image
+  images
+  videos
+  video
+}
+
+type KeyValueModel implements BaseNameEntity @cacheControl(maxAge: 300) {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  formatType: KVModelFormatType
+
+  pair: KeyValuePair
+}
+
 type KeyValuePair implements BaseEntity {
   id: Int!
   createdAt: Date!
@@ -5,12 +35,15 @@ type KeyValuePair implements BaseEntity {
 
   collection: String!
   key: String!
-  type: String!
+  type: KeyValueType!
   name: String
   value: Any
+
+  #  model: KeyValueModel
 }
 
 extend type Query {
   kv(collection: String, key: String): KeyValuePair
   kvs(collection: String): [KeyValuePair]
+  kv_models: [KeyValueModel]
 }

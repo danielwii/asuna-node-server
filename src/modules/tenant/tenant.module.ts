@@ -4,7 +4,14 @@ import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
 import { DBHelper } from '../core/db';
-import { KeyValuePair, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper } from '../core/kv';
+import {
+  KeyValuePair,
+  KeyValueType,
+  KvDefIdentifierHelper,
+  KVGroupFieldsValue,
+  KvHelper,
+  KVModelFormatType,
+} from '../core/kv';
 import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
@@ -47,7 +54,7 @@ export class TenantModule implements OnModuleInit {
         {
           ...TenantHelper.kvDef,
           name: 'Tenant 配置',
-          type: 'json',
+          type: KeyValueType.json,
           value: {
             form: {
               default: {
@@ -103,7 +110,7 @@ export class TenantModule implements OnModuleInit {
             values: {},
           },
         },
-        { merge: true },
+        { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
       );
 
     await KvHelper.initializers[identifier]();

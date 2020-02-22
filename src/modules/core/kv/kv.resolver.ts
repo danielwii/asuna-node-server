@@ -1,28 +1,54 @@
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Context, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
+import { Promise } from 'bluebird';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { KeyValuePair } from './kv.entities';
-import { KvHelper } from './kv.helper';
+import { GraphqlContext } from '../../dataloader';
+import { GqlAdminAuthGuard, GraphqlHelper } from '../../graphql';
+import { KeyValueModel, KeyValuePair } from './kv.entities';
+import { KvHelper, recognizeTypeValue } from './kv.helper';
 
 @Resolver()
 export class KvQueryResolver {
   logger = LoggerFactory.getLogger('KvQueryResolver');
 
   @Query()
-  async kv(
-    @Args('collection') collection: string,
-    @Args('key') key: string,
-    @Context() context,
-  ): Promise<KeyValuePair> {
+  async kv(@Args('collection') collection: string, @Args('key') key: string, @Context() ctx): Promise<KeyValuePair> {
     this.logger.log(`kv: ${r({ collection, key })}`);
-    await KvHelper.auth(context, { collection });
+    await KvHelper.auth(ctx, { collection });
     return KvHelper.get({ collection, key });
   }
 
   @Query()
-  async kvs(@Args('collection') collection: string, @Context() context): Promise<KeyValuePair[]> {
+  async kvs(@Args('collection') collection: string, @Context() ctx): Promise<KeyValuePair[]> {
     this.logger.log(`kvs: ${r({ collection })}`);
-    await KvHelper.auth(context, { collection });
+    await KvHelper.auth(ctx, { collection });
     return KvHelper.find(collection);
+  }
+
+  @UseGuards(GqlAdminAuthGuard)
+  @Query()
+  async kv_models(@Context() ctx: GraphqlContext): Promise<KeyValueModel[]> {
+    return KeyValueModel.find();
+  }
+}
+
+@Resolver(KeyValueModel)
+export class KeyValueModelResolver {
+  logger = LoggerFactory.getLogger(this.constructor.name);
+
+  @ResolveProperty()
+  async pair(@Root() model: KeyValueModel): Promise<KeyValuePair> {
+    this.logger.verbose(`load pair for ${model.id} ${r(model)}`);
+    return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
+      cls: KeyValueModel,
+      instance: model,
+      key: 'pair',
+      targetCls: KeyValuePair,
+    }).then(item => {
+      // eslint-disable-next-line no-param-reassign
+      [, item.value] = recognizeTypeValue(item.type, item.value);
+      return item;
+    });
   }
 }

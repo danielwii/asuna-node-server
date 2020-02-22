@@ -5,17 +5,22 @@ import { CacheUtils } from '../../cache';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { jsonType } from '../helpers';
 
-export const ValueType = {
-  string: 'string',
-  text: 'text',
-  json: 'json',
-  boolean: 'boolean',
-  number: 'number',
-  image: 'image',
-  images: 'images',
-  videos: 'videos',
-  video: 'video',
-};
+export enum KVModelFormatType {
+  KVGroupFieldsValue = 'KVGroupFieldsValue',
+  LIST = 'LIST',
+}
+
+export enum KeyValueType {
+  string = 'string',
+  text = 'text',
+  json = 'json',
+  boolean = 'boolean',
+  number = 'number',
+  image = 'image',
+  images = 'images',
+  videos = 'videos',
+  video = 'video',
+}
 
 @EntityMetaInfo({ name: 'kv__pairs' })
 @Entity('kv__t_pairs')
@@ -32,9 +37,9 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column({ nullable: true, length: 255 })
   name?: string;
 
-  @MetaInfo({ name: 'Type', type: 'Enum', enumData: ValueType })
+  @MetaInfo({ name: 'Type', type: 'Enum', enumData: KeyValueType })
   @Column('varchar', { nullable: true })
-  type?: keyof typeof ValueType;
+  type?: KeyValueType;
 
   @MetaInfo({ name: 'Value' })
   @Column('text', { nullable: true })
@@ -44,8 +49,9 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column(jsonType(), { nullable: true })
   extra?: JsonMap;
 
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   // @OneToOne(type => KeyValueModel, model => model.pair)
-  model: KeyValueModel;
+  // model: KeyValueModel;
 
   @AfterUpdate()
   afterUpdate(): void {
@@ -56,14 +62,19 @@ export class KeyValuePair extends AbstractBaseEntity {
 @EntityMetaInfo({ name: 'kv__models' })
 @Entity('kv__t_models')
 export class KeyValueModel extends Publishable(AbstractNameEntity) {
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, /* length: 36, */ name: 'pair__id' })
+  pairId?: number;
+
   @OneToOne(
     type => KeyValuePair,
-    pair => pair.model,
+    // pair => pair.model,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'pair__id' })
   pair: KeyValuePair;
 
-  @MetaInfo({ name: 'FormatType' })
-  @Column({ nullable: true, name: 'format_type' })
-  formatType?: string;
+  @MetaInfo({ name: 'FormatType', type: 'Enum', enumData: KVModelFormatType })
+  @Column('varchar', { nullable: true, name: 'format_type' })
+  formatType?: KVModelFormatType;
 }

@@ -191,7 +191,7 @@ export class WXEventMessageHelper {
 
 export class WeChatHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_WECHAT, key: 'config' };
-  static noticeKvDef: KvDef = { collection: AsunaCollections.SYSTEM_WECHAT, key: 'notice' };
+  static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
 
   static async getServiceConfig(): Promise<WeChatServiceConfig> {
     return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, WeChatFieldKeys));

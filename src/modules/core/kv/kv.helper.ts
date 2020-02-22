@@ -18,7 +18,7 @@ import { EnumValueStatic } from '../../enum-values';
 import { auth } from '../../helper';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
-import { KeyValueModel, KeyValuePair, ValueType } from './kv.entities';
+import { KeyValueModel, KeyValuePair, KeyValueType, KVModelFormatType } from './kv.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');
 
@@ -79,31 +79,31 @@ export interface KVGroupFieldsValue {
   values: { [key: string]: any };
 }
 
-function recognizeTypeValue(type: keyof typeof ValueType, value: any): [keyof typeof ValueType, string] {
+export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueType, string] {
   let newType = type;
   let newValue = value;
   if (type) {
-    if (Object.values(ValueType).includes(type)) {
-      if (type.toLowerCase() === ValueType.boolean) {
+    if (Object.values(KeyValueType).includes(type)) {
+      if (type.toLowerCase() === KeyValueType.boolean) {
         newValue = castToBoolean(value);
-      } else if (type.toLowerCase() === ValueType.number) {
+      } else if (type.toLowerCase() === KeyValueType.number) {
         newValue = +value;
       } else if (['json', 'images', 'videos'].includes(type.toLowerCase())) {
         newValue = toJson(value);
       }
     }
   } else if (value === 'true' || value === 'false') {
-    newType = 'boolean';
+    newType = KeyValueType.boolean;
     newValue = castToBoolean(value);
   } else if (!_.isNaN(+value)) {
-    newType = 'number';
+    newType = KeyValueType.number;
     newValue = +value;
   } else if (isJson(value)) {
-    newType = 'json';
+    newType = KeyValueType.json;
     newValue = toJson(value);
   }
   // logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
-  return [newType || 'string', newValue];
+  return [newType || KeyValueType.string, newValue];
 }
 
 export enum AsunaColletionPrefix {
@@ -161,7 +161,11 @@ export class KvHelper {
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };
     if (!this.constantMapsPair) {
-      this.constantMapsPair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+      this.constantMapsPair = await this.get(this.constantKvDef, {
+        name: '关键词中文映射表',
+        value,
+        type: KeyValueType.json,
+      });
     }
     // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
     this.constantMapsPair.value = { ...this.constantMapsPair.value, ...value };
@@ -179,7 +183,7 @@ export class KvHelper {
       this.enumValueConstantMapsPair = await this.get(this.constantKvDef, {
         name: '关键词中文映射表',
         value,
-        type: 'json',
+        type: KeyValueType.json,
       });
     }
     // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
@@ -200,14 +204,14 @@ export class KvHelper {
   }
 
   static async set<V = any>(
-    opts: { collection?: string; key: string; name?: string; type?: keyof typeof ValueType; value?: V; extra?: any },
+    opts: { collection?: string; key: string; name?: string; type?: KeyValueType; value?: V; extra?: any },
     {
       formatType,
       merge,
       noUpdate,
     }: {
       // 用于 admin 中识别类型
-      formatType?: string;
+      formatType?: KVModelFormatType;
       noUpdate?: boolean;
       // 用于合并 KVGroupFieldsValue 中的表单
       merge?: boolean;
@@ -255,18 +259,9 @@ export class KvHelper {
     }
 
     logger.verbose(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any)
-      .then(pair => {
-        /*
-        if (opts.name)
-          (async () => {
-            const model = await KeyValueModel.findOne({ name: opts.name });
-            if (!model) KeyValueModel.create({ name: opts.name, pair, formatType }).save();
-          })();
-*/
-        return pair;
-      })
-      .finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
+    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any).finally(() =>
+      CacheUtils.clear({ prefix: 'kv', key: { collection, key } }),
+    );
   }
 
   static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
@@ -290,11 +285,7 @@ export class KvHelper {
 
   static async get(
     kvDef: KvDef,
-    defaultPair?: {
-      name: string;
-      type: keyof typeof ValueType;
-      value: any;
-    },
+    defaultPair?: { name: string; type: KeyValueType; value: any },
   ): Promise<KeyValuePair> {
     const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
     if (!keyValuePair && defaultPair) {
