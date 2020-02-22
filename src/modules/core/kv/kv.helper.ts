@@ -257,11 +257,13 @@ export class KvHelper {
     logger.verbose(`set ${r(entity)}`);
     return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any)
       .then(pair => {
+        /*
         if (opts.name)
           (async () => {
             const model = await KeyValueModel.findOne({ name: opts.name });
             if (!model) KeyValueModel.create({ name: opts.name, pair, formatType }).save();
           })();
+*/
         return pair;
       })
       .finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
