@@ -11,11 +11,10 @@ export class MQProvider {
   private static _instance: MQProvider = new MQProvider();
 
   private _connectionFuture: amqp.Connection;
-
   private _channel: amqp.Channel;
-
   private _retryLimit = 10;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   private async createConnection(): Promise<amqp.Connection> {
@@ -26,6 +25,7 @@ export class MQProvider {
 
       if (connection == null) {
         if (this._retryLimit < 1) {
+          // eslint-disable-next-line unicorn/no-process-exit
           process.exit(1);
         }
 

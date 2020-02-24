@@ -15,11 +15,8 @@ export const RedisConfigKeys = {
 
 export class RedisConfigObject {
   host?: string;
-
   port?: number;
-
   db?: number;
-
   enable?: boolean;
 
   @Expose({ name: 'with-password', toPlainOnly: true })

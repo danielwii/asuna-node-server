@@ -1,4 +1,3 @@
-import { Exclude } from 'class-transformer';
 import {
   AfterLoad,
   BaseEntity,
@@ -7,12 +6,12 @@ import {
   CreateDateColumn,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { MetaInfo } from '../common/decorators/meta.decorator';
-import { fixTZ } from '../core/helpers/entity.helper';
-import { SimpleIdGenerator } from '../ids';
-import { Publishable } from './abilities';
+  UpdateDateColumn
+} from "typeorm";
+import { MetaInfo } from "../common/decorators/meta.decorator";
+import { fixTZ } from "../core/helpers/entity.helper";
+import { SimpleIdGenerator } from "../ids";
+import { Publishable } from "./abilities";
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<
@@ -43,10 +42,8 @@ export class AbstractBaseEntity extends BaseEntity {
  * 生成基于时间的 id，prefix 可以作为一个特殊的前缀用于识别不同的类型
  */
 export class AbstractTimeBasedBaseEntity extends BaseEntity {
-  @Exclude()
-  readonly idPrefix: string;
-  @Exclude()
-  readonly generator: SimpleIdGenerator;
+  readonly #idPrefix: string;
+  readonly #generator: SimpleIdGenerator;
 
   @PrimaryColumn({ length: 36 }) id?: string;
 
@@ -62,13 +59,13 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
 
   constructor(idPrefix: string = '') {
     super();
-    this.idPrefix = idPrefix;
-    this.generator = new SimpleIdGenerator(idPrefix);
+    this.#idPrefix = idPrefix;
+    this.#generator = new SimpleIdGenerator(idPrefix);
   }
 
   @BeforeInsert()
   beforeInsert(): void {
-    if (!this.id) this.id = this.generator.nextId();
+    if (!this.id) this.id = this.#generator.nextId();
   }
 
   @AfterLoad()

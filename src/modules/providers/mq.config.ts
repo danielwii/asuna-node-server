@@ -16,13 +16,9 @@ export const MQConfigKeys = {
 
 export class MQConfigObject {
   enable?: boolean;
-
   url?: string;
-
   host?: string;
-
   port?: number;
-
   username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
@@ -47,7 +43,7 @@ export class MQConfigObject {
   }
 
   static loadOr(prefix = ''): MQConfigObject | null {
-    const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
+    const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     if (enable === true) {

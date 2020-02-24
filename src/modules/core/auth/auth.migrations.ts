@@ -1,4 +1,5 @@
 import { LoggerFactory } from '../../common/logger';
+import { SimpleIdGenerator } from '../../ids';
 import { MigrationsHelper } from '../migrations/migrations.helper';
 import { AdminUser } from './auth.entities';
 
@@ -31,7 +32,7 @@ export class AuthMigrations {
       // eslint-disable-next-line no-restricted-syntax
       for (const user of await AdminUser.find()) {
         if (!user.id) {
-          user.id = user.generator.nextId();
+          user.id = new SimpleIdGenerator('sa').nextId();
           // eslint-disable-next-line no-await-in-loop
           await user.save();
         }
