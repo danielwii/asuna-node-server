@@ -1,5 +1,6 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 import { CacheTTL } from '../cache';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { emptyPage, Pageable, toPage } from '../core';
 import { PageRequestInput } from '../graphql';
@@ -14,7 +15,6 @@ export class AppQueryResolver {
     @Args('key') key: string,
     @Args({ name: 'pageRequest', type: () => PageRequestInput }) pageRequest,
   ): Promise<Pageable<AppRelease>> {
-    this.logger.log(`app_releases: ${JSON.stringify({ key, pageRequest })}`);
     const pageInfo = toPage(pageRequest);
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     if (!appInfo) return emptyPage(pageInfo);
@@ -34,7 +34,7 @@ export class AppQueryResolver {
 
   @Query()
   async app_latestRelease(@Args('key') key: string): Promise<AppRelease> {
-    this.logger.log(`app_latestRelease: ${JSON.stringify({ key })}`);
+    this.logger.log(`app_latestRelease: ${r({ key })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' }, cache: CacheTTL.FLASH });
@@ -42,7 +42,7 @@ export class AppQueryResolver {
 
   @Query()
   async app_info(@Args('key') key: string): Promise<AppInfo> {
-    this.logger.log(`app_info: ${JSON.stringify({ key })}`);
+    this.logger.log(`app_info: ${r({ key })}`);
 
     return AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
   }

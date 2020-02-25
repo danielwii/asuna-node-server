@@ -1,9 +1,10 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
+import { EntityManager, getManager } from 'typeorm';
 
-export const DEFAULT_PAGE = 0;
+export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
-export const MAX_PAGE_SIZE = 1000;
+export const MAX_PAGE_SIZE = 200;
 
 export enum Order {
   ASC = 'ASC',
@@ -25,10 +26,20 @@ export class PageHelper {
   static doPageSeries<T>(
     total: number,
     size: number,
-    handler: (page: number, totalPages: number) => Promise<T> | any,
+    handler: (page: number, totalPages: number) => Promise<T>,
   ): Promise<T[]> {
-    const totalPages = Math.ceil(total / size);
+    const totalPages = Math.ceil(total / (size ?? 100));
     return Promise.mapSeries(_.range(totalPages), page => handler(page + 1, totalPages));
+  }
+  static doPageSeriesWithTransaction<T>(
+    total: number,
+    size: number,
+    handler: (page: number, totalPages: number, transaction: EntityManager) => Promise<T>,
+  ): Promise<T[]> {
+    const totalPages = Math.ceil(total / (size ?? 100));
+    return Promise.mapSeries(_.range(totalPages), page =>
+      getManager().transaction(entityManager => handler(page + 1, totalPages, entityManager)),
+    );
   }
 }
 
@@ -62,12 +73,14 @@ export type PageInfo = {
   skip: number;
 };
 
-export const emptyPage = (pageInfo): Pageable<any> => ({ ...pageInfo, items: [], total: 0 });
+export const emptyPage = <T>(pageInfo: PageInfo): Pageable<T> => ({ ...pageInfo, items: [], total: 0 });
 
-export const toPage = (pageRequest: PageRequest): PageInfo => {
+export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInfo => {
   let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
   if (page < 0) {
-    page = 0;
+    page = startsWith0 ? 0 : 1;
+  } else if (page === 0 && !startsWith0) {
+    page = 1;
   }
 
   if (size > MAX_PAGE_SIZE) {
@@ -78,6 +91,6 @@ export const toPage = (pageRequest: PageRequest): PageInfo => {
     page,
     size,
     take: size,
-    skip: page * size,
+    skip: (page - (startsWith0 ? 0 : 1)) * size,
   };
 };
