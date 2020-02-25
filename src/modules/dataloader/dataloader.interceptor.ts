@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
 export interface GraphqlContext<GetDataLoaders = DefaultGetDataLoaders, U = UserProfile> {
   getDataLoaders: GetDataLoaders;
-  getCurrentUser: () => U;
+  getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;
 }
 

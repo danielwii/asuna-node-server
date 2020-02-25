@@ -7,8 +7,9 @@ import { BaseEntity } from 'typeorm';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { DBHelper } from '../core/db';
 
-const logger = LoggerFactory.getLogger('DataLoaderCache');
+const logger = LoggerFactory.getLogger('DataLoader');
 
 const cacheMap = new Map();
 
@@ -17,8 +18,8 @@ export interface DataLoaderFunction<Entity extends BaseEntity> {
   load(ids?: PrimaryKey[]): Promise<Entity[]>;
 }
 
-function resolveIds(ids: PrimaryKey[]) {
-  return entities => ids.map(id => entities.find(entity => (entity ? entity.id === id : false)));
+function resolveIds(ids: PrimaryKey[], primaryKey: PrimaryKey) {
+  return entities => ids.map(id => entities.find(entity => (entity ? entity[primaryKey] === id : false)));
 }
 
 function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Entity>): DataLoaderFunction<Entity> {
@@ -37,14 +38,15 @@ export function loader<Entity extends BaseEntity>(
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
-    cachedDataLoader(entity.name, ids =>
-      ((entity as any) as typeof BaseEntity)
+    cachedDataLoader(entity.name, ids => {
+      const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
+      return ((entity as any) as typeof BaseEntity)
         .findByIds(ids, {
           where: { isPublished: opts.isPublished },
           loadRelationIds: opts.loadRelationIds,
         })
-        .then(resolveIds(ids)),
-    ),
+        .then(resolveIds(ids, primaryKey));
+    }),
   );
 }
 
@@ -149,11 +151,8 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
           // logger.log(`get (${segment}:${id}) ${r(cachedObject)}`);
           // return cachedObject;
           const now = Date.now();
-          // console.log({ size: cacheMap.size });
           const key = `${segment}-${id}`;
-          // console.log('cacheMap load', key);
           const { value, expires } = cacheMap.get(key) || ({} as any);
-          // console.log('cacheMap load', { key, value });
           logger.debug(
             `get (${segment}:${id}) ${r({
               exists: !!value,

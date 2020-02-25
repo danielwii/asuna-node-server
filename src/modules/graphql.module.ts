@@ -85,7 +85,7 @@ export class GraphqlModule implements OnModuleInit {
           }),
           extensions: _.compact([
             configLoader.loadBoolConfig('JAEGER_ENABLED', false)
-              ? () => {
+              ? _.memoize(() => {
                   const opentracingExtension = new OpentracingExtension({
                     server: tracer,
                     local: tracer,
@@ -94,7 +94,7 @@ export class GraphqlModule implements OnModuleInit {
                   });
                   logger.log(`load opentracingExtension ...`);
                   return opentracingExtension;
-                }
+                })
               : undefined,
           ]),
           formatResponse: response => {

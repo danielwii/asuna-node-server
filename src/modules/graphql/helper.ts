@@ -93,37 +93,28 @@ export class GraphqlHelper {
     mapper?: (item: any) => any;
   }): Promise<PageInfo & { items: any[]; total: number }> {
     const entityRepo = (cls as any) as Repository<Entity>;
-    const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, loader });
+    const pageInfo = toPage(pageRequest);
+    logger.verbose(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, loader })}`);
+    const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, pageInfo, loader });
     const total = await entityRepo.count({ where });
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>({
-    cls,
-    query,
-    where,
-    ctx,
-    loader,
-    mapper,
-  }: {
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
+    pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[] | null>;
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity>({
-    cls,
-    query,
-    where,
-    ctx,
-    loader,
-  }: {
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity>(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
+    pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[] | null>;
   public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>({
@@ -131,6 +122,7 @@ export class GraphqlHelper {
     query,
     where,
     ctx,
+    pageInfo,
     loader,
     mapper,
   }: {
@@ -138,6 +130,7 @@ export class GraphqlHelper {
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<any>;
+    pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[] | null> {
@@ -147,18 +140,20 @@ export class GraphqlHelper {
       const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
       return mapper ? Promise.map(items, mapper) : items;
     }
+
+    const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls))) as any;
+    const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
+    // eslint-disable-next-line no-param-reassign
+    where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : null) };
+
     if (query.random > 0) {
-      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls)));
-      const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
-      // eslint-disable-next-line no-param-reassign
-      where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : null) };
       logger.verbose(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
-        await this.genericFindOptions<Entity>({ cls, select: [primaryKey as any], where, skip, take: query.random }),
+        await this.genericFindOptions<Entity>({ cls, select: [primaryKey], where, skip, take: query.random }),
       );
-      const ids: any[] = _.chain(randomIds)
+      const ids: PrimaryKey[] = _.chain(randomIds)
         .map(fp.get(primaryKey))
         .shuffle()
         .take(query.random)
@@ -169,7 +164,17 @@ export class GraphqlHelper {
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
       return mapper ? Promise.map(items, mapper) : items;
     }
-    return null;
+
+    const options = await this.genericFindOptions<Entity>({
+      cls,
+      select: [primaryKey],
+      where,
+      skip: pageInfo.skip,
+      take: pageInfo.take,
+    });
+    const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
+    // logger.verbose(`load ids ${r(ids)}`);
+    return dataloader.load(ids);
   }
 
   /**
@@ -211,6 +216,8 @@ export class GraphqlHelper {
       timeCondition,
       cache,
       join,
+      skip,
+      take,
     } = opts;
     const order = opts.order || this.resolveOrder(cls, pageRequest);
     const whereCondition = where;
@@ -235,14 +242,17 @@ export class GraphqlHelper {
         timeCondition && timeCondition.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : null;
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
+    const loadRelationIds = resolveRelationsFromInfo(info, relationPath);
     const options: FindManyOptions<Entity> = {
       ...(pageRequest ? toPage(pageRequest) : null),
       ...(select && select.length > 0 ? { select } : null),
       where: whereCondition,
       join,
-      loadRelationIds: resolveRelationsFromInfo(info, relationPath),
+      loadRelationIds,
       order,
       cache,
+      skip,
+      take,
     };
     logger.verbose(`resolved FindOptions is ${r(options)}`);
     return options;
