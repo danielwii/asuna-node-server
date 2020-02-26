@@ -77,7 +77,7 @@ export class GraphqlModule implements OnModuleInit {
             stripFormattedExtensions: false,
             calculateHttpHeaders: true,
           },
-          context: (context): GraphqlContext<any> => ({
+          context: (context): GraphqlContext => ({
             ...context,
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
             getCurrentUser: () => _.get(context.req, 'user'),

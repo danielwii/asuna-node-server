@@ -3,8 +3,9 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
-import { auth } from '../helper/auth';
 import { JwtPayload } from '../core/auth/auth.interfaces';
+import { DefaultGetDataLoaders, GraphqlContext } from '../dataloader';
+import { auth } from '../helper/auth';
 
 const logger = LoggerFactory.getLogger('GqlAuthGuard');
 
@@ -91,6 +92,12 @@ export class GqlAuthGuard extends AuthGuard('jwt') {
     return req;
   }
 }
+
+/**
+ * temp use, using auth func in GqlAuthGuard later
+ * @deprecated
+ */
+export type GraphqlAuthContext__REMOVE_LATER = GraphqlContext<DefaultGetDataLoaders, JwtPayload>;
 
 export interface GetCurrentUser {
   (): JwtPayload;

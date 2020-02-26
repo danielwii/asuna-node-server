@@ -13,13 +13,13 @@ export class UserProfileQueryResolver {
 
   @UseGuards(new GqlWXAuthGuard())
   @Query()
-  async user_profile(@Context() ctx: GraphqlContext<any>): Promise<UserProfile> {
+  async user_profile(@Context() ctx: GraphqlContext): Promise<UserProfile> {
     return ctx.getCurrentUser();
   }
 
   @UseGuards(new GqlAdminAuthGuard())
   @Query()
-  async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext<any>): Promise<UserProfile> {
+  async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext): Promise<UserProfile> {
     const { profiles: loader } = ctx.getDataLoaders();
     return loader.load(id);
   }

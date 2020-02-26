@@ -87,7 +87,7 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext<any>;
+    ctx?: GraphqlContext;
     loader?: (loaders) => DataLoaderFunction<Entity>;
     pageRequest: PageRequest;
     mapper?: (item: any) => any;
@@ -104,7 +104,7 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext<any>;
+    ctx?: GraphqlContext;
     pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
@@ -113,7 +113,7 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext<any>;
+    ctx?: GraphqlContext;
     pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[] | null>;
@@ -129,7 +129,7 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext<any>;
+    ctx?: GraphqlContext;
     pageInfo?: PageInfo;
     loader?: (loaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
