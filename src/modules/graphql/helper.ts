@@ -34,8 +34,8 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   relationPath?: string;
   timeCondition?: TimeConditionInput;
   cache?: boolean | number;
-  skip?: number;
-  take?: number;
+  // skip?: number;
+  // take?: number;
   order?: {
     [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
   };
@@ -151,7 +151,13 @@ export class GraphqlHelper {
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
-        await this.genericFindOptions<Entity>({ cls, select: [primaryKey], where, skip, take: query.random }),
+        await this.genericFindOptions<Entity>({
+          cls,
+          select: [primaryKey],
+          where,
+          pageRequest: { page: Math.floor(skip / query.random), size: query.random },
+          // skip, take: query.random
+        }),
       );
       const ids: PrimaryKey[] = _.chain(randomIds)
         .map(fp.get(primaryKey))
@@ -169,8 +175,9 @@ export class GraphqlHelper {
       cls,
       select: [primaryKey],
       where,
-      skip: pageInfo.skip,
-      take: pageInfo.take,
+      pageRequest: pageInfo,
+      // skip: pageInfo.skip,
+      // take: pageInfo.take,
     });
     const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
     // logger.verbose(`load ids ${r(ids)}`);
@@ -216,8 +223,6 @@ export class GraphqlHelper {
       timeCondition,
       cache,
       join,
-      skip,
-      take,
     } = opts;
     const order = opts.order || this.resolveOrder(cls, pageRequest);
     const whereCondition = where;
@@ -251,8 +256,6 @@ export class GraphqlHelper {
       loadRelationIds,
       order,
       cache,
-      skip,
-      take,
     };
     logger.verbose(`resolved FindOptions is ${r(options)}`);
     return options;

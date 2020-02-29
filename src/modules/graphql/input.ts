@@ -10,6 +10,7 @@ export class PageRequestInput implements PageRequest {
   @IsOptional()
   size?: number;
 
+  @IsOptional()
   orderBy?: { column: string; order?: Order };
 
   info(): PageInfo {
