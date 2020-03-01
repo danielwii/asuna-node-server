@@ -13,6 +13,10 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
+
+// add condition function in typeorm find
+import './typeorm.fixture';
+
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
@@ -32,7 +36,6 @@ if (process.env.NODE_ENV === 'production') {
   logger.log(`[X] run as non-production mode at ${__dirname}`);
 }
 */
-
 const startAt = Date.now();
 const pkg = require('../package.json');
 
