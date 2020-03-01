@@ -22,7 +22,7 @@
     "@nestjs/common": "^6.11.8",
     "@nestjs/core": "^6.11.8",
     "@nestjs/cqrs": "^6.1.0",
-    "@nestjs/graphql": "^6.6.1",
+    "@nestjs/graphql": "^6.6.2",
     "@nestjs/jwt": "^6.1.2",
     "@nestjs/passport": "^6.2.0",
     "@nestjs/platform-express": "^6.11.8",
@@ -33,7 +33,7 @@
     "@nestjs/terminus": "^6.5.6",
     "@nestjs/typeorm": "^6.3.3",
     "@nestjs/websockets": "^6.11.8",
-    "@sentry/node": "^5.12.5",
+    "@sentry/node": "^5.13.1",
     "accesscontrol": "^2.2.1",
     "apollo-opentracing": "^1.4.2",
     "apollo-server-cache-redis": "^1.1.5",
@@ -107,7 +107,7 @@
     "@nestjs/testing": "^6.11.8",
     "@types/amqplib": "^0.5.13",
     "@types/bluebird": "^3.5.29",
-    "@types/bull": "^3.12.0",
+    "@types/bull": "^3.12.1",
     "@types/cli-color": "^2.0.0",
     "@types/common-tags": "^1.8.0",
     "@types/compression": "^1.7.0",
@@ -125,7 +125,7 @@
     "@types/luxon": "^1.21.0",
     "@types/mime-types": "^2.1.0",
     "@types/minio": "^7.0.5",
-    "@types/morgan": "^1.7.37",
+    "@types/morgan": "^1.9.0",
     "@types/multer": "^1.4.2",
     "@types/node-fetch": "^2.5.5",
     "@types/passport": "^1.0.2",
@@ -148,7 +148,7 @@
     "eslint-formatter-pretty": "^3.0.1",
     "eslint-plugin-eslint-comments": "^3.1.2",
     "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-jest": "^23.8.0",
+    "eslint-plugin-jest": "^23.8.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
@@ -162,7 +162,7 @@
     "supertest": "^4.0.2",
     "ts-jest": "^25.2.1",
     "ts-node": "^8.6.2",
-    "typescript": "^3.8.2"
+    "typescript": "^3.8.3"
   },
   "husky": {
     "hooks": {
