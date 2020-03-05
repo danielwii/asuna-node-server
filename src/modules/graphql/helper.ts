@@ -75,7 +75,10 @@ export class GraphqlHelper {
       : { ...(includeOrdinal ? { ordinal: 'DESC' } : null), createdAt: 'DESC' };
   }
 
-  public static async handlePagedDefaultQueryRequest<Entity extends BaseEntity, DataLoaders = DefaultRegisteredLoaders>({
+  public static async handlePagedDefaultQueryRequest<
+    Entity extends BaseEntity,
+    DataLoaders = DefaultRegisteredLoaders
+  >({
     cls,
     query,
     where,
@@ -100,24 +103,24 @@ export class GraphqlHelper {
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>(opts: {
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity, DataLoaders>(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext;
+    ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
-    loader?: (loaders) => DataLoaderFunction<Entity>;
+    loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[] | null>;
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity>(opts: {
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, DataLoaders>(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext;
+    ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
-    loader?: (loaders) => DataLoaderFunction<Entity>;
+    loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[] | null>;
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity>({
+  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity, DataLoaders>({
     cls,
     query,
     where,
@@ -129,9 +132,9 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext;
+    ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
-    loader?: (loaders) => DataLoaderFunction<Entity>;
+    loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[] | null> {
     const entityRepo = (cls as any) as Repository<Entity>;
