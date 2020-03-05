@@ -1,5 +1,6 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
 
@@ -58,6 +59,29 @@ export class RedisConfigObject {
       port: this.port,
       ...(this.password ? { password: this.password } : null),
       db: this.db,
+      connect_timeout: 10_000,
+      retry_strategy: options => {
+        if (options) {
+          logger.warn(`retry_strategy ${r({ db: this.db, host: this.host, port: this.port })} ${r(options)}`);
+          if (options.error && options.error.code === 'ECONNREFUSED') {
+            // End reconnecting on a specific error and flush all commands with
+            // a individual error
+            return new Error('The server refused the connection');
+          }
+          if (options.total_retry_time > 1000 * 60 * 60) {
+            // End reconnecting after a specific timeout and flush all commands
+            // with a individual error
+            return new Error('Retry time exhausted');
+          }
+          if (options.attempt > 10) {
+            // End reconnecting with built in error
+            return undefined;
+          }
+          // reconnect after
+          return Math.min(options.attempt * 100, 3000);
+        }
+        return 3_000;
+      },
     };
   }
 

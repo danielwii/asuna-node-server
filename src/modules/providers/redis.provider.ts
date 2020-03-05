@@ -57,12 +57,12 @@ export class RedisProvider {
 
     client.on('error', err => {
       redisClientObject.isHealthy = false;
-      logger.error(`Redis default connection error ${r(err)}`);
+      logger.error(`Redis ${configObject.db} connection error ${r(err)}`);
     });
 
     process.on('SIGINT', () => {
       client.quit((err: Error, res: string) => {
-        logger.log(`signal: SIGINT. Redis default connection disconnected ${r({ err, res })}`);
+        logger.log(`signal: SIGINT. Redis ${configObject.db} connection disconnected ${r({ err, res })}`);
         process.exit(0);
       });
     });

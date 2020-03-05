@@ -93,6 +93,7 @@ export class RedisLockProvider {
       return;
     }
 
+    // eslint-disable-next-line consistent-return
     return this.redLock.lock(resource, ttl).then(
       lock => {
         logger.verbose(`lock ${resource}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);

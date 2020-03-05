@@ -19,6 +19,7 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
+  // https://api.adorable.io/avatars/64/{id}.png
   @MetaInfo({ name: '头像', type: 'Image' })
   @Column({ nullable: true, name: 'portrait' })
   portrait: string;

@@ -84,11 +84,11 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
   let newValue = value;
   if (type) {
     if (Object.values(KeyValueType).includes(type)) {
-      if (type.toLowerCase() === KeyValueType.boolean) {
+      if (type === KeyValueType.boolean) {
         newValue = castToBoolean(value);
-      } else if (type.toLowerCase() === KeyValueType.number) {
+      } else if (type === KeyValueType.number) {
         newValue = +value;
-      } else if (['json', 'images', 'videos'].includes(type.toLowerCase())) {
+      } else if (['json', 'images', 'videos'].includes(type)) {
         newValue = toJson(value);
       }
     }

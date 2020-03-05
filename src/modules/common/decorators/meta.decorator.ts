@@ -71,6 +71,7 @@ export interface NormalMetaInfoOptions extends MetaInfoBaseOptions {
     | 'SortPosition'
     | 'Enum'
     | 'Tree'
+    | 'JSON'
     /**
      * 包含浮动标签信息的图片
      */
@@ -112,6 +113,11 @@ export interface JSONMetaInfoOptions extends MetaInfoBaseOptions {
   jsonType: 'string-array' | 'tag-array' | 'textarea-array' | 'rich-array' | 'any';
 }
 
+export interface StringTmplMetaInfoOptions extends MetaInfoBaseOptions {
+  type: 'StringTmpl';
+  fields: { name: string; help?: string; fake?: string }[];
+}
+
 export interface AddressMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'Address';
 }
@@ -132,6 +138,7 @@ export interface STIMetaInfoOptions extends MetaInfoBaseOptions {
 }
 
 export type MetaInfoOptions =
+  | StringTmplMetaInfoOptions
   | AddressMetaInfoOptions
   | NormalMetaInfoOptions
   | EnumFilterMetaInfoOptions

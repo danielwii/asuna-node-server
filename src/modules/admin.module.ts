@@ -16,10 +16,12 @@ import { DynamicRouterModule } from './dynamic-router';
 import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
+import { PaymentModule } from './payments/payment.module';
 import { RedisProvider } from './providers';
 import {
   AdminAppRestController,
   AdminContentRestController,
+  AdminPaymentRestController,
   AdminRestController,
   AdminSysRestController,
   AdminWxRestController,
@@ -37,6 +39,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     DynamicRouterModule,
     GraphqlQueryModule,
     AuthModule,
+    PaymentModule,
     ClientModule,
     KvModule,
     DBModule,
@@ -66,6 +69,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AdminContentRestController,
     AdminSysRestController,
     AdminWxRestController,
+    AdminPaymentRestController,
     WwwRestController,
     CommandController,
     UserController,

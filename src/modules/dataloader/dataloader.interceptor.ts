@@ -3,14 +3,14 @@ import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
 import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth';
-import { DefaultGetDataLoaders } from './context';
+import { DefaultRegisteredLoaders } from './context';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export interface GraphqlContext<GetDataLoaders = DefaultGetDataLoaders, U = UserProfile> {
-  getDataLoaders: GetDataLoaders;
+export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = UserProfile> {
+  getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;
 }

@@ -19,7 +19,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { DataLoaderFunction, GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
+import { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
 import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -75,7 +75,7 @@ export class GraphqlHelper {
       : { ...(includeOrdinal ? { ordinal: 'DESC' } : null), createdAt: 'DESC' };
   }
 
-  public static async handlePagedDefaultQueryRequest<Entity extends BaseEntity>({
+  public static async handlePagedDefaultQueryRequest<Entity extends BaseEntity, DataLoaders = DefaultRegisteredLoaders>({
     cls,
     query,
     where,
@@ -87,8 +87,8 @@ export class GraphqlHelper {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
-    ctx?: GraphqlContext;
-    loader?: (loaders) => DataLoaderFunction<Entity>;
+    ctx?: GraphqlContext<DataLoaders>;
+    loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     pageRequest: PageRequest;
     mapper?: (item: any) => any;
   }): Promise<PageInfo & { items: any[]; total: number }> {

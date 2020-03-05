@@ -1,0 +1,38 @@
+type PaymentMethod implements TimeBasedBaseNameEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  displayName: String
+  endpoint: String
+}
+
+type PaymentItem implements TimeBasedBaseNameEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  summary: String
+  price: Float
+  cover: String
+  images: [String]
+}
+
+type APIPaymentItem implements PagedQuery {
+  items: [PaymentItem]
+  page: Int
+  size: Int
+  total: Int
+}
+
+extend type Query {
+  api_payment_methods: [PaymentMethod]
+
+  api_paged_payment_items(pageRequest: PageRequest): APIPaymentItem
+}

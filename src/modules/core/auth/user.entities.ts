@@ -1,4 +1,4 @@
-import { AfterRemove, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
@@ -39,7 +39,7 @@ export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
     profileId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
-    @OneToOne(type => UserProfile)
+    @ManyToOne(type => UserProfile)
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }

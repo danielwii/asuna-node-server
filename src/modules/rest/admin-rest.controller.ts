@@ -42,3 +42,10 @@ export class AdminWxRestController extends RestCrudController {
     super('wx');
   }
 }
+
+@Controller('admin/rest/payment')
+export class AdminPaymentRestController extends RestCrudController {
+  constructor() {
+    super('payment');
+  }
+}

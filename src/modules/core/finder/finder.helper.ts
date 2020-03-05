@@ -52,7 +52,7 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
-    logger.debug(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
+    logger.verbose(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
       logger.warn(`${name || 'default'} not available in upstream ${defaultEndpoint}`);

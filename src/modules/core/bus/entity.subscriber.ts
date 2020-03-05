@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
-import { deserializeSafely, r, validateObjectSync } from '../../common/helpers';
+import { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
+import { deserializeSafely, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { dataLoaderCleaner } from '../../dataloader';
 import { jsonType, safeReloadJSON } from '../helpers';
-import { Hermes } from './hermes';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
 
@@ -43,8 +43,13 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 */
   }
 
-  afterLoad(entity: BaseEntity): Promise<any> | void {
+  afterLoad(entity: BaseEntity, event?: LoadEvent<BaseEntity>): Promise<any> | void {
     // logger.debug(`afterLoad ${entity.constructor.name} ${r(entity)}`);
+    event.metadata.columns.forEach(column => {
+      if (column.type === jsonType()) {
+        safeReloadJSON(event.entity as any, column.propertyName);
+      }
+    });
   }
 
   afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {

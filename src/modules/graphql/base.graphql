@@ -51,6 +51,21 @@ interface BaseEntity {
   updatedAt: Date!
 }
 
+interface TimeBasedBaseEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+interface TimeBasedBaseNameEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+}
+
 interface BaseEntity2 {
   id: String!
   createdAt: Date!
