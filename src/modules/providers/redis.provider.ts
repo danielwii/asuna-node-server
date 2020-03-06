@@ -31,7 +31,7 @@ export class RedisProvider {
       return this.clients[key];
     }
 
-    const configObject = RedisConfigObject.loadOr(prefix);
+    const configObject = RedisConfigObject.load(prefix);
     const redisOptions = configObject.getOptions(db);
     logger.log(
       `init redis provider: ${r({ configObject, redisOptions }, { transform: true })} with ${r({ prefix, db })}`,

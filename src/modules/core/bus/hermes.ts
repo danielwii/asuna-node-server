@@ -133,9 +133,9 @@ export class Hermes {
       () => logger.log('Hermes completed'),
     );
 
-    const configObject = RedisConfigObject.loadOr('job');
+    const configObject = RedisConfigObject.load('job');
     logger.log(`init queues with redis: ${r(configObject, { transform: true })}`);
-    if (configObject && configObject.enable) {
+    if (configObject.enable) {
       const db = configLoader.loadNumericConfig(ConfigKeys.JOB_REDIS_DB, 1);
       logger.log(`init job with redis db: ${db}`);
       // redis.ClientOpts have to convert to ioredis.RedisOptions

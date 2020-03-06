@@ -16,8 +16,7 @@ export class RedisLockProvider {
   public static readonly instance: RedisLockProvider = new RedisLockProvider();
 
   constructor() {
-    const redisProvider = RedisProvider.instance;
-    const redisClientObject = redisProvider.getRedisClient('lock');
+    const redisClientObject = RedisProvider.instance.getRedisClient('lock');
     logger.log(`init ${r(redisClientObject, { transform: true })}`);
     if (redisClientObject.isEnabled) {
       this.client = redisClientObject.client;
