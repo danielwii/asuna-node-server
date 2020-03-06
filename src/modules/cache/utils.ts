@@ -17,11 +17,13 @@ export class CacheUtils {
 
   static async clearAll(): Promise<void> {
     const redis = RedisProvider.instance.getRedisClient();
-    const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
+    if (redis.isEnabled) {
+      const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
 
-    if (!_.isEmpty(redisKeys)) {
-      logger.log(`clean keys... ${r(redisKeys)}`);
-      redisKeys.forEach(key => promisify(redis.client.del, redis.client)(key));
+      if (!_.isEmpty(redisKeys)) {
+        logger.log(`clean keys... ${r(redisKeys)}`);
+        redisKeys.forEach(key => promisify(redis.client.del, redis.client)(key));
+      }
     }
   }
 }
