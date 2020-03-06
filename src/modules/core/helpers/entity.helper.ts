@@ -56,7 +56,7 @@ export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity
             entity[column] = JSON.parse(entity[column] as any);
           }
         } catch (error) {
-          logger.error(error);
+          logger.error(`safeReloadJSON ${column} error: ${error}`);
           entity[column] = null;
         }
       } else {

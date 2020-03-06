@@ -605,7 +605,7 @@ export class DBHelper {
     normalWhere.forEach(condition => {
       // console.log('condition', condition);
 
-      if (condition.value.$or) {
+      if (condition.value?.$or) {
         condition.value.$or.forEach(elementCondition => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
@@ -619,7 +619,7 @@ export class DBHelper {
             queryBuilder.orWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
           }
         });
-      } else if (condition.value.$and) {
+      } else if (condition.value?.$and) {
         condition.value.$and.forEach(elementCondition => {
           const currentCondition = { field: condition.field, value: elementCondition };
 

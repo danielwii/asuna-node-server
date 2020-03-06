@@ -47,7 +47,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
     // logger.debug(`afterLoad ${entity.constructor.name} ${r(entity)}`);
     event.metadata.columns.forEach(column => {
       if (column.type === jsonType()) {
-        safeReloadJSON(event.entity as any, column.propertyName);
+        safeReloadJSON(entity as any, column.propertyName);
       }
     });
   }
