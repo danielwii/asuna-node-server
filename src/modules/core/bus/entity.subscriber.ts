@@ -82,7 +82,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       tableName: event.metadata.tableName,
     });
 */
-    dataLoaderCleaner.clear(event.entity.constructor.name, _.get(event.entity, 'id'));
+    dataLoaderCleaner.clear(event.metadata.name, _.get(event.entity, 'id'));
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {

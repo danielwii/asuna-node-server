@@ -51,25 +51,11 @@ export function loader<Entity extends BaseEntity>(
 }
 
 export const dataLoaderCleaner = {
-  clear(segment, id) {
+  clear(segment, id): void {
     logger.verbose(`remove loader cache ... ${segment}-${id}`);
     cacheMap.delete(`${segment}-${id}`);
   },
 };
-
-/*
-export function createDataLoaderProxy(preloader?: () => any | Promise<any>) {
-  return {
-    clear(segment, id) {
-      logger.log(`remove ... ${segment}-${id}`);
-      cacheMap.delete(`${segment}-${id}`);
-    },
-    async preload() {
-      return preloader ? preloader() : Promise.resolve();
-    },
-  };
-}
-*/
 
 export class GenericDataLoader {
   private static loaders;
@@ -187,7 +173,7 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
           }
         },
         delete: (id: string) => {
-          // logger.log(`delete (${segment}:${id})`);
+          logger.log(`delete (${segment}:${id})`);
           const key = `${segment}-${id}`;
           cacheMap.delete(key);
           // return client.drop({ segment, id });

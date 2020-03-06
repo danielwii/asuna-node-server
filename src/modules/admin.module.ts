@@ -2,6 +2,7 @@ import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
 import { AdminController } from './admin.controller';
+import { CacheUtils } from './cache';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
 import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
@@ -82,6 +83,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 export class AdminInternalModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
+    await CacheUtils.clearAll();
     await this.initConstants();
   }
 
