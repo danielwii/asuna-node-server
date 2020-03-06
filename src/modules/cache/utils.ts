@@ -17,7 +17,7 @@ export class CacheUtils {
 
   static async clearAll(): Promise<void> {
     const redis = RedisProvider.instance.getRedisClient();
-    const redisKeys = (await promisify(redis.client.keys, redis.client)('*')) as string[];
+    const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
 
     if (!_.isEmpty(redisKeys)) {
       logger.log(`clean keys... ${r(redisKeys)}`);
