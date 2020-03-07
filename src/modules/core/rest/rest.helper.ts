@@ -109,16 +109,27 @@ export class RestHelper {
     modelNameObject: ModelNameObject,
     where: string[] | FindOperator<any>[] | null,
     column: string,
-  ): Promise<{ [name: string]: number }> {
+  ): Promise<{ [id: string]: { [name: string]: number } }> {
     const repository = DBHelper.repo(modelNameObject);
+    const [[relation, value]] = _.toPairs(where);
+    const field = `${relation}__id`;
+    const whereSql = DBHelper.toSqlValue({ field, value });
     const raw = await repository
       .createQueryBuilder()
-      .select(`${column}, COUNT(${column}) as count`)
-      .where(where)
-      .groupBy(column)
+      .select(`${column}, ${field}, COUNT(${column}) as count`)
+      .where(whereSql)
+      .groupBy(`${column}, ${field}`)
       .getRawMany();
-    const stats = _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
-    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats, where })}`);
+
+    // indexed
+    // _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
+    const stats = _.flow(
+      fp.groupBy(fp.get(field)), // group by field
+      fp.mapValues(fp.map(o => ({ [o[column]]: _.toNumber(o.count) }))), // convert
+      fp.mapValues(v => _.assign({}, ...v)), // merge values
+      // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
+    )(raw);
+    logger.verbose(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ whereSql, stats })}`);
     return stats;
   }
 }

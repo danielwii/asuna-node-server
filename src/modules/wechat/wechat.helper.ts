@@ -435,20 +435,22 @@ export class WeChatHelper {
     const accessToken = await Promise.promisify(redis.client.get).bind(redis.client)(key);
     if (accessToken) return accessToken;
 
-    const token = await RedisLockProvider.instance.lockProcess(
-      key,
-      async () => {
-        const result = await WxApi.getAccessToken({ mini });
-        logger.verbose(`getAccessToken with key(${key}): ${r(result)}`);
-        if (result.access_token) {
-          // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
-          await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
-          return result.access_token;
-        }
-        throw new AsunaException(AsunaErrorCode.Unprocessable, 'get access token error', result);
-      },
-      { ttl: 60_000 },
-    );
+    const token = await RedisLockProvider.instance
+      .lockProcess(
+        key,
+        async () => {
+          const result = await WxApi.getAccessToken({ mini });
+          logger.verbose(`getAccessToken with key(${key}): ${r(result)}`);
+          if (result.access_token) {
+            // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
+            await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
+            return result.access_token;
+          }
+          throw new AsunaException(AsunaErrorCode.Unprocessable, 'get access token error', result);
+        },
+        { ttl: 60_000 },
+      )
+      .catch(reason => logger.error(reason));
     logger.verbose(`access token is ${r(token)}`);
     if (!token) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');

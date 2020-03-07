@@ -133,7 +133,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   admin?: AdminUser;
 }
 
-@EntityMetaInfo({ name: 'wx__mini_app_users' })
+@EntityMetaInfo({ name: 'wx__mini_app_users', displayName: '小程序用户' })
 @Entity('wx__t_mini_app_users')
 export class WXMiniAppUserInfo extends BaseEntity {
   @Exclude()

@@ -65,7 +65,7 @@ export class RedisLockProvider {
     }
   }
 
-  isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE, true);
+  isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE);
 
   async lockProcess<T>(
     // the string identifier for the resource you want to lock
@@ -79,7 +79,7 @@ export class RedisLockProvider {
     },
   ): Promise<T | void> {
     if (!this.redLock) {
-      throw new Error('can not get redLock instance');
+      throw new Error(`can not get redLock instance, REDIS_ENABLE: ${this.isEnabled()}`);
     }
 
     const ttl = options ? options.ttl : 1000;

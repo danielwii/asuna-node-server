@@ -71,7 +71,7 @@ export abstract class RestCrudController {
     @Param('model') model: string,
     @Query('where') whereStr: string,
     @Query('column') column: string,
-  ): Promise<{ [name: string]: number }> {
+  ): Promise<{ [id: string]: { [name: string]: number } }> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
     return RestHelper.groupCounts(modelNameObject, parseWhere(whereStr), column);

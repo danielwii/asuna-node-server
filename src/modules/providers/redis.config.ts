@@ -40,6 +40,20 @@ export class RedisConfigObject {
     });
   }
 
+  // using default configs when specific not found
+  static loadOr(prefix = ''): RedisConfigObject | null {
+    const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
+    logger.debug(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
+    const enable = configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
+    if (enable === true) {
+      return RedisConfigObject.load(prefix);
+    }
+    // if (enable === false) {
+    //   return null;
+    // }
+    return RedisConfigObject.load();
+  }
+
   get options(): Redis.ClientOpts {
     return {
       host: this.host,

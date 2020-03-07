@@ -40,10 +40,11 @@ export class CronHelper {
     }
 
     const ttl = opts.ttl ?? 10;
-    logger.verbose(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts })}`);
+    const enabled = this.redis.isEnabled();
+    logger.verbose(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
     const callPromise = () =>
-      this.redis.isEnabled()
-        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 })
+      enabled
+        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch(reason => logger.error(reason))
         : handler().catch(reason => logger.error(reason));
     return new CronJob({
       cronTime,

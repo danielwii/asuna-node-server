@@ -406,7 +406,7 @@ export class DBHelper {
         name: column.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByColumn(column, opts),
-          type: R.is(String, column.type) ? column.type : (column.type as Function).name,
+          type: _.isString(column.type) ? column.type : (column.type as Function).name,
           primaryKey: column.isPrimary ? column.isPrimary : undefined,
           nullable: column.isNullable,
           length: column.length,
@@ -421,7 +421,7 @@ export class DBHelper {
         name: relation.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),
-          type: R.is(String, relation.type) ? relation.type : (relation.type as Function).name,
+          type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
           info: info ? info[relation.propertyName] : undefined,
         },
       })),
@@ -434,7 +434,7 @@ export class DBHelper {
           name: relation.propertyName,
           config: {
             selectable: DBHelper.extractSelectableByRelation(relation, opts),
-            type: R.is(String, relation.type) ? relation.type : (relation.type as Function).name,
+            type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
             // nullable  : relation.isNullable,
             many: true,
             info: info ? info[relation.propertyName] : undefined,
@@ -451,7 +451,7 @@ export class DBHelper {
           name: relation.propertyName,
           config: {
             selectable: DBHelper.extractSelectableByRelation(relation, opts),
-            type: R.is(String, relation.type) ? relation.type : (relation.type as Function).name,
+            type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
             // nullable  : relation.isNullable,
             many: true,
             info: info ? info[relation.propertyName] : undefined,
@@ -467,7 +467,7 @@ export class DBHelper {
         name: relation.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),
-          type: R.is(String, relation.type) ? relation.type : (relation.type as Function).name,
+          type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
           info: info ? info[relation.propertyName] : undefined,
         },
       })),

@@ -17,7 +17,7 @@ export class RedisIoAdapter extends IoAdapter {
   constructor(app) {
     super(app);
     if (!RedisIoAdapter.redisAdapter) {
-      const configObject = RedisConfigObject.load('ws');
+      const configObject = RedisConfigObject.loadOr('ws');
 
       if (!configObject.enable) {
         logger.warn(`no redis config found: ${r(configObject, { transform: true })}`);
