@@ -5,6 +5,7 @@ import { AdminController } from './admin.controller';
 import { CacheUtils } from './cache';
 import { ClientModule } from './client/client.module';
 import { LoggerFactory } from './common/logger';
+import { ContentModule } from './content';
 import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
@@ -41,6 +42,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     GraphqlQueryModule,
     AuthModule,
     PaymentModule,
+    ContentModule,
     ClientModule,
     KvModule,
     DBModule,
