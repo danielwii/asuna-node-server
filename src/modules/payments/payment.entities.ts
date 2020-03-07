@@ -102,7 +102,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
  */
 @EntityMetaInfo({ name: 'payment__items' })
 @Entity('payment__t_items')
-export class PaymentItem extends Publishable(InjectUserProfile(AbstractTimeBasedNameEntity)) {
+export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   constructor() {
     super('pi');
   }
@@ -112,7 +112,7 @@ export class PaymentItem extends Publishable(InjectUserProfile(AbstractTimeBased
   summary: string;
 
   @MetaInfo({ name: '价格' })
-  @Column({ nullable: true })
+  @Column('numeric', { nullable: true })
   price: number;
 
   @MetaInfo({ name: '封面', type: 'Image' })
