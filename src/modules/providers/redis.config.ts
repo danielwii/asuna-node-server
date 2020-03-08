@@ -36,7 +36,7 @@ export class RedisConfigObject {
       host: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_HOST}`, 'localhost'),
       port: configLoader.loadNumericConfig(`${appendPrefix}${RedisConfigKeys.REDIS_PORT}`, 6379),
       password: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_PASSWORD}`),
-      db: configLoader.loadNumericConfig(`${appendPrefix}${RedisConfigKeys.REDIS_DB}`) || 0,
+      db: configLoader.loadNumericConfig(`${appendPrefix}${RedisConfigKeys.REDIS_DB}`) ?? 0,
     });
   }
 
@@ -87,6 +87,6 @@ export class RedisConfigObject {
   }
 
   getOptions(db?: number): Redis.ClientOpts {
-    return { ...this.options, db: db || this.db };
+    return { ...this.options, db: db ?? this.db };
   }
 }

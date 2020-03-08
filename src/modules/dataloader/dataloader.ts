@@ -4,11 +4,14 @@ import { GraphQLResolveInfo } from 'graphql';
 import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { LRUMap } from 'lru_map';
 import { BaseEntity } from 'typeorm';
+import { CacheTTL } from '../cache';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
+import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 const logger = LoggerFactory.getLogger('DataLoader');
 
@@ -35,13 +38,13 @@ function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Ent
 }
 
 export function loader<Entity extends BaseEntity>(
-  entity: new (...args) => Entity,
+  entity: typeof BaseEntity,
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
     cachedDataLoader(entity.name, ids => {
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
-      return ((entity as any) as typeof BaseEntity)
+      return entity
         .findByIds(ids, {
           where: { isPublished: opts.isPublished },
           loadRelationIds: opts.loadRelationIds,
@@ -74,7 +77,7 @@ export class GenericDataLoader {
   }
 }
 
-export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
+export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
   /* dataloader is a internal cache, not support distributed
   const redis = RedisProvider.instance.getRedisClient('dataloader');
   if (redis.isEnabled) {
@@ -170,23 +173,36 @@ export function cachedDataLoader(segment, fn): DataLoader<PrimaryKey, any> {
             //   cacheMap.set(key, { value, expires: now + 1 * 60 * 1000 });
             //   // console.log({ size: cacheMap.size });
             // }
-            cacheMap.set(key, { value: promised, expires: now + 5 * 60 * 1000 });
+            cacheMap.set(key, { value: promised, expires: now + CacheTTL.SHORT });
           }
         },
         delete: (id: string) => {
           logger.log(`delete (${segment}:${id})`);
           const key = `${segment}-${id}`;
           cacheMap.delete(key);
+          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch(reason =>
+            logger.error(reason),
+          );
           // return client.drop({ segment, id });
         },
         clear: () => {
           // logger.log(`clear (${segment})`);
           cacheMap.clear();
+          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch(reason => logger.error(reason));
           // return logger.warn('not implemented.');
         },
       },
     },
-    // { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(1000) },
+  );
+}
+
+export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
+  return new DataLoader(
+    ids => {
+      logger.verbose(`per-request dataloader load ${segment}: ${ids}`);
+      return fn(ids);
+    },
+    { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(100) },
   );
 }
 

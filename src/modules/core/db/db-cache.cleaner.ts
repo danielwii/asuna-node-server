@@ -14,7 +14,6 @@ export class DBCacheCleaner {
   }
 
   static clear(name: string): void {
-    logger.verbose(`registers is ${r(this.registers)}`);
     const triggers = _.flow([fp.filter(({ Entity }) => Entity.name === name), fp.map(fp.get('trigger'))])(
       this.registers,
     );
