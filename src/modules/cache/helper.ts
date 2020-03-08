@@ -1,7 +1,7 @@
 import { PrimaryKey } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { DBCacheCleaner } from '../core/db';
-import { dataLoaderCleaner } from '../dataloader';
+import { dataLoaderCleaner } from '../dataloader/dataloader';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 const logger = LoggerFactory.getLogger('CacheHelper');

@@ -96,7 +96,7 @@ export class GraphqlHelper {
 
   public static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
-    DataLoaders extends DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders
   >({
     cls,
     query,

@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
 import { BaseEntity } from 'typeorm';
-import { CacheTTL } from '../cache';
+import { CacheTTL } from '../cache/constants';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
