@@ -4,6 +4,7 @@ import { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import { deserializeSafely, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { dataLoaderCleaner } from '../../dataloader';
+import { DBCacheCleaner } from '../db';
 import { jsonType, safeReloadJSON } from '../helpers';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
@@ -41,6 +42,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       }),
     );
 */
+    DBCacheCleaner.clear(event.metadata.name);
   }
 
   afterLoad(entity: BaseEntity, event?: LoadEvent<BaseEntity>): Promise<any> | void {
@@ -82,7 +84,9 @@ export class EntitySubscriber implements EntitySubscriberInterface {
       tableName: event.metadata.tableName,
     });
 */
-    dataLoaderCleaner.clear(event.metadata.name, _.get(event.entity, 'id'));
+    const id = _.get(event.entity, 'id') ?? _.get(event.entity, 'uuid');
+    dataLoaderCleaner.clear(event.metadata.name, id);
+    DBCacheCleaner.clear(event.metadata.name);
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {

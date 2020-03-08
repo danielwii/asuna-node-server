@@ -46,7 +46,13 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
         disableMixedMap?: boolean;
       };
   timeCondition?: TimeConditionInput;
-  cache?: boolean | number;
+  cache?:
+    | boolean
+    | number
+    | {
+        id: any;
+        milliseconds: number;
+      };
   // skip?: number;
   // take?: number;
   order?: {
@@ -90,7 +96,7 @@ export class GraphqlHelper {
 
   public static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
-    DataLoaders = DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders
   >({
     cls,
     query,
@@ -116,7 +122,11 @@ export class GraphqlHelper {
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity, DataLoaders>(opts: {
+  public static async handleDefaultQueryRequest<
+    Entity extends BaseEntity,
+    MixedEntity,
+    DataLoaders extends DefaultRegisteredLoaders
+  >(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -125,7 +135,10 @@ export class GraphqlHelper {
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[] | null>;
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, DataLoaders>(opts: {
+  public static async handleDefaultQueryRequest<
+    Entity extends BaseEntity,
+    DataLoaders extends DefaultRegisteredLoaders
+  >(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -133,7 +146,11 @@ export class GraphqlHelper {
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[] | null>;
-  public static async handleDefaultQueryRequest<Entity extends BaseEntity, MixedEntity, DataLoaders>({
+  public static async handleDefaultQueryRequest<
+    Entity extends BaseEntity,
+    MixedEntity,
+    DataLoaders extends DefaultRegisteredLoaders
+  >({
     cls,
     query,
     where,
