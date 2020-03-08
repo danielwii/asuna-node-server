@@ -19,7 +19,13 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext, resolveRelationsFromInfo } from '../dataloader';
+import {
+  DataLoaderFunction,
+  DefaultRegisteredLoaders,
+  GraphqlContext,
+  resolveRelationsFromInfo,
+  resolveSelectsFromInfo,
+} from '../dataloader';
 import { CommonConditionInput, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
@@ -27,11 +33,18 @@ const logger = LoggerFactory.getLogger('GraphqlHelper');
 interface ResolveFindOptionsType<Entity extends BaseEntity> {
   cls: ClassType<Entity>;
   pageRequest?: PageRequest;
-  select?: (keyof Entity)[];
+  select?: (keyof Entity)[] | string[];
   info?: GraphQLResolveInfo;
   where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
   join?: JoinOptions;
   relationPath?: string;
+  selectionPath?: string;
+  relations?:
+    | boolean
+    | {
+        relations?: string[];
+        disableMixedMap?: boolean;
+      };
   timeCondition?: TimeConditionInput;
   cache?: boolean | number;
   // skip?: number;
@@ -220,6 +233,8 @@ export class GraphqlHelper {
       pageRequest,
       where,
       relationPath,
+      relations,
+      selectionPath,
       categoryRef,
       categoryCls,
       query,
@@ -250,10 +265,11 @@ export class GraphqlHelper {
         timeCondition && timeCondition.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : null;
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
-    const loadRelationIds = resolveRelationsFromInfo(info, relationPath);
+    const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
+    const selectFields: any[] = resolveSelectsFromInfo(info, selectionPath) ?? select;
     const options: FindManyOptions<Entity> = {
       ...(pageRequest ? toPage(pageRequest) : null),
-      ...(select && select.length > 0 ? { select } : null),
+      ...(selectFields && selectFields.length > 0 ? { select: selectFields } : null),
       where: whereCondition,
       join,
       loadRelationIds,

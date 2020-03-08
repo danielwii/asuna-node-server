@@ -52,7 +52,9 @@ export class GraphqlModule implements OnModuleInit {
           resolvers: { JSON: GraphQLJSON },
           playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
           debug: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
-          introspection: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
+          introspection:
+            configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE) ||
+            configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
           tracing: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
           resolverValidationOptions: {
             requireResolversForResolveType: false,

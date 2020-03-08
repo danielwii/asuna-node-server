@@ -1,6 +1,7 @@
 import { Promise } from 'bluebird';
 import * as DataLoader from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql';
+import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { BaseEntity } from 'typeorm';
@@ -211,13 +212,47 @@ export function resolveRelationsFromInfo(
         node => (node as any).name.value === locations[index + 1],
       );
     });
-    const relations = (selectionNode || fieldNode).selectionSet.selections
+    const relations = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
       .filter(node => node.selectionSet)
       .map(node => node.name.value);
-    logger.verbose(`resolved relations is ${r(relations)}`);
+    logger.verbose(`resolved relations ${r({ path, relations })}`);
     return { relations };
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);
     return false;
   }
+}
+
+export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): string[] | null {
+  if (!info || !path) return null;
+
+  try {
+    const locations = path.split('.');
+    const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
+
+    if (fieldNode == null) return null;
+
+    let selectionNode;
+    _.times(locations.length - 1).forEach(index => {
+      selectionNode = (selectionNode || fieldNode).selectionSet.selections.find(
+        node => (node as any).name.value === locations[index + 1],
+      );
+    });
+    const selects = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
+      .filter(node => !node.selectionSet)
+      .map(node => node.name.value);
+    logger.verbose(`resolved selects ${r({ path, selects })}`);
+    return selects;
+  } catch (error) {
+    logger.warn(`resolveRelationsFromInfo ${r(error)}`);
+    return null;
+  }
+}
+
+export function resolveFieldsByPagedMixInfo(info: GraphQLResolveInfo, path: string) {
+  return {
+    mixedFields: resolveSelectsFromInfo(info, `${path}.items`),
+    relations: resolveRelationsFromInfo(info, `${path}.items`),
+    select: resolveSelectsFromInfo(info, `${path}.items.origin`),
+  };
 }

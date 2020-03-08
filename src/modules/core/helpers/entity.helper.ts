@@ -57,10 +57,10 @@ export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity
           }
         } catch (error) {
           logger.error(`safeReloadJSON ${column} error: ${error}`);
-          entity[column] = null;
+          // entity[column] = null;
         }
       } else {
-        entity[column] = null;
+        // entity[column] = null;
       }
     }
   });
