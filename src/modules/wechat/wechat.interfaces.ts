@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { UserProfile } from '../core/auth';
-import { AnyAuthRequest } from '../helper';
+import { UserProfile } from '../core/auth/user.entities';
+import { AnyAuthRequest } from '../helper/interfaces';
 import { WXJwtPayload } from './interfaces';
 
 export type WXAuthRequest = AnyAuthRequest<WXJwtPayload, UserProfile>;

@@ -1,39 +1,23 @@
 import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../common';
-import { AdminUser, Role } from '../core/auth/auth.entities';
+import { AdminUser } from '../core/auth/auth.entities';
 import { JwtPayload } from '../core/auth/auth.interfaces';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
 import { isApiKeyRequest } from '../core/auth/strategy/interfaces';
 import { UserProfile } from '../core/auth/user.entities';
 import { Store } from '../store';
-import { Tenant } from '../tenant/tenant.entities';
 import { WXJwtPayload } from '../wechat/interfaces';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
+import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
-
-export type PayloadType = JwtPayload | WXJwtPayload | ApiKeyPayload;
-export type AuthInfo<P = PayloadType, U = UserProfile | AdminUser> = Partial<{
-  payload: P;
-  user: U;
-  identifier: string;
-  tenant?: Tenant;
-  roles?: Role[];
-}>;
-export type AnyAuthRequest<P = PayloadType, U = UserProfile | AdminUser> = Request & AuthInfo<P, U>;
-
-export interface ApiKeyPayload {
-  apiKey: string;
-}
 
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
 }
-
-export type AuthResult<P> = { err: string | Error; payload: P; info };
 
 export class AuthHelper {
   static authAdminApiKey(req: AnyAuthRequest<ApiKeyPayload>, res: Response): Promise<AuthResult<ApiKeyPayload>> {

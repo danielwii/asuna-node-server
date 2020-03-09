@@ -1,10 +1,21 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
-import { AbstractBaseEntity } from '../../base/base.entity';
+import { Publishable } from '../../base';
+import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { Tenant } from '../../tenant/tenant.entities';
 import { jsonType } from '../helpers/column.helper';
 import { safeReloadObject } from '../helpers/entity.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
+
+@EntityMetaInfo({ name: 'auth__api_keys' })
+@Entity('auth__t_api_keys')
+export class AdminApiKeys extends Publishable(AbstractNameEntity) {
+  @Column({ nullable: true, name: 'app_key' })
+  appKey?: string;
+
+  @Column({ nullable: true, name: 'app_secret' })
+  appSecret?: string;
+}
 
 @EntityMetaInfo({ name: 'auth__roles' })
 @Entity('auth__t_roles')

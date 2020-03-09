@@ -202,8 +202,9 @@ export class WeChatHelper {
     const validation = [config.token, opts.timestamp, opts.nonce].sort().join('');
     const hashCode = crypto.createHash('sha1');
     const result = hashCode.update(validation, 'utf8').digest('hex');
-    logger.log(`validate ${r({ config, opts, validation, result, validated: result === opts.signature })}`);
-    return result === opts.signature;
+    const validated = result === opts.signature;
+    logger.log(`validate ${r({ config, opts, validation, result, validated })}`);
+    return validated;
   }
 
   static async parseXmlToJson<T = any>(req: Request): Promise<T> {
@@ -353,7 +354,6 @@ export class WeChatHelper {
 
     let decoded;
     try {
-      // 解密
       const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, encodedIV);
       // 设置自动 padding 为 true，删除填充补位
       decipher.setAutoPadding(true);
@@ -362,7 +362,7 @@ export class WeChatHelper {
 
       decoded = JSON.parse(decoded);
     } catch (err) {
-      logger.error(`decrypt data error: ${err}`);
+      logger.error(`decrypt data ${r({ key, encryptedData, iv })} error: ${err}`);
       throw new Error('Illegal Buffer');
     }
 
