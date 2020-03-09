@@ -3,7 +3,7 @@ import { Promise } from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
 import { LoggerFactory } from '../common/logger';
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { AnyAuthRequest } from '../helper/auth';
+import { AnyAuthRequest } from '../helper/interfaces';
 import { Tenant } from './tenant.entities';
 import { TenantHelper, TenantInfo } from './tenant.helper';
 import { TenantService } from './tenant.service';

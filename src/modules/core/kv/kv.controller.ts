@@ -4,7 +4,7 @@ import { IsOptional, IsString } from 'class-validator';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest } from '../../helper/auth';
+import { AnyAuthRequest } from '../../helper/interfaces';
 import { JwtAdminAuthGuard } from '../auth/admin-auth.guard';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';

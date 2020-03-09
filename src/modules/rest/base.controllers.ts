@@ -21,7 +21,7 @@ import {
 } from '../core/db';
 import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
-import { AnyAuthRequest } from '../helper/auth';
+import { AnyAuthRequest } from '../helper/interfaces';
 import { Tenant, TenantHelper } from '../tenant';
 // import { AdminUser } from '../../core/auth';
 

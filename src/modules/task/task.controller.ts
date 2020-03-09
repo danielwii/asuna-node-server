@@ -3,7 +3,7 @@ import { IsDefined, IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { AnyAuthRequest } from '../helper/auth';
+import { AnyAuthRequest } from '../helper/interfaces';
 import { TaskRecord } from './task.entities';
 import { TaskHelper } from './task.helper';
 

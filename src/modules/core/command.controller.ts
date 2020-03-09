@@ -1,10 +1,10 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { r } from "../common/helpers";
-import { LoggerFactory } from "../common/logger";
-import { AnyAuthRequest } from "../helper/auth";
-import { AnyAuthGuard } from "./auth/auth.guard";
-import { Hermes } from "./bus";
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
+import { AnyAuthRequest } from '../helper/interfaces';
+import { AnyAuthGuard } from './auth/auth.guard';
+import { Hermes } from './bus';
 
 const logger = LoggerFactory.getLogger('CommandController');
 

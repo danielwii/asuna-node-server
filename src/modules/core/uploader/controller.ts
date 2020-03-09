@@ -16,7 +16,7 @@ import * as uuid from 'uuid';
 import { r, UploadException } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { AnyAuthRequest } from '../../helper/auth';
+import { AnyAuthRequest } from '../../helper/interfaces';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { AsunaContext } from '../context';
 import { Global } from '../global';

@@ -13,7 +13,7 @@ import {
   SignException,
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest } from '../../helper/auth';
+import { AnyAuthRequest } from '../../helper/interfaces';
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';

@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { BaseEntity, FindOperator, getManager, ObjectLiteral } from 'typeorm';
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
-import { AnyAuthRequest, AuthInfo } from '../../helper/auth';
+import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair, KvHelper } from '../kv';

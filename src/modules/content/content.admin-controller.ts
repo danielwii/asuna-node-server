@@ -7,7 +7,7 @@ import { JsonMap } from '../common/decorators';
 import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';
 import { RestHelper } from '../core/rest/rest.helper';
-import { AnyAuthRequest } from '../helper';
+import { AnyAuthRequest } from '../helper/interfaces';
 import { TenantHelper } from '../tenant';
 import { Draft } from './draft.entities';
 
