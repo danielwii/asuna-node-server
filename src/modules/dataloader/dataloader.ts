@@ -55,7 +55,7 @@ export function loader<Entity extends BaseEntity>(
 }
 
 export const dataLoaderCleaner = {
-  clear(segment, id): void {
+  clear(segment: string, id: PrimaryKey): void {
     logger.verbose(`remove loader cache ... ${segment}-${id}`);
     cacheMap.delete(`${segment}-${id}`);
   },

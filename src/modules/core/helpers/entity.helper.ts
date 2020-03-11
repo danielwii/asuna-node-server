@@ -5,13 +5,13 @@ import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
 import { LoggerFactory } from '../../common/logger/factory';
 import { ConfigKeys, configLoader } from '../../config';
-import { jsonType } from './column.helper';
+import { ColumnType } from './column.helper';
 
 const logger = LoggerFactory.getLogger('EntityHelper');
 
 export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (jsonType() === 'simple-json') {
+    if (ColumnType.json === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {
@@ -30,7 +30,7 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
 
 export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (jsonType() === 'simple-json') {
+    if (ColumnType.json === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {
@@ -49,7 +49,7 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
 
 export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (entity && column /* && jsonType() === 'simple-json' */) {
+    if (entity && column /* && ColumnType.json === 'simple-json' */) {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {

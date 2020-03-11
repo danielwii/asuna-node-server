@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorators';
 import { InjectUserProfile } from '../core/auth';
-import { jsonType } from '../core/helpers';
+import { ColumnType } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
 
 /**
@@ -40,7 +40,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   // callbackUrl: string;
 
   @MetaInfo({ name: '附加信息', type: 'JSON' })
-  @Column(jsonType(), { nullable: true, name: 'extra' })
+  @Column(ColumnType.json, { nullable: true, name: 'extra' })
   extra: Record<string, string | number>;
 
   @MetaInfo({
@@ -74,6 +74,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
       { name: 'method.extra', help: '自定义附加信息' },
       { name: 'md5sign', fake: 'finance.iban' },
     ],
+    // extra: { jsonMode: true },
   })
   @Column('text', { nullable: true, name: 'body_tmpl' })
   bodyTmpl: string;
@@ -88,13 +89,6 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
     transaction => transaction.method,
   )
   transactions: PaymentTransaction[];
-
-  // @AfterLoad()
-  // afterLoad() {
-  //   try {
-  //     this.extra = JSON.parse(this.extra as any);
-  //   } catch (e) {}
-  // }
 }
 
 /**
@@ -112,7 +106,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   summary: string;
 
   @MetaInfo({ name: '价格' })
-  @Column('numeric', { nullable: true })
+  @Column(ColumnType.money, { nullable: true })
   price: number;
 
   @MetaInfo({ name: '封面', type: 'Image' })
@@ -120,7 +114,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   cover: string;
 
   @MetaInfo({ name: '图片', type: 'Images' })
-  @Column(jsonType(), { nullable: true })
+  @Column(ColumnType.json, { nullable: true })
   images: JsonArray;
 }
 
@@ -165,7 +159,7 @@ export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity)
     super('po');
   }
 
-  @Column('numeric', { name: 'amount' })
+  @Column(ColumnType.money, { name: 'amount' })
   amount: number;
 
   items: PaymentItem[]; //

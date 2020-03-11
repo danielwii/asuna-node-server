@@ -3,7 +3,7 @@ import { Publishable } from '../../base';
 import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { Tenant } from '../../tenant/tenant.entities';
-import { jsonType } from '../helpers/column.helper';
+import { ColumnType } from '../helpers/column.helper';
 import { safeReloadObject } from '../helpers/entity.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
@@ -29,7 +29,7 @@ export class Role extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: '权限', type: 'Authorities' })
-  @Column(jsonType(), { nullable: true })
+  @Column(ColumnType.json, { nullable: true })
   authorities: JsonMap;
 
   @ManyToMany(

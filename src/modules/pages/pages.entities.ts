@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { jsonType } from '../core/helpers';
+import { ColumnType } from '../core/helpers';
 
 @EntityMetaInfo({ name: 'page__views' })
 @Entity('page__t_views')
@@ -15,10 +15,10 @@ export class PageView extends Publishable(AbstractNameEntity) {
   mainFile: string;
 
   @MetaInfo({ name: '文件', type: 'Files' })
-  @Column(jsonType(), { nullable: true, name: 'files' })
+  @Column(ColumnType.json, { nullable: true, name: 'files' })
   files: JsonArray;
 
   @MetaInfo({ name: '图片', type: 'Images' })
-  @Column(jsonType(), { nullable: true, name: 'images' })
+  @Column(ColumnType.json, { nullable: true, name: 'images' })
   images: JsonArray;
 }

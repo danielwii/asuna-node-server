@@ -19,7 +19,7 @@ export class CacheHelper {
   }
 
   static clear({ key, id }: { id?: PrimaryKey; key: string }) {
-    dataLoaderCleaner.clear(key, id);
+    if (id) dataLoaderCleaner.clear(key, id);
     DBCacheCleaner.clear(key);
   }
 }

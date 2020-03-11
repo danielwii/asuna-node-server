@@ -2,26 +2,12 @@ import * as _ from 'lodash';
 import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import { CacheHelper, CleanCacheType } from '../../cache';
-import { deserializeSafely, r, validateObjectSync } from '../../common/helpers';
+import { r, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
-import { jsonType, safeReloadJSON } from '../helpers';
+import { ColumnType, safeReloadJSON } from '../helpers';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
-
-export class BeforeAfterInsertPayload<T extends BaseEntity> {
-  public readonly entity: T;
-
-  public readonly updatedColumns: T;
-
-  public readonly name: string;
-
-  public readonly tableName: string;
-
-  public constructor(o: BeforeAfterInsertPayload<T>) {
-    Object.assign(this, deserializeSafely(BeforeAfterInsertPayload, o));
-  }
-}
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
@@ -35,96 +21,40 @@ export class EntitySubscriber implements EntitySubscriberInterface {
   }
 
   afterInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    /*
-    Hermes.emit(
-      EntitySubscriber.name,
-      'entity.afterInsert',
-      new BeforeAfterInsertPayload({
-        entity: event.entity,
-        updatedColumns: event.entity,
-        name: event.metadata.name,
-        tableName: event.metadata.tableName,
-      }),
-    );
-*/
     CacheHelper.clear({ key: event.metadata.name });
   }
 
   afterLoad(entity: BaseEntity, event?: LoadEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(`afterLoad ${entity.constructor.name} ${r(entity)}`);
     event.metadata.columns.forEach(column => {
-      if (column.type === jsonType()) {
+      if (column.type === ColumnType.json) {
         safeReloadJSON(entity as any, column.propertyName);
       }
     });
   }
 
-  afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(
-    //   `afterRemove ${(event, _ => _.entity.constructor.name)} ${r({
-    //     entity: event.entity,
-    //     id: event.entityId,
-    //   })}`,
-    // );
-  }
+  afterRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {}
 
   afterUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(
-    //   `afterUpdate ${(event, _ => _.entity.constructor.name)} ${r({
-    //     entity: event.entity,
-    //     updatedColumns: diff(event.entity, event.databaseEntity),
-    //     name: event.metadata.name,
-    //     tableName: event.metadata.tableName,
-    //   })}`,
-    // );
     if (!event.entity) {
       return;
     }
 
-    /*
-    Hermes.emit(EntitySubscriber.name, 'entity.afterUpdate', {
-      entity: event.entity,
-      updatedColumns: diff(event.entity, event.databaseEntity),
-      name: event.metadata.name,
-      tableName: event.metadata.tableName,
-    });
-*/
     const id = _.get(event.entity, 'id') ?? _.get(event.entity, 'uuid');
     CacheHelper.pubClear({ key: event.metadata.name, id });
   }
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(`beforeInsert ${(event, _ => _.entity.constructor.name)} ${r(event.entity)}`);
     event.metadata.columns.forEach(column => {
-      if (column.type === jsonType()) {
-        safeReloadJSON(event.entity as any, column.propertyName);
-      }
+      if (column.type === ColumnType.json) safeReloadJSON(event.entity as any, column.propertyName);
     });
     validateObjectSync(event.entity);
   }
 
-  beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(
-    //   `beforeRemove ${(event, _ => _.entity.constructor.name)} ${r({
-    //     entity: event.entity,
-    //     id: event.entityId,
-    //   })}`,
-    // );
-  }
+  beforeRemove(event: RemoveEvent<BaseEntity>): Promise<any> | void {}
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
-    // logger.debug(
-    //   `beforeUpdate ${(event, _ => _.entity.constructor.name)} ${r({
-    //     entity: event.entity,
-    //     updatedColumns: diff(event.entity, event.databaseEntity),
-    //     name: event.metadata.name,
-    //     tableName: event.metadata.tableName,
-    //   })}`,
-    // );
     event.metadata.columns.forEach(column => {
-      if (column.type === jsonType()) {
-        safeReloadJSON(event.entity as any, column.propertyName);
-      }
+      if (column.type === ColumnType.json) safeReloadJSON(event.entity as any, column.propertyName);
     });
     validateObjectSync(event.entity);
   }

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
-import { jsonType } from '../core/helpers';
+import { ColumnType } from '../core/helpers';
 
 @EntityMetaInfo({ name: 'sys__tasks' })
 @Entity('sys__t_tasks')
@@ -56,7 +56,7 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   state: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(jsonType(), { nullable: true, name: 'body' })
+  @Column(ColumnType.json, { nullable: true, name: 'body' })
   body: JsonMap;
 
   // --------------------------------------------------------------
@@ -79,7 +79,7 @@ export class TaskEvent extends AbstractBaseEntity {
   message: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(jsonType(), { nullable: true, name: 'body' })
+  @Column(ColumnType.json, { nullable: true, name: 'body' })
   body: JsonMap;
 
   @ManyToOne(

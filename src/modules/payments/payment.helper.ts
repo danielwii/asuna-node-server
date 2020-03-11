@@ -50,11 +50,11 @@ export class PaymentHelper {
 
   static async pay(transactionId: string): Promise<any> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
-    const { method, order } = transaction;
+    const { method, order, createdAt } = transaction;
     const signTmpl = method?.signTmpl;
     const bodyTmpl = method?.bodyTmpl;
 
-    const createdAt = dayjs(transaction.createdAt).format('YYYY-MM-DD HH:mm:ss');
+    // const createdAt = dayjs(transaction.createdAt).format('YYYY-MM-DD HH:mm:ss');
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
 
     const context = {

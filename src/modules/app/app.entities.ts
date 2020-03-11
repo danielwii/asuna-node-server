@@ -1,7 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { jsonType, safeReloadArray } from '../core/helpers';
+import { ColumnType, safeReloadArray } from '../core/helpers';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',
@@ -60,7 +60,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   description: string;
 
   @MetaInfo({ name: 'File', type: 'File' })
-  @Column(jsonType(), { nullable: false, name: 'paths' })
+  @Column(ColumnType.json, { nullable: false, name: 'paths' })
   paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })

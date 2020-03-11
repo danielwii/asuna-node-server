@@ -116,6 +116,7 @@ export interface JSONMetaInfoOptions extends MetaInfoBaseOptions {
 export interface StringTmplMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'StringTmpl';
   fields: { name: string; help?: string; fake?: string }[];
+  extra?: { jsonMode: true } | { language: string };
 }
 
 export interface AddressMetaInfoOptions extends MetaInfoBaseOptions {

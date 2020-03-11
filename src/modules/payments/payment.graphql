@@ -8,6 +8,7 @@ type PaymentMethod implements TimeBasedBaseNameEntity {
 
   displayName: String
   endpoint: String
+  extra: JsonObject
 }
 
 type PaymentItem implements TimeBasedBaseNameEntity {
