@@ -140,6 +140,9 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
 
   paymentInfo: JsonMap;
 
+  @Column(ColumnType.json, { nullable: true })
+  data: JsonMap;
+
   @OneToOne(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     type => PaymentOrder,

@@ -82,8 +82,9 @@ export class PaymentHelper {
     return body;
   }
 
-  // static async close(orderId: string): Promise<PaymentOrder> {
-  //   const order = await PaymentOrder.findOneOrFail(orderId);
-  //   // ... set status to done
-  // }
+  static async updateOrder(orderId: string, data: any) {
+    const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
+    order.transaction.data = data;
+    return order.save();
+  }
 }

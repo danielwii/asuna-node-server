@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { IsDefined, IsString } from 'class-validator';
+import { Body, Controller, Get, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
@@ -12,6 +12,13 @@ class CreateOrderDTO {
   methodId: number;
   @IsDefined()
   paymentInfo: object;
+}
+
+class UpdateOrderDTO {
+  @IsString()
+  orderId: string;
+  @IsOptional()
+  data?: any;
 }
 
 const logger = LoggerFactory.getLogger('PaymentController');
@@ -30,10 +37,16 @@ export class PaymentController {
     logger.log(`callback ${r({ query, body })}`);
   }
 
-  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
+  @UseGuards(new JwtAuthGuard())
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest): Promise<any> {
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload.id });
     return PaymentHelper.pay(order.transaction.id);
+  }
+
+  @UseGuards(new JwtAuthGuard())
+  @Put('order')
+  async updateOrder(@Body() body: UpdateOrderDTO) {
+    return PaymentHelper.updateOrder(body.orderId, body.data);
   }
 }
