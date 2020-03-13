@@ -62,6 +62,7 @@ export class RedisProvider {
 
     process.on('SIGINT', () => {
       client.quit((err: Error, res: string) => {
+        redisClientObject.isHealthy = false;
         logger.log(`signal: SIGINT. Redis ${configObject.db} connection disconnected ${r({ err, res })}`);
         process.exit(0);
       });

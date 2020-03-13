@@ -60,7 +60,7 @@ export class RedisConfigObject {
       port: this.port,
       ...(this.password ? { password: this.password } : null),
       db: this.db,
-      connect_timeout: 10_000,
+      // connect_timeout: 10_000,
       retry_strategy: options => {
         if (options) {
           logger.warn(`retry_strategy ${r({ db: this.db, host: this.host, port: this.port })} ${r(options)}`);
