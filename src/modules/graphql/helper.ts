@@ -283,7 +283,7 @@ export class GraphqlHelper {
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
-    const selectFields: any[] = resolveSelectsFromInfo(info, selectionPath) ?? select;
+    const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
       ...(pageRequest ? toPage(pageRequest) : null),
       ...(selectFields && selectFields.length > 0 ? { select: selectFields } : null),

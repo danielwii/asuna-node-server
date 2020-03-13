@@ -5,7 +5,7 @@ import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
-import { BaseEntity } from 'typeorm';
+import { BaseEntity, ObjectType } from 'typeorm';
 import { CacheTTL } from '../cache/constants';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
@@ -239,6 +239,7 @@ export function resolveRelationsFromInfo(
   }
 }
 
+// TODO cannot resolve fragments
 export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): string[] | null {
   if (!info || !path) return null;
 
@@ -265,10 +266,14 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
   }
 }
 
-export function resolveFieldsByPagedMixInfo(info: GraphQLResolveInfo, path: string) {
+export function resolveFieldsByPagedMixInfo<Entity>(
+  entity: ObjectType<Entity>,
+  info: GraphQLResolveInfo,
+  path: string,
+) {
   return {
     mixedFields: resolveSelectsFromInfo(info, `${path}.items`),
     relations: resolveRelationsFromInfo(info, `${path}.items`),
-    select: resolveSelectsFromInfo(info, `${path}.items.origin`),
+    select: DBHelper.filterSelect(entity, resolveSelectsFromInfo(info, `${path}.items.origin`)),
   };
 }

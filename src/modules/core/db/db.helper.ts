@@ -323,6 +323,11 @@ export class DBHelper {
     return this.getPropertyNamesByRepo(this.repo(entity));
   }
 
+  public static filterSelect<Entity>(entity: ObjectType<Entity>, select: (keyof Entity | string)[]): (keyof Entity)[] {
+    const entityPropertyNames = DBHelper.getPropertyNames(entity);
+    return _.filter(select, (field: string) => entityPropertyNames.includes(field)) as any;
+  }
+
   public static getPropertyNamesByRepo<Entity>(repo: Repository<Entity>): string[] {
     return this.getPropertyNamesByMetadata(repo.metadata);
   }

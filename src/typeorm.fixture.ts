@@ -1,6 +1,10 @@
 import * as _ from 'lodash';
 import { FindOneOptions, FindOptionsUtils, JoinOptions, ObjectLiteral } from 'typeorm';
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
+import { r } from './modules/common/helpers/utils';
+import { LoggerFactory } from './modules/common/logger';
+
+const logger = LoggerFactory.getLogger('FindOptionsFixture');
 
 const oldApplyOptionsToQueryBuilder = FindOptionsUtils.applyOptionsToQueryBuilder;
 
@@ -12,6 +16,7 @@ FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixtur
   const join = options?.join;
 
   if (join) {
+    logger.verbose(`apply ${r(join)}`);
     if (join.leftJoin)
       Object.keys(join.leftJoin).forEach(key => {
         const extra = join.options?.[key] || {};
