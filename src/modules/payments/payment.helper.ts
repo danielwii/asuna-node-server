@@ -3,7 +3,6 @@ import * as Handlebars from 'handlebars';
 import _ from 'lodash';
 import * as qs from 'qs';
 import { EntityManager, TransactionManager } from 'typeorm';
-import { Api } from 'web/services';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
@@ -85,7 +84,7 @@ export class PaymentHelper {
       const response = await fetch(`${method.endpoint}?${qs.stringify(payload)}`);
       const result = await response.json();
       if (result) {
-        await Api.updateOrder({ orderId: order.id, data: result });
+        await this.updateOrder(order.id, result);
         return { payload, result };
       }
     }
