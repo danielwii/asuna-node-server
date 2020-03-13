@@ -1,7 +1,9 @@
 import * as crypto from 'crypto';
-import * as dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
+import _ from 'lodash';
+import * as qs from 'qs';
 import { EntityManager, TransactionManager } from 'typeorm';
+import { Api } from 'web/services';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
@@ -79,7 +81,16 @@ export class PaymentHelper {
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ md5, signed, payload })}`);
 
-    return body;
+    if (_.get(method.extra, 'method') === 'GET') {
+      const response = await fetch(`${method.endpoint}?${qs.stringify(payload)}`);
+      const result = await response.json();
+      if (result) {
+        await Api.updateOrder({ orderId: order.id, data: result });
+        return { payload, result };
+      }
+    }
+
+    return { payload };
   }
 
   static async updateOrder(orderId: string, data: any) {
