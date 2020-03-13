@@ -1,6 +1,6 @@
 import * as crypto from 'crypto';
 import * as Handlebars from 'handlebars';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import * as qs from 'qs';
 import { EntityManager, TransactionManager } from 'typeorm';
 import { r } from '../common/helpers/utils';
