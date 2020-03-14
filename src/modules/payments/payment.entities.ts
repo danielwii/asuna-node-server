@@ -127,7 +127,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
     order => order.items,
     { onDelete: 'CASCADE' },
   )
-  order: PaymentOrder;
+  order: any; // PaymentOrder;
 }
 
 /**
@@ -141,7 +141,7 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   }
 
   @Column({ nullable: true })
-  status; // 交易状态
+  status: string; // 交易状态
 
   @Column({ nullable: true })
   sign: string;
@@ -190,7 +190,7 @@ export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity)
   items: PaymentItem[]; //
 
   @Column({ nullable: true })
-  status; // 订单状态
+  status: string; // 订单状态
 
   @OneToOne(
     type => PaymentTransaction,
