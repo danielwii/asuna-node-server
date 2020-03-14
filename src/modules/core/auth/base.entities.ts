@@ -83,11 +83,11 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: true, select: false })
   salt?: string;
 
-  @MetaInfo({ name: '最后获取登录凭证时间' })
+  @MetaInfo({ name: '最后获取登录凭证时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_signed_at' })
   lastSignedAt?: Date;
 
-  @MetaInfo({ name: '最后登录时间' })
+  @MetaInfo({ name: '最后登录时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_login_at' })
   lastLoginAt?: Date;
 

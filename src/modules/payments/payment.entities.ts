@@ -143,22 +143,22 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   order: any; // PaymentOrder;
 }
 
-/**
- * 支付交易信息
- */
-@EntityMetaInfo({ name: 'payment__transactions' })
+@EntityMetaInfo({ name: 'payment__transactions', displayName: '交易' })
 @Entity('payment__t_transactions')
 export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('pt');
   }
 
+  @MetaInfo({ name: '状态' })
   @Column({ nullable: true })
-  status: string; // 交易状态
+  status: string;
 
+  @MetaInfo({ name: '签名' })
   @Column({ nullable: true })
   sign: string;
 
+  @MetaInfo({ name: '支付类型' })
   @ManyToOne(
     type => PaymentMethod,
     method => method.transactions,
@@ -167,12 +167,15 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   @JoinColumn({ name: 'method__id' })
   method: PaymentMethod;
 
+  @MetaInfo({ name: '附加信息' })
   @Column(ColumnType.json, { nullable: true })
   paymentInfo: JsonMap;
 
+  @MetaInfo({ name: '返回信息' })
   @Column(ColumnType.json, { nullable: true })
   data: JsonMap;
 
+  @MetaInfo({ name: '订单' })
   @OneToOne(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     type => PaymentOrder,
@@ -182,34 +185,35 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   order: any; // PaymentOrder;
 }
 
-/**
- * 支付订单
- */
-@EntityMetaInfo({ name: 'payment__orders' })
+@EntityMetaInfo({ name: 'payment__orders', displayName: '订单' })
 @Entity('payment__t_orders')
 export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('po');
   }
 
+  @MetaInfo({ name: '总金额' })
   @Column(ColumnType.money, { name: 'amount' })
   amount: number;
 
-  @OneToMany(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => PaymentItem,
-    item => item.order,
-  )
-  items: PaymentItem[]; //
-
+  @MetaInfo({ name: '状态' })
   @Column({ nullable: true })
   status: string; // 订单状态
 
+  @MetaInfo({ name: '交易' })
   @OneToOne(
     type => PaymentTransaction,
     transaction => transaction.order,
     { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'transaction__id' })
-  transaction: PaymentTransaction; // 交易信息
+  transaction: PaymentTransaction;
+
+  @MetaInfo({ name: '订单内容' })
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => PaymentItem,
+    item => item.order,
+  )
+  items: PaymentItem[];
 }
