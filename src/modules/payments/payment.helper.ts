@@ -111,10 +111,10 @@ export class PaymentHelper {
     const { context, signed, md5sign } = await this.sign(transactionId);
     const body = Handlebars.compile(bodyTmpl)(Object.assign(context, { md5sign }));
 
-    logger.verbose(`parse body ${body}`);
+    logger.verbose(`parse body ${r({ body, context, md5sign })}`);
 
     const payload = JSON.parse(body);
-    logger.log(`sign by ${r({ md5sign, signed, payload })}`);
+    logger.log(`sign by ${r({ signed, payload })}`);
     transaction.sign = md5sign;
     transaction.status = 'signed';
     await transaction.save();
