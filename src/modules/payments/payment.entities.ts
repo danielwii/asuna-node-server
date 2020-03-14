@@ -101,6 +101,10 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
     super('pi');
   }
 
+  @MetaInfo({ name: 'Key' })
+  @Column({ nullable: false, unique: true, length: 50, name: 'key' })
+  key: string;
+
   @MetaInfo({ name: '简要' })
   @Column('text', { nullable: true, name: 'summary' })
   summary: string;
@@ -116,6 +120,14 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @MetaInfo({ name: '图片', type: 'Images' })
   @Column(ColumnType.json, { nullable: true })
   images: JsonArray;
+
+  @ManyToOne(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => PaymentOrder,
+    order => order.items,
+    { onDelete: 'CASCADE' },
+  )
+  order: PaymentOrder;
 }
 
 /**
@@ -128,7 +140,11 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
     super('pt');
   }
 
+  @Column({ nullable: true })
   status; // 交易状态
+
+  @Column({ nullable: true })
+  sign: string;
 
   @ManyToOne(
     type => PaymentMethod,
@@ -138,6 +154,7 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   @JoinColumn({ name: 'method__id' })
   method: PaymentMethod;
 
+  @Column(ColumnType.json, { nullable: true })
   paymentInfo: JsonMap;
 
   @Column(ColumnType.json, { nullable: true })
@@ -165,8 +182,14 @@ export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity)
   @Column(ColumnType.money, { name: 'amount' })
   amount: number;
 
+  @OneToMany(
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    type => PaymentItem,
+    item => item.order,
+  )
   items: PaymentItem[]; //
 
+  @Column({ nullable: true })
   status; // 订单状态
 
   @OneToOne(

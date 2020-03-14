@@ -50,15 +50,30 @@ export class PaymentHelper {
     return order.save();
   }
 
-  static async pay(transactionId: string): Promise<any> {
+  static async validateSign(transactionId: string, body): Promise<boolean> {
+    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
+    const { method, order, sign } = transaction;
+
+    const remoteSign = _.get(body, _.get(method.extra, 'remoteSign'));
+
+    if (sign !== remoteSign) throw new Error('failure');
+
+    if (transaction.status !== 'done') {
+      transaction.status = 'done';
+      await transaction.save();
+      order.status = 'paid';
+      await order.save();
+    }
+
+    return true;
+  }
+
+  static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order, createdAt } = transaction;
     const signTmpl = method?.signTmpl;
-    const bodyTmpl = method?.bodyTmpl;
-
-    // const createdAt = dayjs(transaction.createdAt).format('YYYY-MM-DD HH:mm:ss');
+    // const bodyTmpl = method?.bodyTmpl;
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
-
     const context = {
       method,
       order,
@@ -67,6 +82,7 @@ export class PaymentHelper {
       callback: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`),
       notify: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`),
     };
+
     const signed = Handlebars.compile(signTmpl)(context);
     const md5 = crypto
       .createHash('md5')
@@ -75,12 +91,26 @@ export class PaymentHelper {
       .toUpperCase();
 
     const md5sign = _.get(method.extra, 'lowercase') ? md5.toLowerCase() : md5.toUpperCase();
+    return { context, signed, md5sign };
+  }
+
+  static async pay(transactionId: string): Promise<any> {
+    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
+    const { method, order } = transaction;
+    const bodyTmpl = method?.bodyTmpl;
+
+    const { context, signed, md5sign } = await this.sign(transactionId);
     const body = Handlebars.compile(bodyTmpl)(Object.assign(context, { md5sign }));
 
     logger.verbose(`parse body ${body}`);
 
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ md5sign, signed, payload })}`);
+    transaction.sign = md5sign;
+    transaction.status = 'signed';
+    await transaction.save();
+    order.status = 'waiting';
+    await order.save();
 
     if (_.get(method.extra, 'method') === 'GET') {
       const url = `${method.endpoint}?${qs.stringify(payload)}`;

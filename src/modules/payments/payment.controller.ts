@@ -29,6 +29,7 @@ export class PaymentController {
   @Post('notify')
   notify(@Query() query, @Body() body) {
     logger.log(`notify ${r({ query, body })}`);
+    return PaymentHelper.validateSign(query.id, query ?? body);
   }
 
   @Get('callback')
