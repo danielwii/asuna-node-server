@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
+import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
 import { LoggerFactory } from '../../common/logger';
 import { UserProfile } from '../../core/auth';
@@ -29,7 +29,7 @@ export class UserProfileQueryResolver {
 export class UserProfileResolver {
   logger = LoggerFactory.getLogger(this.constructor.name);
 
-  @ResolveProperty()
+  @ResolveField()
   async miniAppUserInfo(@Root() profile: UserProfile): Promise<WXMiniAppUserInfo> {
     this.logger.verbose(`load event for ${profile.id}`);
     return GraphqlHelper.resolveProperty<UserProfile, WXMiniAppUserInfo>({

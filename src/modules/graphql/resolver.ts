@@ -1,4 +1,4 @@
-import { ResolveProperty } from '@nestjs/graphql';
+import { ResolveField } from '@nestjs/graphql';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 
@@ -10,7 +10,7 @@ export interface CursoredQuery<After = string> {
 }
 
 export abstract class UnionTypeResolver {
-  @ResolveProperty('__resolveType')
+  @ResolveField('__resolveType')
   __resolveType(obj): string {
     const { name } = obj.constructor;
     if (name === 'Object') {

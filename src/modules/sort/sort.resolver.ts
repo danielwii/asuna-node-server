@@ -1,4 +1,4 @@
-import { Args, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
+import { Args, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 import * as util from 'util';
 import { LoggerFactory } from '../common/logger';
 import { UnionTypeResolver } from '../graphql';
@@ -26,7 +26,7 @@ export class SortResolver {
     return sort || this.Sort.getRepository().save({ name, type: sortType });
   }
 
-  @ResolveProperty()
+  @ResolveField()
   items(@Root() sort) {
     return this.sortService.findItems(sort);
   }

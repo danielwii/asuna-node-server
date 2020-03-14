@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Query, ResolveProperty, Resolver, Root } from '@nestjs/graphql';
+import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
@@ -37,7 +37,7 @@ export class KvQueryResolver {
 export class KeyValueModelResolver {
   logger = LoggerFactory.getLogger(this.constructor.name);
 
-  @ResolveProperty()
+  @ResolveField()
   async pair(@Root() model: KeyValueModel): Promise<KeyValuePair> {
     this.logger.verbose(`load pair for ${model.id} ${r(model)}`);
     return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
