@@ -74,12 +74,13 @@ export class PaymentHelper {
       .digest('hex')
       .toUpperCase();
 
-    const body = Handlebars.compile(bodyTmpl)(Object.assign(context, { md5sign: md5 }));
+    const md5sign = _.get(method.extra, 'lowercase') ? md5.toLowerCase() : md5.toUpperCase();
+    const body = Handlebars.compile(bodyTmpl)(Object.assign(context, { md5sign }));
 
     logger.verbose(`parse body ${body}`);
 
     const payload = JSON.parse(body);
-    logger.log(`sign by ${r({ md5, signed, payload })}`);
+    logger.log(`sign by ${r({ md5sign, signed, payload })}`);
 
     if (_.get(method.extra, 'method') === 'GET') {
       const url = `${method.endpoint}?${qs.stringify(payload)}`;

@@ -17,8 +17,8 @@ export class DBCacheCleaner {
     const triggers = _.flow([fp.filter(({ Entity }) => Entity.name === name), fp.map(fp.get('trigger'))])(
       this.registers,
     );
-    logger.verbose(`clear ${r(triggers)}`);
     if (!_.isEmpty(triggers)) {
+      logger.verbose(`clear ${r(triggers)}`);
       getConnection()
         .queryResultCache?.remove(triggers)
         .catch(reason => logger.error(reason));
