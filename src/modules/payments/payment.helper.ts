@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
 import { EntityManager, TransactionManager } from 'typeorm';
-import { r } from '../common/helpers/utils';
+import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from './payment.entities';
@@ -82,11 +82,14 @@ export class PaymentHelper {
     logger.log(`sign by ${r({ md5, signed, payload })}`);
 
     if (_.get(method.extra, 'method') === 'GET') {
-      const response = await fetch(`${method.endpoint}?${qs.stringify(payload)}`);
-      const result = await response.json();
+      const url = `${method.endpoint}?${qs.stringify(payload)}`;
+      const response = await fetch(url);
+      const result = await response.text();
+      logger.verbose(`fetch ${url} response is ${result}`);
       if (result) {
-        await this.updateOrder(order.id, result);
-        return { payload, result };
+        const parsed = parseJSONIfCould(result);
+        await this.updateOrder(order.id, parsed);
+        return { payload, result: parsed };
       }
     }
 
