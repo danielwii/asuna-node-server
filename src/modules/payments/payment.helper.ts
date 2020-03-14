@@ -50,13 +50,18 @@ export class PaymentHelper {
     return order.save();
   }
 
-  static async validateSign(transactionId: string, body): Promise<boolean> {
-    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
-    const { method, order, sign } = transaction;
+  static async validateSign(orderId: string, body): Promise<boolean> {
+    const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
+    const transaction = await PaymentTransaction.findOneOrFail(order.transaction.id, { relations: ['method'] });
+    const { method, sign } = transaction;
 
-    const remoteSign = _.get(body, _.get(method.extra, 'remoteSign'));
+    const remoteSignPath = _.get(method.extra, 'remoteSign');
+    const remoteSign: string = _.get(body, remoteSignPath);
 
-    if (sign !== remoteSign) throw new Error('failure');
+    if (sign?.toLowerCase() !== remoteSign?.toLowerCase()) {
+      logger.error(`invalid sign ${r({ sign, remoteSign, remoteSignPath })}`);
+      throw new Error('failure');
+    }
 
     if (transaction.status !== 'done') {
       transaction.status = 'done';
@@ -68,13 +73,10 @@ export class PaymentHelper {
     return true;
   }
 
-  static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
-    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
-    const { method, order, createdAt } = transaction;
-    const signTmpl = method?.signTmpl;
-    // const bodyTmpl = method?.bodyTmpl;
+  static async extraContext(transaction: PaymentTransaction, method: PaymentMethod, order: PaymentOrder): Promise<any> {
+    const { createdAt } = transaction;
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
-    const context = {
+    return {
       method,
       order,
       transaction,
@@ -82,6 +84,13 @@ export class PaymentHelper {
       callback: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`),
       notify: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`),
     };
+  }
+
+  static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
+    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
+    const { method, order } = transaction;
+    const signTmpl = method?.signTmpl;
+    const context = this.extraContext(transaction, method, order);
 
     const signed = Handlebars.compile(signTmpl)(context);
     const md5 = crypto

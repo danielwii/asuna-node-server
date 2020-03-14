@@ -1,3 +1,4 @@
+import { html } from 'common-tags';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorators';
@@ -39,7 +40,19 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   // @Column({ nullable: true, name: 'callback_url' })
   // callbackUrl: string;
 
-  @MetaInfo({ name: '附加信息', type: 'JSON' })
+  @MetaInfo({
+    name: '附加信息',
+    type: 'JSON',
+    help: html`
+      <ul>
+        <li>method: string = GET 手动发送</li>
+        <li>lowercase: boolean = true 签名大小写，默认大写</li>
+        <li>remoteSign: string = 'sign' 回掉签名位置</li>
+        <li>query: string = 'http://xxx.endpoint' 查询地址</li>
+        <li>queryBody: string = '{}' 查询消息模版</li>
+      </ul>
+    `,
+  })
   @Column(ColumnType.json, { nullable: true, name: 'extra' })
   extra: Record<string, string | number>;
 
