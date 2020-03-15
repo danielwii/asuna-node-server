@@ -242,11 +242,11 @@ export class DBHelper {
 
   public static hasRelation<R extends BaseEntity>(fullModelName: string, relation: ObjectType<R>): boolean {
     const { metadata, target } = this.repo(fullModelName);
-    const included = metadata.relations
-      .map(fp.get('type'))
-      .find((type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => {
-        return type.name === relation.name;
-      });
+    const relations = metadata.relations.map(fp.get('type'));
+    const included = relations.find(
+      (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => type.name === relation.name,
+    );
+    // logger.verbose(`hasRelation ${r({ included, relation: relation.name, relations })}`);
     return !_.isEmpty(included);
   }
 

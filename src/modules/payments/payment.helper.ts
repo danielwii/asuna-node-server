@@ -58,6 +58,9 @@ export class PaymentHelper {
     const remoteSignPath = _.get(method.extra, 'remoteSign');
     const remoteSign: string = _.get(body, remoteSignPath);
 
+    transaction.data = body;
+    await transaction.save();
+
     if (sign?.toLowerCase() !== remoteSign?.toLowerCase()) {
       logger.error(`invalid sign ${r({ sign, remoteSign, remoteSignPath })}`);
       throw new Error('failure');

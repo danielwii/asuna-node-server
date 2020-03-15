@@ -160,12 +160,17 @@ export class TenantHelper {
   static async tenantSupport(fullModelName: string, roles: Role[]): Promise<boolean> {
     const isTenantEntity = await this.isTenantEntity(fullModelName);
     const hasTenantRoles = await this.hasTenantRole(roles);
+    // logger.verbose(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
     return isTenantEntity && hasTenantRoles;
   }
 
   static async getTenantRoles(roles: Role[]): Promise<string[]> {
     const config = await TenantHelper.getConfig();
-    return _.remove(_.split(config.bindRoles, ','), fp.includes(_.map(roles, fp.get('name'))) as any);
+    const roleNames = _.map(roles, fp.get('name'));
+    const bindRoles = _.split(config.bindRoles, ',');
+    const results = _.compact(_.remove(bindRoles, fp.includes(roleNames) as any));
+    // logger.verbose(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
+    return results;
   }
 
   static async checkPermission(userId: string, fullModelName: string): Promise<void> {
