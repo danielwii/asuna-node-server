@@ -54,7 +54,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
       { name: 'sign', fake: 'finance.iban' },
     ],
   })
-  @Column(ColumnType.json, { nullable: true, name: 'extra' })
+  @Column(ColumnType.text(), { nullable: true, name: 'extra' })
   extra: string;
 
   @MetaInfo({
