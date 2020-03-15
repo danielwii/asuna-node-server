@@ -1,3 +1,4 @@
+import { html } from 'common-tags';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorators';
@@ -41,21 +42,19 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
 
   @MetaInfo({
     name: '附加信息',
-    type: 'StringTmpl',
-    fields: [
-      { name: 'order.id', fake: 'random.number' },
-      { name: 'order.amount', fake: 'finance.amount' },
-      { name: 'createdAt', fake: 'date.past' },
-      { name: 'callback', fake: 'internet.url' },
-      { name: 'notify', fake: 'internet.url' },
-      { name: 'method.apiKey', fake: 'internet.password' },
-      { name: 'method.merchant', fake: 'finance.account' },
-      { name: 'method.extra', help: '自定义附加信息' },
-      { name: 'sign', fake: 'finance.iban' },
-    ],
+    type: 'JSON',
+    help: html`
+      <ul>
+        <li>method: string = GET 手动发送</li>
+        <li>lowercase: boolean = true 签名大小写，默认大写</li>
+        <li>remoteSign: string = 'sign' 回掉签名位置</li>
+        <li>query: string = 'http://xxx.endpoint' 查询地址</li>
+        <li>queryBody: stringTmpl = '{}' 查询消息模版</li>
+      </ul>
+    `,
   })
-  @Column(ColumnType.text(), { nullable: true, name: 'extra' })
-  extra: string;
+  @Column(ColumnType.json, { nullable: true, name: 'extra' })
+  extra: Record<string, string | number>;
 
   @MetaInfo({
     name: '签名模版',
