@@ -3,7 +3,6 @@ import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
-import { EntityManager, TransactionManager } from 'typeorm';
 import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
@@ -12,20 +11,17 @@ import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from './
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
 export class PaymentHelper {
-  static async createOrder(
-    {
-      itemId,
-      methodId,
-      paymentInfo,
-      profileId,
-    }: {
-      itemId: string;
-      methodId: number;
-      paymentInfo: object;
-      profileId: string;
-    },
-    @TransactionManager() manager?: EntityManager,
-  ): Promise<PaymentOrder> {
+  static async createOrder({
+    itemId,
+    methodId,
+    paymentInfo,
+    profileId,
+  }: {
+    itemId: string;
+    methodId: number;
+    paymentInfo: object;
+    profileId: string;
+  }): Promise<PaymentOrder> {
     logger.log(`create order by ${r({ itemId, methodId, profileId })}`);
     // create order first
     const item = await PaymentItem.findOneOrFail(itemId);
@@ -63,6 +59,8 @@ export class PaymentHelper {
 
     if (sign?.toLowerCase() !== remoteSign?.toLowerCase()) {
       logger.error(`invalid sign ${r({ sign, remoteSign, remoteSignPath })}`);
+      transaction.status = 'error';
+      await transaction.save();
       throw new Error('failure');
     }
 
