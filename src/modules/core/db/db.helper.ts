@@ -44,6 +44,7 @@ export interface ColumnSchema {
     primaryKey?: boolean; // 是否是主键
     nullable?: boolean;
     many?: boolean; // 是否在数据关联中处在多的一端
+    relation?: 'ManyToOne' | 'ManyToMany' | 'OneToMany' | 'OneToOne';
     selectable?: string; // 关联的对象，用于拉取数据
     info?: MetaInfoOptions;
   };
@@ -427,6 +428,7 @@ export class DBHelper {
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),
           type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
+          relation: 'ManyToOne',
           info: info ? info[relation.propertyName] : undefined,
         },
       })),
@@ -442,6 +444,7 @@ export class DBHelper {
             type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
             // nullable  : relation.isNullable,
             many: true,
+            relation: 'ManyToMany',
             info: info ? info[relation.propertyName] : undefined,
           },
         }),
@@ -459,6 +462,7 @@ export class DBHelper {
             type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
             // nullable  : relation.isNullable,
             many: true,
+            relation: 'OneToMany',
             info: info ? info[relation.propertyName] : undefined,
           },
         }),
@@ -473,6 +477,7 @@ export class DBHelper {
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),
           type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
+          relation: 'OneToOne',
           info: info ? info[relation.propertyName] : undefined,
         },
       })),

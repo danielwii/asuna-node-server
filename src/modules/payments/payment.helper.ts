@@ -93,7 +93,7 @@ export class PaymentHelper {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     const signTmpl = method?.signTmpl;
-    const context = this.extraContext(transaction, method, order);
+    const context = await this.extraContext(transaction, method, order);
 
     const signed = Handlebars.compile(signTmpl)(context);
     const md5 = crypto
@@ -112,9 +112,10 @@ export class PaymentHelper {
     const bodyTmpl = method?.bodyTmpl;
 
     const { context, signed, md5sign } = await this.sign(transactionId);
-    const body = Handlebars.compile(bodyTmpl)(Object.assign(context, { md5sign }));
+    Object.assign(context, { md5sign });
+    const body = Handlebars.compile(bodyTmpl)(context);
 
-    logger.verbose(`parse body ${r({ body, context, md5sign })}`);
+    logger.verbose(`parse body ${r({ body, context })}`);
 
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ signed, payload })}`);
