@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('EntityHelper');
 
 export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (ColumnType.json === 'simple-json') {
+    if (ColumnType.JSON === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {
@@ -30,7 +30,7 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
 
 export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (ColumnType.json === 'simple-json') {
+    if (ColumnType.JSON === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {

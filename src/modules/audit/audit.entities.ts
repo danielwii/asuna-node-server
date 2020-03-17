@@ -16,15 +16,15 @@ export class AuditRecord extends AbstractBaseEntity {
   @Column({ nullable: true, length: 100 })
   action: string;
 
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   identification: any;
 
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   from: any;
 
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   to: any;
 
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   diff: any;
 }

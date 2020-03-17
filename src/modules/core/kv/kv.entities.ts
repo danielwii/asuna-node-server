@@ -46,7 +46,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   value?: any;
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   extra?: JsonMap;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define

@@ -15,10 +15,10 @@ export class PageView extends Publishable(AbstractNameEntity) {
   mainFile: string;
 
   @MetaInfo({ name: '文件', type: 'Files' })
-  @Column(ColumnType.json, { nullable: true, name: 'files' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'files' })
   files: JsonArray;
 
   @MetaInfo({ name: '图片', type: 'Images' })
-  @Column(ColumnType.json, { nullable: true, name: 'images' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'images' })
   images: JsonArray;
 }

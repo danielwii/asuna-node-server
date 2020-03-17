@@ -5,7 +5,7 @@ import { ColumnType, safeReloadArray } from '../core';
 
 export abstract class AbstractSort extends AbstractNameEntity {
   @MetaInfo({ type: 'SortPosition', accessible: 'readonly' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   positions: JsonArray;
 
   @BeforeInsert()

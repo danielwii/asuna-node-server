@@ -4,8 +4,8 @@ import { classToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
-import { DeleteResult } from 'typeorm';
-import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, Profile, r } from '../common';
+import { BaseEntity, DeleteResult } from 'typeorm';
+import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
 import { Role } from '../core/auth/auth.entities';
@@ -117,9 +117,7 @@ export abstract class RestCrudController {
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
     DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, where);
 
-    if (order) {
-      queryBuilder.orderBy(order as any);
-    }
+    if (order) queryBuilder.orderBy(order as any);
 
     const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
     logger.log(`list ${r(modelName)} with ${r({ where, normalWhere })}`);
@@ -141,12 +139,12 @@ export abstract class RestCrudController {
   @Get(':model/:id')
   async get(
     @Param('model') model: string,
-    @Param('id') id: number,
+    @Param('id') id: PrimaryKey,
     @Req() req: AnyAuthRequest,
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
-  ): Promise<any> {
+  ): Promise<BaseEntity> {
     return RestHelper.get(
       { model: DBHelper.getModelNameObject(model, this.module), id, profile, fields, relationsStr },
       req,
@@ -159,7 +157,7 @@ export abstract class RestCrudController {
     @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
     @Param('model') model: string,
-    @Param('id') id: number,
+    @Param('id') id: PrimaryKey,
   ): Promise<DeleteResult> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
@@ -180,22 +178,20 @@ export abstract class RestCrudController {
     @CurrentTenant() tenant: Tenant,
     @CurrentRoles() roles: Role[],
     @Param('model') model: string,
-    @Param('id') id: number,
+    @Param('id') id: PrimaryKey,
     @Body() updateTo: { [member: string]: any },
   ): Promise<any> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
     const whereOptions = { id };
     if (tenant) {
       await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
-      if (await TenantHelper.tenantSupport(modelName.entityName, roles)) {
-        _.assign(whereOptions, { tenant });
-      }
+      if (await TenantHelper.tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
     }
     logger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
       logger.log('update by kv...');
-      return KvHelper.update(id, updateTo.name, updateTo.type, updateTo.value);
+      return KvHelper.update(id as any, updateTo.name, updateTo.type, updateTo.value);
     }
 
     const repository = DBHelper.repo(modelName);

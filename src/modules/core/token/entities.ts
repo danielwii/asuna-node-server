@@ -72,7 +72,7 @@ export class OperationToken extends AbstractBaseEntity {
   shortId: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnType.json, { nullable: true, name: 'body' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'body' })
   body: any;
 
   @MetaInfo({ name: 'Service', help: 'web-login / app-login / opt-secret / etc.' })

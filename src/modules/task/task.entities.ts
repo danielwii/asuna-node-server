@@ -56,7 +56,7 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   state: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnType.json, { nullable: true, name: 'body' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'body' })
   body: JsonMap;
 
   // --------------------------------------------------------------
@@ -79,7 +79,7 @@ export class TaskEvent extends AbstractBaseEntity {
   message: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnType.json, { nullable: true, name: 'body' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'body' })
   body: JsonMap;
 
   @ManyToOne(

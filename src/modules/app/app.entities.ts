@@ -60,7 +60,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   description: string;
 
   @MetaInfo({ name: 'File', type: 'File' })
-  @Column(ColumnType.json, { nullable: false, name: 'paths' })
+  @Column(ColumnType.JSON, { nullable: false, name: 'paths' })
   paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })

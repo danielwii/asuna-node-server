@@ -29,7 +29,7 @@ export class Role extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: '权限', type: 'Authorities' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   authorities: JsonMap;
 
   @ManyToMany(

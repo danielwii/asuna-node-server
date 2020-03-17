@@ -2,11 +2,11 @@ import { WithPrecisionColumnType } from 'typeorm/driver/types/ColumnTypes';
 import { Global } from '../global';
 
 export class ColumnType {
-  static get money(): WithPrecisionColumnType {
+  static get MONEY(): WithPrecisionColumnType {
     return 'double precision';
   }
 
-  static get json(): 'simple-json' | 'json' | 'jsonb' {
+  static get JSON(): 'simple-json' | 'json' | 'jsonb' {
     const { dbType } = Global;
     if (dbType === 'mysql57') {
       return 'json';

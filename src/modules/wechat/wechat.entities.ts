@@ -71,7 +71,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   unionId: string;
 
   @MetaInfo({ name: '绑定ID' })
-  @Column(ColumnType.json, { nullable: true, name: 'tag_ids' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'tag_ids' })
   tagIds: JsonArray;
 
   // 用户的性别，值为1时是男性，值为2时是女性，值为0时是未知

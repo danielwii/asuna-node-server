@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -12,7 +13,7 @@ import { KeyValuePair, KvHelper } from '../kv';
 const logger = LoggerFactory.getLogger('RestHelper');
 
 export class RestHelper {
-  static async get<T extends BaseEntity | ObjectLiteral>(
+  static async get<T extends BaseEntity>(
     {
       model,
       id,
@@ -22,11 +23,12 @@ export class RestHelper {
     }: { model: ModelNameObject; id: PrimaryKey; profile?: Profile; fields?: string; relationsStr?: string | string[] },
     { user, tenant, roles }: AnyAuthRequest,
   ): Promise<T> {
+    if (!id) throw new NotFoundException();
     if (tenant) await TenantHelper.checkPermission(user.id as string, model.entityName);
-    const repository = DBHelper.repo(model);
+    const repository = DBHelper.repo<T>(model);
     const parsedFields = parseFields(fields);
 
-    logger.log(`get ${r({ profile, model, parsedFields, relationsStr })}`);
+    logger.log(`get ${r({ profile, model, id, parsedFields, relationsStr })}`);
 
     const queryBuilder = repository.createQueryBuilder(model.model);
 
@@ -36,7 +38,7 @@ export class RestHelper {
     queryBuilder.whereInIds(id);
     if (await TenantHelper.tenantSupport(model.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 
-    return (await queryBuilder.getOne()) as any;
+    return queryBuilder.getOne();
   }
 
   static async save<T extends BaseEntity | ObjectLiteral>(

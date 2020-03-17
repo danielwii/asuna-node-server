@@ -8,7 +8,7 @@ import { ColumnType } from "../core/helpers";
 @Entity('content__t_drafts')
 export class Draft extends _.flow()(AbstractBaseEntity) {
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnType.json)
+  @Column(ColumnType.JSON)
   content: JSON;
 
   @Column({ nullable: false, length: 36, name: 'ref_id' })

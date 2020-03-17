@@ -26,7 +26,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   afterLoad(entity: BaseEntity, event?: LoadEvent<BaseEntity>): Promise<any> | void {
     event.metadata.columns.forEach(column => {
-      if (column.type === ColumnType.json) {
+      if (column.type === ColumnType.JSON) {
         safeReloadJSON(entity as any, column.propertyName);
       }
     });
@@ -45,7 +45,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeInsert(event: InsertEvent<BaseEntity>): Promise<any> | void {
     event.metadata.columns.forEach(column => {
-      if (column.type === ColumnType.json) safeReloadJSON(event.entity as any, column.propertyName);
+      if (column.type === ColumnType.JSON) safeReloadJSON(event.entity as any, column.propertyName);
     });
     validateObjectSync(event.entity);
   }
@@ -54,7 +54,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
 
   beforeUpdate(event: UpdateEvent<BaseEntity>): Promise<any> | void {
     event.metadata.columns.forEach(column => {
-      if (column.type === ColumnType.json) safeReloadJSON(event.entity as any, column.propertyName);
+      if (column.type === ColumnType.JSON) safeReloadJSON(event.entity as any, column.propertyName);
     });
     validateObjectSync(event.entity);
   }

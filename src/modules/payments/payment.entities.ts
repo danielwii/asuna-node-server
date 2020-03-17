@@ -53,7 +53,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
       </ul>
     `,
   })
-  @Column(ColumnType.json, { nullable: true, name: 'extra' })
+  @Column(ColumnType.JSON, { nullable: true, name: 'extra' })
   extra: Record<string, string | number>;
 
   @MetaInfo({
@@ -123,7 +123,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   summary: string;
 
   @MetaInfo({ name: '价格' })
-  @Column(ColumnType.money, { nullable: true })
+  @Column(ColumnType.MONEY, { nullable: true })
   price: number;
 
   @MetaInfo({ name: '封面', type: 'Image' })
@@ -131,7 +131,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   cover: string;
 
   @MetaInfo({ name: '图片', type: 'Images' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   images: JsonArray;
 
   @ManyToOne(
@@ -168,11 +168,11 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   method: PaymentMethod;
 
   @MetaInfo({ name: '附加信息' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   paymentInfo: JsonMap;
 
   @MetaInfo({ name: '返回信息' })
-  @Column(ColumnType.json, { nullable: true })
+  @Column(ColumnType.JSON, { nullable: true })
   data: JsonMap;
 
   @MetaInfo({ name: '订单' })
@@ -193,7 +193,7 @@ export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity)
   }
 
   @MetaInfo({ name: '总金额' })
-  @Column(ColumnType.money, { name: 'amount' })
+  @Column(ColumnType.MONEY, { name: 'amount' })
   amount: number;
 
   @MetaInfo({ name: '状态' })
