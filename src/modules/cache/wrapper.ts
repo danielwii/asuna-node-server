@@ -1,10 +1,7 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
-import { LoggerFactory, parseJSONIfCould, promisify } from '../common';
-import { r } from '../common/helpers';
-import { RedisProvider } from '../providers';
-import { CacheManager } from './cache';
-import { CacheTTL } from './constants';
+import { LoggerFactory } from '../common';
+import { InMemoryDB } from './db';
 
 const logger = LoggerFactory.getLogger('CacheWrapper');
 
@@ -23,9 +20,12 @@ export class CacheWrapper {
 
   static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds, strategy } = opts;
-    const cacheKey = this.calcKey({ prefix, key });
+    // const cacheKey = this.calcKey({ prefix, key });
     // logger.verbose(`get cache ${cacheKey}`);
 
+    return InMemoryDB.save({ prefix, key }, opts.resolver, { expiresInSeconds, strategy });
+
+    /*
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
@@ -60,10 +60,12 @@ export class CacheWrapper {
     value = await primeToRedis();
 
     logger.debug(`value is ${r(value)}`);
-    return value;
+    return value; */
   }
 
   static async clear(opts: { prefix?: string; key: string | object }): Promise<void> {
+    return InMemoryDB.clear(opts);
+    /*
     const { key, prefix } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
     logger.verbose(`remove cache ${cacheKey}`);
@@ -71,6 +73,6 @@ export class CacheWrapper {
     if (!redis.isEnabled) {
       return CacheManager.clear(cacheKey);
     }
-    return Promise.promisify(redis.client.del).bind(redis.client)(cacheKey);
+    return Promise.promisify(redis.client.del).bind(redis.client)(cacheKey); */
   }
 }

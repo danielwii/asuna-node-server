@@ -8,6 +8,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { RedisLockProvider } from '../providers';
+import { StatsHelper } from '../stats/stats.helper';
 
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -17,7 +18,7 @@ const logger = LoggerFactory.getLogger('CronHelper');
 export class CronHelper {
   private static readonly redis = RedisLockProvider.instance;
 
-  static nextTime(cronTime: string) {
+  static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
     const next = cronParser
       .parseExpression(cronTime)
       .next()
@@ -25,10 +26,10 @@ export class CronHelper {
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
   }
 
-  static reg(
+  static reg<Value extends any>(
     operation: string,
     cronTime: string,
-    handler: () => Promise<any>,
+    handler: () => Promise<Value>,
     opts: Omit<CronJobParameters, 'cronTime' | 'onTick'> & {
       // ttl in seconds
       ttl?: number;
@@ -46,16 +47,29 @@ export class CronHelper {
       enabled
         ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch(reason => logger.error(reason))
         : handler().catch(reason => logger.error(reason));
+
     return new CronJob({
       cronTime,
       onTick: () =>
-        callPromise().finally(() =>
-          logger.verbose(`${operation} done. next: ${r({ cronTime, ...this.nextTime(cronTime) })}`),
-        ),
+        callPromise()
+          .then(value => {
+            StatsHelper.addCronSuccessEvent(operation, { cronTime, next: this.nextTime(cronTime) }).catch(reason =>
+              logger.error(`addCronSuccessEvent error: ${r(reason)}`),
+            );
+            return value;
+          })
+          .catch(reason => {
+            logger.error(`${operation} error found: ${r(reason)}`);
+            StatsHelper.addCronFailureEvent(operation, { cronTime, next: this.nextTime(cronTime) }).catch(err =>
+              logger.error(`addCronFailureEvent error: ${r(err)}`),
+            );
+          })
+          .finally(() => logger.verbose(`${operation} done. next: ${r({ cronTime, ...this.nextTime(cronTime) })}`)),
+      /*
       onComplete: () => {
         logger.verbose(`${operation} completed.`);
         if (_.isFunction(opts.onComplete)) opts.onComplete();
-      },
+      }, */
       runOnInit: false,
       ..._.omit(opts, 'ttl'),
     });
