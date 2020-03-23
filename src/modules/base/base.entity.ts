@@ -6,12 +6,12 @@ import {
   CreateDateColumn,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import { MetaInfo } from "../common/decorators/meta.decorator";
-import { fixTZ } from "../core/helpers/entity.helper";
-import { SimpleIdGenerator } from "../ids";
-import { Publishable } from "./abilities";
+  UpdateDateColumn,
+} from 'typeorm';
+import { MetaInfo } from '../common/decorators/meta.decorator';
+import { fixTZ } from '../core/helpers/entity.helper';
+import { SimpleIdGenerator } from '../ids';
+import { Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<
