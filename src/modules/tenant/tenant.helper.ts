@@ -59,6 +59,10 @@ const logger = LoggerFactory.getLogger('TenantHelper');
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
+  static async preload() {
+    return KvHelper.preload(this.kvDef);
+  }
+
   static async getConfig(): Promise<TenantConfig> {
     return CacheManager.cacheable(
       'tenant.config',
@@ -82,15 +86,6 @@ export class TenantHelper {
       },
       60,
     );
-
-    // const entities = await DBHelper.getModelsHasRelation(Tenant);
-    // const keyValues = _.assign(
-    //   {},
-    //   TenantFieldKeys,
-    //   ...entities.map(entity => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
-    // );
-    // logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
-    // return new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
   }
 
   static async info(userId: PrimaryKey): Promise<TenantInfo> {
@@ -106,17 +101,6 @@ export class TenantHelper {
     const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
       entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
-    /*
-    const recordCounts = await Promise.props<{ [name: string]: number }>(
-      _.assign(
-        {},
-        // 仅在 tenant 存在时检测数量
-        ...entities.map(entity => ({
-          [entity.entityInfo.name]: tenant ? entity.count({ tenant } as any) : Number.NaN,
-        })),
-      ),
-    );
-*/
     // 仅在 tenant 存在时检测数量
     const recordCounts = tenant
       ? await Promise.props<{ [name: string]: { total: number; published?: number } }>(
@@ -129,24 +113,14 @@ export class TenantHelper {
                 published: DBHelper.getPropertyNames(entity).includes('isPublished')
                   ? entity.count({ tenant, isPublished: true } as any)
                   : undefined,
-                // isPublished: DBHelper.getPropertyNames(entity).includes('isPublished'),
               }),
             })),
           ),
         )
       : {};
 
-    // console.log(DBHelper.getModelsHasRelation(Tenant).map(entity => console.log(entity.entityInfo)));
-    // const config = await TenantHelper.getConfig();
-    // const admin = await AdminUser.findOne(user.id, { relations: ['roles'] });
-    return Promise.props({
-      entities: _.assign({}, ...entities.map(entity => ({ [entity.entityInfo.name]: entity.entityInfo }))),
-      config,
-      // recordCounts: _.omit(recordCounts, 'wx__users', 'auth__users'),
-      recordCounts,
-      tenant,
-      roles: this.getTenantRoles(admin.roles),
-    });
+    const filtered = _.assign({}, ...entities.map(entity => ({ [entity.entityInfo.name]: entity.entityInfo })));
+    return Promise.props({ entities: filtered, config, recordCounts, tenant, roles: this.getTenantRoles(admin.roles) });
   }
 
   static async isTenantEntity(fullModelName: string): Promise<boolean> {

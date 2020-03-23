@@ -10,7 +10,7 @@ import { KvHelper, recognizeTypeValue } from './kv.helper';
 
 @Resolver()
 export class KvQueryResolver {
-  logger = LoggerFactory.getLogger('KvQueryResolver');
+  logger = LoggerFactory.getLogger(this.constructor.name);
 
   @Query()
   async kv(@Args('collection') collection: string, @Args('key') key: string, @Context() ctx): Promise<KeyValuePair> {
@@ -38,13 +38,14 @@ export class KeyValueModelResolver {
   logger = LoggerFactory.getLogger(this.constructor.name);
 
   @ResolveField()
-  async pair(@Root() model: KeyValueModel): Promise<KeyValuePair> {
+  async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
     this.logger.verbose(`load pair for ${model.id} ${r(model)}`);
     return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
       cls: KeyValueModel,
       instance: model,
       key: 'pair',
       targetCls: KeyValuePair,
+      loader: ctx.getDataLoaders().keyValuePairs,
     }).then(item => {
       // eslint-disable-next-line no-param-reassign
       [, item.value] = recognizeTypeValue(item.type, item.value);

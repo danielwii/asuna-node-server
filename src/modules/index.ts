@@ -17,6 +17,7 @@ export * from './payments';
 export * from './providers';
 export * from './core/auth/auth.module';
 export * from './core/auth/strategy/jwt.strategy';
+export * from './stats';
 export * from './store';
 export * from './task';
 export * from './tenant';

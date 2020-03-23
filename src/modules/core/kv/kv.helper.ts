@@ -346,6 +346,10 @@ export class KvHelper {
     }
   }
 
+  static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
+    return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => (await KvHelper.get(kvDef))?.value });
+  }
+
   private static async getGroupFieldsValueByFieldKV(
     kvDef: KvDef,
     fieldKey: string,

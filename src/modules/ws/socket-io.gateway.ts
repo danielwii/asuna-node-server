@@ -9,6 +9,7 @@ import {
 } from '@nestjs/websockets';
 import * as _ from 'lodash';
 import { Client, Server } from 'socket.io';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,6 +28,16 @@ export class WsHelper {
     this.server = server;
   }
 }
+
+export enum AsunaSocketEvents {
+  views = 'views',
+  rooms = 'rooms',
+  events = 'events',
+}
+
+export type AsunaSocketViewsType = number;
+export type AsunaSocketEventsType = { event: string; data: object };
+export type AsunaSocketRoomsType = { namespace; sids; rooms };
 
 @WebSocketGateway({
   namespace: 'admin',
@@ -48,16 +59,16 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       if (this.views !== this.history) {
         logger.log(`online: ${this.views}`);
         this.history = this.views;
-        this.server?.volatile.emit('views', this.views);
-        // logger.verbose(
-        //   `clients: ${r({
-        //     namespace: (this.server?.clients()).name,
-        //     sids: (this.server?.clients()).adapter.sids,
-        //     rooms: (this.server?.clients()).adapter.rooms,
-        //   })}`,
-        // );
 
         if (this.server) {
+          const rooms = {
+            namespace: this.server.clients().name,
+            sids: this.server.clients().adapter.sids,
+            rooms: this.server.clients().adapter.rooms,
+          };
+          this.server.volatile.emit('views', { count: this.views, rooms });
+          logger.verbose(`clients: ${r(rooms)}`);
+
           const id = _.head(_.keys(this.server.clients().adapter.sids));
           this.server.to(id).emit('first', 'hello world');
         }

@@ -30,13 +30,14 @@ export class UserProfileResolver {
   logger = LoggerFactory.getLogger(this.constructor.name);
 
   @ResolveField()
-  async miniAppUserInfo(@Root() profile: UserProfile): Promise<WXMiniAppUserInfo> {
+  async miniAppUserInfo(@Root() profile: UserProfile, @Context() ctx: GraphqlContext): Promise<WXMiniAppUserInfo> {
     this.logger.verbose(`load event for ${profile.id}`);
     return GraphqlHelper.resolveProperty<UserProfile, WXMiniAppUserInfo>({
       cls: UserProfile,
       instance: profile,
       key: 'miniAppUserInfo',
       targetCls: WXMiniAppUserInfo,
+      loader: ctx.getDataLoaders().wxMiniAppUserInfo,
     });
   }
 }

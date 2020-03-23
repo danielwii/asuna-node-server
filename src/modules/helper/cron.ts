@@ -8,6 +8,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { RedisLockProvider } from '../providers';
+import { StatsResult } from '../stats/stats.interface';
 import { StatsHelper } from '../stats/stats.helper';
 
 dayjs.extend(calendar);
@@ -29,7 +30,7 @@ export class CronHelper {
   static reg<Value extends any>(
     operation: string,
     cronTime: string,
-    handler: () => Promise<Value>,
+    handler: () => Promise<StatsResult<Value>>,
     opts: Omit<CronJobParameters, 'cronTime' | 'onTick'> & {
       // ttl in seconds
       ttl?: number;
@@ -52,15 +53,17 @@ export class CronHelper {
       cronTime,
       onTick: () =>
         callPromise()
-          .then(value => {
-            StatsHelper.addCronSuccessEvent(operation, { cronTime, next: this.nextTime(cronTime) }).catch(reason =>
-              logger.error(`addCronSuccessEvent error: ${r(reason)}`),
-            );
-            return value;
+          .then(result => {
+            StatsHelper.addCronSuccessEvent(operation, {
+              cronTime,
+              next: this.nextTime(cronTime),
+              ...(_.isObject(result) ? result : { value: result }),
+            }).catch(reason => logger.error(`addCronSuccessEvent error: ${r(reason)}`));
+            return result;
           })
           .catch(reason => {
             logger.error(`${operation} error found: ${r(reason)}`);
-            StatsHelper.addCronFailureEvent(operation, { cronTime, next: this.nextTime(cronTime) }).catch(err =>
+            StatsHelper.addCronFailureEvent(operation, { cronTime, next: this.nextTime(cronTime), reason }).catch(err =>
               logger.error(`addCronFailureEvent error: ${r(err)}`),
             );
           })

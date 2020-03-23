@@ -37,6 +37,7 @@ const logger = LoggerFactory.getLogger('TenantModule');
 })
 export class TenantModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
+    await TenantHelper.preload();
     logger.log(`init... ${r(await TenantHelper.getConfig())}`);
     await this.initKV();
     await this.initAC();

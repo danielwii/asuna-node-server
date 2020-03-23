@@ -1,7 +1,7 @@
 export interface CronStatsInterface {
   latestAt: Date;
   nextAt: Date;
-  message: string;
+  message?: string;
   verbose: object;
   success: number;
   failure: number;
@@ -11,4 +11,9 @@ export interface CronStatsInterface {
 export interface EventStatsInterface {
   parameters: object;
   result: object;
+}
+
+export interface StatsResult<Value extends any = any> {
+  value?: Value;
+  stats?: object;
 }
