@@ -10,7 +10,15 @@ const logger = LoggerFactory.getLogger('StatsHelper');
 export class StatsHelper {
   static prefix = 'stats';
 
-  static async addCronSuccessEvent(key: string, event) {
+  static async addErrorInfo(type: string, info): Promise<void> {
+    const key = `error-${type}`;
+    logger.log(`add error info ${r({ key, info })}`);
+    const errors = await InMemoryDB.list({ prefix: this.prefix, key });
+    logger.log(`current errors length is ${errors?.length}`);
+    await InMemoryDB.insert({ prefix: this.prefix, key }, () => Promise.resolve({ info, createdAt: new Date() }));
+  }
+
+  static async addCronSuccessEvent(key: string, event): Promise<void> {
     logger.log(`add cron success event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {
@@ -36,7 +44,7 @@ export class StatsHelper {
     }
   }
 
-  static async addCronFailureEvent(key: string, event) {
+  static async addCronFailureEvent(key: string, event): Promise<void> {
     logger.log(`add cron failure event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {

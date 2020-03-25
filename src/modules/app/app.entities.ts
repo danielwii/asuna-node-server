@@ -31,11 +31,8 @@ export class AppInfo extends Publishable(AbstractNameEntity) {
   @Column('varchar', { nullable: true, name: 'mode' })
   mode: keyof typeof Mode;
 
-  @OneToMany(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => AppRelease,
-    release => release.appInfo,
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @OneToMany((type) => AppRelease, (release) => release.appInfo)
   releases: AppRelease[];
 }
 
@@ -64,11 +61,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })
-  @ManyToOne(
-    type => AppInfo,
-    info => info.releases,
-    { onDelete: 'CASCADE' },
-  )
+  @ManyToOne((type) => AppInfo, (info) => info.releases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'app_info__id' })
   appInfo: AppInfo;
 

@@ -12,6 +12,60 @@ const isPrefixObject = (key): key is { prefix?: string; key: string | object } =
 const logger = LoggerFactory.getLogger('InMemoryDB');
 
 export class InMemoryDB {
+  static async insert<Key extends string | { prefix?: string; key: string | object }, Value extends any>(
+    key: Key,
+    resolver: () => Promise<Value>,
+    options?: { length?: number; strategy?: 'default' | 'cache-first' },
+  ): Promise<Value> {
+    const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
+    const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
+
+    const redis = RedisProvider.instance.getRedisClient(prefix);
+    // redis 未启用时使用 CacheManager
+    if (!redis.isEnabled) {
+      logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
+      const value = await resolver();
+      CacheManager.cacheable(cacheKey, async () => {
+        const saved = (await CacheManager.get(cacheKey)) as Array<Value>;
+        return [...saved, value];
+      }).catch((reason) => logger.error(reason));
+      return value;
+    }
+
+    const primeToRedis = async (): Promise<Value> => {
+      const value = await resolver();
+      if (value) {
+        // update
+        await promisify(redis.client.lpush, redis.client)(
+          cacheKey,
+          // options?.expiresInSeconds,
+          _.isString(value) ? value : JSON.stringify(value),
+        );
+      } else {
+        // remove null just in case
+        await promisify(redis.client.ltrim, redis.client)(cacheKey, 0, options?.length ?? 99);
+      }
+      return value;
+    };
+
+    return primeToRedis();
+  }
+
+  static async list<Key extends string | { prefix?: string; key: string | object }, Value extends any>(
+    key: Key,
+  ): Promise<Value[]> {
+    const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
+    const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
+
+    const redis = RedisProvider.instance.getRedisClient(prefix);
+    // redis 未启用时使用 CacheManager
+    if (!redis.isEnabled) {
+      logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix })}.`);
+      return CacheManager.get(cacheKey);
+    }
+    return Promise.promisify(redis.client.lrange).bind(redis.client)(cacheKey, 0, -1);
+  }
+
   static async get<Key extends string | { prefix?: string; key: string | object }>(key: Key) {
     const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';

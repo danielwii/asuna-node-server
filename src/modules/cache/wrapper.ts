@@ -1,6 +1,6 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
-import { LoggerFactory } from '../common';
+import { LoggerFactory } from '../common/logger/factory';
 import { InMemoryDB } from './db';
 
 const logger = LoggerFactory.getLogger('CacheWrapper');

@@ -53,6 +53,11 @@ export class CommonConditionInput {
   category?: string;
 }
 
+export type InputQuery<R extends Record<string, any> = {}> = R & {
+  category?: string;
+  [key: string]: string;
+};
+
 export class TimeConditionInput {
   @IsString()
   @IsOptional()

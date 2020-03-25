@@ -6,10 +6,11 @@ import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
+import { StatsHelper } from '../../stats/stats.helper';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
-import { r } from '../helpers';
-import { LoggerFactory } from '../logger';
+import { r } from '../helpers/utils';
+import { LoggerFactory } from '../logger/factory';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
@@ -33,10 +34,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = getRepository(model);
-      const [index] = metadata.indices.filter(i => i.name === key);
+      const [index] = metadata.indices.filter((i) => i.name === key);
       return new ValidationException(
         index.name,
-        (index.givenColumnNames as string[]).map(name => ({
+        (index.givenColumnNames as string[]).map((name) => ({
           constraints: { isUnique: `${name} must be unique` },
           property: name,
           target: { [name]: value },
@@ -146,22 +147,24 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
 
     const isGraphqlRes = !res.status;
-    logger.error(
-      `error: ${r({
-        httpStatus,
-        isGraphqlRes,
-        message,
-        body: _.omit(body, 'error.message'),
-        type: typeof exception,
-        name: exception.constructor.name,
-        isHttpException: exception instanceof HttpException,
-        isError: exception instanceof Error,
-        isAsunaException: exception instanceof AsunaException,
-      })}`,
-    );
+    const errorInfo = {
+      httpStatus,
+      isGraphqlRes,
+      message,
+      body: _.omit(body, 'error.message'),
+      type: typeof exception,
+      name: exception.constructor.name,
+      isHttpException: exception instanceof HttpException,
+      isError: exception instanceof Error,
+      isAsunaException: exception instanceof AsunaException,
+    };
+    logger.error(`error: ${r(errorInfo)}`);
+    StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+    /*
     if (exception instanceof Error && httpStatus !== 500) {
       logger.error(exception);
     }
+*/
 
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
     if (isGraphqlRes) {
