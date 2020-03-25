@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+import { CacheTTL } from '../cache/constants';
 import { InMemoryDB } from '../cache/db';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
@@ -9,20 +11,35 @@ const logger = LoggerFactory.getLogger('StatsHelper');
 
 export class StatsHelper {
   static prefix = 'stats';
+  static keys = new Set<string>();
 
   static async addErrorInfo(type: string, info): Promise<void> {
     const key = `error-${type}`;
-    logger.log(`add error info ${r({ key, info })}`);
+    this.keys.add(key);
+    logger.verbose(`add error info ${r({ key, info })}`);
     const errors = await InMemoryDB.list({ prefix: this.prefix, key });
-    logger.log(`current errors length is ${errors?.length}`);
+    logger.verbose(`current errors length is ${errors?.length}`);
     await InMemoryDB.insert({ prefix: this.prefix, key }, () => Promise.resolve({ info, createdAt: new Date() }));
+    const statsKey = `error-stats`;
+    // logger.log(`try save stats ${statsKey}`);
+    await InMemoryDB.save(
+      statsKey,
+      async (saved) => {
+        const stats = saved ?? {};
+        const newValue = _.isNumber(stats[key]) ? stats[key] + 1 : 0;
+        const newStats = { ...stats, [key]: newValue };
+        logger.verbose(`update stats ${r({ stats, newStats, key, value: stats[key], newValue })}`);
+        return newStats;
+      },
+      { expiresInSeconds: CacheTTL.WEEK },
+    );
   }
 
   static async addCronSuccessEvent(key: string, event): Promise<void> {
     logger.log(`add cron success event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {
-      logger.log(`current stat is ${r(cronStat)}`);
+      // logger.log(`current stat is ${r(cronStat)}`);
       await InMemoryDB.save({ prefix: this.prefix, key }, () =>
         Promise.resolve({
           ...cronStat,

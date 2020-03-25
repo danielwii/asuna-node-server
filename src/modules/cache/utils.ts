@@ -11,8 +11,8 @@ export class CacheUtils {
   static clear(opts: { prefix?: string; key: string | object }): void {
     logger.verbose(`clear cache ${r(opts)}`);
 
-    CacheWrapper.clear(opts).catch(reason => logger.error(reason));
-    CacheManager.clear(opts.key).catch(reason => logger.error(reason));
+    CacheWrapper.clear(opts).catch((reason) => logger.error(reason));
+    CacheManager.clear(opts.key).catch((reason) => logger.error(reason));
   }
 
   static async clearAll(): Promise<void> {
@@ -22,7 +22,7 @@ export class CacheUtils {
 
       if (!_.isEmpty(redisKeys)) {
         logger.log(`clean keys... ${r(redisKeys)}`);
-        redisKeys.forEach(key => promisify(redis.client.del, redis.client)(key));
+        redisKeys.forEach((key) => promisify(redis.client.del, redis.client)(key));
       }
     }
   }

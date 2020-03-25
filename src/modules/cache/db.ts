@@ -74,16 +74,24 @@ export class InMemoryDB {
     if (!redis.isEnabled) {
       return CacheManager.get(cacheKey);
     }
-    return Promise.promisify(redis.client.get).bind(redis.client)(cacheKey);
+    const value = await Promise.promisify(redis.client.get).bind(redis.client)(cacheKey);
+    return parseJSONIfCould(value);
   }
 
   static async save<Key extends string | { prefix?: string; key: string | object }, Value extends any>(
     key: Key,
-    resolver: () => Promise<Value>,
-    options?: { expiresInSeconds?: number; strategy?: 'default' | 'cache-first' },
+    resolver: (saved?) => Promise<Value>,
+    options?: {
+      expiresInSeconds?: number;
+      strategy?: // 优先返回缓存
+      | 'cache-only'
+        // 优先返回缓存，然后计算结果压入缓存，default
+        | 'cache-first';
+    },
   ): Promise<Value> {
     const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
+    const strategy = options?.strategy ?? 'cache-only';
 
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
@@ -92,34 +100,36 @@ export class InMemoryDB {
       return CacheManager.cacheable(cacheKey, resolver, options?.expiresInSeconds);
     }
 
-    const primeToRedis = async (): Promise<Value> => {
-      value = await resolver();
-      if (value) {
+    const primeToRedis = async (saved?): Promise<Value> => {
+      const resolved = await resolver(saved);
+      logger.verbose(`prime to redis by ${r({ cacheKey, prefix, strategy, saved /* , resolved */ })}`);
+      if (resolved) {
         // update
         await promisify(redis.client.setex, redis.client)(
           cacheKey,
-          options?.expiresInSeconds ?? CacheTTL.SHORT,
-          _.isString(value) ? value : JSON.stringify(value),
+          options?.expiresInSeconds ?? CacheTTL.LONG_24,
+          _.isString(resolved) ? resolved : JSON.stringify(resolved),
         );
       } else {
         // remove null just in case
         await promisify(redis.client.del, redis.client)(cacheKey);
       }
-      return value;
+      return resolved;
     };
-
     // redis 存在未过期的值时直接返回
-    let value = await Promise.promisify(redis.client.get).bind(redis.client)(cacheKey);
+    const value = await Promise.promisify(redis.client.get).bind(redis.client)(cacheKey);
+    // logger.verbose(`prime to redis -- ${r({ cacheKey, prefix, strategy, value })}`);
+
     if (value) {
       // when in cache-first mode will populate data to store later and return value in cache at first time
-      if (options?.strategy === 'cache-first') setTimeout(() => primeToRedis(), 0);
-      return parseJSONIfCould(value);
+      const parsed = parseJSONIfCould(value);
+      if (strategy === 'cache-first') setTimeout(() => primeToRedis(parsed), 0);
+      return parsed;
     }
 
-    value = await primeToRedis();
-
-    logger.debug(`value is ${r(value)}`);
-    return value;
+    // value = await primeToRedis();
+    // logger.verbose(`value is ${r(value)}`);
+    return primeToRedis();
   }
 
   static async clear(opts: { prefix?: string; key: string | object }): Promise<void> {

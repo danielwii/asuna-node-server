@@ -10,7 +10,7 @@ type CacheWrapperDoOptions<V> = {
   key: string | object;
   resolver: () => Promise<V>;
   expiresInSeconds?: number;
-  strategy?: 'default' | 'cache-first';
+  strategy?: 'cache-only' | 'cache-first';
 };
 
 export class CacheWrapper {
@@ -23,7 +23,7 @@ export class CacheWrapper {
     // const cacheKey = this.calcKey({ prefix, key });
     // logger.verbose(`get cache ${cacheKey}`);
 
-    return InMemoryDB.save({ prefix, key }, opts.resolver, { expiresInSeconds, strategy });
+    return InMemoryDB.save({ prefix, key }, resolver, { expiresInSeconds, strategy });
 
     /*
     const redis = RedisProvider.instance.getRedisClient(prefix);

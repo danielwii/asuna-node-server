@@ -59,7 +59,7 @@ const logger = LoggerFactory.getLogger('TenantHelper');
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
-  static async preload() {
+  static async preload(): Promise<any> {
     return KvHelper.preload(this.kvDef);
   }
 
@@ -71,8 +71,8 @@ export class TenantHelper {
         const keyValues = _.assign(
           {},
           TenantFieldKeys,
-          ...entities.map(entity => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
-          ...entities.map(entity => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
+          ...entities.map((entity) => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
+          ...entities.map((entity) => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
         // logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
         const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
@@ -99,14 +99,14 @@ export class TenantHelper {
 
     const { tenant } = admin;
     const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
-      entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
+      (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
     // 仅在 tenant 存在时检测数量
     const recordCounts = tenant
       ? await Promise.props<{ [name: string]: { total: number; published?: number } }>(
           _.assign(
             {},
-            ...entities.map(entity => ({
+            ...entities.map((entity) => ({
               [entity.entityInfo.name]: Promise.props({
                 // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
                 total: entity.count({ tenant } as any),
@@ -119,7 +119,7 @@ export class TenantHelper {
         )
       : {};
 
-    const filtered = _.assign({}, ...entities.map(entity => ({ [entity.entityInfo.name]: entity.entityInfo })));
+    const filtered = _.assign({}, ...entities.map((entity) => ({ [entity.entityInfo.name]: entity.entityInfo })));
     return Promise.props({ entities: filtered, config, recordCounts, tenant, roles: this.getTenantRoles(admin.roles) });
   }
 
@@ -142,7 +142,7 @@ export class TenantHelper {
     const config = await TenantHelper.getConfig();
     const roleNames = _.map(roles, fp.get('name'));
     const bindRoles = _.split(config.bindRoles, ',');
-    const results = _.compact(_.filter(bindRoles, role => _.includes(roleNames, role)));
+    const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
     logger.verbose(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
     return results;
   }

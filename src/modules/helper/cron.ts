@@ -20,17 +20,14 @@ export class CronHelper {
   private static readonly redis = RedisLockProvider.instance;
 
   static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
-    const next = cronParser
-      .parseExpression(cronTime)
-      .next()
-      .toDate();
+    const next = cronParser.parseExpression(cronTime).next().toDate();
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
   }
 
   static reg<Value extends any>(
     operation: string,
     cronTime: string,
-    handler: () => Promise<StatsResult<Value>>,
+    handler: () => Promise<StatsResult<Value> | null | void>,
     opts: Omit<CronJobParameters, 'cronTime' | 'onTick'> & {
       // ttl in seconds
       ttl?: number;
@@ -46,26 +43,34 @@ export class CronHelper {
     logger.verbose(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
     const callPromise = () =>
       enabled
-        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch(reason => logger.error(reason))
-        : handler().catch(reason => logger.error(reason));
+        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch((reason) => logger.error(reason))
+        : handler().catch((reason) => logger.error(reason));
 
     return new CronJob({
       cronTime,
       onTick: () =>
         callPromise()
-          .then(result => {
-            StatsHelper.addCronSuccessEvent(operation, {
-              cronTime,
-              next: this.nextTime(cronTime),
-              ...(_.isObject(result) ? result : { value: result }),
-            }).catch(reason => logger.error(`addCronSuccessEvent error: ${r(reason)}`));
+          .then((result) => {
+            if (result) {
+              const event = {
+                cronTime,
+                next: this.nextTime(cronTime),
+                ...(_.isObject(result) ? result : { value: result }),
+              };
+              // logger.verbose(`addCronSuccessEvent to ${r({ operation, event })}`);
+              StatsHelper.addCronSuccessEvent(operation, event).catch((reason) =>
+                logger.error(`addCronSuccessEvent error: ${r(reason)}`),
+              );
+            }
             return result;
           })
-          .catch(reason => {
+          .catch((reason) => {
             logger.error(`${operation} error found: ${r(reason)}`);
-            StatsHelper.addCronFailureEvent(operation, { cronTime, next: this.nextTime(cronTime), reason }).catch(err =>
-              logger.error(`addCronFailureEvent error: ${r(err)}`),
-            );
+            StatsHelper.addCronFailureEvent(operation, {
+              cronTime,
+              next: this.nextTime(cronTime),
+              reason,
+            }).catch((err) => logger.error(`addCronFailureEvent error: ${r(err)}`));
           })
           .finally(() => logger.verbose(`${operation} done. next: ${r({ cronTime, ...this.nextTime(cronTime) })}`)),
       /*

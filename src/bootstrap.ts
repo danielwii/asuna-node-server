@@ -26,6 +26,7 @@ import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
 import { Global } from './modules/core/global';
 import { TracingInterceptor } from './modules/tracing';
+import { CacheUtils } from './modules/cache/utils';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -60,6 +61,7 @@ export interface BootstrapOptions {
 }
 
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
+  await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
 

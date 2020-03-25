@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
 import { SocketIOGateway } from './socket-io.gateway';
+import { AdminWsSyncHelper } from './ws-sync.helper';
 import { WSGateway } from './ws.gateway';
 
 const logger = LoggerFactory.getLogger('WSModule');
@@ -11,5 +12,6 @@ const logger = LoggerFactory.getLogger('WSModule');
 export class WSModule implements OnModuleInit {
   onModuleInit(): void {
     logger.log('init...');
+    AdminWsSyncHelper.initCron();
   }
 }

@@ -46,7 +46,7 @@ export class TenantModule implements OnModuleInit {
   async initKV(): Promise<void> {
     const entities = _.filter(
       await DBHelper.getModelsHasRelation(Tenant),
-      entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
+      (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
 
     const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
@@ -91,7 +91,7 @@ export class TenantModule implements OnModuleInit {
               },
               models: {
                 name: '模型配置',
-                fields: entities.flatMap(entity => {
+                fields: entities.flatMap((entity) => {
                   const name = entity.entityInfo.displayName
                     ? `${entity.name} / ${entity.entityInfo.displayName}`
                     : entity.name;
@@ -120,9 +120,9 @@ export class TenantModule implements OnModuleInit {
   async initAC(): Promise<void> {
     const entities = await DBHelper.getModelsHasRelation(Tenant);
     const entityNames = entities
-      .filter(entity => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
-      .map(entity => entity.entityInfo.name);
-    AccessControlHelper.setup(ac =>
+      .filter((entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name))
+      .map((entity) => entity.entityInfo.name);
+    AccessControlHelper.setup((ac) =>
       ac
         .grant('hunter')
         .createOwn([...entityNames, ACResource.draft])

@@ -20,7 +20,7 @@ import { Hermes } from '../core/bus';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import { Store } from '../store';
-import { WsHelper } from '../ws';
+import { AdminWsHelper } from '../ws';
 import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 // eslint-disable-next-line import/no-cycle
@@ -283,12 +283,12 @@ export class WeChatHelper {
     if (admin) {
       if (admin.isActive) {
         const token = await TokenHelper.createToken(admin);
-        WsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'activated', token, username: user.nickname }));
+        AdminWsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'activated', token, username: user.nickname }));
       } else {
-        WsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'unactivated' }));
+        AdminWsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'unactivated' }));
       }
     } else {
-      WsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'invalid' }));
+      AdminWsHelper.ws.to(sid).emit(type, JSON.stringify({ type: 'invalid' }));
     }
   }
 

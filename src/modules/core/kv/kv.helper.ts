@@ -301,7 +301,7 @@ export class KvHelper {
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
       ...(key ? { key } : null),
     }).then(
-      fp.map(item => {
+      fp.map((item) => {
         // eslint-disable-next-line no-param-reassign
         [, item.value] = recognizeTypeValue(item.type, item.value);
         return item;
@@ -313,7 +313,7 @@ export class KvHelper {
     kvDef: KvDef,
     keyValues: KeyValues,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    return Promise.props(_.mapValues(keyValues, key => KvHelper.getValueByGroupFieldKV(kvDef, key)));
+    return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 
   static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
@@ -347,7 +347,8 @@ export class KvHelper {
   }
 
   static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
-    return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => (await KvHelper.get(kvDef))?.value });
+    const value = (await KvHelper.get(kvDef))?.value;
+    return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value });
   }
 
   private static async getGroupFieldsValueByFieldKV(
@@ -358,6 +359,7 @@ export class KvHelper {
       prefix: 'kv',
       key: kvDef,
       resolver: async () => (await KvHelper.get(kvDef))?.value,
+      strategy: 'cache-only',
     });
     if (!fields) return null;
 
@@ -365,8 +367,8 @@ export class KvHelper {
       value: _.get(fields.values, fieldKey),
       field: _.get(
         _.chain(fields.form)
-          .flatMap(fieldGroup => fieldGroup.fields)
-          .find(fieldDef => fieldDef.field.name === fieldKey)
+          .flatMap((fieldGroup) => fieldGroup.fields)
+          .find((fieldDef) => fieldDef.field.name === fieldKey)
           .value(),
         'field',
       ),

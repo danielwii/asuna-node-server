@@ -21,7 +21,7 @@ export class RedisConfigObject {
   enable?: boolean;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
+  @Transform((value) => !!value, { toPlainOnly: true })
   password?: string;
 
   constructor(o: Partial<RedisConfigObject>) {
@@ -61,22 +61,26 @@ export class RedisConfigObject {
       ...(this.password ? { password: this.password } : null),
       db: this.db,
       // connect_timeout: 10_000,
-      retry_strategy: options => {
+      retry_strategy: (options) => {
         if (options) {
           logger.warn(`retry_strategy ${r({ db: this.db, host: this.host, port: this.port })} ${r(options)}`);
           if (options.error && options.error.code === 'ECONNREFUSED') {
             // End reconnecting on a specific error and flush all commands with
             // a individual error
-            return new Error('The server refused the connection');
+            logger.error('The server refused the connection');
+            // return new Error('The server refused the connection');
+            return 10_000;
           }
           if (options.total_retry_time > 1000 * 60 * 60) {
             // End reconnecting after a specific timeout and flush all commands
             // with a individual error
-            return new Error('Retry time exhausted');
+            logger.error('Retry time exhausted');
+            // return new Error('Retry time exhausted');
+            return 10_000;
           }
           if (options.attempt > 10) {
             // End reconnecting with built in error
-            return undefined;
+            return 60_000;
           }
           // reconnect after
           return Math.min(options.attempt * 100, 3000);

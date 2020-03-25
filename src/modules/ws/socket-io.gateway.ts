@@ -17,7 +17,7 @@ const pkg = require('../../../package.json');
 
 const logger = LoggerFactory.getLogger('SocketIOGateway');
 
-export class WsHelper {
+export class AdminWsHelper {
   private static server: Server;
 
   static get ws(): Server {
@@ -86,7 +86,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   public afterInit(server: Server): any {
     logger.log('init...');
     // SocketIOGateway.ws.next(server);
-    WsHelper.ws = server;
+    AdminWsHelper.ws = server;
   }
 
   public handleConnection(client: Client): any {
