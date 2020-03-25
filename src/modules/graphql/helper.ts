@@ -73,6 +73,18 @@ type BaseResolveProperty<Entity extends BaseEntity> = {
   cache?: boolean | number;
 };
 
+type BaseResolvePropertyWithMapper<
+  Entity extends BaseEntity,
+  RelationEntity extends BaseEntity,
+  MixedRelationEntity
+> = {
+  cls: ClassType<Entity>;
+  instance: Entity;
+  key: keyof Entity;
+  cache?: boolean | number;
+  mapper: (item: RelationEntity) => MixedRelationEntity | Promise<MixedRelationEntity>;
+};
+
 type ResolvePropertyByTarget<RelationEntity extends BaseEntity> = {
   targetCls: ClassType<RelationEntity>;
 };
@@ -192,11 +204,7 @@ export class GraphqlHelper {
           // skip, take: query.random
         }),
       );
-      const ids: PrimaryKey[] = _.chain(randomIds)
-        .map(fp.get(primaryKey))
-        .shuffle()
-        .take(query.random)
-        .value();
+      const ids: PrimaryKey[] = _.chain(randomIds).map(fp.get(primaryKey)).shuffle().take(query.random).value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
       if (_.isEmpty(ids)) return null;
 
@@ -328,7 +336,24 @@ export class GraphqlHelper {
   public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
-  ): Promise<RelationEntity[]> {
+  ): Promise<RelationEntity[] | null>;
+  public static async resolveProperties<
+    Entity extends BaseEntity,
+    RelationEntity extends BaseEntity,
+    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
+  >(
+    opts: BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity> &
+      (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
+  ): Promise<MixedRelationEntity[] | null>;
+  public static async resolveProperties<
+    Entity extends BaseEntity,
+    RelationEntity extends BaseEntity,
+    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
+  >(
+    opts: (BaseResolveProperty<Entity> | BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>) &
+      (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
+  ): Promise<RelationEntity[] | MixedRelationEntity[] | null> {
+    const { mapper } = opts as BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>;
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
       logger.error(`no relation ${opts.key} exists in ${opts.cls.name}. list: ${relations}`);
@@ -344,11 +369,13 @@ export class GraphqlHelper {
     if (_.isEmpty(ids)) return null;
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
-      return _opts.loader.load(ids as PrimaryKey[]);
+      return _opts.loader
+        .load(ids as PrimaryKey[])
+        .then((items) => (mapper ? (Promise.map(items, mapper) as any) : items));
     }
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-    return targetRepo.findByIds(ids);
+    return targetRepo.findByIds(ids).then((items) => (mapper ? (Promise.map(items, mapper) as any) : items));
   }
 
   public static pagedResult<Entity>({
