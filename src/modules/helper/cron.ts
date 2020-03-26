@@ -8,8 +8,8 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { RedisLockProvider } from '../providers';
-import { StatsResult } from '../stats/stats.interface';
 import { StatsHelper } from '../stats/stats.helper';
+import { StatsResult } from '../stats/stats.interface';
 
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -33,7 +33,7 @@ export class CronHelper {
       ttl?: number;
     } = {},
   ): CronJob {
-    if (!configLoader.loadBoolConfig(ConfigKeys.CRON_ENABLE, true)) {
+    if (!configLoader.loadBoolConfig(ConfigKeys.CRON_ENABLE)) {
       logger.warn(`skip ${operation} cron not enabled.`);
       return null;
     }
