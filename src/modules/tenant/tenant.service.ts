@@ -12,6 +12,7 @@ import {
 import { AdminUser } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
+import { StatsResult } from '../stats';
 import { WeChatHelper, WeChatUser } from '../wechat';
 import { Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
@@ -62,6 +63,33 @@ export class TenantService {
     return admin.tenant;
   }
 
+  static async populateTenantForEntities(): Promise<StatsResult> {
+    const config = await TenantHelper.getConfig();
+    if (!config.enabled && !config.firstModelBind && !config.firstModelName) return {};
+
+    const filtered = await TenantHelper.getTenantEntities();
+    if (_.isEmpty(filtered)) return {};
+
+    const firstModelMetadata = DBHelper.getMetadata(config.firstModelName);
+
+    const stats = {};
+    await Promise.all(
+      filtered.map(async (metadata) => {
+        const [items, total] = await (metadata.target as any).findAndCount({
+          // where: { tenantId: IsNull() },
+          select: ['id', 'tenantId'],
+          relations: [_.camelCase(firstModelMetadata.name)],
+        });
+        stats[metadata.name] = total;
+        logger.verbose(`${metadata.name} items: ${total}`);
+        if (total) {
+          await Promise.all(items.map((loaded) => TenantService.populate(loaded)));
+        }
+      }),
+    );
+    return { stats };
+  }
+
   /**
    * 没有填写 tenant 的时候，
    * 1.尝试通过 {@see TenantConfig.firstModelBind} 来获取 tenant 信息。
@@ -80,19 +108,25 @@ export class TenantService {
       const entities = await DBHelper.getModelsHasRelation(Tenant);
       // logger.log(`check entities: ${entities}`);
       const modelName = entityInfo.name;
-      const hasTenantField = entities.find(o => o.entityInfo.name === modelName);
+      const hasTenantField = entities.find((o) => o.entityInfo.name === modelName);
       // 模型包含 tenant 元素
       // 只处理不包含 tenant 信息的数据，但是 FIXME 可能存在 tenant 信息和 bindModel 对不上的问题
       if (hasTenantField && !entity.tenantId) {
-        logger.log(`handle ${r(entityInfo)} ${r(entity)}`);
         const metadata = DBHelper.getMetadata(modelName);
         const relation = metadata.manyToOneRelations.find(
-          o => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
+          (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
         );
         if (!relation) {
-          // logger.error(`no relation found for ${modelName} with ${config.firstModelName}`);
           return;
         }
+        // logger.error(`no relation found for ${modelName} with ${config.firstModelName}`);
+        logger.log(
+          `handle ${r(entityInfo)} ${r({
+            entity,
+            relation: relation.propertyName,
+            firstModelName: config.firstModelName,
+          })}`,
+        );
         /*
         logger.log(
           `metadata is ${r([
@@ -112,12 +146,13 @@ export class TenantService {
           //   relations: ['tenant'],
           // });
           logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
-          if (!tenant) {
-            logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
-            // FIXME 创建租户同时需要用户，在 server 端孤立的资源没有对应的用户
-            // this.registerTenant()
-            return;
-          }
+          // 没找到关联资源的情况下移除原有的绑定
+          // if (!tenant) {
+          //   logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
+          //   // FIXME 创建租户同时需要用户，在 server 端孤立的资源没有对应的用户
+          //   // this.registerTenant()
+          //   return;
+          // }
 
           // eslint-disable-next-line no-param-reassign
           entity.tenant = tenant;

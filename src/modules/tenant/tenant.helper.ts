@@ -2,6 +2,7 @@ import { Promise } from 'bluebird';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { EntityMetadata } from 'typeorm';
 import { CacheManager } from '../cache';
 import {
   AsunaErrorCode,
@@ -61,6 +62,36 @@ export class TenantHelper {
 
   static async preload(): Promise<any> {
     return KvHelper.preload(this.kvDef);
+  }
+
+  static async getTenantEntities(): Promise<EntityMetadata[]> {
+    const config = await TenantHelper.getConfig();
+    if (!config.enabled && !config.firstModelBind) return [];
+
+    const filtered = _.flow([
+      fp.filter<EntityMetadata>(
+        (metadata) =>
+          !['kv__pairs', 'auth__users', 'auth__roles', 'wx__users', config.firstModelName].includes(
+            DBHelper.getEntityInfo(metadata)?.name,
+          ),
+      ),
+      fp.filter<EntityMetadata>((metadata) => DBHelper.getPropertyNamesByMetadata(metadata).includes('tenantId')),
+      // remove entities without direct relation
+      fp.filter<EntityMetadata>(
+        (metadata) =>
+          !!metadata.manyToOneRelations.find(
+            (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
+          ),
+      ),
+    ])(DBHelper.loadMetadatas());
+    logger.verbose(
+      `entities waiting for scan ${r({
+        filtered: filtered.length,
+        entityNames: _.map(filtered, fp.get('name')),
+        entityInfoNames: _.map(filtered, (metadata) => DBHelper.getEntityInfo(metadata)?.name),
+      })}`,
+    );
+    return filtered;
   }
 
   static async getConfig(): Promise<TenantConfig> {

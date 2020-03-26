@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { CronExpression } from '@nestjs/schedule';
 import * as _ from 'lodash';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
@@ -12,9 +13,11 @@ import {
   KvHelper,
   KVModelFormatType,
 } from '../core/kv';
+import { CronHelper } from '../helper';
 import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
+import { TenantService } from './tenant.service';
 
 const logger = LoggerFactory.getLogger('TenantModule');
 
@@ -41,6 +44,7 @@ export class TenantModule implements OnModuleInit {
     logger.log(`init... ${r(await TenantHelper.getConfig())}`);
     await this.initKV();
     await this.initAC();
+    await this.initCron();
   }
 
   async initKV(): Promise<void> {
@@ -129,6 +133,15 @@ export class TenantModule implements OnModuleInit {
         .readOwn([...entityNames, ACResource.draft])
         .updateOwn([...entityNames, ACResource.draft])
         .deleteOwn([...entityNames, ACResource.draft]),
+    );
+  }
+
+  async initCron(): Promise<void> {
+    CronHelper.reg(
+      'populate-tenant-for-entities',
+      CronExpression.EVERY_5_MINUTES,
+      TenantService.populateTenantForEntities,
+      { runOnInit: true, start: true },
     );
   }
 }

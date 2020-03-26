@@ -34,8 +34,8 @@ export class Role extends AbstractBaseEntity {
 
   @ManyToMany(
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => AdminUser,
-    user => user.roles,
+    (type) => AdminUser,
+    (user) => user.roles,
   )
   users: AdminUser[];
 
@@ -54,20 +54,12 @@ export class AdminUser extends AbstractTimeBasedAuthUser {
   }
 
   @MetaInfo({ name: 'Tenant' })
-  @ManyToOne(
-    type => Tenant,
-    tenant => tenant.users,
-    { onDelete: 'SET NULL' },
-  )
+  @ManyToOne((type) => Tenant, (tenant) => tenant.users, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'tennat__id' })
   tenant: Tenant;
 
   @MetaInfo({ name: '角色' })
-  @ManyToMany(
-    type => Role,
-    role => role.users,
-    { primary: true },
-  )
+  @ManyToMany((type) => Role, (role) => role.users, { primary: true })
   @JoinTable({
     name: 'auth__tr_users_roles',
     joinColumn: { name: 'user__id' },
