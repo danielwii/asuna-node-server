@@ -59,11 +59,6 @@ export interface BootstrapOptions {
   renamer?: { from: string; to: string }[];
 }
 
-const processLogger = LoggerFactory.getLogger('process');
-process.on('unhandledRejection', (reason, p) =>
-  processLogger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
-);
-
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');

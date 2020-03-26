@@ -9,7 +9,7 @@ const logger = LoggerFactory.getLogger('RedisProvider');
 
 export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
+  @Transform((value) => !!value, { toPlainOnly: true })
   client: redis.RedisClient;
 
   isEnabled: boolean;
@@ -52,18 +52,18 @@ export class RedisProvider {
     redisClientObject.client = client;
     client.on('connect', () => {
       redisClientObject.isHealthy = true;
-      logger.log(`Redis default connection open to ${r({ redisClientObject, prefix, key }, { transform: true })}`);
+      logger.log(`Redis ${key} connection open to ${r({ redisClientObject, prefix, key }, { transform: true })}`);
     });
 
-    client.on('error', err => {
+    client.on('error', (err) => {
       redisClientObject.isHealthy = false;
-      logger.error(`Redis ${configObject.db} connection error ${r(err)}`);
+      logger.error(`Redis ${key} connection error ${r(err)}`);
     });
 
     process.on('SIGINT', () => {
       client.quit((err: Error, res: string) => {
         redisClientObject.isHealthy = false;
-        logger.log(`signal: SIGINT. Redis ${configObject.db} connection disconnected ${r({ err, res })}`);
+        logger.log(`signal: SIGINT. Redis ${key} connection disconnected ${r({ err, res })}`);
         process.exit(0);
       });
     });
@@ -71,7 +71,7 @@ export class RedisProvider {
     process.on('beforeExit', () => {
       client.quit((err: Error, res: string) => {
         redisClientObject.isHealthy = false;
-        logger.log(`beforeExit. Redis default connection disconnected ${r({ err, res })}`);
+        logger.log(`beforeExit. Redis ${key} connection disconnected ${r({ err, res })}`);
       });
     });
 

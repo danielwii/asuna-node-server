@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client/client.module';
+import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
 import { ContentModule } from './content';
 import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
@@ -83,6 +84,13 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 })
 export class AdminInternalModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
+    {
+      const processLogger = LoggerFactory.getLogger('process');
+      process.on('unhandledRejection', (reason, p) =>
+        processLogger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
+      );
+    }
+
     logger.log('init...');
     await this.initConstants();
   }
