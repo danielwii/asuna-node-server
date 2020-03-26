@@ -30,7 +30,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
    */
   constructor(@InjectConnection() private readonly connection: Connection) {
     super(
-      UserProfile.getRepository(),
+      connection.getRepository(UserProfile),
       /* 历史 User 对象的认证数据已经迁移到了 UserProfile 中
       ((): Repository<AdminUser> => {
         // 获得用户继承的 AbstractAuthUser
