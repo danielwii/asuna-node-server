@@ -12,7 +12,7 @@ export enum PubSubChannels {
 
 export class PubSubHelper {
   static async publish(channel: string, payload: string | object) {
-    const redis = RedisProvider.instance.getRedisClient('pub-sub-publisher');
+    const redis = RedisProvider.instance.getRedisClient('pub_sub_publisher');
     if (!redis.isEnabled) return Promise.resolve();
 
     logger.log(`publish ... ${r({ channel, payload })}`);
@@ -21,7 +21,7 @@ export class PubSubHelper {
   }
 
   static subscribe<T>(...channels: string[]): Subject<T> {
-    const redis = RedisProvider.instance.getRedisClient('pub-sub-subscriber');
+    const redis = RedisProvider.instance.getRedisClient('pub_sub_subscriber');
     const subscription = new Subject<T>();
     if (redis.isEnabled) {
       logger.log(`subscribe ... ${channels}`);

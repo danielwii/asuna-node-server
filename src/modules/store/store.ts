@@ -14,7 +14,7 @@ export class Store {
   public static readonly Global = new Store('global');
 
   constructor(prefix: string) {
-    this.prefix = `store:${prefix}`;
+    this.prefix = `store_${prefix}`;
 
     this.redis = RedisProvider.instance.getRedisClient(this.prefix);
     this.redisMode = this.redis.isEnabled;

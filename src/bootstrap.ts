@@ -14,11 +14,9 @@ import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection } from 'typeorm';
 
-// add condition function in typeorm find
-import './typeorm.fixture';
-
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
+import { CacheUtils } from './modules/cache/utils';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, LoggerHelper } from './modules/common/logger';
 import { LoggerConfigObject } from './modules/common/logger/config';
@@ -26,7 +24,8 @@ import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
 import { Global } from './modules/core/global';
 import { TracingInterceptor } from './modules/tracing';
-import { CacheUtils } from './modules/cache/utils';
+// add condition function in typeorm find
+import './typeorm.fixture';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -59,6 +58,11 @@ export interface BootstrapOptions {
   context?: IAsunaContextOpts;
   renamer?: { from: string; to: string }[];
 }
+
+const processLogger = LoggerFactory.getLogger('process');
+process.on('unhandledRejection', (reason, p) =>
+  processLogger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
+);
 
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
   await CacheUtils.clearAll();
