@@ -43,7 +43,7 @@ export class RedisLockProvider {
             retryJitter: 200, // time in ms
           },
         );
-        this.redLock.on('clientError', err => logger.error('A redis error has occurred:', err));
+        this.redLock.on('clientError', (err) => logger.error('A redis error has occurred:', err));
       }
 
       process.on('SIGINT', () => {
@@ -94,27 +94,27 @@ export class RedisLockProvider {
 
     // eslint-disable-next-line consistent-return
     return this.redLock.lock(resource, ttl).then(
-      lock => {
+      (lock) => {
         logger.verbose(`lock ${resource}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
         return handler()
           .then(
-            value => {
+            (value) => {
               logger.debug(`release lock: ${resource}, result is ${r(value)}`);
               return value;
             },
-            reason => logger.warn(`execute handler:${handler} error: ${reason}`),
+            (reason) => logger.error(`execute handler:${handler} error: ${reason}`),
           )
-          .catch(reason => logger.warn(`execute handler:${handler} error: ${reason}`))
+          .catch((reason) => logger.error(`execute handler:${handler} error: ${reason}`))
           .finally(() =>
             lock
               .unlock()
-              .catch(err => {
-                logger.warn(`unlock ${resource} error: ${err}`);
+              .catch((err) => {
+                logger.error(`unlock ${resource} error: ${err}`);
               })
               .finally(() => logger.verbose(`unlock ${resource}`)),
           );
       },
-      err => logger.warn(`get ${resource} lock error: ${err}`),
+      (err) => logger.error(`get ${resource} lock error: ${err}`),
     );
   }
 }
