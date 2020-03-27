@@ -138,10 +138,16 @@ export class TenantModule implements OnModuleInit {
 
   async initCron(): Promise<void> {
     CronHelper.reg(
-      'populate-tenant-for-entities',
+      'populate-tenant-for-entities-with-no-tenant',
       CronExpression.EVERY_5_MINUTES,
-      TenantService.populateTenantForEntities,
+      TenantService.populateTenantForEntitiesWithNoTenant,
       { runOnInit: true, start: true },
+    );
+    CronHelper.reg(
+      'populate-tenant-for-entities-with-old-tenant',
+      CronExpression.EVERY_10_MINUTES,
+      TenantService.populateTenantForEntitiesWithOldTenant,
+      { runOnInit: true, start: true, ttl: 120_000 },
     );
   }
 }
