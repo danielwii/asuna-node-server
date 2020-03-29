@@ -18,15 +18,8 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   // Relations
   // --------------------------------------------------------------
 
-  // @OneToOne(type => AdminUser)
-  // @JoinColumn({ name: 'admin__id' })
-  // admin?: AdminUser;
-
   @MetaInfo({ name: '管理员' })
-  @OneToMany(
-    type => AdminUser,
-    admin => admin.tenant,
-  )
+  @OneToMany((type) => AdminUser, (admin) => admin.tenant)
   users: AdminUser[];
 }
 
@@ -38,7 +31,7 @@ export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
     tenantId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
-    @ManyToOne(type => Tenant)
+    @ManyToOne((type) => Tenant)
     @JoinColumn({ name: 'tenant__id' })
     tenant?: Tenant;
   }

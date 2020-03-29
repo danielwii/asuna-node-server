@@ -27,7 +27,7 @@ export class CronHelper {
   static reg<Value extends any>(
     operation: string,
     cronTime: string,
-    handler: () => Promise<StatsResult<Value> | null | void>,
+    handler: () => Promise<StatsResult<Value> | any>,
     opts: Omit<CronJobParameters, 'cronTime' | 'onTick'> & {
       // ttl in seconds
       ttl?: number;
@@ -79,6 +79,7 @@ export class CronHelper {
         if (_.isFunction(opts.onComplete)) opts.onComplete();
       }, */
       runOnInit: false,
+      start: true,
       ..._.omit(opts, 'ttl'),
     });
   }

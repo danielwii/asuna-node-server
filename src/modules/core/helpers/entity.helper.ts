@@ -49,7 +49,7 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
 
 export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach(column => {
-    if (entity && column /* && ColumnType.json === 'simple-json' */) {
+    if (entity && column /* && ColumnType.JSON === 'simple-json' */) {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {

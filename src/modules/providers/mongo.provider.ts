@@ -7,7 +7,7 @@ import { MongoConfigObject } from './mongo.config';
 const logger = LoggerFactory.getLogger('MongoProvider');
 
 export class MongoProvider {
-  static module(): DynamicModule {
+  static forRootAsync(): DynamicModule {
     return MongooseModule.forRootAsync({
       useFactory: () => {
         const configObject = MongoConfigObject.load();

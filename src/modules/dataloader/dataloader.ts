@@ -23,7 +23,7 @@ export interface DataLoaderFunction<Entity extends BaseEntity> {
 }
 
 function resolveIds(ids: PrimaryKey[], primaryKey: PrimaryKey) {
-  return entities => ids.map(id => entities.find(entity => (entity ? entity[primaryKey] === id : false)));
+  return (entities) => ids.map((id) => entities.find((entity) => (entity ? entity[primaryKey] === id : false)));
 }
 
 function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Entity>): DataLoaderFunction<Entity> {
@@ -42,7 +42,7 @@ export function loader<Entity extends BaseEntity>(
   opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
-    cachedDataLoader(entity.name, ids => {
+    cachedDataLoader(entity.name, (ids) => {
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
       return entity
         .findByIds(ids, {
@@ -129,12 +129,12 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   }
 */
   return new DataLoader(
-    ids => {
+    (ids) => {
       logger.verbose(`dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     {
-      batchScheduleFn: callback => setTimeout(callback, 10),
+      batchScheduleFn: (callback) => setTimeout(callback, 10),
       cacheMap: {
         get: (id: string) => {
           // const cachedObject = await client.get({ segment, id });
@@ -180,7 +180,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           logger.log(`delete (${segment}:${id})`);
           const key = `${segment}-${id}`;
           cacheMap.delete(key);
-          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch(reason =>
+          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch((reason) =>
             logger.error(reason),
           );
           // return client.drop({ segment, id });
@@ -188,7 +188,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
         clear: () => {
           // logger.log(`clear (${segment})`);
           cacheMap.clear();
-          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch(reason => logger.error(reason));
+          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch((reason) => logger.error(reason));
           // return logger.warn('not implemented.');
         },
       },
@@ -198,11 +198,11 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
 
 export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
   return new DataLoader(
-    ids => {
+    (ids) => {
       logger.verbose(`per-request dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
-    { batchScheduleFn: callback => setTimeout(callback, 10), cacheMap: new LRUMap(100) },
+    { batchScheduleFn: (callback) => setTimeout(callback, 10), cacheMap: new LRUMap(100) },
   );
 }
 
@@ -219,18 +219,18 @@ export function resolveRelationsFromInfo(
 
   try {
     const locations = path.split('.');
-    const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
+    const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
     if (fieldNode == null) return false;
 
     let selectionNode;
-    _.times(locations.length - 1).forEach(index => {
+    _.times(locations.length - 1).forEach((index) => {
       selectionNode = (selectionNode || fieldNode).selectionSet.selections.find(
-        node => (node as any).name.value === locations[index + 1],
+        (node) => (node as any).name.value === locations[index + 1],
       );
     });
     const relations = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
-      .filter(node => node.selectionSet)
-      .map(node => node.name.value);
+      .filter((node) => node.selectionSet)
+      .map((node) => node.name.value);
     logger.verbose(`resolved relations ${r({ path, relations })}`);
     return { relations };
   } catch (error) {
@@ -245,19 +245,19 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
 
   try {
     const locations = path.split('.');
-    const fieldNode = info.fieldNodes.find(node => node.name.value === locations[0]);
+    const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
 
     if (fieldNode == null) return null;
 
     let selectionNode;
-    _.times(locations.length - 1).forEach(index => {
+    _.times(locations.length - 1).forEach((index) => {
       selectionNode = (selectionNode || fieldNode).selectionSet.selections.find(
-        node => (node as any).name.value === locations[index + 1],
+        (node) => (node as any).name.value === locations[index + 1],
       );
     });
     const selects = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
-      .filter(node => !node.selectionSet)
-      .map(node => node.name.value);
+      .filter((node) => !node.selectionSet)
+      .map((node) => node.name.value);
     logger.verbose(`resolved selects ${r({ path, selects })}`);
     return selects;
   } catch (error) {
@@ -265,15 +265,14 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
     return null;
   }
 }
+export const resolveFieldsByPagedMixInfo = <Entity>(entity: ObjectType<Entity>, info: GraphQLResolveInfo) => ({
+  mixedFields: resolveSelectsFromInfo(info, `${info.fieldName}.items`),
+  relations: resolveRelationsFromInfo(info, `${info.fieldName}.items`),
+  select: DBHelper.filterSelect(entity, resolveSelectsFromInfo(info, `${info.fieldName}.items.origin`)),
+});
 
-export function resolveFieldsByPagedMixInfo<Entity>(
-  entity: ObjectType<Entity>,
-  info: GraphQLResolveInfo,
-  path: string,
-) {
-  return {
-    mixedFields: resolveSelectsFromInfo(info, `${path}.items`),
-    relations: resolveRelationsFromInfo(info, `${path}.items`),
-    select: DBHelper.filterSelect(entity, resolveSelectsFromInfo(info, `${path}.items.origin`)),
-  };
-}
+export const resolveFieldsByPagedInfo = <Entity>(entity: ObjectType<Entity>, info: GraphQLResolveInfo) => ({
+  // mixedFields: resolveSelectsFromInfo(info, `${path}.items`),
+  relations: resolveRelationsFromInfo(info, `${info.fieldName}.items`),
+  select: DBHelper.filterSelect(entity, resolveSelectsFromInfo(info, `${info.fieldName}.items`)),
+});

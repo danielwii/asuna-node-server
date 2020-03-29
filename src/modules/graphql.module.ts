@@ -101,7 +101,7 @@ export class GraphqlModule implements OnModuleInit {
           ]),
           formatResponse: response => {
             if (response.errors) {
-              logger.warn(`response: ${r(response.errors)}`);
+              logger.error(`response: ${r(response.errors)}`);
             }
             // logger.debug(`response: ${r(response.data)}`);
             return response;
