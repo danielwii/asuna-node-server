@@ -1,7 +1,6 @@
 import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
-import { RegisteredLoaders } from 'server/src/domains/dataloaders';
 import { r } from '../common/helpers/utils';
 import { Pageable } from '../core/helpers';
 import { GraphqlContext, resolveFieldsByPagedInfo } from '../dataloader';
@@ -22,7 +21,7 @@ export class FeedbackQueryResolver extends QueryResolver {
   @named
   async api_paged_feedback(
     @Args('pageRequest') pageRequest: PageRequestInput,
-    @Context() ctx: GraphqlContext<RegisteredLoaders>,
+    @Context() ctx: GraphqlContext,
     @Info() info: GraphQLResolveInfo,
     funcName?: string,
   ): Promise<Pageable<Feedback>> {
