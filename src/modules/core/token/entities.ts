@@ -19,7 +19,7 @@ export const OperationTokenType = {
   // Any: 'Any',
 };
 
-@EntityMetaInfo({ name: 'sys_operation_tokens' })
+@EntityMetaInfo({ name: 'sys_operation_tokens', internal: true })
 @Entity('sys__t_operation_tokens')
 export class OperationToken extends AbstractBaseEntity {
   @MetaInfo({

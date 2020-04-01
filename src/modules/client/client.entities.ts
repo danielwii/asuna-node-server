@@ -2,7 +2,7 @@ import { BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryCol
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity } from '../base';
 
-@EntityMetaInfo({ name: 'client__users' })
+@EntityMetaInfo({ name: 'client__users', internal: true })
 @Entity('client__t_users')
 export class ClientUser extends BaseEntity {
   @PrimaryColumn({ length: 36 })

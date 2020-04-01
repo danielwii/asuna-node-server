@@ -4,7 +4,7 @@ import { AbstractBaseEntity } from "../base";
 import { EntityMetaInfo, MetaInfo } from "../common/decorators";
 import { ColumnType } from "../core/helpers";
 
-@EntityMetaInfo({ name: 'content__drafts' })
+@EntityMetaInfo({ name: 'content__drafts', internal: true })
 @Entity('content__t_drafts')
 export class Draft extends _.flow()(AbstractBaseEntity) {
   @MetaInfo({ name: 'Body' })

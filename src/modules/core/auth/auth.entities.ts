@@ -7,7 +7,7 @@ import { ColumnType } from '../helpers/column.helper';
 import { safeReloadObject } from '../helpers/entity.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
-@EntityMetaInfo({ name: 'auth__api_keys' })
+@EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
 export class AdminApiKeys extends Publishable(AbstractNameEntity) {
   @Column({ nullable: true, name: 'app_key' })
@@ -17,7 +17,7 @@ export class AdminApiKeys extends Publishable(AbstractNameEntity) {
   appSecret?: string;
 }
 
-@EntityMetaInfo({ name: 'auth__roles' })
+@EntityMetaInfo({ name: 'auth__roles', internal: true })
 @Entity('auth__t_roles')
 export class Role extends AbstractBaseEntity {
   @MetaInfo({ name: '名称' })
@@ -46,7 +46,7 @@ export class Role extends AbstractBaseEntity {
   }
 }
 
-@EntityMetaInfo({ name: 'auth__users' })
+@EntityMetaInfo({ name: 'auth__users', internal: true })
 @Entity('auth__t_users')
 export class AdminUser extends AbstractTimeBasedAuthUser {
   constructor() {

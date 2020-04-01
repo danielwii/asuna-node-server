@@ -16,6 +16,10 @@ export type EntityMetaInfoOptions = {
    */
   displayName?: string;
   /**
+   * 一个简单的标记位
+   */
+  internal?: boolean;
+  /**
    * 用于声明 STI 的类型信息
    */
   sti?: {

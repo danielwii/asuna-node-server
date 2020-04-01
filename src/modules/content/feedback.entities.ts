@@ -10,7 +10,7 @@ import {
   FeedbackStatusType,
 } from './enum-values';
 
-@EntityMetaInfo({ name: 'content__feedback' })
+@EntityMetaInfo({ name: 'content__feedback', internal: true })
 @Entity('content__t_feedback')
 export class Feedback extends InjectUserProfile(AbstractBaseEntity) {
   @MetaInfo({ name: 'name' })
@@ -33,6 +33,7 @@ export class Feedback extends InjectUserProfile(AbstractBaseEntity) {
   @Column('varchar', { nullable: false, length: 20, name: 'status' })
   status: FeedbackStatusType;
 
+  @MetaInfo({ name: '回复' })
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   @OneToMany((type) => FeedbackReply, (reply) => reply.feedback)
   replies: FeedbackReply[];
@@ -44,7 +45,7 @@ export class Feedback extends InjectUserProfile(AbstractBaseEntity) {
   }
 }
 
-@EntityMetaInfo({ name: 'content__feedback_replies' })
+@EntityMetaInfo({ name: 'content__feedback_replies', internal: true })
 @Entity('content__t_feedback_replies')
 export class FeedbackReply extends AbstractBaseEntity {
   @Column({ nullable: false, length: 36, name: 'ref_id' })

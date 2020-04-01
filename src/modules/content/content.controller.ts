@@ -1,12 +1,13 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { Promise } from 'bluebird';
-import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 import { JsonArray } from '../common/decorators';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { Feedback, FeedbackReply } from './feedback.entities';
+import { FeedbackReplyBody } from './feedback.interface';
 
 class CreateFeedbackDto {
   @IsString()
@@ -16,15 +17,6 @@ class CreateFeedbackDto {
   @IsArray()
   @IsOptional()
   images?: JsonArray;
-  @IsString()
-  description: string;
-}
-
-class FeedbackReplyBody {
-  @IsInt()
-  feedbackId: number;
-  @IsArray()
-  images: JsonArray;
   @IsString()
   description: string;
 }
@@ -43,12 +35,16 @@ export class ContentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('feedback/reply')
-  async addFeedbackReply(@Body() body: FeedbackReplyBody, @Req() req: JwtAuthRequest): Promise<FeedbackReply> {
+  @Post('feedback/:feedbackId/reply')
+  async addFeedbackReply(
+    @Param('feedbackId') feedbackId: number,
+    @Body() body: FeedbackReplyBody,
+    @Req() req: JwtAuthRequest,
+  ): Promise<FeedbackReply> {
     const { user } = req;
-    logger.log(`save feedback reply ${r(body)}`);
+    logger.log(`save feedback reply ${r({ feedbackId, body })}`);
     const feedbackReply = FeedbackReply.create({
-      feedback: { id: body.feedbackId },
+      feedback: { id: feedbackId },
       description: body.description,
       refId: user.id,
       images: body.images,

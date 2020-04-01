@@ -6,7 +6,7 @@ import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
 import { ColumnType } from '../core/helpers';
 
-@EntityMetaInfo({ name: 'sys__tasks' })
+@EntityMetaInfo({ name: 'sys__tasks', internal: true })
 @Entity('sys__t_tasks')
 export class TaskRecord extends AbstractTimeBasedBaseEntity {
   constructor() {
@@ -71,7 +71,7 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   events: TaskEvent[];
 }
 
-@EntityMetaInfo({ name: 'sys__task_events' })
+@EntityMetaInfo({ name: 'sys__task_events', internal: true })
 @Entity('sys__t_task_events')
 export class TaskEvent extends AbstractBaseEntity {
   @MetaInfo({ name: 'message' })

@@ -20,7 +20,7 @@ export const Mode = {
   STANDALONE: 'STANDALONE',
 };
 
-@EntityMetaInfo({ name: 'app__infos' })
+@EntityMetaInfo({ name: 'app__infos', internal: true })
 @Entity('app__t_infos')
 export class AppInfo extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '唯一识别 Key' })
@@ -36,7 +36,7 @@ export class AppInfo extends Publishable(AbstractNameEntity) {
   releases: AppRelease[];
 }
 
-@EntityMetaInfo({ name: 'app__releases' })
+@EntityMetaInfo({ name: 'app__releases', internal: true })
 @Entity('app__t_releases')
 export class AppRelease extends Publishable(AbstractBaseEntity) {
   @Column({ nullable: false, length: 10, name: 'version_code' })

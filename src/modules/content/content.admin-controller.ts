@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Promise } from 'bluebird';
 import { IsDefined, IsObject, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -10,6 +11,9 @@ import { RestHelper } from '../core/rest/rest.helper';
 import { AnyAuthRequest } from '../helper/interfaces';
 import { TenantHelper } from '../tenant';
 import { Draft } from './draft.entities';
+import { FeedbackSenderEnumValue } from './enum-values';
+import { FeedbackReply } from './feedback.entities';
+import { FeedbackReplyBody } from './feedback.interface';
 
 class CreateDraftDto {
   @IsObject()
@@ -132,5 +136,24 @@ export class ContentAdminController {
     logger.log(`update ${r({ modelNameObject, primaryKey, isTenantEntity })}`);
     await DBHelper.repo(modelNameObject.entityName).update(draft.refId, { ...draft.content, isPublished: true });
     await Draft.delete(draft.id);
+  }
+
+  @UseGuards(AnyAuthGuard)
+  @Post('feedback/:feedbackId/reply')
+  async addFeedbackReply(
+    @Param('feedbackId') feedbackId: number,
+    @Body() body: FeedbackReplyBody,
+    @Req() req: AnyAuthRequest,
+  ): Promise<FeedbackReply> {
+    const { user } = req;
+    logger.log(`save feedback reply ${r({ feedbackId, body })}`);
+    const feedbackReply = FeedbackReply.create({
+      feedback: { id: feedbackId },
+      description: body.description,
+      refId: user.id,
+      images: body.images,
+      senderType: FeedbackSenderEnumValue.types.admin,
+    });
+    return FeedbackReply.save(feedbackReply);
   }
 }

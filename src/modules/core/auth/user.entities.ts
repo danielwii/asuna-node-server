@@ -5,7 +5,7 @@ import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
-@EntityMetaInfo({ name: 'auth__user_profiles' })
+@EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
 @Entity('auth__t_user_profiles')
 export class UserProfile extends AbstractTimeBasedAuthUser {
   constructor() {

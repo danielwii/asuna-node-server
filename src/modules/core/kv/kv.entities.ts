@@ -22,7 +22,7 @@ export enum KeyValueType {
   video = 'video',
 }
 
-@EntityMetaInfo({ name: 'kv__pairs' })
+@EntityMetaInfo({ name: 'kv__pairs', internal: true })
 @Entity('kv__t_pairs')
 export class KeyValuePair extends AbstractBaseEntity {
   @MetaInfo({ name: 'Collection' })
@@ -59,7 +59,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   }
 }
 
-@EntityMetaInfo({ name: 'kv__models' })
+@EntityMetaInfo({ name: 'kv__models', internal: true })
 @Entity('kv__t_models')
 export class KeyValueModel extends Publishable(AbstractNameEntity) {
   @MetaInfo({ accessible: 'hidden' })

@@ -1,8 +1,9 @@
 import { AppInfo } from '../app/app.entities';
+import { Feedback, FeedbackReply } from '../content/feedback.entities';
 import { UserProfile } from '../core/auth';
-import { KeyValueModel, KeyValuePair } from "../core/kv/kv.entities";
+import { KeyValueModel, KeyValuePair } from '../core/kv/kv.entities';
 import { PaymentItem, PaymentMethod } from '../payments';
-import { WXMiniAppUserInfo } from "../wechat/wechat.entities";
+import { WXMiniAppUserInfo } from '../wechat/wechat.entities';
 import { DataLoaderFunction, loader } from './dataloader';
 
 export type DefaultRegisteredLoaders = {
@@ -13,6 +14,8 @@ export type DefaultRegisteredLoaders = {
   appInfos: DataLoaderFunction<AppInfo>;
   paymentMethods: DataLoaderFunction<PaymentMethod>;
   paymentItems: DataLoaderFunction<PaymentItem>;
+  feedback: DataLoaderFunction<Feedback>;
+  feedbackReplies: DataLoaderFunction<FeedbackReply>;
 };
 
 export const defaultDataLoaders = {
@@ -23,4 +26,6 @@ export const defaultDataLoaders = {
   appInfos: loader<AppInfo>(AppInfo, { isPublished: true }),
   paymentMethods: loader<PaymentMethod>(PaymentMethod, { isPublished: true }),
   paymentItems: loader<PaymentItem>(PaymentItem, { isPublished: true }),
+  feedback: loader<Feedback>(Feedback),
+  feedbackReplies: loader<FeedbackReply>(FeedbackReply),
 };

@@ -9,7 +9,7 @@ import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values
 /**
  * 支付方式配置
  */
-@EntityMetaInfo({ name: 'payment__methods' })
+@EntityMetaInfo({ name: 'payment__methods', internal: true })
 @Entity('payment__t_methods')
 export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   constructor() {
@@ -107,7 +107,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
 /**
  * 支付实体信息
  */
-@EntityMetaInfo({ name: 'payment__items' })
+@EntityMetaInfo({ name: 'payment__items', internal: true })
 @Entity('payment__t_items')
 export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   constructor() {
@@ -143,7 +143,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   order: any; // PaymentOrder;
 }
 
-@EntityMetaInfo({ name: 'payment__transactions', displayName: '交易' })
+@EntityMetaInfo({ name: 'payment__transactions', internal: true, displayName: '交易' })
 @Entity('payment__t_transactions')
 export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
@@ -185,7 +185,7 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   order: any; // PaymentOrder;
 }
 
-@EntityMetaInfo({ name: 'payment__orders', displayName: '订单' })
+@EntityMetaInfo({ name: 'payment__orders', internal: true, displayName: '订单' })
 @Entity('payment__t_orders')
 export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {

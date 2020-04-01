@@ -7,7 +7,7 @@ export const AuditType = {
   entity: 'entity',
 };
 
-@EntityMetaInfo({ name: 'sys__audit_records' })
+@EntityMetaInfo({ name: 'sys__audit_records', internal: true })
 @Entity('sys__t_audit_records')
 export class AuditRecord extends AbstractBaseEntity {
   @Column('varchar', { nullable: true })

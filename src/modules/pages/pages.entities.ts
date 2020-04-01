@@ -3,7 +3,7 @@ import { AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { ColumnType } from '../core/helpers';
 
-@EntityMetaInfo({ name: 'page__views' })
+@EntityMetaInfo({ name: 'page__views', internal: true })
 @Entity('page__t_views')
 export class PageView extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '绑定路径' })

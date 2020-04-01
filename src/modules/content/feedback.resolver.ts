@@ -1,12 +1,13 @@
 import { Logger, UseGuards } from '@nestjs/common';
-import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Info, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
+import { Promise } from 'bluebird';
 import { GraphQLResolveInfo } from 'graphql';
 import { r } from '../common/helpers/utils';
 import { Pageable } from '../core/helpers';
 import { GraphqlContext, resolveFieldsByPagedInfo } from '../dataloader';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, QueryResolver } from '../graphql';
 import { named } from '../helper';
-import { Feedback } from './feedback.entities';
+import { Feedback, FeedbackReply } from './feedback.entities';
 
 @Resolver()
 export class FeedbackQueryResolver extends QueryResolver {
@@ -41,5 +42,22 @@ export class FeedbackQueryResolver extends QueryResolver {
 
     this.logger.verbose(`${funcName}: ${r({ total, pageRequest })}`);
     return GraphqlHelper.pagedResult({ pageRequest, items, total });
+  }
+}
+
+@Resolver(Feedback)
+export class UserFeedbackResolver {
+  logger = new Logger(this.constructor.name);
+
+  @ResolveField('replies')
+  async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {
+    this.logger.verbose(`load replies for ${feedback.id}`);
+    return GraphqlHelper.resolveProperties<Feedback, FeedbackReply>({
+      cls: Feedback,
+      instance: feedback,
+      key: 'replies',
+      targetCls: FeedbackReply,
+      loader: ctx.getDataLoaders().feedbackReplies,
+    });
   }
 }

@@ -38,7 +38,7 @@ export class WeChatUserIdentifierHelper {
   }
 }
 
-@EntityMetaInfo({ name: 'wx__users' })
+@EntityMetaInfo({ name: 'wx__users', internal: true })
 @Entity('wx__t_users')
 export class WeChatUser extends InjectTenant(BaseEntity) {
   constructor(o: EntityConstructorObject<WeChatUser>) {
@@ -133,7 +133,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   admin?: AdminUser;
 }
 
-@EntityMetaInfo({ name: 'wx__mini_app_users', displayName: '小程序用户' })
+@EntityMetaInfo({ name: 'wx__mini_app_users', internal: true, displayName: '小程序用户' })
 @Entity('wx__t_mini_app_users')
 export class WXMiniAppUserInfo extends BaseEntity {
   @Exclude()

@@ -1,5 +1,6 @@
 type ModelSchema {
   name: String!
+  internal: Boolean
   schema: Any
 }
 

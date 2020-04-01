@@ -4,7 +4,7 @@ import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 // eslint-disable-next-line import/no-cycle
 import { AdminUser } from '../core/auth/auth.entities';
 
-@EntityMetaInfo({ name: 'sys__tenants' })
+@EntityMetaInfo({ name: 'sys__tenants', internal: true })
 @Entity('sys__t_tenants')
 export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   constructor() {

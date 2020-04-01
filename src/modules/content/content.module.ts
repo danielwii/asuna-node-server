@@ -2,13 +2,13 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
 import { ContentAdminController } from './content.admin-controller';
 import { ContentController } from './content.controller';
-import { FeedbackQueryResolver } from './feedback.resolver';
+import { FeedbackQueryResolver, UserFeedbackResolver } from './feedback.resolver';
 
 const logger = LoggerFactory.getLogger('ContentModule');
 
 @Module({
   imports: [],
-  providers: [FeedbackQueryResolver],
+  providers: [FeedbackQueryResolver, UserFeedbackResolver],
   exports: [],
   controllers: [ContentAdminController, ContentController],
 })
