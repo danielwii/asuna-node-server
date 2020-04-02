@@ -97,14 +97,11 @@ export class RedisLockProvider {
       (lock) => {
         logger.verbose(`lock ${resource}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
         return handler()
-          .then(
-            (value) => {
-              logger.debug(`release lock: ${resource}, result is ${r(value)}`);
-              return value;
-            },
-            (reason) => logger.error(`execute handler:${handler} error: ${reason}`),
-          )
-          .catch((reason) => logger.error(`execute handler:${handler} error: ${reason}`))
+          .then((value) => {
+            logger.debug(`release lock: ${resource}, result is ${r(value)}`);
+            return value;
+          })
+          .catch((reason) => logger.error(`execute handler:${handler} error: ${r(reason)}`))
           .finally(() =>
             lock
               .unlock()

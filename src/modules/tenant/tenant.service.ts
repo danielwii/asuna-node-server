@@ -82,7 +82,7 @@ export class TenantService {
           relations: [_.camelCase(firstModelMetadata.name)],
         });
         stats[metadata.name] = total;
-        const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)].tenantId);
+        const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
         logger.verbose(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
@@ -117,7 +117,7 @@ export class TenantService {
           relations: [_.camelCase(firstModelMetadata.name)],
         });
         stats[metadata.name] = total;
-        const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)].tenantId);
+        const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
         logger.verbose(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(

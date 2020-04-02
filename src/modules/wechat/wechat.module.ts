@@ -9,8 +9,8 @@ import {
   KVGroupFieldsValue,
   KvHelper,
   KeyValueType,
-  KVModelFormatType
-} from "../core/kv";
+  KVModelFormatType,
+} from '../core/kv';
 import { WeChatController } from './wechat.controller';
 import { WeChatFieldKeys, WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
@@ -26,8 +26,8 @@ const logger = LoggerFactory.getLogger('WeChatModule');
 export class WeChatModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
-    this.initKV();
-    this.initSubscriber();
+    await this.initKV();
+    await this.initSubscriber();
   }
 
   async initKV(): Promise<void> {
@@ -78,7 +78,7 @@ export class WeChatModule implements OnModuleInit {
   }
 
   async initSubscriber(): Promise<void> {
-    Hermes.subscribe(this.constructor.name, /^wx$/, async event => {
+    Hermes.subscribe(this.constructor.name, /^wx$/, async (event) => {
       logger.log(`subscribe event: ${r(event)}`);
       if (WXEventMessageHelper.isWXSubscribedQrSceneMessage(event.payload)) {
         const message = event.payload as WXSubscribedQrSceneMessage;

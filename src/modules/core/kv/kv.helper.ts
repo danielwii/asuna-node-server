@@ -89,7 +89,7 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
       } else if (type === KeyValueType.number) {
         newValue = +value;
       } else if (['json', 'images', 'videos'].includes(type)) {
-        newValue = toJson(value);
+        newValue = _.isString(value) ? toJson(value) : value;
       }
     }
   } else if (value === 'true' || value === 'false') {
@@ -115,6 +115,7 @@ export enum AsunaColletionPrefix {
 
 export const AsunaCollections = {
   SYSTEM_MIGRATIONS: 'system.migrations',
+  SYSTEM_EMAIL: 'system.email',
   SYSTEM_SERVER: 'system.server',
   SYSTEM_WECHAT: 'system.wechat',
   SYSTEM_DYNAMIC_ROUTER: 'system.dynamic-router',

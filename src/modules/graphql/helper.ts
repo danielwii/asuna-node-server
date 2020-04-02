@@ -26,7 +26,7 @@ import {
   resolveRelationsFromInfo,
   resolveSelectsFromInfo,
 } from '../dataloader';
-import { InputQuery, QueryConditionInput, TimeConditionInput } from './input';
+import { CategoryInputQuery, QueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -63,7 +63,7 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
 interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
   categoryRef?: keyof Entity;
   categoryCls: ClassType<AbstractCategoryEntity>;
-  query: InputQuery;
+  query: CategoryInputQuery;
 }
 
 type BaseResolveProperty<Entity extends BaseEntity> = {

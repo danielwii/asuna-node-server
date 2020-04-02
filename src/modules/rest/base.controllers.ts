@@ -110,8 +110,8 @@ export abstract class RestCrudController {
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns
-      .filter(column => column.isPrimary)
-      .map(column => column.propertyName);
+      .filter((column) => column.isPrimary)
+      .map((column) => column.propertyName);
 
     // logger.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
@@ -125,10 +125,7 @@ export abstract class RestCrudController {
 
     if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 
-    const [items, total] = await queryBuilder
-      .take(query.take)
-      .skip(query.skip)
-      .getManyAndCount();
+    const [items, total] = await queryBuilder.take(query.take).skip(query.skip).getManyAndCount();
 
     logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
 
@@ -197,7 +194,7 @@ export abstract class RestCrudController {
     const repository = DBHelper.repo(modelName);
     const relationKeys = _.merge(
       {},
-      ...repository.metadata.relations.map(relation => ({
+      ...repository.metadata.relations.map((relation) => ({
         [relation.propertyName]: _.get(relation, 'type.entityInfo.name'),
       })),
     );
@@ -205,7 +202,7 @@ export abstract class RestCrudController {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
       logger.verbose(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
-        ? (value as any[]).map(currentId => ({ [_.first(primaryKeys)]: currentId }))
+        ? (value as any[]).map((currentId) => ({ [_.first(primaryKeys)]: currentId }))
         : { [_.first(primaryKeys)]: value };
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);

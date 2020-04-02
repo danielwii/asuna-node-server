@@ -3,13 +3,14 @@ import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config/loader';
 
 export const EmailConfigKeys = {
-  EMAIL_ENABLE: 'MAIL_ENABLE',
-  EMAIL_HOST: 'MAIL_HOST',
-  EMAIL_PORT: 'MAIL_PORT',
-  EMAIL_SSL: 'MAIL_SSL',
-  EMAIL_USERNAME: 'MAIL_USERNAME',
-  EMAIL_PASSWORD: 'MAIL_PASSWORD',
-  EMAIL_FROM: 'MAIL_FROM',
+  enable: 'enable',
+  host: 'host',
+  port: 'port',
+  ssl: 'ssl',
+  username: 'username',
+  password: 'password',
+  from: 'from',
+  interval: 'interval',
 };
 
 export class EmailConfigObject {
@@ -21,6 +22,7 @@ export class EmailConfigObject {
   ssl: boolean;
   username: string;
   from: string;
+  interval: number;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
   @Transform((value) => !!value, { toPlainOnly: true })
@@ -32,11 +34,12 @@ export class EmailConfigObject {
 
   static load = (): EmailConfigObject =>
     new EmailConfigObject({
-      enable: configLoader.loadBoolConfig(EmailConfigKeys.EMAIL_ENABLE, false),
-      host: configLoader.loadConfig(EmailConfigKeys.EMAIL_HOST, 'localhost'),
-      port: configLoader.loadNumericConfig(EmailConfigKeys.EMAIL_PORT, 465),
-      ssl: configLoader.loadBoolConfig(EmailConfigKeys.EMAIL_SSL, false),
-      username: configLoader.loadConfig(EmailConfigKeys.EMAIL_USERNAME),
-      password: configLoader.loadConfig(EmailConfigKeys.EMAIL_PASSWORD),
+      enable: configLoader.loadBoolConfig(`email_${EmailConfigKeys.enable}`, false),
+      host: configLoader.loadConfig(`email_${EmailConfigKeys.host}`, 'localhost'),
+      port: configLoader.loadNumericConfig(`email_${EmailConfigKeys.port}`, 465),
+      ssl: configLoader.loadBoolConfig(`email_${EmailConfigKeys.ssl}`, false),
+      username: configLoader.loadConfig(`email_${EmailConfigKeys.username}`),
+      password: configLoader.loadConfig(`email_${EmailConfigKeys.password}`),
+      interval: configLoader.loadNumericConfig(`email_${EmailConfigKeys.interval}`, 2000),
     });
 }

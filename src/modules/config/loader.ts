@@ -1,4 +1,5 @@
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
+import { resolve } from 'path';
 import { LoggerFactory } from '../common/logger/factory';
 import { r } from '../common/helpers/utils';
 
@@ -91,6 +92,7 @@ export const ConfigKeys = {
 
 export const configLoader: ConfigLoader = createConfigLoader({
   requiredVariables: [],
+  basePath: resolve(__dirname, '../../..'),
 });
 
 // logger.log(`NODE_ENV: ${util.inspect(configLoader.loadConfigs())}`);

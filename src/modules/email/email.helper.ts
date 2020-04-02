@@ -10,9 +10,10 @@ import { concatMap, delay } from 'rxjs/operators';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
+import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
 import { MinioConfigObject, QiniuConfigObject } from '../core/storage/storage.config';
 import { StorageMode } from '../core/storage/storage.engines';
-import { EmailConfigObject } from './email.config';
+import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { MailInfo } from './email.interface';
 
 const logger = LoggerFactory.getLogger('EmailHelper');
@@ -24,6 +25,12 @@ const env = process.env.ENV;
 const TIME_INTERVAL = 2000;
 
 export class EmailHelper {
+  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'config' };
+
+  static async getConfig(): Promise<EmailConfigObject> {
+    return new EmailConfigObject(await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys));
+  }
+
   static sender = new Subject();
 
   private static sender$ = new Observable<MailInfo>((fn) => EmailHelper.sender.subscribe(fn)).pipe(
@@ -35,8 +42,8 @@ export class EmailHelper {
   private static transporter: Mail;
   private static emailTemplate: EmailTemplate;
 
-  static init(): void {
-    const config = EmailConfigObject.load();
+  static async init(): Promise<void> {
+    const config = await this.getConfig();
 
     if (config.enable) {
       logger.log(`init by ${r(config)}`);
