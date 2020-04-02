@@ -1,5 +1,6 @@
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { LoggerFactory } from '../common/logger/factory';
+import { r } from '../common/helpers/utils';
 
 const logger = LoggerFactory.getLogger('ConfigLoader');
 
@@ -53,12 +54,13 @@ export const ConfigKeys = {
 
   DEFAULT_STORAGE: 'DEFAULT_STORAGE',
 
-  MAIL_HOST: 'MAIL_HOST',
-  MAIL_PORT: 'MAIL_PORT',
-  MAIL_SSL: 'MAIL_SSL',
-  MAIL_USERNAME: 'MAIL_USERNAME',
-  MAIL_PASSWORD: 'MAIL_PASSWORD',
-  MAIL_FROM: 'MAIL_FROM',
+  // MAIL_ENABLE: 'MAIL_ENABLE',
+  // MAIL_HOST: 'MAIL_HOST',
+  // MAIL_PORT: 'MAIL_PORT',
+  // MAIL_SSL: 'MAIL_SSL',
+  // MAIL_USERNAME: 'MAIL_USERNAME',
+  // MAIL_PASSWORD: 'MAIL_PASSWORD',
+  // MAIL_FROM: 'MAIL_FROM',
 
   // WS_REDIS_HOST: 'WS_REDIS_HOST',
   // WS_REDIS_PORT: 'WS_REDIS_PORT',

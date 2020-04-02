@@ -15,6 +15,7 @@ import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
 import { DynamicRouterModule } from './dynamic-router';
+import { EmailModule } from './email/email.module';
 import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
@@ -43,6 +44,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AuthModule,
     PaymentModule,
     ContentModule,
+    EmailModule,
     ClientModule,
     KvModule,
     DBModule,

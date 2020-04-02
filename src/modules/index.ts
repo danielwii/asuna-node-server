@@ -10,6 +10,7 @@ export * from './client';
 export * from './config';
 export * from './common';
 export * from './content';
+export * from './email';
 export * from './form/form.module';
 export * from './graphql';
 export * from './helper';

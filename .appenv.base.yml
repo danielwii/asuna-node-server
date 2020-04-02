@@ -1,0 +1,172 @@
+# false, true | false
+#debug: false
+# default: info, info | debug | error
+LOGGER_LEVEL: info
+#NO_COLOR:
+#ADMIN_SECRET_KEY:
+# default: secret
+SECRET_KEY:
+# default: 5000
+PORT: 5000
+# default: 20mb ; post json 的 body 大小
+PAYLOAD_LIMIT: 200mb
+
+app:
+  # default: admin@example.com
+  SYS_ADMIN_EMAIL: admin@example.com
+  # 为空时生成随机密码
+  SYS_ADMIN_PASSWORD:
+  # default: 500
+  BATCH_SIZE:
+  FIX_TZ:
+  # --- default assets endpoint
+  ASSETS_ENDPOINT:
+  ASSETS_INTERNAL_ENDPOINT:
+  # default: http://127.0.0.1:5000
+  MASTER_ADDRESS: http://127.0.0.1:5000
+
+features:
+  # 是否开启审计模式
+  AUDIT: false
+  # ; endpoint is /swagger
+  SWAGGER: false
+  CRON_ENABLE: true
+
+uploader:
+  ENABLE: true
+  # default: 3
+  MAX_COUNT: 10
+  # default: /uploads
+  RESOURCE_PATH: /uploads
+
+graphql:
+  # default: false
+  DEBUG:
+  # default: false
+  PLAYGROUND_ENABLE:
+
+# -- sentry --
+sentry:
+  SENTRY_ENABLE:
+  SENTRY_DSN:
+
+# -- jaeger --
+jaeger:
+  ENABLED: false
+  SERVICE_NAME: my-service
+  ENDPOINT: http://localhost:14268/api/traces
+
+# --- mq ---
+mq:
+  # default: false
+  ENABLE: false
+  # default: amqp://localhost ; 存在 url 时忽略其他参数
+  URL: amqp://localhost
+  #HOST: localhost
+  #PORT: 5672
+  #PASSWORD:
+  #USERNAME:
+
+# --- redis ---
+redis:
+  ENABLE: false
+  HOST: localhost
+  PORT: 6379
+  # (Optional)
+  PASSWORD:
+  # default: 0
+  DB: 0
+  # other modules used
+  # default: 1
+  WS_REDIS_DB: 1
+  # default: 2
+  JOB_REDIS_DB: 2
+
+  # redis 部分支持设置前缀来定义多个数据源
+  #PREFIX_REDIS_ENABLE: false
+  #PREFIX_REDIS_HOST: localhost
+  #PREFIX_REDIS_PORT: 6379
+  #PREFIX_REDIS_PASSWORD:
+  #PREFIX_REDIS_DB:
+
+# --- mysql ---
+db:
+  # default: mysql57 ; mysql56 | mysql57 | postgres
+  DB_TYPE:
+  TYPEORM_SYNCHRONIZE: false
+  #TYPEORM_DEBUG: true
+  # error | true
+  TYPEORM_LOGGING: error
+  # https://github.com/typeorm/typeorm/blob/master/docs/logging.md
+  # advanced-console | simple-console | file | debug
+  TYPEORM_LOGGER: advanced-console
+
+  TYPEORM_CONNECTION: mysql
+  TYPEORM_HOST:
+  #TYPEORM_PORT:
+  TYPEORM_DATABASE: db_name
+  TYPEORM_USERNAME:
+  TYPEORM_PASSWORD:
+
+  # --- db-cache ---
+  #TYPEORM_CACHE_ALWAYS_ENABLED: true
+  # type: database
+  #TYPEORM_CACHE: database
+  #TYPEORM_TABLE_NAME: query-result-cache
+  # type: redis
+  #TYPEORM_CACHE: redis
+  #TYPEORM_CACHE_OPTIONS: {"host": "redis", "db": 0}
+  #TYPEORM_CACHE_DURATION: 60000
+  # type: ioredis/cluster
+  #TYPEORM_CACHE: ioredis/cluster
+
+# --- qiniu storage config ---
+#DEFAULT_STORAGE: qiniu
+#QINIU_ACCESS_KEY: **********
+#QINIU_SECRET_KEY: **********
+#QINIU_BUCKET_NAME: test-bucket
+#QINIU_PREFIX: /uploads/images
+#QINIU_DOMAIN: http://www.example.com
+
+#IMAGES|VIDEOS|FILES|[ANY]_STORAGE: qiniu
+#IMAGES|VIDEOS|FILES|[ANY]_QINIU_ACCESS_KEY: **********
+#IMAGES|VIDEOS|FILES|[ANY]_QINIU_SECRET_KEY: **********
+#IMAGES|VIDEOS|FILES|[ANY]_QINIU_BUCKET_NAME: test-bucket
+#IMAGES|VIDEOS|FILES|[ANY]_QINIU_PREFIX: /uploads/images
+#IMAGES|VIDEOS|FILES|[ANY]_QINIU_DOMAIN: https://www.example.com
+
+# --- local storage config ---
+#IMAGES|VIDEOS|FILES|CHUNKS_STORAGE: local|minio|qiniu
+
+storage:
+  DEFAULT_STORAGE: local
+  #IMAGES|[ANY]_STORAGE
+  #VIDEOS|[ANY]_STORAGE:
+  #FILES|[ANY]_STORAGE:
+  #CHUNKS|[ANY]_STORAGE:
+  minio:
+    # --- minio storage config ---
+    # true or false
+    ENABLE: false
+    # minio.domain.io
+    #ENDPOINT:
+    # 9000
+    PORT: 9000
+    # true or false
+    USE_SSL: false
+    #ACCESS_KEY:
+    #SECRET_KEY:
+
+# --- mail ---
+email:
+  enable: false
+  HOST:
+  PORT: 465
+  SSL: false
+  USERNAME:
+  PASSWORD:
+  FROM:
+# --------------------------------------------------------------
+# Customize
+# --------------------------------------------------------------
+
