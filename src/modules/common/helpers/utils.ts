@@ -44,8 +44,8 @@ export function r(
  * @param baseCtors
  */
 export function applyMixins(derivedCtor: any, baseCtors: any[]): void {
-  baseCtors.forEach(baseCtor => {
-    Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+  baseCtors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
       Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
     });
   });
@@ -56,12 +56,7 @@ export async function download(url: string, to: string): Promise<AxiosResponse> 
   const dir = path.resolve(to);
   const writer = fs.createWriteStream(dir);
 
-  const response = await axios({
-    url,
-    method: 'GET',
-    responseType: 'stream',
-    timeout: 60000,
-  });
+  const response = await axios({ url, method: 'GET', responseType: 'stream', timeout: 60000 });
 
   response.data.pipe(writer);
 
@@ -89,7 +84,7 @@ export function fixedPath(name: string, length = 32, pos = 0): string {
 // TODO make only safe dirs can be list
 export function traverseDir(dir: string): string[] {
   const dirs = [];
-  fs.readdirSync(dir).forEach(file => {
+  fs.readdirSync(dir).forEach((file) => {
     const fullPath = path.join(dir, file);
     if (fs.lstatSync(fullPath).isDirectory()) {
       dirs.push(...traverseDir(fullPath));

@@ -34,6 +34,6 @@ export class EmailController {
 
     EmailHelper.send(body)
       .then((value) => logger.log(`send mail done: ${r(value)}`))
-      .catch((error) => logger.error(`send mail error: ${r(error)}`));
+      .catch((error) => logger.error(error));
   }
 }

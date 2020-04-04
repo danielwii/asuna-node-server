@@ -211,7 +211,7 @@ export class WeChatHelper {
     const value = await rawBody(req);
     const json = (await Promise.promisify(xml2js.parseString)(value)) as { xml: { [key: string]: any[] } };
     logger.verbose(`parsed json is ${r(json)}`);
-    return _.mapValues(json.xml, values => (values.length === 1 ? values[0] : values)) as T;
+    return _.mapValues(json.xml, (values) => (values.length === 1 ? values[0] : values)) as T;
   }
 
   static async getTicketByType(type: WxTicketType, value: string): Promise<WxQrTicketInfo> {
@@ -257,21 +257,22 @@ export class WeChatHelper {
     return 'success';
   }
 
+  // TODO move to utils
   static parseTemplateData(data: object, context: object): TemplateData {
     const tmplData = _.assign(
       {},
       ..._.chain(data)
         .toPairs()
         .groupBy(([key]) => key.split('-')[0])
-        .map(value => {
+        .map((value) => {
           const values = _.assign({}, ...value.map(([k, v]) => ({ [k.split('-')[1]]: v })));
           return { [values.key]: _.omit(values, 'key') };
         })
         .value(),
     );
-    logger.verbose(`tmplData is ${r(tmplData)}`);
-    return _.mapValues(tmplData, tmpl =>
-      _.mapValues(tmpl, value => HandlebarsHelper.injectContext(value, context)),
+    // logger.verbose(`tmplData is ${r(tmplData)}`);
+    return _.mapValues(tmplData, (tmpl) =>
+      _.mapValues(tmpl, (value) => HandlebarsHelper.injectContext(value, context)),
     ) as any;
   }
 
@@ -450,7 +451,7 @@ export class WeChatHelper {
         },
         { ttl: 60_000 },
       )
-      .catch(reason => logger.error(reason));
+      .catch((reason) => logger.error(reason));
     logger.verbose(`access token is ${r(token)}`);
     if (!token) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');
@@ -473,7 +474,7 @@ export class WeChatHelper {
     url?: string;
     payload: TemplateData;
   }): Promise<WxSendTemplateInfo> {
-    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, url, data: payload }).then(sendInfo => {
+    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, url, data: payload }).then((sendInfo) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       sendInfo.errcode
         ? logger.error(
@@ -499,7 +500,7 @@ export class WeChatHelper {
     payload: MiniSubscribeData;
   }): Promise<SubscribeMessageInfo> {
     return WxApi.sendSubscribeMsg({ touser: openId, page, template_id: subscribeId, data: payload }).then(
-      messageInfo => {
+      (messageInfo) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         messageInfo.errcode
           ? logger.error(

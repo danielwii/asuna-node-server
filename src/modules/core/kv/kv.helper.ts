@@ -42,7 +42,7 @@ const toJson = (value): JSON => {
 
 export type KVField = {
   name: string;
-  type: 'number' | 'string' | 'text' | 'json' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'boolean';
+  type: 'number' | 'string' | 'text' | 'json' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'email-tmpl-data' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
@@ -202,6 +202,16 @@ export class KvHelper {
     if (this.enumValueConstantMapsPair) {
       await this.set(this.enumValueConstantMapsPair);
     }
+  }
+
+  static regInitializer<V = KVGroupFieldsValue>(
+    kvDef: KvDef,
+    opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
+    config: { formatType?: KVModelFormatType; noUpdate?: boolean; merge?: boolean },
+  ): void {
+    const identifier = KvDefIdentifierHelper.stringify(kvDef);
+    KvHelper.initializers[identifier] = (): Promise<KeyValuePair> => KvHelper.set<V>({ ...kvDef, ...opts }, config);
+    KvHelper.initializers[identifier]();
   }
 
   static async set<V = any>(
