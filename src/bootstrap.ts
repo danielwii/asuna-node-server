@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
-import { Connection } from 'typeorm';
+import { Connection, getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
@@ -63,6 +63,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
+
+  const dbConfig = await getConnectionOptions();
+  logger.log(`dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ****${_.get(dbConfig, 'password').slice(-4)}`);
 
   logger.log(
     `init logger: ${r({
