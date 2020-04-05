@@ -26,7 +26,7 @@ export class InMemoryDB {
       logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
       const value = await resolver();
       CacheManager.cacheable(cacheKey, async () => {
-        const saved = (await CacheManager.get(cacheKey)) as Array<Value>;
+        const saved = ((await CacheManager.get(cacheKey)) as Array<Value>) ?? [];
         return [...saved, value];
       }).catch((reason) => logger.error(reason));
       return value;

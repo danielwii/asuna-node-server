@@ -18,25 +18,25 @@ FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixtur
   if (join) {
     logger.verbose(`apply ${r(join)}`);
     if (join.leftJoin)
-      Object.keys(join.leftJoin).forEach(key => {
+      Object.keys(join.leftJoin).forEach((key) => {
         const extra = join.options?.[key] || {};
         qb.leftJoin(join.leftJoin[key], key, extra.condition, extra.parameters);
       });
 
     if (join.innerJoin)
-      Object.keys(join.innerJoin).forEach(key => {
+      Object.keys(join.innerJoin).forEach((key) => {
         const extra = join.options?.[key] || {};
         qb.innerJoin(join.innerJoin[key], key, extra.condition, extra.parameters);
       });
 
     if (join.leftJoinAndSelect)
-      Object.keys(join.leftJoinAndSelect).forEach(key => {
+      Object.keys(join.leftJoinAndSelect).forEach((key) => {
         const extra = join.options?.[key] || {};
         qb.leftJoinAndSelect(join.leftJoinAndSelect[key], key, extra.condition, extra.parameters);
       });
 
     if (join.innerJoinAndSelect)
-      Object.keys(join.innerJoinAndSelect).forEach(key => {
+      Object.keys(join.innerJoinAndSelect).forEach((key) => {
         const extra = join.options?.[key] || {};
         qb.innerJoinAndSelect(join.innerJoinAndSelect[key], key, extra.condition, extra.parameters);
       });

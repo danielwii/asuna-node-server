@@ -8,8 +8,8 @@ const logger = LoggerFactory.getLogger('DBService');
 export class DBService {
   repos(): Repository<any>[] {
     return getConnection()
-      .entityMetadatas.filter(metadata => DBHelper.isValidEntity(metadata))
-      .map(metadata => getRepository<any>(metadata.target));
+      .entityMetadatas.filter((metadata) => DBHelper.isValidEntity(metadata))
+      .map((metadata) => getRepository<any>(metadata.target));
   }
 
   get(opts: {
