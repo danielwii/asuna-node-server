@@ -95,6 +95,6 @@ export const configLoader: ConfigLoader = createConfigLoader({
   basePath: resolve(__dirname, '../../..'),
 });
 
-// logger.log(`NODE_ENV: ${util.inspect(configLoader.loadConfigs())}`);
 logger.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 logger.log(`ENV: ${process.env.ENV}`);
+// logger.log(`configs: ${r(configLoader.loadConfigs())}`);

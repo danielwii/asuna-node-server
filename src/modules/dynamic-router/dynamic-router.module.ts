@@ -1,13 +1,6 @@
 import { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
-import {
-  KeyValuePair,
-  KeyValueType,
-  KvDefIdentifierHelper,
-  KVFieldsList,
-  KvHelper,
-  KVModelFormatType,
-} from '../core/kv';
+import { KeyValueType, KVFieldsList, KvHelper, KVModelFormatType } from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
 import { DynamicRouterMiddleware } from './dynamic-router.middleware';
 
@@ -31,26 +24,22 @@ export class DynamicRouterModule implements NestModule, OnModuleInit {
   }
 
   async initKV(): Promise<void> {
-    const identifier = KvDefIdentifierHelper.stringify(DynamicRouterHelper.kvDef);
-    KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set<KVFieldsList<DynamicTextRouter>>(
-        {
-          ...DynamicRouterHelper.kvDef,
-          name: '文本路由配置',
-          type: KeyValueType.json,
-          value: {
-            type: 'list',
-            fields: [
-              { name: '路径', field: { name: DynamicRouterFieldKeys.path, type: 'string' } },
-              { name: '文本', field: { name: DynamicRouterFieldKeys.text, type: 'string' } },
-              { name: '说明', field: { name: DynamicRouterFieldKeys.description, type: 'string' } },
-            ],
-            values: [],
-          },
+    KvHelper.regInitializer<KVFieldsList<DynamicTextRouter>>(
+      DynamicRouterHelper.kvDef,
+      {
+        name: '文本路由配置',
+        type: KeyValueType.json,
+        value: {
+          type: 'list',
+          fields: [
+            { name: '路径', field: { name: DynamicRouterFieldKeys.path, type: 'string' } },
+            { name: '文本', field: { name: DynamicRouterFieldKeys.text, type: 'string' } },
+            { name: '说明', field: { name: DynamicRouterFieldKeys.description, type: 'string' } },
+          ],
+          values: [],
         },
-        { merge: true, formatType: KVModelFormatType.LIST },
-      );
-
-    KvHelper.initializers[identifier]();
+      },
+      { merge: true, formatType: KVModelFormatType.LIST },
+    );
   }
 }

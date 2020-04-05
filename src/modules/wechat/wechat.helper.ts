@@ -13,7 +13,7 @@ import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely, HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
-import { AuthedUserHelper } from '../core';
+import { AuthedUserHelper, PageHelper } from '../core';
 import { AdminUser, AuthUserChannel, TokenHelper } from '../core/auth';
 import { UserProfile } from '../core/auth/user.entities';
 import { Hermes } from '../core/bus';
@@ -221,6 +221,33 @@ export class WeChatHelper {
     });
   }
 
+  static async syncAdminUsers(): Promise<void> {
+    const config = await this.getServiceConfig();
+    logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
+    if (config.saveToAdmin) {
+      const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
+      await PageHelper.doCursorPageSeries(async (next) => {
+        const userList = await WxApi.getUserList(next);
+        logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
+        const users = userList.data.openid;
+        await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
+          const currentUserIds = _.slice(users, start, end);
+          const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
+          return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
+        });
+        await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
+        // 10000 is the max count of a request
+        return userList.count === 10000 ? userList.next_openid : null;
+      });
+    }
+  }
+
+  static async syncAdminUser(openId: string): Promise<void> {
+    const user = await WeChatHelper.updateWeChatUser(openId);
+    logger.log(`sync user '${user.openId}' to admin`);
+    return WeChatHelper.updateAdmin(user);
+  }
+
   static async handleEvent(
     message: WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage,
   ): Promise<string> {
@@ -229,16 +256,13 @@ export class WeChatHelper {
 
     if (message.MsgType === 'event' && message.Event === 'subscribe') {
       const event = message as WXSubscribeMessage;
-      const user = await this.updateWeChatUser(event.FromUserName);
 
       if (config.saveToAdmin) {
-        logger.log(`save user '${user.openId}' to admin`);
-        await this.updateAdmin(user);
+        await this.syncAdminUser(event.FromUserName);
       }
     } else if (message.MsgType === 'event' && message.Event === 'unsubscribe') {
       const event = message as WXSubscribeMessage;
-      const user = await this.updateWeChatUser(event.FromUserName);
-      await this.updateAdmin(user);
+      await this.syncAdminUser(event.FromUserName);
     } else if (message.MsgType === 'text') {
       const event = message as WXTextMessage;
     } else if (message.MsgType === 'event' && message.Event === 'SCAN') {
@@ -315,9 +339,8 @@ export class WeChatHelper {
     }
   }
 
-  static async updateWeChatUser(openId: string): Promise<WeChatUser> {
-    const userInfo = await this.getUserInfo(openId);
-    logger.log(`get user info ${r(userInfo)}`);
+  static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser> {
+    const { openid: openId } = userInfo;
     if (await WeChatUser.findOne(openId)) {
       const weChatUser = classToPlain(userInfo.toWeChatUser());
       const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
@@ -326,6 +349,12 @@ export class WeChatHelper {
       return WeChatUser.findOne(openId);
     }
     return WeChatUser.save(userInfo.toWeChatUser());
+  }
+
+  static async updateWeChatUser(openId: string): Promise<WeChatUser> {
+    const userInfo = await WeChatHelper.getUserInfo(openId);
+    logger.log(`get user info ${r(userInfo)}`);
+    return WeChatHelper.updateWeChatUserByUserInfo(userInfo);
   }
 
   static async updateUserInfo(user: Pick<UserProfile, 'id' | 'username'>, userInfo: UserInfo): Promise<void> {

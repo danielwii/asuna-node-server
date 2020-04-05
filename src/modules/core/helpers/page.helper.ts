@@ -1,6 +1,7 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
+import { LoggerFactory } from '../../common/logger';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
@@ -22,14 +23,26 @@ export interface PageRequest {
   orderBy?: { column: string; order?: Order };
 }
 
+const logger = LoggerFactory.getLogger('PageHelper');
+
 export class PageHelper {
+  static async doCursorPageSeries<T>(fn: (next?: string) => Promise<string | null>): Promise<any> {
+    const recursion = async (next?: string) => {
+      logger.verbose(`doCursorPageSeries: ${next}...`);
+      if (next) return recursion(await fn(next));
+      return null;
+    };
+    return recursion(await fn());
+  }
   static doPageSeries<T>(
     total: number,
     size: number,
-    handler: (page: number, totalPages: number) => Promise<T>,
+    handler: (params: { page: number; totalPages: number; start: number; end: number }) => Promise<T>,
   ): Promise<T[]> {
     const totalPages = Math.ceil(total / (size ?? 100));
-    return Promise.mapSeries(_.range(totalPages), page => handler(page + 1, totalPages));
+    return Promise.mapSeries(_.range(totalPages), (page) =>
+      handler({ page: page + 1, totalPages, start: size * page, end: _.min([size * (page + 1), total]) }),
+    );
   }
   static doPageSeriesWithTransaction<T>(
     total: number,
@@ -37,8 +50,8 @@ export class PageHelper {
     handler: (page: number, totalPages: number, transaction: EntityManager) => Promise<T>,
   ): Promise<T[]> {
     const totalPages = Math.ceil(total / (size ?? 100));
-    return Promise.mapSeries(_.range(totalPages), page =>
-      getManager().transaction(entityManager => handler(page + 1, totalPages, entityManager)),
+    return Promise.mapSeries(_.range(totalPages), (page) =>
+      getManager().transaction((entityManager) => handler(page + 1, totalPages, entityManager)),
     );
   }
 }

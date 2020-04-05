@@ -1,4 +1,5 @@
 import { oneLineTrim } from 'common-tags';
+import * as _ from 'lodash';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
 import * as cloud from 'wx-server-sdk';
@@ -16,6 +17,7 @@ import {
   WxQrTicketInfo,
   WxSendTemplateInfo,
   WxUserInfo,
+  WxUserList,
 } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
@@ -147,7 +149,7 @@ export class WxApi {
    * @param opts.mini 是否是小程序
    */
   static getAccessToken = (opts?: { appId?: string; appSecret?: string; mini?: boolean }): Promise<WxAccessToken> =>
-    WxApi.withConfig(config => {
+    WxApi.withConfig((config) => {
       const appId = opts?.appId || (opts.mini ? config.miniAppId : config.appId);
       const appSecret = opts?.appSecret || (opts.mini ? config.miniAppSecret : config.appSecret);
       logger.verbose(`getAccessToken for app: ${appId}`);
@@ -161,7 +163,7 @@ export class WxApi {
 
   static code2Session = (code: string): Promise<WxCodeSession> => {
     ow(code, ow.string.nonEmpty);
-    return WxApi.withMiniConfig(config =>
+    return WxApi.withMiniConfig((config) =>
       WxApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/sns/jscode2session
         ?appid=${config.miniAppId}
@@ -171,6 +173,26 @@ export class WxApi {
       ),
     );
   };
+
+  static getUserList = (nextOpenId: string): Promise<WxUserList> =>
+    WxApi.withAccessToken((config, { accessToken }) =>
+      WxApi.wrappedFetch(oneLineTrim`
+        https://api.weixin.qq.com/cgi-bin/user/get
+        ?access_token=${accessToken}
+        &next_openid=${nextOpenId}`),
+    );
+
+  static batchGetUserInfo = (openIds: string[]): Promise<{ user_info_list: WxUserInfo[] }> =>
+    WxApi.withAccessToken((config, { accessToken }) =>
+      WxApi.wrappedFetch(
+        oneLineTrim`https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=${accessToken}`,
+        {
+          method: 'post',
+          body: JSON.stringify({ user_list: _.map(openIds, (openid) => ({ openid, lang: 'zh_CN' })) }),
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+    );
 
   /**
    * https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId
@@ -183,7 +205,7 @@ export class WxApi {
         ?access_token=${accessToken}
         &openid=${openId}
         &lang=zh_CN`),
-    ).then(json => new WxUserInfo(json));
+    ).then((json) => new WxUserInfo(json));
 
   // 服务号发送消息
   static sendTemplateMsg = (
@@ -241,7 +263,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json' },
         }),
       true,
-    ).then(value => value.buffer());
+    ).then((value) => value.buffer());
 
   /**
    * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.get.html#HTTPS%20%E8%B0%83%E7%94%A8
@@ -256,7 +278,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json' },
         }),
       true,
-    ).then(value => value.buffer());
+    ).then((value) => value.buffer());
 
   // call in client directly
   static getQrCodeByTicket = (ticket: string): Promise<any> =>
@@ -267,7 +289,7 @@ export class WxApi {
   static wrappedFetch(url: RequestInfo, init?: RequestInit): Promise<any> {
     return fetch(url, init)
       .then(WxApi.logInterceptor)
-      .catch(reason => {
+      .catch((reason) => {
         logger.error(`fetch ${url} with opts ${r(init)} error: ${reason}`);
         return reason;
       });

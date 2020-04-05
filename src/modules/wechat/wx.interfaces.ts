@@ -84,6 +84,13 @@ export interface WxQrTicketInfo {
   url: string;
 }
 
+export class WxUserList {
+  total: number;
+  count: number;
+  data: { openid: string[] };
+  next_openid: string;
+}
+
 export class WxUserInfo {
   // 用户所在城市
   city: string;

@@ -5,14 +5,7 @@ import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
 import { DBHelper } from '../core/db';
-import {
-  KeyValuePair,
-  KeyValueType,
-  KvDefIdentifierHelper,
-  KVGroupFieldsValue,
-  KvHelper,
-  KVModelFormatType,
-} from '../core/kv';
+import { KeyValueType, KvHelper, KVModelFormatType } from '../core/kv';
 import { CronHelper } from '../helper';
 import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
@@ -53,72 +46,68 @@ export class TenantModule implements OnModuleInit {
       (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
 
-    const identifier = KvDefIdentifierHelper.stringify(TenantHelper.kvDef);
-    KvHelper.initializers[identifier] = (): Promise<KeyValuePair> =>
-      KvHelper.set<KVGroupFieldsValue>(
-        {
-          ...TenantHelper.kvDef,
-          name: 'Tenant 配置',
-          type: KeyValueType.json,
-          value: {
-            form: {
-              default: {
-                name: 'Default',
-                fields: [
-                  { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
-                  { name: '默认激活状态', field: { name: TenantFieldKeys.activeByDefault, type: 'boolean' } },
-                  {
-                    name: 'Bind Roles',
-                    field: {
-                      name: TenantFieldKeys.bindRoles,
-                      type: 'string',
-                      help: "绑定用户角色，暂时设计为用','分割的角色数组",
-                    },
+    KvHelper.regInitializer(
+      TenantHelper.kvDef,
+      {
+        name: 'Tenant 配置',
+        type: KeyValueType.json,
+        value: {
+          form: {
+            default: {
+              name: 'Default',
+              fields: [
+                { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
+                { name: '默认激活状态', field: { name: TenantFieldKeys.activeByDefault, type: 'boolean' } },
+                {
+                  name: 'Bind Roles',
+                  field: {
+                    name: TenantFieldKeys.bindRoles,
+                    type: 'string',
+                    help: "绑定用户角色，暂时设计为用','分割的角色数组",
                   },
-                ],
-              },
-              first: {
-                name: '资源创建入口',
-                fields: [
-                  {
-                    name: '绑定模型',
-                    field: {
-                      name: TenantFieldKeys.firstModelBind,
-                      type: 'boolean',
-                      help: '模型绑定会将 tenant 和该资源捆绑到一起，并且将限制该模型数量为 1，并自动在关联中设置',
-                    },
-                  },
-                  { name: '绑定字段', field: { name: TenantFieldKeys.firstModelField, type: 'string' } },
-                  { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
-                  { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
-                ],
-              },
-              models: {
-                name: '模型配置',
-                fields: entities.flatMap((entity) => {
-                  const name = entity.entityInfo.displayName
-                    ? `${entity.name} / ${entity.entityInfo.displayName}`
-                    : entity.name;
-                  return [
-                    {
-                      name: `${name} 模型用户发布权限`,
-                      field: { name: `publish.${entity.entityInfo.name}`, type: 'boolean' },
-                    },
-                    {
-                      name: `${name} 模型数量限制`,
-                      field: { name: `limit.${entity.entityInfo.name}`, type: 'number' },
-                    },
-                  ];
-                }),
-              },
+                },
+              ],
             },
-            values: {},
+            first: {
+              name: '资源创建入口',
+              fields: [
+                {
+                  name: '绑定模型',
+                  field: {
+                    name: TenantFieldKeys.firstModelBind,
+                    type: 'boolean',
+                    help: '模型绑定会将 tenant 和该资源捆绑到一起，并且将限制该模型数量为 1，并自动在关联中设置',
+                  },
+                },
+                { name: '绑定字段', field: { name: TenantFieldKeys.firstModelField, type: 'string' } },
+                { name: 'Model Name', field: { name: TenantFieldKeys.firstModelName, type: 'string' } },
+                { name: 'Display Name', field: { name: TenantFieldKeys.firstDisplayName, type: 'string' } },
+              ],
+            },
+            models: {
+              name: '模型配置',
+              fields: entities.flatMap((entity) => {
+                const name = entity.entityInfo.displayName
+                  ? `${entity.name} / ${entity.entityInfo.displayName}`
+                  : entity.name;
+                return [
+                  {
+                    name: `${name} 模型用户发布权限`,
+                    field: { name: `publish.${entity.entityInfo.name}`, type: 'boolean' },
+                  },
+                  {
+                    name: `${name} 模型数量限制`,
+                    field: { name: `limit.${entity.entityInfo.name}`, type: 'number' },
+                  },
+                ];
+              }),
+            },
           },
+          values: {},
         },
-        { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
-      );
-
-    await KvHelper.initializers[identifier]();
+      },
+      { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
+    );
   }
 
   async initAC(): Promise<void> {
