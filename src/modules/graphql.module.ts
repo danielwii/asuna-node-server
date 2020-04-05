@@ -67,7 +67,7 @@ export class GraphqlModule implements OnModuleInit {
               },
             },
             (responseCachePlugin as any)({
-              sessionId: requestContext => {
+              sessionId: (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid') || null;
                 if (sessionID) logger.verbose(`cache sessionID: ${sessionID}`);
                 return sessionID;
@@ -93,13 +93,13 @@ export class GraphqlModule implements OnModuleInit {
                     local: tracer,
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
-                  });
+                  }) as any;
                   logger.log(`load opentracingExtension ...`);
                   return opentracingExtension;
                 })
               : undefined,
           ]),
-          formatResponse: response => {
+          formatResponse: (response) => {
             if (response.errors) {
               logger.error(`response: ${r(response.errors)}`);
             }
