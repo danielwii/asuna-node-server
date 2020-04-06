@@ -190,7 +190,9 @@ export class WeChatHelper {
           const currentUsers = await WxApi.batchGetUserInfo(currentUserIds);
           return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
         });
-        await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
+        await Promise.mapSeries<string, void>(users, (openId) =>
+          WeChatHelper.syncAdminUser(openId).catch((reason) => logger.error(reason)),
+        );
         // 10000 is the max count of a request
         return userList.count === 10000 ? userList.next_openid : null;
       });
