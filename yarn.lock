@@ -7696,10 +7696,10 @@ node-addon-api@^2.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.0.tgz#f9afb8d777a91525244b01775ea0ddbe1125483b"
   integrity sha512-ASCL5U13as7HhOExbT6OlWJJUV/lLzL2voOSP1UVehpRD8FbSrSDjfScK/KwAvVTI5AS6r4VwbOMlIqtvRidnA==
 
-node-buffs@^0.8.3-1:
-  version "0.8.3-1"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.3-1.tgz#ffcf7818527d86ab5a6f39e6e96f5f74ee5eaeb9"
-  integrity sha512-e3XLo96VQh1iC0TXgpcAUBiqe7ZWIc9ClKw0G4nwwQiJ9yw8SMxRrCx2gIQFoWVs4Tc1QScBi9tOhPoTU8euwQ==
+node-buffs@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.3.tgz#688313e6e139f854678259b08819bb362d89dd42"
+  integrity sha512-F9Vnp/W6mpUudhVV6wOesiYCJ3b3Fu7brNUwlnqkSAkU1xgMTP80PMS6qjnoJsRFkM3VgOBqpc3j3IEnOIiTyQ==
   dependencies:
     dotenv "^8.2.0"
     js-yaml "^3.13.1"
@@ -8514,10 +8514,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.2.tgz#1ba8f3eb92231e769b7fcd7cb73ae1b6b74ade08"
-  integrity sha512-5xJQIPT8BraI7ZnaDwSbu5zLrB6vvi8hVV58yHQ+QK64qrY40dULy0HSRlQ2/2IdzeBpjhDkqdcFBnFeDEMVdg==
+prettier@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.3.tgz#9a06f0e94a51420e78b6925568b5bec72afe41ea"
+  integrity sha512-5qpBDBHO9fpE0zruKiTZm8Gxmz7kknO+WlQR/ivV+RMwgDw/WjOgmxLDn66MPrxq/WZPx/EgEZzh87xJO5E6Fw==
 
 pretty-format@^24.7.0:
   version "24.9.0"
