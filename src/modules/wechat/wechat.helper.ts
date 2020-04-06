@@ -1,6 +1,5 @@
 import { Promise } from 'bluebird';
 import { classToPlain } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as crypto from 'crypto';
 import { Request } from 'express';
 import * as _ from 'lodash';
@@ -8,23 +7,20 @@ import * as fp from 'lodash/fp';
 import * as rawBody from 'raw-body';
 import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
-import { CacheManager } from '../cache';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
-import { deserializeSafely, HandlebarsHelper, r } from '../common/helpers';
+import { HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { AuthedUserHelper, PageHelper } from '../core';
 import { AdminUser, AuthUserChannel, TokenHelper } from '../core/auth';
 import { UserProfile } from '../core/auth/user.entities';
 import { Hermes } from '../core/bus';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
-import { RedisLockProvider, RedisProvider } from '../providers';
+import { AsunaCollections, KvDef } from '../core/kv/kv.helper';
 import { Store } from '../store';
 import { AdminWsHelper } from '../ws';
 import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
-// eslint-disable-next-line import/no-cycle
-import { WxApi } from './wx.api';
+import { WxApi, WxHelper } from './wx.api';
 import {
   GetPhoneNumber,
   MiniSubscribeData,
@@ -145,42 +141,6 @@ export interface WXSubscribedQrSceneMessage {
 
 export type WXEventMessage = WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage;
 
-enum WxKeys {
-  accessToken = 'wx-access-token',
-}
-
-export class WeChatServiceConfig {
-  @IsBoolean() @IsOptional() login?: boolean;
-  @IsBoolean() @IsOptional() saveToAdmin?: boolean;
-
-  @IsBoolean() @IsOptional() enabled?: boolean;
-  @IsString() @IsOptional() token?: string;
-  @IsString() @IsOptional() appId?: string;
-  @IsString() @IsOptional() appSecret?: string;
-
-  @IsBoolean() @IsOptional() miniEnabled?: boolean;
-  @IsString() @IsOptional() miniAppId?: string;
-  @IsString() @IsOptional() miniAppSecret?: string;
-
-  constructor(o: WeChatServiceConfig) {
-    Object.assign(this, deserializeSafely(WeChatServiceConfig, o));
-  }
-}
-
-export enum WeChatFieldKeys {
-  login = 'wechat.login',
-  saveToAdmin = 'wechat.save-to-admin',
-
-  enabled = 'service.enabled',
-  token = 'service.token',
-  appId = 'service.appid',
-  appSecret = 'service.appsecret',
-
-  miniEnabled = 'mini.enabled',
-  miniAppId = 'mini.appid',
-  miniAppSecret = 'mini.appsecret',
-}
-
 export class WXEventMessageHelper {
   static isWXSubscribeMessage = (message: WXEventMessage): boolean =>
     message.MsgType === 'event' && ['subscribe', 'unsubscribe'].includes(message.Event);
@@ -190,15 +150,10 @@ export class WXEventMessageHelper {
 }
 
 export class WeChatHelper {
-  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_WECHAT, key: 'config' };
   static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
 
-  static async getServiceConfig(): Promise<WeChatServiceConfig> {
-    return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(WeChatHelper.kvDef, WeChatFieldKeys));
-  }
-
   static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
-    const config = await WeChatHelper.getServiceConfig();
+    const config = await WxHelper.getServiceConfig();
     const validation = [config.token, opts.timestamp, opts.nonce].sort().join('');
     const hashCode = crypto.createHash('sha1');
     const result = hashCode.update(validation, 'utf8').digest('hex');
@@ -222,29 +177,23 @@ export class WeChatHelper {
   }
 
   static async syncAdminUsers(): Promise<void> {
-    try {
-      const config = await WeChatHelper.getServiceConfig();
-      logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
-      if (config.saveToAdmin) {
-        const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
-        await PageHelper.doCursorPageSeries(async (next) => {
-          const userList = await WxApi.getUserList(next);
-          logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
-          const users = userList.data.openid;
-          await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
-            const currentUserIds = _.slice(users, start, end);
-            const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
-            return Promise.mapSeries(currentUsers, async (userInfo) =>
-              WeChatHelper.updateWeChatUserByUserInfo(userInfo),
-            );
-          });
-          await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
-          // 10000 is the max count of a request
-          return userList.count === 10000 ? userList.next_openid : null;
+    const config = await WxHelper.getServiceConfig();
+    logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
+    if (config.saveToAdmin) {
+      const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
+      await PageHelper.doCursorPageSeries(async (next) => {
+        const userList = await WxApi.getUserList(next);
+        logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
+        const users = userList.data.openid;
+        await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
+          const currentUserIds = _.slice(users, start, end);
+          const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
+          return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
         });
-      }
-    } catch (e) {
-      logger.error(e);
+        await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
+        // 10000 is the max count of a request
+        return userList.count === 10000 ? userList.next_openid : null;
+      });
     }
   }
 
@@ -257,7 +206,7 @@ export class WeChatHelper {
   static async handleEvent(
     message: WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage,
   ): Promise<string> {
-    const config = await this.getServiceConfig();
+    const config = await WxHelper.getServiceConfig();
     logger.log(`handle message ${r(message)}`);
 
     if (message.MsgType === 'event' && message.Event === 'subscribe') {
@@ -446,52 +395,6 @@ export class WeChatHelper {
       configLoader.loadConfig(ConfigKeys.WX_SECRET_KEY, 'wx-secret'),
       // { expiresIn: 60 * 60 * 24 },
     );
-  }
-
-  static async getAccessToken(mini?: boolean): Promise<string> {
-    const key = mini ? `${WxKeys.accessToken}#mini` : WxKeys.accessToken;
-    const redis = RedisProvider.instance.getRedisClient('wx');
-    // redis 未启用时将 token 保存到内存中，2h 后过期
-    if (!redis.isEnabled) {
-      return CacheManager.cacheable(
-        key,
-        async () => {
-          logger.warn(
-            `redis is not enabled, ${
-              mini ? 'mini' : ''
-            } access token will store in memory and lost when app restarted.`,
-          );
-          return (await WxApi.getAccessToken({ mini })).access_token;
-        },
-        2 * 3600,
-      );
-    }
-
-    // redis 存在未过期的 token 时直接返回
-    const accessToken = await Promise.promisify(redis.client.get).bind(redis.client)(key);
-    if (accessToken) return accessToken;
-
-    const token = await RedisLockProvider.instance
-      .lockProcess(
-        key,
-        async () => {
-          const result = await WxApi.getAccessToken({ mini });
-          logger.verbose(`getAccessToken with key(${key}): ${r(result)}`);
-          if (result.access_token) {
-            // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
-            await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
-            return result.access_token;
-          }
-          throw new AsunaException(AsunaErrorCode.Unprocessable, 'get access token error', result);
-        },
-        { ttl: 60_000 },
-      )
-      .catch((reason) => logger.error(reason));
-    logger.verbose(`access token is ${r(token)}`);
-    if (!token) {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');
-    }
-    return token;
   }
 
   static async getUserInfo(openId: string): Promise<WxUserInfo> {

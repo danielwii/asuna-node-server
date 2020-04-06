@@ -7,8 +7,9 @@ import { Hermes } from '../core/bus';
 import { KeyValueType, KvHelper, KVModelFormatType } from '../core/kv';
 import { CronHelper } from '../helper';
 import { WeChatController } from './wechat.controller';
-import { WeChatFieldKeys, WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
+import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
+import { WeChatFieldKeys, WxHelper } from './wx.api';
 
 const logger = LoggerFactory.getLogger('WeChatModule');
 
@@ -28,7 +29,7 @@ export class WeChatModule implements OnModuleInit {
 
   async initKV(): Promise<void> {
     KvHelper.regInitializer(
-      WeChatHelper.kvDef,
+      WxHelper.kvDef,
       {
         name: '微信配置',
         type: KeyValueType.json,
