@@ -190,7 +190,7 @@ export class WxApi {
         &next_openid=${nextOpenId}`),
     );
 
-  static batchGetUserInfo = (openIds: string[]): Promise<{ user_info_list: WxUserInfo[] }> =>
+  static batchGetUserInfo = (openIds: string[]): Promise<WxUserInfo[]> =>
     WxApi.withAccessToken((config, { accessToken }) =>
       WxApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=${accessToken}`,
@@ -200,7 +200,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json' },
         },
       ),
-    );
+    ).then(({ user_info_list }) => _.map(user_info_list, (json) => new WxUserInfo(json)));
 
   /**
    * https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html#UinonId

@@ -187,7 +187,7 @@ export class WeChatHelper {
         const users = userList.data.openid;
         await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
           const currentUserIds = _.slice(users, start, end);
-          const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
+          const currentUsers = await WxApi.batchGetUserInfo(currentUserIds);
           return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
         });
         await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
