@@ -14,7 +14,7 @@ import { AdminUser } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
 import { StatsResult } from '../stats';
-import { WeChatHelper, WeChatUser } from '../wechat';
+import { WeChatUser, WxHelper } from '../wechat';
 import { Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
 
@@ -52,7 +52,7 @@ export class TenantService {
     }
 
     // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
-    const config = await WeChatHelper.getServiceConfig();
+    const config = await WxHelper.getServiceConfig();
     if (config.enabled && config.saveToAdmin) {
       const weChatUser = await WeChatUser.findOne({ admin });
       if (weChatUser) {
