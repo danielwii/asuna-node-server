@@ -222,23 +222,29 @@ export class WeChatHelper {
   }
 
   static async syncAdminUsers(): Promise<void> {
-    const config = await WeChatHelper.getServiceConfig();
-    logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
-    if (config.saveToAdmin) {
-      const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
-      await PageHelper.doCursorPageSeries(async (next) => {
-        const userList = await WxApi.getUserList(next);
-        logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
-        const users = userList.data.openid;
-        await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
-          const currentUserIds = _.slice(users, start, end);
-          const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
-          return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
+    try {
+      const config = await WeChatHelper.getServiceConfig();
+      logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
+      if (config.saveToAdmin) {
+        const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
+        await PageHelper.doCursorPageSeries(async (next) => {
+          const userList = await WxApi.getUserList(next);
+          logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
+          const users = userList.data.openid;
+          await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
+            const currentUserIds = _.slice(users, start, end);
+            const currentUsers = (await WxApi.batchGetUserInfo(currentUserIds))?.user_info_list;
+            return Promise.mapSeries(currentUsers, async (userInfo) =>
+              WeChatHelper.updateWeChatUserByUserInfo(userInfo),
+            );
+          });
+          await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
+          // 10000 is the max count of a request
+          return userList.count === 10000 ? userList.next_openid : null;
         });
-        await Promise.mapSeries<string, void>(users, (openId) => WeChatHelper.syncAdminUser(openId));
-        // 10000 is the max count of a request
-        return userList.count === 10000 ? userList.next_openid : null;
-      });
+      }
+    } catch (e) {
+      logger.error(e);
     }
   }
 

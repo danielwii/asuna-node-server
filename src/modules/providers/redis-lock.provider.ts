@@ -88,30 +88,30 @@ export class RedisLockProvider {
     // const exists = this.client.get
     const exists = await promisify(this.client.get, this.client)(resource);
     if (exists) {
-      logger.verbose(`lock resource ${resource} already exists: ${exists}`);
+      logger.verbose(`lock [${resource}] already exists: ${exists}`);
       return;
     }
 
     // eslint-disable-next-line consistent-return
     return this.redLock.lock(resource, ttl).then(
       (lock) => {
-        logger.verbose(`lock ${resource}: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
+        logger.verbose(`lock [${resource}]: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
         return handler()
           .then((value) => {
-            logger.debug(`release lock: ${resource}, result is ${r(value)}`);
+            logger.debug(`release lock [${resource}], result is ${r(value)}`);
             return value;
           })
-          .catch((reason) => logger.error(`execute handler:${handler} error: ${reason}`))
+          .catch((reason) => logger.error(`execute [${resource}] handler: ${handler} error: ${reason}`))
           .finally(() =>
             lock
               .unlock()
               .catch((err) => {
-                logger.error(`unlock ${resource} error: ${err}`);
+                logger.error(`unlock [${resource}] error: ${err}`);
               })
-              .finally(() => logger.verbose(`unlock ${resource}`)),
+              .finally(() => logger.verbose(`unlock [${resource}]`)),
           );
       },
-      (err) => logger.error(`get ${resource} lock error: ${err}`),
+      (err) => logger.error(`get [${resource}] lock error: ${err}`),
     );
   }
 }
