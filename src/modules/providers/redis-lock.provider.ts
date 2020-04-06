@@ -101,7 +101,7 @@ export class RedisLockProvider {
             logger.debug(`release lock: ${resource}, result is ${r(value)}`);
             return value;
           })
-          .catch((reason) => logger.error(`execute handler:${handler} error: ${r(reason)}`))
+          .catch((reason) => logger.error(`execute handler:${handler} error: ${reason}`))
           .finally(() =>
             lock
               .unlock()

@@ -194,7 +194,7 @@ export class WeChatHelper {
   static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
 
   static async getServiceConfig(): Promise<WeChatServiceConfig> {
-    return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, WeChatFieldKeys));
+    return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(WeChatHelper.kvDef, WeChatFieldKeys));
   }
 
   static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
@@ -222,7 +222,7 @@ export class WeChatHelper {
   }
 
   static async syncAdminUsers(): Promise<void> {
-    const config = await this.getServiceConfig();
+    const config = await WeChatHelper.getServiceConfig();
     logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
       const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);

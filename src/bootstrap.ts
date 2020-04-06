@@ -65,7 +65,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`options: ${r(options)}`);
 
   const dbConfig = await getConnectionOptions();
-  logger.log(`dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ****${_.get(dbConfig, 'password').slice(-4)}`);
+  logger.log(
+    `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ******${_.get(dbConfig, 'password').slice(-4)}`,
+  );
 
   logger.log(
     `init logger: ${r({
