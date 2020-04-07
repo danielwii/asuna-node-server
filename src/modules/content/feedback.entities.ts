@@ -1,7 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { InjectUserProfile } from '../core/auth';
+import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnType, safeReloadArray } from '../core/helpers';
 import {
   FeedbackSenderEnumValue,
@@ -12,7 +12,7 @@ import {
 
 @EntityMetaInfo({ name: 'content__feedback', internal: true })
 @Entity('content__t_feedback')
-export class Feedback extends InjectUserProfile(AbstractBaseEntity) {
+export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   @MetaInfo({ name: 'name' })
   @Column({ nullable: true, name: 'name' })
   name: string;

@@ -1,4 +1,4 @@
-import { AfterRemove, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
@@ -37,6 +37,22 @@ export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
     @OneToOne((type) => UserProfile)
+    @JoinColumn({ name: 'profile__id' })
+    profile?: UserProfile;
+  }
+
+  return ExtendableEntity;
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const InjectMultiUserProfile = <TBase extends Constructor>(Base: TBase) => {
+  class ExtendableEntity extends Base {
+    @MetaInfo({ accessible: 'hidden' })
+    @Column({ nullable: true, length: 36, name: 'profile__id' })
+    profileId?: string;
+
+    @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
+    @ManyToOne((type) => UserProfile)
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }

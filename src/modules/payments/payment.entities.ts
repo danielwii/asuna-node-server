@@ -2,7 +2,7 @@ import { html } from 'common-tags';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorators';
-import { InjectUserProfile } from '../core/auth';
+import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnType } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
 
@@ -96,11 +96,8 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column('varchar', { nullable: true, name: 'status', default: PaymentMethodEnumValue.types.third })
   status: PaymentMethodType;
 
-  @OneToMany(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => PaymentTransaction,
-    transaction => transaction.method,
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @OneToMany((type) => PaymentTransaction, (transaction) => transaction.method)
   transactions: PaymentTransaction[];
 }
 
@@ -134,18 +131,14 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @Column(ColumnType.JSON, { nullable: true })
   images: JsonArray;
 
-  @ManyToOne(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => PaymentOrder,
-    order => order.items,
-    { onDelete: 'CASCADE' },
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @ManyToOne((type) => PaymentOrder, (order) => order.items, { onDelete: 'CASCADE' })
   order: any; // PaymentOrder;
 }
 
 @EntityMetaInfo({ name: 'payment__transactions', internal: true, displayName: '交易' })
 @Entity('payment__t_transactions')
-export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
+export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('pt');
   }
@@ -159,11 +152,7 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   sign: string;
 
   @MetaInfo({ name: '支付类型' })
-  @ManyToOne(
-    type => PaymentMethod,
-    method => method.transactions,
-    { onDelete: 'SET NULL' },
-  )
+  @ManyToOne((type) => PaymentMethod, (method) => method.transactions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'method__id' })
   method: PaymentMethod;
 
@@ -176,18 +165,14 @@ export class PaymentTransaction extends InjectUserProfile(AbstractTimeBasedBaseE
   data: JsonMap;
 
   @MetaInfo({ name: '订单' })
-  @OneToOne(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => PaymentOrder,
-    order => order.transaction,
-    { onDelete: 'CASCADE' },
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @OneToOne((type) => PaymentOrder, (order) => order.transaction, { onDelete: 'CASCADE' })
   order: any; // PaymentOrder;
 }
 
 @EntityMetaInfo({ name: 'payment__orders', internal: true, displayName: '订单' })
 @Entity('payment__t_orders')
-export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
+export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('po');
   }
@@ -201,19 +186,12 @@ export class PaymentOrder extends InjectUserProfile(AbstractTimeBasedBaseEntity)
   status: string; // 订单状态
 
   @MetaInfo({ name: '交易' })
-  @OneToOne(
-    type => PaymentTransaction,
-    transaction => transaction.order,
-    { onDelete: 'CASCADE' },
-  )
+  @OneToOne((type) => PaymentTransaction, (transaction) => transaction.order, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'transaction__id' })
   transaction: PaymentTransaction;
 
   @MetaInfo({ name: '订单内容' })
-  @OneToMany(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    type => PaymentItem,
-    item => item.order,
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @OneToMany((type) => PaymentItem, (item) => item.order)
   items: PaymentItem[];
 }
