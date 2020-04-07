@@ -1,4 +1,4 @@
-import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { AfterRemove, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
@@ -12,10 +12,7 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
     super('u');
   }
 
-  @OneToOne(
-    type => WXMiniAppUserInfo,
-    info => info.profile,
-  )
+  @OneToOne((type) => WXMiniAppUserInfo, (info) => info.profile)
   miniAppUserInfo: WXMiniAppUserInfo;
 
   /* use AuthedUserHelper.createProfile
@@ -39,7 +36,7 @@ export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
     profileId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
-    @ManyToOne(type => UserProfile)
+    @OneToOne((type) => UserProfile)
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }

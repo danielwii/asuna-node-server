@@ -128,7 +128,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   // Relations
   // --------------------------------------------------------------
 
-  @OneToOne(type => AdminUser, { eager: true })
+  @OneToOne((type) => AdminUser, { eager: true })
   @JoinColumn({ name: 'admin__id' })
   admin?: AdminUser;
 }
@@ -157,7 +157,7 @@ export class WXMiniAppUserInfo extends BaseEntity {
   language: string;
 
   @Expose({ name: 'with-phone-number', toPlainOnly: true })
-  @Transform(value => !!_.trim(value), { toPlainOnly: true })
+  @Transform((value) => !!_.trim(value), { toPlainOnly: true })
   @MetaInfo({ name: '手机号' })
   @Column({ nullable: true, name: 'mobile' })
   mobile: string;
@@ -201,11 +201,8 @@ export class WXMiniAppUserInfo extends BaseEntity {
   profileId: string;
 
   @Expose({ name: 'profile-id', toPlainOnly: true })
-  @Transform(value => value.id, { toPlainOnly: true })
-  @OneToOne(
-    type => UserProfile,
-    profile => profile.miniAppUserInfo,
-  )
+  @Transform((value) => value.id, { toPlainOnly: true })
+  @OneToOne((type) => UserProfile, (profile) => profile.miniAppUserInfo)
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;
 

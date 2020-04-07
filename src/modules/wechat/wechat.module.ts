@@ -71,7 +71,7 @@ export class WeChatModule implements OnModuleInit {
   }
 
   async initCron(): Promise<void> {
-    CronHelper.reg('sync-admin-users', CronExpression.EVERY_30_MINUTES, WeChatHelper.syncAdminUsers, {
+    CronHelper.reg('sync-admin-users', CronExpression.EVERY_DAY_AT_4AM, WeChatHelper.syncAdminUsers, {
       runOnInit: true,
     });
   }

@@ -62,6 +62,7 @@ export class EmailHelper {
         port: config.port,
         secure: config.ssl, // upgrade later with STARTTLS
         auth: { user: config.username, pass: config.password },
+        from: config.from,
       };
       EmailHelper.transporter = createTransport(transport);
     } else {
@@ -88,6 +89,7 @@ export class EmailHelper {
   static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
     logger.verbose(`send ${r(_.omit(mailInfo, 'content'))}`);
     const { to, cc, bcc, subject, content, attachments } = mailInfo;
+    const { from } = await this.getConfig();
     const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
     let domain = '';
     if (!storageConfigs) logger.warn(`no storage set for image`);
@@ -97,8 +99,8 @@ export class EmailHelper {
       // FIXME domain position for attachments may not correct
       domain = (storageConfigs.loader() as MinioConfigObject).endpoint;
     }
-    logger.verbose(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
-    return EmailHelper.transporter.sendMail({
+    const mailOptions: Mail.Options = {
+      from,
       to,
       cc,
       bcc,
@@ -109,7 +111,9 @@ export class EmailHelper {
           : (attachment as Attachment),
       ),
       ...(content ? { html: content } : null),
-    });
+    };
+    logger.verbose(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
+    return EmailHelper.transporter.sendMail(mailOptions);
   }
 
   static async sendByTemplateKey(

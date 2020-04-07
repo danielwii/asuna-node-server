@@ -66,10 +66,7 @@ export class SimpleIdGenerator {
       ${this.prefix}
       ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
       ${this.workerId}
-      ${process
-        .hrtime()[1]
-        .toString()
-        .slice(2, 6)}
+      ${process.hrtime()[1].toString().slice(2, 6)}
     `;
   }
 
@@ -78,10 +75,7 @@ export class SimpleIdGenerator {
       ${prefix}
       ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
       ${workerId || 0}
-      ${process
-        .hrtime()[1]
-        .toString()
-        .slice(2, 6)}
+      ${process.hrtime()[1].toString().slice(2, 6)}
     `;
   }
 }
