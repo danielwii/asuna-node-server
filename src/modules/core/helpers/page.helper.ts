@@ -58,19 +58,14 @@ export class PageHelper {
 
 export class Pageable<T> {
   total: number;
-
   page: number;
-
   size: number;
-
   items: T[];
 }
 
 export class CursoredPageable<T> {
   total: number;
-
   pageInfo: CursorPageInfo;
-
   items: T[];
 }
 

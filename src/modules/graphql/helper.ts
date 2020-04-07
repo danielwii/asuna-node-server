@@ -39,20 +39,9 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   join?: JoinOptions;
   relationPath?: string;
   selectionPath?: string;
-  relations?:
-    | boolean
-    | {
-        relations?: string[];
-        disableMixedMap?: boolean;
-      };
+  relations?: boolean | { relations?: string[]; disableMixedMap?: boolean };
   timeCondition?: TimeConditionInput;
-  cache?:
-    | boolean
-    | number
-    | {
-        id: any;
-        milliseconds: number;
-      };
+  cache?: boolean | number | { id: any; milliseconds: number };
   // skip?: number;
   // take?: number;
   order?: {
@@ -108,7 +97,8 @@ export class GraphqlHelper {
 
   public static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
-    DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders,
+    MixedEntity = any
   >({
     cls,
     query,
@@ -124,7 +114,7 @@ export class GraphqlHelper {
     ctx?: GraphqlContext<DataLoaders>;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     pageRequest: PageRequest;
-    mapper?: (item: any) => any;
+    mapper?: (item: Entity) => Promise<MixedEntity>;
   }): Promise<PageInfo & { items: any[]; total: number }> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const pageInfo = toPage(pageRequest);
@@ -146,7 +136,7 @@ export class GraphqlHelper {
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
-  }): Promise<MixedEntity[] | null>;
+  }): Promise<MixedEntity[]>;
   public static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders
@@ -157,7 +147,7 @@ export class GraphqlHelper {
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
-  }): Promise<Entity[] | null>;
+  }): Promise<Entity[]>;
   public static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     MixedEntity,
@@ -178,12 +168,12 @@ export class GraphqlHelper {
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
-  }): Promise<Entity[] | MixedEntity[] | null> {
+  }): Promise<Entity[] | MixedEntity[]> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
     if (query.ids && query.ids.length > 0) {
       const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
-      return mapper ? Promise.map(items, mapper) : items;
+      return mapItems(items, mapper);
     }
 
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls))) as any;
@@ -206,10 +196,10 @@ export class GraphqlHelper {
       );
       const ids: PrimaryKey[] = _.chain(randomIds).map(fp.get(primaryKey)).shuffle().take(query.random).value();
       logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
-      if (_.isEmpty(ids)) return null;
+      if (_.isEmpty(ids)) return [];
 
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
-      return mapper ? Promise.map(items, mapper) : items;
+      return mapItems(items, mapper);
     }
 
     const options = await this.genericFindOptions<Entity>({
@@ -221,8 +211,11 @@ export class GraphqlHelper {
       // take: pageInfo.take,
     });
     const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
-    // logger.verbose(`load ids ${r(ids)}`);
-    return dataloader.load(ids);
+    if (_.isEmpty(ids)) return [];
+    logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
+
+    const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
+    return mapItems(items, mapper);
   }
 
   /**
@@ -336,7 +329,7 @@ export class GraphqlHelper {
   public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
-  ): Promise<RelationEntity[] | null>;
+  ): Promise<RelationEntity[]>;
   public static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
@@ -344,7 +337,7 @@ export class GraphqlHelper {
   >(
     opts: BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
-  ): Promise<MixedRelationEntity[] | null>;
+  ): Promise<MixedRelationEntity[]>;
   public static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
@@ -352,7 +345,7 @@ export class GraphqlHelper {
   >(
     opts: (BaseResolveProperty<Entity> | BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>) &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
-  ): Promise<RelationEntity[] | MixedRelationEntity[] | null> {
+  ): Promise<RelationEntity[] | MixedRelationEntity[]> {
     const { mapper } = opts as BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>;
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
@@ -366,16 +359,14 @@ export class GraphqlHelper {
       cache: opts.cache,
     })) as Entity;
     const ids = result[opts.key] as any;
-    if (_.isEmpty(ids)) return null;
+    if (_.isEmpty(ids)) return [];
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
-      return _opts.loader
-        .load(ids as PrimaryKey[])
-        .then((items) => (mapper ? (Promise.map(items, mapper) as any) : items));
+      return _opts.loader.load(ids as PrimaryKey[]).then((items) => mapItems(items, mapper));
     }
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-    return targetRepo.findByIds(ids).then((items) => (mapper ? (Promise.map(items, mapper) as any) : items));
+    return targetRepo.findByIds(ids).then((items) => mapItems(items, mapper));
   }
 
   public static pagedResult<Entity>({
@@ -409,6 +400,11 @@ export class GraphqlHelper {
     total: number;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: Entity[] | MixedEntity[]; total: number }> {
-    return Promise.props({ ...toPage(pageRequest), items: mapper ? Promise.map(items, mapper) : items, total });
+    return Promise.props({ ...toPage(pageRequest), items: mapItems(items, mapper), total });
   }
 }
+
+const mapItems = async <Entity, MixedEntity>(
+  items: Entity[],
+  mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>,
+): Promise<Entity[] | MixedEntity[]> => (mapper && items ? Promise.map(items, mapper) : items);

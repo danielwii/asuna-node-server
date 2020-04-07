@@ -10,8 +10,8 @@ export interface CursoredQuery<After = string> {
 }
 
 export abstract class UnionTypeResolver {
-  @ResolveField('__resolveType')
-  __resolveType(obj): string {
+  @ResolveField()
+  __resolveType(obj: Function): string {
     const { name } = obj.constructor;
     if (name === 'Object') {
       logger.error(`cannot resolve union type: ${r(obj)}`);

@@ -2,14 +2,14 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
 import { LoggerFactory } from '../common/logger';
-import { UserProfile } from '../core/auth';
+import { JwtPayload } from '../core/auth';
 import { DefaultRegisteredLoaders } from './context';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = UserProfile> {
+export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = JwtPayload> {
   getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;
