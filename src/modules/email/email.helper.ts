@@ -7,6 +7,7 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
+import { HandlebarsHelper } from '../common/helpers';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
@@ -118,7 +119,7 @@ export class EmailHelper {
 
   static async sendByTemplateKey(
     key: string,
-    { to, attachments }: { to: string[]; attachments?: Attachment[] },
+    { to, attachments, context }: { to: string[]; attachments?: Attachment[]; context?: Record<string, any> },
   ): Promise<MailInfo> {
     const { templates } = await EmailHelper.getTmplConfig();
     const loaded = WeChatHelper.parseTemplateData(templates, {});
@@ -130,7 +131,12 @@ export class EmailHelper {
     // logger.verbose(`loaded templates ${r(template)}`);
     return new Promise((resolve) => {
       EmailHelper.sender.next({
-        email: { to, subject, content: template, attachments },
+        email: {
+          to,
+          subject: HandlebarsHelper.injectContext(subject, context),
+          content: HandlebarsHelper.injectContext(template, context),
+          attachments,
+        },
         cb: (info) => resolve(info),
       });
     });
