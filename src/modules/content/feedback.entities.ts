@@ -1,8 +1,8 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
-import { ColumnType, safeReloadArray } from '../core/helpers';
+import { ColumnType } from '../core/helpers';
 import {
   FeedbackSenderEnumValue,
   FeedbackSenderType,
@@ -25,7 +25,7 @@ export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   @Column({ nullable: true, length: 50, name: 'type' })
   type: string;
 
-  @MetaInfo({ name: '问题图片', type: 'Images' })
+  @MetaInfo({ name: '问题图片', type: 'Images', safeReload: 'json-array' })
   @Column(ColumnType.JSON, { nullable: true, name: 'images' })
   images: JsonArray;
 
@@ -37,12 +37,6 @@ export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   @OneToMany((type) => FeedbackReply, (reply) => reply.feedback)
   replies: FeedbackReply[];
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  preSave() {
-    safeReloadArray(this, 'images');
-  }
 }
 
 @EntityMetaInfo({ name: 'content__feedback_replies', internal: true })
@@ -51,7 +45,7 @@ export class FeedbackReply extends AbstractBaseEntity {
   @Column({ nullable: false, length: 36, name: 'ref_id' })
   refId: string;
 
-  @MetaInfo({ name: '回复图片', type: 'Images' })
+  @MetaInfo({ name: '回复图片', type: 'Images', safeReload: 'json-array' })
   @Column(ColumnType.JSON, { nullable: true, name: 'images' })
   images: JsonArray;
 
@@ -67,10 +61,4 @@ export class FeedbackReply extends AbstractBaseEntity {
   @ManyToOne((type) => Feedback, (feedback) => feedback.replies, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'feedback__id' })
   feedback: Feedback;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  preSave() {
-    safeReloadArray(this, 'images');
-  }
 }

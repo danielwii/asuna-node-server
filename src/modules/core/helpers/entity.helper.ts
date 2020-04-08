@@ -9,8 +9,11 @@ import { ColumnType } from './column.helper';
 
 const logger = LoggerFactory.getLogger('EntityHelper');
 
+/**
+ * @deprecated {@see safeReloadJSON}
+ */
 export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
-  columns.forEach(column => {
+  columns.forEach((column) => {
     if (ColumnType.JSON === 'simple-json') {
       if (entity[column]) {
         try {
@@ -28,8 +31,11 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
   });
 }
 
+/**
+ * @deprecated {@see safeReloadJSON}
+ */
 export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
-  columns.forEach(column => {
+  columns.forEach((column) => {
     if (ColumnType.JSON === 'simple-json') {
       if (entity[column]) {
         try {
@@ -47,37 +53,32 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
   });
 }
 
-export function safeReloadJSON<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
-  columns.forEach(column => {
-    if (entity && column /* && ColumnType.JSON === 'simple-json' */) {
-      if (entity[column]) {
-        try {
-          if (!_.isObject(entity[column])) {
-            entity[column] = JSON.parse(entity[column] as any);
-          }
-        } catch (error) {
-          logger.error(`safeReloadJSON ${column} error: ${error}`);
-          // entity[column] = null;
+export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, defaultValue?): void {
+  if (entity && column /* && ColumnType.JSON === 'simple-json' */) {
+    if (entity[column]) {
+      try {
+        // logger.verbose(`safeReloadJSON ${r({ column, value: entity[column] })}`);
+        if (!_.isObject(entity[column])) {
+          entity[column] = JSON.parse(entity[column] as any);
         }
-      } else {
-        // entity[column] = null;
+      } catch (error) {
+        logger.error(`safeReloadJSON ${column} error: ${error}`);
+        entity[column] = defaultValue;
       }
+    } else {
+      entity[column] = defaultValue;
     }
-  });
+  }
 }
 
 export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
   const hours = configLoader.loadNumericConfig(ConfigKeys.FIX_TZ);
   if (hours) {
     if (entity.createdAt) {
-      entity.createdAt = DateTime.fromJSDate(entity.createdAt)
-        .plus(Duration.fromObject({ hours }))
-        .toJSDate();
+      entity.createdAt = DateTime.fromJSDate(entity.createdAt).plus(Duration.fromObject({ hours })).toJSDate();
     }
     if (entity.updatedAt) {
-      entity.updatedAt = DateTime.fromJSDate(entity.updatedAt)
-        .plus(Duration.fromObject({ hours }))
-        .toJSDate();
+      entity.updatedAt = DateTime.fromJSDate(entity.updatedAt).plus(Duration.fromObject({ hours })).toJSDate();
     }
   }
 }

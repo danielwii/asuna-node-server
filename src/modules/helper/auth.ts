@@ -21,9 +21,9 @@ export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPaylo
 
 export class AuthHelper {
   static authAdminApiKey(req: AnyAuthRequest<ApiKeyPayload>, res: Response): Promise<AuthResult<ApiKeyPayload>> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       passport.authenticate('admin-api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
-        logger.log(`admin-api-key auth: ${r({ user: payload })}`);
+        logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
         if (err || info) {
           logger.warn(`api-key auth error: ${r(err)}`);
         } else {
@@ -31,13 +31,13 @@ export class AuthHelper {
           req.payload = payload;
           req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
         }
-        resolve({ err: err || wrapErrorInfo(info), payload, info });
+        resolve({ err: err ?? wrapErrorInfo(info), payload, info });
       })(req, res);
     });
   }
 
   static authAdmin(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       passport.authenticate('admin-jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
         // logger.log(`admin-jwt auth ${r({ user })}`);
         if (err || info) {
@@ -56,7 +56,7 @@ export class AuthHelper {
   }
 
   static authWX(req: AnyAuthRequest<WXJwtPayload>, res: Response): Promise<AuthResult<WXJwtPayload>> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       passport.authenticate(
         'wx-jwt',
         { session: false, authInfo: true },
@@ -93,7 +93,7 @@ export class AuthHelper {
   }
 
   static authJwt(req: AnyAuthRequest<JwtPayload, UserProfile>, res: Response): Promise<AuthResult<JwtPayload>> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       passport.authenticate('jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
         logger.log(`jwt auth ${r({ payload })}`);
         if (err || info) {

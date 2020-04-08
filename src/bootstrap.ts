@@ -107,6 +107,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   const queryRunner = connection.createQueryRunner();
   await Promise.all(
     _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
+      logger.log(`rename table ${r({ from, to })}`);
       const fromTable = await queryRunner.getTable(from);
       if (fromTable) {
         logger.log(`rename ${from} -> ${to}`);
@@ -185,7 +186,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
-    logger.log('[X] debug mode is enabled');
+    logger.warn('[X] debug mode is enabled, but no features for debug mode exists :P');
   }
 
   // --------------------------------------------------------------

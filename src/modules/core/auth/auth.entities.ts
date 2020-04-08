@@ -1,10 +1,9 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Publishable } from '../../base';
 import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { Tenant } from '../../tenant/tenant.entities';
 import { ColumnType } from '../helpers/column.helper';
-import { safeReloadObject } from '../helpers/entity.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
@@ -28,22 +27,13 @@ export class Role extends AbstractBaseEntity {
   @Column({ nullable: true })
   description: string;
 
-  @MetaInfo({ name: '权限', type: 'Authorities' })
+  @MetaInfo({ name: '权限', type: 'Authorities', safeReload: 'json-map' })
   @Column(ColumnType.JSON, { nullable: true })
   authorities: JsonMap;
 
-  @ManyToMany(
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    (type) => AdminUser,
-    (user) => user.roles,
-  )
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  @ManyToMany((type) => AdminUser, (user) => user.roles)
   users: AdminUser[];
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  preSave(): void {
-    safeReloadObject(this, 'authorities');
-  }
 }
 
 @EntityMetaInfo({ name: 'auth__users', internal: true })

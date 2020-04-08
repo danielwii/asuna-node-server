@@ -59,6 +59,7 @@ export interface MetaInfoBaseOptions {
    * 默认值
    */
   defaultValue?: any;
+  safeReload?: 'json-array' | 'json-map';
 }
 
 export interface NormalMetaInfoOptions extends MetaInfoBaseOptions {
@@ -157,14 +158,14 @@ export type MetaInfoOptions =
  * @constructor
  */
 export function MetaInfo(options: MetaInfoOptions): Function {
-  return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     // eslint-disable-next-line no-param-reassign
     target.info = { ...target.info, [propertyKey]: options };
   };
 }
 
 export function EntityMetaInfo(options: EntityMetaInfoOptions): Function {
-  return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     // eslint-disable-next-line no-param-reassign
     target.entityInfo = options;
   };

@@ -1,7 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { ColumnType, safeReloadArray } from '../core/helpers';
+import { ColumnType } from '../core/helpers';
 
 export const AppUpgradeMode = {
   MANUAL: 'MANUAL',
@@ -56,7 +56,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   @Column('text', { nullable: true })
   description: string;
 
-  @MetaInfo({ name: 'File', type: 'File' })
+  @MetaInfo({ name: 'File', type: 'File', safeReload: 'json-array' })
   @Column(ColumnType.JSON, { nullable: false, name: 'paths' })
   paths: JsonArray;
 
@@ -64,11 +64,4 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   @ManyToOne((type) => AppInfo, (info) => info.releases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'app_info__id' })
   appInfo: AppInfo;
-
-  // TODO try reload in entity subscribers
-  @BeforeInsert()
-  @BeforeUpdate()
-  preSave(): void {
-    safeReloadArray(this, 'paths');
-  }
 }

@@ -14,7 +14,7 @@ export class AdminAuthMiddleware {
   static forRoutes(...routeFilters: string[]) {
     return async (req: Request, res: Response, next: () => void) => {
       const url = req.originalUrl;
-      const matched = _.find(routeFilters, routeFilter => url.startsWith(routeFilter));
+      const matched = _.find(routeFilters, (routeFilter) => url.startsWith(routeFilter));
       if (!matched) {
         return next();
       }
@@ -29,10 +29,9 @@ export class AdminAuthMiddleware {
         if (result.err instanceof Error) {
           throw result.err;
         } else {
-          throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+          throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err ?? result.info);
         }
       }
-
       next();
     };
   }

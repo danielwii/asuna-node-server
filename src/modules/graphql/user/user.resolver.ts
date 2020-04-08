@@ -14,7 +14,7 @@ export class UserProfileQueryResolver {
   @UseGuards(new GqlWXAuthGuard())
   @Query()
   async user_profile(@Context() ctx: GraphqlContext): Promise<UserProfile> {
-    return ctx.getCurrentUser();
+    return UserProfile.findOne(ctx.getCurrentUser().id);
   }
 
   @UseGuards(new GqlAdminAuthGuard())
