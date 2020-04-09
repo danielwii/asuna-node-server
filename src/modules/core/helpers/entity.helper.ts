@@ -3,6 +3,7 @@
 import * as _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
+import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger/factory';
 import { ConfigKeys, configLoader } from '../../config';
 import { ColumnType } from './column.helper';
@@ -54,10 +55,10 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
 }
 
 export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, defaultValue?): void {
-  if (entity && column /* && ColumnType.JSON === 'simple-json' */) {
+  // logger.verbose(`safeReloadJSON ${r({ entity: typeof entity, column, value: entity[column], defaultValue })}`);
+  if (_.has(entity, column)) {
     if (entity[column]) {
       try {
-        // logger.verbose(`safeReloadJSON ${r({ column, value: entity[column] })}`);
         if (!_.isObject(entity[column])) {
           entity[column] = JSON.parse(entity[column] as any);
         }
