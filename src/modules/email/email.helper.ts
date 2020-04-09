@@ -7,7 +7,6 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
-import { HandlebarsHelper } from '../common/helpers';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
@@ -122,17 +121,16 @@ export class EmailHelper {
     { to, attachments, context }: { to: string[]; attachments?: Attachment[]; context?: Record<string, any> },
   ): Promise<MailInfo> {
     const { templates } = await EmailHelper.getTmplConfig();
-    const loaded = WeChatHelper.parseTemplateData(templates, {});
+    const loaded = WeChatHelper.parseTemplateData(templates, context);
     const { subject, template } = loaded?.[key] ?? {};
     if (!subject && !template) {
       logger.error(`no ${key} found in email templates...`);
       return Promise.reject(new Error(`no ${key} found in email templates...`));
     }
-    const injected = HandlebarsHelper.injectContext(subject, context);
-    logger.verbose(`send template mail ${r({ key, subject, injected, context })}`);
+    logger.verbose(`send template mail ${r({ key, subject })}`);
     return new Promise((resolve) => {
       EmailHelper.sender.next({
-        email: { to, subject: injected, content: HandlebarsHelper.injectContext(template, context), attachments },
+        email: { to, subject, content: template, attachments },
         cb: (info) => resolve(info),
       });
     });
