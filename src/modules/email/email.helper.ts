@@ -128,15 +128,11 @@ export class EmailHelper {
       logger.error(`no ${key} found in email templates...`);
       return Promise.reject(new Error(`no ${key} found in email templates...`));
     }
-    // logger.verbose(`loaded templates ${r(template)}`);
+    const injected = HandlebarsHelper.injectContext(subject, context);
+    logger.verbose(`send template mail ${r({ key, subject, injected, context })}`);
     return new Promise((resolve) => {
       EmailHelper.sender.next({
-        email: {
-          to,
-          subject: HandlebarsHelper.injectContext(subject, context),
-          content: HandlebarsHelper.injectContext(template, context),
-          attachments,
-        },
+        email: { to, subject: injected, content: HandlebarsHelper.injectContext(template, context), attachments },
         cb: (info) => resolve(info),
       });
     });
