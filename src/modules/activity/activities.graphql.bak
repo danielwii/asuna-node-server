@@ -1,0 +1,27 @@
+#type UserActivity implements TimeBasedBaseEntity {
+#  id: String!
+#  createdAt: Date!
+#  updatedAt: Date!
+#
+#  refId: String
+#  type: String
+#
+#  profile: UserProfile
+#}
+#
+#type MixedUserActivity {
+#  origin: UserActivity
+#  ref: Any
+#}
+#
+#type PagedMixedUserActivity implements PagedQuery {
+#  total: Int
+#  page: Int
+#  size: Int
+#  items: [MixedUserActivity]
+#}
+
+#type Query {
+##  user_paged_activities(pageRequest: PageRequest): PagedMixedUserActivity
+#  api_paged_activities(pageRequest: PageRequest): PagedMixedUserActivity
+#}
