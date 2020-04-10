@@ -298,7 +298,7 @@ export class WxApi {
     return fetch(url, init)
       .then(WxApi.logInterceptor)
       .catch((reason) => {
-        logger.error(`fetch ${r({ url, init })} ${r(reason)}`);
+        logger.error(`fetch ${r({ url, init })} reason: ${r(reason)}`);
         return reason;
       });
   }
@@ -307,7 +307,7 @@ export class WxApi {
     const { url, status } = response;
     const json = await response.json();
     if (json.errcode) {
-      // logger.error(`[${status}] call '${url}' error: ${r(json)}`);
+      logger.error(`[${status}] call '${url}' error: ${r(json)}`);
       throw new Error(`[${status}] call '${url}' response: ${r(json)}`);
     } else {
       logger.verbose(`[${status}] call '${url}': ${r(json)}`);

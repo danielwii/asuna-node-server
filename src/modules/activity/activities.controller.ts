@@ -3,7 +3,7 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
+import { AnyAuthGuard, JwtAuthRequest } from '../core/auth';
 import { PageHelper } from '../core/helpers';
 import { UserActivity } from './activities.entities';
 
@@ -22,7 +22,7 @@ const logger = LoggerFactory.getLogger('ActivitiesController');
 
 @Controller('api/v1/activities')
 export class ActivitiesController {
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(AnyAuthGuard)
   @Post()
   async addActivity(@Body() body: CreateActivityDto, @Req() req: JwtAuthRequest): Promise<UserActivity> {
     const { user } = req;

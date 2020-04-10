@@ -9,17 +9,17 @@ type UserActivity implements TimeBasedBaseEntity {
   profile: UserProfile
 }
 
-type MixedUserActivity {
-  origin: UserActivity
-  ref: Any
-}
+#type MixedUserActivity {
+#  origin: UserActivity
+#  ref: Any
+#}
 
-type PagedMixedUserActivity implements PagedQuery {
-  total: Int
-  page: Int
-  size: Int
-  items: [MixedUserActivity]
-}
+#type PagedMixedUserActivity implements PagedQuery {
+#  total: Int
+#  page: Int
+#  size: Int
+#  items: [MixedUserActivity]
+#}
 
 #type Query {
 #  #  user_paged_activities(pageRequest: PageRequest): PagedMixedUserActivity
