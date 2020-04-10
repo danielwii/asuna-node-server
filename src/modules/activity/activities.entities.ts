@@ -9,7 +9,7 @@ import { InjectUserProfile } from '../core/auth';
   sti: { name: 'user__activities', info: { type: 'EnumFilter', accessible: 'readonly' } },
 })
 @Entity('user__t_activities')
-@TableInheritance()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class UserActivity extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('ua');
@@ -22,5 +22,8 @@ export class UserActivity extends InjectUserProfile(AbstractTimeBasedBaseEntity)
   // type: string;
 
   @Column({ nullable: false, length: 20 })
-  action: string;
+  service: string;
+
+  @Column({ nullable: false, length: 20 })
+  operation: string;
 }

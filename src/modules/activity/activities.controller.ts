@@ -1,16 +1,19 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
-import { UserActivity } from './activities.entitiy';
+import { PageHelper } from '../core/helpers';
+import { UserActivity } from './activities.entities';
 
 class CreateActivityDto {
   @IsString()
   type: string;
   @IsString()
-  action: string;
+  service: string;
+  @IsString()
+  operation: string;
   @IsString()
   refId: string;
 }
@@ -25,5 +28,12 @@ export class ActivitiesController {
     const { user } = req;
     logger.log(`save activity ${r(body)}`);
     return UserActivity.create({ ...body, profile: user }).save();
+  }
+
+  @Get()
+  async latestActivities(@Query() query: Partial<CreateActivityDto>): Promise<UserActivity[]> {
+    logger.log(`list latest activities ${r(query)}`);
+    const count = await UserActivity.count({ ...query });
+    return UserActivity.find({ ...query, take: 10, skip: PageHelper.latestSkip(count, 10) });
   }
 }

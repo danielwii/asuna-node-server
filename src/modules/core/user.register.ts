@@ -2,6 +2,7 @@ import { BaseEntity } from 'typeorm';
 import { Constructor } from '../base';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+// eslint-disable-next-line import/no-cycle
 import { UserProfile } from './auth/user.entities';
 import { DBHelper } from './db';
 
@@ -22,12 +23,12 @@ export class UserRegister {
     this.Entity = Entity;
     this.onProfileCreate =
       onProfileCreate ||
-      (profile => {
+      ((profile) => {
         const entity = new Entity({ id: profile.id, profile });
         logger.verbose(`onProfileCreate save ${r({ profile, entity })}`);
         return DBHelper.repo(Entity).save(entity as any);
       });
-    this.onProfileDelete = onProfileDelete || (profile => DBHelper.repo(Entity).delete(profile.id));
+    this.onProfileDelete = onProfileDelete || ((profile) => DBHelper.repo(Entity).delete(profile.id));
   }
 
   static createUserByProfile(profile: UserProfile): Promise<any> {

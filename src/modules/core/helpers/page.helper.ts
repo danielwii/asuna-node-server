@@ -54,6 +54,11 @@ export class PageHelper {
       getManager().transaction((entityManager) => handler(page + 1, totalPages, entityManager)),
     );
   }
+
+  static latestSkip(total: number, latest: number): number {
+    const left = total - latest;
+    return total > 0 && latest > 0 && left > 0 ? left : total;
+  }
 }
 
 export class Pageable<T> {
