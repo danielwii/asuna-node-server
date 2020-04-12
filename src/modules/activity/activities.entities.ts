@@ -1,7 +1,7 @@
 import { Column, Entity, TableInheritance } from 'typeorm';
 import { AbstractTimeBasedBaseEntity } from '../base/base.entity';
 import { EntityMetaInfo } from '../common/decorators';
-import { InjectUserProfile } from '../core/auth';
+import { InjectMultiUserProfile } from '../core/auth';
 
 @EntityMetaInfo({
   name: 'user__activities',
@@ -10,7 +10,7 @@ import { InjectUserProfile } from '../core/auth';
 })
 @Entity('user__t_activities')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
-export class UserActivity extends InjectUserProfile(AbstractTimeBasedBaseEntity) {
+export class UserActivity extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('ua');
   }
