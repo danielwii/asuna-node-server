@@ -17,7 +17,7 @@ export class OperationTokenGuard implements CanActivate {
 
     const token = getIgnoreCase(req.headers, OPERATION_TOKEN_HEADER);
     return from(OperationTokenHelper.getTokenByToken(token)).pipe(
-      map(operationToken => {
+      map((operationToken) => {
         if (operationToken == null) {
           throw new AsunaException(AsunaErrorCode.Unprocessable, 'operation token required.');
         }

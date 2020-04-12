@@ -34,6 +34,6 @@ export class ActivitiesController {
   async latestActivities(@Query() query: Partial<CreateActivityDto>): Promise<UserActivity[]> {
     logger.log(`list latest activities ${r(query)}`);
     const count = await UserActivity.count({ ...query });
-    return UserActivity.find({ ...query, take: 10, skip: PageHelper.latestSkip(count, 10) });
+    return UserActivity.find({ ...query, ...PageHelper.latestSkip(count, 10) });
   }
 }
