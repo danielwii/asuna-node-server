@@ -55,9 +55,10 @@ export class PageHelper {
     );
   }
 
-  static latestSkip(total: number, latest: number): number {
+  static latestSkip(total: number, latest: number): { skip: number; take: number } {
     const left = total - latest;
-    return total > 0 && latest > 0 && left > 0 ? left : total;
+    const skip = total > 0 && latest > 0 && left > 0 ? left : 0;
+    return { skip, take: latest };
   }
 }
 
