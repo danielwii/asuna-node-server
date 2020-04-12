@@ -27,6 +27,10 @@ export class ActivitiesController {
   async addActivity(@Body() body: CreateActivityDto, @Req() req: JwtAuthRequest): Promise<UserActivity> {
     const { user } = req;
     logger.log(`save activity ${r(body)}`);
+
+    const exists = await UserActivity.findOne({ ...body, profile: user });
+    if (exists) return exists;
+
     return UserActivity.create({ ...body, profile: user }).save();
   }
 

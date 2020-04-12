@@ -9,7 +9,7 @@ import { InjectMultiUserProfile } from '../core/auth';
   sti: { name: 'user__activities', info: { type: 'EnumFilter', accessible: 'readonly' } },
 })
 @Entity('user__t_activities')
-@TableInheritance({ column: { type: 'varchar', name: 'type' } })
+// @TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class UserActivity extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
   constructor() {
     super('ua');
@@ -18,8 +18,8 @@ export class UserActivity extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   @Column({ nullable: false, length: 36, name: 'ref_id' })
   refId: string;
 
-  // @Column({ nullable: false, length: 20 })
-  // type: string;
+  @Column({ nullable: false, length: 20 })
+  type: string;
 
   @Column({ nullable: false, length: 20 })
   service: string;
