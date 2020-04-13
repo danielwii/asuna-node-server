@@ -6,7 +6,7 @@ import { GraphqlContext } from '../dataloader';
 import { GraphqlHelper } from '../graphql';
 import { UserActivity } from './activities.entities';
 
-@Resolver('UserActivity')
+@Resolver(UserActivity)
 export class ActivitiesResolver {
   logger = new Logger(this.constructor.name);
 
