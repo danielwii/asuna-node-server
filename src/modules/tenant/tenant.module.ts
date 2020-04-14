@@ -136,7 +136,7 @@ export class TenantModule implements OnModuleInit {
       'populate-tenant-for-entities-with-old-tenant',
       CronExpression.EVERY_10_MINUTES,
       TenantService.populateTenantForEntitiesWithOldTenant,
-      { runOnInit: true, start: true, ttl: 120_000 },
+      { runOnInit: true, start: true, ttl: 120 },
     );
   }
 }

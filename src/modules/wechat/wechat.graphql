@@ -11,5 +11,6 @@ type WXMiniAppUserInfo {
   createdAt: Date
   updatedAt: Date
   updatedBy: String
+
   profile: UserProfile
 }

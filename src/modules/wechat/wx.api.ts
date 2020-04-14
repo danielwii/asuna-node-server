@@ -420,7 +420,7 @@ export class WxHelper {
           }
           throw new AsunaException(AsunaErrorCode.Unprocessable, 'get access token error', result);
         },
-        { ttl: 60_000 },
+        { ttl: 60 },
       )
       .catch((reason) => logger.error(reason));
     logger.verbose(`access token is ${r(token)}`);
