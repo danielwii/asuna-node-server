@@ -31,6 +31,12 @@ input TimeCondition {
   after: Date
 }
 
+input RelationQueryCondition {
+  where: JSON
+  latest: Int
+  orderBy: Sorter
+}
+
 input QueryCondition {
   ids: [Any!]
   random: Int
@@ -113,10 +119,7 @@ interface CursoredQuery {
 # https://www.apollographql.com/docs/apollo-server/performance/caching/
 # --------------------------------------------------------------
 
-directive @cacheControl(
-  maxAge: Int,
-  scope: CacheControlScope
-) on OBJECT | FIELD | FIELD_DEFINITION
+directive @cacheControl(maxAge: Int, scope: CacheControlScope) on OBJECT | FIELD | FIELD_DEFINITION
 
 enum CacheControlScope {
   # 代理服务器缓存
