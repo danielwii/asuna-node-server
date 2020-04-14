@@ -1,8 +1,8 @@
-import { Promise } from 'bluebird';
-import { ClassType } from 'class-transformer/ClassTransformer';
-import { GraphQLResolveInfo } from 'graphql';
-import * as _ from 'lodash';
-import * as fp from 'lodash/fp';
+import { Promise } from "bluebird";
+import { ClassType } from "class-transformer/ClassTransformer";
+import { GraphQLResolveInfo } from "graphql";
+import * as _ from "lodash";
+import * as fp from "lodash/fp";
 import {
   BaseEntity,
   FindConditions,
@@ -11,22 +11,22 @@ import {
   LessThan,
   MoreThan,
   ObjectLiteral,
-  Repository,
-} from 'typeorm';
-import { AbstractCategoryEntity } from '../base';
-import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { DBHelper } from '../core/db';
-import { PageInfo, PageRequest, toPage } from '../core/helpers';
+  Repository
+} from "typeorm";
+import { AbstractCategoryEntity } from "../base";
+import { AsunaErrorCode, AsunaException, PrimaryKey } from "../common";
+import { r } from "../common/helpers";
+import { LoggerFactory } from "../common/logger";
+import { DBHelper } from "../core/db";
+import { PageHelper, PageInfo, PageRequest, toPage } from "../core/helpers";
 import {
   DataLoaderFunction,
   DefaultRegisteredLoaders,
   GraphqlContext,
   resolveRelationsFromInfo,
-  resolveSelectsFromInfo,
-} from '../dataloader';
-import { CategoryInputQuery, QueryConditionInput, TimeConditionInput } from './input';
+  resolveSelectsFromInfo
+} from "../dataloader";
+import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from "./input";
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -83,7 +83,7 @@ type ResolvePropertyByLoader<RelationEntity extends BaseEntity> = {
 };
 
 export class GraphqlHelper {
-  public static resolveOrder<Entity extends BaseEntity>(
+  static resolveOrder<Entity extends BaseEntity>(
     cls: ClassType<Entity>,
     pageRequest: PageRequest,
   ): {
@@ -95,7 +95,7 @@ export class GraphqlHelper {
       : { ...(includeOrdinal ? { ordinal: 'DESC' } : null), createdAt: 'DESC' };
   }
 
-  public static async handlePagedDefaultQueryRequest<
+  static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders,
     MixedEntity = any
@@ -124,7 +124,7 @@ export class GraphqlHelper {
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
-  public static async handleDefaultQueryRequest<
+  static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     MixedEntity,
     DataLoaders extends DefaultRegisteredLoaders
@@ -137,7 +137,7 @@ export class GraphqlHelper {
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[]>;
-  public static async handleDefaultQueryRequest<
+  static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders
   >(opts: {
@@ -148,7 +148,7 @@ export class GraphqlHelper {
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]>;
-  public static async handleDefaultQueryRequest<
+  static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     MixedEntity,
     DataLoaders extends DefaultRegisteredLoaders
@@ -231,17 +231,17 @@ export class GraphqlHelper {
    * @param timeCondition
    * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
    */
-  public static async genericFindOptions<Entity extends BaseEntity>(
+  static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  public static async genericFindOptions<Entity extends BaseEntity>(
+  static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & ResolveCategoryOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  public static async genericFindOptions<Entity extends BaseEntity>(
+  static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>,
   ): Promise<FindManyOptions<Entity>> {
     const {
@@ -298,7 +298,7 @@ export class GraphqlHelper {
     return options;
   }
 
-  public static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+  static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity> {
@@ -326,11 +326,11 @@ export class GraphqlHelper {
     return targetRepo.findOne(id);
   }
 
-  public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+  static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity[]>;
-  public static async resolveProperties<
+  static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
     MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
@@ -338,7 +338,7 @@ export class GraphqlHelper {
     opts: BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<MixedRelationEntity[]>;
-  public static async resolveProperties<
+  static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
     MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
@@ -369,7 +369,7 @@ export class GraphqlHelper {
     return targetRepo.findByIds(ids).then((items) => mapItems(items, mapper));
   }
 
-  public static pagedResult<Entity>({
+  static pagedResult<Entity>({
     pageRequest,
     items,
     total,
@@ -378,7 +378,7 @@ export class GraphqlHelper {
     items: Entity[];
     total: number;
   }): Promise<PageInfo & { items: Entity[]; total: number }>;
-  public static pagedResult<Entity, MixedEntity>({
+  static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
     total,
@@ -389,7 +389,7 @@ export class GraphqlHelper {
     total: number;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: MixedEntity[]; total: number }>;
-  public static pagedResult<Entity, MixedEntity>({
+  static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
     total,
@@ -401,6 +401,42 @@ export class GraphqlHelper {
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: Entity[] | MixedEntity[]; total: number }> {
     return Promise.props({ ...toPage(pageRequest), items: mapItems(items, mapper), total });
+  }
+
+  static async resolveMixedRelation<Entity extends BaseEntity, RelationEntity extends BaseEntity>({
+    origin,
+    query,
+    // loader,
+    targetCls,
+    where,
+  }: {
+    origin: Entity;
+    // instance: Job;
+    // loader: DataLoaderFunction<Entity>;
+    query: RelationQueryConditionInput;
+    targetCls: ClassType<RelationEntity>;
+    where: FindConditions<RelationEntity>;
+    // cls: Job;
+    // key: string;
+  }) {
+    if (!origin) return null;
+
+    const targetRepo = (targetCls as any) as Repository<RelationEntity>;
+    const count = await targetRepo.count();
+    let latest = count;
+    let order: object = { createdAt: 'DESC' };
+    if (query) {
+      if (query.latest) latest = query.latest;
+      if (query.orderBy) order = { [query.orderBy.column]: query.orderBy.order };
+    }
+    const skip = PageHelper.latestSkip(count, latest);
+
+    logger.verbose(
+      `load mixed relation ${r({ where: { ...(where ?? {}), ...(query?.where ?? {}) }, order, ...skip })}`,
+    );
+    const items = await targetRepo.find({ where: { ...(where ?? {}), ...(query?.where ?? {}) }, order, ...skip });
+
+    return { count, items };
   }
 }
 

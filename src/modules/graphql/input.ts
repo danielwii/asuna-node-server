@@ -40,6 +40,17 @@ export class QueryConditionInput {
   random?: number;
 }
 
+export class RelationQueryConditionInput {
+  @IsOptional()
+  latest?: number;
+
+  @IsOptional()
+  where?: object;
+
+  @IsOptional()
+  orderBy?: { column: string; order?: Order };
+}
+
 export class AdminQueryConditionInput {
   @IsOptional()
   ids?: string[] | number[];

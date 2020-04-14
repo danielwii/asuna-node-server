@@ -58,7 +58,8 @@ export class PageHelper {
   static latestSkip(total: number, latest: number): { skip: number; take: number } {
     const left = total - latest;
     const skip = total > 0 && latest > 0 && left > 0 ? left : 0;
-    return { skip, take: latest };
+    const take = latest > 0 ? latest : total;
+    return { skip, take };
   }
 }
 

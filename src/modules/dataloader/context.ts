@@ -1,3 +1,4 @@
+import { UserActivity } from '../activity';
 import { AppInfo } from '../app/app.entities';
 import { Feedback, FeedbackReply } from '../content/feedback.entities';
 import { UserProfile } from '../core/auth';
@@ -16,6 +17,7 @@ export type DefaultRegisteredLoaders = {
   paymentItems: DataLoaderFunction<PaymentItem>;
   feedback: DataLoaderFunction<Feedback>;
   feedbackReplies: DataLoaderFunction<FeedbackReply>;
+  userActivities: DataLoaderFunction<UserActivity>;
 };
 
 export const defaultDataLoaders = {
@@ -28,4 +30,5 @@ export const defaultDataLoaders = {
   paymentItems: loader<PaymentItem>(PaymentItem, { isPublished: true }),
   feedback: loader<Feedback>(Feedback),
   feedbackReplies: loader<FeedbackReply>(FeedbackReply),
+  userActivities: loader<UserActivity>(UserActivity),
 };
