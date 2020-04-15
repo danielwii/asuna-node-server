@@ -1,3 +1,9 @@
+import * as _ from 'lodash';
+import { r } from '../common/helpers/utils';
+import { LoggerFactory } from '../common/logger';
+
+const logger = LoggerFactory.getLogger('StateMachine');
+
 export type StateMachineAction<Action, State> = { type: Action; from: State; to: State };
 
 export abstract class AbstractStateMachine<StatusType, ActionType> {
@@ -10,7 +16,8 @@ export abstract class AbstractStateMachine<StatusType, ActionType> {
   ) {}
 
   do(from: StatusType, type: ActionType): StatusType {
-    const found = this.actions.find((action) => action.from === from && action.type === type);
+    const found = _.find(this.actions, (action) => action.from === from && action.type === type);
+    logger.verbose(`do ${this.key} ${r({ found, from, type })}`);
     return found?.to ?? from;
   }
 
