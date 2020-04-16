@@ -142,6 +142,8 @@ export class KvDefIdentifierHelper {
   static stringify = (payload: KvDef): string => `${payload.collection}#${payload.key}`;
 }
 
+export type ConstantsKeys = 'WXMessageIds';
+
 export class KvHelper {
   static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
@@ -157,7 +159,7 @@ export class KvHelper {
    * @param constantMap
    */
   static async mergeConstantMaps(
-    key: 'PointExchange' | 'FinancialTransaction' | 'InteractionType' | 'WXMessageIds' | string,
+    key: ConstantsKeys | string,
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };

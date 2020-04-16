@@ -1,8 +1,8 @@
-import { Promise } from "bluebird";
-import { ClassType } from "class-transformer/ClassTransformer";
-import { GraphQLResolveInfo } from "graphql";
-import * as _ from "lodash";
-import * as fp from "lodash/fp";
+import { Promise } from 'bluebird';
+import { ClassType } from 'class-transformer/ClassTransformer';
+import { GraphQLResolveInfo } from 'graphql';
+import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import {
   BaseEntity,
   FindConditions,
@@ -11,22 +11,22 @@ import {
   LessThan,
   MoreThan,
   ObjectLiteral,
-  Repository
-} from "typeorm";
-import { AbstractCategoryEntity } from "../base";
-import { AsunaErrorCode, AsunaException, PrimaryKey } from "../common";
-import { r } from "../common/helpers";
-import { LoggerFactory } from "../common/logger";
-import { DBHelper } from "../core/db";
-import { PageHelper, PageInfo, PageRequest, toPage } from "../core/helpers";
+  Repository,
+} from 'typeorm';
+import { AbstractCategoryEntity } from '../base';
+import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
+import { DBHelper } from '../core/db';
+import { PageHelper, PageInfo, PageRequest, toPage } from '../core/helpers';
 import {
   DataLoaderFunction,
   DefaultRegisteredLoaders,
   GraphqlContext,
   resolveRelationsFromInfo,
-  resolveSelectsFromInfo
-} from "../dataloader";
-import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from "./input";
+  resolveSelectsFromInfo,
+} from '../dataloader';
+import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -422,7 +422,7 @@ export class GraphqlHelper {
     if (!origin) return null;
 
     const targetRepo = (targetCls as any) as Repository<RelationEntity>;
-    const count = await targetRepo.count();
+    const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
     let latest = count;
     let order: object = { createdAt: 'DESC' };
     if (query) {
@@ -431,10 +431,8 @@ export class GraphqlHelper {
     }
     const skip = PageHelper.latestSkip(count, latest);
 
-    logger.verbose(
-      `load mixed relation ${r({ where: { ...(where ?? {}), ...(query?.where ?? {}) }, order, ...skip })}`,
-    );
-    const items = await targetRepo.find({ where: { ...(where ?? {}), ...(query?.where ?? {}) }, order, ...skip });
+    logger.verbose(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, ...skip })}`);
+    const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, ...skip });
 
     return { count, items };
   }
