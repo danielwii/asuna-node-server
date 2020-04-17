@@ -206,7 +206,16 @@ export type MiniSubscribeData = {
   thing2?: {
     value: string;
   };
+  thing3?: {
+    value: string;
+  };
+  thing4?: {
+    value: string;
+  };
   thing5?: {
+    value: string;
+  };
+  thing6?: {
     value: string;
   };
   thing7?: {

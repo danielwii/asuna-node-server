@@ -20,7 +20,7 @@ import { Store } from '../store';
 import { AdminWsHelper } from '../ws';
 import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
-import { WxApi, WxHelper } from './wx.api';
+import { MiniSubscribeInfo, TemplateMsgInfo, WxApi, WxHelper } from './wx.api';
 import {
   GetPhoneNumber,
   MiniSubscribeData,
@@ -414,16 +414,14 @@ export class WeChatHelper {
     url?: string;
     payload: TemplateData;
   }): Promise<WxSendTemplateInfo> {
-    return WxApi.sendTemplateMsg({ touser: openId, template_id: templateId, url, data: payload }).then((sendInfo) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      sendInfo.errcode
-        ? logger.error(
-            `send template message to ${openId} error: ${r({
-              sendInfo,
-              opts: { touser: openId, template_id: templateId, url, data: payload },
-            })}`,
-          )
-        : logger.verbose(`send template message to ${openId} done: ${r(sendInfo)}`);
+    const opts: TemplateMsgInfo = { touser: openId, template_id: templateId, url, data: payload };
+    return WxApi.sendTemplateMsg(opts).then((sendInfo) => {
+      const info = { sendInfo, opts };
+      if (sendInfo.errcode) {
+        logger.error(`send template message to ${openId} error: ${r(info)}`);
+      } else {
+        logger.verbose(`send template message to ${openId} done: ${r(info)}`);
+      }
       return sendInfo;
     });
   }
@@ -439,19 +437,15 @@ export class WeChatHelper {
     subscribeId: string;
     payload: MiniSubscribeData;
   }): Promise<SubscribeMessageInfo> {
-    return WxApi.sendSubscribeMsg({ touser: openId, page, template_id: subscribeId, data: payload }).then(
-      (messageInfo) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        messageInfo.errcode
-          ? logger.error(
-              `send subscribe message to ${openId} error: ${r({
-                messageInfo,
-                opts: { touser: openId, subscribe_id: subscribeId, data: payload },
-              })}`,
-            )
-          : logger.verbose(`send subscribe message to ${openId} done: ${r(messageInfo)}`);
-        return messageInfo;
-      },
-    );
+    const opts: MiniSubscribeInfo = { touser: openId, page, template_id: subscribeId, data: payload };
+    return WxApi.sendSubscribeMsg(opts).then((messageInfo) => {
+      const info = { messageInfo, opts };
+      if (messageInfo.errcode) {
+        logger.error(`send subscribe message to ${openId} error: ${r(info)}`);
+      } else {
+        logger.verbose(`send subscribe message to ${openId} done: ${r(info)}`);
+      }
+      return messageInfo;
+    });
   }
 }

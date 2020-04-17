@@ -83,7 +83,7 @@ type QrLimitScene =
       };
     };
 
-type TemplateInfo = {
+export type TemplateInfo = {
   // 接收者 openid
   touser: string;
   // 模板ID
@@ -93,7 +93,7 @@ type TemplateInfo = {
   color?: string;
 };
 
-type MiniAppTemplateInfo = TemplateData & {
+export type MiniAppTemplateInfo = TemplateData & {
   // 跳小程序所需数据，不需跳小程序可不用传该数据
   miniprogram?: {
     // 跳转小程序
@@ -105,12 +105,12 @@ type MiniAppTemplateInfo = TemplateData & {
   pagepath?: string;
 };
 
-type UrlRedirectTemplateInfo = TemplateData & {
+export type UrlRedirectTemplateInfo = TemplateData & {
   // 模板跳转链接（海外帐号没有跳转能力）
   url: string;
 };
 
-type MiniSubscribeInfo = {
+export type MiniSubscribeInfo = {
   // 接收者（用户）的 openid
   touser: string;
   // 所需下发的订阅模板id
@@ -150,6 +150,8 @@ type GetMiniCode = {
 enum WxKeys {
   accessToken = 'wx-access-token',
 }
+
+export type TemplateMsgInfo = TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo;
 
 export class WxApi {
   /**
@@ -216,9 +218,7 @@ export class WxApi {
     ).then((json) => new WxUserInfo(json));
 
   // 服务号发送消息
-  static sendTemplateMsg = (
-    opts: TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo,
-  ): Promise<WxSendTemplateInfo> =>
+  static sendTemplateMsg = (opts: TemplateMsgInfo): Promise<WxSendTemplateInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
       WxApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`,
