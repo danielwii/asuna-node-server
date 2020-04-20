@@ -18,7 +18,7 @@ import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
-import { PageHelper, PageInfo, PageRequest, toPage } from '../core/helpers';
+import { PageInfo, PageRequest, toPage } from '../core/helpers';
 import {
   DataLoaderFunction,
   DefaultRegisteredLoaders,
@@ -423,16 +423,12 @@ export class GraphqlHelper {
 
     const targetRepo = (targetCls as any) as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
-    let latest = count;
-    let order: object = { createdAt: 'DESC' };
-    if (query) {
-      if (query.latest) latest = query.latest;
-      if (query.orderBy) order = { [query.orderBy.column]: query.orderBy.order };
-    }
-    const skip = PageHelper.latestSkip(count, latest);
+    const take = query?.latest ?? count;
+    const order: object = query?.orderBy ? { [query.orderBy.column]: query.orderBy.order } : { createdAt: 'DESC' };
+    // const skip = PageHelper.latestSkip(count, limit);
 
-    logger.verbose(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, ...skip })}`);
-    const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, ...skip });
+    logger.verbose(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
+    const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, take });
 
     return { count, items };
   }
