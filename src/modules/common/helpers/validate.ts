@@ -1,7 +1,6 @@
 import { ClassTransformOptions, deserialize, plainToClass } from 'class-transformer';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import { validate, validateSync } from 'class-validator';
-import { ValidationError } from 'class-validator/validation/ValidationError';
+import { validate, validateSync, ValidationError } from 'class-validator';
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
 import { LoggerFactory } from '../logger';
@@ -16,7 +15,7 @@ export async function validateObject(object): Promise<ValidationError[]> {
   const errors = await validate(object);
   if (errors.length > 0) {
     logger.warn(`async validate ${r(object)} error: ${r(errors)}`);
-    throw new ValidationException(errors.map(error => error.property).join(','), errors);
+    throw new ValidationException(errors.map((error) => error.property).join(','), errors);
   }
 }
 

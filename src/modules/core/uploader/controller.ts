@@ -4,7 +4,7 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, Min, Validator } from 'class-validator';
+import { isEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
@@ -37,10 +37,9 @@ const fileInterceptorOptions: MulterOptions = {
   }),
   fileFilter(req, file, cb) {
     logger.verbose(`validate file ${r(file)}`);
-    const validator = new Validator();
-    const supportedImage = validator.isEnum(file.mimetype, ImageMimeType);
-    const supportedVideo = validator.isEnum(file.mimetype, VideoMimeType);
-    const supportedDoc = validator.isEnum(file.mimetype, DocMimeType);
+    const supportedImage = isEnum(file.mimetype, ImageMimeType);
+    const supportedVideo = isEnum(file.mimetype, VideoMimeType);
+    const supportedDoc = isEnum(file.mimetype, DocMimeType);
     logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
     if (!(supportedImage || supportedVideo || supportedDoc)) {
       // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
@@ -52,7 +51,7 @@ const fileInterceptorOptions: MulterOptions = {
 
 class CreateChunksUploadTaskDto {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   filename: string;
 
   @IsNumber()
@@ -62,17 +61,17 @@ class CreateChunksUploadTaskDto {
 
 class CreateChunksUploadTaskQuery {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly key: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly filename: string;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @Transform(value => Number(value))
+  @Transform((value) => Number(value))
   readonly totalChunks: number = 1;
 }
 
@@ -128,7 +127,7 @@ export class UploaderController {
     const stream = fs.createWriteStream(tempFile);
     req.pipe(stream);
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       req.on('end', () => {
         logger.log(`save to ${tempFile} done.`);
         resolve();
@@ -218,7 +217,7 @@ export class UploaderController {
       throw new UploadException(req.fileValidationError);
     } */
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
-    const results = await this.saveFiles(bucket, prefix, local, files).catch(error => {
+    const results = await this.saveFiles(bucket, prefix, local, files).catch((error) => {
       logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
       throw new UploadException(error);
@@ -249,7 +248,7 @@ export class UploaderController {
     const stream = fs.createWriteStream(tempFile);
     req.pipe(stream);
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       req.on('end', () => {
         logger.log(`save to ${tempFile} done.`);
         resolve();
@@ -258,7 +257,7 @@ export class UploaderController {
 
     const fileInfo = new FileInfo({ filename: baseFilename, path: tempFile });
     // fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${baseFilename}`;
-    const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch(error => {
+    const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch((error) => {
       logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
       throw new UploadException(error);
@@ -270,7 +269,7 @@ export class UploaderController {
   }
 
   private saveFiles(defaultBucket: string, prefix: string, local: string, files: FileInfo[]): Promise<SavedFile[]> {
-    return Promise.map(files, file => {
+    return Promise.map(files, (file) => {
       const bucket = defaultBucket || `${file.mimetype.split('/')[0]}s`;
       if (local === '1') {
         logger.log(oneLineTrim`
