@@ -3,6 +3,7 @@ import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
+import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
@@ -90,15 +91,14 @@ export class PaymentHelper {
   static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
-    const signTmpl = method?.signTmpl;
+    if (!method) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
+    }
+    // const signTmpl = method?.signTmpl;
     const context = await this.extraContext(transaction, method, order);
 
-    const signed = Handlebars.compile(signTmpl)(context);
-    const md5 = crypto
-      .createHash('md5')
-      .update(signed)
-      .digest('hex')
-      .toUpperCase();
+    const signed = Handlebars.compile(method.signTmpl ?? '')(context);
+    const md5 = crypto.createHash('md5').update(signed).digest('hex').toUpperCase();
 
     const md5sign = _.get(method.extra, 'lowercase') ? md5.toLowerCase() : md5.toUpperCase();
     return { context, signed, md5sign };
@@ -107,11 +107,14 @@ export class PaymentHelper {
   static async pay(transactionId: string): Promise<any> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
-    const bodyTmpl = method?.bodyTmpl;
+    // const bodyTmpl = method?.bodyTmpl;
+    if (!method) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
+    }
 
     const { context, signed, md5sign } = await this.sign(transactionId);
     Object.assign(context, { md5sign });
-    const body = Handlebars.compile(bodyTmpl)(context);
+    const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 
     logger.verbose(`parse body ${r({ body, context })}`);
 
