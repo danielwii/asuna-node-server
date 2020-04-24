@@ -31,7 +31,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
   static handleSqlExceptions(exception: QueryFailedErrorType): ValidationException | QueryFailedErrorType {
     // 包装唯一性约束，用于前端检测
     if (exception.code === 'ER_DUP_ENTRY') {
-      const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.+)' for key '(.+)'/);
+      const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.*)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = getRepository(model);
       const [index] = metadata.indices.filter((i) => i.name === key);
@@ -48,7 +48,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     // 未找到默认值
     if (exception.code === 'ER_NO_DEFAULT_FOR_FIELD') {
-      const [, name] = exception.sqlMessage.match(/Field '(.+)' doesn't have a default value/);
+      const [, name] = exception.sqlMessage.match(/Field '(.*)' doesn't have a default value/);
       const value = null;
       return new ValidationException('ER_NO_DEFAULT_FOR_FIELD', [
         {
