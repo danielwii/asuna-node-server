@@ -121,6 +121,7 @@ export const AsunaCollections = {
   SYSTEM_DYNAMIC_ROUTER: 'system.dynamic-router',
   SYSTEM_TENANT: 'system.tenant',
   APP_SETTINGS: 'app.settings',
+  THIRD_SETTINGS: '3rd.settings',
 };
 
 export class KvDef {
