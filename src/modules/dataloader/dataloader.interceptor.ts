@@ -6,6 +6,7 @@ import { JwtPayload } from '../core/auth';
 import { DefaultRegisteredLoaders } from './context';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
+import * as _ from 'lodash';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
@@ -27,9 +28,10 @@ export class DataLoaderInterceptor implements NestInterceptor {
     if (request.dataLoaders) {
       // this.logger.verbose('Data loaders exist', this.constructor.name);
     } else {
-      // this.logger.verbose('Creating data loaders', this.constructor.name);
-
-      // Create new instances of DataLoaders per request
+      if (_.isEmpty(GenericDataLoader.loaders)) {
+        logger.error(`no data loaders for request found, may not initialized at startup.`);
+      }
+      // logger.verbose(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
       request.dataLoaders = genericDataLoader.createLoaders();
     }
 

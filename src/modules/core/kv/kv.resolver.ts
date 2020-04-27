@@ -39,14 +39,14 @@ export class KeyValueModelResolver {
 
   @ResolveField()
   async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
-    this.logger.verbose(`load pair for ${model.id} ${r(model)}`);
+    this.logger.verbose(`load pair for ${model.id}`);
     return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
       cls: KeyValueModel,
       instance: model,
       key: 'pair',
       targetCls: KeyValuePair,
       loader: ctx.getDataLoaders().keyValuePairs,
-    }).then(item => {
+    }).then((item) => {
       // eslint-disable-next-line no-param-reassign
       [, item.value] = recognizeTypeValue(item.type, item.value);
       return item;

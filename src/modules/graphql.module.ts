@@ -4,6 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { default as OpentracingExtension } from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
+import { GraphQLServiceContext, ValueOrPromise, GraphQLRequestContext } from 'apollo-server-types';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
 import * as GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
@@ -62,8 +63,8 @@ export class GraphqlModule implements OnModuleInit {
           persistedQueries: { cache },
           plugins: [
             {
-              serverWillStart() {
-                logger.log('Server starting!');
+              serverWillStart(service: GraphQLServiceContext): ValueOrPromise<void> {
+                logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
             (responseCachePlugin as any)({

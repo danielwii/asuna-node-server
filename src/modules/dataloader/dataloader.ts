@@ -62,13 +62,14 @@ export const dataLoaderCleaner = {
 };
 
 export class GenericDataLoader {
-  private static loaders;
+  static loaders;
 
   constructor() {
     logger.log('init ...');
   }
 
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
+    logger.verbose(`init loaders ${r(loaders)}`);
     GenericDataLoader.loaders = loaders;
   }
 
