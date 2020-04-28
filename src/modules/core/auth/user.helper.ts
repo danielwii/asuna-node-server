@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity } from 'typeorm';
 import { AsunaErrorCode, AsunaException, LoggerFactory } from '../../common';

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { Promise } from 'bluebird';
-import { ChildProcess } from 'child_process';
+import { exec } from 'child_process';
 import { classToPlain } from 'class-transformer';
 import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
@@ -20,11 +20,25 @@ export function BeforeDate(date: Date): FindOperator<any> {
   return Between(subYears(date, 100), date);
 }
 
-export function execAsync(child: ChildProcess): Promise<void> {
+export function execAsync(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    child.addListener('error', reject);
-    child.addListener('exit', resolve);
+    exec(command, (error, stdout, stderr) => {
+      if (error) reject(error);
+      else resolve(stdout ?? stderr);
+    });
   });
+}
+
+export function toHHMMSS(num: string): string {
+  const sec_num = Number.parseInt(num, 10); // don't forget the second param
+  let hours: any = Math.floor(sec_num / 3600);
+  let minutes: any = Math.floor((sec_num - hours * 3600) / 60);
+  let seconds: any = sec_num - hours * 3600 - minutes * 60;
+
+  if (hours < 10) hours = `0${hours}`;
+  if (minutes < 10) minutes = `0${minutes}`;
+  if (seconds < 10) seconds = `0${seconds}`;
+  return `${hours}:${minutes}:${seconds}`;
 }
 
 export function r(

@@ -1,9 +1,9 @@
 import { Promise } from 'bluebird';
 import * as EmailTemplate from 'email-templates';
 import * as _ from 'lodash';
-import { createTransport, SentMessageInfo } from 'nodemailer';
-import Mail, { Attachment } from 'nodemailer/lib/mailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
+import { Attachment, Options } from 'nodemailer/lib/mailer';
+import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
@@ -48,7 +48,7 @@ export class EmailHelper {
   );
   // .pipe(observeOn(queueScheduler, 5000));
 
-  private static transporter: Mail;
+  private static transporter: Transporter;
   private static emailTemplate: EmailTemplate;
 
   static async init(): Promise<void> {
@@ -99,7 +99,7 @@ export class EmailHelper {
       // FIXME domain position for attachments may not correct
       domain = (storageConfigs.loader() as MinioConfigObject).endpoint;
     }
-    const mailOptions: Mail.Options = {
+    const mailOptions: Options = {
       from,
       to,
       cc,

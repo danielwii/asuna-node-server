@@ -1,9 +1,25 @@
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { resolve } from 'path';
+import { deserializeSafely } from '../common/helpers';
 import { LoggerFactory } from '../common/logger/factory';
-import { r } from '../common/helpers/utils';
 
 const logger = LoggerFactory.getLogger('ConfigLoader');
+
+/**
+ * all fields need null as default value to load all keys
+ */
+export class AbstractConfigLoader<Config> {
+  constructor(o?: Config) {
+    Object.assign(this, deserializeSafely(this as any, o));
+  }
+
+  fromConfigurator(): Config {
+    Object.keys(this).forEach((key) => {
+      this[key] = configLoader.loadConfig(key, null, true);
+    });
+    return this as any;
+  }
+}
 
 export const ConfigKeys = {
   ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',

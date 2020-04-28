@@ -1,7 +1,7 @@
 import { ClassTransformOptions, deserialize, plainToClass } from 'class-transformer';
-import { ClassType } from 'class-transformer/ClassTransformer';
 import { validate, validateSync, ValidationError } from 'class-validator';
 import * as _ from 'lodash';
+import { ClassType } from '../decorators';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
 import { LoggerFactory } from '../logger';
 import { r } from './utils';
@@ -36,7 +36,7 @@ export function deserializeSafely<T>(
   options: ClassTransformOptions = { enableCircularCheck: true },
 ): T {
   if (!json) {
-    return;
+    return undefined;
   }
 
   if (json instanceof cls) {
