@@ -1,7 +1,7 @@
 import * as dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../logger/factory';
 
 const logger = LoggerFactory.getLogger('HandlebarsHelper');
 

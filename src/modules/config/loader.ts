@@ -1,6 +1,6 @@
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { resolve } from 'path';
-import { deserializeSafely } from '../common/helpers';
+import { deserializeSafely } from '../common/helpers/validate';
 import { LoggerFactory } from '../common/logger/factory';
 
 const logger = LoggerFactory.getLogger('ConfigLoader');

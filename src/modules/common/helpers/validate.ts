@@ -3,7 +3,7 @@ import { validate, validateSync, ValidationError } from 'class-validator';
 import * as _ from 'lodash';
 import { ClassType } from '../decorators';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
-import { LoggerFactory } from '../logger';
+import { LoggerFactory } from '../logger/factory';
 import { r } from './utils';
 
 const logger = LoggerFactory.getLogger('Validator');

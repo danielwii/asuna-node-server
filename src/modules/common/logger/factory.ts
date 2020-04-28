@@ -1,7 +1,7 @@
-import { Logger } from "@nestjs/common";
-import * as _ from "lodash";
-import * as fp from "lodash/fp";
-import { dirname, join } from "path";
+import { Logger } from '@nestjs/common';
+import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
+import { dirname, join } from 'path';
 
 const root = dirname(process.mainModule.filename);
 const { packageDir } = global;
@@ -22,7 +22,7 @@ export class LoggerFactory {
     const context = _.flow(
       fp.replace(packageDir, ''),
       fp.replace(root, ''),
-      path => join('/', path).slice(1), // //a/b/c -> a/b/c
+      (path) => join('/', path).slice(1), // //a/b/c -> a/b/c
       fp.replace(/\//g, '.'), // a/b/c -> a.b.c
     )(join(callerPath, name));
 

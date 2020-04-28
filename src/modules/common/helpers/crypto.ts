@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 
 export function sha256(value: string | object): string {
   let str = value;
@@ -7,7 +7,7 @@ export function sha256(value: string | object): string {
   }
   return crypto
     .createHash('sha256')
-    .update(str)
+    .update(str as any)
     .digest('hex');
 }
 
@@ -18,6 +18,6 @@ export function sha1(value: string | object): string {
   }
   return crypto
     .createHash('sha1')
-    .update(str)
+    .update(str as any)
     .digest('hex');
 }

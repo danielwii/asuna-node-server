@@ -2,7 +2,7 @@ import { HttpStatus } from '@nestjs/common';
 import * as _ from 'lodash';
 import { NameValue } from './helpers/normal';
 import { r } from './helpers/utils';
-import { LoggerFactory } from './logger';
+import { LoggerFactory } from './logger/factory';
 
 const logger = LoggerFactory.getLogger('exceptions');
 
@@ -156,7 +156,7 @@ export class AsunaExceptionHelper {
       code: 'E02001',
       nameValue: AsunaErrorCode.InvalidCredentials,
       message: () => `auth token expired`,
-      localMessage: params => `认证已过期`,
+      localMessage: (params) => `认证已过期`,
     },
     [AsunaExceptionTypes.TenantNeeded]: {
       code: 'E03001',
@@ -180,7 +180,7 @@ export class AsunaExceptionHelper {
   ): AsunaException {
     if (this.registers[type]) {
       const opts = this.registers[type];
-      const transformed = _.map(params, param => (_.isObject(param) ? JSON.stringify(param) : param));
+      const transformed = _.map(params, (param) => (_.isObject(param) ? JSON.stringify(param) : param));
       return AsunaException.of(
         opts.nameValue,
         opts.code,
