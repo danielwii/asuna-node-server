@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.5.0",
+  "version": "0.4.9",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "types": "declaration/index.d.ts",
@@ -162,7 +162,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-unicorn": "^19.0.1",
     "husky": "^4.2.5",
-    "jest": "^25.4.0",
+    "jest": "^25.5.1",
     "nodemon": "^2.0.3",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
