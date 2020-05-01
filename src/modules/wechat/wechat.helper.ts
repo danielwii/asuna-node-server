@@ -201,8 +201,10 @@ export class WeChatHelper {
 
   static async syncAdminUser(openId: string): Promise<void> {
     const user = await WeChatHelper.updateWeChatUser(openId);
-    logger.log(`sync user '${user.openId}' to admin`);
-    return WeChatHelper.updateAdmin(user);
+    logger.log(`sync user '${user?.openId}' to admin`);
+    if (user) {
+      await WeChatHelper.updateAdmin(user);
+    }
   }
 
   static async handleEvent(
@@ -296,19 +298,23 @@ export class WeChatHelper {
     }
   }
 
-  static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser> {
+  static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser | undefined> {
+    if (!userInfo?.openid) {
+      logger.warn(`unresolved userInfo: ${r(userInfo)}`);
+      return undefined;
+    }
     const { openid: openId } = userInfo;
     if (await WeChatUser.findOne(openId)) {
       const weChatUser = classToPlain(userInfo.toWeChatUser());
       const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
       logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
-      await WeChatUser.update(userInfo.openid, updatedTo);
+      await WeChatUser.update(openId, updatedTo);
       return WeChatUser.findOne(openId);
     }
     return WeChatUser.save(userInfo.toWeChatUser());
   }
 
-  static async updateWeChatUser(openId: string): Promise<WeChatUser> {
+  static async updateWeChatUser(openId: string): Promise<WeChatUser | undefined> {
     const userInfo = await WeChatHelper.getUserInfo(openId);
     logger.log(`get user info ${r(userInfo)}`);
     return WeChatHelper.updateWeChatUserByUserInfo(userInfo);
