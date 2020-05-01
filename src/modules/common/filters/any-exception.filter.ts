@@ -34,6 +34,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.*)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = getRepository(model);
+      if (!metadata) {
+        logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
+        return new AsunaException(AsunaErrorCode.Unprocessable, 'dup entry error');
+      }
       const [index] = metadata.indices.filter((i) => i.name === key);
       return new ValidationException(
         index.name,
