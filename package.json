@@ -111,7 +111,7 @@
     "wx-server-sdk": "^1.8.3",
     "xlsx": "^0.16.0",
     "xml2js": "^0.4.23",
-    "snyk": "^1.316.1"
+    "snyk": "^1.316.2"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.0.9",
@@ -148,7 +148,7 @@
     "@types/sharp": "^0.25.0",
     "@types/shortid": "^0.0.29",
     "@types/socket.io": "^2.1.4",
-    "@types/supertest": "^2.0.8",
+    "@types/supertest": "^2.0.9",
     "@types/uuid": "^7.0.3",
     "@types/wx-server-sdk": "^0.8.0",
     "@types/xml2js": "^0.4.5",
@@ -165,7 +165,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-unicorn": "^19.0.1",
     "husky": "^4.2.5",
-    "jest": "^25.5.3",
+    "jest": "^25.5.4",
     "nodemon": "^2.0.3",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
