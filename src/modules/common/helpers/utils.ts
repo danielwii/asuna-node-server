@@ -29,6 +29,10 @@ export function execAsync(command: string): Promise<string> {
   });
 }
 
+export function emptyOr<Value>(condition: boolean, value: Value): Value | {} {
+  return condition ? value : {};
+}
+
 export function toHHMMSS(num: string): string {
   const sec_num = Number.parseInt(num, 10); // don't forget the second param
   let hours: any = Math.floor(sec_num / 3600);

@@ -1,3 +1,4 @@
+export * from './abstract.auth.controller';
 export * from './abstract.auth.service';
 export * from './access-control.helper';
 export * from './admin-auth.guard';

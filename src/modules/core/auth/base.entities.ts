@@ -101,3 +101,4 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
 }
 
 export type AuthUser = AbstractTimeBasedAuthUser | AbstractAuthUser;
+export type AuthUserType = typeof AbstractTimeBasedAuthUser | typeof AbstractAuthUser;

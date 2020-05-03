@@ -2,9 +2,10 @@ import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Secret, SignOptions } from 'jsonwebtoken';
+import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
-import { PrimaryKey } from '../../common';
+import { emptyOr, PrimaryKey } from '../../common';
 import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
@@ -26,11 +27,10 @@ export class PasswordHelper {
   }
 }
 
+export type CreatedToken = { expiresIn: number; accessToken: string };
+
 export class TokenHelper {
-  static async createToken(
-    user: AuthUser,
-    extra?: { uid: PrimaryKey },
-  ): Promise<{ expiresIn: number; accessToken: string }> {
+  static async createToken(user: AuthUser, extra?: { uid: PrimaryKey }): Promise<CreatedToken> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -72,7 +72,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     const user = await this.getUser(identifier, true);
 
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
-    const validated = user != null && user.id === jwtPayload.id;
+    const validated = !_.isNil(user) && user.id === jwtPayload.id;
     if (!validated) {
       logger.verbose(oneLine`
         validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
@@ -82,10 +82,10 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return validated;
   }
 
-  createToken(profile: UserProfile, extra?: { uid: PrimaryKey }) {
+  createToken(profile: UserProfile, extra?: { uid: PrimaryKey }): Promise<CreatedToken> {
     // eslint-disable-next-line no-param-reassign
     profile.lastSignedAt = new Date();
-    profile.save().catch(reason => logger.error(reason));
+    profile.save().catch((reason) => logger.error(reason));
     return TokenHelper.createToken(profile, extra);
   }
 
@@ -111,19 +111,19 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   ): Promise<U> {
     return this.userRepository.findOne(
       {
-        ...(identifier.email ? { email: identifier.email } : null),
-        ...(identifier.username ? { username: identifier.username } : null),
+        ...emptyOr(!!identifier.email, { email: identifier.email }),
+        ...emptyOr(!!identifier.username, { username: identifier.username }),
         isActive,
       } as any,
-      options as any,
+      options,
     );
   }
 
   public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.userRepository.findOne(
       {
-        ...(identifier.email ? { email: identifier.email } : null),
-        ...(identifier.username ? { username: identifier.username } : null),
+        ...emptyOr(!!identifier.email, { email: identifier.email }),
+        ...emptyOr(!!identifier.username, { username: identifier.username }),
         isActive,
       } as any,
       { select: ['id', 'username', 'email', 'channel', 'password', 'salt'] },
