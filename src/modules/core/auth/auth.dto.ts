@@ -6,12 +6,12 @@ import * as _ from 'lodash';
 export class ResetPasswordDto {
   @ApiProperty({ type: 'username' })
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly username: string;
 
   @ApiProperty({ type: 'email' })
   @IsEmail()
-  @Transform(value => (value ? _.trim(value) : null))
+  @Transform((value) => (value ? _.trim(value) : undefined))
   @IsOptional()
   readonly email?: string;
 
@@ -27,7 +27,7 @@ export class ResetPasswordDto {
 export class SignDto {
   @ApiProperty({ type: 'email' })
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   @IsNotEmpty()
   readonly email: string;
 
@@ -38,7 +38,7 @@ export class SignDto {
 
 export class SignInDto {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   @IsNotEmpty()
   readonly username: string;
 
@@ -49,13 +49,13 @@ export class SignInDto {
 
 export class SignUpDto {
   @IsEmail()
-  @Transform(value => (value ? _.trim(value) : null))
+  @Transform((value) => (value ? _.trim(value) : undefined))
   @IsOptional()
   readonly email?: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly username: string;
 
   @IsNotEmpty()
