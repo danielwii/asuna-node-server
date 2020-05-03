@@ -2,22 +2,16 @@ import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/c
 import * as _ from 'lodash';
 import * as shortid from 'shortid';
 import { UpdateResult } from 'typeorm';
-import {
-  AsunaErrorCode,
-  AsunaException,
-  AsunaExceptionHelper,
-  AsunaExceptionTypes,
-  LoggerFactory,
-  SignException,
-} from '../../common';
+import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
 import { SimpleIdGenerator } from '../../ids';
 import { Hermes } from '../bus';
 import { CreatedToken, PasswordHelper } from './abstract.auth.service';
-import { ResetPasswordDto, SignInDto } from './auth.dto';
+import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthService, CreatedUser } from './auth.service';
-import { AuthUser, AuthUserType } from './base.entities';
+import { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
+import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
@@ -33,30 +27,44 @@ export abstract class AbstractAuthController {
 
   @Post('reset-password')
   @UseGuards(new JwtAuthGuard())
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<UpdateResult> {
-    logger.log(`reset password: ${r(resetPasswordDto)}`);
-    const user = await this.authService.getUser({
-      email: resetPasswordDto.email,
-      username: resetPasswordDto.username,
-    });
+  async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
+    const { payload, user } = req;
+    logger.log(`reset password: ${r({ dto, payload, user })}`);
 
-    if (!user) {
-      throw new SignException('account not exists or active');
+    const { hash, salt } = PasswordHelper.encrypt(dto.password);
+    return this.authService
+      .updatePassword(payload.uid, hash, salt)
+      .then((result) => this.handlers.onResetPassword?.(result, dto));
+  }
+
+  @Post('reset-account')
+  @UseGuards(JwtAuthGuard)
+  async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<UserProfile> {
+    const { payload, user } = req;
+    logger.log(`reset account: ${r({ dto, payload, user })}`);
+
+    if (dto.username !== payload.id) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
-    const { hash, salt } = PasswordHelper.encrypt(resetPasswordDto.password);
-    return this.authService
-      .updatePassword(user.id, hash, salt)
-      .then((result) => this.handlers.onResetPassword?.(result, resetPasswordDto));
+    const found = await this.authService.getUser({ email: dto.email, username: dto.username });
+    if (found) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `username or email already exists`);
+    }
+    return this.authService.updateAccount(payload.id, dto);
   }
 
   @Post('quick-pass')
   async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
     const username = new SimpleIdGenerator('u').nextId();
     const password = shortid.generate();
+
     const signed = await this.authService
       .createUser<AuthUser>(username, `${username}@quick.passport`, password)
       .then((result) => this.handlers.onSignUp?.(result, body));
+    signed.profile.channel = AuthUserChannel.quickpass;
+    await signed.profile.save();
+
     const profile = await this.authService.getUserWithPassword({ username });
     const token = await this.authService.createToken(profile, { uid: signed.user.id });
     return { username, defaultPassword: password, token };

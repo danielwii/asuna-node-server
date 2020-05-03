@@ -16,6 +16,7 @@ import { EntityConstructorObject } from '../base/base.entity';
 import { EntityMetaInfo, IdentifierHelper, JsonArray, MetaInfo, StaticImplements } from '../common';
 import { deserializeSafely } from '../common/helpers/validate';
 import { AdminUser } from '../core/auth/auth.entities';
+// eslint-disable-next-line import/no-cycle
 import { UserProfile } from '../core/auth/user.entities';
 import { ColumnType } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';

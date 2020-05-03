@@ -6,6 +6,7 @@ import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base';
 export enum AuthUserChannel {
   default = 'default',
   wechat = 'wechat',
+  quickpass = 'quickpass',
 }
 
 export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {

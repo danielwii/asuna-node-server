@@ -18,7 +18,7 @@ import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';
 import { AdminAuthService } from './admin-auth.service';
-import { ResetPasswordDto, SignDto } from './auth.dto';
+import { AdminResetPasswordDto, SignDto } from './auth.dto';
 import { AdminUser } from './auth.entities';
 import { AdminUserIdentifierHelper } from './identifier';
 
@@ -62,7 +62,7 @@ export class AdminAuthController extends RestCrudController {
   // TODO need role: SYS_ADMIN
   // FIXME type ResetPasswordDto not recognise email
   @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<UpdateResult> {
+  async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<UpdateResult> {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
     const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
     logger.log(`reset password: ${r({ resetPasswordDto, data })}`);

@@ -27,7 +27,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
-        return null;
+        return undefined;
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }

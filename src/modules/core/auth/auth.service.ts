@@ -69,4 +69,14 @@ export class AuthService extends AbstractAuthService<UserProfile> {
       return { profile, user };
     });
   }
+
+  async updateAccount(
+    profileId: string,
+    { username, email }: { username: string; email?: string },
+  ): Promise<UserProfile> {
+    const profile = await this.getUser({ email, username });
+    if (username) profile.username = username;
+    if (email) profile.email = email;
+    return profile.save();
+  }
 }

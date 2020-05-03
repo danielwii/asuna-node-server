@@ -3,7 +3,7 @@ import { Exclude, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import * as _ from 'lodash';
 
-export class ResetPasswordDto {
+export class AdminResetPasswordDto {
   @ApiProperty({ type: 'username' })
   @IsString()
   @Transform((value) => _.trim(value))
@@ -19,6 +19,26 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   @MinLength(6)
   readonly password: string;
+}
+
+export class ResetPasswordDto {
+  @ApiProperty({ minLength: 6 })
+  @IsNotEmpty()
+  @MinLength(6)
+  readonly password: string;
+}
+
+export class ResetAccountDto {
+  @ApiProperty({ type: 'username' })
+  @IsString()
+  @Transform((value) => _.trim(value))
+  readonly username: string;
+
+  @ApiProperty({ type: 'email' })
+  @IsEmail()
+  @Transform((value) => (value ? _.trim(value) : undefined))
+  @IsOptional()
+  readonly email?: string;
 }
 
 /**

@@ -1,7 +1,9 @@
 import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+// eslint-disable-next-line import/no-cycle
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
+// eslint-disable-next-line import/no-cycle
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
