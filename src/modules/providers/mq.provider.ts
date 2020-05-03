@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as amqp from 'amqplib';
+import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQConfigObject } from './mq.config';
@@ -10,8 +11,8 @@ const logger = LoggerFactory.getLogger('MQProvider');
 export class MQProvider {
   private static _instance: MQProvider = new MQProvider();
 
-  #connectionFuture: amqp.Connection;
-  #channel: amqp.Channel;
+  #connectionFuture?: amqp.Connection;
+  #channel?: amqp.Channel;
   // private _retryLimit = 10;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -23,7 +24,7 @@ export class MQProvider {
       logger.log(`connecting to ${url}`);
       const connection = await amqp.connect(url).catch((error) => logger.error(`connect to mq error: ${r(error)}`));
 
-      if (connection == null) {
+      if (_.isNil(connection)) {
         /*
         if (this._retryLimit < 1) {
           // eslint-disable-next-line unicorn/no-process-exit
@@ -76,7 +77,7 @@ export class MQProvider {
   }
 
   get connectionFuture(): Promise<amqp.Connection> {
-    if (this.#connectionFuture != null) {
+    if (_.isNil(this.#connectionFuture)) {
       return Promise.resolve(this.#connectionFuture);
     }
 
