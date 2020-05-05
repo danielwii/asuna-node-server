@@ -111,7 +111,7 @@
     "wx-server-sdk": "^1.8.3",
     "xlsx": "^0.16.0",
     "xml2js": "^0.4.23",
-    "snyk": "^1.316.2"
+    "snyk": "^1.317.0"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.0.9",
