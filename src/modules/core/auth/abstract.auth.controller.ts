@@ -4,14 +4,12 @@ import * as shortid from 'shortid';
 import { UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
-import { SimpleIdGenerator } from '../../ids';
 import { Hermes } from '../bus';
 import { CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthService, CreatedUser } from './auth.service';
 import { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
-import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
@@ -33,17 +31,17 @@ export abstract class AbstractAuthController {
 
     const { hash, salt } = PasswordHelper.encrypt(dto.password);
     return this.authService
-      .updatePassword(payload.uid, hash, salt)
+      .updatePassword(user.id, hash, salt)
       .then((result) => this.handlers.onResetPassword?.(result, dto));
   }
 
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
-  async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<UserProfile> {
+  async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
-    if (dto.username !== payload.id) {
+    if (`${user.username}@quick.passport` !== user.email) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
@@ -51,19 +49,29 @@ export abstract class AbstractAuthController {
     if (found) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `username or email already exists`);
     }
-    return this.authService.updateAccount(payload.id, dto);
+
+    await this.authService.updateAccount(payload.id, dto);
+    const userEntity = await this.UserEntity.findOne(payload.uid);
+    if (_.has(userEntity, 'username') && dto.username) userEntity.username = dto.username;
+    if (_.has(userEntity, 'email') && dto.email) userEntity.email = dto.email;
+    await userEntity.save();
   }
 
   @Post('quick-pass')
   async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
-    const username = new SimpleIdGenerator('u').nextId();
+    shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
+    // shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    const username = shortid.generate();
     const password = shortid.generate();
 
+    // const email = `${username}@quick.passport`;
     const signed = await this.authService
-      .createUser<AuthUser>(username, `${username}@quick.passport`, password)
+      .createUser<AuthUser>(username, undefined, password)
       .then((result) => this.handlers.onSignUp?.(result, body));
     signed.profile.channel = AuthUserChannel.quickpass;
     await signed.profile.save();
+    // if (_.has(signed.user, 'email')) signed.user.email = email;
+    await signed.user.save();
 
     const profile = await this.authService.getUserWithPassword({ username });
     const token = await this.authService.createToken(profile, { uid: signed.user.id });
@@ -115,7 +123,7 @@ export abstract class AbstractAuthController {
   async current(@Req() req: JwtAuthRequest): Promise<AuthUser> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
-    const loaded = await this.UserEntity.findOne(payload.uid, { relations: ['wallet'] });
+    const loaded = await this.UserEntity.findOne(payload.uid, { relations: ['wallet', 'profile'] });
     if (!payload) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
     }
@@ -128,6 +136,8 @@ export abstract class AbstractAuthController {
         return undefined;
       })
       .catch((reason) => logger.error(reason));
+    logger.verbose(`current authed user is ${r(loaded)}`);
+    _.set(loaded, 'profile', _.pick((loaded as any).profile, 'id', 'email'));
     return loaded;
   }
 

@@ -74,7 +74,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     profileId: string,
     { username, email }: { username: string; email?: string },
   ): Promise<UserProfile> {
-    const profile = await this.getUser({ email, username });
+    const profile = await UserProfile.findOneOrFail(profileId);
     if (username) profile.username = username;
     if (email) profile.email = email;
     return profile.save();

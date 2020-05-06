@@ -119,7 +119,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     );
   }
 
-  public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
+  getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.userRepository.findOne(
       {
         ...emptyOr(!!identifier.email, { email: identifier.email }),
@@ -130,7 +130,8 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     );
   }
 
-  public updatePassword(id: PrimaryKey, password: string, salt: string): Promise<UpdateResult> {
-    return this.userRepository.update(id, { password, salt } as any);
+  updatePassword(profileId: string, password: string, salt: string): Promise<UpdateResult> {
+    // return this.userRepository.update(id, { password, salt } as any);
+    return UserProfile.update(profileId, { password, salt });
   }
 }
