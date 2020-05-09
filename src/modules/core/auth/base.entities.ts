@@ -1,7 +1,7 @@
 import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
-import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base';
+import { MetaInfo } from '../../common/decorators';
 
 export enum AuthUserChannel {
   default = 'default',
@@ -56,6 +56,10 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @MetaInfo({ name: '是否启用？' })
   @Column({ nullable: true, name: 'is_active' })
   isActive?: boolean;
+
+  @MetaInfo({ name: '是否被绑定', help: 'quickpass 模式时被 reset' })
+  @Column({ nullable: true, name: 'is_bound', default: false })
+  isBound?: boolean;
 }
 
 /**

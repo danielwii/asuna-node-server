@@ -7,6 +7,7 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
+import { AuthUserChannel } from './base.entities';
 import { UserProfile } from './user.entities';
 import { AuthedUserHelper } from './user.helper';
 
@@ -52,7 +53,12 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     );
   }
 
-  async createUser<U>(username: string, email: string, password: string): Promise<CreatedUser<U>> {
+  async createUser<U>(
+    username: string,
+    email: string,
+    password: string,
+    channel?: AuthUserChannel,
+  ): Promise<CreatedUser<U>> {
     const { hash, salt } = PasswordHelper.encrypt(password);
 
     const found = await this.getUser({ email, username });
@@ -61,7 +67,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
     }
 
-    const entity = this.userRepository.create({ email, username, isActive: true, password: hash, salt });
+    const entity = this.userRepository.create({ email, username, isActive: true, password: hash, salt, channel });
     logger.verbose(`create user ${r(entity)}`);
     return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
       logger.verbose(`created ${r({ profile, user })}`);
@@ -77,6 +83,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     const profile = await UserProfile.findOneOrFail(profileId);
     if (username) profile.username = username;
     if (email) profile.email = email;
+    profile.isBound = true;
     return profile.save();
   }
 }

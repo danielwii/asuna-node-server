@@ -41,7 +41,7 @@ export abstract class AbstractAuthController {
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
-    if (`${user.username}@quick.passport` !== user.email) {
+    if (user.isBound) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
@@ -50,10 +50,13 @@ export abstract class AbstractAuthController {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `username or email already exists`);
     }
 
-    await this.authService.updateAccount(payload.id, dto);
+    const profile = await this.authService.updateAccount(payload.id, dto);
+    // profile.isBound = true;
+    // await profile.save();
+
     const userEntity = await this.UserEntity.findOne(payload.uid);
-    if (_.has(userEntity, 'username') && dto.username) userEntity.username = dto.username;
-    if (_.has(userEntity, 'email') && dto.email) userEntity.email = dto.email;
+    if (_.has(userEntity, 'username') && dto.username) userEntity.username = profile.username;
+    if (_.has(userEntity, 'email') && dto.email) userEntity.email = profile.email;
     await userEntity.save();
   }
 
@@ -66,13 +69,14 @@ export abstract class AbstractAuthController {
 
     // const email = `${username}@quick.passport`;
     const signed = await this.authService
-      .createUser<AuthUser>(username, undefined, password)
+      .createUser<AuthUser>(username, undefined, password, AuthUserChannel.quickpass)
       .then((result) => this.handlers.onSignUp?.(result, body));
+    /*
     signed.profile.channel = AuthUserChannel.quickpass;
     await signed.profile.save();
-    // if (_.has(signed.user, 'email')) signed.user.email = email;
+    if (_.has(signed.user, 'email')) signed.user.email = email;
     await signed.user.save();
-
+*/
     const profile = await this.authService.getUserWithPassword({ username });
     const token = await this.authService.createToken(profile, { uid: signed.user.id });
     return { username, defaultPassword: password, token };
@@ -137,7 +141,7 @@ export abstract class AbstractAuthController {
       })
       .catch((reason) => logger.error(reason));
     logger.verbose(`current authed user is ${r(loaded)}`);
-    _.set(loaded, 'profile', _.pick((loaded as any).profile, 'id', 'email'));
+    _.set(loaded, 'profile', _.pick((loaded as any).profile, 'id', 'email', 'isBound'));
     return loaded;
   }
 
