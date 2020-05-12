@@ -1,6 +1,6 @@
 import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import * as chance from 'chance';
 import * as _ from 'lodash';
-import * as shortid from 'shortid';
 import { UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
@@ -62,10 +62,8 @@ export abstract class AbstractAuthController {
 
   @Post('quick-pass')
   async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
-    shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$@');
-    // shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-    const username = shortid.generate();
-    const password = shortid.generate();
+    const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
+    const password = chance.string({ length: 8, pool: '0123456789' });
 
     // const email = `${username}@quick.passport`;
     const signed = await this.authService

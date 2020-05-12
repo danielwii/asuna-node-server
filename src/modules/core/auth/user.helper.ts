@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('AuthedUserHelper');
 export class AuthedUserHelper {
   static async createProfile(profile: UserProfile): Promise<any> {
     const saved = await profile.save();
-    const user = await UserRegister.createUserByProfile(saved).catch(reason => logger.error(reason));
+    const user = await UserRegister.createUserByProfile(saved).catch((reason) => logger.error(reason));
     return [saved, user];
   }
 

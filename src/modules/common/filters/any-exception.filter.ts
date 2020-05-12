@@ -39,21 +39,23 @@ export class AnyExceptionFilter implements ExceptionFilter {
         return new AsunaException(AsunaErrorCode.Unprocessable, 'dup entry error');
       }
       const [index] = metadata.indices.filter((i) => i.name === key);
-      return new ValidationException(
-        index.name,
-        (index.givenColumnNames as string[]).map((name) => ({
-          constraints: { isUnique: `${name} must be unique` },
-          property: name,
-          target: { [name]: value },
-          value,
-        })),
-      );
+      if (index)
+        return new ValidationException(
+          index.name,
+          (index.givenColumnNames as string[]).map((name) => ({
+            constraints: { isUnique: `${name} must be unique` },
+            property: name,
+            target: { [name]: value },
+            value,
+          })),
+        );
+      return new AsunaException(AsunaErrorCode.Unprocessable, `${key} not found.`);
     }
 
     // 未找到默认值
     if (exception.code === 'ER_NO_DEFAULT_FOR_FIELD') {
       const [, name] = exception.sqlMessage.match(/Field '(.*)' doesn't have a default value/);
-      const value = null;
+      const value = undefined;
       return new ValidationException('ER_NO_DEFAULT_FOR_FIELD', [
         {
           constraints: { notNull: `${name} must not be empty` },

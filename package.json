@@ -49,6 +49,7 @@
     "bull": "^3.14.0",
     "cache-manager": "^3.3.0",
     "cache-manager-redis-store": "^2.0.0",
+    "chance": "^1.1.5",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "cli-color": "^2.0.0",
@@ -101,6 +102,7 @@
     "rxjs": "^6.5.5",
     "sharp": "^0.25.2",
     "shortid": "^2.2.15",
+    "snyk": "^1.319.2",
     "socket.io": "^2.3.0",
     "socket.io-redis": "^5.2.0",
     "swagger-ui-express": "^4.1.4",
@@ -110,8 +112,7 @@
     "winston": "^3.2.1",
     "wx-server-sdk": "^2.0.2",
     "xlsx": "^0.16.0",
-    "xml2js": "^0.4.23",
-    "snyk": "^1.319.2"
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.0.9",
