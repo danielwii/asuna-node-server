@@ -1,5 +1,5 @@
 import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
-import * as chance from 'chance';
+import * as Chance from 'chance';
 import * as _ from 'lodash';
 import { UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
@@ -62,8 +62,9 @@ export abstract class AbstractAuthController {
 
   @Post('quick-pass')
   async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
+    const chance = new Chance();
     const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
-    const password = chance.string({ length: 8, pool: '0123456789' });
+    const password = chance.string({ length: 6, pool: '0123456789' });
 
     // const email = `${username}@quick.passport`;
     const signed = await this.authService
