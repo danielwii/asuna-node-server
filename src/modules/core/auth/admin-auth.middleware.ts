@@ -32,7 +32,7 @@ export class AdminAuthMiddleware {
           throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err ?? result.info);
         }
       }
-      next();
+      return next();
     };
   }
 }
