@@ -1,7 +1,7 @@
 import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import * as Chance from 'chance';
 import * as _ from 'lodash';
-import { UpdateResult } from 'typeorm';
+import { DeepPartial, UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
 import { Hermes } from '../bus';
@@ -123,7 +123,7 @@ export abstract class AbstractAuthController {
 
   @Get('current')
   @UseGuards(new JwtAuthGuard())
-  async current(@Req() req: JwtAuthRequest): Promise<AuthUser> {
+  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<AuthUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     const loaded = await this.UserEntity.findOne(payload.uid, { relations: ['wallet', 'profile'] });
@@ -136,12 +136,12 @@ export abstract class AbstractAuthController {
         logger.verbose(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
         if (!sameDay) Hermes.emit(AbstractAuthController.name, 'user.first-login-everyday', payload);
         // !sameDay && Hermes.emit(AuthController.name, HermesUserEventKeys.firstLoginEveryday, payload);
-        return undefined;
       })
       .catch((reason) => logger.error(reason));
     logger.verbose(`current authed user is ${r(loaded)}`);
-    _.set(loaded, 'profile', _.pick((loaded as any).profile, 'id', 'email', 'isBound'));
-    return loaded;
+    const result = _.omit(loaded, 'channel', 'info'); // ...
+    _.set(result, 'profile', _.pick((result as any).profile, 'id', 'email', 'isBound', 'channel'));
+    return result;
   }
 
   @Get('authorized')

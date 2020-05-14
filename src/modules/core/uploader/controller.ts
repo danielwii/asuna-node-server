@@ -32,7 +32,7 @@ const fileInterceptorOptions: MulterOptions = {
     filename(req, file, cb) {
       const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname.toLowerCase()}`;
       logger.verbose(`set filename ${filename}`);
-      cb(null, filename);
+      cb(undefined, filename);
     },
   }),
   fileFilter(req, file, cb) {
@@ -45,7 +45,7 @@ const fileInterceptorOptions: MulterOptions = {
       // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
       logger.log(`unsupported mime type: ${file.mimetype}, save as normal file.`);
     }
-    cb(null, true);
+    cb(undefined, true);
   },
 };
 
@@ -107,11 +107,7 @@ export class UploaderController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Stream upload chunked file' })
   @ApiConsumes('multipart/form-data')
-  @ApiQuery({
-    name: 'chunk',
-    required: false,
-    description: 'chunked upload file index',
-  })
+  @ApiQuery({ name: 'chunk', required: false, description: 'chunked upload file index' })
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks-stream')
   async streamChunkedUploader(
@@ -148,11 +144,7 @@ export class UploaderController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Chunked upload file' })
   @ApiConsumes('multipart/form-data')
-  @ApiQuery({
-    name: 'chunk',
-    required: false,
-    description: 'chunked upload file index',
-  })
+  @ApiQuery({ name: 'chunk', required: false, description: 'chunked upload file index' })
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
   @UseInterceptors(FileInterceptor('file', fileInterceptorOptions))
