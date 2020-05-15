@@ -1,6 +1,6 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
-import { configLoader } from '../config';
 import { LoggerFactory } from '../common/logger';
+import { configLoader } from '../config';
 
 const logger = LoggerFactory.getLogger('MQConfig');
 
@@ -22,7 +22,7 @@ export class MQConfigObject {
   username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
+  @Transform((value) => !!value, { toPlainOnly: true })
   password?: string;
 
   constructor(o: Partial<MQConfigObject>) {
@@ -42,7 +42,7 @@ export class MQConfigObject {
     });
   }
 
-  static loadOr(prefix = ''): MQConfigObject | null {
+  static loadOr(prefix = ''): MQConfigObject | undefined {
     const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     logger.debug(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
@@ -50,7 +50,7 @@ export class MQConfigObject {
       return MQConfigObject.load(prefix);
     }
     if (enable === false) {
-      return null;
+      return undefined;
     }
     return MQConfigObject.load();
   }

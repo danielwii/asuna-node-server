@@ -19,38 +19,38 @@ export class MQProvider {
   private constructor() {}
 
   private async createConnection(): Promise<amqp.Connection> {
-    if (MQProvider.enabled) {
-      const { url } = MQConfigObject.load();
-      logger.log(`connecting to ${url}`);
-      const connection = await amqp.connect(url).catch((error) => logger.error(`connect to mq error: ${r(error)}`));
+    if (!MQProvider.enabled) {
+      logger.error(`mq not enabled: ${MQProvider.enabled}`);
+      return Promise.reject();
+    }
 
-      if (_.isNil(connection)) {
-        /*
+    const { url } = MQConfigObject.load();
+    logger.log(`connecting to ${url}`);
+    const connection = await amqp.connect(url).catch((error) => logger.error(`connect to mq error: ${r(error)}`));
+
+    if (_.isNil(connection)) {
+      /*
         if (this._retryLimit < 1) {
           // eslint-disable-next-line unicorn/no-process-exit
           process.exit(1);
         }
 */
 
-        setTimeout(
-          () =>
-            this.createConnection().catch(() => {
-              // this._retryLimit -= 1;
-              logger.error(`reconnect to mq error, retry in 10s.`);
-            }),
-          10000,
-        );
-        return Promise.reject();
-      }
-
-      // this._retryLimit = 10;
-      this.#connectionFuture = connection as amqp.Connection;
-      logger.log('connection established');
-      return Promise.resolve(this.#connectionFuture);
+      setTimeout(
+        () =>
+          this.createConnection().catch(() => {
+            // this._retryLimit -= 1;
+            logger.error(`reconnect to mq error, retry in 10s.`);
+          }),
+        10000,
+      );
+      return Promise.reject();
     }
 
-    logger.error(`mq not enabled: ${MQProvider.enabled}`);
-    return Promise.reject();
+    // this._retryLimit = 10;
+    this.#connectionFuture = connection as amqp.Connection;
+    logger.log('connection established');
+    return Promise.resolve(this.#connectionFuture);
   }
 
   static get instance(): MQProvider {
@@ -77,7 +77,7 @@ export class MQProvider {
   }
 
   get connectionFuture(): Promise<amqp.Connection> {
-    if (_.isNil(this.#connectionFuture)) {
+    if (!_.isNil(this.#connectionFuture)) {
       return Promise.resolve(this.#connectionFuture);
     }
 
