@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { IsDefined, IsString } from 'class-validator';
+import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
@@ -51,7 +52,7 @@ export class TaskController {
 
   @UseGuards(new JwtAdminAuthGuard())
   @Post(':id/invoke')
-  async invoke(@Param('id') id: number, @Req() req: AnyAuthRequest): Promise<void> {
+  async invoke(@Param('id') id: PrimaryKey, @Req() req: AnyAuthRequest): Promise<void> {
     const { identifier } = req;
     logger.log(`invoke task ${id} by ${identifier}`);
     return TaskHelper.invoke(id);

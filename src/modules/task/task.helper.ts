@@ -1,3 +1,4 @@
+import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQProvider } from '../providers';
@@ -32,10 +33,12 @@ export class TaskHelper {
     return record.save();
   }
 
-  static async invoke(id: number): Promise<void> {
+  static async invoke(id: PrimaryKey): Promise<void> {
     const task = await TaskRecord.findOne(id);
     logger.log(`invoke ${r(task)}`);
-    await this.mq.send(task.channel, task.body).catch(reason => logger.error(`send message to mq error: ${r(reason)}`));
+    await this.mq
+      .send(task.channel, task.body)
+      .catch((reason) => logger.error(`send message to mq error: ${r(reason)}`));
   }
 
   static search(type: string, service: string, identifier: string): Promise<TaskRecord> {
