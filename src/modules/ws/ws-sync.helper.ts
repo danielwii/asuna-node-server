@@ -20,7 +20,7 @@ export class AdminWsSyncHelper {
   static initCron(): void {
     CronHelper.reg(
       'sync-ws',
-      CronExpression.EVERY_15_SECONDS,
+      CronExpression.EVERY_10_SECONDS,
       async () => {
         const stats = await InMemoryDB.get(`error-stats`);
         const diff = _.omitBy(stats, (value, key) => AdminWsSyncHelper.sentStats?.[key] === value);
@@ -35,7 +35,7 @@ export class AdminWsSyncHelper {
           );
           return { stats: { count: results.length, keys: StatsHelper.keys } };
         }
-        return null;
+        return {};
       },
       { start: true },
     );
