@@ -7,7 +7,7 @@ export class PaymentMethodEnumValue {
   static key = 'PaymentMethod';
   static types = {
     third: 'third',
-    // alipay: 'alipay',
+    alipay: 'alipay',
     // paypal: 'paypal',
   };
 
@@ -16,7 +16,7 @@ export class PaymentMethodEnumValue {
   }
 
   static get data(): { [key in keyof typeof PaymentMethodEnumValue.types]: string } {
-    return { third: '第三方' /* alipay: '支付宝', paypal: 'PayPal' */ };
+    return { third: '第三方', alipay: '支付宝' /* paypal: 'PayPal' */ };
   }
 }
 
