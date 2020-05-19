@@ -32,6 +32,10 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column({ nullable: true })
   apiKey: string;
 
+  @MetaInfo({ name: 'Private Key' })
+  @Column({ nullable: true, length: 500, name: 'private_key' })
+  privateKey: string;
+
   // @MetaInfo({ name: '通知 URL' })
   // @Column({ nullable: true, name: 'notify_url' })
   // notifyUrl: string;

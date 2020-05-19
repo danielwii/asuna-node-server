@@ -17,8 +17,14 @@ export class StatsHelper {
     const key = `error-${type}`;
     this.keys.add(key);
     logger.verbose(`add error info ${r({ key, info })}`);
-    const errors = await InMemoryDB.list({ prefix: this.prefix, key });
+    const opts = { prefix: this.prefix, key };
+    const errors = await InMemoryDB.list(opts);
     logger.verbose(`current errors length is ${errors?.length}`);
+    if (errors?.length > 1000) {
+      // todo remove more
+      await InMemoryDB.clear(opts);
+    }
+
     await InMemoryDB.insert({ prefix: this.prefix, key }, () => Promise.resolve({ info, createdAt: new Date() }));
     const statsKey = `error-stats`;
     // logger.log(`try save stats ${statsKey}`);
