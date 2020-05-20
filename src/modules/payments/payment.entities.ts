@@ -5,6 +5,7 @@ import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorato
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnType } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
+import { Expose } from 'class-transformer';
 
 /**
  * 支付方式配置
@@ -28,12 +29,14 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column({ nullable: true })
   merchant: string;
 
+  @Expose({ name: 'with-api-key', toPlainOnly: true })
   @MetaInfo({ name: 'API Key' })
   @Column({ nullable: true })
   apiKey: string;
 
+  @Expose({ name: 'with-private-key', toPlainOnly: true })
   @MetaInfo({ name: 'Private Key' })
-  @Column({ nullable: true, length: 500, name: 'private_key' })
+  @Column(ColumnType.text(), { nullable: true, name: 'private_key' })
   privateKey: string;
 
   // @MetaInfo({ name: '通知 URL' })
@@ -97,8 +100,8 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   bodyTmpl: string;
 
   @MetaInfo({ name: '支付类型', type: 'EnumFilter', enumData: PaymentMethodEnumValue.data })
-  @Column('varchar', { nullable: true, name: 'status', default: PaymentMethodEnumValue.types.third })
-  status: PaymentMethodType;
+  @Column('varchar', { nullable: true, name: 'type', default: PaymentMethodEnumValue.types.third })
+  type: PaymentMethodType;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   @OneToMany((type) => PaymentTransaction, (transaction) => transaction.method)

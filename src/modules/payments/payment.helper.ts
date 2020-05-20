@@ -7,7 +7,9 @@ import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
+import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from './payment.entities';
+import { PaymentMethodEnumValue } from './payment.enum-values';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
@@ -112,11 +114,19 @@ export class PaymentHelper {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
     }
 
+    if (method.type === PaymentMethodEnumValue.types.alipay) {
+      return PaymentAlipayHelper.createOrder({
+        cost: order.amount,
+        name: order.id,
+        packParams: transaction.paymentInfo,
+      });
+    }
+
     const { context, signed, md5sign } = await this.sign(transactionId);
     Object.assign(context, { md5sign });
     const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 
-    logger.verbose(`parse body ${r({ body, context })}`);
+    logger.verbose(`parse body [${body}] with context ${r(context)}`);
 
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ signed, payload })}`);

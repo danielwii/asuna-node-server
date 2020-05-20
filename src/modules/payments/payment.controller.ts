@@ -38,10 +38,10 @@ export class PaymentController {
     logger.log(`callback ${r({ query, body })}`);
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest): Promise<any> {
-    const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload.id });
+    const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
     return PaymentHelper.pay(order.transaction.id);
   }
 

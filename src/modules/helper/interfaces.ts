@@ -7,9 +7,9 @@ import { WXJwtPayload } from '../wechat/interfaces';
 
 export type PayloadType = JwtPayload | WXJwtPayload | ApiKeyPayload;
 export type AuthInfo<P = PayloadType, U = UserProfile | AdminUser> = Partial<{
-  payload: P;
-  user: U;
-  identifier: string;
+  payload?: P;
+  user?: U;
+  identifier?: string;
   tenant?: Tenant;
   roles?: Role[];
 }>;
