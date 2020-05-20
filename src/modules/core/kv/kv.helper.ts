@@ -313,7 +313,7 @@ export class KvHelper {
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return KeyValuePair.find({
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
-      ...(key ? { key } : null),
+      ...(key ? { key } : undefined),
     }).then(
       fp.map((item) => {
         // eslint-disable-next-line no-param-reassign

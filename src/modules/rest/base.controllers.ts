@@ -98,13 +98,7 @@ export abstract class RestCrudController {
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
     const order = parseOrder(modelName.model, sortStr);
-    const query = {
-      where,
-      order,
-      parsedFields,
-      skip: (page - 1) * size,
-      take: +size,
-    };
+    const query = { where, order, parsedFields, skip: (page - 1) * size, take: +size };
 
     // logger.log(`list ${r({ whereStr, query, order })}`);
 
@@ -209,11 +203,7 @@ export abstract class RestCrudController {
 
     const entity = await repository.findOneOrFail({ where: whereOptions });
 
-    const entityTo = repository.merge(entity, {
-      ...updateTo,
-      ...relationIds,
-      updatedBy: admin?.username,
-    });
+    const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username });
     logger.log(`patch ${r({ entityTo })}`);
     return repository.save(entityTo);
   }

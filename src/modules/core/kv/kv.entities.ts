@@ -67,7 +67,7 @@ export class KeyValueModel extends Publishable(AbstractNameEntity) {
   pairId?: number;
 
   @OneToOne(
-    type => KeyValuePair,
+    (type) => KeyValuePair,
     // pair => pair.model,
     { onDelete: 'CASCADE' },
   )

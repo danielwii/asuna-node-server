@@ -58,6 +58,9 @@ export class AdminQueryConditionInput {
   where?: object;
 }
 
+/**
+ * @deprecated
+ */
 export class CommonConditionInput {
   @IsString()
   @IsOptional()

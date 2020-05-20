@@ -44,12 +44,11 @@ export function loader<Entity extends BaseEntity>(
   return build<Entity>(
     cachedDataLoader(entity.name, (ids) => {
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
-      return entity
-        .findByIds(ids, {
-          where: { isPublished: opts.isPublished },
-          loadRelationIds: opts.loadRelationIds,
-        })
-        .then(resolveIds(ids, primaryKey));
+      const options = {
+        where: { ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined) },
+        loadRelationIds: opts.loadRelationIds,
+      };
+      return entity.findByIds(ids, options).then(resolveIds(ids, primaryKey));
     }),
   );
 }
