@@ -13,6 +13,6 @@ export class FormService {
   }
 
   async findByName(name: string): Promise<DynamicForm[]> {
-    return this.formModel.find({ name }).exec();
+    return this.formModel.find({ where: { name } }).exec();
   }
 }
