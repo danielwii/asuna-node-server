@@ -148,8 +148,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(
     rateLimit({
       windowMs: 60 * 1e3, // 1 minute(s)
-      max: 100, // limit each IP to 1000 requests per windowMs
-      message: 'Too many accounts created from this IP, please try again after 1474560 minutes.',
+      max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
+      message: 'Too many requests from this IP, please try again after 1474560 minutes.',
     }),
   );
   app.use(morgan('combined'));
