@@ -169,7 +169,7 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
 
   @MetaInfo({ name: '返回信息' })
   @Column(ColumnType.JSON, { nullable: true })
-  data: JsonMap;
+  data: object;
 
   @MetaInfo({ name: '订单' })
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -183,6 +183,10 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   constructor() {
     super('po');
   }
+
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: true, name: 'name' })
+  name: string;
 
   @MetaInfo({ name: '总金额' })
   @Column(ColumnType.MONEY, { name: 'amount' })

@@ -7,7 +7,12 @@ import { PaymentHelper } from './payment.helper';
 
 class CreateOrderDTO {
   @IsString()
+  @IsOptional()
+  name?: string;
+  @IsString()
   itemId: string;
+  @IsString()
+  callback: string;
   @IsDefined()
   methodId: number;
   @IsDefined()
@@ -26,14 +31,18 @@ const logger = LoggerFactory.getLogger('PaymentController');
 @Controller('api/v1/payment')
 export class PaymentController {
   @Get('notify')
+  getNotify(@Query() query) {
+    logger.log(`notify ${r({ query })}`);
+    return PaymentHelper.handleNotify(query?.id, query);
+  }
+
   @Post('notify')
-  notify(@Query() query, @Body() body) {
-    logger.log(`notify ${r({ query, body })}`);
-    return PaymentHelper.validateSign(query?.id, query ?? body);
+  postNotify(@Body() body) {
+    logger.log(`notify ${r({ body })}`);
+    return PaymentHelper.handleNotify(body?.id, body);
   }
 
   @Get('callback')
-  @Post('callback')
   callback(@Query() query, @Body() body) {
     logger.log(`callback ${r({ query, body })}`);
   }
@@ -42,7 +51,7 @@ export class PaymentController {
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest): Promise<any> {
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
-    return PaymentHelper.pay(order.transaction.id);
+    return PaymentHelper.pay(order.transaction.id, body.callback);
   }
 
   @UseGuards(new JwtAuthGuard())

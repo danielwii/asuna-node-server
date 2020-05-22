@@ -16,11 +16,14 @@ const logger = LoggerFactory.getLogger('PaymentHelper');
 export class PaymentHelper {
   static async createOrder({
     itemId,
+    name,
     methodId,
     paymentInfo,
     profileId,
   }: {
     itemId: string;
+    name?: string;
+    callback: string;
     methodId: number;
     paymentInfo: object;
     profileId: string;
@@ -28,12 +31,7 @@ export class PaymentHelper {
     logger.log(`create order by ${r({ itemId, methodId, profileId })}`);
     // create order first
     const item = await PaymentItem.findOneOrFail(itemId);
-    const order = await PaymentOrder.create({
-      // name: `${profileId}'s order`,
-      items: [item],
-      amount: item.price,
-      profileId,
-    }).save();
+    const order = await PaymentOrder.create({ name, items: [item], amount: item.price, profileId }).save();
 
     logger.verbose(`create order by ${r({ item, order })}`);
 
@@ -106,7 +104,7 @@ export class PaymentHelper {
     return { context, signed, md5sign };
   }
 
-  static async pay(transactionId: string): Promise<any> {
+  static async pay(transactionId: string, callback?: string): Promise<any> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
@@ -115,11 +113,14 @@ export class PaymentHelper {
     }
 
     if (method.type === PaymentMethodEnumValue.types.alipay) {
-      return PaymentAlipayHelper.createOrder({
-        cost: order.amount,
-        name: order.id,
-        packParams: transaction.paymentInfo,
-      });
+      return PaymentAlipayHelper.createOrder(
+        {
+          cost: order.amount,
+          name: order.name ?? order.id,
+          packParams: { ...(transaction.paymentInfo ?? {}), orderId: order.id },
+        },
+        callback,
+      );
     }
 
     const { context, signed, md5sign } = await this.sign(transactionId);
@@ -155,5 +156,57 @@ export class PaymentHelper {
     const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
     order.transaction.data = data;
     return order.save();
+  }
+
+  static async handleNotify(orderId: string | undefined, data: any) {
+    if (_.has(data, 'out_trade_no')) {
+      // handle as alipay
+      const body = data as {
+        app_id: string;
+        auth_app_id: string;
+        buyer_id: string;
+        buyer_pay_amount: string;
+        charset: string;
+        fund_bill_list: { amount: string; fundChannel: string }[];
+        gmt_create: Date;
+        gmt_payment: Date;
+        invoice_amount: number;
+        notify_id: string;
+        notify_time: Date;
+        notify_type: string; // trade_status_sync
+        out_trade_no: string;
+        passback_params: any;
+        point_amount: number;
+        receipt_amount: number;
+        seller_id: string;
+        sign: string;
+        sign_type: string;
+        subject: string;
+        total_amount: number;
+        trade_no: string;
+        trade_status: string; // TRADE_SUCCESS
+        version: string;
+      };
+
+      const validated = await PaymentAlipayHelper.validateSign(body);
+      logger.verbose(`validated is ${r(validated)}`);
+      if (!validated) {
+        // logger.error(`${body.subject} not validated.`);
+        throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
+      }
+
+      const order = await PaymentOrder.findOneOrFail(body.passback_params.orderId ?? body.subject, {
+        relations: ['transaction'],
+      });
+      order.transaction.status = 'done';
+      order.transaction.data = body;
+      await order.transaction.save();
+      order.status = 'done';
+      await order.save();
+      return;
+    } else {
+      // return PaymentHelper.validateSign(orderId, data);
+    }
+    throw new AsunaException(AsunaErrorCode.Unprocessable, 'alipay support only');
   }
 }
