@@ -1,8 +1,10 @@
 import * as crypto from 'crypto';
+import { sub } from 'date-fns';
 import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import * as qs from 'qs';
+import { IsNull, LessThan } from 'typeorm';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
@@ -156,6 +158,19 @@ export class PaymentHelper {
     const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
     order.transaction.data = data;
     return order.save();
+  }
+
+  static async cleanExpiredPayments(): Promise<void> {
+    const oneDayAgo = sub(new Date(), { days: 1 });
+    const transactions = await PaymentTransaction.count({
+      where: { createdAt: LessThan(oneDayAgo), status: IsNull() },
+    });
+    logger.verbose(`remove expired transactions: ${transactions}`);
+    await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo) });
+
+    const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
+    logger.verbose(`remove expired orders: ${orders}`);
+    await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo) });
   }
 
   static async handleNotify(orderId: string | undefined, data: any) {
