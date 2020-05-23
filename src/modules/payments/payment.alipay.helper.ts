@@ -48,6 +48,7 @@ export class PaymentAlipayHelper {
   }
 
   static async createOrder(
+    method: PaymentMethod,
     goods: { cost: number; name: string; packParams: object },
     returnUrl?: string,
   ): Promise<AlipaySdkCommonResult | string> {
@@ -55,7 +56,7 @@ export class PaymentAlipayHelper {
 
     const sdk = await this.sdk();
 
-    const method = 'alipay.trade.page.pay'; // 统一收单下单并支付页面接口
+    const execMethod = 'alipay.trade.page.pay'; // 统一收单下单并支付页面接口
     // 公共参数 可根据业务需要决定是否传入，当前不用
     // const params = {
     //     app_id: '2016101000654289', // 应用 id
@@ -79,12 +80,15 @@ export class PaymentAlipayHelper {
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
     const formData = new AlipayFormData(); // 获取一个实例化对象
     formData.addField('returnUrl', returnUrl || `${MASTER_HOST}/api/v1/payment/callback`); // 客户端支付成功后会同步跳回的地址
-    if (!_.isEmpty(MASTER_HOST?.trim())) formData.addField('notifyUrl', `${MASTER_HOST}/api/v1/payment/notify`); // 支付宝在用户支付成功后会异步通知的回调地址，必须在公网 IP 上才能收到
+    // 支付宝在用户支付成功后会异步通知的回调地址，必须在公网 IP 上才能收到
+    if (_.get(method.extra, 'notifyUrl')) formData.addField('notifyUrl', _.get(method.extra, 'notifyUrl'));
+    else if (!_.isEmpty(MASTER_HOST?.trim())) formData.addField('notifyUrl', `${MASTER_HOST}/api/v1/payment/notify`);
+    else throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');
     formData.addField('bizContent', bizContent); // 将必要的参数集合添加进 form 表单
 
-    logger.verbose(`exec ${method} ${r(formData)}`);
+    logger.verbose(`exec ${execMethod} ${r(formData)}`);
     // 异步向支付宝发送生成订单请求, 第二个参数为公共参数，不需要的话传入空对象就行
-    const result = await sdk.exec(method, {}, { formData });
+    const result = await sdk.exec(execMethod, {}, { formData });
     logger.verbose(`result is ${r(result)}`);
     // 返回订单的结果信息
     return result;

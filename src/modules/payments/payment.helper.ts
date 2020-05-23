@@ -114,6 +114,7 @@ export class PaymentHelper {
 
     if (method.type === PaymentMethodEnumValue.types.alipay) {
       return PaymentAlipayHelper.createOrder(
+        method,
         {
           cost: order.amount,
           name: order.name ? `${order.id}-${order.name}` : order.id,
