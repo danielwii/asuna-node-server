@@ -4,8 +4,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { default as OpentracingExtension } from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
-import { GraphQLServiceContext, ValueOrPromise, GraphQLRequestContext } from 'apollo-server-types';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
+import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import * as GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import { join } from 'path';
@@ -102,7 +102,7 @@ export class GraphqlModule implements OnModuleInit {
           ]),
           formatResponse: (response) => {
             if (response.errors) {
-              logger.error(`response: ${r(response.errors)}`);
+              logger.error(`response: ${r(_.pick(response, 'errors', 'data'))}`);
             }
             // logger.debug(`response: ${r(response.data)}`);
             return response;

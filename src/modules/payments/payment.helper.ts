@@ -18,13 +18,11 @@ const logger = LoggerFactory.getLogger('PaymentHelper');
 export class PaymentHelper {
   static async createOrder({
     itemId,
-    name,
     methodId,
     paymentInfo,
     profileId,
   }: {
     itemId: string;
-    name?: string;
     callback: string;
     methodId: number;
     paymentInfo: object;
@@ -33,7 +31,7 @@ export class PaymentHelper {
     logger.log(`create order by ${r({ itemId, methodId, profileId })}`);
     // create order first
     const item = await PaymentItem.findOneOrFail(itemId);
-    const order = await PaymentOrder.create({ name, items: [item], amount: item.price, profileId }).save();
+    const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
 
     logger.verbose(`create order by ${r({ item, order })}`);
 
@@ -118,7 +116,7 @@ export class PaymentHelper {
       return PaymentAlipayHelper.createOrder(
         {
           cost: order.amount,
-          name: order.name ?? order.id,
+          name: order.name ? `${order.id}-${order.name}` : order.id,
           packParams: { ...(transaction.paymentInfo ?? {}), orderId: order.id },
         },
         callback,

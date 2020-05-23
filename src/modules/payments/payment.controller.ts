@@ -7,9 +7,6 @@ import { PaymentHelper } from './payment.helper';
 
 class CreateOrderDTO {
   @IsString()
-  @IsOptional()
-  name?: string;
-  @IsString()
   itemId: string;
   @IsString()
   callback: string;
