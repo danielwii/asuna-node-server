@@ -29,12 +29,12 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column({ nullable: true })
   merchant: string;
 
-  @Expose({ name: 'with-api-key', toPlainOnly: true })
+  // @Expose({ name: 'with-api-key', toPlainOnly: true })
   @MetaInfo({ name: 'API Key' })
   @Column({ nullable: true })
   apiKey: string;
 
-  @Expose({ name: 'with-private-key', toPlainOnly: true })
+  // @Expose({ name: 'with-private-key', toPlainOnly: true })
   @MetaInfo({ name: 'Private Key' })
   @Column(ColumnType.text(), { nullable: true, name: 'private_key' })
   privateKey: string;
