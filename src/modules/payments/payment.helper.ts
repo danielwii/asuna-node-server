@@ -209,9 +209,8 @@ export class PaymentHelper {
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
       }
 
-      const order = await PaymentOrder.findOneOrFail(body.passback_params.orderId ?? body.subject, {
-        relations: ['transaction'],
-      });
+      const params = parseJSONIfCould(body.passback_params);
+      const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
