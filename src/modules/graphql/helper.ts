@@ -120,7 +120,7 @@ export class GraphqlHelper {
     const pageInfo = toPage(pageRequest);
     logger.verbose(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, loader })}`);
     const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, pageInfo, loader });
-    const total = await entityRepo.count({ where });
+    const total = await entityRepo.count(where ? { where } : {});
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
@@ -170,7 +170,7 @@ export class GraphqlHelper {
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[]> {
     const entityRepo = (cls as any) as Repository<Entity>;
-    const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : null;
+    const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : undefined;
     if (query.ids && query.ids.length > 0) {
       const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
       return mapItems(items, mapper);
