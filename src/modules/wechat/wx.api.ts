@@ -4,7 +4,6 @@ import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
-import * as cloud from 'wx-server-sdk';
 import { CacheManager } from '../cache';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely } from '../common/helpers';
@@ -25,8 +24,6 @@ import {
 } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
-
-cloud.init();
 
 type QrScene =
   | {
@@ -142,7 +139,7 @@ type GetMiniCode = {
   auto_color?: boolean;
   // {"r":0,"g":0,"b":0}	否	auto_color 为 false 时生效，
   // 使用 rgb 设置颜色 例如 {"r":"xxx","g":"xxx","b":"xxx"} 十进制表示
-  line_color?: object;
+  line_color?: Record<'r' | 'g' | 'b', string>;
   // false	否	是否需要透明底色，为 true 时，生成透明底色的小程序码
   is_hyaline?: boolean;
 };
@@ -303,7 +300,7 @@ export class WxApi {
       });
   }
 
-  static async logInterceptor<T extends Response>(response: T): Promise<object> {
+  static async logInterceptor<T extends Response>(response: T): Promise<Record<string, unknown>> {
     const { url, status } = response;
     const json = await response.json();
     if (json.errcode) {

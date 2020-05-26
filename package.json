@@ -111,7 +111,6 @@
     "typeorm": "^0.2.25",
     "validator": "^13.0.0",
     "winston": "^3.2.1",
-    "wx-server-sdk": "^2.0.4",
     "xlsx": "^0.16.1",
     "xml2js": "^0.4.23"
   },
@@ -152,7 +151,6 @@
     "@types/socket.io": "^2.1.8",
     "@types/supertest": "^2.0.9",
     "@types/uuid": "^8.0.0",
-    "@types/wx-server-sdk": "^0.8.0",
     "@types/xml2js": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^3.0.1",
     "eslint": "^7.1.0",
