@@ -19,6 +19,8 @@ const logger = LoggerFactory.getLogger('CronHelper');
 export class CronHelper {
   private static readonly redis = RedisLockProvider.instance;
 
+  static crons = {};
+
   static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
     const next = cronParser.parseExpression(cronTime).next().toDate();
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
@@ -33,9 +35,11 @@ export class CronHelper {
       ttl?: number;
     } = {},
   ): CronJob {
+    this.crons[operation] = { cronTime, nextTime: this.nextTime(cronTime) };
+
     if (!configLoader.loadBoolConfig(ConfigKeys.CRON_ENABLE)) {
       logger.warn(`skip ${operation} cron not enabled.`);
-      return null;
+      return undefined;
     }
 
     const ttl = opts.ttl ?? 10;

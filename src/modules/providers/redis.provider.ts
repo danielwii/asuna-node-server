@@ -27,7 +27,7 @@ export class RedisProvider {
 
   getRedisClient(prefix = '', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
-    if (this.clients && this.clients[key] /* && this.clients[key].isHealthy */) {
+    if (this.clients[key] /* && this.clients[key].isHealthy */) {
       return this.clients[key];
     }
 

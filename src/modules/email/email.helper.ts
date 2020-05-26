@@ -110,7 +110,7 @@ export class EmailHelper {
           ? { filename: attachment.name, path: `${domain}/${attachment.prefix}/${attachment.filename}` }
           : (attachment as Attachment),
       ),
-      ...emptyOr(content, { html: content }),
+      ...emptyOr(!!content, { html: content }),
     };
     logger.verbose(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);

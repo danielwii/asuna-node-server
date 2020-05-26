@@ -7,6 +7,7 @@ import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { RedisProvider } from './modules/providers';
+import {CronHelper} from "./modules/helper";
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 
@@ -58,7 +59,8 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   static async onAppStartListening(app: NestExpressApplication): Promise<void> {
     logger.verbose(`[onAppStartListening] ...`);
 
-    logger.verbose(`init redis provider: ${r(RedisProvider.instance.clients)}`);
+    logger.verbose(`inspect redis providers: ${r(RedisProvider.instance.clients)}`);
+    logger.verbose(`inspect crons: ${r(CronHelper.crons)}`);
 
     for (const handler of LifecycleRegister.handlers) {
       await handler?.appStarted?.();
