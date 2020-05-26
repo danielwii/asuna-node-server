@@ -26,7 +26,7 @@ export * from './store';
 export * from './task';
 export * from './tenant';
 export * from './sort';
-export * from './health/terminus-options.service';
+export * from './health/health.controller';
 export * from './tracing';
 export * from './wechat';
 export * from './ws';

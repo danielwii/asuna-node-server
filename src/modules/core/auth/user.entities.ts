@@ -30,9 +30,7 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   }
 }
 
-export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(
-  Base: TBase,
-): TBase & { profileId?: string; profile?: UserProfile } => {
+export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })
@@ -47,9 +45,7 @@ export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(
   return ExtendableEntity;
 };
 
-export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(
-  Base: TBase,
-): TBase & { profileId?: string; profile?: UserProfile } => {
+export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })

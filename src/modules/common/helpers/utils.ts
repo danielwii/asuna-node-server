@@ -29,8 +29,12 @@ export function execAsync(command: string): Promise<string> {
   });
 }
 
-export function emptyOr<Value>(condition: boolean, value: Value): Value | {} {
-  return condition ? value : {};
+export function emptyOr<Value>(
+  condition: boolean,
+  value: Value,
+  defaultValue?: Record<string, unknown>,
+): Value | Record<string, unknown> {
+  return condition ? value : defaultValue ?? {};
 }
 
 export function toHHMMSS(num: string): string {

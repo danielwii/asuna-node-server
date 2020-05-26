@@ -1,3 +1,4 @@
+import { Controller, Get } from '@nestjs/common';
 import {
   DiskHealthIndicator,
   DNSHealthIndicator,
@@ -6,14 +7,13 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import { Controller, Get } from '@nestjs/common';
-import { getConnection } from 'typeorm';
-import { MQHealthIndicator, MQProvider, RedisHealthIndicator, RedisProvider } from '../providers';
-import * as _ from 'lodash';
 import * as checkDiskSpace from 'check-disk-space';
-import { LoggerFactory } from '../common/logger';
+import * as _ from 'lodash';
 import { dirname, resolve } from 'path';
+import { getConnection } from 'typeorm';
 import { r } from '../common/helpers/utils';
+import { LoggerFactory } from '../common/logger';
+import { MQHealthIndicator, MQProvider, RedisHealthIndicator, RedisProvider } from '../providers';
 
 const logger = LoggerFactory.getLogger('HealthController');
 

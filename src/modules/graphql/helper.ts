@@ -15,7 +15,7 @@ import {
 } from 'typeorm';
 import { AbstractCategoryEntity } from '../base';
 import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
-import { r } from '../common/helpers';
+import { emptyOr, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
@@ -92,7 +92,7 @@ export class GraphqlHelper {
     const includeOrdinal = DBHelper.getPropertyNames(cls).includes('ordinal');
     return pageRequest && pageRequest.orderBy
       ? ({ [pageRequest.orderBy.column]: pageRequest.orderBy.order } as any)
-      : { ...(includeOrdinal ? { ordinal: 'DESC' } : null), createdAt: 'DESC' };
+      : { ...emptyOr(includeOrdinal, { ordinal: 'DESC' }), createdAt: 'DESC' };
   }
 
   static async handlePagedDefaultQueryRequest<
@@ -179,7 +179,7 @@ export class GraphqlHelper {
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls))) as any;
     const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
     // eslint-disable-next-line no-param-reassign
-    where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : null) };
+    where = _.isString(where) ? where : { ...where, ...emptyOr(publishable, { isPublished: true }) };
 
     if (query.random > 0) {
       logger.verbose(`parse where ${r({ publishable, cls, where })}`);
@@ -264,7 +264,7 @@ export class GraphqlHelper {
     const whereCondition = where;
 
     if (opts.query && query.category) {
-      if (categoryCls == null) {
+      if (_.isNil(categoryCls)) {
         throw new AsunaException(AsunaErrorCode.Unprocessable, `category class not defined for ${cls.name}`);
       }
 
@@ -277,17 +277,19 @@ export class GraphqlHelper {
     }
 
     if (timeCondition && typeof where === 'object') {
-      const afterCondition =
-        timeCondition && timeCondition.after ? { [timeCondition.column]: MoreThan(timeCondition.after) } : null;
-      const beforeCondition =
-        timeCondition && timeCondition.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : null;
+      const afterCondition = emptyOr(!!(timeCondition && timeCondition.after), {
+        [timeCondition.column]: MoreThan(timeCondition.after),
+      });
+      const beforeCondition = emptyOr(!!(timeCondition && timeCondition.before), {
+        [timeCondition.column]: LessThan(timeCondition.before),
+      });
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
     const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
-      ...(pageRequest ? toPage(pageRequest) : null),
-      ...(selectFields && selectFields.length > 0 ? { select: selectFields } : null),
+      ...emptyOr(!!pageRequest, toPage(pageRequest)),
+      ...emptyOr(selectFields && selectFields.length > 0, { select: selectFields }),
       where: whereCondition,
       join,
       loadRelationIds,
@@ -316,7 +318,7 @@ export class GraphqlHelper {
     })) as Entity;
     const id = result[opts.key] as any;
     // logger.verbose(`resolveProperty ${r({ result, opts, id })}`);
-    if (!id) return null;
+    if (!id) return undefined;
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
       return _opts.loader.load(id);
@@ -419,12 +421,14 @@ export class GraphqlHelper {
     // cls: Job;
     // key: string;
   }) {
-    if (!origin) return null;
+    if (!origin) return undefined;
 
     const targetRepo = (targetCls as any) as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
     const take = query?.latest ?? count;
-    const order: object = query?.orderBy ? { [query.orderBy.column]: query.orderBy.order } : { createdAt: 'DESC' };
+    const order: { [P in keyof RelationEntity]?: 'ASC' | 'DESC' | 1 | -1 } = query?.orderBy
+      ? ({ [query.orderBy.column]: query.orderBy.order } as any)
+      : { createdAt: 'DESC' };
     // const skip = PageHelper.latestSkip(count, limit);
 
     logger.verbose(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
