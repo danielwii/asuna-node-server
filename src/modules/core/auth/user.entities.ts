@@ -1,4 +1,4 @@
-import { AfterRemove, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 // eslint-disable-next-line import/no-cycle
@@ -30,8 +30,9 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
+export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(
+  Base: TBase,
+): TBase & { profileId?: string; profile?: UserProfile } => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })
@@ -46,8 +47,9 @@ export const InjectUserProfile = <TBase extends Constructor>(Base: TBase) => {
   return ExtendableEntity;
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const InjectMultiUserProfile = <TBase extends Constructor>(Base: TBase) => {
+export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(
+  Base: TBase,
+): TBase & { profileId?: string; profile?: UserProfile } => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })

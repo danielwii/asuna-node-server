@@ -13,6 +13,7 @@ export class MQProvider {
 
   #connectionFuture?: amqp.Connection;
   #channel?: amqp.Channel;
+  #isHealthy: boolean;
   // private _retryLimit = 10;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -26,30 +27,40 @@ export class MQProvider {
 
     const { url } = MQConfigObject.load();
     logger.log(`connecting to ${url}`);
-    const connection = await amqp.connect(url).catch((error) => logger.error(`connect to mq error: ${r(error)}`));
+    await amqp
+      .connect(url)
+      .then((connection) => {
+        this.#connectionFuture = connection as amqp.Connection;
+        this.#isHealthy = true;
+        logger.log('connection established');
+      })
+      .catch((error) => {
+        logger.error(`connect to mq error: ${r(error)}`);
 
-    if (_.isNil(connection)) {
-      /*
+        this.#isHealthy = false;
+        /*
         if (this._retryLimit < 1) {
           // eslint-disable-next-line unicorn/no-process-exit
           process.exit(1);
         }
 */
 
-      setTimeout(
-        () =>
-          this.createConnection().catch(() => {
-            // this._retryLimit -= 1;
-            logger.error(`reconnect to mq error, retry in 10s.`);
-          }),
-        10000,
-      );
-      return Promise.reject();
-    }
+        setTimeout(async () => {
+          this.createConnection()
+            .then((connection) => {
+              this.#connectionFuture = connection as amqp.Connection;
+              this.#isHealthy = true;
+            })
+            .catch(() => {
+              this.#isHealthy = false;
+              // this._retryLimit -= 1;
+              logger.error(`reconnect to mq error, retry in 10s.`);
+            });
+        }, 10000);
+        return Promise.reject();
+      });
 
     // this._retryLimit = 10;
-    this.#connectionFuture = connection as amqp.Connection;
-    logger.log('connection established');
     return Promise.resolve(this.#connectionFuture);
   }
 
@@ -74,6 +85,10 @@ export class MQProvider {
 
   static get enabled(): boolean {
     return MQConfigObject.load().enable;
+  }
+
+  static get isHealthy(): boolean {
+    return MQProvider._instance.#isHealthy;
   }
 
   get connectionFuture(): Promise<amqp.Connection> {
