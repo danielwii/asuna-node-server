@@ -18,7 +18,7 @@ export class RedisClientObject {
 }
 
 export class RedisProvider {
-  private clients: { [key: string]: RedisClientObject } = {};
+  clients: { [key: string]: RedisClientObject } = {};
 
   public static readonly instance = new RedisProvider();
 
@@ -38,9 +38,11 @@ export class RedisProvider {
     );
     const redisClientObject = plainToClass(
       RedisClientObject,
-      { client: null, isHealthy: false, isEnabled: configObject.enable, redisOptions },
+      { client: undefined, isHealthy: false, isEnabled: configObject.enable, redisOptions },
       { enableImplicitConversion: true },
     );
+
+    this.clients[key] = redisClientObject;
 
     if (!configObject.enable) {
       return redisClientObject;
@@ -84,7 +86,6 @@ export class RedisProvider {
     });
 */
 
-    this.clients = { ...this.clients, [key]: redisClientObject };
     return redisClientObject;
   }
 }

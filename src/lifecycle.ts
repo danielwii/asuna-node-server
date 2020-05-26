@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
+import { RedisProvider } from './modules/providers';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 
@@ -50,20 +51,23 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     }
     logger.verbose(`[beforeBootstrap] done`);
   }
-  async onApplicationBootstrap() {
+  async onApplicationBootstrap(): Promise<void> {
     logger.verbose(`[onApplicationBootstrap] ...`);
     logger.verbose(`[onApplicationBootstrap] done`);
   }
   static async onAppStartListening(app: NestExpressApplication): Promise<void> {
     logger.verbose(`[onAppStartListening] ...`);
+
+    logger.verbose(`init redis provider: ${r(RedisProvider.instance.clients)}`);
+
     for (const handler of LifecycleRegister.handlers) {
       await handler?.appStarted?.();
     }
   }
-  async beforeApplicationShutdown(signal?: string) {
+  async beforeApplicationShutdown(signal?: string): Promise<void> {
     logger.verbose(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
-  async onApplicationShutdown(signal?: string) {
+  async onApplicationShutdown(signal?: string): Promise<void> {
     logger.verbose(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }

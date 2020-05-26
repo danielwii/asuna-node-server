@@ -23,7 +23,7 @@ export class InMemoryDB {
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
-      logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
+      // logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
       const value = await resolver();
       CacheManager.cacheable(cacheKey, async () => {
         const saved = ((await CacheManager.get(cacheKey)) as Array<Value>) ?? [];
@@ -60,7 +60,7 @@ export class InMemoryDB {
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
-      logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix })}.`);
+      // logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix })}.`);
       return CacheManager.get(cacheKey);
     }
     return Promise.promisify(redis.client.lrange).bind(redis.client)(cacheKey, 0, -1);
@@ -96,7 +96,7 @@ export class InMemoryDB {
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
-      logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
+      // logger.verbose(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
       return CacheManager.cacheable(cacheKey, resolver, options?.expiresInSeconds);
     }
 

@@ -7,7 +7,7 @@ import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
-import { r } from '../common/helpers/utils';
+import { emptyOr, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
@@ -110,7 +110,7 @@ export class EmailHelper {
           ? { filename: attachment.name, path: `${domain}/${attachment.prefix}/${attachment.filename}` }
           : (attachment as Attachment),
       ),
-      ...(content ? { html: content } : null),
+      ...emptyOr(content, { html: content }),
     };
     logger.verbose(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);
@@ -118,7 +118,7 @@ export class EmailHelper {
 
   static async sendByTemplateKey(
     key: string,
-    { to, attachments, context }: { to: string[]; attachments?: Attachment[]; context?: Record<string, any> },
+    { to, attachments, context }: { to: string[]; attachments?: Attachment[]; context?: Record<string, string> },
   ): Promise<MailInfo> {
     const { templates } = await EmailHelper.getTmplConfig();
     const loaded = WeChatHelper.parseTemplateData(templates, context);
