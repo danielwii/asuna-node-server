@@ -1,11 +1,10 @@
 import { html } from 'common-tags';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
-import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnType } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
-import { Expose } from 'class-transformer';
 
 /**
  * 支付方式配置
@@ -165,11 +164,11 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
 
   @MetaInfo({ name: '附加信息' })
   @Column(ColumnType.JSON, { nullable: true })
-  paymentInfo: JsonMap;
+  paymentInfo: Record<string, unknown>;
 
   @MetaInfo({ name: '返回信息' })
   @Column(ColumnType.JSON, { nullable: true })
-  data: object;
+  data: Record<string, unknown>;
 
   @MetaInfo({ name: '订单' })
   // eslint-disable-next-line @typescript-eslint/no-use-before-define

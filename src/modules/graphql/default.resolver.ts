@@ -8,8 +8,8 @@ const logger = LoggerFactory.getLogger('QueryResolver');
 
 export class QueryResolver {
   constructor(Entity: typeof BaseEntity) {
-    const keys = Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor');
+    const keys = Object.getOwnPropertyNames(this.constructor.prototype).filter((name) => name !== 'constructor');
     logger.verbose(`init ... ${r({ keys })}`);
-    _.forEach(keys, key => DBCacheCleaner.regTrigger(Entity, key));
+    _.forEach(keys, (key) => DBCacheCleaner.regTrigger(Entity, key));
   }
 }

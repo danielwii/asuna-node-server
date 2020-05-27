@@ -11,7 +11,7 @@ import {
 import { MetaInfo } from '../common/decorators/meta.decorator';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { SimpleIdGenerator } from '../ids';
-import { Publishable } from './abilities';
+import { NameDescAttachable, Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityConstructorObject<Entity> = Omit<
@@ -74,24 +74,18 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractTimeBasedNameEntity extends AbstractTimeBasedBaseEntity {
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '描述' })
-  @Column('text', { nullable: true, name: 'description' })
-  description?: string;
+export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTimeBasedBaseEntity) {
+  @AfterLoad()
+  afterLoad(): void {
+    fixTZ(this);
+  }
 }
 
-export class AbstractNameEntity extends AbstractBaseEntity {
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '描述' })
-  @Column('text', { nullable: true, name: 'description' })
-  description?: string;
+export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {
+  @AfterLoad()
+  afterLoad(): void {
+    fixTZ(this);
+  }
 }
 
 export class AbstractUUIDBaseEntity extends BaseEntity {
@@ -113,14 +107,11 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractUUIDNameEntity extends AbstractUUIDBaseEntity {
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '描述' })
-  @Column('text', { nullable: true, name: 'description' })
-  description: string;
+export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {
+  @AfterLoad()
+  afterLoad(): void {
+    fixTZ(this);
+  }
 }
 
 export class AbstractUUID2BaseEntity extends BaseEntity {
@@ -142,30 +133,20 @@ export class AbstractUUID2BaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractUUID2NameEntity extends AbstractUUID2BaseEntity {
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '描述' })
-  @Column('text', { nullable: true, name: 'description' })
-  description: string;
+export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2BaseEntity) {
+  @AfterLoad()
+  afterLoad(): void {
+    fixTZ(this);
+  }
 }
 
-export class AbstractCategoryEntity extends Publishable(AbstractBaseEntity) {
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '描述' })
-  @Column('text', { nullable: true, name: 'description' })
-  description: string;
-
-  @MetaInfo({
-    name: '是否系统数据？',
-    type: 'Deletable',
-    help: '系统数据无法删除',
-  })
+export class AbstractCategoryEntity extends Publishable(NameDescAttachable(AbstractBaseEntity)) {
+  @MetaInfo({ name: '是否系统数据？', type: 'Deletable', help: '系统数据无法删除' })
   @Column({ nullable: true, name: 'is_system' })
   isSystem: boolean;
+
+  @AfterLoad()
+  afterLoad(): void {
+    fixTZ(this);
+  }
 }

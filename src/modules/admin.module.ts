@@ -61,10 +61,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     CacheModule.registerAsync({
       useFactory: () => {
         const redisClient = RedisProvider.instance.getRedisClient('cache_manager');
-        if (redisClient.isEnabled) {
-          return { store: redisStore, ...redisClient.redisOptions };
-        }
-        return {};
+        return redisClient.isEnabled ? { store: redisStore, ...redisClient.redisOptions } : {};
       },
     }),
   ],

@@ -21,7 +21,7 @@ export class DBCacheCleaner {
       logger.verbose(`clear ${r(triggers)}`);
       getConnection()
         .queryResultCache?.remove(triggers)
-        .catch(reason => logger.error(reason));
+        .catch((reason) => logger.error(reason));
     }
   }
 }

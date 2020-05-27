@@ -25,7 +25,7 @@ export class PaymentHelper {
     itemId: string;
     callback: string;
     methodId: number;
-    paymentInfo: object;
+    paymentInfo: Record<string, unknown>;
     profileId: string;
   }): Promise<PaymentOrder> {
     logger.log(`create order by ${r({ itemId, methodId, profileId })}`);

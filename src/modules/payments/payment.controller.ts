@@ -13,14 +13,14 @@ class CreateOrderDTO {
   @IsDefined()
   methodId: number;
   @IsDefined()
-  paymentInfo: object;
+  paymentInfo: Record<string, unknown>;
 }
 
 class UpdateOrderDTO {
   @IsString()
   orderId: string;
   @IsOptional()
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 const logger = LoggerFactory.getLogger('PaymentController');

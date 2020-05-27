@@ -8,6 +8,7 @@ import {
   AsunaErrorCode,
   AsunaException,
   deserializeSafely,
+  emptyOr,
   IdentifierHelper,
   r,
   StaticImplements,
@@ -231,8 +232,8 @@ export class KvHelper {
       merge?: boolean;
     } = {},
   ): Promise<KeyValuePair> {
-    const collection = opts.collection ? opts.collection.replace('/\b+/', '') : null;
-    const key = opts.key ? opts.key.replace('/\b+/', '') : null;
+    const collection = opts.collection ? opts.collection.replace('/\b+/', '') : undefined;
+    const key = opts.key ? opts.key.replace('/\b+/', '') : undefined;
 
     if (!key) {
       throw new ValidationException('kv', 'key is required');
@@ -254,7 +255,7 @@ export class KvHelper {
     const exists = await this.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOne({ name: opts.name });
-      logger.verbose(`found kv model ${r(model)}`);
+      logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
         model.formatType = formatType;
@@ -273,7 +274,7 @@ export class KvHelper {
     }
 
     logger.verbose(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...(exists ? { id: exists.id } : null), ...entity } as any).finally(() =>
+    return KeyValuePair.save({ ...emptyOr(!!exists, { id: exists?.id }), ...entity } as any).finally(() =>
       CacheUtils.clear({ prefix: 'kv', key: { collection, key } }),
     );
   }
@@ -313,7 +314,7 @@ export class KvHelper {
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return KeyValuePair.find({
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
-      ...(key ? { key } : undefined),
+      ...emptyOr(!!key, { key }),
     }).then(
       fp.map((item) => {
         // eslint-disable-next-line no-param-reassign
@@ -332,7 +333,7 @@ export class KvHelper {
 
   static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    return field?.value || _.get(field, 'field.defaultValue');
+    return field?.value ?? _.get(field, 'field.defaultValue');
   }
 
   /**
@@ -375,7 +376,7 @@ export class KvHelper {
       resolver: async () => (await KvHelper.get(kvDef))?.value,
       strategy: 'cache-only',
     });
-    if (!fields) return null;
+    if (!fields) return undefined;
 
     const result = {
       value: _.get(fields.values, fieldKey),

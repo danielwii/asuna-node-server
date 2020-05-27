@@ -39,7 +39,7 @@ export class HealthController {
     return this.health.check(
       _.compact([
         async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
-        async () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() as any }),
+        async () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() }),
         async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
         async () => this.memory.checkRSS('memory_rss', 3000 * 1024 * 1024),
         async () => this.disk.checkStorage('storage', { thresholdPercent: 0.99, path: this.path }),
