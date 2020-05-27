@@ -167,9 +167,9 @@ export class PaymentHelper {
     logger.verbose(`remove expired transactions: ${transactions}`);
     await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo) });
 
-    const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
-    logger.verbose(`remove expired orders: ${orders}`);
-    await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo) });
+    // const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
+    // logger.verbose(`remove expired orders: ${orders}`);
+    // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo) });
   }
 
   static async handleNotify(orderId: string | undefined, data: any) {

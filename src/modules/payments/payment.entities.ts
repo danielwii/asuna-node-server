@@ -138,7 +138,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   images: JsonArray;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @ManyToOne((type) => PaymentOrder, (order) => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne((type) => PaymentOrder, (order) => order.items, { onDelete: 'SET NULL' })
   order: any; // PaymentOrder;
 }
 
