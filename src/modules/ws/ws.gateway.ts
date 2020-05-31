@@ -12,7 +12,7 @@ import { LoggerFactory } from '../common/logger';
 
 const pkg = require('../../../package.json');
 
-const logger = LoggerFactory.getLogger('WSGateway');
+const logger = LoggerFactory.getLogger('WSGateway(default)');
 
 @WebSocketGateway(3002, {
   path: '/',

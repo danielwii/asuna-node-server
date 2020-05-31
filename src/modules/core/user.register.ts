@@ -1,20 +1,21 @@
 import { BaseEntity } from 'typeorm';
-import { Constructor } from '../base';
+import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 // eslint-disable-next-line import/no-cycle
 import { UserProfile } from './auth/user.entities';
 import { DBHelper } from './db';
+import { Constructor } from '../base/abilities';
 
 const logger = LoggerFactory.getLogger('UserRegister');
 
 export class UserRegister {
-  static Entity: Constructor<any>;
+  static Entity: Constructor<any> | any;
   static onProfileCreate: (profile: UserProfile) => Promise<any>;
   static onProfileDelete: (profile: UserProfile) => Promise<any>;
 
   static regCoreUserCreator<User extends BaseEntity>(
-    Entity: Constructor<User>,
+    Entity: Constructor<any> | any,
     onProfileCreate?: (profile: UserProfile) => Promise<any>,
     onProfileDelete?: (profile: UserProfile) => Promise<any>,
   ): void {
@@ -24,7 +25,9 @@ export class UserRegister {
     this.onProfileCreate =
       onProfileCreate ||
       ((profile) => {
-        const entity = new Entity({ id: profile.id, profile });
+        const entity = _.has(Entity, 'of')
+          ? Entity.of({ id: profile.id, profile })
+          : new Entity({ id: profile.id, profile });
         logger.verbose(`onProfileCreate save ${r({ profile, entity })}`);
         return DBHelper.repo(Entity).save(entity as any);
       });

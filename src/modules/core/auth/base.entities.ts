@@ -2,6 +2,7 @@ import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base';
 import { MetaInfo } from '../../common/decorators';
+import { UserProfile } from './user.entities';
 
 export enum AuthUserChannel {
   default = 'default',
@@ -107,3 +108,7 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
 
 export type AuthUser = AbstractTimeBasedAuthUser | AbstractAuthUser;
 export type AuthUserType = typeof AbstractTimeBasedAuthUser | typeof AbstractAuthUser;
+export type WithProfileUser = typeof AbstractTimeBasedBaseEntity & Partial<{
+  profileId: string;
+  profile: UserProfile;
+}>;

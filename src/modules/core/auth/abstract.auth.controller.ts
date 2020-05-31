@@ -9,13 +9,13 @@ import { CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthService, CreatedUser } from './auth.service';
-import { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
+import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
 export abstract class AbstractAuthController {
   constructor(
-    private readonly UserEntity: AuthUserType,
+    private readonly UserEntity: WithProfileUser,
     private readonly authService: AuthService,
     private readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
@@ -55,8 +55,8 @@ export abstract class AbstractAuthController {
     // await profile.save();
 
     const userEntity = await this.UserEntity.findOne(payload.uid);
-    if (_.has(userEntity, 'username') && dto.username) userEntity.username = profile.username;
-    if (_.has(userEntity, 'email') && dto.email) userEntity.email = profile.email;
+    if (_.has(userEntity, 'username') && dto.username) _.set(userEntity, 'username', profile.username);
+    if (_.has(userEntity, 'email') && dto.email) _.set(userEntity, 'email', profile.email);
     await userEntity.save();
   }
 
@@ -69,7 +69,7 @@ export abstract class AbstractAuthController {
     // const email = `${username}@quick.passport`;
     const signed = await this.authService
       .createUser<AuthUser>(username, undefined, password, AuthUserChannel.quickpass)
-      .then((result) => this.handlers.onSignUp?.(result, body));
+      .then((result) => (this.handlers.onSignUp ? this.handlers.onSignUp(result, body) : result));
     /*
     signed.profile.channel = AuthUserChannel.quickpass;
     await signed.profile.save();
