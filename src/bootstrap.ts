@@ -13,6 +13,7 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection, getConnectionOptions } from 'typeorm';
+import * as rookout from 'rookout';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
@@ -75,6 +76,10 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
       envs: _.pickBy(configLoader.loadConfigs(), (v, k) => k.startsWith('LOGGER_')),
     })}`,
   );
+
+  if (configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN)) {
+    rookout.start({ token: configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN) }).catch((reason) => logger.error(reason));
+  }
 
   AsunaContext.instance.setup(options.context);
   // AsunaContext.instance.setup(options.context || { root: options.root });
