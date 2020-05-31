@@ -76,7 +76,11 @@ export class CronHelper {
               reason,
             }).catch((err) => logger.error(`addCronFailureEvent error: ${r(err)}`));
           })
-          .finally(() => logger.verbose(`${operation} done. next: ${r({ cronTime, ...this.nextTime(cronTime) })}`)),
+          .finally(() => {
+            const next = this.nextTime(cronTime);
+            if (dayjs(next.next).diff(new Date(), 'minute') > 1)
+              logger.verbose(`${operation} done. next: ${r({ cronTime, ...next })}`);
+          }),
       /*
       onComplete: () => {
         logger.verbose(`${operation} completed.`);

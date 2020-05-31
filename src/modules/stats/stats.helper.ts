@@ -16,7 +16,7 @@ export class StatsHelper {
   static async addErrorInfo(type: string, info): Promise<void> {
     const key = `error-${type}`;
     this.keys.add(key);
-    logger.verbose(`add error info ${r({ key, info })}`);
+    // logger.verbose(`add error info ${r({ key, info })}`);
     const opts = { prefix: this.prefix, key };
     const errors = await InMemoryDB.list(opts);
     logger.verbose(`current errors length is ${errors?.length}`);
@@ -42,7 +42,7 @@ export class StatsHelper {
   }
 
   static async addCronSuccessEvent(key: string, event): Promise<void> {
-    logger.log(`add cron success event ${r({ key, event })}`);
+    // logger.debug(`add cron success event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {
       // logger.log(`current stat is ${r(cronStat)}`);
