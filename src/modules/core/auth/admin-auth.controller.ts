@@ -79,8 +79,11 @@ export class AdminAuthController extends RestCrudController {
   @Post('token')
   @HttpCode(HttpStatus.OK)
   async getToken(@Body() signDto: SignDto): Promise<{ expiresIn: number; accessToken: string }> {
-    logger.log(`getToken() >> ${signDto.email}`);
-    const user = await this.adminAuthService.getUserWithPassword({ email: signDto.email }, true);
+    logger.log(`getToken() >> ${r(_.omit(signDto, 'password'))}`);
+    const user = await this.adminAuthService.getUserWithPassword(
+      _.omitBy({ email: signDto.email, username: signDto.username }, _.isNil),
+      true,
+    );
 
     if (!user) {
       throw new SignException('account not exists or active');

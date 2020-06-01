@@ -13,6 +13,16 @@ export const Publishable = <TBase extends Constructor<BaseEntity>>(Base: TBase) 
   return ExtendableEntity;
 };
 
+export const Featuredable = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
+  class ExtendableEntity extends Base {
+    @MetaInfo({ name: '是否推荐？' })
+    @Column({ nullable: true, name: 'is_featured' })
+    isFeatured: boolean;
+  }
+
+  return ExtendableEntity;
+};
+
 export const NameDescAttachable = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '名称' })

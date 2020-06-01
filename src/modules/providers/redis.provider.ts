@@ -25,7 +25,7 @@ export class RedisProvider {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
-  getRedisClient(prefix = '', db = 0): RedisClientObject {
+  getRedisClient(prefix = 'default', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
     if (this.clients[key] /* && this.clients[key].isHealthy */) {
       return this.clients[key];
@@ -62,20 +62,20 @@ export class RedisProvider {
       logger.error(`Redis ${key} connection error ${r(err)}`);
     });
 
-    process.on('SIGINT', () => {
+    process.on('SIGINT', () =>
       client.quit((err: Error, res: string) => {
         redisClientObject.isHealthy = false;
         logger.log(`signal: SIGINT. Redis ${key} connection disconnected ${r({ err, res })}`);
         process.exit(0);
-      });
-    });
+      }),
+    );
 
-    process.on('beforeExit', () => {
+    process.on('beforeExit', () =>
       client.quit((err: Error, res: string) => {
         redisClientObject.isHealthy = false;
         logger.log(`beforeExit. Redis ${key} connection disconnected ${r({ err, res })}`);
-      });
-    });
+      }),
+    );
 
     /*
     process.on('removeListener', () => {

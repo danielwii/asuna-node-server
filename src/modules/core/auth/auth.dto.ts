@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import * as _ from 'lodash';
 
 export class AdminResetPasswordDto {
@@ -46,10 +46,18 @@ export class ResetAccountDto {
  */
 export class SignDto {
   @ApiProperty({ type: 'email' })
+  @ValidateIf(o => _.isEmpty(o.username))
   @IsString()
   @Transform((value) => _.trim(value))
   @IsNotEmpty()
   readonly email: string;
+
+  @ApiProperty({ type: 'username' })
+  @ValidateIf(o => _.isEmpty(o.email))
+  @IsString()
+  @Transform((value) => _.trim(value))
+  @IsNotEmpty()
+  readonly username: string;
 
   @ApiProperty()
   @IsNotEmpty()

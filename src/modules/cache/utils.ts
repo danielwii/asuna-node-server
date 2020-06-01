@@ -16,7 +16,7 @@ export class CacheUtils {
   }
 
   static async clearAll(): Promise<void> {
-    const redis = RedisProvider.instance.getRedisClient();
+    const redis = RedisProvider.instance.getRedisClient('cache_utils');
     if (redis.isEnabled) {
       const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
 
