@@ -106,17 +106,16 @@ export abstract class AbstractAuthService<U extends AuthUser> {
 
   async getUser(
     identifier: { email?: string; username?: string },
-    isActive = true,
+    isActive?: boolean,
     options?: FindOneOptions<U>,
   ): Promise<U> {
-    return this.userRepository.findOne(
-      {
-        ...emptyOr(!!identifier.email, { email: identifier.email }),
-        ...emptyOr(!!identifier.username, { username: identifier.username }),
-        isActive,
-      } as any,
-      options,
-    );
+    const condition = {
+      ...emptyOr(!!identifier.email, { email: identifier.email }),
+      ...emptyOr(!!identifier.username, { username: identifier.username }),
+      ...emptyOr(!_.isNil(isActive), { isActive }),
+    };
+    logger.verbose(`get user by condition ${r(condition)}`);
+    return this.userRepository.findOne(condition as any, options);
   }
 
   getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
@@ -131,7 +130,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   updatePassword(profileId: string, password: string, salt: string): Promise<UpdateResult> {
-    // return this.userRepository.update(id, { password, salt } as any);
-    return UserProfile.update(profileId, { password, salt });
+    return this.userRepository.update(profileId, { password, salt } as any);
+    // return UserProfile.update(profileId, { password, salt });
   }
 }

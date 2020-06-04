@@ -66,7 +66,7 @@ export class AdminAuthController extends RestCrudController {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
     const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
     logger.log(`reset password: ${r({ resetPasswordDto, data })}`);
-    const user = await this.adminAuthService.getUser(data, true);
+    const user = await this.adminAuthService.getUser(data);
 
     if (!user) {
       throw new SignException('account not exists or active');
