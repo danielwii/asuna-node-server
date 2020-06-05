@@ -39,10 +39,10 @@
     "accesscontrol": "^2.2.1",
     "alipay-sdk": "^3.1.1",
     "amqplib": "^0.5.6",
-    "apollo-opentracing": "^1.4.2",
+    "apollo-opentracing": "^1.4.3",
     "apollo-server-cache-redis": "^1.2.1",
     "apollo-server-caching": "^0.5.1",
-    "apollo-server-express": "^2.14.1",
+    "apollo-server-express": "^2.14.2",
     "apollo-server-plugin-response-cache": "^0.5.2",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
@@ -105,13 +105,13 @@
     "shortid": "^2.2.15",
     "snyk": "^1.336.0",
     "socket.io": "^2.3.0",
-    "socket.io-redis": "^5.2.0",
+    "socket.io-redis": "^5.3.0",
     "swagger-ui-express": "^4.1.4",
     "tmp": "^0.2.1",
     "typeorm": "^0.2.25",
     "validator": "^13.0.0",
     "winston": "^3.2.1",
-    "xlsx": "^0.16.1",
+    "xlsx": "^0.16.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
@@ -173,7 +173,7 @@
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.0",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.3"
+    "typescript": "^3.9.5"
   },
   "husky": {
     "hooks": {
