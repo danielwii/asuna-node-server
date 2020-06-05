@@ -150,13 +150,14 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(helmet());
   app.use(compression());
   app.use(responseTime());
-  app.use(
-    rateLimit({
-      windowMs: 60 * 1e3, // 1 minute(s)
-      max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
-      message: 'Too many requests from this IP, please try again after 1474560 minutes.',
-    }),
-  );
+  if (configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT_ENABLED))
+    app.use(
+      rateLimit({
+        windowMs: 60 * 1e3, // 1 minute(s)
+        max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
+        message: 'Too many requests from this IP, please try again after 1474560 minutes.',
+      }),
+    );
   app.use(morgan('combined'));
 
   const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '20mb');
