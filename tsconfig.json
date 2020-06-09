@@ -21,9 +21,7 @@
     "declarationDir": "declaration",
     "baseUrl": "."
   },
-  "files": [
-    "@types/global.d.ts"
-  ],
-  "include": ["index.ts", "src/**/*"],
+  "files": ["@types/global.d.ts"],
+  "include": ["index.ts", "src/**/*.*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts"]
 }
