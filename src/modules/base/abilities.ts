@@ -1,7 +1,7 @@
 import { BaseEntity, Column } from 'typeorm';
 import { MetaInfo } from '../common/decorators';
 
-export type Constructor<T = Record<string, unknown>> = new (...args: any[]) => T;
+export type Constructor<T = {}> = new (...args: any[]) => T;
 
 export const Publishable = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
