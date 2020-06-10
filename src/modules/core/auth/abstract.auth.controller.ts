@@ -106,7 +106,7 @@ export abstract class AbstractAuthController {
           await this.handlers.onSignUp(result, body);
         }
         const user = await this.UserEntity.findOne(result.user.id, { relations: ['profile'] });
-        return user.profile;
+        return _.get(user, 'profile');
       });
   }
 
