@@ -6,7 +6,7 @@ import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
-import * as GraphQLJSON from 'graphql-type-json';
+import { GraphQLJSONObject } from 'graphql-type-json';
 import * as _ from 'lodash';
 import { join } from 'path';
 import { AppModule } from './app';
@@ -50,7 +50,7 @@ export class GraphqlModule implements OnModuleInit {
           // },
           typePaths,
           // autoSchemaFile: 'schema.gql',
-          resolvers: { JSON: GraphQLJSON },
+          resolvers: { JSON: GraphQLJSONObject },
           playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
           debug: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
           introspection:
@@ -69,7 +69,7 @@ export class GraphqlModule implements OnModuleInit {
             },
             (responseCachePlugin as any)({
               sessionId: (requestContext) => {
-                const sessionID = requestContext.request.http.headers.get('sessionid') || null;
+                const sessionID = requestContext.request.http.headers.get('sessionid');
                 if (sessionID) logger.verbose(`cache sessionID: ${sessionID}`);
                 return sessionID;
               },
