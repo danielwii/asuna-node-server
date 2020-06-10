@@ -8,8 +8,9 @@ import { Hermes } from '../bus';
 import { CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
-import { AuthService, CreatedUser } from './auth.service';
-import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
+import { AuthService } from './auth.service';
+import { AuthUserChannel, WithProfileUser, WithProfileUserInstance } from './base.entities';
+import { DBHelper } from '../db';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
@@ -19,7 +20,7 @@ export abstract class AbstractAuthController {
     private readonly authService: AuthService,
     private readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
-      onSignUp?: <Result>(result: Result, body) => Promise<Result>;
+      onSignUp?: <Result>(result: Result, body) => Promise<WithProfileUser>;
     } = {},
   ) {}
 
@@ -68,8 +69,13 @@ export abstract class AbstractAuthController {
 
     // const email = `${username}@quick.passport`;
     const signed = await this.authService
-      .createUser<AuthUser>(username, undefined, password, AuthUserChannel.quickpass)
-      .then((result) => (this.handlers.onSignUp ? this.handlers.onSignUp(result, body) : result));
+      .createUser<WithProfileUserInstance>(username, undefined, password, AuthUserChannel.quickpass)
+      .then(async (result) => {
+        if (this.handlers.onSignUp) {
+          await this.handlers.onSignUp(result, body);
+        }
+        return result;
+      });
     /*
     signed.profile.channel = AuthUserChannel.quickpass;
     await signed.profile.save();
@@ -82,7 +88,7 @@ export abstract class AbstractAuthController {
   }
 
   @Post('sign-up')
-  async signUp(@Body() body): Promise<CreatedUser<AuthUser>> {
+  async signUp(@Body() body): Promise<WithProfileUserInstance> {
     logger.log(`sign-up: ${r(body)}`);
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
 
@@ -94,8 +100,13 @@ export abstract class AbstractAuthController {
     }
 
     return this.authService
-      .createUser<AuthUser>(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
-      .then((result) => this.handlers.onSignUp?.(result, body));
+      .createUser<WithProfileUserInstance>(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
+      .then(async (result) => {
+        if (this.handlers.onSignUp) {
+          await this.handlers.onSignUp(result, body);
+        }
+        return this.UserEntity.findOne(result.user.id, { relations: ['profile'] });
+      });
   }
 
   @Post('token')
@@ -123,10 +134,14 @@ export abstract class AbstractAuthController {
 
   @Get('current')
   @UseGuards(new JwtAuthGuard())
-  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<AuthUser>> {
+  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
-    const loaded = await this.UserEntity.findOne(payload.uid, { relations: ['wallet', 'profile'] });
+    const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
+    const loaded = await this.UserEntity.findOne<WithProfileUserInstance>(payload.uid, {
+      // maybe get relations from a register
+      relations: ['wallet', 'profile'].filter((relation) => relations.includes(relation)),
+    });
     if (!payload) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
     }
@@ -140,7 +155,7 @@ export abstract class AbstractAuthController {
       .catch((reason) => logger.error(reason));
     logger.verbose(`current authed user is ${r(loaded)}`);
     const result = _.omit(loaded, 'channel', 'info'); // ...
-    _.set(result, 'profile', _.pick((result as any).profile, 'id', 'email', 'isBound', 'channel'));
+    _.set(result, 'profile', _.pick(result.profile, 'id', 'email', 'isBound', 'channel'));
     return result;
   }
 

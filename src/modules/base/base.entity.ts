@@ -14,6 +14,10 @@ import { SimpleIdGenerator } from '../ids';
 import { NameDescAttachable, Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
+export type EntityObject<Entity> = Omit<
+  Entity,
+  'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator' | 'of' | 'hasId'
+>;
 export type EntityConstructorObject<Entity> = Omit<
   Entity,
   keyof typeof BaseEntity | 'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'

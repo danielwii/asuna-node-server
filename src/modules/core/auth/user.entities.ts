@@ -5,6 +5,7 @@ import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 // eslint-disable-next-line import/no-cycle
 import { UserRegister } from '../user.register';
+// eslint-disable-next-line import/no-cycle
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__user_profiles', internal: true })

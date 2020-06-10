@@ -15,7 +15,7 @@ export class AbstractConfigLoader<Config> {
 
   fromConfigurator(): Config {
     Object.keys(this).forEach((key) => {
-      this[key] = configLoader.loadConfig(key, null, true);
+      this[key] = configLoader.loadConfig(key, undefined, true);
     });
     return this as any;
   }
