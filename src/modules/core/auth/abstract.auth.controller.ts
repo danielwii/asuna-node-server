@@ -5,12 +5,12 @@ import { DeepPartial, UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
 import { Hermes } from '../bus';
+import { DBHelper } from '../db';
 import { CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthUserChannel, WithProfileUser, WithProfileUserInstance } from './base.entities';
-import { DBHelper } from '../db';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
@@ -105,7 +105,8 @@ export abstract class AbstractAuthController {
         if (this.handlers.onSignUp) {
           await this.handlers.onSignUp(result, body);
         }
-        return this.UserEntity.findOne(result.user.id, { relations: ['profile'] });
+        const user = await this.UserEntity.findOne(result.user.id, { relations: ['profile'] });
+        return user.profile;
       });
   }
 

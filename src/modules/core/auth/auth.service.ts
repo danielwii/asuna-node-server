@@ -67,7 +67,14 @@ export class AuthService extends AbstractAuthService<UserProfile> {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
     }
 
-    const entity = this.userRepository.create({ email, username, isActive: true, password: hash, salt, channel });
+    const entity = this.userRepository.create({
+      email: email || undefined,
+      username: username || undefined,
+      isActive: true,
+      password: hash,
+      salt,
+      channel,
+    });
     logger.verbose(`create user ${r(entity)}`);
     return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
       logger.verbose(`created ${r({ profile, user })}`);
