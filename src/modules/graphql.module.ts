@@ -6,7 +6,7 @@ import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
-import { GraphQLJSONObject } from 'graphql-type-json';
+import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import { join } from 'path';
 import { AppModule } from './app';
@@ -50,7 +50,7 @@ export class GraphqlModule implements OnModuleInit {
           // },
           typePaths,
           // autoSchemaFile: 'schema.gql',
-          resolvers: { JSON: GraphQLJSONObject },
+          resolvers: { JSON: GraphQLJSON },
           playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
           debug: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
           introspection:
@@ -95,14 +95,14 @@ export class GraphqlModule implements OnModuleInit {
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
                   }) as any;
-                  logger.log(`load opentracingExtension ...`);
+                  logger.log(`load open tracing extension ...`);
                   return opentracingExtension;
                 })
               : undefined,
           ]),
           formatResponse: (response) => {
             if (response.errors) {
-              logger.error(`response: ${r(_.pick(response, 'errors', 'data'))}`);
+              logger.error(`response: ${r(response.errors)}`);
             }
             // logger.debug(`response: ${r(response.data)}`);
             return response;

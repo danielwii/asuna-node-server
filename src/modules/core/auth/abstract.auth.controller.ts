@@ -20,7 +20,7 @@ export abstract class AbstractAuthController {
     private readonly authService: AuthService,
     private readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
-      onSignUp?: <Result>(result: Result, body) => Promise<WithProfileUser>;
+      onSignUp?: <Result>(result: Result, body) => Promise<void>;
     } = {},
   ) {}
 
