@@ -1,5 +1,4 @@
-// import AlipaySdk from 'alipay-sdk';
-import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk/lib/alipay';
+import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk';
 import AlipayFormData from 'alipay-sdk/lib/form';
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, parseJSONIfCould } from '../common';

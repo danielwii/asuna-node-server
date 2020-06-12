@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
-import { IsDefined, IsOptional, IsString } from 'class-validator';
+import { Body, Controller, Get, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { IsDefined, IsOptional, IsString, isURL } from 'class-validator';
+import { Response } from 'express';
+import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
@@ -46,9 +48,10 @@ export class PaymentController {
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @Post('order')
-  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest): Promise<any> {
+  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<any> {
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
-    return PaymentHelper.pay(order.transaction.id, { callback: body.callback, clientIp: req.clientIp });
+    const result = await PaymentHelper.pay(order.transaction.id, { callback: body.callback, clientIp: req.clientIp });
+    return _.isString(result) && isURL(result) ? res.redirect(result) : result;
   }
 
   @UseGuards(new JwtAuthGuard())

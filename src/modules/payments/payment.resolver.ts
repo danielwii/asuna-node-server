@@ -27,7 +27,7 @@ export class PaymentQueryResolver {
       query: {},
       pageRequest,
       ctx,
-      loader: loaders => loaders.paymentItems,
+      loader: (loaders) => loaders.paymentItems,
     });
   }
 }

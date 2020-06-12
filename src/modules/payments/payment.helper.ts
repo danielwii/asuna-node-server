@@ -1,3 +1,4 @@
+import { AlipaySdkCommonResult } from 'alipay-sdk';
 import * as crypto from 'crypto';
 import { sub } from 'date-fns';
 import * as Handlebars from 'handlebars';
@@ -76,17 +77,23 @@ export class PaymentHelper {
     return true;
   }
 
-  static async extraContext(transaction: PaymentTransaction, method: PaymentMethod, order: PaymentOrder): Promise<any> {
+  static async extraContext(
+    transaction: PaymentTransaction,
+    method: PaymentMethod,
+    order: PaymentOrder,
+  ): Promise<{
+    method: PaymentMethod;
+    order: PaymentOrder;
+    transaction: PaymentTransaction;
+    callback: string;
+    notify: string;
+    createdAt: Date;
+  }> {
     const { createdAt } = transaction;
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
-    return {
-      method,
-      order,
-      transaction,
-      createdAt,
-      callback: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`),
-      notify: encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`),
-    };
+    const callback = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`);
+    const notify = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`);
+    return { method, order, transaction, createdAt, callback, notify };
   }
 
   static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
@@ -108,7 +115,7 @@ export class PaymentHelper {
   static async pay(
     transactionId: string,
     { callback, clientIp }: { callback?: string; clientIp?: string },
-  ): Promise<any> {
+  ): Promise<string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string }> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
