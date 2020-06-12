@@ -19,7 +19,7 @@ export class Uploader {
 
   private constructor() {
     this.asunaQueue = Hermes.regInMemoryQueue(this.queueName);
-    Hermes.setupJobProcessor(this.queueName, payload => {
+    Hermes.setupJobProcessor(this.queueName, (payload) => {
       logger.log(`queue(${this.queueName}): ${r(payload)}`);
       return payload;
     });
@@ -53,7 +53,7 @@ export class Uploader {
         headers: { 'content-type': 'multipart/form-data' },
         maxContentLength,
       })
-      .catch(error => handleAxiosResponseError(endpoint, error));
+      .catch((error) => handleAxiosResponseError(endpoint, error));
   }
 
   // TODO async uploadFolder(dir: string) {}

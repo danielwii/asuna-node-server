@@ -3,13 +3,13 @@
 import { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as Sentry from '@sentry/node';
+import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { RedisProvider } from './modules/providers';
 import { CronHelper } from './modules/helper';
-import * as _ from 'lodash';
-import * as fp from 'lodash/fp';
 import { IdGenerators } from './modules/base/generator';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
@@ -48,6 +48,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     }
     logger.verbose(`[onInit] done`);
   }
+
   static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
     logger.verbose(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
@@ -55,10 +56,12 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     }
     logger.verbose(`[beforeBootstrap] done`);
   }
+
   async onApplicationBootstrap(): Promise<void> {
     logger.verbose(`[onApplicationBootstrap] ...`);
     logger.verbose(`[onApplicationBootstrap] done`);
   }
+
   static async onAppStartListening(app: NestExpressApplication): Promise<void> {
     logger.verbose(`[onAppStartListening] ...`);
 
@@ -72,9 +75,11 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       await handler?.appStarted?.();
     }
   }
+
   async beforeApplicationShutdown(signal?: string): Promise<void> {
     logger.verbose(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
+
   async onApplicationShutdown(signal?: string): Promise<void> {
     logger.verbose(`[onApplicationShutdown] ... signal: ${signal}`);
   }
