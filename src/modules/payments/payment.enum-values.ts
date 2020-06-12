@@ -8,6 +8,7 @@ export class PaymentMethodEnumValue {
   static types = {
     third: 'third',
     alipay: 'alipay',
+    wxpay: 'wxpay',
     // paypal: 'paypal',
   };
 
@@ -16,7 +17,7 @@ export class PaymentMethodEnumValue {
   }
 
   static get data(): { [key in keyof typeof PaymentMethodEnumValue.types]: string } {
-    return { third: '第三方', alipay: '支付宝' /* paypal: 'PayPal' */ };
+    return { third: '第三方', alipay: '支付宝', wxpay: '微信支付' /* paypal: 'PayPal' */ };
   }
 }
 

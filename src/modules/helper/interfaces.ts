@@ -13,7 +13,8 @@ export type AuthInfo<P = PayloadType, U = UserProfile | AdminUser> = Partial<{
   tenant?: Tenant;
   roles?: Role[];
 }>;
-export type AnyAuthRequest<P = PayloadType, U = UserProfile | AdminUser> = Request & AuthInfo<P, U>;
+export type AnyAuthRequest<P = PayloadType, U = UserProfile | AdminUser> = Request &
+  AuthInfo<P, U> & { clientIp: string };
 
 export interface ApiKeyPayload {
   apiKey: string;

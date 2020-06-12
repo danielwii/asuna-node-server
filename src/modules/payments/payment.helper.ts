@@ -12,6 +12,7 @@ import { ConfigKeys, configLoader } from '../config';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
+import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
@@ -104,7 +105,10 @@ export class PaymentHelper {
     return { context, signed, md5sign };
   }
 
-  static async pay(transactionId: string, callback?: string): Promise<any> {
+  static async pay(
+    transactionId: string,
+    { callback, clientIp }: { callback?: string; clientIp?: string },
+  ): Promise<any> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
@@ -123,12 +127,24 @@ export class PaymentHelper {
         callback,
       );
     }
+    if (method.type === PaymentMethodEnumValue.types.wxpay) {
+      return PaymentWxpayHelper.createOrder(
+        method,
+        {
+          tradeNo: order.id,
+          fee: order.amount,
+          name: order.name ? `${order.id}-${order.name}` : order.id,
+          clientIp,
+        },
+        callback,
+      );
+    }
 
     const { context, signed, md5sign } = await this.sign(transactionId);
     Object.assign(context, { md5sign });
     const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 
-    logger.verbose(`parse body [${body}] with context ${r(context)}`);
+    logger.verbose(`parse body '${body}' with context ${r(context)}`);
 
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ signed, payload })}`);

@@ -14,6 +14,7 @@ import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection, getConnectionOptions } from 'typeorm';
 import * as rookout from 'rookout';
+import * as requestIp from 'request-ip';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
@@ -147,6 +148,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // setup application
   // --------------------------------------------------------------
 
+  app.use(requestIp.mw());
   app.use(helmet());
   app.use(compression());
   app.use(responseTime());

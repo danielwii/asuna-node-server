@@ -48,7 +48,7 @@ export class PaymentController {
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest): Promise<any> {
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
-    return PaymentHelper.pay(order.transaction.id, body.callback);
+    return PaymentHelper.pay(order.transaction.id, { callback: body.callback, clientIp: req.clientIp });
   }
 
   @UseGuards(new JwtAuthGuard())

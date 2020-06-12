@@ -72,11 +72,8 @@ export class AuthHelper {
               req.payload = payload;
               const user = await UserProfile.findOne({ username: codeSession.openid });
               if (!user) {
-                return resolve({
-                  err: new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session'),
-                  payload: null,
-                  info,
-                });
+                const err = new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session');
+                return resolve({ err, payload: null, info });
               }
 
               req.user = user;
