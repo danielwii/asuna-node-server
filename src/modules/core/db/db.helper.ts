@@ -449,7 +449,7 @@ export class DBHelper {
           },
         }),
       ),
-      R.filter(R.prop('isPrimary')),
+      // R.filter(R.prop('isPrimary')),
     )(repository.metadata.manyToManyRelations);
 
     // 加载 OneToMany 数据
