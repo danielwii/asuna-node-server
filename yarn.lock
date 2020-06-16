@@ -10307,10 +10307,10 @@ rimraf@^3.0.0, rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
-rookout@^0.1.92:
-  version "0.1.92"
-  resolved "https://registry.yarnpkg.com/rookout/-/rookout-0.1.92.tgz#60bc66038e38490849c1384f4ca6260ec5012be1"
-  integrity sha512-tW8gHMCMCW0cksj2OoYUB0oJc23j4FdYzsCq05J/QCCGxihvP3XuRCX1hpGItfUPAmYHBg+wRqHwpl9jqWRtEA==
+rookout@^0.1.93:
+  version "0.1.93"
+  resolved "https://registry.yarnpkg.com/rookout/-/rookout-0.1.93.tgz#f210e1d3258b9eb4fbfb052749062f7c5e953f07"
+  integrity sha512-+lJsuRj1MRM5LkesV+4dQ06xkujdnW+5N5Pa2iUCrzmAjCIbMA5RiSJ7yGrqfoA8q5robqEQu/ELWCGk4snc3g==
   dependencies:
     buffer-from "^1.1.1"
     crc "^3.8.0"
