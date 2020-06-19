@@ -14,23 +14,23 @@ export enum StorageMode {
 
 export class FileInfo {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   filename: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   path: string;
 
   @IsString()
-  @Transform(value => (value ? _.trim(value) : null))
+  @Transform((value) => (value ? _.trim(value) : undefined))
   mimetype?: string;
 
   @IsString()
-  @Transform(value => (value ? _.trim(value) : null))
+  @Transform((value) => (value ? _.trim(value) : undefined))
   extension?: string;
 
   constructor(o: FileInfo) {
-    if (o == null) {
+    if (_.isNil(o)) {
       return;
     }
 
@@ -73,7 +73,6 @@ export type ResolverOpts = {
   resolver?: (url: string) => Promise<string>;
 };
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IStorageEngine {
   /**
    * 这里会创建一个上传任务，异步执行
