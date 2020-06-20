@@ -7,5 +7,5 @@ install:
   - yarn global add codecov
 after_success:
   - codecov
-cache:
-  yarn: true
+#cache:
+#  yarn: true
