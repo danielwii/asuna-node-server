@@ -126,8 +126,8 @@ export class GraphqlHelper {
 
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
-    MixedEntity,
-    DataLoaders extends DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders,
+    MixedEntity
   >(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
@@ -150,8 +150,8 @@ export class GraphqlHelper {
   }): Promise<Entity[]>;
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
-    MixedEntity,
-    DataLoaders extends DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders,
+    MixedEntity
   >({
     cls,
     query,

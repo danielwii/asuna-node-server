@@ -12,20 +12,28 @@ export enum AuthUserChannel {
 }
 
 export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
+  @MetaInfo({ name: '用户名' })
+  @Column({ nullable: false, length: 50, unique: true })
+  username: string;
+
+  // --------------------------------------------------------------
+  // Optional
+  // --------------------------------------------------------------
+
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
   @Column({ nullable: true, length: 50, unique: true })
   email?: string;
 
-  @MetaInfo({ name: '用户名' })
-  @Column({ nullable: false, length: 50, unique: true })
-  username: string;
+  @MetaInfo({ name: '昵称' })
+  @Column({ nullable: true, length: 50, unique: true })
+  nickname?: string;
 
   // https://api.adorable.io/avatars/64/{id}.png
   @MetaInfo({ name: '头像', type: 'Image' })
   @Column({ nullable: true, name: 'portrait' })
-  portrait: string;
+  portrait?: string;
 
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
   @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
@@ -62,6 +70,10 @@ export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEnt
   @MetaInfo({ name: '是否被绑定', help: 'quickpass 模式时被 reset' })
   @Column({ nullable: true, name: 'is_bound', default: false })
   isBound?: boolean;
+
+  // --------------------------------------------------------------
+  // Relations
+  // --------------------------------------------------------------
 }
 
 /**

@@ -101,17 +101,17 @@ export class RedisLockProvider {
             logger.debug(`release lock [${resource}], result is ${r(value)}`);
             return value;
           })
-          .catch((reason) => logger.error(`execute [${resource}] handler: ${handler} error: ${reason}`))
+          .catch((reason) => logger.error(`execute [${resource}] handler: ${handler} error: ${reason} ${r(options)}`))
           .finally(() =>
             lock
               .unlock()
               .catch((err) => {
-                logger.error(`unlock [${resource}] error: ${err}`);
+                logger.error(`unlock [${resource}] error: ${err} ${r(options)}`);
               })
               .finally(() => logger.debug(`unlock [${resource}]`)),
           );
       },
-      (err) => logger.error(`get [${resource}] lock error: ${err}`),
+      (err) => logger.error(`get [${resource}] lock error: ${err} ${r(options)}`),
     );
   }
 }
