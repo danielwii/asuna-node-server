@@ -4,8 +4,8 @@ type UserProfile {
   username: String
   portrait: String
   channel: String
-  password: String
-  salt: String
+  #  password: String
+  #  salt: String
   lastSignedAt: Date
   lastLoginAt: Date
   description: String

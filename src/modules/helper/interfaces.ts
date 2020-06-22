@@ -6,15 +6,16 @@ import { Tenant } from '../tenant/tenant.entities';
 import { WXJwtPayload } from '../wechat/interfaces';
 
 export type PayloadType = JwtPayload | WXJwtPayload | ApiKeyPayload;
-export type AuthInfo<P = PayloadType, U = UserProfile | AdminUser> = Partial<{
-  payload?: P;
-  user?: U;
+export type AuthInfo<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = Partial<{
+  payload?: Payload;
+  user?: User;
+  profile?: Profile;
   identifier?: string;
   tenant?: Tenant;
   roles?: Role[];
 }>;
-export type AnyAuthRequest<P = PayloadType, U = UserProfile | AdminUser> = Request &
-  AuthInfo<P, U> & { clientIp: string };
+export type AnyAuthRequest<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = Request &
+  AuthInfo<Payload, User, Profile> & { clientIp: string };
 
 export interface ApiKeyPayload {
   apiKey: string;

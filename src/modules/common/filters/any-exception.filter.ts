@@ -164,8 +164,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
       isError: exception instanceof Error,
       isAsunaException: exception instanceof AsunaException,
     };
-    logger.error(`error: ${r(errorInfo)}`);
-    StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+    if (![404].includes(httpStatus)) {
+      logger.error(`error: ${r(errorInfo)}`);
+      StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+    }
     /*
     if (exception instanceof Error && httpStatus !== 500) {
       logger.error(exception);

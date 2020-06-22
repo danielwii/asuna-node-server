@@ -42,6 +42,11 @@ export class AuthedUserHelper {
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(+id.slice(1)) as any;
   }
 
+  static getUserByProfileId<User>(profileId: string): Promise<User> {
+    ow(profileId, 'profileId', ow.string.nonEmpty);
+    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({ where: { profileId } }) as any;
+  }
+
   static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {
     if (!email && !email) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);

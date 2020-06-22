@@ -11,6 +11,7 @@ import { WXJwtPayload } from '../wechat/interfaces';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
 import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
+import { AuthedUserHelper } from '../core/auth/user.helper';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
@@ -27,7 +28,6 @@ export class AuthHelper {
         if (err || info) {
           logger.warn(`api-key auth error: ${r(err)}`);
         } else {
-          req.user = null;
           req.payload = payload;
           req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
         }
@@ -45,6 +45,7 @@ export class AuthHelper {
         } else {
           const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
           req.identifier = AdminUserIdentifierHelper.stringify(payload);
+          req.profile = await UserProfile.findOne(payload.id);
           req.user = admin;
           req.payload = payload;
           req.tenant = admin?.tenant;
@@ -70,14 +71,15 @@ export class AuthHelper {
             logger.log(`wx-jwt load user by ${r(codeSession)}`);
             if (codeSession?.openid) {
               req.payload = payload;
-              const user = await UserProfile.findOne({ username: codeSession.openid });
-              if (!user) {
+              const profile = await UserProfile.findOne({ username: codeSession.openid });
+              if (!profile) {
                 const err = new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session');
                 return resolve({ err, payload: null, info });
               }
 
-              req.user = user;
-              req.identifier = UserIdentifierHelper.stringify(user);
+              req.profile = profile;
+              req.user = await AuthedUserHelper.getUserByProfileId(profile.id);
+              req.identifier = UserIdentifierHelper.stringify(profile);
               // req.tenant = user?.tenant;
               // req.roles = user?.roles; // TODO 目前的 roles 属于后端角色
               logger.verbose(`wx-jwt found user by ${r(req.user)}`);
@@ -89,7 +91,7 @@ export class AuthHelper {
     });
   }
 
-  static authJwt(req: AnyAuthRequest<JwtPayload, UserProfile>, res: Response): Promise<AuthResult<JwtPayload>> {
+  static authJwt(req: AnyAuthRequest<JwtPayload, AdminUser>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
         logger.log(`jwt auth ${r({ payload })}`);
@@ -99,7 +101,8 @@ export class AuthHelper {
           const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
           req.identifier = UserIdentifierHelper.stringify(payload);
           req.payload = payload;
-          req.user = await UserProfile.findOne(payload.id);
+          req.profile = await UserProfile.findOne(payload.id);
+          req.user = admin;
           req.tenant = admin?.tenant;
           req.roles = admin?.roles;
         }
@@ -128,7 +131,7 @@ export async function auth<Payload = PayloadType>(
     if (isWXAuthRequest(req)) {
       return (await AuthHelper.authWX(req, res)) as any;
     }
-    return (await AuthHelper.authJwt((req as any) as AnyAuthRequest<JwtPayload, UserProfile>, res)) as any;
+    return (await AuthHelper.authJwt((req as any) as AnyAuthRequest<JwtPayload, AdminUser>, res)) as any;
   }
 
   throw new AsunaException(AsunaErrorCode.InvalidCredentials);

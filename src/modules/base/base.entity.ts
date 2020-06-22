@@ -78,19 +78,9 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTimeBasedBaseEntity) {
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
-}
+export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTimeBasedBaseEntity) {}
 
-export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
-}
+export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {}
 
 export class AbstractUUIDBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') uuid!: string;
@@ -111,12 +101,7 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
-}
+export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {}
 
 export class AbstractUUID2BaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') id!: string;
@@ -137,20 +122,10 @@ export class AbstractUUID2BaseEntity extends BaseEntity {
   }
 }
 
-export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2BaseEntity) {
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
-}
+export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2BaseEntity) {}
 
 export class AbstractCategoryEntity extends Publishable(NameDescAttachable(AbstractBaseEntity)) {
   @MetaInfo({ name: '是否系统数据？', type: 'Deletable', help: '系统数据无法删除' })
   @Column({ nullable: true, name: 'is_system' })
   isSystem: boolean;
-
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
 }

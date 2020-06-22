@@ -7,10 +7,8 @@ import { AnyAuthRequest } from '../../helper/interfaces';
 import { auth } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 import { JwtPayload } from './auth.interfaces';
-import { UserIdentifierHelper } from './identifier';
-import { UserProfile } from './user.entities';
 
-export type JwtAuthRequest = AnyAuthRequest<JwtPayload, UserProfile>;
+export type JwtAuthRequest<User = any> = AnyAuthRequest<JwtPayload, User>;
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -23,7 +21,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type,@typescript-eslint/ban-ts-ignore
   // @ts-ignore
   async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest<JwtAuthRequest>();
+    const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
+    const res = context.switchToHttp().getResponse();
     this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
@@ -31,12 +30,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }
-    const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
-    req.identifier = UserIdentifierHelper.stringify(payload);
-    req.payload = payload;
-    req.user = await UserProfile.findOne(payload.id);
-    req.tenant = admin?.tenant;
-    req.roles = admin?.roles;
+    await auth(req, res, 'admin');
     return req.user;
   }
 }
