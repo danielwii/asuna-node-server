@@ -63,7 +63,7 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
           entity[column] = JSON.parse(entity[column] as any);
         }
       } catch (error) {
-        logger.error(`safeReloadJSON '${column}' error: ${error}, ${r(entity?.[column])}`);
+        logger.error(`safeReloadJSON '${column}' error: ${error}, ${r(entity[column])}`);
         entity[column] = defaultValue;
       }
     } else {
