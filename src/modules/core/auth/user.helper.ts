@@ -42,9 +42,13 @@ export class AuthedUserHelper {
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(+id.slice(1)) as any;
   }
 
-  static getUserByProfileId<User>(profileId: string): Promise<User> {
+  static getUserByProfileId<User>(profileId: string, relations?: string[]): Promise<User> {
     ow(profileId, 'profileId', ow.string.nonEmpty);
-    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({ where: { profileId } }) as any;
+    const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);
+    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({
+      where: { profileId },
+      relations: existRelations.filter((relation) => relations?.includes(relation)),
+    }) as any;
   }
 
   static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {

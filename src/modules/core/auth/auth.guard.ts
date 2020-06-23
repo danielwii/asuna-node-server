@@ -30,7 +30,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }
-    await auth(req, res, 'admin');
+    await auth(req, res, 'client');
     return req.user;
   }
 }

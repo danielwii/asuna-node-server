@@ -12,6 +12,7 @@ import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
 import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 import { AuthedUserHelper } from '../core/auth/user.helper';
+import { Tenant } from '../tenant';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
@@ -91,20 +92,20 @@ export class AuthHelper {
     });
   }
 
-  static authJwt(req: AnyAuthRequest<JwtPayload, AdminUser>, res: Response): Promise<AuthResult<JwtPayload>> {
+  static authJwt(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
         logger.log(`jwt auth ${r({ payload })}`);
         if (err || info) {
           logger.warn(`jwt auth error: ${r(err)}`);
         } else {
-          const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
+          const user = await AuthedUserHelper.getUserByProfileId<any>(payload.id, ['roles', 'tenant']);
           req.identifier = UserIdentifierHelper.stringify(payload);
           req.payload = payload;
           req.profile = await UserProfile.findOne(payload.id);
-          req.user = admin;
-          req.tenant = admin?.tenant;
-          req.roles = admin?.roles;
+          req.user = user;
+          req.tenant = user?.tenant;
+          req.roles = user?.roles;
         }
         resolve({ err: err || wrapErrorInfo(info), payload, info });
       })(req, res);
