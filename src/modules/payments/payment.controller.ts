@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { IsDefined, IsOptional, IsString, isURL } from 'class-validator';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
@@ -30,23 +30,12 @@ const logger = LoggerFactory.getLogger('PaymentController');
 
 @Controller('api/v1/payment')
 export class PaymentController {
-  @Get('notify')
-  getNotify(@Query() query) {
-    logger.log(`notify ${r({ query })}`);
-    return PaymentHelper.handleNotify(query?.id, query);
-  }
-
   @Post('notify')
   async postNotify(@Body() body, @Req() req: Request) {
-    const data = await WeChatHelper.parseXmlToJson(req);
-    logger.log(`notify ${r({ body, data })}`);
-    const isWxPay = !_.isEmpty(data);
-    return PaymentHelper.handleNotify(body?.id, isWxPay ? data : body, isWxPay);
-  }
-
-  @Get('callback')
-  callback(@Query() query, @Body() body) {
-    logger.log(`callback ${r({ query, body })}`);
+    const isWxPay = _.isEmpty(body);
+    const data = isWxPay ? await WeChatHelper.parseXmlToJson(req) : body;
+    logger.log(`notify ${r(data)}`);
+    return PaymentHelper.handleNotify(body?.id, data, isWxPay);
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
