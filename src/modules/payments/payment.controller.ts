@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { IsDefined, IsOptional, IsString, isURL } from 'class-validator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
+import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
 
 class CreateOrderDTO {
@@ -36,9 +37,10 @@ export class PaymentController {
   }
 
   @Post('notify')
-  postNotify(@Body() body) {
-    logger.log(`notify ${r({ body })}`);
-    return PaymentHelper.handleNotify(body?.id, body);
+  async postNotify(@Body() body, @Req() req: Request) {
+    const data = await WeChatHelper.parseXmlToJson(req);
+    logger.log(`notify ${r({ body, data })}`);
+    return PaymentHelper.handleNotify(body?.id, body ?? data);
   }
 
   @Get('callback')
