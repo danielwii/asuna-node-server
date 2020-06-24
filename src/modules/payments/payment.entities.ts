@@ -1,5 +1,5 @@
 import { html } from 'common-tags';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
@@ -130,8 +130,8 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   images: JsonArray;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @ManyToOne((type) => PaymentOrder, (order) => order.items, { onDelete: 'SET NULL' })
-  order: any; // PaymentOrder;
+  @ManyToMany((type) => PaymentOrder, (offer) => offer.items, { primary: true })
+  orders: PaymentOrder[];
 }
 
 @EntityMetaInfo({ name: 'payment__transactions', internal: true, displayName: '交易' })
@@ -194,6 +194,11 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
 
   @MetaInfo({ name: '订单内容' })
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToMany((type) => PaymentItem, (item) => item.order)
+  @ManyToMany((type) => PaymentItem, (item) => item.orders, { primary: true })
+  @JoinTable({
+    name: 'payment__tr_order_items',
+    joinColumn: { name: 'order__id' },
+    inverseJoinColumn: { name: 'item__id' },
+  })
   items: PaymentItem[];
 }
