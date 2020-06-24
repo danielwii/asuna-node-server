@@ -74,4 +74,9 @@ export class PaymentWxpayHelper {
     }
     return data.mweb_url;
   }
+
+  static async validateSign(body: Record<string, string>): Promise<boolean> {
+    // const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
+    return true; // todo ...
+  }
 }

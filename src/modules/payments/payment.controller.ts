@@ -40,7 +40,8 @@ export class PaymentController {
   async postNotify(@Body() body, @Req() req: Request) {
     const data = await WeChatHelper.parseXmlToJson(req);
     logger.log(`notify ${r({ body, data })}`);
-    return PaymentHelper.handleNotify(body?.id, body ?? data);
+    const isWxPay = !_.isEmpty(data);
+    return PaymentHelper.handleNotify(body?.id, body ?? data, isWxPay);
   }
 
   @Get('callback')

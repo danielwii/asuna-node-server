@@ -195,8 +195,43 @@ export class PaymentHelper {
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo) });
   }
 
-  static async handleNotify(orderId: string | undefined, data: any) {
-    if (_.has(data, 'out_trade_no')) {
+  static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<void> {
+    if (isWxPay) {
+      const body = data as {
+        appid: string;
+        bank_type: 'OTHERS';
+        cash_fee: string;
+        device_info: 'WEB';
+        fee_type: 'CNY';
+        is_subscribe: 'N';
+        mch_id: string;
+        nonce_str: string;
+        openid: string;
+        out_trade_no: string;
+        result_code: 'SUCCESS';
+        return_code: 'SUCCESS';
+        sign: string;
+        time_end: string;
+        total_fee: string;
+        trade_type: 'MWEB';
+        transaction_id: string;
+      };
+      const validated = await PaymentWxpayHelper.validateSign(body);
+      logger.verbose(`validated is ${r(validated)}`);
+      if (!validated) {
+        // logger.error(`${body.subject} not validated.`);
+        throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.out_trade_no} not validated.`);
+      }
+
+      // const params = parseJSONIfCould(body.passback_params);
+      const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
+      order.transaction.status = 'done';
+      order.transaction.data = body;
+      await order.transaction.save();
+      order.status = 'done';
+      await order.save();
+      return;
+    } else {
       // handle as alipay
       const body = data as {
         app_id: string;
@@ -240,9 +275,8 @@ export class PaymentHelper {
       order.status = 'done';
       await order.save();
       return;
-    } else {
-      // return PaymentHelper.validateSign(orderId, data);
     }
-    throw new AsunaException(AsunaErrorCode.Unprocessable, 'alipay support only');
+
+    // throw new AsunaException(AsunaErrorCode.Unprocessable, 'alipay or wxpay support only');
   }
 }
