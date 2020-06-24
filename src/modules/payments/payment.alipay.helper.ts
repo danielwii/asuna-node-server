@@ -55,7 +55,7 @@ export class PaymentAlipayHelper {
 
     const sdk = await this.sdk();
 
-    const execMethod = 'alipay.trade.page.pay'; // 统一收单下单并支付页面接口
+    const execMethod = 'alipay.trade.wap.pay'; // 统一收单下单并支付页面接口
     // 公共参数 可根据业务需要决定是否传入，当前不用
     // const params = {
     //     app_id: '2016101000654289', // 应用 id

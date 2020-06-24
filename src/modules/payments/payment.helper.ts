@@ -217,7 +217,7 @@ export class PaymentHelper {
         transaction_id: string;
       };
       const validated = await PaymentWxpayHelper.validateSign(body);
-      logger.verbose(`validated is ${r(validated)}`);
+      logger.verbose(`validated wxpay is ${r(validated)}`);
       if (!validated) {
         // logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.out_trade_no} not validated.`);
@@ -225,6 +225,7 @@ export class PaymentHelper {
 
       // const params = parseJSONIfCould(body.passback_params);
       const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
+      logger.verbose(`update order ${r(order)} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
@@ -261,7 +262,7 @@ export class PaymentHelper {
       };
 
       const validated = await PaymentAlipayHelper.validateSign(body);
-      logger.verbose(`validated is ${r(validated)}`);
+      logger.verbose(`validated alipay is ${r(validated)}`);
       if (!validated) {
         // logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
@@ -269,6 +270,7 @@ export class PaymentHelper {
 
       const params = parseJSONIfCould(body.passback_params);
       const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
+      logger.verbose(`update order ${r(order)} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
