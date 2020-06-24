@@ -9,7 +9,7 @@ import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely } from '../common/helpers';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
+import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import {
   MiniSubscribeData,

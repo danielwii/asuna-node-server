@@ -16,7 +16,7 @@ import {
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { EnumValueStatic } from '../../enum-values';
-import { auth } from '../../helper';
+import { auth } from '../../helper/auth';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValueModel, KeyValuePair, KeyValueType, KVModelFormatType } from './kv.entities';
@@ -28,7 +28,7 @@ const isJson = (value): boolean => {
   try {
     JSON.parse(value);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -127,6 +127,7 @@ export const AsunaCollections = {
 
 export class KvDef {
   @IsString() collection: string;
+
   @IsString() key: string;
 
   constructor(o: KvDef) {
@@ -148,11 +149,13 @@ export type ConstantsKeys = 'WXMessageIds';
 
 export class KvHelper {
   static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
+
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
   static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
 
   private static constantMapsPair: KeyValuePair;
+
   private static enumValueConstantMapsPair: KeyValuePair;
 
   /**
@@ -376,7 +379,7 @@ export class KvHelper {
       resolver: async () => (await KvHelper.get(kvDef))?.value,
       strategy: 'cache-only',
     });
-    if (!fields) return undefined;
+    if (!fields) return;
 
     const result = {
       value: _.get(fields.values, fieldKey),

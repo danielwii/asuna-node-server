@@ -6,13 +6,12 @@ import { JwtPayload } from '../core/auth/auth.interfaces';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
 import { isApiKeyRequest } from '../core/auth/strategy/interfaces';
 import { UserProfile } from '../core/auth/user.entities';
+import { AuthedUserHelper } from '../core/auth/user.helper';
 import { Store } from '../store';
 import { WXJwtPayload } from '../wechat/interfaces';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
 import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
-import { AuthedUserHelper } from '../core/auth/user.helper';
-import { Tenant } from '../tenant';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
@@ -74,8 +73,8 @@ export class AuthHelper {
               req.payload = payload;
               const profile = await UserProfile.findOne({ username: codeSession.openid });
               if (!profile) {
-                const err = new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session');
-                return resolve({ err, payload: null, info });
+                const error = new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session');
+                return resolve({ err: error, payload: undefined, info });
               }
 
               req.profile = profile;
