@@ -224,8 +224,9 @@ export class PaymentHelper {
       }
 
       // const params = parseJSONIfCould(body.passback_params);
-      const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
-      logger.verbose(`update order ${r(order)} status to done`);
+      logger.verbose(`find order ${body.out_trade_no}`);
+      const order = await PaymentOrder.findOneOrFail({ id: body.out_trade_no }, { relations: ['transaction'] });
+      logger.verbose(`update order ${r({ order, body })} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
@@ -269,8 +270,12 @@ export class PaymentHelper {
       }
 
       const params = parseJSONIfCould(body.passback_params);
-      const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
-      logger.verbose(`update order ${r(order)} status to done`);
+      logger.verbose(`find order ${params.orderId ?? body.subject}`);
+      const order = await PaymentOrder.findOneOrFail(
+        { id: params.orderId ?? body.subject },
+        { relations: ['transaction'] },
+      );
+      logger.verbose(`update order ${r({ order, body })} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
