@@ -184,15 +184,13 @@ export class PaymentHelper {
 
   static async cleanExpiredPayments(): Promise<void> {
     const oneDayAgo = sub(new Date(), { days: 1 });
-    const transactions = await PaymentTransaction.count({
-      where: { createdAt: LessThan(oneDayAgo), status: IsNull() },
-    });
+    const transactions = await PaymentTransaction.count({ createdAt: LessThan(oneDayAgo), status: IsNull() });
     logger.verbose(`remove expired transactions: ${transactions}`);
-    await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo) });
+    await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
 
     // const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
     // logger.verbose(`remove expired orders: ${orders}`);
-    // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo) });
+    // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 
   static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<void> {
