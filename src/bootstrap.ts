@@ -13,7 +13,7 @@ import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection, getConnectionOptions } from 'typeorm';
-import * as rookout from 'rookout';
+// import * as rookout from 'rookout';
 import * as requestIp from 'request-ip';
 
 import { AppLifecycle } from './lifecycle';
@@ -78,9 +78,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     })}`,
   );
 
-  if (configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN)) {
-    rookout.start({ token: configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN) }).catch((reason) => logger.error(reason));
-  }
+  // if (configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN)) {
+  //   rookout.start({ token: configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN) }).catch((reason) => logger.error(reason));
+  // }
 
   AsunaContext.instance.setup(options.context);
   // AsunaContext.instance.setup(options.context || { root: options.root });
