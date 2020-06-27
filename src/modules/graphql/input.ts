@@ -1,12 +1,12 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Order, PageInfo, PageRequest, toPage } from '../core/helpers';
 
 export class PageRequestInput implements PageRequest {
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   page?: number;
 
-  @IsNumber()
+  @IsInt()
   @IsOptional()
   size?: number;
 

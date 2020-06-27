@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Promise } from 'bluebird';
 import { plainToClass, Transform } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import * as highland from 'highland';
 import * as _ from 'lodash';
@@ -22,20 +22,20 @@ const logger = LoggerFactory.getLogger('UploaderService');
 
 export class ChunkFileInfo {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly chunkname: string;
 
   readonly file: FileInfo;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly identifier: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly fingerprint: string;
 
-  @IsNumber()
+  @IsInt()
   readonly chunk: number;
 
   constructor(o: ChunkFileInfo) {
@@ -45,15 +45,15 @@ export class ChunkFileInfo {
 
 export class RemoteFileInfo extends FileInfo {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly fullpath: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly bucket: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly prefix: string;
 
   constructor(o: RemoteFileInfo) {
@@ -67,7 +67,7 @@ export class UploaderService {
   private readonly context = AsunaContext.instance;
 
   constructor(private readonly commandBus: CommandBus) {
-    Hermes.subscribe(this.constructor.name, /^commands$/, event => {
+    Hermes.subscribe(this.constructor.name, /^commands$/, (event) => {
       logger.log(r(event));
     });
   }
@@ -87,7 +87,7 @@ export class UploaderService {
 
     return this.context.chunksStorageEngine
       .saveEntity({ ...file, filename: chunkname }, { prefix: fingerprint })
-      .then(async saved => {
+      .then(async (saved) => {
         const payload = new ChunksUploadPayload(token.body);
         payload.finished[chunk] = 1;
         await token.save();
@@ -135,8 +135,8 @@ export class UploaderService {
     // try to merge all chunks
     logger.debug(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
-      await Promise.all(chunks.map(chunk => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
-      name => +name.slice(name.lastIndexOf('.') + 1),
+      await Promise.all(chunks.map((chunk) => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
+      (name) => +name.slice(name.lastIndexOf('.') + 1),
     );
     const tempDirectory = join(Global.tempPath, 'chunks', payload.fingerprint);
 
@@ -146,19 +146,16 @@ export class UploaderService {
     logger.log(`merge files: ${r(filepaths)} to ${dest}`);
     const writableStream = fs.createWriteStream(dest);
 
-    highland(filepaths)
-      .map(fs.createReadStream)
-      .flatMap(highland)
-      .pipe(writableStream);
+    highland(filepaths).map(fs.createReadStream).flatMap(highland).pipe(writableStream);
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       writableStream.on('close', () => {
         const directory = path.dirname(filepaths[0]);
         logger.log(`merge file done: ${dest}, clean chunks in ${directory} ...`);
         resolve();
         // fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
       });
-    }).catch(reason => logger.error(reason));
+    }).catch((reason) => logger.error(reason));
 
     const fileInfo = new FileInfo({ filename: _filename, path: dest });
     // const mimetype = mime.lookup(filename) || 'application/octet-stream';
