@@ -62,6 +62,8 @@ export interface BootstrapOptions {
 }
 
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
+  require('events').EventEmitter.defaultMaxListeners = 15;
+
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);

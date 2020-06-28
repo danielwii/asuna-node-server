@@ -22,6 +22,13 @@ export interface EnumValueStatic<T = {}> {
   data: { [key in keyof T]: string };
 }
 
+export abstract class CanRegEnumValue {
+  static reg(key: string, value?: string, desc?: string) {
+    _.set(this, 'types', value ?? key);
+    _.set(this, 'desc', value ?? key);
+  }
+}
+
 @StaticImplements<EnumValueStatic>()
 export class SexEnumValue {
   static key = 'Sex';
