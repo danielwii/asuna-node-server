@@ -102,7 +102,7 @@ export class InMemoryDB {
 
     const primeToRedis = async (saved?): Promise<Value> => {
       const resolved = await resolver(saved);
-      logger.verbose(`prime to redis by ${r({ cacheKey, prefix, strategy, saved /* , resolved */ })}`);
+      logger.debug(`prime to redis by ${r({ cacheKey, prefix, strategy, saved /* , resolved */ })}`);
       if (resolved) {
         // update
         await promisify(redis.client.setex, redis.client)(

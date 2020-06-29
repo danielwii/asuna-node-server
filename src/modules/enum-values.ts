@@ -24,8 +24,8 @@ export interface EnumValueStatic<T = {}> {
 
 export abstract class CanRegEnumValue {
   static reg(key: string, value?: string, desc?: string) {
-    _.set(this, 'types', value ?? key);
-    _.set(this, 'desc', value ?? key);
+    _.set(_.get(this, 'types'), key, value ?? key);
+    _.set(_.get(this, 'desc'), key, desc ?? value ?? key);
   }
 }
 

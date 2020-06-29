@@ -113,6 +113,11 @@ export interface EnumFilterMetaInfoOptions extends MetaInfoBaseOptions {
   enumData: { [key: string]: string | object };
 }
 
+export interface EditableEnumMetaInfoOptions extends MetaInfoBaseOptions {
+  type: 'EditableEnum';
+  enumData: { [key: string]: string | object };
+}
+
 export interface JSONMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'SimpleJSON';
   jsonType: 'string-array' | 'tag-array' | 'textarea-array' | 'rich-array' | 'any';
@@ -149,6 +154,7 @@ export type MetaInfoOptions =
   | NormalMetaInfoOptions
   | EnumFilterMetaInfoOptions
   | EnumMetaInfoOptions
+  | EditableEnumMetaInfoOptions
   | JSONMetaInfoOptions;
 
 /**
