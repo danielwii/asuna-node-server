@@ -10,3 +10,4 @@ uploads/
 coverage/
 yarn-error.log
 database.db
+.yarn
