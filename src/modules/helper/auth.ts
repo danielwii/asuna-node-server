@@ -98,7 +98,7 @@ export class AuthHelper {
         if (err || info) {
           logger.warn(`jwt auth error: ${r(err)}`);
         } else {
-          const user = await AuthedUserHelper.getUserByProfileId<any>(payload.id, ['roles', 'tenant']);
+          const user = await AuthedUserHelper.getUserByProfileId<any>(payload.id, ['roles', 'tenant', 'profile']);
           req.identifier = UserIdentifierHelper.stringify(payload);
           req.payload = payload;
           req.profile = await UserProfile.findOne(payload.id);
