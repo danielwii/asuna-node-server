@@ -643,10 +643,10 @@
   resolved "https://registry.yarnpkg.com/@nestjs/bull/-/bull-0.1.1.tgz#538131aa2e1df45e7b0dc4bbc4a3f4f8ab0d9505"
   integrity sha512-E7NA2ukUbeBJZIH5d1HufCmOmH63ZjlG96XQEr8BWgZpgHk38M3V5sukhBnPLL8fHvBYxZnaKpDbGfXRX8VlPQ==
 
-"@nestjs/common@^7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-7.3.0.tgz#7e1ca6ebc8da54f9cf0ed81e84e471ecb6a7d45d"
-  integrity sha512-wkqrQBrqqCIlxxnIUkwzTcBcCjYFa+LPphqS/Pjn4NUUS1+k8X+T0GD+E9qrhkf6oNnQF2YnufuFPNcYdsFYYw==
+"@nestjs/common@^7.3.1":
+  version "7.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-7.3.1.tgz#9ed4ccf0086c308985c785fb9ac0c9265596d7e6"
+  integrity sha512-zrd/C+g2QVg2ebVN22Bs8U2Je9aHDWcysNfZFSGpqc+rLRjqDr0ixr1GL3WEhQSyxAm4YRa0yvZiiFicbVAV7Q==
   dependencies:
     axios "0.19.2"
     cli-color "2.0.0"
@@ -672,10 +672,10 @@
   resolved "https://registry.yarnpkg.com/@nestjs/cqrs/-/cqrs-7.0.0.tgz#12b70af5f06ca5ffde5fb1493f17dcfc6eed5e1d"
   integrity sha512-ZqsQuTdTzgqpizFEgacwHXvfz2+ekGLbMWuPcXk5uDS0+rY1R1rkY8oVkHA7SG700PaV4CccG93THxGfRM9mBQ==
 
-"@nestjs/graphql@^7.5.0":
-  version "7.5.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/graphql/-/graphql-7.5.0.tgz#87dd6ecb20d50d615103314edda156fe529d239d"
-  integrity sha512-IVX3oBT+vigl/fMoOxROJMjUwQ2+DLwR5jjo1rDBvcOatZ5iRRph9NH7zGw44IsJY2iM+5G3ftOTUu4AIPpp7g==
+"@nestjs/graphql@^7.5.1":
+  version "7.5.1"
+  resolved "https://registry.yarnpkg.com/@nestjs/graphql/-/graphql-7.5.1.tgz#444ba99b899e13ab38ed0c77d0f0e836d1694cdb"
+  integrity sha512-E9mHs6cP5d3RhLG6iQPBOYFlisv3UOJifv0Glyds4AIkju/glJRefg5i8iU32CxUoP96tKcshwlkFEI91WlJlQ==
   dependencies:
     "@graphql-tools/merge" "6.0.11"
     "@nestjs/mapped-types" "0.0.5"
@@ -1420,10 +1420,10 @@
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
   integrity sha512-Q1y515GcOdTHgagaVFhHnIFQ38ygs/kmxdNpvpou+raI9UO3YZcHDngBSYKQklcKlvA7iuQlmIKbzvmxcOE9CQ==
 
-"@types/email-templates@^7.0.1":
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/@types/email-templates/-/email-templates-7.0.1.tgz#0b7bcafa1ff396ff69eb6bb73de11ee8469378d1"
-  integrity sha512-dO/luzyN+O60lVi9njcmh5AoofwxKz0yZiIZEbw0F2fcfe3RsAU/BUNlJDR8ry2gyjR0qn3PoOrUNJblcu9PmQ==
+"@types/email-templates@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@types/email-templates/-/email-templates-7.0.2.tgz#1ec249464f92ced3fa4f8f16f71734e7979b1d8c"
+  integrity sha512-vt1Btes7FEiu8chW6C5zvwXwbnECehQhnAfm6aaOWQQ3HOLcd4wlLQb2deXOZSPHmvJZZlrlhfGmTrVejMRRFQ==
   dependencies:
     "@types/html-to-text" "*"
     "@types/nodemailer" "*"
@@ -1822,10 +1822,10 @@
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.3.tgz#7ee330ba7caafb98090bece86a5ee44115904c2c"
   integrity sha512-ewFXqrQHlFsgc09MK5jP5iR7vumV/BYayNC6PgJO2LPe8vrnNFyjQjSppfEngITi0qvfKtzFvgKymGheFM9UOA==
 
-"@types/redis@^2.8.22":
-  version "2.8.22"
-  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.22.tgz#8935227cbe39080506b625276d64974ddbcb9ea4"
-  integrity sha512-O21YLcAtcSzax8wy4CfxMNjIMNf5X2c1pKTXDWLMa2p77Igvy7wuNjWVv+Db93wTvRvLLev6oq3IE7gxNKFZyg==
+"@types/redis@^2.8.23":
+  version "2.8.23"
+  resolved "https://registry.yarnpkg.com/@types/redis/-/redis-2.8.23.tgz#9a82ae862d14cb21090e7075590a1007a145be3d"
+  integrity sha512-VbwR9By89j9r3z2cYLdKJlm5hZpmTENVhOEyl/4uEQ+TIkgCI0f4YqokfNpKoo1bVyfWuvqFvDUf7E/MRe07Cg==
   dependencies:
     "@types/node" "*"
 
