@@ -30,11 +30,11 @@ export class LoggerInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    // logger.verbose(`${context.getClass().name}.${context.getHandler().name} info: ${r(info)}`);
+    // logger.debug(`${context.getClass().name}.${context.getHandler().name} info: ${r(info)}`);
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () => logger.verbose(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
+        () => logger.debug(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
         e => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {

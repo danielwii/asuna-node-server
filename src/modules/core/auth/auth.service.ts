@@ -75,9 +75,9 @@ export class AuthService extends AbstractAuthService<UserProfile> {
       salt,
       channel,
     });
-    logger.verbose(`create user ${r(entity)}`);
+    logger.debug(`create user ${r(entity)}`);
     return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
-      logger.verbose(`created ${r({ profile, user })}`);
+      logger.debug(`created ${r({ profile, user })}`);
       Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
       return { profile, user };
     });

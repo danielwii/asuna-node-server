@@ -44,7 +44,7 @@ export class CronHelper {
 
     const ttl = opts.ttl ?? 10;
     const enabled = this.redis.isEnabled();
-    logger.verbose(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
+    logger.debug(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
     const callPromise = () =>
       enabled
         ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch((reason) => logger.error(reason))
@@ -61,7 +61,7 @@ export class CronHelper {
                 next: this.nextTime(cronTime),
                 ...(_.isObject(result) ? result : { value: result }),
               };
-              // logger.verbose(`addCronSuccessEvent to ${r({ operation, event })}`);
+              // logger.debug(`addCronSuccessEvent to ${r({ operation, event })}`);
               StatsHelper.addCronSuccessEvent(operation, event).catch((reason) =>
                 logger.error(`addCronSuccessEvent error: ${r(reason)}`),
               );
@@ -79,11 +79,11 @@ export class CronHelper {
           .finally(() => {
             const next = this.nextTime(cronTime);
             if (dayjs(next.next).diff(new Date(), 'minute') > 1)
-              logger.verbose(`${operation} done. next: ${r({ cronTime, ...next })}`);
+              logger.debug(`${operation} done. next: ${r({ cronTime, ...next })}`);
           }),
       /*
       onComplete: () => {
-        logger.verbose(`${operation} completed.`);
+        logger.debug(`${operation} completed.`);
         if (_.isFunction(opts.onComplete)) opts.onComplete();
       }, */
       runOnInit: false,

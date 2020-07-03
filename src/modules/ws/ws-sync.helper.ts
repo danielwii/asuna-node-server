@@ -25,7 +25,7 @@ export class AdminWsSyncHelper {
         const stats = await InMemoryDB.get(`error-stats`);
         const diff = _.omitBy(stats, (value, key) => AdminWsSyncHelper.sentStats?.[key] === value);
         if (!_.isEmpty(diff)) {
-          logger.verbose(`diff ${r({ diff, stats, sent: AdminWsSyncHelper.sentStats })}`);
+          logger.debug(`diff ${r({ diff, stats, sent: AdminWsSyncHelper.sentStats })}`);
           AdminWsSyncHelper.sentStats = stats;
           const results = await Promise.all(
             _.map([...StatsHelper.keys], async (key) => {

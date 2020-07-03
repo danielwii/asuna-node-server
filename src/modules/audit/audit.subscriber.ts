@@ -30,7 +30,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     if (!this.enabled) return;
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    // logger.debug(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // logger.verbose(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',
@@ -52,7 +52,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
       loadRelationIds: true,
     });
     if (entity) {
-      // logger.debug(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
+      // logger.verbose(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
       this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity as any });
     }
   }
@@ -63,7 +63,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     const from = this.map.get(`${event.entity.name}-${event.entity.id}`);
-    // logger.debug(
+    // logger.verbose(
     //   `call afterUpdate... ${event.entity.constructor.name} ${r({
     //     diff: diff(from, event.entity),
     //   })}`,
@@ -86,7 +86,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('afterRemove', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    // logger.debug(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // logger.verbose(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',

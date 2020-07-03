@@ -9,7 +9,7 @@ export function getLocalIP(): string {
   logger.log(`osType: ${osType}`);
   const netInfo = os.networkInterfaces();
   let ip = '';
-  logger.debug(`netInfo: ${r(netInfo)}`);
+  logger.verbose(`netInfo: ${r(netInfo)}`);
   if (osType === 'Windows_NT') {
     for (const dev in netInfo) {
       if (dev === '本地连接') {

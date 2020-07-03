@@ -194,7 +194,7 @@ export abstract class RestCrudController {
     );
     const relationIds = R.mapObjIndexed((value, relation) => {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
-      logger.verbose(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
+      logger.debug(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
         ? (value as any[]).map((currentId) => ({ [_.first(primaryKeys)]: currentId }))
         : { [_.first(primaryKeys)]: value };

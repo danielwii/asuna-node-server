@@ -28,7 +28,7 @@ const logger = LoggerFactory.getLogger('PageHelper');
 export class PageHelper {
   static async doCursorPageSeries<T>(fn: (next?: string) => Promise<string | null>): Promise<any> {
     const recursion = async (next?: string) => {
-      logger.verbose(`doCursorPageSeries: ${next}...`);
+      logger.debug(`doCursorPageSeries: ${next}...`);
       if (next) return recursion(await fn(next));
       return null;
     };

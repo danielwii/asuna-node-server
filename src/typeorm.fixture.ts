@@ -16,7 +16,7 @@ FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixtur
   const join = options?.join;
 
   if (join) {
-    logger.verbose(`apply ${r(join)}`);
+    logger.debug(`apply ${r(join)}`);
     if (join.leftJoin)
       Object.keys(join.leftJoin).forEach((key) => {
         const extra = join.options?.[key] || {};

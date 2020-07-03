@@ -18,7 +18,7 @@ export class DBCacheCleaner {
       this.registers,
     );
     if (!_.isEmpty(triggers)) {
-      logger.verbose(`clear ${r(triggers)}`);
+      logger.debug(`clear ${r(triggers)}`);
       getConnection()
         .queryResultCache?.remove(triggers)
         .catch((reason) => logger.error(reason));

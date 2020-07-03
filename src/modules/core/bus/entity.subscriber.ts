@@ -34,7 +34,7 @@ export class EntitySubscriber implements EntitySubscriberInterface {
     logger.log('init ...');
 
     PubSubHelper.subscribe<CleanCacheType>(PubSubChannels.dataloader).subscribe(({ action, payload }) => {
-      logger.verbose(`sub ${r({ action, payload })}`);
+      logger.debug(`sub ${r({ action, payload })}`);
       CacheHelper.clear(payload);
     });
   }

@@ -28,7 +28,7 @@ export class UserRegister {
         const entity = _.has(Entity, 'of')
           ? Entity.of({ id: profile.id, profile })
           : new Entity({ id: profile.id, profile });
-        logger.verbose(`onProfileCreate save ${r({ profile, entity })}`);
+        logger.debug(`onProfileCreate save ${r({ profile, entity })}`);
         return DBHelper.repo(Entity).save(entity as any);
       });
     this.onProfileDelete = onProfileDelete || ((profile) => DBHelper.repo(Entity).delete(profile.id));

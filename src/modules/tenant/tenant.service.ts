@@ -83,7 +83,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        logger.verbose(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        logger.debug(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -118,7 +118,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        logger.verbose(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        logger.debug(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -154,7 +154,7 @@ export class TenantService {
       const hasTenantField = entities.find((o) => o.entityInfo.name === modelName);
       if (!hasTenantField) return;
 
-      logger.verbose(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
+      logger.debug(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
       const metadata = DBHelper.getMetadata(modelName);
       const relation = metadata.manyToOneRelations.find(
         (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,

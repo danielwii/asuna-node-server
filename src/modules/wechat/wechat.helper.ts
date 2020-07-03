@@ -165,7 +165,7 @@ export class WeChatHelper {
   static async parseXmlToJson<T = any>(req: Request): Promise<T> {
     const value = await rawBody(req);
     const json = (await Promise.promisify(xml2js.parseString)(value)) as { xml: { [key: string]: any[] } };
-    logger.verbose(`parsed json is ${r(json)}`);
+    logger.debug(`parsed json is ${r(json)}`);
     return _.mapValues(json.xml, (values) => (values.length === 1 ? values[0] : values)) as T;
   }
 
@@ -178,12 +178,12 @@ export class WeChatHelper {
 
   static async syncAdminUsers(): Promise<void> {
     const config = await WxHelper.getServiceConfig();
-    logger.verbose(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
+    logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
       const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
       await PageHelper.doCursorPageSeries(async (next) => {
         const userList = await WxApi.getUserList(next);
-        logger.verbose(`userList is ${r(_.omit(userList, 'data'))}`);
+        logger.debug(`userList is ${r(_.omit(userList, 'data'))}`);
         const users = userList.data.openid;
         await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
           const currentUserIds = _.slice(users, start, end);
@@ -253,7 +253,7 @@ export class WeChatHelper {
         })
         .value(),
     );
-    // logger.verbose(`tmplData is ${r(tmplData)}`);
+    // logger.debug(`tmplData is ${r(tmplData)}`);
     return _.mapValues(tmplData, (tmpl) =>
       _.mapValues(tmpl, (value) => HandlebarsHelper.injectContext(value, context)),
     ) as any;
@@ -369,7 +369,7 @@ export class WeChatHelper {
   ): Promise<void> {
     const key = await this.getSessionKey(payload);
     const decoded = await this.decryptData<GetPhoneNumber>(key, body.encryptedData, body.iv);
-    // logger.verbose(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
+    // logger.debug(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
     const userInfo = await WXMiniAppUserInfo.findOne({ profile: { id: user.id } });
     userInfo.mobile = decoded.phoneNumber;
     await userInfo.save();
@@ -426,7 +426,7 @@ export class WeChatHelper {
       if (sendInfo.errcode) {
         logger.error(`send template message to ${openId} error: ${r(info)}`);
       } else {
-        logger.verbose(`send template message to ${openId} done: ${r(info)}`);
+        logger.debug(`send template message to ${openId} done: ${r(info)}`);
       }
       return sendInfo;
     });
@@ -449,7 +449,7 @@ export class WeChatHelper {
       if (messageInfo.errcode) {
         logger.error(`send subscribe message to ${openId} error: ${r(info)}`);
       } else {
-        logger.verbose(`send subscribe message to ${openId} done: ${r(info)}`);
+        logger.debug(`send subscribe message to ${openId} done: ${r(info)}`);
       }
       return messageInfo;
     });

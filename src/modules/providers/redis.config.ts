@@ -30,7 +30,7 @@ export class RedisConfigObject {
 
   static load(prefix = ''): RedisConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    logger.debug(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
+    logger.verbose(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
     return new RedisConfigObject({
       enable: configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`, false),
       host: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_HOST}`, 'localhost'),
@@ -45,7 +45,7 @@ export class RedisConfigObject {
     const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     const key = `${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`;
     const enable = configLoader.loadBoolConfig(key);
-    logger.debug(`try loadOr env: ${key} ${enable ? 'fallback to default' : ''}`);
+    logger.verbose(`try loadOr env: ${key} ${enable ? 'fallback to default' : ''}`);
     if (enable === true) {
       return RedisConfigObject.load(prefix);
     }

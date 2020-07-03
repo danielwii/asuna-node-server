@@ -21,13 +21,13 @@ export class PaymentAlipayHelper {
       privateKey: method.privateKey,
       alipayPublicKey: _.get(method.extra, 'alipayPublicKey') as string,
     };
-    // logger.verbose(`alipay config is ${r(config)}`);
+    // logger.debug(`alipay config is ${r(config)}`);
     return new AlipaySdk(config);
   }
 
   static async authToken(): Promise<AlipaySdkCommonResult | string> {
     const sdk = await this.sdk();
-    logger.verbose(`alipay sdk is ${r(sdk)}`);
+    logger.debug(`alipay sdk is ${r(sdk)}`);
 
     const result = await sdk
       .exec('alipay.system.oauth.token', {
@@ -85,10 +85,10 @@ export class PaymentAlipayHelper {
     else throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');
     formData.addField('bizContent', bizContent); // 将必要的参数集合添加进 form 表单
 
-    logger.verbose(`exec ${execMethod} ${r(formData)}`);
+    logger.debug(`exec ${execMethod} ${r(formData)}`);
     // 异步向支付宝发送生成订单请求, 第二个参数为公共参数，不需要的话传入空对象就行
     const result = await sdk.exec(execMethod, {}, { formData });
-    logger.verbose(`result is ${r(result)}`);
+    logger.debug(`result is ${r(result)}`);
     // 返回订单的结果信息
     return result;
   }

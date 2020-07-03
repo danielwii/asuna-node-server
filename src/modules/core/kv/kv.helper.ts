@@ -245,7 +245,7 @@ export class KvHelper {
     const { name, type, value } = opts;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
-    logger.debug(`recognize ${r({ type, newType, value, stringifyValue })}`);
+    logger.verbose(`recognize ${r({ type, newType, value, stringifyValue })}`);
 
     const entity = {
       key,
@@ -258,7 +258,7 @@ export class KvHelper {
     const exists = await this.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOne({ name: opts.name });
-      logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
+      logger.debug(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
         model.formatType = formatType;
@@ -272,11 +272,11 @@ export class KvHelper {
         ...exists.value,
         ..._.omit(value as any, 'values'),
       });
-      logger.verbose(`inspect ${r(exists)}`);
+      logger.debug(`inspect ${r(exists)}`);
       return exists.save();
     }
 
-    logger.verbose(`set ${r(entity)}`);
+    logger.debug(`set ${r(entity)}`);
     return KeyValuePair.save({ ...emptyOr(!!exists, { id: exists?.id }), ...entity } as any).finally(() =>
       CacheUtils.clear({ prefix: 'kv', key: { collection, key } }),
     );
@@ -391,7 +391,7 @@ export class KvHelper {
         'field',
       ),
     };
-    logger.debug(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
     return result;
   }
 }

@@ -35,7 +35,7 @@ export class HealthController {
   @HealthCheck()
   async healthCheck() {
     const diskSpace = await checkDiskSpace(this.path);
-    logger.verbose(`check disk path ${r({ path: this.path, diskSpace })}`);
+    logger.debug(`check disk path ${r({ path: this.path, diskSpace })}`);
     return this.health.check(
       _.compact([
         async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),

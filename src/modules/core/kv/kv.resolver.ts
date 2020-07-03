@@ -39,7 +39,7 @@ export class KeyValueModelResolver {
 
   @ResolveField()
   async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
-    this.logger.verbose(`load pair for ${model.id}`);
+    this.logger.debug(`load pair for ${model.id}`);
     return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
       cls: KeyValueModel,
       instance: model,

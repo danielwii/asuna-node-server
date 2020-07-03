@@ -58,7 +58,7 @@ export class CreateChunksUploadTaskOpts {
 export class UploaderHelper {
   static calcFingerprint(identifier: string, filename: string) {
     const fingerprint = sha1({ identifier, filename });
-    logger.verbose(`calc fingerprint ${r({ identifier, filename, fingerprint })}`);
+    logger.debug(`calc fingerprint ${r({ identifier, filename, fingerprint })}`);
     return fingerprint;
   }
 

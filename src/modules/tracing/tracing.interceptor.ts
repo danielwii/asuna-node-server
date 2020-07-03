@@ -34,23 +34,23 @@ export class TracingInterceptor implements NestInterceptor {
     };
 
     const serviceName = `${context.getClass().name}.${context.getHandler().name}`;
-    // logger.verbose(`[trace] start span ${serviceName}`);
+    // logger.debug(`[trace] start span ${serviceName}`);
     const span = TracingHelper.tracer.startSpan(serviceName);
     request.trace = span.context();
     return next.handle().pipe(
       tap(
         () => {
           span.log({ event: 'success', info });
-          // logger.verbose(`[trace] log span ${serviceName}`);
+          // logger.debug(`[trace] log span ${serviceName}`);
         },
         err => {
           span.setTag(Tags.ERROR, true);
           span.log({ event: 'error', 'error.object': err, message: err.message, stack: err.stack, info });
-          // logger.verbose(`[trace] error span ${serviceName}`);
+          // logger.debug(`[trace] error span ${serviceName}`);
         },
         () => {
           span.finish();
-          // logger.verbose(`[trace] finish span ${serviceName}`);
+          // logger.debug(`[trace] finish span ${serviceName}`);
         },
       ),
     );

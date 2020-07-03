@@ -116,7 +116,7 @@ export abstract class AbstractAuthController {
     logger.log(`getToken() >> ${signInDto.username}`);
     const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
 
-    logger.verbose(`get user ${r(profile)}`);
+    logger.debug(`get user ${r(profile)}`);
     if (!profile || !profile?.password) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, 'account not exists or active');
     }
@@ -149,12 +149,12 @@ export abstract class AbstractAuthController {
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {
-        logger.verbose(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
+        logger.debug(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
         if (!sameDay) Hermes.emit(AbstractAuthController.name, 'user.first-login-everyday', payload);
         // !sameDay && Hermes.emit(AuthController.name, HermesUserEventKeys.firstLoginEveryday, payload);
       })
       .catch((reason) => logger.error(reason));
-    logger.verbose(`current authed user is ${r(loaded)}`);
+    logger.debug(`current authed user is ${r(loaded)}`);
     const result = _.omit(loaded, 'channel', 'info'); // ...
     _.set(result, 'profile', _.pick(result.profile, 'id', 'email', 'portrait', 'isBound', 'channel'));
     return result;

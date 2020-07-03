@@ -118,7 +118,7 @@ export class GraphqlHelper {
   }): Promise<PageInfo & { items: any[]; total: number }> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const pageInfo = toPage(pageRequest);
-    logger.verbose(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, loader })}`);
+    logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, loader })}`);
     const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, pageInfo, loader });
     const total = await entityRepo.count(where ? { where } : {});
     return this.pagedResult({ pageRequest, items, mapper, total });
@@ -182,7 +182,7 @@ export class GraphqlHelper {
     where = _.isString(where) ? where : { ...where, ...emptyOr(publishable, { isPublished: true }) };
 
     if (query.random > 0) {
-      logger.verbose(`parse where ${r({ publishable, cls, where })}`);
+      logger.debug(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       const randomIds = await entityRepo.find(
@@ -195,7 +195,7 @@ export class GraphqlHelper {
         }),
       );
       const ids: PrimaryKey[] = _.chain(randomIds).map(fp.get(primaryKey)).shuffle().take(query.random).value();
-      logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
+      logger.debug(`ids for ${cls.name} is ${r(ids)}`);
       if (_.isEmpty(ids)) return [];
 
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
@@ -212,7 +212,7 @@ export class GraphqlHelper {
     });
     const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
     if (_.isEmpty(ids)) return [];
-    logger.verbose(`ids for ${cls.name} is ${r(ids)}`);
+    logger.debug(`ids for ${cls.name} is ${r(ids)}`);
 
     const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
     return mapItems(items, mapper);
@@ -271,7 +271,7 @@ export class GraphqlHelper {
       const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;
       const category = await categoryClsRepoAlike.findOne({ name: query.category, isPublished: true });
 
-      logger.verbose(`category is ${r(category)}`);
+      logger.debug(`category is ${r(category)}`);
       // if (category != null) {}
       Object.assign(whereCondition, { [categoryRef || 'category']: _.get(category, 'id') });
     }
@@ -296,7 +296,7 @@ export class GraphqlHelper {
       order,
       cache,
     };
-    logger.verbose(`resolved FindOptions is ${r(options)}`);
+    logger.debug(`resolved FindOptions is ${r(options)}`);
     return options;
   }
 
@@ -317,7 +317,7 @@ export class GraphqlHelper {
       cache: opts.cache,
     })) as Entity;
     const id = result[opts.key] as any;
-    // logger.verbose(`resolveProperty ${r({ result, opts, id })}`);
+    // logger.debug(`resolveProperty ${r({ result, opts, id })}`);
     if (!id) return undefined;
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
@@ -431,7 +431,7 @@ export class GraphqlHelper {
       : { createdAt: 'DESC' };
     // const skip = PageHelper.latestSkip(count, limit);
 
-    logger.verbose(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
+    logger.debug(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
     const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, take });
 
     return { count, items };

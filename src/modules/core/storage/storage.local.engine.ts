@@ -53,14 +53,14 @@ export class LocalStorage implements IStorageEngine {
   }
 
   async getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
-    logger.verbose(`getEntity ${r({ fileInfo, toPath })}`);
+    logger.debug(`getEntity ${r({ fileInfo, toPath })}`);
     return join(Global.uploadPath, fileInfo.bucket ?? '', fileInfo.prefix ?? '', fileInfo.path);
   }
 
   async listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     const path = join(Global.uploadPath, opts.bucket ?? '', opts.prefix ?? '');
     const directory = fs.readdirSync(path);
-    logger.verbose(`listEntities ${r({ opts, directory })}`);
+    logger.debug(`listEntities ${r({ opts, directory })}`);
     return directory.map(filename => {
       const fileInfo = new FileInfo({ filename, path: join(path, filename) });
       return new SavedFile({
@@ -81,7 +81,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
-    logger.verbose(`removeEntities ${r(opts)}`);
+    logger.debug(`removeEntities ${r(opts)}`);
     throw new Error('Method not implemented.');
   }
 
@@ -151,7 +151,7 @@ export class LocalStorage implements IStorageEngine {
       logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
       const imageProcess = sharp(fullFilePath);
       if (thumbnailConfig.opts) {
-        logger.verbose(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
+        logger.debug(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
         imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
           fit: thumbnailConfig.opts.fit,
         });

@@ -74,7 +74,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     const left = Math.floor(jwtPayload.exp - Date.now() / 1000);
     const validated = !_.isNil(user) && user.id === jwtPayload.id;
     if (!validated) {
-      logger.verbose(oneLine`
+      logger.debug(oneLine`
         validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
         left: ${formatTime(left)}
       `);
@@ -114,7 +114,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       ...emptyOr(!!identifier.username, { username: identifier.username }),
       ...emptyOr(!_.isNil(isActive), { isActive }),
     };
-    logger.verbose(`get user by condition ${r(condition)}`);
+    logger.debug(`get user by condition ${r(condition)}`);
     return this.userRepository.findOne(condition as any, options);
   }
 

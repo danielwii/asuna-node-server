@@ -16,10 +16,10 @@ export class StatsHelper {
   static async addErrorInfo(type: string, info): Promise<void> {
     const key = `error-${type}`;
     this.keys.add(key);
-    // logger.verbose(`add error info ${r({ key, info })}`);
+    // logger.debug(`add error info ${r({ key, info })}`);
     const opts = { prefix: this.prefix, key };
     const errors = await InMemoryDB.list(opts);
-    logger.verbose(`current errors length is ${errors?.length}`);
+    logger.debug(`current errors length is ${errors?.length}`);
     if (errors?.length > 1000) {
       // todo remove more
       await InMemoryDB.clear(opts);
@@ -34,7 +34,7 @@ export class StatsHelper {
         const stats = saved ?? {};
         const newValue = _.isNumber(stats[key]) ? stats[key] + 1 : 0;
         const newStats = { ...stats, [key]: newValue };
-        logger.verbose(`update stats ${r({ stats, newStats, key, value: stats[key], newValue })}`);
+        logger.debug(`update stats ${r({ stats, newStats, key, value: stats[key], newValue })}`);
         return newStats;
       },
       { expiresInSeconds: CacheTTL.WEEK },
@@ -42,7 +42,7 @@ export class StatsHelper {
   }
 
   static async addCronSuccessEvent(key: string, event): Promise<void> {
-    // logger.debug(`add cron success event ${r({ key, event })}`);
+    // logger.verbose(`add cron success event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {
       // logger.log(`current stat is ${r(cronStat)}`);

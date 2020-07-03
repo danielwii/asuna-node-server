@@ -67,7 +67,7 @@ export class RestHelper {
         }
       }
     }
-    logger.verbose(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
+    logger.debug(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
@@ -131,7 +131,7 @@ export class RestHelper {
       fp.mapValues(v => _.assign({}, ...v)), // merge values
       // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
     )(raw);
-    logger.verbose(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ whereSql, stats })}`);
+    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ whereSql, stats })}`);
     return stats;
   }
 }

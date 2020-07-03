@@ -27,7 +27,7 @@ export class PubSubHelper {
       logger.log(`subscribe ... ${channels}`);
       const subscriber = redis.client;
       subscriber.subscribe(channels, (err, reply) => {
-        logger.verbose(`sub ${r({ channels, reply })}`);
+        logger.debug(`sub ${r({ channels, reply })}`);
         // if (err) {
         //   reject(err);
         // } else {

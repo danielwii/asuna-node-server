@@ -77,7 +77,7 @@ export class AsunaContext {
   getStorageEngine(bucket: string): IStorageEngine {
     const KEY = `${bucket.toUpperCase()}_STORAGE`;
     const storageType = configLoader.loadConfig(KEY);
-    logger.verbose(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
+    logger.debug(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
     if (storageType === StorageMode.QINIU) {
       return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
     }

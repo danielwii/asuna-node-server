@@ -21,7 +21,7 @@ export class CacheWrapper {
   static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds, strategy } = opts;
     // const cacheKey = this.calcKey({ prefix, key });
-    // logger.verbose(`get cache ${cacheKey}`);
+    // logger.debug(`get cache ${cacheKey}`);
 
     return InMemoryDB.save({ prefix, key }, resolver, { expiresInSeconds, strategy });
 
@@ -29,7 +29,7 @@ export class CacheWrapper {
     const redis = RedisProvider.instance.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
-      logger.verbose(`redis is not enabled, using inner cache ${r(opts)}.`);
+      logger.debug(`redis is not enabled, using inner cache ${r(opts)}.`);
       return CacheManager.cacheable(cacheKey, resolver, expiresInSeconds);
     }
 
@@ -59,7 +59,7 @@ export class CacheWrapper {
 
     value = await primeToRedis();
 
-    logger.debug(`value is ${r(value)}`);
+    logger.verbose(`value is ${r(value)}`);
     return value; */
   }
 
@@ -68,7 +68,7 @@ export class CacheWrapper {
     /*
     const { key, prefix } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
-    logger.verbose(`remove cache ${cacheKey}`);
+    logger.debug(`remove cache ${cacheKey}`);
     const redis = RedisProvider.instance.getRedisClient(prefix);
     if (!redis.isEnabled) {
       return CacheManager.clear(cacheKey);

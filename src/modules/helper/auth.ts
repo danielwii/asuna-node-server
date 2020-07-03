@@ -63,7 +63,7 @@ export class AuthHelper {
         { session: false, authInfo: true },
         // eslint-disable-next-line consistent-return
         async (err: string | Error, payload: WXJwtPayload, info) => {
-          logger.verbose(`wx-jwt auth ${r({ payload, err, info })}`);
+          logger.debug(`wx-jwt auth ${r({ payload, err, info })}`);
           if (err || info) {
             logger.warn(`wx-jwt auth error: ${r(err)}`);
           } else {
@@ -82,7 +82,7 @@ export class AuthHelper {
               req.identifier = UserIdentifierHelper.stringify(profile);
               // req.tenant = user?.tenant;
               // req.roles = user?.roles; // TODO 目前的 roles 属于后端角色
-              logger.verbose(`wx-jwt found user by ${r(req.user)}`);
+              logger.debug(`wx-jwt found user by ${r(req.user)}`);
             }
           }
           resolve({ err: err || wrapErrorInfo(info), payload, info });

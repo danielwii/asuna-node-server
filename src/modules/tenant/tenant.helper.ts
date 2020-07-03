@@ -84,7 +84,7 @@ export class TenantHelper {
           ),
       ),
     ])(DBHelper.loadMetadatas());
-    logger.verbose(
+    logger.debug(
       `entities waiting for scan ${r({
         filtered: filtered.length,
         entityNames: _.map(filtered, fp.get('name')),
@@ -165,7 +165,7 @@ export class TenantHelper {
   static async tenantSupport(fullModelName: string, roles: Role[]): Promise<boolean> {
     const isTenantEntity = await this.isTenantEntity(fullModelName);
     const hasTenantRoles = await this.hasTenantRole(roles);
-    logger.verbose(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
+    logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
     return isTenantEntity && hasTenantRoles;
   }
 
@@ -174,7 +174,7 @@ export class TenantHelper {
     const roleNames = _.map(roles, fp.get('name'));
     const bindRoles = _.split(config.bindRoles, ',');
     const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
-    logger.verbose(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
+    logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
     return results;
   }
 

@@ -55,7 +55,7 @@ export function loader<Entity extends BaseEntity>(
 
 export const dataLoaderCleaner = {
   clear(segment: string, id: PrimaryKey): void {
-    logger.verbose(`remove loader cache ... ${segment}-${id}`);
+    logger.debug(`remove loader cache ... ${segment}-${id}`);
     cacheMap.delete(`${segment}-${id}`);
   },
 };
@@ -68,7 +68,7 @@ export class GenericDataLoader {
   }
 
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
-    logger.verbose(`init loaders ${r(loaders)}`);
+    logger.debug(`init loaders ${r(loaders)}`);
     GenericDataLoader.loaders = loaders;
   }
 
@@ -92,16 +92,16 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           get: (id: PrimaryKey) => {
             const key = `${segment}-${id}`;
             const exists = redis.client.EXISTS(key);
-            logger.verbose(`dataloader exists ${key} ${exists}`);
+            logger.debug(`dataloader exists ${key} ${exists}`);
             if (!exists) return; // Not cached. Sorry.
             // eslint-disable-next-line no-async-promise-executor
             return new Promise(async resolve => {
               const entry = await promisify(redis.client.GET, redis.client)(key);
-              logger.verbose(`dataloader get ${key} ${r(entry)}`);
+              logger.debug(`dataloader get ${key} ${r(entry)}`);
               if (!entry) {
                 promisify(redis.client.DEL, redis.client)(key);
                 const reload = await fn([id]).catch(reason => logger.error(reason));
-                logger.verbose(`dataloader reload ${key} ${r(reload)}`);
+                logger.debug(`dataloader reload ${key} ${r(reload)}`);
                 resolve(reload);
               } else {
                 resolve(entry);
@@ -111,7 +111,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           set: async (id: PrimaryKey, value: Promise<any>) => {
             const key = `${segment}-${id}`;
             const entry = await value;
-            logger.verbose(`dataloader set ${key}`);
+            logger.debug(`dataloader set ${key}`);
             Promise.promisify(redis.client.SET).bind(redis.client)(key, entry);
           },
           delete(id: PrimaryKey): void {
@@ -130,7 +130,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
 */
   return new DataLoader(
     (ids) => {
-      logger.verbose(`dataloader load ${segment}: ${ids}`);
+      logger.debug(`dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     {
@@ -143,7 +143,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           const now = Date.now();
           const key = `${segment}-${id}`;
           const { value, expires } = cacheMap.get(key) || ({} as any);
-          logger.debug(
+          logger.verbose(
             `get (${segment}:${id}) ${r({
               exists: !!value,
               expires: new Date(expires),
@@ -166,7 +166,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           const key = `${segment}-${id}`;
           const promised = await value;
           if (promised) {
-            logger.verbose(`dataloader set ${key}`);
+            logger.debug(`dataloader set ${key}`);
             const now = Date.now();
             // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
             // if (!cacheMap.has(key)) {
@@ -199,7 +199,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
 export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
   return new DataLoader(
     (ids) => {
-      logger.verbose(`per-request dataloader load ${segment}: ${ids}`);
+      logger.debug(`per-request dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     { batchScheduleFn: (callback) => setTimeout(callback, 10), cacheMap: new LRUMap(100) },
@@ -231,7 +231,7 @@ export function resolveRelationsFromInfo(
     const relations = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
       .filter((node) => node.selectionSet)
       .map((node) => node.name.value);
-    logger.verbose(`resolved relations ${r({ path, relations })}`);
+    logger.debug(`resolved relations ${r({ path, relations })}`);
     return { relations };
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);
@@ -258,7 +258,7 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
     const selects = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
       .filter((node) => !node.selectionSet)
       .map((node) => node.name.value);
-    logger.verbose(`resolved selects ${r({ path, selects })}`);
+    logger.debug(`resolved selects ${r({ path, selects })}`);
     return selects;
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);

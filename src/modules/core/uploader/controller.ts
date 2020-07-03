@@ -31,12 +31,12 @@ const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
       const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname.toLowerCase()}`;
-      logger.verbose(`set filename ${filename}`);
+      logger.debug(`set filename ${filename}`);
       cb(undefined, filename);
     },
   }),
   fileFilter(req, file, cb) {
-    logger.verbose(`validate file ${r(file)}`);
+    logger.debug(`validate file ${r(file)}`);
     const supportedImage = isEnum(file.mimetype, ImageMimeType);
     const supportedVideo = isEnum(file.mimetype, VideoMimeType);
     const supportedDoc = isEnum(file.mimetype, DocMimeType);

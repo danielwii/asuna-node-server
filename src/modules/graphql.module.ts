@@ -70,7 +70,7 @@ export class GraphqlModule implements OnModuleInit {
             (responseCachePlugin as any)({
               sessionId: (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
-                if (sessionID) logger.verbose(`cache sessionID: ${sessionID}`);
+                if (sessionID) logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
               },
             }),
@@ -104,7 +104,7 @@ export class GraphqlModule implements OnModuleInit {
             if (response.errors) {
               logger.error(`response: ${r(response.errors)}`);
             }
-            // logger.debug(`response: ${r(response.data)}`);
+            // logger.verbose(`response: ${r(response.data)}`);
             return response;
           },
         }),

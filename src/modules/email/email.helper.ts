@@ -87,7 +87,7 @@ export class EmailHelper {
   }
 
   static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
-    logger.verbose(`send ${r(_.omit(mailInfo, 'content'))}`);
+    logger.debug(`send ${r(_.omit(mailInfo, 'content'))}`);
     const { to, cc, bcc, subject, content, attachments } = mailInfo;
     const { from } = await this.getConfig();
     const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
@@ -112,7 +112,7 @@ export class EmailHelper {
       ),
       ...emptyOr(!!content, { html: content }),
     };
-    logger.verbose(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
+    logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);
   }
 
@@ -127,7 +127,7 @@ export class EmailHelper {
       logger.error(`no ${key} found in email templates...`);
       return Promise.reject(new Error(`no ${key} found in email templates...`));
     }
-    logger.verbose(`send template mail ${r({ key, subject })}`);
+    logger.debug(`send template mail ${r({ key, subject })}`);
     return new Promise((resolve) => {
       EmailHelper.sender.next({
         email: { to, subject, content: template, attachments },

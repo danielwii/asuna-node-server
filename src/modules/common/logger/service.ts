@@ -24,8 +24,8 @@ const levels = {
   error: 0,
   warn: 1,
   info: 2,
-  verbose: 3,
-  debug: 4,
+  debug: 3,
+  verbose: 4,
   silly: 5,
 };
 
@@ -44,28 +44,28 @@ export class LoggerHelper {
 }
 
 export class SimpleLoggerService extends Logger {
-  debug(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] <= levels.debug) return;
-    super.debug(message, context);
-  }
-
   error(message: any, trace?: string, context?: string): any {
     super.error(typeof message === 'object' ? r(message) : message, trace, context);
   }
 
+  warn(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] < levels.warn) return;
+    super.warn(message, context);
+  }
+
   log(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] <= levels.info) return;
+    if (levels[LoggerConfigObject.lv(context)] < levels.info) return;
     super.log(message, context);
   }
 
-  verbose(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] <= levels.verbose) return;
-    super.verbose(message, context);
+  debug(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] < levels.debug) return;
+    super.debug(message, context);
   }
 
-  warn(message: any, context?: string): any {
-    if (levels[LoggerConfigObject.lv(context)] <= levels.warn) return;
-    super.warn(message, context);
+  verbose(message: any, context?: string): any {
+    if (levels[LoggerConfigObject.lv(context)] < levels.verbose) return;
+    super.verbose(message, context);
   }
 }
 
@@ -126,7 +126,7 @@ export class WinstonLoggerService {
   }
 
   private getLoggerFormat() {
-    return winston.format.printf(info => {
+    return winston.format.printf((info) => {
       const level = this.colorizeLevel(info.level);
       let { message } = info;
       if (typeof info.message === 'object') {
@@ -155,22 +155,22 @@ export class WinstonLoggerService {
     let colorFunc: (msg: string) => string;
     switch (level) {
       case 'verbose':
-        colorFunc = msg => clc.cyanBright(msg);
+        colorFunc = (msg) => clc.cyanBright(msg);
         break;
       case 'debug':
-        colorFunc = msg => clc.blue(msg);
+        colorFunc = (msg) => clc.blue(msg);
         break;
       case 'info':
-        colorFunc = msg => clc.green(msg);
+        colorFunc = (msg) => clc.green(msg);
         break;
       case 'warn':
-        colorFunc = msg => clc.yellow(msg);
+        colorFunc = (msg) => clc.yellow(msg);
         break;
       case 'error':
-        colorFunc = msg => clc.red(msg);
+        colorFunc = (msg) => clc.red(msg);
         break;
       default:
-        colorFunc = msg => clc.magenta(msg);
+        colorFunc = (msg) => clc.magenta(msg);
     }
 
     // 17 because of the color bytes

@@ -40,7 +40,7 @@ export class FeedbackQueryResolver extends QueryResolver {
       }),
     );
 
-    this.logger.verbose(`${funcName}: ${r({ total, pageRequest })}`);
+    this.logger.debug(`${funcName}: ${r({ total, pageRequest })}`);
     return GraphqlHelper.pagedResult({ pageRequest, items, total });
   }
 }
@@ -51,7 +51,7 @@ export class UserFeedbackResolver {
 
   @ResolveField('replies')
   async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {
-    this.logger.verbose(`load replies for ${feedback.id}`);
+    this.logger.debug(`load replies for ${feedback.id}`);
     return GraphqlHelper.resolveProperties<Feedback, FeedbackReply>({
       cls: Feedback,
       instance: feedback,

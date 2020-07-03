@@ -17,7 +17,7 @@ export abstract class AbstractStateMachine<StatusType, ActionType> {
 
   do(from: StatusType, type: ActionType): StatusType {
     const found = _.find(this.actions, (action) => action.from === from && action.type === type);
-    logger.verbose(`do ${this.key} ${r({ found, from, type })}`);
+    logger.debug(`do ${this.key} ${r({ found, from, type })}`);
     return found?.to ?? from;
   }
 

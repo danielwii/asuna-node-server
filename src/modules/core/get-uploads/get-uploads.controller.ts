@@ -45,7 +45,7 @@ export class GetUploadsController {
     @Res() res: Response,
   ): Promise<void> {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
-    logger.verbose(
+    logger.debug(
       `get ${r({ bucket, filename })} by ${r({
         storageEngine: classToPlain(storageEngine),
         thumbnailConfig,

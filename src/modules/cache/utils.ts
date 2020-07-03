@@ -9,7 +9,7 @@ const logger = LoggerFactory.getLogger('CacheUtils');
 
 export class CacheUtils {
   static clear(opts: { prefix?: string; key: string | object }): void {
-    logger.verbose(`clear cache ${r(opts)}`);
+    logger.debug(`clear cache ${r(opts)}`);
 
     CacheWrapper.clear(opts).catch((reason) => logger.error(reason));
     CacheManager.clear(opts.key).catch((reason) => logger.error(reason));

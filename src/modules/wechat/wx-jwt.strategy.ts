@@ -24,7 +24,7 @@ export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {
   }
 
   async validate(payload: WXJwtPayload): Promise<WXJwtPayload> {
-    logger.verbose(`validate ${r(payload)}`);
+    logger.debug(`validate ${r(payload)}`);
     const isValid = await Store.Global.getItem(payload.key);
     if (!isValid) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials);

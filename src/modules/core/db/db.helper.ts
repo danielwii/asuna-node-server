@@ -85,7 +85,7 @@ export function parseNormalWhereAndRelatedFields(
   repository,
 ): { normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
   const allRelations = repository.metadata.relations.map(relation => relation.propertyName);
-  logger.verbose(`all relations is ${r(allRelations)}`);
+  logger.debug(`all relations is ${r(allRelations)}`);
   const normalWhere = [];
   const relatedFields = [];
   const relatedWhere = {};
@@ -247,7 +247,7 @@ export class DBHelper {
     const included = relations.find(
       (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => type.name === relation.name,
     );
-    // logger.verbose(`hasRelation ${r({ included, relation: relation.name, relations })}`);
+    // logger.debug(`hasRelation ${r({ included, relation: relation.name, relations })}`);
     return !_.isEmpty(included);
   }
 
@@ -294,7 +294,7 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    logger.debug(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
+    logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = this.getMetadata(parsedModel);
     if (!metadata) {
       logger.error(`no metadata found for ${r({ parsedModel, model, parsedModule, module })}`);
@@ -549,7 +549,7 @@ export class DBHelper {
 
       // 处理条件关联
       const { relatedFields, relatedWhere } = parseNormalWhereAndRelatedFields(where, repository);
-      logger.verbose(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
+      logger.debug(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach(field => {
         const [relatedModel, relatedField] = _.split(field, '.');
         // logger.log('[innerJoinAndSelect]', { field, model, where });
@@ -597,13 +597,13 @@ export class DBHelper {
 
       // 处理普通关联
       const diff = _.difference(relations, _.keys(relatedWhere));
-      logger.verbose(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
+      logger.debug(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
       _.each(diff, relation => {
         const select = parsedFields.relatedFieldsMap[relation];
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);
         } else {
-          logger.verbose(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
+          logger.debug(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
           queryBuilder.leftJoinAndSelect(`${model}.${relation}`, relation);
         }
       });
@@ -668,7 +668,7 @@ export class DBHelper {
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         field => `${model}.${field}`,
       );
-      logger.debug(`wrapParsedFields '${r(selection)}'`);
+      logger.verbose(`wrapParsedFields '${r(selection)}'`);
       queryBuilder.select(selection);
     }
   }

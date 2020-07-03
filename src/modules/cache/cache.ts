@@ -20,12 +20,12 @@ export class CacheManager {
   static async cacheable<T>(key: string | object, resolver: () => Promise<T>, seconds?: number): Promise<T> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const cacheValue = this.cache.get(cacheKey);
-    // logger.verbose(`cacheable ${r({ key, cacheKey, cacheValue })}`);
+    // logger.debug(`cacheable ${r({ key, cacheKey, cacheValue })}`);
     if (cacheValue) return cacheValue;
 
     const value = await resolver();
     this.cache.set(cacheKey, value, seconds ? seconds * 1000 : null);
-    logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
+    logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 

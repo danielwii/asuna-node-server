@@ -118,12 +118,12 @@ export class UploaderService {
     logger.log(`merge file '${_filename}' chunks... ${r(payload)}`);
 
     // TODO bucket 在 localStorage 中需要主动传递
-    logger.verbose(`chunks storage engine type is ${this.context.chunksStorageEngine.constructor.name}`);
+    logger.debug(`chunks storage engine type is ${this.context.chunksStorageEngine.constructor.name}`);
     const chunks = await this.context.chunksStorageEngine.listEntities({
       prefix: payload.fingerprint,
       bucket: this.context.chunksStorageEngine.constructor.name === 'LocalStorage' ? 'chunks' : null,
     });
-    logger.verbose(`found ${r(chunks.length)} chunks`);
+    logger.debug(`found ${r(chunks.length)} chunks`);
 
     if (chunks.length <= 0) {
       throw new AsunaException(
@@ -133,7 +133,7 @@ export class UploaderService {
     }
 
     // try to merge all chunks
-    logger.debug(`try to merge chunks: ${r(chunks)}`);
+    logger.verbose(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
       await Promise.all(chunks.map((chunk) => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
       (name) => +name.slice(name.lastIndexOf('.') + 1),

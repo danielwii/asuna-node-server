@@ -159,7 +159,7 @@ export class WxApi {
     WxApi.withConfig((config) => {
       const appId = opts?.appId || (opts.mini ? config.miniAppId : config.appId);
       const appSecret = opts?.appSecret || (opts.mini ? config.miniAppSecret : config.appSecret);
-      logger.verbose(`getAccessToken for app: ${appId}`);
+      logger.debug(`getAccessToken for app: ${appId}`);
       return WxApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/token
           ?grant_type=client_credential
@@ -307,7 +307,7 @@ export class WxApi {
       logger.error(`[${status}] call '${url}' error: ${r(json)}`);
       throw new Error(`[${status}] call '${url}' response: ${r(json)}`);
     } else {
-      logger.verbose(`[${status}] call '${url}': ${r(json)}`);
+      logger.debug(`[${status}] call '${url}': ${r(json)}`);
     }
     return json;
   }
@@ -410,7 +410,7 @@ export class WxHelper {
         async () => {
           const result = await WxApi.getAccessToken({ mini });
           if (result.access_token) {
-            logger.verbose(`getAccessToken with key(${key}): ${r(result)}`);
+            logger.debug(`getAccessToken with key(${key}): ${r(result)}`);
             // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
             await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
             return result.access_token;
@@ -420,7 +420,7 @@ export class WxHelper {
         { ttl: 60 },
       )
       .catch((reason) => logger.error(reason));
-    logger.verbose(`access token is ${r(token)}`);
+    logger.debug(`access token is ${r(token)}`);
     if (!token) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');
     }

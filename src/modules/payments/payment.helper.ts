@@ -35,7 +35,7 @@ export class PaymentHelper {
     const item = await PaymentItem.findOneOrFail(itemId);
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
 
-    logger.verbose(`create order by ${r({ item, order })}`);
+    logger.debug(`create order by ${r({ item, order })}`);
 
     // create transaction
     const method = await PaymentMethod.findOneOrFail(methodId);
@@ -151,7 +151,7 @@ export class PaymentHelper {
     Object.assign(context, { md5sign });
     const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 
-    logger.verbose(`parse body '${body}' with context ${r(context)}`);
+    logger.debug(`parse body '${body}' with context ${r(context)}`);
 
     const payload = JSON.parse(body);
     logger.log(`sign by ${r({ signed, payload })}`);
@@ -165,7 +165,7 @@ export class PaymentHelper {
       const url = `${method.endpoint}?${qs.stringify(payload)}`;
       const response = await fetch(url);
       const result = await response.text();
-      logger.verbose(`fetch ${url} response is ${result}`);
+      logger.debug(`fetch ${url} response is ${result}`);
       if (result) {
         const parsed = parseJSONIfCould(result);
         await this.updateOrder(order.id, parsed);
@@ -185,13 +185,13 @@ export class PaymentHelper {
   static async cleanExpiredPayments(): Promise<void> {
     const oneDayAgo = sub(new Date(), { days: 1 });
     const transactions = await PaymentTransaction.count({ createdAt: LessThan(oneDayAgo), status: IsNull() });
-    logger.verbose(`remove expired transactions: ${transactions}`);
+    logger.debug(`remove expired transactions: ${transactions}`);
     if (transactions) {
       await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
     }
 
     // const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
-    // logger.verbose(`remove expired orders: ${orders}`);
+    // logger.debug(`remove expired orders: ${orders}`);
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 
@@ -217,16 +217,16 @@ export class PaymentHelper {
         transaction_id: string;
       };
       const validated = await PaymentWxpayHelper.validateSign(body);
-      logger.verbose(`validated wxpay is ${r(validated)}`);
+      logger.debug(`validated wxpay is ${r(validated)}`);
       if (!validated) {
         // logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.out_trade_no} not validated.`);
       }
 
       // const params = parseJSONIfCould(body.passback_params);
-      logger.verbose(`find order ${body.out_trade_no}`);
+      logger.debug(`find order ${body.out_trade_no}`);
       const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
-      logger.verbose(`update order ${r({ order, body })} status to done`);
+      logger.debug(`update order ${r({ order, body })} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();
@@ -263,16 +263,16 @@ export class PaymentHelper {
       };
 
       const validated = await PaymentAlipayHelper.validateSign(body);
-      logger.verbose(`validated alipay is ${r(validated)}`);
+      logger.debug(`validated alipay is ${r(validated)}`);
       if (!validated) {
         // logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
       }
 
       const params = parseJSONIfCould(body.passback_params);
-      logger.verbose(`find order ${params.orderId ?? body.subject}`);
+      logger.debug(`find order ${params.orderId ?? body.subject}`);
       const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
-      logger.verbose(`update order ${r({ order, body })} status to done`);
+      logger.debug(`update order ${r({ order, body })} status to done`);
       order.transaction.status = 'done';
       order.transaction.data = body;
       await order.transaction.save();

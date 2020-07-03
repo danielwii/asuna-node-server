@@ -63,11 +63,11 @@ export class PaymentWxpayHelper {
       cdata: true,
     }).buildObject(postBody);
 
-    logger.verbose(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url })}`);
+    logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url })}`);
     const response = await axios.post(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
-    logger.verbose(`response is ${r(data)}`);
+    logger.debug(`response is ${r(data)}`);
 
     if (data.return_code !== 'SUCCESS') {
       throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);

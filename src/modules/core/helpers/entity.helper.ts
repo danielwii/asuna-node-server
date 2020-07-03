@@ -55,7 +55,7 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
 }
 
 export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, defaultValue?): void {
-  // logger.verbose(`safeReloadJSON ${r({ entity: typeof entity, column, value: entity[column], defaultValue })}`);
+  // logger.debug(`safeReloadJSON ${r({ entity: typeof entity, column, value: entity[column], defaultValue })}`);
   if (_.has(entity, column)) {
     if (entity[column]) {
       try {

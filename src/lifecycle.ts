@@ -24,16 +24,16 @@ export class LifecycleRegister {
 
   static reg(handler: AppLifecycleType): void {
     this.handlers.push(handler);
-    logger.verbose(`reg handler ${r(handler)} total: ${this.handlers.length}`);
+    logger.debug(`reg handler ${r(handler)} total: ${this.handlers.length}`);
   }
 }
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   static async onInit(app: NestExpressApplication): Promise<void> {
-    logger.verbose(`[onInit] ...`);
+    logger.debug(`[onInit] ...`);
     if (configLoader.loadBoolConfig(ConfigKeys.SENTRY_ENABLE)) {
       const dsn = configLoader.loadConfig(ConfigKeys.SENTRY_DSN);
-      logger.verbose(`[onInit] sentry ... ${dsn}`);
+      logger.debug(`[onInit] sentry ... ${dsn}`);
       Sentry.init({ dsn, debug: configLoader.loadConfig(ConfigKeys.DEBUG) });
 
       // The request handler must be the first middleware on the app
@@ -46,28 +46,28 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       });
 */
     }
-    logger.verbose(`[onInit] done`);
+    logger.debug(`[onInit] done`);
   }
 
   static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
-    logger.verbose(`[beforeBootstrap] ...`);
+    logger.debug(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
       await handler?.beforeBootstrap?.(app);
     }
-    logger.verbose(`[beforeBootstrap] done`);
+    logger.debug(`[beforeBootstrap] done`);
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    logger.verbose(`[onApplicationBootstrap] ...`);
-    logger.verbose(`[onApplicationBootstrap] done`);
+    logger.debug(`[onApplicationBootstrap] ...`);
+    logger.debug(`[onApplicationBootstrap] done`);
   }
 
   static async onAppStartListening(app: NestExpressApplication): Promise<void> {
-    logger.verbose(`[onAppStartListening] ...`);
+    logger.debug(`[onAppStartListening] ...`);
 
-    logger.verbose(`inspect redis providers: ${r(_.mapValues(RedisProvider.instance.clients, fp.omit('client')))}`);
-    logger.verbose(`inspect crons: ${r(CronHelper.crons)}`);
-    logger.verbose(
+    logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.instance.clients, fp.omit('client')))}`);
+    logger.debug(`inspect crons: ${r(CronHelper.crons)}`);
+    logger.debug(
       `inspect id generators: ${r({ byPrefix: IdGenerators.handlers, byEntity: IdGenerators.handlersByEntity })}`,
     );
 
@@ -77,10 +77,10 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   }
 
   async beforeApplicationShutdown(signal?: string): Promise<void> {
-    logger.verbose(`[beforeApplicationShutdown] ... signal: ${signal}`);
+    logger.debug(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
 
   async onApplicationShutdown(signal?: string): Promise<void> {
-    logger.verbose(`[onApplicationShutdown] ... signal: ${signal}`);
+    logger.debug(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }

@@ -29,7 +29,7 @@ export class MongoConfigObject {
   }
 
   static load(): MongoConfigObject {
-    logger.debug(`try load env: ${MongoConfigKeys.MONGO_ENABLE}`);
+    logger.verbose(`try load env: ${MongoConfigKeys.MONGO_ENABLE}`);
     return new MongoConfigObject({
       enable: configLoader.loadBoolConfig(MongoConfigKeys.MONGO_ENABLE, false),
       host: configLoader.loadConfig(MongoConfigKeys.MONGO_HOST, 'localhost'),

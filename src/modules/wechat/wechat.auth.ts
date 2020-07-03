@@ -62,7 +62,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
     logger.log(`wx-jwt load user by ${r(codeSession)}`);
     if (codeSession?.openid) {
       const user = await UserProfile.findOne({ username: codeSession.openid });
-      logger.verbose(`wx-jwt found user by ${r(user)}`);
+      logger.debug(`wx-jwt found user by ${r(user)}`);
       return user;
     }
     throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'code-session not found');
@@ -90,7 +90,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    logger.verbose(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     return req;
   }
 }

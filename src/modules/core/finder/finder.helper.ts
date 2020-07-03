@@ -52,7 +52,7 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
-    logger.verbose(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
+    logger.debug(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
       logger.warn(`${name || 'default'} not available in upstream ${defaultEndpoint}`);
@@ -66,10 +66,10 @@ export class FinderHelper {
     if (config.hostExchanges) {
       try {
         const exchanges: HostExchange[] = JSON.parse(config.hostExchanges);
-        logger.debug(`parse exchanges ${r({ exchanges })}`);
+        logger.verbose(`parse exchanges ${r({ exchanges })}`);
         const exchange = exchanges.find(x => new RegExp(x.regex).test(path));
         if (exchange) {
-          logger.verbose(`check exchange ${r({ exchange, path })}`);
+          logger.debug(`check exchange ${r({ exchange, path })}`);
           return `${exchange.endpoint || ''}${resourcePath}`;
         }
       } catch (e) {

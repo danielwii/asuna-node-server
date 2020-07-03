@@ -47,7 +47,7 @@ export class ContentAdminController {
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.verbose(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
@@ -99,7 +99,7 @@ export class ContentAdminController {
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.verbose(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
@@ -123,7 +123,7 @@ export class ContentAdminController {
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.verbose(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');

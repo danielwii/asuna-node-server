@@ -86,11 +86,11 @@ export class ImportExportService {
               await repository.remove(res);
             }
           }
-          // logger.debug(`${modelName} set ${keyName} to ${value}`);
+          // logger.verbose(`${modelName} set ${keyName} to ${value}`);
           entity[keyName] = value;
         }
       }
-      logger.verbose(`save ${modelName}: ${r(entity)} by ${r(jsonArray[row])}`);
+      logger.debug(`save ${modelName}: ${r(entity)} by ${r(jsonArray[row])}`);
       const saveRes = await repository.save(entity);
       status.push(saveRes);
     }
