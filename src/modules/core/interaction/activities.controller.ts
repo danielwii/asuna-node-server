@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { AnyAuthGuard, JwtAuthRequest } from '../core/auth';
-import { PageHelper } from '../core/helpers';
+import { r } from '../../common/helpers';
+import { LoggerFactory } from '../../common/logger';
+import { AnyAuthGuard, JwtAuthRequest } from '../auth';
+import { PageHelper } from '../helpers';
 import { UserActivity } from './activities.entities';
 
 class CreateActivityDto {

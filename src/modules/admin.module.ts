@@ -1,7 +1,7 @@
 import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
-import { ActivitiesModule } from './activity/activities.module';
+import { InteractionModule } from './core/interaction/interaction.module';
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client/client.module';
 import { r } from './common/helpers';
@@ -43,7 +43,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     DynamicRouterModule,
     GraphqlQueryModule,
     AuthModule,
-    ActivitiesModule,
+    InteractionModule,
     PaymentModule,
     ContentModule,
     EmailModule,

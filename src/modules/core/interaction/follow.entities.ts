@@ -4,11 +4,11 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { InteractionFollowEnumValue, InteractionFollowType } from './enum-values';
 import { UserProfile } from '../auth/user.entities';
 
-@EntityMetaInfo({ name: 'interaction__follow', internal: true })
-@Entity('interaction__t_follow')
+@EntityMetaInfo({ name: 'user__follow', internal: true })
+@Entity('user__t_follow')
 export class UserFollow extends AbstractTimeBasedBaseEntity {
   constructor() {
-    super('if');
+    super('uf');
   }
 
   @MetaInfo({ accessible: 'readonly', type: 'EditableEnum', enumData: InteractionFollowEnumValue.data })

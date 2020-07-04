@@ -1,7 +1,7 @@
-import { Column, Entity, TableInheritance } from 'typeorm';
-import { AbstractTimeBasedBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo } from '../common/decorators';
-import { InjectMultiUserProfile } from '../core/auth';
+import { Column, Entity } from 'typeorm';
+import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
+import { EntityMetaInfo } from '../../common/decorators';
+import { InjectMultiUserProfile } from '../auth';
 
 @EntityMetaInfo({
   name: 'user__activities',

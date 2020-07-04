@@ -1,5 +1,4 @@
 export * from './app';
-export * from './activity';
 export * from './base';
 export * from './core';
 export * from './dataloader';

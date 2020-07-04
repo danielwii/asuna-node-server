@@ -1,4 +1,3 @@
-import { UserActivity } from '../activity';
 import { AppInfo } from '../app/app.entities';
 import { Feedback, FeedbackReply } from '../content/feedback.entities';
 import { UserProfile } from '../core/auth';
@@ -6,6 +5,7 @@ import { KeyValueModel, KeyValuePair } from '../core/kv/kv.entities';
 import { PaymentItem, PaymentMethod } from '../payments';
 import { WXMiniAppUserInfo } from '../wechat/wechat.entities';
 import { DataLoaderFunction, loader } from './dataloader';
+import { UserActivity } from '../core/interaction/activities.entities';
 
 export type DefaultRegisteredLoaders = {
   wxMiniAppUserInfo: DataLoaderFunction<WXMiniAppUserInfo>;

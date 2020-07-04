@@ -10,6 +10,7 @@ export * from './get-uploads';
 export * from './rest';
 export * from './storage';
 export * from './helpers';
+export * from './interaction';
 export * from './command.controller';
 export * from './user.controller';
 export * from './user.register';

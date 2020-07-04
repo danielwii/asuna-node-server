@@ -1,9 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '../../common/logger';
 import { ActivitiesController } from './activities.controller';
 import { ActivitiesResolver } from './activities.resolver';
 
-const logger = LoggerFactory.getLogger('ActivitiesModule');
+const logger = LoggerFactory.getLogger('InteractionModule');
 
 @Module({
   imports: [],
@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('ActivitiesModule');
   exports: [],
   controllers: [ActivitiesController],
 })
-export class ActivitiesModule implements OnModuleInit {
+export class InteractionModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
   }
