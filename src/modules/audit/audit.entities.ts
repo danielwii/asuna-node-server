@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo } from '../common/decorators';
-import { ColumnType } from '../core';
+import { ColumnTypeHelper } from '../core';
 
 export const AuditType = {
   entity: 'entity',
@@ -16,15 +16,15 @@ export class AuditRecord extends AbstractBaseEntity {
   @Column({ nullable: true, length: 100 })
   action: string;
 
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   identification: any;
 
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   from: any;
 
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   to: any;
 
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   diff: any;
 }

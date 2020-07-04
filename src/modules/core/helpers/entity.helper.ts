@@ -6,7 +6,7 @@ import { BaseEntity } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger/factory';
 import { ConfigKeys, configLoader } from '../../config';
-import { ColumnType } from './column.helper';
+import { ColumnTypeHelper } from './column.helper';
 
 const logger = LoggerFactory.getLogger('EntityHelper');
 
@@ -15,7 +15,7 @@ const logger = LoggerFactory.getLogger('EntityHelper');
  */
 export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach((column) => {
-    if (ColumnType.JSON === 'simple-json') {
+    if (ColumnTypeHelper.JSON === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {
@@ -37,7 +37,7 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
  */
 export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Entity)[]): void {
   columns.forEach((column) => {
-    if (ColumnType.JSON === 'simple-json') {
+    if (ColumnTypeHelper.JSON === 'simple-json') {
       if (entity[column]) {
         try {
           if (!_.isObject(entity[column])) {

@@ -2,7 +2,7 @@ import { html } from 'common-tags';
 import { Column, Entity } from 'typeorm';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity } from '../../base';
-import { ColumnType } from '../helpers';
+import { ColumnTypeHelper } from '../helpers';
 
 export const TokenRule = {
   sys: 'sys',
@@ -72,7 +72,7 @@ export class OperationToken extends AbstractBaseEntity {
   shortId: string;
 
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnType.JSON, { nullable: true, name: 'body' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
   body: any;
 
   @MetaInfo({ name: 'Service', help: 'web-login / app-login / opt-secret / etc.' })

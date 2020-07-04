@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
-import { ColumnType } from '../core/helpers';
+import { ColumnTypeHelper } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
 
 /**
@@ -35,7 +35,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
 
   // @Expose({ name: 'with-private-key', toPlainOnly: true })
   @MetaInfo({ name: 'Private Key' })
-  @Column(ColumnType.text(), { nullable: true, name: 'private_key' })
+  @Column(ColumnTypeHelper.text(), { nullable: true, name: 'private_key' })
   privateKey: string;
 
   @MetaInfo({
@@ -51,7 +51,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
       </ul>
     `,
   })
-  @Column(ColumnType.JSON, { nullable: true, name: 'extra' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'extra' })
   extra: Record<string, string | number>;
 
   @MetaInfo({
@@ -68,7 +68,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
       { name: 'method.extra', help: '自定义附加信息' },
     ],
   })
-  @Column(ColumnType.text(), { nullable: true, name: 'sign_tmpl' })
+  @Column(ColumnTypeHelper.text(), { nullable: true, name: 'sign_tmpl' })
   signTmpl: string;
 
   @MetaInfo({
@@ -87,7 +87,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
     ],
     // extra: { jsonMode: true },
   })
-  @Column(ColumnType.text(), { nullable: true, name: 'body_tmpl' })
+  @Column(ColumnTypeHelper.text(), { nullable: true, name: 'body_tmpl' })
   bodyTmpl: string;
 
   @MetaInfo({ name: '支付类型', type: 'EnumFilter', enumData: PaymentMethodEnumValue.data })
@@ -114,11 +114,11 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   key: string;
 
   @MetaInfo({ name: '简要' })
-  @Column(ColumnType.text(), { nullable: true, name: 'summary' })
+  @Column(ColumnTypeHelper.text(), { nullable: true, name: 'summary' })
   summary: string;
 
   @MetaInfo({ name: '价格' })
-  @Column(ColumnType.MONEY, { nullable: true })
+  @Column({ ...ColumnTypeHelper.money(), nullable: true })
   price: number;
 
   @MetaInfo({ name: '封面', type: 'Image' })
@@ -126,7 +126,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   cover: string;
 
   @MetaInfo({ name: '图片', type: 'Images' })
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   images: JsonArray;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -155,11 +155,11 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   method: PaymentMethod;
 
   @MetaInfo({ name: '附加信息' })
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   paymentInfo: Record<string, unknown>;
 
   @MetaInfo({ name: '返回信息' })
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   data: Record<string, unknown>;
 
   @MetaInfo({ name: '订单' })
@@ -180,7 +180,7 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   name: string;
 
   @MetaInfo({ name: '总金额' })
-  @Column(ColumnType.MONEY, { name: 'amount' })
+  @Column({ ...ColumnTypeHelper.money(), name: 'amount' })
   amount: number;
 
   @MetaInfo({ name: '状态' })

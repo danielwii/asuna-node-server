@@ -7,7 +7,7 @@ import { MetaInfoOptions } from '../../common/decorators';
 import { r, validateObjectSync } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
-import { ColumnType, safeReloadJSON } from '../helpers';
+import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 
 const logger = LoggerFactory.getLogger('EntitySubscriber');
 
@@ -16,7 +16,7 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
 
   const { info }: { info: { [key: string]: MetaInfoOptions } } = (metadata.target as Function).prototype;
   metadata.columns.forEach((column) => {
-    if (column.type === ColumnType.JSON) {
+    if (column.type === ColumnTypeHelper.JSON) {
       // const entityInfo = (column.target as any).entityInfo as MetaInfoBaseOptions;
       const defaultValue = _.cond([
         [_.matches('json-array'), _.constant([])],
@@ -24,6 +24,8 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
         [_.stubTrue, _.constant(null)],
       ])(info[column.propertyName]?.safeReload);
       safeReloadJSON(entity as any, column.propertyName, defaultValue);
+    } else if (column.type === 'decimal') {
+      entity[column.propertyName] = _.toNumber(entity[column.propertyName]);
     }
   });
 };

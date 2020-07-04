@@ -3,7 +3,7 @@ import { AfterUpdate, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
 import { CacheUtils } from '../../cache';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { ColumnType } from '../helpers';
+import { ColumnTypeHelper } from '../helpers';
 
 export enum KVModelFormatType {
   KVGroupFieldsValue = 'KVGroupFieldsValue',
@@ -46,7 +46,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   value?: any;
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   extra?: JsonMap;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define

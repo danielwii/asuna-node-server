@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
-import { ColumnType } from '../core/helpers';
+import { ColumnTypeHelper } from '../core/helpers';
 import {
   FeedbackSenderEnumValue,
   FeedbackSenderType,
@@ -26,7 +26,7 @@ export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   type: string;
 
   @MetaInfo({ name: '问题图片', type: 'Images', safeReload: 'json-array' })
-  @Column(ColumnType.JSON, { nullable: true, name: 'images' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'images' })
   images: JsonArray;
 
   @MetaInfo({ name: '问题状态', type: 'Enum', enumData: FeedbackStatusEnumValue.data })
@@ -46,7 +46,7 @@ export class FeedbackReply extends AbstractBaseEntity {
   refId: string;
 
   @MetaInfo({ name: '回复图片', type: 'Images', safeReload: 'json-array' })
-  @Column(ColumnType.JSON, { nullable: true, name: 'images' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'images' })
   images: JsonArray;
 
   @MetaInfo({ name: '回复内容' })

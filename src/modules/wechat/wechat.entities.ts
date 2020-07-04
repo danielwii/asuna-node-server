@@ -18,7 +18,7 @@ import { deserializeSafely } from '../common/helpers/validate';
 import { AdminUser } from '../core/auth/auth.entities';
 // eslint-disable-next-line import/no-cycle
 import { UserProfile } from '../core/auth/user.entities';
-import { ColumnType } from '../core/helpers/column.helper';
+import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
 // eslint-disable-next-line import/no-cycle
@@ -72,7 +72,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   unionId: string;
 
   @MetaInfo({ name: '绑定ID' })
-  @Column(ColumnType.JSON, { nullable: true, name: 'tag_ids' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'tag_ids' })
   tagIds: JsonArray;
 
   // 用户的性别，值为1时是男性，值为2时是女性，值为0时是未知

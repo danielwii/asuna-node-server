@@ -3,7 +3,7 @@ import { Publishable } from '../../base';
 import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { Tenant } from '../../tenant/tenant.entities';
-import { ColumnType } from '../helpers/column.helper';
+import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
@@ -28,7 +28,7 @@ export class Role extends AbstractBaseEntity {
   description: string;
 
   @MetaInfo({ name: '权限', type: 'Authorities', safeReload: 'json-map' })
-  @Column(ColumnType.JSON, { nullable: true })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
   authorities: JsonMap;
 
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
