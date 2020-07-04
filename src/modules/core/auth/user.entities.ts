@@ -1,4 +1,4 @@
-import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 // eslint-disable-next-line import/no-cycle
@@ -7,6 +7,7 @@ import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 import { UserRegister } from '../user.register';
 // eslint-disable-next-line import/no-cycle
 import { AbstractTimeBasedAuthUser } from './base.entities';
+import { UserFollow } from '../interaction/follow.entities';
 
 @EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
 @Entity('auth__t_user_profiles')
@@ -17,6 +18,9 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
 
   @OneToOne((type) => WXMiniAppUserInfo, (info) => info.profile)
   miniAppUserInfo: WXMiniAppUserInfo;
+
+  @OneToMany((type) => UserFollow, (follow) => follow.follower)
+  follows: UserFollow[];
 
   /* use AuthedUserHelper.createProfile
   @AfterInsert()

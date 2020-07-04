@@ -3,12 +3,18 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AsunaErrorCode, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest } from '../../helper/interfaces';
+import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 import { auth } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 import { JwtPayload } from './auth.interfaces';
+import * as _ from 'lodash';
 
 export type JwtAuthRequest<User = any> = AnyAuthRequest<JwtPayload, User>;
+
+export class JwtAuthRequestExtractor {
+  static of = <User>(req: JwtAuthRequest): AuthInfo<JwtPayload, User> =>
+    _.pick(req, 'user', 'profile', 'payload', 'identifier', 'tenant', 'roles');
+}
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
