@@ -2,6 +2,7 @@ type UserProfile {
   id: String
   email: String
   username: String
+  nickname: String
   portrait: String
   channel: String
   #  password: String

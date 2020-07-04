@@ -5,6 +5,7 @@ import { AsunaErrorCode, AsunaException, LoggerFactory } from '../../common';
 import { DBHelper } from '../db';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
+import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 
 const logger = LoggerFactory.getLogger('AuthedUserHelper');
 
@@ -33,13 +34,15 @@ export class AuthedUserHelper {
     return UserProfile.findOneOrFail({ username, email });
   }
 
-  static getUserById<User>(id: string | number): Promise<User> {
+  static async getUserById<User>(id: string | number, options?: FindOneOptions<User>): Promise<User> {
     if (typeof id === 'number') {
       // ow(id, 'id', ow.number.integer);
-      return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(id) as any;
+      return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(id, options as any) as any;
     }
     ow(id, 'id', ow.string.nonEmpty);
-    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(+id.slice(1)) as any;
+    const entity = await UserRegister.Entity.findOne({ cache: true });
+    const fixedId = _.isNumber(entity.id) ? +id.slice(1) : id;
+    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(fixedId, options as any) as any;
   }
 
   static getUserByProfileId<User>(profileId: string, relations?: string[]): Promise<User> {

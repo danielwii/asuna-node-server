@@ -30,6 +30,11 @@ export class PasswordHelper {
 export type CreatedToken = { expiresIn: number; accessToken: string };
 
 export class TokenHelper {
+  static decode<Payload = JwtPayload>(token: string): Payload {
+    const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
+    return jwt.verify(token, secretOrKey) as any;
+  }
+
   static async createToken(user: AuthUser, extra?: { uid: PrimaryKey }): Promise<CreatedToken> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
