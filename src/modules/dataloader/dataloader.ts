@@ -12,6 +12,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
+import { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoader');
 
@@ -61,19 +62,23 @@ export const dataLoaderCleaner = {
 };
 
 export class GenericDataLoader {
-  static loaders;
+  static _loaders;
 
   constructor() {
     logger.log('init ...');
   }
 
+  static loaders<Loaders = DefaultRegisteredLoaders>(): Loaders {
+    return GenericDataLoader._loaders;
+  }
+
   initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
     logger.debug(`init loaders ${r(loaders)}`);
-    GenericDataLoader.loaders = loaders;
+    GenericDataLoader._loaders = loaders;
   }
 
   createLoaders(): { [key: string]: DataLoaderFunction<any> } {
-    return _.memoize(() => GenericDataLoader.loaders)();
+    return _.memoize(() => GenericDataLoader._loaders)();
   }
 }
 
