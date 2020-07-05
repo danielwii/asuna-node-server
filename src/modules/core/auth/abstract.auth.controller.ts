@@ -156,7 +156,7 @@ export abstract class AbstractAuthController {
       .catch((reason) => logger.error(reason));
     logger.debug(`current authed user is ${r(loaded)}`);
     const result = _.omit(loaded, 'channel', 'info'); // ...
-    _.set(result, 'profile', _.pick(result.profile, 'id', 'email', 'portrait', 'isBound', 'channel'));
+    _.set(result, 'profile', _.omit(result.profile, 'salt', 'password'));
     return result;
   }
 
