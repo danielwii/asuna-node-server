@@ -28,7 +28,7 @@ export class DataLoaderInterceptor implements NestInterceptor {
     if (request.dataLoaders) {
       // this.logger.debug('Data loaders exist', this.constructor.name);
     } else {
-      if (_.isEmpty(GenericDataLoader.loaders)) {
+      if (_.isEmpty(GenericDataLoader.loaders())) {
         logger.error(`no data loaders for request found, may not initialized at startup.`);
       }
       // logger.debug(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
