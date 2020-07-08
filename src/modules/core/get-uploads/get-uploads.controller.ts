@@ -62,7 +62,7 @@ export class GetUploadsController {
         thumbnailConfig,
         jpegConfig,
         query,
-        resolver: path => FinderHelper.resolveUrl({ type: 'assets', path, internal }),
+        resolver: (path) => FinderHelper.resolveUrl({ type: 'assets', path, internal }),
       },
       res,
     );

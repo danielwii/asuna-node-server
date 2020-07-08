@@ -1,6 +1,7 @@
 import { Promise } from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
 import { join } from 'path';
+import * as url from 'url';
 import { AsunaErrorCode, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
@@ -52,25 +53,25 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
-    logger.debug(`get endpoint ${r({ internal, config, defaultEndpoint })}`);
+    logger.debug(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
-      logger.warn(`${name || 'default'} not available in upstream ${defaultEndpoint}`);
+      logger.warn(`${name ?? 'default'} not available in upstream ${defaultEndpoint}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
-        `${name || 'default'} not available in upstream ${defaultEndpoint}`,
+        `${name ?? 'default'} not available in upstream ${defaultEndpoint}`,
       );
     }
 
-    const resourcePath = join('/', path).replace(/\/+/g, '/');
+    // const resourcePath = join('/', path).replace(/\/+/g, '/');
     if (config.hostExchanges) {
       try {
         const exchanges: HostExchange[] = JSON.parse(config.hostExchanges);
         logger.verbose(`parse exchanges ${r({ exchanges })}`);
-        const exchange = exchanges.find(x => new RegExp(x.regex).test(path));
+        const exchange = exchanges.find((x) => new RegExp(x.regex).test(path));
         if (exchange) {
           logger.debug(`check exchange ${r({ exchange, path })}`);
-          return `${exchange.endpoint || ''}${resourcePath}`;
+          return url.resolve(exchange.endpoint ?? '', path);
         }
       } catch (e) {
         logger.error(`handle exchange error: ${e}`);
@@ -78,7 +79,7 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
-      return `${config.endpoint || ''}${resourcePath}`;
+      return url.resolve(config.endpoint ?? '', path);
     }
     // TODO add other handlers later
     logger.warn('only type assets is available');

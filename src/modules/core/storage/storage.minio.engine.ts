@@ -48,7 +48,11 @@ export class MinioStorage implements IStorageEngine {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, resolver } = opts;
-    const url = await resolver(join(bucket || this.defaultBucket, prefix || '', filename));
+    const pathname = join(bucket ?? this.defaultBucket, prefix ?? '', filename);
+    const url = await resolver(pathname);
+    logger.debug(
+      `resolveUrl ${r({ bucket: bucket ?? this.defaultBucket, prefix: prefix ?? '', filename, pathname, url })}`,
+    );
     return res.redirect(url);
     // resolver(join(bucket || this.defaultBucket, prefix || '', filename)).then(url => res.redirect(url));
     // return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
@@ -63,7 +67,7 @@ export class MinioStorage implements IStorageEngine {
     const region = opts.region || 'local';
     const items: minio.BucketItemFromList[] = await this.client.listBuckets();
     logger.log(`found buckets: ${r(items)} current is ${bucket}`);
-    if (!(items && items.find(item => item.name === bucket))) {
+    if (!(items && items.find((item) => item.name === bucket))) {
       logger.log(`create bucket [${bucket}] for region [${region}]`);
       await this.client.makeBucket(bucket, region);
     }
@@ -89,11 +93,7 @@ export class MinioStorage implements IStorageEngine {
     }
 
     // remove head and tail chars '/' in prefix
-    const resolvedPrefix = (prefix || '')
-      .replace(/^\/+/, '')
-      .replace(/\/+$/, '')
-      .replace(/\/+/g, '/')
-      .trim();
+    const resolvedPrefix = (prefix || '').replace(/^\/+/, '').replace(/\/+$/, '').replace(/\/+/g, '/').trim();
     const filename = convertFilename(file.filename);
     const filenameWithPrefix = join(resolvedPrefix, filename);
 
@@ -111,7 +111,7 @@ export class MinioStorage implements IStorageEngine {
         const files = fs.readdirSync(parent);
         if (files.length === 0) {
           logger.log(`no more files in ${parent}, remove it.`);
-          fs.remove(parent).catch(reason => logger.warn(`remove ${parent} error: ${r(reason)}`));
+          fs.remove(parent).catch((reason) => logger.warn(`remove ${parent} error: ${r(reason)}`));
         }
       } catch (e) {
         logger.error(`clean temp files error: ${e}`);
@@ -132,11 +132,11 @@ export class MinioStorage implements IStorageEngine {
 
   listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     const currentBucket = bucket || this.defaultBucket;
-    return new Promise<SavedFile[]>(resolve => {
+    return new Promise<SavedFile[]>((resolve) => {
       const savedFiles: SavedFile[] = [];
       logger.log(`list entities ${r({ currentBucket, prefix })}`);
       const bucketStream = this.client.listObjectsV2(currentBucket, prefix, true);
-      bucketStream.on('data', item => {
+      bucketStream.on('data', (item) => {
         logger.log(`bucketStream on data ${r(item)}`);
         const filename = item.name.slice(prefix.length + 1);
         savedFiles.push(
@@ -164,7 +164,7 @@ export class MinioStorage implements IStorageEngine {
           ),
         );
       });
-      bucketStream.on('error', error => {
+      bucketStream.on('error', (error) => {
         logger.log(`bucketStream on error ${r(error)}`);
         throw new Error(r(error));
       });
@@ -193,7 +193,7 @@ export class MinioStorage implements IStorageEngine {
     const fileInfos = await this.listEntities({ bucket, prefix: join(prefix, filename) });
     return this.client.removeObjects(
       bucket,
-      fileInfos.map(fileInfo => join(fileInfo.prefix, fileInfo.filename)),
+      fileInfos.map((fileInfo) => join(fileInfo.prefix, fileInfo.filename)),
     );
   }
 }
