@@ -71,7 +71,7 @@ export class FinderHelper {
         const exchange = exchanges.find((x) => new RegExp(x.regex).test(path));
         if (exchange) {
           logger.debug(`check exchange ${r({ exchange, path })}`);
-          return url.resolve(exchange.endpoint ?? '', path);
+          return url.resolve(`${exchange.endpoint ?? ''}/`, path);
         }
       } catch (e) {
         logger.error(`handle exchange error: ${e}`);
@@ -79,7 +79,7 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
-      return url.resolve(config.endpoint ?? '', path);
+      return url.resolve(`${config.endpoint ?? ''}/`, path);
     }
     // TODO add other handlers later
     logger.warn('only type assets is available');
