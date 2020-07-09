@@ -116,7 +116,7 @@ export class MinioStorage implements IStorageEngine {
       } catch (e) {
         logger.error(`clean temp files error: ${e}`);
       }
-    })();
+    })().catch((reason) => logger.error(reason));
 
     return new SavedFile({
       prefix: resolvedPrefix,
