@@ -1,7 +1,7 @@
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import { default as OpentracingExtension } from 'apollo-opentracing';
+import { default as OpenTracingExtension } from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -12,11 +12,12 @@ import { join } from 'path';
 import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
-import { ConfigKeys, configLoader } from './config';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
+import { GraphQLConfigObject } from './graphql/graphql.config';
 import { RedisProvider } from './providers';
 import { TracingHelper } from './tracing';
+import { TracingConfigObject } from './tracing/tracing.config';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
@@ -25,13 +26,14 @@ export class GraphqlModule implements OnModuleInit {
   static forRoot(dir, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
-
+    const tracingConfig = TracingConfigObject.load();
+    const config = GraphQLConfigObject.load();
     const typePaths = [
       // '../**/*.graphql',
       `${join(__dirname, '../../src')}/**/*.graphql`,
       `${join(dir, '../src')}/**/*.graphql`,
     ];
-    logger.log(`typePaths is ${r({ typePaths })}`);
+    logger.log(`typePaths is ${r({ typePaths, config })}`);
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
@@ -51,15 +53,11 @@ export class GraphqlModule implements OnModuleInit {
           typePaths,
           // autoSchemaFile: 'schema.gql',
           resolvers: { JSON: GraphQLJSON },
-          playground: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE),
-          debug: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
-          introspection:
-            configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_PLAYGROUND_ENABLE) ||
-            configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
-          tracing: configLoader.loadBoolConfig(ConfigKeys.GRAPHQL_DEBUG),
-          resolverValidationOptions: {
-            requireResolversForResolveType: false,
-          },
+          playground: config.playground_enable,
+          debug: config.debug,
+          introspection: config.playground_enable || config.debug,
+          tracing: config.debug,
+          resolverValidationOptions: { requireResolversForResolveType: false },
           persistedQueries: { cache },
           plugins: [
             {
@@ -87,16 +85,16 @@ export class GraphqlModule implements OnModuleInit {
             getTrace: () => _.get(context.req, 'trace'),
           }),
           extensions: _.compact([
-            configLoader.loadBoolConfig('JAEGER_ENABLED', false)
+            tracingConfig.enabled
               ? _.memoize(() => {
-                  const opentracingExtension = new OpentracingExtension({
+                  const openTracingExtension = new OpenTracingExtension({
                     server: tracer,
                     local: tracer,
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
                   }) as any;
                   logger.log(`load open tracing extension ...`);
-                  return opentracingExtension;
+                  return openTracingExtension;
                 })
               : undefined,
           ]),

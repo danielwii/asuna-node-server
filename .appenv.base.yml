@@ -11,7 +11,7 @@ PORT: 5000
 # default: 20mb ; post json 的 body 大小
 PAYLOAD_LIMIT: 200mb
 
-app:
+app: # TODO
   # default: admin@example.com
   SYS_ADMIN_EMAIL: admin@example.com
   # 为空时生成随机密码
@@ -25,14 +25,19 @@ app:
   # default: http://127.0.0.1:5000
   MASTER_ADDRESS: http://127.0.0.1:5000
 
-features:
+features: # TODO
   # 是否开启审计模式
   AUDIT: false
   # ; endpoint is /swagger
   SWAGGER: false
   CRON_ENABLE: true
 
-uploader:
+tracing:
+  enabled: false
+  service_name: my-service
+  endpoint: http://localhost:14268/api/traces
+
+uploader: # TODO
   ENABLE: true
   # default: 3
   MAX_COUNT: 10
@@ -41,23 +46,17 @@ uploader:
 
 graphql:
   # default: false
-  DEBUG:
+  debug: true
   # default: false
-  PLAYGROUND_ENABLE:
+  playground_enable: true
 
 # -- sentry --
 sentry:
-  SENTRY_ENABLE:
-  SENTRY_DSN:
-
-# -- jaeger --
-jaeger:
-  ENABLED: false
-  SERVICE_NAME: my-service
-  ENDPOINT: http://localhost:14268/api/traces
+  enable:
+  dsn:
 
 # --- mq ---
-mq:
+mq: # TODO
   # default: false
   ENABLE: false
   # default: amqp://localhost ; 存在 url 时忽略其他参数
@@ -68,7 +67,7 @@ mq:
   #USERNAME:
 
 # --- redis ---
-redis:
+redis: # TODO
   ENABLE: false
   HOST: localhost
   PORT: 6379
@@ -90,7 +89,7 @@ redis:
   #PREFIX_REDIS_DB:
 
 # --- mysql ---
-db:
+db: # TODO
   # default: mysql57 ; mysql56 | mysql57 | postgres
   DB_TYPE:
   TYPEORM_SYNCHRONIZE: false
@@ -138,7 +137,7 @@ db:
 # --- local storage config ---
 #IMAGES|VIDEOS|FILES|CHUNKS_STORAGE: local|minio|qiniu
 
-storage:
+storage: # TODO
   DEFAULT_STORAGE: local
   #IMAGES|[ANY]_STORAGE
   #VIDEOS|[ANY]_STORAGE:
@@ -160,12 +159,12 @@ storage:
 # --- mail ---
 email:
   enable: false
-  HOST:
-  PORT: 465
-  SSL: false
-  USERNAME:
-  PASSWORD:
-  FROM:
+  host:
+  port: 465
+  ssl: false
+  username:
+  password:
+  from:
 # --------------------------------------------------------------
 # Customize
 # --------------------------------------------------------------

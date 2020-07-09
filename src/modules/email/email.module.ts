@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { KeyValueType, KvHelper, KVModelFormatType } from '../core/kv';
 import { EmailTmplConfigKeys } from './email-tmpl.config';
@@ -10,7 +11,7 @@ const logger = LoggerFactory.getLogger('EmailModule');
 @Module({})
 export class EmailModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
-    logger.log('init...');
+    logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
 
     await this.initKV();
     await EmailHelper.init();

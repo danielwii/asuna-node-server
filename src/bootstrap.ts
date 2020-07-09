@@ -67,7 +67,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
-  // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
+  logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
   const dbConfig = await getConnectionOptions();
   logger.log(

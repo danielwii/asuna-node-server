@@ -9,7 +9,7 @@ import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 import { emptyOr, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
-import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamicConfigs';
+import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamic_configs';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
 import { MinioConfigObject, QiniuConfigObject } from '../core/storage/storage.config';
 import { StorageMode } from '../core/storage/storage.engines';
@@ -31,7 +31,9 @@ export class EmailHelper {
   static tmplKvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'templates' };
 
   static async getConfig(): Promise<EmailConfigObject> {
-    return new EmailConfigObject(await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys));
+    const kv = await KvHelper.get(this.kvDef);
+    const configObject = new EmailConfigObject(await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys));
+    return !_.isEmpty(kv) ? configObject : EmailConfigObject.load();
   }
 
   static async getTmplConfig(): Promise<EmailTmplConfigObject> {
@@ -66,7 +68,7 @@ export class EmailHelper {
       };
       EmailHelper.transporter = createTransport(transport);
     } else {
-      logger.warn(`EMAIL settings must be set up to send mail in real world ${r(config)}`);
+      logger.warn(`EMAIL settings must be set up and enabled to send mail in real world ${r(config)}`);
       EmailHelper.transporter = createTransport({ jsonTransport: true });
     }
 

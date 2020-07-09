@@ -5,12 +5,13 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as Sentry from '@sentry/node';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { IdGenerators } from './modules/base/generator';
 import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
-import { RedisProvider } from './modules/providers';
+import { SentryConfigObject } from './modules/config/sentry.config';
 import { CronHelper } from './modules/helper';
-import { IdGenerators } from './modules/base/generator';
+import { RedisProvider } from './modules/providers';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 
@@ -30,9 +31,10 @@ export class LifecycleRegister {
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   static async onInit(app: NestExpressApplication): Promise<void> {
-    logger.debug(`[onInit] ...`);
-    if (configLoader.loadBoolConfig(ConfigKeys.SENTRY_ENABLE)) {
-      const dsn = configLoader.loadConfig(ConfigKeys.SENTRY_DSN);
+    const config = SentryConfigObject.load();
+    logger.debug(`[onInit] ... ${r(config)}`);
+    if (config.enable) {
+      const { dsn } = config;
       logger.debug(`[onInit] sentry ... ${dsn}`);
       Sentry.init({ dsn, debug: configLoader.loadConfig(ConfigKeys.DEBUG) });
 

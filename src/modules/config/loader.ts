@@ -21,6 +21,13 @@ export class AbstractConfigLoader<Config> {
   }
 }
 
+export enum YamlConfigKeys {
+  graphql = 'graphql',
+  sentry = 'sentry',
+  tracing = 'tracing',
+  email = 'email',
+}
+
 export const ConfigKeys = {
   ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',
   SECRET_KEY: 'SECRET_KEY',
@@ -36,13 +43,13 @@ export const ConfigKeys = {
   LOGGER_LEVEL: 'LOGGER_LEVEL',
   MASTER_ADDRESS: 'MASTER_ADDRESS',
 
-  GRAPHQL_PLAYGROUND_ENABLE: 'GRAPHQL_PLAYGROUND_ENABLE',
-  GRAPHQL_DEBUG: 'GRAPHQL_DEBUG',
+  // GRAPHQL_PLAYGROUND_ENABLE: 'GRAPHQL_PLAYGROUND_ENABLE',
+  // GRAPHQL_DEBUG: 'GRAPHQL_DEBUG',
 
   CHROMIUM_PATH: 'CHROMIUM_PATH',
   CRON_ENABLE: 'CRON_ENABLE',
-  SENTRY_ENABLE: 'SENTRY_ENABLE',
-  SENTRY_DSN: 'SENTRY_DSN',
+  // SENTRY_ENABLE: 'SENTRY_ENABLE',
+  // SENTRY_DSN: 'SENTRY_DSN',
   // ROOKOUT_TOKEN: 'ROOKOUT_TOKEN',
 
   RATE_LIMIT_ENABLED: 'RATE_LIMIT_ENABLED',
