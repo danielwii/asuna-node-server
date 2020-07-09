@@ -48,7 +48,7 @@ export interface BootstrapOptions {
   // dirname?: string;
   staticAssets?: string;
   viewsDir?: string;
-  // viewEngine?: string;
+  viewEngine?: string;
   typeormEntities?: string[];
   version?: string;
   /**
@@ -67,6 +67,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
+  // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
   const dbConfig = await getConnectionOptions();
   logger.log(
@@ -188,7 +189,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   if (options.viewsDir) {
     app.setBaseViewsDir(options.viewsDir);
-    app.setViewEngine('hbs');
+    app.setViewEngine(options.viewEngine ?? 'hbs');
   }
 
   // app.use(csurf());
