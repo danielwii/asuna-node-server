@@ -1,6 +1,17 @@
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Order, PageInfo, PageRequest, toPage } from '../core/helpers';
 
+export class SorterInput {
+  @IsString()
+  @IsOptional()
+  column?: string;
+
+  @IsOptional()
+  order?: Order;
+}
+
+export const toOrder = (sorter: SorterInput) => (sorter?.column ? { [sorter.column]: sorter.order ?? Order.ASC } : {});
+
 export class PageRequestInput implements PageRequest {
   @IsInt()
   @IsOptional()
@@ -11,7 +22,7 @@ export class PageRequestInput implements PageRequest {
   size?: number;
 
   @IsOptional()
-  orderBy?: { column: string; order?: Order };
+  orderBy?: SorterInput;
 
   /**
    * @deprecated {@see toPage}

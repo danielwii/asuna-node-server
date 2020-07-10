@@ -2,6 +2,7 @@ import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
 import { LoggerFactory } from '../../common/logger';
+import { SorterInput } from '../../graphql';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
@@ -20,7 +21,7 @@ export const DefaultPageRequest: PageRequest = {
 export interface PageRequest {
   page?: number;
   size?: number;
-  orderBy?: { column: string; order?: Order };
+  orderBy?: { column?: string; order?: Order };
 }
 
 const logger = LoggerFactory.getLogger('PageHelper');
