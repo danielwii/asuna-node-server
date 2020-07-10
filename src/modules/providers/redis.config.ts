@@ -59,7 +59,7 @@ export class RedisConfigObject {
     return {
       host: this.host,
       port: this.port,
-      ...emptyOr(this.password, { password: this.password }),
+      ...emptyOr(!!this.password, { password: this.password }),
       db: this.db,
       // connect_timeout: 10_000,
       retry_strategy: (options) => {
