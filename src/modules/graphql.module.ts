@@ -30,7 +30,7 @@ export class GraphqlModule implements OnModuleInit {
     const config = GraphQLConfigObject.load();
     const typePaths = [
       // '../**/*.graphql',
-      `${join(__dirname, '../../src')}/**/*.graphql`,
+      `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
       `${join(dir, '../src')}/**/*.graphql`,
     ];
     logger.log(`typePaths is ${r({ typePaths, config })}`);

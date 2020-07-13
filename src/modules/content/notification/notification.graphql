@@ -1,0 +1,28 @@
+enum NotificationType {
+  float
+  system
+}
+
+type Notification implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  usage: String
+  type: NotificationType!
+
+  isPublished: Boolean
+}
+
+type MixedNotification {
+  origin: Notification
+  read: Boolean
+}
+
+extend type Query {
+  api_notification(id: String): MixedNotification
+  api_notifications(type: NotificationType, usage: String): [MixedNotification]
+}
