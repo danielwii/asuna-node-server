@@ -1,12 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
-import { Notification, NotificationType } from './notification.entities';
-import { RegisteredLoaders } from 'server/src/domains/dataloaders';
-import { MixedNotification, NotificationHelper } from './notification.helper';
+import { emptyOr, r } from '../../common/helpers';
+import { DefaultRegisteredLoaders } from '../../dataloader/context';
+import { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 import { GraphqlHelper, QueryResolver } from '../../graphql';
-import { GraphqlContext } from '../../dataloader';
-import { emptyOr } from '../../common/helpers';
+import { NotificationType } from './enum-values';
+import { Notification } from './notification.entities';
+import { MixedNotification, NotificationHelper } from './notification.helper';
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {
@@ -17,10 +18,7 @@ export class NotificationQueryResolver extends QueryResolver {
   }
 
   @Query()
-  async api_notification(
-    @Args('id') id: number,
-    @Context() ctx: GraphqlContext<RegisteredLoaders>,
-  ): Promise<MixedNotification> {
+  async api_notification(@Args('id') id: number, @Context() ctx: GraphqlContext): Promise<MixedNotification> {
     this.logger.log(`api_notification: ${r({ id })}`);
     const { notifications: loader } = ctx.getDataLoaders();
     const origin = await loader.load(id);
@@ -31,11 +29,11 @@ export class NotificationQueryResolver extends QueryResolver {
   async api_notifications(
     @Args('type') type: NotificationType,
     @Args('usage') usage: string,
-    @Context() ctx: GraphqlContext<RegisteredLoaders>,
+    @Context() ctx: GraphqlContext,
   ): Promise<MixedNotification[]> {
     this.logger.log(`api_notifications: ${r({ type, usage })}`);
 
-    return GraphqlHelper.handleDefaultQueryRequest<Notification, RegisteredLoaders, MixedNotification>({
+    return GraphqlHelper.handleDefaultQueryRequest<Notification, DefaultRegisteredLoaders, MixedNotification>({
       cls: Notification,
       ctx,
       loader: (loaders) => loaders.notifications,
