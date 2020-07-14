@@ -10,7 +10,7 @@ import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
-import { dirname, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import * as responseTime from 'response-time';
 import { Connection, getConnectionOptions } from 'typeorm';
 // import * as rookout from 'rookout';
@@ -240,6 +240,7 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const suffix = packageDir.includes('node_modules') ? 'js' : 'ts';
   const entities = [
     `${resolve(packageDir)}/**/*entities.${suffix}`,
+    `${resolve(rootDir, '../..')}/packages/*/src/**/*entities.${suffix}`,
     `${resolve(rootDir)}/**/*entities.ts`,
     ...(options.typeormEntities || []),
   ];
