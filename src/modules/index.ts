@@ -16,6 +16,7 @@ export * from './graphql';
 export * from './helper';
 export * from './ids';
 export * from './payments';
+export * from './property';
 export * from './providers';
 export * from './core/auth/auth.module';
 export * from './core/auth/strategy/jwt.strategy';

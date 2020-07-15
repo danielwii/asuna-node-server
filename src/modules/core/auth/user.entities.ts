@@ -1,13 +1,11 @@
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
-// eslint-disable-next-line import/no-cycle
+import { FinancialTransaction, PointExchange, Wallet } from '../../property';
 import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
-// eslint-disable-next-line import/no-cycle
-import { UserRegister } from '../user.register';
-// eslint-disable-next-line import/no-cycle
-import { AbstractTimeBasedAuthUser } from './base.entities';
 import { UserFollow } from '../interaction/follow.entities';
+import { UserRegister } from '../user.register';
+import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
 @Entity('auth__t_user_profiles')
@@ -21,6 +19,15 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
 
   @OneToMany((type) => UserFollow, (follow) => follow.follower)
   follows: UserFollow[];
+
+  @OneToMany((type) => PointExchange, (points) => points.profile)
+  exchangeRecords: PointExchange[];
+
+  @OneToMany((type) => FinancialTransaction, (transaction) => transaction.profile)
+  financialTransactions: FinancialTransaction[];
+
+  @OneToOne((type) => Wallet, (wallet) => wallet.profile)
+  wallet: Wallet;
 
   /* use AuthedUserHelper.createProfile
   @AfterInsert()

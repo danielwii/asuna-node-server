@@ -1,0 +1,85 @@
+enum ExchangeCurrencyType {
+  points
+  balance
+}
+
+type ExchangeObject implements BaseNameEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  key: String!
+  type: ExchangeCurrencyType!
+  price: Int!
+
+  isPublished: Boolean
+}
+
+type ExchangeRecord implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  type: String
+  remark: String
+  change: Int!
+  before: Int!
+  after: Int!
+  refId: String
+  body: String
+
+  #  user: User
+}
+
+type FinancialTransaction implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  type: String
+  remark: String
+  change: Int!
+  before: Int!
+  after: Int!
+  refId: String
+  extra: Any
+
+  #  user: User
+}
+
+type Wallet implements BaseEntity {
+  id: Int!
+  createdAt: Date!
+  updatedAt: Date!
+
+  balance: Int!
+  available: Int!
+  frozen: Int!
+  points: Int!
+
+  #  user: User
+}
+
+type APIPagedExchangeRecord implements PagedQuery {
+  total: Int
+  page: Int
+  size: Int
+  items: [ExchangeRecord]
+}
+
+type APIPagedFinancialTransaction implements PagedQuery {
+  total: Int
+  page: Int
+  size: Int
+  items: [FinancialTransaction]
+}
+
+extend type Query {
+  user_paged_exchangeRecords(type: String, refId: String, pageRequest: PageRequest): APIPagedExchangeRecord
+  user_paged_financialTransactions(type: String, refId: String, pageRequest: PageRequest): APIPagedFinancialTransaction
+
+  api_exchangeObjects(type: ExchangeCurrencyType): [ExchangeObject]
+}
