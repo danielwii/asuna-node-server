@@ -17,24 +17,24 @@ export class CacheManager {
    * @param resolver
    * @param seconds
    */
-  static async cacheable<T>(key: string | object, resolver: () => Promise<T>, seconds?: number): Promise<T> {
+  static async cacheable<T>(key: any, resolver: () => Promise<T>, seconds?: number): Promise<T> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const cacheValue = this.cache.get(cacheKey);
     // logger.debug(`cacheable ${r({ key, cacheKey, cacheValue })}`);
     if (cacheValue) return cacheValue;
 
     const value = await resolver();
-    this.cache.set(cacheKey, value, seconds ? seconds * 1000 : null);
+    this.cache.set(cacheKey, value, seconds ? seconds * 1000 : undefined);
     logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 
-  static set(key: string | object, value, ttl?: number): void {
+  static set(key: any, value, ttl?: number): void {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
-    this.cache.set(cacheKey, value, ttl ? ttl * 1000 : null);
+    this.cache.set(cacheKey, value, ttl ? ttl * 1000 : undefined);
   }
 
-  static get<T = any>(key: string | object): T {
+  static get<T = any>(key: any): T {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.get(cacheKey);
   }
@@ -43,14 +43,14 @@ export class CacheManager {
     this.cache.reset();
   }
 
-  static async clear(key: string | object): Promise<void> {
+  static async clear(key: any): Promise<void> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.del(cacheKey);
   }
 }
 
 export function Cacheable(options: { type?: 'default' | 'short'; key: string }) {
-  return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     let { cache } = CacheManager;
     if (options.type === 'short') {
       cache = CacheManager.shortCache;

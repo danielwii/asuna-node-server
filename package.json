@@ -170,7 +170,7 @@
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
-    "snyk": "^1.361.3",
+    "snyk": "^1.362.0",
     "sqlite3": "^4.2.0",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.2",

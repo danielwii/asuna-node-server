@@ -1,11 +1,13 @@
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
-import { FinancialTransaction, PointExchange, Wallet } from '../../property';
-import { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
-import { UserFollow } from '../interaction/follow.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
+
+import type { FinancialTransaction, Wallet } from '../../property/financial.entities';
+import type { PointExchange } from '../../property/points.entities';
+import type { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
+import type { UserFollow } from '../interaction/follow.entities';
 
 @EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
 @Entity('auth__t_user_profiles')
@@ -14,19 +16,19 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
     super('u');
   }
 
-  @OneToOne((type) => WXMiniAppUserInfo, (info) => info.profile)
+  @OneToOne('WXMiniAppUserInfo', 'profile')
   miniAppUserInfo: WXMiniAppUserInfo;
 
-  @OneToMany((type) => UserFollow, (follow) => follow.follower)
+  @OneToMany('UserFollow', 'follower')
   follows: UserFollow[];
 
-  @OneToMany((type) => PointExchange, (points) => points.profile)
+  @OneToMany('PointExchange', 'profile')
   exchangeRecords: PointExchange[];
 
-  @OneToMany((type) => FinancialTransaction, (transaction) => transaction.profile)
+  @OneToMany('FinancialTransaction', 'profile')
   financialTransactions: FinancialTransaction[];
 
-  @OneToOne((type) => Wallet, (wallet) => wallet.profile)
+  @OneToOne('Wallet', 'profile')
   wallet: Wallet;
 
   /* use AuthedUserHelper.createProfile

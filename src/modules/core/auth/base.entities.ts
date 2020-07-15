@@ -2,8 +2,8 @@ import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base';
 import { MetaInfo } from '../../common/decorators';
-// eslint-disable-next-line import/no-cycle
-import { UserProfile } from './user.entities';
+
+import type { UserProfile } from './user.entities';
 
 export enum AuthUserChannel {
   default = 'default',

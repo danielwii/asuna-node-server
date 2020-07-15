@@ -2,7 +2,7 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { CacheUtils } from '../../cache';
+import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
 import {
   AsunaErrorCode,

@@ -2,9 +2,10 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'ty
 import { Publishable } from '../../base';
 import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { Tenant } from '../../tenant/tenant.entities';
 import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
+
+import type { Tenant } from '../../tenant/tenant.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
@@ -31,8 +32,7 @@ export class Role extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   authorities: JsonMap;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @ManyToMany((type) => AdminUser, (user) => user.roles)
+  @ManyToMany('AdminUser', 'roles')
   users: AdminUser[];
 }
 
@@ -44,7 +44,7 @@ export class AdminUser extends AbstractTimeBasedAuthUser {
   }
 
   @MetaInfo({ name: 'Tenant' })
-  @ManyToOne((type) => Tenant, (tenant) => tenant.users, { onDelete: 'SET NULL' })
+  @ManyToOne('Tenant', 'users', { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'tennat__id' })
   tenant: Tenant;
 

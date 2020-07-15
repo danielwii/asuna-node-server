@@ -63,8 +63,7 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   // Relations
   // --------------------------------------------------------------
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToMany((type) => TaskEvent, (event) => event.task)
+  @OneToMany('TaskEvent', 'task')
   events: TaskEvent[];
 }
 

@@ -14,7 +14,8 @@ import { AdminUser } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
 import { StatsResult } from '../stats';
-import { WeChatUser, WxHelper } from '../wechat';
+import { WeChatUser } from '../wechat/wechat.entities';
+import { WxHelper } from '../wechat/wx.helper';
 import { Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
 

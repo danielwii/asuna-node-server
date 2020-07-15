@@ -10,7 +10,7 @@ import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { RedisConfigObject } from '../../providers';
 import { AbstractAuthUser } from '../auth/base.entities';
-import { random } from '../helpers';
+import { random } from '../helpers/random.helper';
 import { IAsunaAction, IAsunaCommand, IAsunaEvent, IAsunaJob, IAsunaObserver, IAsunaRule } from './interfaces';
 
 const logger = LoggerFactory.getLogger('Hermes');
@@ -122,14 +122,14 @@ export class Hermes {
 
     Hermes.subject.subscribe(
       (event: IAsunaEvent) => {
-        Hermes.observers.forEach(observer => {
+        Hermes.observers.forEach((observer) => {
           if (observer.routePattern !== 'fanout' && !observer.routePattern.test(event.name)) {
             return;
           }
           observer.next(event);
         });
       },
-      error => logger.error(`error occurred: ${error}`, error.trace),
+      (error) => logger.error(`error occurred: ${error}`, error.trace),
       () => logger.log('Hermes completed'),
     );
 
@@ -150,7 +150,7 @@ export class Hermes {
   static emitEvents(source: string, events: IAsunaEvent[]) {
     logger.log(`emit events from [${source}]: ${r(events)}`);
     if (events && events.length > 0) {
-      events.forEach(async event => {
+      events.forEach(async (event) => {
         const errors = await validate(event);
         if (errors && errors.length > 0) {
           return logger.warn(`validate error. event: ${r(event)}, errors: ${r(errors)}`);
@@ -224,7 +224,7 @@ export class Hermes {
             const isPromise = typeof result.then === 'function';
             logger.log(`job(${jobId}) call func in defer ... result is ${r(result)} ${typeof result}`);
             if (isPromise) {
-              return fromPromise<any>(result.then(value => ({ result: value, jobId, data })));
+              return fromPromise<any>(result.then((value) => ({ result: value, jobId, data })));
             }
             return result instanceof Observable ? of({ jobId, data, result }) : of(result);
           });
@@ -246,7 +246,7 @@ export class Hermes {
             at: new Date().toUTCString(),
           });
         },
-        error => {
+        (error) => {
           const { jobId, data } = error;
           logger.warn(`job(${jobId}) error occurred in ${queueName}: ${r(error)}`);
           if (jobId && this.getInMemoryQueue(queueName).status[jobId]) {
@@ -360,7 +360,7 @@ export class HermesProcessManager {
           logger.warn(`no events parsed from command: ${r(command)}`);
           return;
         }
-        events.forEach(event => {
+        events.forEach((event) => {
           logger.log(`handle event: ${r(event)}`);
           this.dispatch(event);
         });
@@ -372,13 +372,13 @@ export class HermesProcessManager {
 
   static dispatch(event: IAsunaEvent) {
     if (event.rules && event.rules.length > 0) {
-      event.rules.forEach(rule => {
+      event.rules.forEach((rule) => {
         logger.log(`handle rule ${r(rule)}`);
         if (rule.actions && rule.actions.length > 0) {
-          rule.actions.forEach(action => {
+          rule.actions.forEach((action) => {
             logger.log(`add jobs to queue in action: ${r(action)}`);
             if (action.jobs && action.jobs.length > 0) {
-              action.jobs.forEach(job => {
+              action.jobs.forEach((job) => {
                 logger.log(`send ${r(job)} to queue ${this.queue.name}`);
                 // this.queue.queue.next(job);
                 // eslint-disable-next-line no-param-reassign

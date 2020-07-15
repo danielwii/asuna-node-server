@@ -19,14 +19,10 @@ import { emptyOr, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import {
-  DataLoaderFunction,
-  DefaultRegisteredLoaders,
-  GraphqlContext,
-  resolveRelationsFromInfo,
-  resolveSelectsFromInfo,
-} from '../dataloader';
+import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/dataloader';
 import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from './input';
+
+import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 

@@ -1,7 +1,7 @@
 import { Column } from 'typeorm';
-import { AbstractBaseEntity } from '../base';
-import { JsonMap } from '../common/decorators';
-import { ColumnTypeHelper } from '../core/helpers';
+import { AbstractBaseEntity } from '../base/base.entity';
+import { JsonMap } from '../common/decorators/meta.decorator';
+import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 export class AbstractTransactionEntity extends AbstractBaseEntity {
   @Column({ nullable: false, name: 'change' })

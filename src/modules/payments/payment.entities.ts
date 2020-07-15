@@ -2,8 +2,8 @@ import { html } from 'common-tags';
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
-import { InjectMultiUserProfile } from '../core/auth';
-import { ColumnTypeHelper } from '../core/helpers';
+import { InjectMultiUserProfile } from '../core/auth/user.entities';
+import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
 
 /**
@@ -94,8 +94,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column('varchar', { nullable: true, name: 'type', default: PaymentMethodEnumValue.types.third })
   type: PaymentMethodType;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToMany((type) => PaymentTransaction, (transaction) => transaction.method)
+  @OneToMany('PaymentTransaction', 'method')
   transactions: PaymentTransaction[];
 }
 
@@ -129,8 +128,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   images: JsonArray;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @ManyToMany((type) => PaymentOrder, (offer) => offer.items, { primary: true })
+  @ManyToMany('PaymentOrder', 'items', { primary: true })
   orders: PaymentOrder[];
 }
 
@@ -163,8 +161,7 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   data: Record<string, unknown>;
 
   @MetaInfo({ name: '订单' })
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToOne((type) => PaymentOrder, (order) => order.transaction, { onDelete: 'CASCADE' })
+  @OneToOne('PaymentOrder', 'transaction', { onDelete: 'CASCADE' })
   order: any; // PaymentOrder;
 }
 
@@ -193,7 +190,6 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   transaction: PaymentTransaction;
 
   @MetaInfo({ name: '订单内容' })
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   @ManyToMany((type) => PaymentItem, (item) => item.orders, { primary: true })
   @JoinTable({
     name: 'payment__tr_order_items',

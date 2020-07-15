@@ -34,8 +34,7 @@ export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   status: FeedbackStatusType;
 
   @MetaInfo({ name: '回复' })
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToMany((type) => FeedbackReply, (reply) => reply.feedback)
+  @OneToMany('FeedbackReply', 'feedback')
   replies: FeedbackReply[];
 }
 

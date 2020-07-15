@@ -31,8 +31,7 @@ export class AppInfo extends Publishable(AbstractNameEntity) {
   @Column('varchar', { nullable: true, name: 'mode' })
   mode: keyof typeof Mode;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  @OneToMany((type) => AppRelease, (release) => release.appInfo)
+  @OneToMany('AppRelease', 'appInfo')
   releases: AppRelease[];
 }
 

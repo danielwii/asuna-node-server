@@ -11,7 +11,9 @@ import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
-import { AdminUser, AuthedUserHelper, AuthUserChannel, TokenHelper } from '../core/auth';
+import { AuthedUserHelper, AuthUserChannel } from '../core/auth';
+import { TokenHelper } from '../core/auth/abstract.auth.service';
+import { AdminUser } from '../core/auth/auth.entities';
 import { UserProfile } from '../core/auth/user.entities';
 import { Hermes } from '../core/bus';
 import { PageHelper } from '../core/helpers/page.helper';
@@ -20,7 +22,8 @@ import { Store } from '../store';
 import { AdminWsHelper } from '../ws';
 import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
-import { MiniSubscribeInfo, TemplateMsgInfo, WxApi, WxHelper } from './wx.api';
+import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
+import { WxHelper } from './wx.helper';
 import {
   GetPhoneNumber,
   MiniSubscribeData,

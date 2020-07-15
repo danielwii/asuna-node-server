@@ -36,7 +36,7 @@ export enum AsunaSocketEvents {
 }
 
 export type AsunaSocketViewsType = number;
-export type AsunaSocketEventsType = { event: string; data: object };
+export type AsunaSocketEventsType = { event: string; data: Record<string, unknown> };
 export type AsunaSocketRoomsType = { namespace; sids; rooms };
 
 @WebSocketGateway({

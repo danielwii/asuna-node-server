@@ -2,12 +2,12 @@ import { Logger } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
 import { emptyOr, r } from '../../common/helpers';
-import { DefaultRegisteredLoaders } from '../../dataloader/context';
-import { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { NotificationType } from './enum-values';
 import { Notification } from './notification.entities';
 import { MixedNotification, NotificationHelper } from './notification.helper';
+
+import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader';
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {

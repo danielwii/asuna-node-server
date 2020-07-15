@@ -31,18 +31,6 @@ const levels = {
 
 const logger = LoggerFactory.getLogger('LoggerService');
 
-export class LoggerHelper {
-  static getLoggerService(): LoggerService | LogLevel[] | boolean {
-    if (process.env.NODE_ENV === 'production') {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return new WinstonLoggerService();
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new SimpleLoggerService();
-  }
-}
-
 export class SimpleLoggerService extends Logger {
   error(message: any, trace?: string, context?: string): any {
     super.error(typeof message === 'object' ? r(message) : message, trace, context);
@@ -140,7 +128,7 @@ export class WinstonLoggerService {
         if (meta.reqId) {
           reqId = clc.cyan(`[${meta.reqId}]`);
         }
-        const ctx = meta.context || this.context || null;
+        const ctx = meta.context || this.context || undefined;
         if (ctx) {
           const module = fixedPath(ctx, 26).slice(0, 26);
           context = clc.blackBright(`[${module}]`).padEnd(38);
@@ -175,5 +163,15 @@ export class WinstonLoggerService {
 
     // 17 because of the color bytes
     return colorFunc(`[${level.toUpperCase()}]`).padEnd(17);
+  }
+}
+
+export class LoggerHelper {
+  static getLoggerService(): LoggerService | LogLevel[] | boolean {
+    if (process.env.NODE_ENV === 'production') {
+      return new WinstonLoggerService();
+    }
+
+    return new SimpleLoggerService();
   }
 }

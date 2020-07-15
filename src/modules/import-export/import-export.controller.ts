@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { LoggerFactory } from '../common/logger';
 import { ImportExportService } from './import-export.service';
@@ -36,10 +27,7 @@ export class ImportExportController {
   @Get('export')
   exportExcel(@Res() res, @Body() body: any[]) {
     const buf = this.importExportService.exportExcel(body);
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    );
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     logger.log('export excel');
     res.send(buf);
   }

@@ -1,14 +1,10 @@
 import * as _ from 'lodash';
-import { AfterUpdate, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
-import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
-import { CacheUtils } from '../../cache';
+import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
+import { AbstractBaseEntity } from '../../base';
+import { CacheUtils } from '../../cache/utils';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { ColumnTypeHelper } from '../helpers';
-
-export enum KVModelFormatType {
-  KVGroupFieldsValue = 'KVGroupFieldsValue',
-  LIST = 'LIST',
-}
+import { ColumnTypeHelper } from '../helpers/column.helper';
+import type { KeyValueModel } from './kv.isolated.entities';
 
 export enum KeyValueType {
   string = 'string',
@@ -49,32 +45,11 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   extra?: JsonMap;
 
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  // @OneToOne(type => KeyValueModel, model => model.pair)
-  // model: KeyValueModel;
+  @OneToOne('KeyValueModel', 'pair')
+  model: KeyValueModel;
 
   @AfterUpdate()
   afterUpdate(): void {
     CacheUtils.clear({ prefix: 'kv', key: _.pick(this, 'collection', 'key') });
   }
-}
-
-@EntityMetaInfo({ name: 'kv__models', internal: true })
-@Entity('kv__t_models')
-export class KeyValueModel extends Publishable(AbstractNameEntity) {
-  @MetaInfo({ accessible: 'hidden' })
-  @Column({ nullable: true, /* length: 36, */ name: 'pair__id' })
-  pairId?: number;
-
-  @OneToOne(
-    (type) => KeyValuePair,
-    // pair => pair.model,
-    { onDelete: 'CASCADE' },
-  )
-  @JoinColumn({ name: 'pair__id' })
-  pair: KeyValuePair;
-
-  @MetaInfo({ name: 'FormatType', type: 'Enum', enumData: KVModelFormatType })
-  @Column('varchar', { nullable: true, name: 'format_type' })
-  formatType?: KVModelFormatType;
 }

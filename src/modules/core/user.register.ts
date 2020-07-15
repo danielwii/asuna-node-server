@@ -2,10 +2,10 @@ import { BaseEntity } from 'typeorm';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-// eslint-disable-next-line import/no-cycle
-import { UserProfile } from './auth/user.entities';
 import { DBHelper } from './db';
-import { Constructor } from '../base/abilities';
+
+import type { Constructor } from '../base/abilities';
+import type { UserProfile } from './auth/user.entities';
 
 const logger = LoggerFactory.getLogger('UserRegister');
 

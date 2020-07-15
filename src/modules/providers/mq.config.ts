@@ -42,16 +42,13 @@ export class MQConfigObject {
     });
   }
 
-  static loadOr(prefix = ''): MQConfigObject | undefined {
+  static loadOr(prefix = ''): MQConfigObject {
     const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
     if (enable === true) {
       return MQConfigObject.load(prefix);
     }
-    if (enable === false) {
-      return undefined;
-    }
-    return MQConfigObject.load();
+    return enable !== false ? MQConfigObject.load() : undefined;
   }
 }

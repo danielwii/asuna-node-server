@@ -12,7 +12,8 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
-import { DefaultRegisteredLoaders } from './context';
+
+import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoader');
 
@@ -33,7 +34,7 @@ function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Ent
       if (_.isArray(ids)) {
         return !_.isEmpty(ids) ? (dataloader.loadMany(ids as PrimaryKey[]).then(fp.compact) as any) : null;
       }
-      return ids ? dataloader.load(ids as PrimaryKey) : null;
+      return ids ? dataloader.load(ids as PrimaryKey) : undefined;
     },
   };
 }
@@ -225,7 +226,7 @@ export function resolveRelationsFromInfo(
   try {
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
-    if (fieldNode == null) return false;
+    if (_.isNil(fieldNode)) return false;
 
     let selectionNode;
     _.times(locations.length - 1).forEach((index) => {
@@ -252,7 +253,7 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
     const locations = path.split('.');
     const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
 
-    if (fieldNode == null) return null;
+    if (_.isNil(fieldNode)) return null;
 
     let selectionNode;
     _.times(locations.length - 1).forEach((index) => {

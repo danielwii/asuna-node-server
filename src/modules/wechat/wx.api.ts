@@ -4,13 +4,11 @@ import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
-import { CacheManager } from '../cache';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely } from '../common/helpers';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
-import { RedisLockProvider, RedisProvider } from '../providers';
+import { WxHelper } from './wx.helper';
 import {
   MiniSubscribeData,
   SubscribeMessageInfo,
@@ -143,10 +141,6 @@ type GetMiniCode = {
   // false	否	是否需要透明底色，为 true 时，生成透明底色的小程序码
   is_hyaline?: boolean;
 };
-
-enum WxKeys {
-  accessToken = 'wx-access-token',
-}
 
 export type TemplateMsgInfo = TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo;
 
@@ -313,7 +307,6 @@ export class WxApi {
   }
 
   static async withConfig<T>(call: (config: WeChatServiceConfig) => Promise<T>): Promise<T> {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const config = await WxHelper.getServiceConfig();
     if (!config.enabled) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'wx service config not enabled');
@@ -322,7 +315,6 @@ export class WxApi {
   }
 
   static async withMiniConfig<T>(call: (config: WeChatServiceConfig) => Promise<T>): Promise<T> {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const config = await WxHelper.getServiceConfig();
     if (!config.miniEnabled) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'wx mini app config not enabled');
@@ -334,9 +326,7 @@ export class WxApi {
     fn: (config: WeChatServiceConfig, opts: { accessToken: string }) => Promise<T>,
     mini?: boolean,
   ): Promise<T> {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const config = await WxHelper.getServiceConfig();
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     const accessToken = await WxHelper.getAccessToken(mini);
     return fn(config, { accessToken });
   }
@@ -372,58 +362,4 @@ export enum WeChatFieldKeys {
   miniEnabled = 'mini.enabled',
   miniAppId = 'mini.appid',
   miniAppSecret = 'mini.appsecret',
-}
-
-export class WxHelper {
-  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_WECHAT, key: 'config' };
-
-  static async getServiceConfig(): Promise<WeChatServiceConfig> {
-    return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(WxHelper.kvDef, WeChatFieldKeys));
-  }
-
-  static async getAccessToken(mini?: boolean): Promise<string> {
-    const key = mini ? `${WxKeys.accessToken}#mini` : WxKeys.accessToken;
-    const redis = RedisProvider.instance.getRedisClient('wx');
-    // redis 未启用时将 token 保存到内存中，2h 后过期
-    if (!redis.isEnabled) {
-      return CacheManager.cacheable(
-        key,
-        async () => {
-          logger.warn(
-            `redis is not enabled, ${
-              mini ? 'mini' : ''
-            } access token will store in memory and lost when app restarted.`,
-          );
-          return (await WxApi.getAccessToken({ mini })).access_token;
-        },
-        2 * 3600,
-      );
-    }
-
-    // redis 存在未过期的 token 时直接返回
-    const accessToken = await Promise.promisify(redis.client.get).bind(redis.client)(key);
-    if (accessToken) return accessToken;
-
-    const token = await RedisLockProvider.instance
-      .lockProcess(
-        key,
-        async () => {
-          const result = await WxApi.getAccessToken({ mini });
-          if (result.access_token) {
-            logger.debug(`getAccessToken with key(${key}): ${r(result)}`);
-            // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间
-            await Promise.promisify(redis.client.setex).bind(redis.client)(key, result.expires_in, result.access_token);
-            return result.access_token;
-          }
-          throw new AsunaException(AsunaErrorCode.Unprocessable, 'get access token error', result);
-        },
-        { ttl: 60 },
-      )
-      .catch((reason) => logger.error(reason));
-    logger.debug(`access token is ${r(token)}`);
-    if (!token) {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, 'no access token got');
-    }
-    return token;
-  }
 }

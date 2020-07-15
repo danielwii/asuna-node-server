@@ -2,7 +2,6 @@ import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
 import { LoggerFactory } from '../../common/logger';
-import { SorterInput } from '../../graphql';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;

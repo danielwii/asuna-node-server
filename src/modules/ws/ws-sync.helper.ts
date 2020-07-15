@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { InMemoryDB } from '../cache/db';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
-import { CronHelper } from '../helper';
+import { CronHelper } from '../helper/cron';
 import { StatsHelper } from '../stats';
 import { AdminWsHelper } from './socket-io.gateway';
 

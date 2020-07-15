@@ -30,7 +30,7 @@ export class RedisIoAdapter extends IoAdapter {
         {
           host: configObject.host,
           port: configObject.port,
-          ...(configObject.password ? { password: configObject.password } : null),
+          ...(configObject.password ? { password: configObject.password } : undefined),
           db,
         } as any /* db is not included in redisIoAdapter */,
       );

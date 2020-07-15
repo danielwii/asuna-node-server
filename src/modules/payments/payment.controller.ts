@@ -4,8 +4,8 @@ import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
-import { WeChatHelper } from '../wechat';
+import { JwtAuthGuard, JwtAuthRequest } from '../core/auth/auth.guard';
+import { WeChatHelper } from '../wechat/wechat.helper';
 import { PaymentHelper } from './payment.helper';
 
 class CreateOrderDTO {

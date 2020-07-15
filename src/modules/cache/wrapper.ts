@@ -7,14 +7,14 @@ const logger = LoggerFactory.getLogger('CacheWrapper');
 
 type CacheWrapperDoOptions<V> = {
   prefix?: string;
-  key: string | object;
+  key: any;
   resolver: () => Promise<V>;
   expiresInSeconds?: number;
   strategy?: 'cache-only' | 'cache-first';
 };
 
 export class CacheWrapper {
-  static calcKey({ prefix, key }: { prefix?: string; key: string | object }): string {
+  static calcKey({ prefix, key }: { prefix?: string; key: any }): string {
     return `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
   }
 
@@ -63,7 +63,7 @@ export class CacheWrapper {
     return value; */
   }
 
-  static async clear(opts: { prefix?: string; key: string | object }): Promise<void> {
+  static async clear(opts: { prefix?: string; key: any }): Promise<void> {
     return InMemoryDB.clear(opts);
     /*
     const { key, prefix } = opts;

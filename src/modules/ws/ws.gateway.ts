@@ -10,6 +10,7 @@ import {
 import { Server } from 'ws';
 import { LoggerFactory } from '../common/logger';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../../package.json');
 
 const logger = LoggerFactory.getLogger('WSGateway(default)');
@@ -48,6 +49,7 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
 
   handleConnection(client: any, ...args: any[]): any {
     logger.log(`connected... id: ${client.id}`);
+    // eslint-disable-next-line no-param-reassign
     client.id = `id-${Date.now()}`;
     this.server.emit('events', 'hello?');
     this.server.emit(JSON.stringify({ event: 'events', data: 'server-emit-stringify-test' }));
