@@ -9,7 +9,7 @@ const logger = LoggerFactory.getLogger('MQProvider');
 
 @Injectable()
 export class MQProvider {
-  private static _instance: MQProvider = new MQProvider();
+  private static _instance: MQProvider;
 
   #connectionFuture?: amqp.Connection;
   #channel?: amqp.Channel;
@@ -65,6 +65,9 @@ export class MQProvider {
   }
 
   static get instance(): MQProvider {
+    if (_.isNil(this._instance)) {
+      this._instance = new MQProvider();
+    }
     return MQProvider._instance;
   }
 

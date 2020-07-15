@@ -33,7 +33,7 @@ export class AbstractBaseEntity extends BaseEntity {
   updatedAt?: Date;
 
   @MetaInfo({ accessible: 'hidden' })
-  @Column({ nullable: true, length: 100, name: 'updated_by' })
+  @Column('varchar', { nullable: true, length: 100, name: 'updated_by' })
   updatedBy?: string;
 
   @AfterLoad()
@@ -49,7 +49,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   readonly #idPrefix: string;
   readonly #generator: SimpleIdGenerator;
 
-  @PrimaryColumn({ length: 36 }) id?: string;
+  @PrimaryColumn('varchar', { length: 36 }) id?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;

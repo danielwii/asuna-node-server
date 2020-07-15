@@ -182,8 +182,8 @@ export class Hermes {
   static regInMemoryQueue(queueName: string): InMemoryAsunaQueue {
     ow(queueName, 'queueName', ow.string.nonEmpty);
 
-    if (this.inMemoryQueues[queueName]) {
-      return this.inMemoryQueues[queueName];
+    if (Hermes.inMemoryQueues[queueName]) {
+      return Hermes.inMemoryQueues[queueName];
     }
 
     logger.log(`reg in-memory queue: ${queueName}`);
@@ -198,25 +198,14 @@ export class Hermes {
             const message = `no handler registered for ${queueName}`;
             logger.error(message);
             status.state = 'UN_READY';
-            status.events.push({
-              state: 'UN_READY',
-              at: new Date().toUTCString(),
-              message,
-            });
-            return of({
-              jobId,
-              data,
-              result: { error: message },
-            });
+            status.events.push({ state: 'UN_READY', at: new Date().toUTCString(), message });
+            return of({ jobId, data, result: { error: message } });
           }
 
           return defer(() => {
             logger.log(`job(${jobId}) call func in defer ...`);
             status.state = 'RUNNING';
-            status.events.push({
-              state: 'RUNNING',
-              at: new Date().toUTCString(),
-            });
+            status.events.push({ state: 'RUNNING', at: new Date().toUTCString() });
             // execute the function and then examine the returned value.
             // if the returned value is *not* an Rx.Observable, then
             // wrap it using Observable.return
@@ -241,10 +230,7 @@ export class Hermes {
           }
 
           status.state = 'DONE';
-          status.events.push({
-            state: 'DONE',
-            at: new Date().toUTCString(),
-          });
+          status.events.push({ state: 'DONE', at: new Date().toUTCString() });
         },
         (error) => {
           const { jobId, data } = error;
@@ -252,11 +238,7 @@ export class Hermes {
           if (jobId && this.getInMemoryQueue(queueName).status[jobId]) {
             const status = this.getInMemoryQueue(queueName).status[jobId];
             status.state = 'ERROR';
-            status.events.push({
-              state: 'ERROR',
-              at: new Date().toUTCString(),
-              message: data,
-            });
+            status.events.push({ state: 'ERROR', at: new Date().toUTCString(), message: data });
           }
         },
       );
@@ -268,10 +250,7 @@ export class Hermes {
       status,
       next(data) {
         const jobId = random(6);
-        this.status[jobId] = {
-          state: 'PENDING',
-          events: [{ state: 'PENDING', at: new Date().toUTCString() }],
-        };
+        this.status[jobId] = { state: 'PENDING', events: [{ state: 'PENDING', at: new Date().toUTCString() }] };
         logger.log(`job(${jobId}) pending ... ${r({ data, status: this.status[jobId] })}`);
         subject.next({ jobId, data });
         return { jobId };
