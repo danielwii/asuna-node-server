@@ -1,7 +1,6 @@
 import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
-import { InteractionModule } from './core/interaction/interaction.module';
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client/client.module';
 import { r } from './common/helpers';
@@ -12,6 +11,7 @@ import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { DBModule } from './core/db';
 import { FinderModule } from './core/finder';
+import { InteractionModule } from './core/interaction/interaction.module';
 import { KvModule } from './core/kv';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
@@ -21,6 +21,7 @@ import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
+import { PropertyModule } from './property';
 import { RedisProvider } from './providers';
 import {
   AdminAppRestController,
@@ -57,6 +58,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     UploaderModule,
     ImportExportModule,
     TenantModule,
+    PropertyModule,
     TracingModule,
     CacheModule.registerAsync({
       useFactory: () => {
@@ -81,7 +83,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     TaskController,
     UploaderController,
   ],
-  exports: [AuthModule, KvModule, DBModule, TokenModule],
+  exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule],
 })
 export class AdminInternalModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {

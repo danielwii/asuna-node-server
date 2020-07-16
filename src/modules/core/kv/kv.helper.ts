@@ -19,7 +19,8 @@ import { EnumValueStatic } from '../../enum-values';
 import { auth } from '../../helper/auth';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
-import { KeyValueModel, KeyValuePair, KeyValueType, KVModelFormatType } from './kv.entities';
+import { KeyValuePair, KeyValueType } from './kv.entities';
+import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 
 const logger = LoggerFactory.getLogger('KvHelper');
 
