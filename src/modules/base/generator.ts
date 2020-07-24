@@ -1,6 +1,6 @@
-import { SimpleIdGenerator } from '../ids';
-import { AsunaErrorCode, AsunaException, LoggerFactory } from '../common';
 import * as _ from 'lodash';
+import { AsunaErrorCode, AsunaException, LoggerFactory } from '../common';
+import { SimpleIdGenerator } from '../ids';
 
 const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');
 
@@ -8,18 +8,18 @@ export class IdGenerators {
   static handlers: Record<string, SimpleIdGenerator> = {};
   static handlersByEntity: Record<string, SimpleIdGenerator> = {};
 
-  static exists(prefix: string, entity: string) {
+  static exists(prefix: string, entity: string): boolean {
     const prefixExists = _.keys(this.handlers).includes(prefix);
     const entityExists = _.keys(this.handlersByEntity).includes(entity);
     if (prefixExists && entityExists) {
       return true;
-    } else if (!prefixExists && !entityExists) {
-      return false;
-    } else {
-      logger.error(`${prefix} or ${entity} already exists in id generators.`);
-      // throw new AsunaException(AsunaErrorCode.Unprocessable, `${prefix} or ${entity} already exists in id generators.`);
+    }
+    if (!prefixExists && !entityExists) {
       return false;
     }
+    logger.error(`${prefix} or ${entity} already exists in id generators.`);
+    // throw new AsunaException(AsunaErrorCode.Unprocessable, `${prefix} or ${entity} already exists in id generators.`);
+    return false;
   }
 
   static reg(prefix: string, entity: string): void {
