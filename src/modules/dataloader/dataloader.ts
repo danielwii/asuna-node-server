@@ -186,7 +186,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           }
         },
         delete: (id: string) => {
-          logger.log(`delete (${segment}:${id})`);
+          // logger.log(`delete (${segment}:${id})`);
           const key = `${segment}-${id}`;
           cacheMap.delete(key);
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch((reason) =>
