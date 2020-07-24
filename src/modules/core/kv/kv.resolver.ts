@@ -5,8 +5,9 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { GraphqlContext } from '../../dataloader';
 import { GqlAdminAuthGuard, GraphqlHelper } from '../../graphql';
-import { KeyValueModel, KeyValuePair } from './kv.entities';
+import { KeyValuePair } from './kv.entities';
 import { KvHelper, recognizeTypeValue } from './kv.helper';
+import { KeyValueModel } from './kv.isolated.entities';
 
 @Resolver()
 export class KvQueryResolver {

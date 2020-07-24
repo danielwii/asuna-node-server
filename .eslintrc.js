@@ -62,5 +62,6 @@ module.exports = {
     // Common abbreviations are known and readable
     'unicorn/prevent-abbreviations': 'off',
     'unicorn/catch-error-name': 'off',
+    'unicorn/no-fn-reference-in-iterator': 'off',
   },
 };

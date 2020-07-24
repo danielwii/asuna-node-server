@@ -4,13 +4,15 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { AdminUser } from '../core/auth/auth.entities';
 import { Hermes } from '../core/bus/hermes';
-import { KeyValueType, KVModelFormatType } from '../core/kv/kv.entities';
+import { KeyValueType } from '../core/kv/kv.entities';
 import { KvHelper } from '../core/kv/kv.helper';
+import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
 import { CronHelper } from '../helper';
 import { WeChatController } from './wechat.controller';
 import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
-import { WeChatFieldKeys, WxHelper } from './wx.api';
+import { WeChatFieldKeys } from './wx.api';
+import { WxHelper } from './wx.helper';
 
 const logger = LoggerFactory.getLogger('WeChatModule');
 
