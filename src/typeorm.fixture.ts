@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { FindOneOptions, FindOptionsUtils, JoinOptions, ObjectLiteral } from 'typeorm';
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
-import { r } from './modules/common/helpers/utils';
+import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 
 const logger = LoggerFactory.getLogger('FindOptionsFixture');
@@ -16,7 +16,7 @@ FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixtur
   const join = options?.join;
 
   if (join) {
-    logger.debug(`apply ${r(join)}`);
+    logger.verbose(`apply join ${r(join)}`);
     if (join.leftJoin)
       Object.keys(join.leftJoin).forEach((key) => {
         const extra = join.options?.[key] || {};
@@ -42,5 +42,12 @@ FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixtur
       });
   }
 
-  return oldApplyOptionsToQueryBuilder.bind(FindOptionsUtils)(qb, _.omit(options, 'join'));
+  const extra = _.omit(options, 'join');
+  logger.verbose(`apply extra ${r(options)}`);
+  try {
+    return oldApplyOptionsToQueryBuilder.bind(FindOptionsUtils)(qb, extra);
+  } catch (e) {
+    logger.error(`resolve sql error: ${r({ e, extra, sql: qb.getSql() })}`);
+    throw e;
+  }
 };

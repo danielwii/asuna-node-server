@@ -1,11 +1,12 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
+import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
-export const MAX_PAGE_SIZE = 200;
+export const MAX_PAGE_SIZE = 1000;
 
 export enum Order {
   ASC = 'ASC',
@@ -91,7 +92,7 @@ export type PageInfo = {
 export const emptyPage = <T>(pageInfo: PageInfo): Pageable<T> => ({ ...pageInfo, items: [], total: 0 });
 
 export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInfo => {
-  let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest || {};
+  let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest ?? {};
   if (page < 0) {
     page = startsWith0 ? 0 : 1;
   } else if (page === 0 && !startsWith0) {

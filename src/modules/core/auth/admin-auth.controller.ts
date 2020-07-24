@@ -4,14 +4,7 @@ import { AccessControl } from 'accesscontrol';
 import * as _ from 'lodash';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
-import {
-  AsunaErrorCode,
-  AsunaException,
-  AsunaExceptionHelper,
-  AsunaExceptionTypes,
-  r,
-  SignException,
-} from '../../common';
+import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { AnyAuthRequest } from '../../helper/interfaces';
 import { RestCrudController } from '../../rest/base.controllers';
@@ -69,7 +62,7 @@ export class AdminAuthController extends RestCrudController {
     const user = await this.adminAuthService.getUser(data);
 
     if (!user) {
-      throw new SignException('account not exists or active');
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
     const { hash, salt } = PasswordHelper.encrypt(resetPasswordDto.password);
@@ -86,7 +79,7 @@ export class AdminAuthController extends RestCrudController {
     );
 
     if (!user) {
-      throw new SignException('account not exists or active');
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
     const isCorrect = PasswordHelper.passwordVerify(signDto.password, user);

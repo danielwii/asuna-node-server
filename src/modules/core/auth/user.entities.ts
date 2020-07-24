@@ -1,13 +1,12 @@
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
-import { Constructor } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
-import type { FinancialTransaction, Wallet } from '../../property/financial.entities';
-import type { PointExchange } from '../../property/points.entities';
-import type { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
-import type { UserFollow } from '../interaction/follow.entities';
+import type { Constructor } from '../../base';
+import type { FinancialTransaction, Wallet, PointExchange } from '../../property';
+import type { WXMiniAppUserInfo } from '../../wechat';
+import type { UserFollow } from '../interaction';
 
 @EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
 @Entity('auth__t_user_profiles')

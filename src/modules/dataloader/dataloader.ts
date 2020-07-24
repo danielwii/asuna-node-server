@@ -45,6 +45,7 @@ export function loader<Entity extends BaseEntity>(
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
     cachedDataLoader(entity.name, (ids) => {
+      // logger.debug(`cachedDataLoader load ${entity.name}: ${ids}`);
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
       const options = {
         where: { ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined) },
@@ -140,11 +141,12 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
       return fn(ids);
     },
     {
-      batchScheduleFn: (callback) => setTimeout(callback, 10),
+      batchScheduleFn: (callback) => setTimeout(callback, 20),
       cacheMap: {
         get: (id: string) => {
           // const cachedObject = await client.get({ segment, id });
           // logger.log(`get (${segment}:${id}) ${r(cachedObject)}`);
+          // logger.debug(`get (${segment}:${id})`);
           // return cachedObject;
           const now = Date.now();
           const key = `${segment}-${id}`;
@@ -163,6 +165,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           }
           const isExpired = expires < now;
           if (isExpired) {
+            // logger.debug(`remove (${segment}:${id})`);
             cacheMap.delete(key);
             return null;
           }
@@ -192,7 +195,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           // return client.drop({ segment, id });
         },
         clear: () => {
-          // logger.log(`clear (${segment})`);
+          logger.log(`clear (${segment})`);
           cacheMap.clear();
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch((reason) => logger.error(reason));
           // return logger.warn('not implemented.');
@@ -214,8 +217,6 @@ export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<Prim
 
 /**
  * 解析出 graphql 参数中的关联字段
- * @param info
- * @param path
  */
 export function resolveRelationsFromInfo(
   info: GraphQLResolveInfo,
@@ -228,16 +229,25 @@ export function resolveRelationsFromInfo(
     const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
     if (_.isNil(fieldNode)) return false;
 
-    let selectionNode;
+    let selectionNode; // like items node
     _.times(locations.length - 1).forEach((index) => {
-      selectionNode = (selectionNode || fieldNode).selectionSet.selections.find(
-        (node) => (node as any).name.value === locations[index + 1],
-      );
+      (selectionNode || fieldNode).selectionSet.selections.find((node) => {
+        if (node.kind === 'FragmentSpread') {
+          selectionNode = info.fragments[node.name.value].selectionSet.selections.find(
+            (fragmentNode: any) => fragmentNode.name.value === locations[index + 1],
+          );
+          return;
+        }
+        if (node.name.value === locations[index + 1]) {
+          selectionNode = node;
+          return;
+        }
+      });
     });
-    const relations = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
+    const relations = (selectionNode || fieldNode).selectionSet.selections
       .filter((node) => node.selectionSet)
       .map((node) => node.name.value);
-    logger.debug(`resolved relations ${r({ path, relations })}`);
+    logger.debug(`resolved relations ${r({ path, locations, relations })}`);
     return { relations };
   } catch (error) {
     logger.warn(`resolveRelationsFromInfo ${r(error)}`);
@@ -276,7 +286,6 @@ export const resolveFieldsByPagedMixInfo = <Entity>(entity: ObjectType<Entity>, 
   relations: resolveRelationsFromInfo(info, `${info.fieldName}.items`),
   select: DBHelper.filterSelect(entity, resolveSelectsFromInfo(info, `${info.fieldName}.items.origin`)),
 });
-
 export const resolveFieldsByPagedInfo = <Entity>(entity: ObjectType<Entity>, info: GraphQLResolveInfo) => ({
   // mixedFields: resolveSelectsFromInfo(info, `${path}.items`),
   relations: resolveRelationsFromInfo(info, `${info.fieldName}.items`),

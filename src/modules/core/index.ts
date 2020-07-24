@@ -3,6 +3,7 @@ export * from './context';
 export * from './global';
 export * from './auth';
 export * from './kv';
+export * from './migrations/migrations.helper';
 export * from './db';
 export * from './token';
 export * from './finder';

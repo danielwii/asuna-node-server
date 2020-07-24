@@ -19,10 +19,9 @@ import { emptyOr, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { PageInfo, PageRequest, toPage } from '../core/helpers';
-import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/dataloader';
-import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from './input';
-
 import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
+import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader';
+import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -103,10 +102,14 @@ export class GraphqlHelper {
     loader,
     pageRequest,
     mapper,
+    info,
+    relationPath,
   }: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    relationPath?: string;
+    info?: GraphQLResolveInfo;
     ctx?: GraphqlContext<DataLoaders>;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     pageRequest: PageRequest;
@@ -114,8 +117,17 @@ export class GraphqlHelper {
   }): Promise<PageInfo & { items: any[]; total: number }> {
     const entityRepo = (cls as any) as Repository<Entity>;
     const pageInfo = toPage(pageRequest);
-    logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, loader })}`);
-    const items = await this.handleDefaultQueryRequest({ cls, query, where, ctx, pageInfo, loader });
+    logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, relationPath, loader })}`);
+    const items = await this.handleDefaultQueryRequest({
+      cls,
+      query,
+      where,
+      ctx,
+      pageInfo,
+      info,
+      relationPath,
+      loader,
+    });
     const total = await entityRepo.count(where ? { where } : {});
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
@@ -127,11 +139,13 @@ export class GraphqlHelper {
   >(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
+    relationPath?: string;
+    info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
-    mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
+    mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[]>;
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
@@ -139,6 +153,8 @@ export class GraphqlHelper {
   >(opts: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
+    relationPath?: string;
+    info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
@@ -152,6 +168,8 @@ export class GraphqlHelper {
     cls,
     query,
     where,
+    info,
+    relationPath,
     ctx,
     pageInfo,
     loader,
@@ -159,6 +177,8 @@ export class GraphqlHelper {
   }: {
     cls: ClassType<Entity>;
     query: QueryConditionInput;
+    relationPath?: string;
+    info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
@@ -181,20 +201,25 @@ export class GraphqlHelper {
       logger.debug(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
-      const randomIds = await entityRepo.find(
-        await this.genericFindOptions<Entity>({
-          cls,
-          select: [primaryKey],
-          where,
-          pageRequest: { page: Math.floor(skip / query.random), size: query.random },
-          // skip, take: query.random
-        }),
-      );
+      const opts = await this.genericFindOptions<Entity>({
+        cls,
+        select: [primaryKey],
+        where,
+        pageRequest: { page: Math.floor(skip / query.random), size: query.random },
+        info,
+        relationPath,
+        // skip, take: query.random
+      });
+      // logger.debug(`opts ${r(opts)}`);
+      const randomIds = await entityRepo.find(opts);
       const ids: PrimaryKey[] = _.chain(randomIds).map(fp.get(primaryKey)).shuffle().take(query.random).value();
       logger.debug(`ids for ${cls.name} is ${r(ids)}`);
       if (_.isEmpty(ids)) return [];
 
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
+      // const items = await (dataloader && _.isEmpty(opts.loadRelationIds)
+      //   ? dataloader.load(ids)
+      //   : entityRepo.findByIds(ids, { loadRelationIds: opts.loadRelationIds }));
       return mapItems(items, mapper);
     }
 
@@ -203,14 +228,21 @@ export class GraphqlHelper {
       select: [primaryKey],
       where,
       pageRequest: pageInfo,
+      info,
+      relationPath,
       // skip: pageInfo.skip,
       // take: pageInfo.take,
     });
+    // logger.debug(`options ${r(options)}`);
+
     const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
     if (_.isEmpty(ids)) return [];
     logger.debug(`ids for ${cls.name} is ${r(ids)}`);
 
     const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
+    // const items = await (dataloader && _.isEmpty(options.loadRelationIds)
+    //   ? dataloader.load(ids)
+    //   : entityRepo.findByIds(ids, { loadRelationIds: options.loadRelationIds }));
     return mapItems(items, mapper);
   }
 
@@ -282,6 +314,7 @@ export class GraphqlHelper {
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
+    logger.debug(`loadRelationIds: ${r({ relations, relationPath, loadRelationIds })}`);
     const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
       ...emptyOr(!!pageRequest, toPage(pageRequest)),

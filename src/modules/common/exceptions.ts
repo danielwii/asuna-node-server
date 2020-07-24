@@ -51,7 +51,7 @@ export class AsunaBaseException extends Error {
     public code: string,
     public name: string,
     public message: string,
-    public localeMessage?: string,
+    public localeMessage: string,
     public errors?: any,
   ) {
     super(message);
@@ -60,7 +60,7 @@ export class AsunaBaseException extends Error {
 
 export class AsunaException extends AsunaBaseException {
   constructor(nameValue: NameValue, message?: string, errors?: any) {
-    super(nameValue.value, null, nameValue.name, message, errors);
+    super(nameValue.value, null, nameValue.name, message, null, errors);
   }
 
   static of(
@@ -77,36 +77,15 @@ export class AsunaException extends AsunaBaseException {
   }
 }
 
-export class AsunaCodeException extends AsunaBaseException {
-  constructor(nameValue: NameValue, code: string, message?: string, errors?: any) {
-    super(nameValue.value, code, nameValue.name, message, errors);
-  }
-}
-
 export class ErrorException extends AsunaBaseException {
   constructor(name: string, message?: string, errors?: any) {
-    super(AsunaErrorCode.Unprocessable.value, name, AsunaErrorCode.Unprocessable.name, message, errors);
+    super(AsunaErrorCode.Unprocessable.value, name, AsunaErrorCode.Unprocessable.name, message, null, errors);
   }
 }
 
 export class ValidationException extends AsunaException {
   constructor(model, errors) {
     super(AsunaErrorCode.InvalidParameter, `validate '${model}' error`, errors);
-  }
-}
-
-export class UploadException extends AsunaException {
-  constructor(errors) {
-    super(AsunaErrorCode.Unprocessable, 'upload file(s) error', errors);
-  }
-}
-
-/**
- * @deprecated use AsunaException directly
- */
-export class SignException extends AsunaException {
-  constructor(message) {
-    super(AsunaErrorCode.InvalidCredentials, message);
   }
 }
 
@@ -117,6 +96,9 @@ export enum AsunaExceptionTypes {
   TenantNeeded = 'TenantNeeded',
   Unpublished = 'Unpublished',
   ResourceLimit = 'ResourceLimit',
+  InvalidAccount = 'InvalidAccount',
+  AccountExists = 'AccountExists',
+  Upload = 'Upload',
 }
 
 type AsunaExceptionOpts = {
@@ -139,6 +121,18 @@ export class AsunaExceptionHelper {
       nameValue: AsunaErrorCode.InvalidCredentials,
       message: () => `wrong password`,
       localMessage: () => `密码错误`,
+    },
+    [AsunaExceptionTypes.InvalidAccount]: {
+      code: 'E01003',
+      nameValue: AsunaErrorCode.InvalidCredentials,
+      message: () => `account not exists or active.`,
+      localMessage: () => `账户不存在或不可用`,
+    },
+    [AsunaExceptionTypes.AccountExists]: {
+      code: 'E01004',
+      nameValue: AsunaErrorCode.InvalidCredentials,
+      message: (email: string, username: string) => `${email ? `email:${email}` : ''} ${username ? `username:${username}` : ''} already exists`,
+      localMessage: (email: string, username: string) => `${email ? `邮件:${email}` : ''} ${username ? `用户名:${username}` : ''} 已存在`,
     },
     [AsunaExceptionTypes.Unpublished]: {
       code: 'E01010',
@@ -164,18 +158,24 @@ export class AsunaExceptionHelper {
       message: () => `tenant needed`,
       localMessage: () => '未找到必要的 tenant 信息',
     },
+    [AsunaExceptionTypes.Upload]: {
+      code: 'E04001',
+      nameValue: AsunaErrorCode.Unprocessable,
+      message: () => `upload file(s) error`,
+      localMessage: () => '上传文件失败',
+    },
   };
 
   static reg(type: string, opts: AsunaExceptionOpts): void {
     if (_.has(this.registers, type)) {
-      throw new Error(`already exists '${type}' in asuna exception registers.`);
+      throw new Error(`'${type}' already exists in asuna exception registers.`);
     }
     this.registers[type] = opts;
   }
 
   static genericException<T extends keyof typeof AsunaExceptionHelper.registers>(
     type: T,
-    params: Parameters<typeof AsunaExceptionHelper.registers[T]['message']>,
+    params?: Parameters<typeof AsunaExceptionHelper.registers[T]['message']>,
     errors?: any,
   ): AsunaException {
     if (this.registers[type]) {

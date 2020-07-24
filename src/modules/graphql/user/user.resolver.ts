@@ -4,6 +4,7 @@ import { Promise } from 'bluebird';
 import { LoggerFactory } from '../../common/logger';
 import { UserProfile } from '../../core/auth';
 import { GraphqlContext } from '../../dataloader';
+import { Wallet } from '../../property';
 import { GqlWXAuthGuard, WXMiniAppUserInfo } from '../../wechat';
 import { GqlAdminAuthGuard } from '../auth.guard';
 import { GraphqlHelper } from '../helper';
@@ -38,6 +39,16 @@ export class UserProfileResolver {
       key: 'miniAppUserInfo',
       targetCls: WXMiniAppUserInfo,
       loader: ctx.getDataLoaders().wxMiniAppUserInfo,
+    });
+  }
+
+  @ResolveField()
+  wallet(@Root() profile: UserProfile) {
+    return GraphqlHelper.resolveProperty<UserProfile, Wallet>({
+      cls: UserProfile,
+      instance: profile,
+      key: 'wallet',
+      targetCls: Wallet,
     });
   }
 }

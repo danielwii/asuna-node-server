@@ -10,10 +10,12 @@ type ExchangeObject implements BaseNameEntity {
 
   name: String!
   description: String
+  usage: String
 
   key: String!
   type: ExchangeCurrencyType!
-  price: Int!
+  price: Float!
+  value: String
 
   isPublished: Boolean
 }
@@ -81,5 +83,5 @@ extend type Query {
   user_paged_exchangeRecords(type: String, refId: String, pageRequest: PageRequest): APIPagedExchangeRecord
   user_paged_financialTransactions(type: String, refId: String, pageRequest: PageRequest): APIPagedFinancialTransaction
 
-  api_exchangeObjects(type: ExchangeCurrencyType): [ExchangeObject]
+  api_exchangeObjects(type: ExchangeCurrencyType, usage: String, orderBy: Sorter): [ExchangeObject]
 }

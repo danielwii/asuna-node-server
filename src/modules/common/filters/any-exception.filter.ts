@@ -5,12 +5,12 @@ import { Response } from 'express';
 import * as _ from 'lodash';
 import * as R from 'ramda';
 import { getRepository, QueryFailedError } from 'typeorm';
+import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
-import { StatsHelper } from '../../stats/stats.helper';
-
+import { StatsHelper } from '../../stats';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
-import { r } from '../helpers/utils';
-import { LoggerFactory } from '../logger/factory';
+import { r } from '../helpers';
+import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
@@ -82,6 +82,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
+    } else if (R.is(EntityColumnNotFound, exception)) {
+      processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
     } else if (R.is(EntityNotFoundError, exception)) {
       processed.status = HttpStatus.NOT_FOUND;
     } else if (exception.name === 'ArgumentError') {
@@ -113,7 +115,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       Sentry.captureException(processed);
     }
 
-    if (res.finished) return;
+    if (res.writableEnded) return;
 
     let body;
     let message;
@@ -150,6 +152,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
           // code: processed.code || processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
         },
       };
+    }
+
+    if (_.isNil(body.error.code)) {
+      logger.warn(`no code found for one error: ${r(message)}`);
     }
 
     const isGraphqlRes = !res.status;

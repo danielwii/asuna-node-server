@@ -2,8 +2,8 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity, EntityConstructorObject } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { deserializeSafely } from '../common/helpers';
-import { AbstractTransactionEntity } from './base.entities';
 import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.entities';
+import { AbstractTransactionEntity } from './base.entities';
 import { ExchangeObject } from './exchange.entities';
 
 export type ExchangeEventPayload = {
@@ -70,6 +70,17 @@ export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransac
   @ManyToOne((type) => ExchangeObject)
   @JoinColumn({ name: 'exchange_object__id' })
   exchangeObject?: ExchangeObject;
+
+  /*
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 36, name: 'receiver__id' })
+  receiverId?: string;
+
+  @MetaInfo({ name: '账户' /!* , accessible: 'readonly' *!/ })
+  @ManyToOne((type) => UserProfile)
+  @JoinColumn({ name: 'receiver__id' })
+  receiver?: UserProfile;
+*/
 
   /*
   @MetaInfo({ name: '用户' })

@@ -13,6 +13,7 @@ type UserProfile {
   isActive: Boolean
 
   miniAppUserInfo: WXMiniAppUserInfo
+  wallet: Wallet
 }
 
 extend type Query {

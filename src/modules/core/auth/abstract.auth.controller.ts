@@ -93,10 +93,7 @@ export abstract class AbstractAuthController {
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
 
     if (found) {
-      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, [
-        'user',
-        r(_.pick(body, ['email', 'username']), { stringify: true }),
-      ]);
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.AccountExists, [body.email, body.username]);
     }
 
     return this.authService
@@ -118,13 +115,13 @@ export abstract class AbstractAuthController {
 
     logger.debug(`get user ${r(profile)}`);
     if (!profile || !profile?.password) {
-      throw new AsunaException(AsunaErrorCode.InvalidCredentials, 'account not exists or active');
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
     const verified = PasswordHelper.passwordVerify(signInDto.password, profile);
 
     if (!verified) {
-      throw new AsunaException(AsunaErrorCode.InvalidCredentials, 'username or wrong password');
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.WrongPassword);
     }
     Hermes.emit('user.activity.event', 'login', { userId: profile.id });
 

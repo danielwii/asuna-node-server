@@ -13,7 +13,7 @@ import * as os from 'os';
 import ow from 'ow';
 import { basename, dirname, join } from 'path';
 import * as uuid from 'uuid';
-import { r, UploadException } from '../../common';
+import { AsunaExceptionHelper, AsunaExceptionTypes, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthRequest } from '../../helper/interfaces';
@@ -212,7 +212,7 @@ export class UploaderController {
     const results = await this.saveFiles(bucket, prefix, local, files).catch((error) => {
       logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
-      throw new UploadException(error);
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Upload, null, error);
     });
     logger.log(`results is ${r(results)}`);
     return results;
@@ -252,7 +252,7 @@ export class UploaderController {
     const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch((error) => {
       logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
-      throw new UploadException(error);
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Upload, null, error);
     });
     // TODO remove temp files in storage engine now
     // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));

@@ -59,6 +59,7 @@ export interface BootstrapOptions {
   redisMode?: 'io' | 'redis' | 'ws';
   context?: IAsunaContextOpts;
   renamer?: { from: string; to: string }[];
+  migrations?: any[];
 }
 
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
@@ -134,7 +135,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`synchronize ... done`);
 
   logger.log(`run custom migrations ...`);
-  await runCustomMigrations();
+  await runCustomMigrations(options.migrations);
   logger.log(`run custom migrations ... done`);
 
   if (Global.dbType !== 'sqlite') {

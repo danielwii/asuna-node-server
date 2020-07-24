@@ -1,10 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
-import { r } from '../common/helpers';
+import { emptyOr, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtPayload } from '../core/auth';
 import { Pageable } from '../core/helpers';
-import { GqlAuthGuard, GraphqlHelper, PageRequestInput } from '../graphql';
+import { GqlAuthGuard, GraphqlHelper, PageRequestInput, SorterInput, toOrder } from '../graphql';
 import { ExchangeCurrencyType, ExchangeObject } from './exchange.entities';
 import { FinancialTransaction } from './financial.entities';
 import { PointExchange } from './points.entities';
@@ -66,19 +66,23 @@ export class PropertyQueryResolver {
   @Query()
   async api_exchangeObjects(
     @Args('type') type: ExchangeCurrencyType,
+    @Args('usage') usage: string,
+    @Args('orderBy') orderBy: SorterInput,
     @Info() info,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<ExchangeObject[]> {
-    this.logger.log(`api_exchangeObjects: ${r({ type })}`);
+    this.logger.log(`api_exchangeObjects: ${r({ type, usage, orderBy })}`);
     const [items, total] = await ExchangeObject.findAndCount(
       await GraphqlHelper.genericFindOptions<ExchangeObject>({
         cls: ExchangeObject,
         relationPath: `${PropertyQueryResolver.prototype.api_exchangeObjects.name}.items`,
         info,
+        where: { ...emptyOr(!!usage, { usage }) },
+        order: toOrder(orderBy),
       }),
     );
 
-    this.logger.verbose(`api_exchangeObjects ${r({ total })}`);
+    this.logger.debug(`api_exchangeObjects ${r({ total })}`);
     return items;
   }
 }

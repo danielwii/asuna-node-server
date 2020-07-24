@@ -1,3 +1,4 @@
+import { Promise } from 'bluebird';
 import { AuthMigrations } from './modules/core/auth/auth.migrations';
 
 export const renameTables = [
@@ -7,6 +8,8 @@ export const renameTables = [
   // { from: 'audit__t_recordsHide', to: 'sys__t_audit_records' },
 ];
 
-export const runCustomMigrations = async (): Promise<void> => {
+export const runCustomMigrations = async (migrations: any[]): Promise<void> => {
   await AuthMigrations.migrate();
+
+  await Promise.each(migrations ?? [], (migration) => migration.migrate());
 };

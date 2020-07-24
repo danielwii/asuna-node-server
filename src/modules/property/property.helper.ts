@@ -39,6 +39,9 @@ export class ExchangePayload {
   @IsString()
   profileId: string;
 
+  @IsString()
+  refId: string;
+
   constructor(o: ExchangePayload) {
     Object.assign(this, deserializeSafely(ExchangePayload, o));
   }
@@ -109,6 +112,7 @@ export class PropertyHelper {
       before: profile.wallet.balance,
       after: profile.wallet.balance - exchangeObject.price,
       profile,
+      refId: payload.refId,
     });
 
     profile.wallet.balance = financialTransaction.after;
