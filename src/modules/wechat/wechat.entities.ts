@@ -16,8 +16,7 @@ import { EntityConstructorObject } from '../base/base.entity';
 import { EntityMetaInfo, IdentifierHelper, JsonArray, MetaInfo, StaticImplements } from '../common';
 import { deserializeSafely } from '../common/helpers/validate';
 import { AdminUser } from '../core/auth/auth.entities';
-// eslint-disable-next-line import/no-cycle
-import { UserProfile } from '../core/auth/user.entities';
+import type { UserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
@@ -203,7 +202,7 @@ export class WXMiniAppUserInfo extends BaseEntity {
 
   @Expose({ name: 'profile-id', toPlainOnly: true })
   @Transform((value) => value.id, { toPlainOnly: true })
-  @OneToOne((type) => UserProfile, (profile) => profile.miniAppUserInfo)
+  @OneToOne('UserProfile', 'miniAppUserInfo')
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;
 

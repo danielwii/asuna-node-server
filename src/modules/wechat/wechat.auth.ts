@@ -47,7 +47,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   async handleRequest(err: any, payload: WXJwtPayload, info: any) {

@@ -1,8 +1,7 @@
-import { PrimaryKey } from '../../common/identifier';
 import { AuthUserChannel } from './base.entities';
 
 export interface JwtPayload {
-  uid: PrimaryKey;
+  uid: string;
   id: string;
   email: string;
   username: string;

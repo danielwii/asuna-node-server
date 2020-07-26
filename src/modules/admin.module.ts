@@ -25,6 +25,7 @@ import { PropertyModule } from './property';
 import { RedisProvider } from './providers';
 import {
   AdminAppRestController,
+  AdminAuthRestController,
   AdminContentRestController,
   AdminPaymentRestController,
   AdminRestController,
@@ -76,6 +77,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AdminSysRestController,
     AdminWxRestController,
     AdminPaymentRestController,
+    AdminAuthRestController,
     WwwRestController,
     CommandController,
     UserController,

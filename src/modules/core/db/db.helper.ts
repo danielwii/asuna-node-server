@@ -83,8 +83,8 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
 export function parseNormalWhereAndRelatedFields(
   where,
   repository,
-): { normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
-  const allRelations = repository.metadata.relations.map(relation => relation.propertyName);
+): { allRelations: any[]; normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
+  const allRelations = repository.metadata.relations.map((relation) => relation.propertyName);
   logger.debug(`all relations is ${r(allRelations)}`);
   const normalWhere = [];
   const relatedFields = [];
@@ -100,7 +100,7 @@ export function parseNormalWhereAndRelatedFields(
       normalWhere.push({ field, value });
     }
   });
-  return { normalWhere, relatedFields, relatedWhere };
+  return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
 function parseCondition(value: Condition): string | Condition | FindOperator<any> {
@@ -163,8 +163,8 @@ export type ParsedFields = {
 export function parseFields(value: string | string[], allRelations?: string[]): ParsedFields {
   const fields = parseListParam(value);
   const relatedFieldsMap = _.chain(fields)
-    .filter(str => str.includes('.'))
-    .filter(str => (allRelations ? allRelations.includes(str.split('.')[0]) : true))
+    .filter((str) => str.includes('.'))
+    .filter((str) => (allRelations ? allRelations.includes(str.split('.')[0]) : true))
     .reduce((result, val) => {
       const subModel = val.split('.')[0];
       // eslint-disable-next-line no-param-reassign
@@ -232,7 +232,7 @@ export class DBHelper {
 
   public static loadMetadatas(): EntityMetadata[] {
     if (this.metadatas.length === 0) {
-      getConnection().entityMetadatas.forEach(metadata => {
+      getConnection().entityMetadatas.forEach((metadata) => {
         if (DBHelper.isValidEntity(metadata)) {
           this.metadatas.push(metadata);
         }
@@ -257,7 +257,7 @@ export class DBHelper {
   ): (typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[] {
     const excludeNames = _.map(excludes, fp.get('name'));
     return this.loadMetadatas()
-      .filter(metadata => {
+      .filter((metadata) => {
         const included = metadata.relations
           .map(fp.get('type'))
           .find(
@@ -310,7 +310,7 @@ export class DBHelper {
   }
 
   public static getMetadata(model: string): EntityMetadata {
-    return this.metadatas.find(metadata => {
+    return this.metadatas.find((metadata) => {
       // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
       return this.getEntityInfo(metadata).name === model;
     });
@@ -334,15 +334,15 @@ export class DBHelper {
   }
 
   public static getPropertyNamesByMetadata<Entity>(metadata: EntityMetadata): string[] {
-    return metadata.columns.map(column => column.propertyName);
+    return metadata.columns.map((column) => column.propertyName);
   }
 
   public static getRelationPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.relations.map(relation => relation.propertyName);
+    return this.repo(entity).metadata.relations.map((relation) => relation.propertyName);
   }
 
   public static getColumnNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.columns.map(column => column.databaseName);
+    return this.repo(entity).metadata.columns.map((column) => column.databaseName);
   }
 
   public static repo<Entity extends BaseEntity>(
@@ -367,7 +367,7 @@ export class DBHelper {
    * getPrimaryKeys
    */
   public static getPrimaryKeys(repository): string[] {
-    return repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName);
+    return repository.metadata.columns.filter((column) => column.isPrimary).map((column) => column.propertyName);
   }
 
   public static getPrimaryKeyByModel(modelNameObject: ModelNameObject): string {
@@ -376,7 +376,9 @@ export class DBHelper {
   }
 
   public static getPrimaryKey(repository): string {
-    return _.first(repository.metadata.columns.filter(column => column.isPrimary).map(column => column.propertyName));
+    return _.first(
+      repository.metadata.columns.filter((column) => column.isPrimary).map((column) => column.propertyName),
+    );
   }
 
   public static extractOriginAsunaSchemasByModel(modelNameObject: ModelNameObject): OriginSchema {
@@ -394,7 +396,7 @@ export class DBHelper {
 
     const columns = R.compose(
       // 更新可能的 STI 信息
-      R.map(column => {
+      R.map((column) => {
         const currentEntityInfo = parentEntityInfo || entityInfo;
         if (currentEntityInfo.sti && currentEntityInfo.sti.name === column.name) {
           return R.mergeDeepRight(column, {
@@ -544,13 +546,13 @@ export class DBHelper {
         .join(',');
       const relations =
         profile === Profile.detail
-          ? repository.metadata.relations.map(relation => relation.propertyName)
+          ? repository.metadata.relations.map((relation) => relation.propertyName)
           : parseListParam(inputRelations);
 
       // 处理条件关联
-      const { relatedFields, relatedWhere } = parseNormalWhereAndRelatedFields(where, repository);
+      const { relatedFields, relatedWhere, allRelations } = parseNormalWhereAndRelatedFields(where, repository);
       logger.debug(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
-      relatedFields.forEach(field => {
+      relatedFields.forEach((field) => {
         const [relatedModel, relatedField] = _.split(field, '.');
         // logger.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field];
@@ -595,10 +597,18 @@ export class DBHelper {
         }
       });
 
+      const intersection = _.intersection(relations, allRelations);
+      if (!_.isEmpty(_.difference(relations, intersection))) {
+        logger.error(
+          `unresolved relation found ${r({ model, intersection, unresolved: _.difference(relations, intersection) })}`,
+        );
+      }
       // 处理普通关联
-      const diff = _.difference(relations, _.keys(relatedWhere));
+      const diff = _.difference(relations, _.keys(relatedWhere)).filter((relation) =>
+        _.includes(allRelations, relation),
+      );
       logger.debug(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
-      _.each(diff, relation => {
+      _.each(diff, (relation) => {
         const select = parsedFields.relatedFieldsMap[relation];
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);
@@ -612,11 +622,11 @@ export class DBHelper {
 
   public static wrapNormalWhere(model: string, queryBuilder, normalWhere): void {
     // console.log({ normalWhere });
-    normalWhere.forEach(condition => {
+    normalWhere.forEach((condition) => {
       // console.log('condition', condition);
 
       if (condition.value?.$or) {
-        condition.value.$or.forEach(elementCondition => {
+        condition.value.$or.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
           const sqlValue = this.toSqlValue(currentCondition);
@@ -630,7 +640,7 @@ export class DBHelper {
           }
         });
       } else if (condition.value?.$and) {
-        condition.value.$and.forEach(elementCondition => {
+        condition.value.$and.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
           const sqlValue = this.toSqlValue(currentCondition);
@@ -666,7 +676,7 @@ export class DBHelper {
     if (!_.isEmpty(parsedFields.fields)) {
       const primaryKeyColumns = primaryKeys || ['id']; // id for default
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
-        field => `${model}.${field}`,
+        (field) => `${model}.${field}`,
       );
       logger.verbose(`wrapParsedFields '${r(selection)}'`);
       queryBuilder.select(selection);
@@ -690,7 +700,7 @@ export class DBHelper {
           const innerCondition = elementCondition._value;
 
           const parameters = _.isArray(innerCondition._value)
-            ? _.map(innerCondition._value, v => `'${v}'`)
+            ? _.map(innerCondition._value, (v) => `'${v}'`)
             : _.flatten([innerCondition._value]);
 
           // console.log('[not]', { parameters });
@@ -711,7 +721,7 @@ export class DBHelper {
           innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
         } else {
           const parameters = _.isArray(elementCondition._value)
-            ? _.map(elementCondition._value, v => `'${v}'`)
+            ? _.map(elementCondition._value, (v) => `'${v}'`)
             : _.flatten([elementCondition._value]);
 
           // console.log('[strict]', { parameters });

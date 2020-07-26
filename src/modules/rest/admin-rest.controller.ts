@@ -49,3 +49,10 @@ export class AdminPaymentRestController extends RestCrudController {
     super('payment');
   }
 }
+
+@Controller('admin/rest/auth')
+export class AdminAuthRestController extends RestCrudController {
+  constructor() {
+    super('auth');
+  }
+}

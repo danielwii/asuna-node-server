@@ -39,6 +39,7 @@ export class ExchangePayload {
   @IsString()
   profileId: string;
 
+  // 相关资源 id
   @IsString()
   refId: string;
 
