@@ -5,7 +5,8 @@ import { LoggerFactory } from '../common/logger';
 import { JwtPayload } from '../core/auth';
 import { Pageable } from '../core/helpers';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, SorterInput, toOrder } from '../graphql';
-import { ExchangeCurrencyType, ExchangeObject } from './exchange.entities';
+import { ExchangeCurrencyType } from './enum-values';
+import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction } from './financial.entities';
 import { PointExchange } from './points.entities';
 
