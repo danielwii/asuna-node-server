@@ -2,12 +2,12 @@ import { Column, Entity } from 'typeorm';
 import { AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { ColumnTypeHelper } from '../core/helpers';
-import { ExchangeCurrencyEnumValue, ExchangeObjectUsageEnumValue, ExchangeObjectUsageType } from './enum-values';
-
-export enum ExchangeCurrencyType {
-  points = 'points',
-  balance = 'balance',
-}
+import {
+  ExchangeCurrencyEnumValue,
+  ExchangeCurrencyType,
+  ExchangeObjectUsageEnumValue,
+  ExchangeObjectUsageType,
+} from './enum-values';
 
 @EntityMetaInfo({ name: 'exchange_objects' })
 @Entity('property__t_exchange_objects')

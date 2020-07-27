@@ -1,4 +1,5 @@
 export * from './base.entities';
+export * from './enum-values';
 export * from './exchange.entities';
 export * from './financial.entities';
 export * from './points.entities';

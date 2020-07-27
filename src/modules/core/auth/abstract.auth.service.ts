@@ -5,7 +5,7 @@ import { Secret, SignOptions } from 'jsonwebtoken';
 import * as _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
-import { emptyOr, PrimaryKey } from '../../common';
+import { emptyOr } from '../../common';
 import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
@@ -35,7 +35,7 @@ export class TokenHelper {
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  static async createToken(user: AuthUser, extra?: { uid: PrimaryKey }): Promise<CreatedToken> {
+  static async createToken(user: AuthUser, extra?: { uid: string }): Promise<CreatedToken> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -87,7 +87,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return validated;
   }
 
-  createToken(profile: UserProfile, extra?: { uid: PrimaryKey }): Promise<CreatedToken> {
+  createToken(profile: UserProfile, extra?: { uid: string }): Promise<CreatedToken> {
     // eslint-disable-next-line no-param-reassign
     profile.lastSignedAt = new Date();
     profile.save().catch((reason) => logger.error(reason));
