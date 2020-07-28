@@ -31,8 +31,8 @@ export class GraphqlModule implements OnModuleInit {
     const typePaths = _.uniq([
       // '../**/*.graphql',
       // `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
+      `${join(dir)}/**/src/**/*.graphql`,
       `${join(process.mainModule.path, '../src')}/**/*.graphql`,
-      `${join(dir, '../src')}/**/*.graphql`,
     ]);
     logger.log(`typePaths is ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
 
