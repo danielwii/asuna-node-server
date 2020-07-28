@@ -23,17 +23,18 @@ const logger = LoggerFactory.getLogger('GraphqlModule');
 
 @Module({})
 export class GraphqlModule implements OnModuleInit {
-  static forRoot(dir, modules = [], options?): DynamicModule {
+  static forRoot(dir: string, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
     const tracingConfig = TracingConfigObject.load();
     const config = GraphQLConfigObject.load();
-    const typePaths = [
+    const typePaths = _.uniq([
       // '../**/*.graphql',
-      `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
+      // `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
+      `${join(process.mainModule.path, '../src')}/**/*.graphql`,
       `${join(dir, '../src')}/**/*.graphql`,
-    ];
-    logger.log(`typePaths is ${r({ typePaths, config })}`);
+    ]);
+    logger.log(`typePaths is ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();

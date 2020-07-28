@@ -10,11 +10,11 @@ import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
-import { dirname, join, resolve } from 'path';
-import * as responseTime from 'response-time';
-import { Connection, getConnectionOptions } from 'typeorm';
+import { dirname, resolve } from 'path';
 // import * as rookout from 'rookout';
 import * as requestIp from 'request-ip';
+import * as responseTime from 'response-time';
+import { Connection, getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
@@ -68,7 +68,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
-  logger.log(`configs: ${r(configLoader.loadConfigs())}`);
+  // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
   const dbConfig = await getConnectionOptions();
   logger.log(
@@ -239,13 +239,16 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   logger.log(`main entrance is ${r(process.mainModule.filename)}`);
   const { packageDir } = global;
   const suffix = packageDir.includes('node_modules') ? 'js' : 'ts';
-  const entities = [
+  const entities = _.uniq([
     `${resolve(packageDir)}/**/*entities.${suffix}`,
     `${resolve(rootDir, '../..')}/packages/*/src/**/*entities.${suffix}`,
     `${resolve(rootDir)}/**/*entities.ts`,
     ...(options.typeormEntities || []),
-  ];
-  const subscribers = [`${resolve(packageDir)}/**/*subscriber.${suffix}`, `${resolve(rootDir)}/**/*subscriber.ts`];
+  ]);
+  const subscribers = _.uniq([
+    `${resolve(packageDir)}/**/*subscriber.${suffix}`,
+    `${resolve(rootDir)}/**/*subscriber.ts`,
+  ]);
   logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
