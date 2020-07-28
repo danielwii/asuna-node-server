@@ -197,7 +197,7 @@ export class WeChatHelper {
           WeChatHelper.syncAdminUser(openId).catch((reason) => logger.error(reason)),
         );
         // 10000 is the max count of a request
-        return userList.count === 10000 ? userList.next_openid : null;
+        return userList.count === 10000 ? userList.next_openid : undefined;
       });
     }
   }

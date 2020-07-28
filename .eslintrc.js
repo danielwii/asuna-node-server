@@ -11,7 +11,6 @@ module.exports = {
     'plugin:unicorn/recommended',
     'plugin:prettier/recommended',
     'prettier',
-    'prettier/react',
     'prettier/@typescript-eslint',
   ],
   env: {
@@ -42,10 +41,6 @@ module.exports = {
     //   'error',
     //   { devDependencies: ['**/*test.ts', '**/*spec.ts'], optionalDependencies: false, peerDependencies: false },
     // ],
-    // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
-    // 'react/destructuring-assignment': 'off',
-    // No jsx extension: https://github.com/facebook/create-react-app/issues/87#issuecomment-234627904
-    // 'react/jsx-filename-extension': 'off',
     // Use function hoisting to improve code readability
     '@typescript-eslint/no-parameter-properties': 'off',
     '@typescript-eslint/no-inferrable-types': 'off',
