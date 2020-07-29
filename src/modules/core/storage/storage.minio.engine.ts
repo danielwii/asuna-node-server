@@ -50,7 +50,7 @@ export class MinioStorage implements IStorageEngine {
     const { filename, bucket, prefix, resolver } = opts;
     const pathname = join(bucket ?? this.defaultBucket, prefix ?? '', filename);
     const url = await resolver(pathname);
-    logger.debug(
+    logger.verbose(
       `resolveUrl ${r({ bucket: bucket ?? this.defaultBucket, prefix: prefix ?? '', filename, pathname, url })}`,
     );
     return res.redirect(url);

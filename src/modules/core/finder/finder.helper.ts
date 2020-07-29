@@ -53,7 +53,7 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
-    logger.debug(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
+    logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
       logger.warn(`${name ?? 'default'} not available in upstream ${defaultEndpoint}`);
@@ -70,7 +70,7 @@ export class FinderHelper {
         logger.verbose(`parse exchanges ${r({ exchanges })}`);
         const exchange = exchanges.find((x) => new RegExp(x.regex).test(path));
         if (exchange) {
-          logger.debug(`check exchange ${r({ exchange, path })}`);
+          logger.verbose(`check exchange ${r({ exchange, path })}`);
           return url.resolve(`${exchange.endpoint ?? ''}/`, path);
         }
       } catch (e) {
