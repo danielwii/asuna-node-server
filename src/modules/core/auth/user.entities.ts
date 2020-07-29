@@ -4,7 +4,7 @@ import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 import type { Constructor } from '../../base';
-import type { FinancialTransaction, Wallet, PointExchange } from '../../property';
+import type { FinancialTransaction, PointExchange, Wallet } from '../../property';
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';
 
@@ -15,19 +15,19 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
     super('u');
   }
 
-  @OneToOne('WXMiniAppUserInfo', 'profile')
+  @OneToOne('WXMiniAppUserInfo', (inverse: WXMiniAppUserInfo) => inverse.profile)
   miniAppUserInfo: WXMiniAppUserInfo;
 
-  @OneToMany('UserFollow', 'follower')
+  @OneToMany('UserFollow', (inverse: UserFollow) => inverse.follower)
   follows: UserFollow[];
 
-  @OneToMany('PointExchange', 'profile')
+  @OneToMany('PointExchange', (inverse: PointExchange) => inverse.profile)
   exchangeRecords: PointExchange[];
 
-  @OneToMany('FinancialTransaction', 'profile')
+  @OneToMany('FinancialTransaction', (inverse: FinancialTransaction) => inverse.profile)
   financialTransactions: FinancialTransaction[];
 
-  @OneToOne('Wallet', 'profile')
+  @OneToOne('Wallet', (inverse: Wallet) => inverse.profile)
   wallet: Wallet;
 
   /* use AuthedUserHelper.createProfile
@@ -50,7 +50,7 @@ export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(Base: T
     profileId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
-    @OneToOne((type) => UserProfile)
+    @OneToOne('UserProfile')
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }
@@ -65,7 +65,7 @@ export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(Ba
     profileId?: string;
 
     @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
-    @ManyToOne((type) => UserProfile)
+    @ManyToOne('UserProfile')
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }

@@ -67,7 +67,7 @@ export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransac
   // Relations
   // --------------------------------------------------------------
 
-  @ManyToOne((type) => ExchangeObject)
+  @ManyToOne('ExchangeObject')
   @JoinColumn({ name: 'exchange_object__id' })
   exchangeObject?: ExchangeObject;
 

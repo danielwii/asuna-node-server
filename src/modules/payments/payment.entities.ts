@@ -95,7 +95,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column('varchar', { nullable: true, name: 'type', default: PaymentMethodEnumValue.types.third })
   type: PaymentMethodType;
 
-  @OneToMany('PaymentTransaction', 'method')
+  @OneToMany('PaymentTransaction', (inverse: PaymentTransaction) => inverse.method)
   transactions: PaymentTransaction[];
 }
 
@@ -129,7 +129,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   images: JsonArray;
 
-  @ManyToMany('PaymentOrder', 'items')
+  @ManyToMany('PaymentOrder', (inverse: PaymentOrder) => inverse.items)
   orders: PaymentOrder[];
 }
 
@@ -157,11 +157,11 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   data: Record<string, unknown>;
 
   @MetaInfo({ name: '支付类型' })
-  @ManyToOne('PaymentMethod', 'transactions', { onDelete: 'SET NULL' })
+  @ManyToOne('PaymentMethod', (inverse: PaymentMethod) => inverse.transactions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'method__id' })
   method: PaymentMethod;
 
   @MetaInfo({ name: '订单' })
-  @OneToOne('PaymentOrder', 'transaction', { onDelete: 'CASCADE' })
+  @OneToOne('PaymentOrder', (inverse: PaymentOrder) => inverse.transaction, { onDelete: 'CASCADE' })
   order: PaymentOrder;
 }

@@ -20,7 +20,6 @@ import type { UserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
-// eslint-disable-next-line import/no-cycle
 import { WxSubscribeSceneType } from './wx.interfaces';
 
 @StaticImplements<IdentifierHelper<Partial<{ openId: string }>>>()
@@ -128,7 +127,7 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   // Relations
   // --------------------------------------------------------------
 
-  @OneToOne((type) => AdminUser, { eager: true })
+  @OneToOne('AdminUser', { eager: true })
   @JoinColumn({ name: 'admin__id' })
   admin?: AdminUser;
 }
@@ -202,7 +201,7 @@ export class WXMiniAppUserInfo extends BaseEntity {
 
   @Expose({ name: 'profile-id', toPlainOnly: true })
   @Transform((value) => value.id, { toPlainOnly: true })
-  @OneToOne('UserProfile', 'miniAppUserInfo')
+  @OneToOne('UserProfile', (inverse: UserProfile) => inverse.miniAppUserInfo)
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;
 

@@ -15,7 +15,7 @@ export class KeyValueModel extends Publishable(AbstractNameEntity) {
   @Column({ nullable: true, /* length: 36, */ name: 'pair__id' })
   pairId?: number;
 
-  @OneToOne('KeyValuePair', 'model', { onDelete: 'CASCADE' })
+  @OneToOne('KeyValuePair', (inverse: KeyValuePair) => inverse.model, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pair__id' })
   pair: KeyValuePair;
 

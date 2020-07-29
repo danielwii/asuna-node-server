@@ -32,7 +32,7 @@ export class Role extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   authorities: JsonMap;
 
-  @ManyToMany('AdminUser', 'roles')
+  @ManyToMany('AdminUser', (inverse: AdminUser) => inverse.roles)
   users: AdminUser[];
 }
 
@@ -44,12 +44,12 @@ export class AdminUser extends AbstractTimeBasedAuthUser {
   }
 
   @MetaInfo({ name: 'Tenant' })
-  @ManyToOne('Tenant', (tenant: Tenant) => tenant.users, { onDelete: 'SET NULL' })
+  @ManyToOne('Tenant', (inverse: Tenant) => inverse.users, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'tenant__id' })
   tenant: Tenant;
 
   @MetaInfo({ name: '角色' })
-  @ManyToMany('Role', (role: Role) => role.users, { primary: true })
+  @ManyToMany('Role', (inverse: Role) => inverse.users, { primary: true })
   @JoinTable({
     name: 'auth__tr_users_roles',
     joinColumn: { name: 'user__id' },

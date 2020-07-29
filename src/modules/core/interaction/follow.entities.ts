@@ -20,7 +20,7 @@ export class UserFollow extends AbstractTimeBasedBaseEntity {
   following: string;
 
   @MetaInfo({ accessible: 'readonly' })
-  @ManyToOne((type) => UserProfile, (profile) => profile.follows)
+  @ManyToOne('UserProfile', (inverse: UserProfile) => inverse.follows)
   @JoinColumn({ name: 'follower__id' })
   follower: UserProfile;
 }

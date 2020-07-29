@@ -29,12 +29,12 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   transactionId?: string;
 
   @MetaInfo({ name: '交易' })
-  @OneToOne('PaymentTransaction', 'order', { onDelete: 'CASCADE' })
+  @OneToOne('PaymentTransaction', (inverse: PaymentTransaction) => inverse.order, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'transaction__id' })
   transaction: PaymentTransaction;
 
   @MetaInfo({ name: '订单内容' })
-  @ManyToMany('PaymentItem', 'orders', { primary: true })
+  @ManyToMany('PaymentItem', (inverse: PaymentItem) => inverse.orders, { primary: true })
   @JoinTable({
     name: 'payment__tr_order_items',
     joinColumn: { name: 'order__id' },

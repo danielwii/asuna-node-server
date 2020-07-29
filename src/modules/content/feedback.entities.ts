@@ -34,7 +34,7 @@ export class Feedback extends InjectMultiUserProfile(AbstractBaseEntity) {
   status: FeedbackStatusType;
 
   @MetaInfo({ name: '回复' })
-  @OneToMany('FeedbackReply', 'feedback')
+  @OneToMany('FeedbackReply', (inverse: FeedbackReply) => inverse.feedback)
   replies: FeedbackReply[];
 }
 
@@ -57,7 +57,7 @@ export class FeedbackReply extends AbstractBaseEntity {
   senderType: FeedbackSenderType;
 
   @MetaInfo({ name: '关联的问题反馈' })
-  @ManyToOne((type) => Feedback, (feedback) => feedback.replies, { onDelete: 'CASCADE' })
+  @ManyToOne('Feedback', (inverse: Feedback) => inverse.replies, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'feedback__id' })
   feedback: Feedback;
 }

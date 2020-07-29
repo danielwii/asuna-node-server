@@ -45,7 +45,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   extra?: JsonMap;
 
-  @OneToOne('KeyValueModel', 'pair')
+  @OneToOne('KeyValueModel', (inverse: KeyValueModel) => inverse.pair)
   model: KeyValueModel;
 
   @AfterUpdate()

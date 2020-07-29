@@ -63,7 +63,7 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   // Relations
   // --------------------------------------------------------------
 
-  @OneToMany('TaskEvent', 'task')
+  @OneToMany('TaskEvent', (inverse: TaskEvent) => inverse.task)
   events: TaskEvent[];
 }
 
@@ -78,7 +78,7 @@ export class TaskEvent extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
   body: JsonMap;
 
-  @ManyToOne((type) => TaskRecord, (record) => record.events, { onDelete: 'CASCADE' })
+  @ManyToOne('TaskRecord', (inverse: TaskRecord) => inverse.events, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'task__id' })
   task: TaskRecord;
 }

@@ -31,7 +31,7 @@ export class AppInfo extends Publishable(AbstractNameEntity) {
   @Column('varchar', { nullable: true, name: 'mode' })
   mode: keyof typeof Mode;
 
-  @OneToMany('AppRelease', 'appInfo')
+  @OneToMany('AppRelease', (inverse: AppRelease) => inverse.appInfo)
   releases: AppRelease[];
 }
 
@@ -60,7 +60,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })
-  @ManyToOne((type) => AppInfo, (info) => info.releases, { onDelete: 'CASCADE' })
+  @ManyToOne('AppInfo', (inverse: AppInfo) => inverse.releases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'app_info__id' })
   appInfo: AppInfo;
 }

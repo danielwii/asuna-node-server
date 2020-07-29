@@ -17,7 +17,7 @@ export class ClientUser extends BaseEntity {
 
 export abstract class AbstractClientUserFavorite extends AbstractBaseEntity {
   @MetaInfo({})
-  @ManyToOne(type => ClientUser)
+  @ManyToOne('ClientUser')
   @JoinColumn({ name: 'client__id' })
   clientUser: ClientUser;
 }
