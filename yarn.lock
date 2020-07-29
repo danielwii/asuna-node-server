@@ -4326,10 +4326,10 @@ dayjs@^1.8.16:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.28.tgz#37aa6201df483d089645cb6c8f6cef6f0c4dbc07"
   integrity sha512-ccnYgKC0/hPSGXxj7Ju6AV/BP4HUkXC2u15mikXT5mX9YorEaoi1bEKOmAqdkJHN4EEkmAf97SpH66Try5Mbeg==
 
-dayjs@^1.8.30:
-  version "1.8.30"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.30.tgz#d3b314d3ccdc179015d915fd3c6e14422c026378"
-  integrity sha512-5s5IGuP5bVvIbOWkEDcfmXsUj24fZW1NMHVVSdSFF/kW8d+alZcI9SpBKC+baEyBe+z3fUp17y75ulstv5swUw==
+dayjs@^1.8.31:
+  version "1.8.31"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.8.31.tgz#0cd1114c2539dd5ad9428be0c38df6d4bb40b9d3"
+  integrity sha512-mPh1mslned+5PuIuiUfbw4CikHk6AEAf2Baxih+wP5fssv+wmlVhvgZ7mq+BhLt7Sr/Hc8leWDiwe6YnrpNt3g==
 
 debug@*, debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@~4.1.0:
   version "4.1.1"
@@ -11254,10 +11254,10 @@ snyk-try-require@1.3.1, snyk-try-require@^1.1.1, snyk-try-require@^1.3.1:
     lru-cache "^4.0.0"
     then-fs "^2.0.0"
 
-snyk@^1.368.0:
-  version "1.368.0"
-  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.368.0.tgz#0aa9f3af105a4844071ff7d6ba0b45ffe83a404f"
-  integrity sha512-ZwX0VxxKVBKqmycPiTpx2El1hPEeNJNKQRyez0yFtIlUM3FscsOpgtfRFWNQKA6znkI075JIpmmShpcrQRLpcQ==
+snyk@^1.369.0:
+  version "1.369.0"
+  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.369.0.tgz#83837a2e7c20dba881f1ad55cdd3e7c9364b8553"
+  integrity sha512-iDRFFtuglOILwe26MQuBGxM4MVeunY95FeUCY42nqbXJzKV1KrsXsqENY+HRHhY1aXAtGTSkf9VmMQHTJYfJYA==
   dependencies:
     "@snyk/cli-interface" "2.8.1"
     "@snyk/dep-graph" "1.18.3"

@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import * as qs from 'qs';
 import { IsNull, LessThan } from 'typeorm';
 import { AsunaErrorCode, AsunaException } from '../common';
-import { parseJSONIfCould, r } from '../common/helpers/utils';
+import { parseJSONIfCould, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
@@ -39,7 +39,6 @@ export class PaymentHelper {
     logger.log(`created order ${r({ item, method, order })}`);
 
     // create transaction
-    const method = await PaymentMethod.findOneOrFail(methodId);
     order.transaction = await PaymentTransaction.create({
       // name: `${profileId}'s transaction`,
       method,
