@@ -40,10 +40,14 @@ export class PaymentController {
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @Post('order')
-  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<any> {
+  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<void> {
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
-    const result = await PaymentHelper.pay(order.transaction.id, { callback: body.callback, clientIp: req.clientIp });
-    return _.isString(result) && isURL(result) ? res.redirect(result) : res.send(result);
+    const result = await PaymentHelper.pay(order.transactionId, { callback: body.callback, clientIp: req.clientIp });
+    if (_.isString(result) && isURL(result)) {
+      res.redirect(result);
+    } else {
+      res.send(result);
+    }
   }
 
   @UseGuards(new JwtAuthGuard())

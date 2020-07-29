@@ -36,18 +36,19 @@ export class PaymentHelper {
     const item = await PaymentItem.findOneOrFail(itemId);
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
     const method = await PaymentMethod.findOneOrFail(methodId);
-    logger.log(`created order ${r({ item, method, order })}`);
+    // logger.log(`created order ${r({ item, method, order })}`);
 
     // create transaction
-    order.transaction = await PaymentTransaction.create({
+    await PaymentTransaction.create({
       // name: `${profileId}'s transaction`,
       method,
       paymentInfo,
       profileId,
       order,
     }).save();
-    logger.log(`transaction is ${r(order.transaction)}`);
-    return order.save();
+    await order.reload();
+    logger.log(`created order is ${r(order)}`);
+    return order;
   }
 
   static async validateSign(orderId: string, body): Promise<boolean> {

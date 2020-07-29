@@ -24,6 +24,10 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   @Column({ nullable: true })
   status: string; // 订单状态
 
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 36, name: 'transaction__id' })
+  transactionId?: string;
+
   @MetaInfo({ name: '交易' })
   @OneToOne('PaymentTransaction', 'order', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'transaction__id' })
