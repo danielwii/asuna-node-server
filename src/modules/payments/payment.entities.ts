@@ -1,10 +1,11 @@
 import { html } from 'common-tags';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
+import type { PaymentOrder } from './payment.order.entities';
 
 /**
  * 支付方式配置
@@ -128,7 +129,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   images: JsonArray;
 
-  @ManyToMany('PaymentOrder', 'items', { primary: true })
+  @ManyToMany('PaymentOrder', 'items')
   orders: PaymentOrder[];
 }
 
@@ -147,11 +148,6 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   @Column({ nullable: true })
   sign: string;
 
-  @MetaInfo({ name: '支付类型' })
-  @ManyToOne((type) => PaymentMethod, (method) => method.transactions, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'method__id' })
-  method: PaymentMethod;
-
   @MetaInfo({ name: '附加信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   paymentInfo: Record<string, unknown>;
@@ -160,41 +156,12 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   data: Record<string, unknown>;
 
+  @MetaInfo({ name: '支付类型' })
+  @ManyToOne('PaymentMethod', 'transactions', { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'method__id' })
+  method: PaymentMethod;
+
   @MetaInfo({ name: '订单' })
   @OneToOne('PaymentOrder', 'transaction', { onDelete: 'CASCADE' })
-  order: any; // PaymentOrder;
-}
-
-@EntityMetaInfo({ name: 'payment__orders', internal: true, displayName: '订单' })
-@Entity('payment__t_orders')
-export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
-  constructor() {
-    super('po');
-  }
-
-  @MetaInfo({ name: '名称' })
-  @Column({ nullable: true, name: 'name' })
-  name: string;
-
-  @MetaInfo({ name: '总金额' })
-  @Column({ ...ColumnTypeHelper.money(), name: 'amount' })
-  amount: number;
-
-  @MetaInfo({ name: '状态' })
-  @Column({ nullable: true })
-  status: string; // 订单状态
-
-  @MetaInfo({ name: '交易' })
-  @OneToOne((type) => PaymentTransaction, (transaction) => transaction.order, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'transaction__id' })
-  transaction: PaymentTransaction;
-
-  @MetaInfo({ name: '订单内容' })
-  @ManyToMany((type) => PaymentItem, (item) => item.orders, { primary: true })
-  @JoinTable({
-    name: 'payment__tr_order_items',
-    joinColumn: { name: 'order__id' },
-    inverseJoinColumn: { name: 'item__id' },
-  })
-  items: PaymentItem[];
+  order: PaymentOrder;
 }

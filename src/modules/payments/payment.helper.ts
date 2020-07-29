@@ -11,8 +11,9 @@ import { parseJSONIfCould, r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
-import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from './payment.entities';
+import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
+import { PaymentOrder } from './payment.order.entities';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
@@ -30,12 +31,12 @@ export class PaymentHelper {
     paymentInfo: Record<string, unknown>;
     profileId: string;
   }): Promise<PaymentOrder> {
-    logger.log(`create order by ${r({ itemId, methodId, profileId })}`);
+    logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo })}`);
     // create order first
     const item = await PaymentItem.findOneOrFail(itemId);
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
-
-    logger.debug(`create order by ${r({ item, order })}`);
+    const method = await PaymentMethod.findOneOrFail(methodId);
+    logger.log(`created order ${r({ item, method, order })}`);
 
     // create transaction
     const method = await PaymentMethod.findOneOrFail(methodId);
@@ -44,8 +45,9 @@ export class PaymentHelper {
       method,
       paymentInfo,
       profileId,
-      order: order as any,
+      order,
     }).save();
+    logger.log(`transaction is ${r(order.transaction)}`);
     return order.save();
   }
 
