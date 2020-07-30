@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity } from 'typeorm';
+import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 import { AsunaErrorCode, AsunaException, LoggerFactory } from '../../common';
 import { DBHelper } from '../db';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
-import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
 
 const logger = LoggerFactory.getLogger('AuthedUserHelper');
 
@@ -47,11 +47,8 @@ export class AuthedUserHelper {
 
   static getUserByProfileId<User>(profileId: string, relations?: string[]): Promise<User> {
     ow(profileId, 'profileId', ow.string.nonEmpty);
-    const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);
-    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({
-      where: { profileId },
-      relations: existRelations.filter((relation) => relations?.includes(relation)),
-    }) as any;
+    // const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);
+    return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({ where: { profileId }, relations }) as any;
   }
 
   static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {

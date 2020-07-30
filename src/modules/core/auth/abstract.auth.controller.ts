@@ -1,16 +1,17 @@
 import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { Promise } from 'bluebird';
 import * as Chance from 'chance';
 import * as _ from 'lodash';
 import { DeepPartial, UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
 import { Hermes } from '../bus';
-import { DBHelper } from '../db';
 import { CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthUserChannel, WithProfileUser, WithProfileUserInstance } from './base.entities';
+import { UserProfile } from './user.entities';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
@@ -135,10 +136,10 @@ export abstract class AbstractAuthController {
   async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
-    const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
+    // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
     const loaded = await this.UserEntity.findOne<WithProfileUserInstance>(payload.uid, {
-      // maybe get relations from a register
-      relations: ['wallet', 'profile'].filter((relation) => relations.includes(relation)),
+      // maybe get relations from a register, cause user side relations won't load here.
+      // relations: ['profile'],
     });
     if (!payload) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
@@ -153,6 +154,7 @@ export abstract class AbstractAuthController {
       .catch((reason) => logger.error(reason));
     logger.debug(`current authed user is ${r(loaded)}`);
     const result = _.omit(loaded, 'channel', 'info'); // ...
+    result.profile = await UserProfile.findOne(result.profileId, { relations: ['wallet'] });
     _.set(result, 'profile', _.omit(result.profile, 'salt', 'password', 'info'));
     return result;
   }
