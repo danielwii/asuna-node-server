@@ -17,9 +17,8 @@ import {
   WxCodeSession,
   WxQrTicketInfo,
   WxSendTemplateInfo,
-  WxUserInfo,
-  WxUserList,
 } from './wx.interfaces';
+import { WxUserInfo, WxUserList } from './wx.vo';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 
