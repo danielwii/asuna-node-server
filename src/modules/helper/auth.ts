@@ -98,13 +98,14 @@ export class AuthHelper {
         if (err || info) {
           logger.warn(`jwt auth error: ${r(err)}`);
         } else {
-          const user = await AuthedUserHelper.getUserByProfileId<any>(payload.id, ['roles', 'tenant', 'profile']);
+          // TODO user not include tenant and roles, only admin-user has currently
+          const user = await AuthedUserHelper.getUserByProfileId(payload.id, ['profile']);
           req.identifier = UserIdentifierHelper.stringify(payload);
           req.payload = payload;
-          req.profile = await UserProfile.findOne(payload.id);
+          req.profile = user.profile;
           req.user = user;
-          req.tenant = user?.tenant;
-          req.roles = user?.roles;
+          req.tenant = user.tenant;
+          req.roles = user.roles;
         }
         resolve({ err: err || wrapErrorInfo(info), payload, info });
       })(req, res);

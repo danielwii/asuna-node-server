@@ -16,22 +16,25 @@ export class AuthedUserHelper {
     return [saved, user];
   }
 
-  static getProfileById(id: string | number): Promise<UserProfile> {
+  static getProfileById(id: string | number, options?: FindOneOptions<UserProfile>): Promise<UserProfile> {
     // console.log(`AuthedUserHelper.getProfileById ${id}`);
     if (typeof id === 'number') {
       // ow(id, 'id', ow.number.integer);
       return UserProfile.findOneOrFail(`u${id}`);
     }
     ow(id, 'id', ow.string.nonEmpty);
-    return UserProfile.findOneOrFail(id);
+    return UserProfile.findOneOrFail(id, options);
   }
 
-  static getProfile({ email, username }: { username?: string; email?: string }): Promise<UserProfile> {
+  static getProfile(
+    { email, username }: { username?: string; email?: string },
+    options?: FindOneOptions<UserProfile>,
+  ): Promise<UserProfile> {
     if (!email && !email) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
 
-    return UserProfile.findOneOrFail({ username, email });
+    return UserProfile.findOneOrFail({ username, email }, options);
   }
 
   static async getUserById<User>(id: string | number, options?: FindOneOptions<User>): Promise<User> {
@@ -45,7 +48,7 @@ export class AuthedUserHelper {
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(fixedId, options as any) as any;
   }
 
-  static getUserByProfileId<User>(profileId: string, relations?: string[]): Promise<User> {
+  static getUserByProfileId<User = any>(profileId: string, relations?: string[]): Promise<User> {
     ow(profileId, 'profileId', ow.string.nonEmpty);
     // const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail({ where: { profileId }, relations }) as any;
