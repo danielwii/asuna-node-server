@@ -16,6 +16,7 @@ type ExchangeObject implements BaseNameEntity {
   type: ExchangeCurrencyType!
   price: Float!
   value: String
+  cover: String
 
   isPublished: Boolean
 }
