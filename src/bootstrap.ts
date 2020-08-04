@@ -7,7 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
+import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
@@ -153,7 +153,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // --------------------------------------------------------------
 
   app.use(requestIp.mw());
-  app.use(helmet());
+  app.use((helmet as any)());
   app.use(compression());
   app.use(responseTime());
   if (configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT_ENABLED))
