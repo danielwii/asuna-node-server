@@ -7,7 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import * as compression from 'compression';
 import * as rateLimit from 'express-rate-limit';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
 import { dirname, resolve } from 'path';
