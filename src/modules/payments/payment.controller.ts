@@ -17,6 +17,8 @@ class CreateOrderDTO {
   methodId: number;
   @IsDefined()
   paymentInfo: Record<string, unknown>;
+  @IsOptional()
+  extra?: Record<string, unknown>;
 }
 
 class UpdateOrderDTO {

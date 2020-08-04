@@ -19,19 +19,23 @@ import { PaymentWxpayHelper } from './payment.wxpay.helper';
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
 export class PaymentHelper {
+  static notifyHandlers: Record<string, (order: PaymentOrder) => any> = {};
+
   static async createOrder({
     itemId,
     methodId,
     paymentInfo,
+    extra,
     profileId,
   }: {
     itemId: string;
     callback: string;
     methodId: number;
     paymentInfo: Record<string, unknown>;
+    extra?: Record<string, unknown>;
     profileId: string;
   }): Promise<PaymentOrder> {
-    logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo })}`);
+    logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo, extra })}`);
     // create order first
     const item = await PaymentItem.findOneOrFail(itemId);
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
@@ -43,6 +47,7 @@ export class PaymentHelper {
       // name: `${profileId}'s transaction`,
       method,
       paymentInfo,
+      extra,
       profileId,
       order,
     }).save();
@@ -234,6 +239,8 @@ export class PaymentHelper {
       await order.transaction.save();
       order.status = 'done';
       await order.save();
+
+      _.each(this.notifyHandlers, (handler) => handler(order));
       return;
     } else {
       // handle as alipay
@@ -280,6 +287,8 @@ export class PaymentHelper {
       await order.transaction.save();
       order.status = 'done';
       await order.save();
+
+      _.each(this.notifyHandlers, (handler) => handler(order));
       return;
     }
 

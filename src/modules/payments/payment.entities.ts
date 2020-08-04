@@ -148,9 +148,13 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   @Column({ nullable: true })
   sign: string;
 
+  @MetaInfo({ name: '支付相关信息' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'payment_info' })
+  paymentInfo: Record<string, unknown>;
+
   @MetaInfo({ name: '附加信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  paymentInfo: Record<string, unknown>;
+  extra: Record<string, unknown>;
 
   @MetaInfo({ name: '返回信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
