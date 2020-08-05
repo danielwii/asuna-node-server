@@ -153,7 +153,14 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // --------------------------------------------------------------
 
   app.use(requestIp.mw());
-  app.use((helmet as any)());
+  app.use(
+    (helmet as any)({
+      referrerPolicy: {
+        // no-referrer is the default and payment will not work
+        policy: 'no-referrer-when-downgrade',
+      },
+    } as helmet.HelmetOptions),
+  );
   app.use(compression());
   app.use(responseTime());
   if (configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT_ENABLED))
