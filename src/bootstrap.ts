@@ -155,6 +155,23 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(requestIp.mw());
   app.use(
     (helmet as any)({
+      contentSecurityPolicy: {
+        directives: {
+          'default-src': ["'self'"],
+          'base-uri': ["'self'"],
+          'block-all-mixed-content': [],
+          'font-src': ["'self'", 'https:', 'data:'],
+          'frame-ancestors': ["'self'"],
+          'img-src': ["'self'", 'data:'],
+          'object-src': ["'none'"],
+          // 'unsafe-inline' used to run alipay script
+          // TODO maybe more safer
+          'script-src': ["'self'", "'unsafe-inline'"],
+          'script-src-attr': ["'none'"],
+          'style-src': ["'self'", 'https:', "'unsafe-inline'"],
+          'upgrade-insecure-requests': [],
+        },
+      },
       referrerPolicy: {
         // no-referrer is the default and payment will not work
         policy: 'no-referrer-when-downgrade',
