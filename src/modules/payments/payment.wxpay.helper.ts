@@ -14,7 +14,7 @@ const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
 
 export class PaymentWxpayHelper {
-  static async createOrder(
+  static async createPaymentOrder(
     method: PaymentMethod,
     goods: {
       // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
@@ -25,6 +25,7 @@ export class PaymentWxpayHelper {
     },
     returnUrl?: string,
   ): Promise<string> {
+    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
     const notify_url = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
     if (_.isEmpty(notify_url)) {

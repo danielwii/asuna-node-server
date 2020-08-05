@@ -46,11 +46,12 @@ export class PaymentAlipayHelper {
     return result;
   }
 
-  static async createOrder(
+  static async createPaymentOrder(
     method: PaymentMethod,
     goods: { cost: number; name: string; packParams: object },
     returnUrl?: string,
   ): Promise<AlipaySdkCommonResult | string> {
+    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
     // const token = await this.authToken();
 
     const sdk = await this.sdk();

@@ -123,6 +123,7 @@ export class PaymentHelper {
     transactionId: string,
     { callback, clientIp }: { callback?: string; clientIp?: string },
   ): Promise<string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string }> {
+    logger.log(`pay ${r({ transactionId, callback, clientIp })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
@@ -131,7 +132,7 @@ export class PaymentHelper {
     }
 
     if (method.type === PaymentMethodEnumValue.types.alipay) {
-      return PaymentAlipayHelper.createOrder(
+      return PaymentAlipayHelper.createPaymentOrder(
         method,
         {
           cost: order.amount,
@@ -142,7 +143,7 @@ export class PaymentHelper {
       );
     }
     if (method.type === PaymentMethodEnumValue.types.wxpay) {
-      return PaymentWxpayHelper.createOrder(
+      return PaymentWxpayHelper.createPaymentOrder(
         method,
         {
           tradeNo: order.id,
