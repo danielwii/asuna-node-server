@@ -220,8 +220,8 @@ export class DBHelper {
     opts: { module?: string; prefix?: string },
   ): string {
     let selectable;
-    if (relation.target.entityInfo) {
-      selectable = (relation.target.entityInfo as EntityMetaInfoOptions).name;
+    if ((relation.target as any).entityInfo) {
+      selectable = ((relation.target as any).entityInfo as EntityMetaInfoOptions).name;
     } else {
       const { tableName } = relation.inverseEntityMetadata;
       const name = tableName.slice(`${opts.module}${opts.prefix}`.length);
