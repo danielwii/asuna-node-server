@@ -26,7 +26,7 @@ export class AuthHelper {
       passport.authenticate('admin-api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
         logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
         if (err || info) {
-          logger.warn(`api-key auth error: ${r(err)}`);
+          logger.error(`api-key auth error: ${r({ err, info })}`);
         } else {
           req.payload = payload;
           req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }

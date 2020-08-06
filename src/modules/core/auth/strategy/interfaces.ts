@@ -3,7 +3,7 @@ import { getIgnoreCase } from '../../../common/helpers';
 import { AnyAuthRequest, ApiKeyPayload } from '../../../helper/interfaces';
 import { AdminUser } from '../auth.entities';
 
-export const API_KEY_HEADER = 'X-ApiKey';
+export const API_KEY_HEADER = 'X-API-KEY';
 
 export function isApiKeyRequest(req: Request): req is AnyAuthRequest<ApiKeyPayload, AdminUser> {
   return !!getIgnoreCase(req.headers, API_KEY_HEADER);

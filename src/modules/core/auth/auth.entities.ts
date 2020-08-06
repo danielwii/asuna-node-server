@@ -10,11 +10,8 @@ import type { Tenant } from '../../tenant/tenant.entities';
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
 export class AdminApiKeys extends Publishable(AbstractNameEntity) {
-  @Column({ nullable: true, name: 'app_key' })
-  appKey?: string;
-
-  @Column({ nullable: true, name: 'app_secret' })
-  appSecret?: string;
+  @Column({ nullable: true, name: 'key' })
+  key?: string;
 }
 
 @EntityMetaInfo({ name: 'auth__roles', internal: true })
