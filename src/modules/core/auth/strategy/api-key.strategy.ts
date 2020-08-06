@@ -18,10 +18,10 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
     if (key) {
       const exists = await AdminApiKeys.find({ key, isPublished: true });
       if (exists) {
-        self.success({ apiKey: key });
+        return self.success({ apiKey: key });
       }
-      logger.error(`invalid api key: '${key}'`);
     }
+    logger.error(`invalid api key: '${key}'`);
     self.fail('ApiKey is required', 401);
   }
 }

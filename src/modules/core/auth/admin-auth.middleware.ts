@@ -25,6 +25,7 @@ export class AdminAuthMiddleware {
 
       const result = await auth(req as any, res);
 
+      // 仅在有认证信息的情况下检测异常
       if (!result.payload) {
         if (result.err instanceof Error) {
           throw result.err;
@@ -32,6 +33,8 @@ export class AdminAuthMiddleware {
           throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err ?? result.info);
         }
       }
+
+      // 无认证信息时继续运行代码，但可能被后续的 guards 拦截
       return next();
     };
   }
