@@ -112,7 +112,8 @@
     "validator": "^13.1.1",
     "winston": "^3.3.3",
     "xlsx": "^0.16.5",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.4.23",
+    "snyk": "^1.369.3"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.4.2",
@@ -171,7 +172,6 @@
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
     "pretty-quick": "^2.0.1",
-    "snyk": "^1.369.3",
     "sqlite3": "^5.0.0",
     "supertest": "^4.0.2",
     "ts-jest": "^26.1.4",
