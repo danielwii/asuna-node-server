@@ -19,6 +19,11 @@ input Sorter {
   order: Order = ASC
 }
 
+input CursoredRequest {
+  first: Int
+  after: String
+}
+
 input PageRequest {
   page: Int = 0
   size: Int = 10
@@ -99,19 +104,16 @@ interface PagedQuery {
   size: Int
 }
 
-interface PagedInfoQuery {
-  pageInfo: PageInfo
-  total: Int
-}
-
-type PageInfo {
+type CursorInfo {
   endCursor: String
   hasNextPage: Boolean
 }
 
 interface CursoredQuery {
-  totalCount: Int
-  pageInfo: PageInfo
+  first: Int
+  after: String
+  total: Int
+  cursorInfo: CursorInfo
 }
 
 # --------------------------------------------------------------

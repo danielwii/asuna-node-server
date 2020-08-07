@@ -25,15 +25,47 @@ type PaymentItem implements TimeBasedBaseNameEntity {
   images: [String]
 }
 
-type APIPaymentItem implements PagedQuery {
+type PaymentOrder implements TimeBasedBaseEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  amount: Float
+  transaction: PaymentTransaction
+  items: [PaymentItem]
+}
+
+type PaymentTransaction implements TimeBasedBaseNameEntity {
+  id: String!
+  createdAt: Date!
+  updatedAt: Date!
+
+  name: String!
+  description: String
+
+  status: String
+}
+
+type APIPagedPaymentItem implements PagedQuery {
   items: [PaymentItem]
   page: Int
   size: Int
   total: Int
 }
 
+type APICursoredPaymentOrder implements CursoredQuery {
+  items: [PaymentOrder]
+  first: Int
+  after: String
+  total: Int
+  cursorInfo: CursorInfo
+}
+
 extend type Query {
   api_payment_methods: [PaymentMethod]
 
-  api_paged_payment_items(pageRequest: PageRequest): APIPaymentItem
+  api_paged_payment_items(pageRequest: PageRequest): APIPagedPaymentItem
+
+  admin_paged_payment_orders(cursoredRequest: CursoredRequest): APICursoredPaymentOrder
 }

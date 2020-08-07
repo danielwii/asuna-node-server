@@ -162,11 +162,11 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
           'block-all-mixed-content': [],
           'font-src': ["'self'", 'https:', 'data:'],
           'frame-ancestors': ["'self'"],
-          'img-src': ["'self'", 'data:'],
+          // TODO load all domains' images
+          'img-src': ["'self'", 'data:', '*'],
           'object-src': ["'none'"],
-          // 'unsafe-inline' used to run alipay script
-          // TODO maybe more safer
-          'script-src': ["'self'", "'unsafe-inline'"],
+          // TODO maybe more safer, 'unsafe-inline' used to run alipay script
+          'script-src': ["'self'", "'unsafe-inline'", '*'],
           'script-src-attr': ["'none'"],
           'style-src': ["'self'", 'https:', "'unsafe-inline'"],
           'upgrade-insecure-requests': [],

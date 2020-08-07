@@ -1,6 +1,7 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
+import { PrimaryKey } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 
@@ -72,12 +73,14 @@ export class Pageable<T> {
 }
 
 export class CursoredPageable<T> {
+  first: number;
+  after: string;
   total: number;
-  pageInfo: CursorPageInfo;
+  cursorInfo: CursorInfo;
   items: T[];
 }
 
-export type CursorPageInfo = {
+export type CursorInfo = {
   endCursor: string | number;
   hasNextPage: boolean;
 };

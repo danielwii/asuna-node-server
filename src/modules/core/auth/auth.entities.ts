@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Publishable } from '../../base';
 import { AbstractBaseEntity, AbstractNameEntity } from '../../base/base.entity';
-import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
@@ -10,8 +10,12 @@ import type { Tenant } from '../../tenant/tenant.entities';
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
 export class AdminApiKeys extends Publishable(AbstractNameEntity) {
-  @Column({ nullable: true, name: 'key' })
-  key?: string;
+  @Column({ nullable: false, name: 'key' })
+  key: string;
+
+  @MetaInfo({ name: '白名单', type: 'SimpleJSON', jsonType: 'string-array' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'whitelist' })
+  whitelist: JsonArray;
 }
 
 @EntityMetaInfo({ name: 'auth__roles', internal: true })

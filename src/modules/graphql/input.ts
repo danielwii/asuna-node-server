@@ -12,6 +12,16 @@ export class SorterInput {
 
 export const toOrder = (sorter: SorterInput) => (sorter?.column ? { [sorter.column]: sorter.order ?? Order.ASC } : {});
 
+export class CursoredRequestInput {
+  @IsInt()
+  @IsOptional()
+  first?: number;
+
+  @IsString()
+  @IsOptional()
+  after?: string;
+}
+
 export class PageRequestInput implements PageRequest {
   @IsInt()
   @IsOptional()

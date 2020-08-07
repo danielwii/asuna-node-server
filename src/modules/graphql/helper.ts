@@ -1,5 +1,6 @@
 import { Promise } from 'bluebird';
 import { ClassType } from 'class-transformer/ClassTransformer';
+import * as F from 'futil';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -18,10 +19,16 @@ import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
 import { emptyOr, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
-import { PageInfo, PageRequest, toPage } from '../core/helpers';
+import { CursoredPageable, PageInfo, PageRequest, toPage } from '../core/helpers';
 import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
-import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader';
-import { CategoryInputQuery, QueryConditionInput, RelationQueryConditionInput, TimeConditionInput } from './input';
+import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/dataloader';
+import {
+  CategoryInputQuery,
+  CursoredRequestInput,
+  QueryConditionInput,
+  RelationQueryConditionInput,
+  TimeConditionInput,
+} from './input';
 
 const logger = LoggerFactory.getLogger('GraphqlHelper');
 
@@ -464,6 +471,42 @@ export class GraphqlHelper {
     const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, take });
 
     return { count, items };
+  }
+
+  static async handleCursoredQueryRequest<Entity extends BaseEntity>({
+    cls,
+    cursoredRequest,
+    where,
+  }: {
+    cls: ClassType<Entity>;
+    cursoredRequest: CursoredRequestInput;
+    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+  }): Promise<CursoredPageable<Entity>> {
+    const entityRepo = (cls as any) as Repository<Entity>;
+    const countOptions = F.when(!!where, () => where, {});
+    const total = await entityRepo.count(countOptions);
+    // const offsetOptions = await F.when(
+    //   cursoredRequest.after,
+    //   () => this.genericFindOptions({ cls, pageRequest: { size: first } }),
+    //   {},
+    // );
+    // const offset = await entityRepo.find(offsetOptions);
+    const first = F.when(cursoredRequest.first > 0 && cursoredRequest.first <= 20, () => cursoredRequest.first, 10);
+    const hasNextPage = first < total;
+    const findOptions = await this.genericFindOptions({
+      cls,
+      where: { ...F.when(!!cursoredRequest.after, () => ({ id: MoreThan(cursoredRequest.after) }), {}) },
+      pageRequest: { size: first },
+    });
+    const items = await entityRepo.find(findOptions);
+    logger.debug(`handleCursoredQueryRequest ${r({ countOptions, total, findOptions, first, cursoredRequest })}`);
+    return {
+      items,
+      total,
+      first,
+      after: cursoredRequest.after,
+      cursorInfo: { hasNextPage, endCursor: _.get(_.last(items), 'id') },
+    };
   }
 }
 
