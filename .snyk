@@ -1,5 +1,5 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.14.1
+version: v1.19.0
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
@@ -34,3 +34,5 @@ patch:
         patched: '2020-04-30T21:44:03.919Z'
     - cache-manager > lodash:
         patched: '2020-05-01T08:30:18.091Z'
+    - futil > lodash:
+        patched: '2020-08-07T12:44:44.978Z'
