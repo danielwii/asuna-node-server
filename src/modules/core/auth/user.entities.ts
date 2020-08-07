@@ -49,7 +49,7 @@ export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(Base: T
     @Column({ nullable: true, length: 36, name: 'profile__id' })
     profileId?: string;
 
-    @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
+    @MetaInfo({ name: '账户' })
     @OneToOne('UserProfile')
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
@@ -64,7 +64,7 @@ export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(Ba
     @Column({ nullable: true, length: 36, name: 'profile__id' })
     profileId?: string;
 
-    @MetaInfo({ name: '账户' /* , accessible: 'readonly' */ })
+    @MetaInfo({ name: '账户' })
     @ManyToOne('UserProfile')
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;

@@ -497,10 +497,13 @@ export class DBHelper {
   }
 
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): ColumnSchema[] {
-    const { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations } = this.extractOriginAsunaSchemas(
-      repository,
-      opts,
-    );
+    const {
+      columns,
+      manyToManyRelations,
+      manyToOneRelations,
+      oneToManyRelations,
+      oneToOneRelations,
+    } = this.extractOriginAsunaSchemas(repository, opts);
 
     return [
       ...columns,
@@ -508,6 +511,7 @@ export class DBHelper {
       ...manyToOneRelations,
       // 没有 info 信息的不予显示
       ...(_.filter(oneToManyRelations, fp.get('config.info')) as ColumnSchema[]),
+      ...oneToOneRelations,
     ];
   }
 
