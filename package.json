@@ -113,7 +113,7 @@
     "winston": "^3.3.3",
     "xlsx": "^0.16.5",
     "xml2js": "^0.4.23",
-    "snyk": "^1.369.3"
+    "snyk": "^1.370.0"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.4.2",
