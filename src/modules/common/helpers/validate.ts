@@ -1,5 +1,12 @@
 import { ClassTransformOptions, deserialize, plainToClass } from 'class-transformer';
-import { validate, validateSync, ValidationError } from 'class-validator';
+import {
+  validate,
+  validateSync,
+  ValidationArguments,
+  ValidationError,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 import * as _ from 'lodash';
 import { ClassType } from '../decorators';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
@@ -7,6 +14,15 @@ import { LoggerFactory } from '../logger/factory';
 import { r } from './utils';
 
 const logger = LoggerFactory.getLogger('Validator');
+
+@ValidatorConstraint({ name: 'exclusiveConstraint', async: false })
+export class ExclusiveConstraintValidator implements ValidatorConstraintInterface {
+  defaultMessage = (validationArguments?: ValidationArguments): string =>
+    `Exclusive constraint occurred: ${r(validationArguments, { stringify: true })}.`;
+
+  validate = (value: any, validationArguments?: ValidationArguments): Promise<boolean> | boolean =>
+    _.keys(_.omitBy(validationArguments.object, _.isNil)).length <= 1;
+}
 
 export async function validateObject(object): Promise<ValidationError[]> {
   if (!object) {

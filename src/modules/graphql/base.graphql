@@ -47,6 +47,12 @@ input QueryCondition {
   random: Int
 }
 
+input ExclusiveQueryCondition {
+  ids: [Any!]
+  random: Int
+  category: String
+}
+
 input AdminQueryCondition {
   ids: [Any!]
   where: JSON

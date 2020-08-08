@@ -25,6 +25,7 @@ import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/
 import {
   CategoryInputQuery,
   CursoredRequestInput,
+  ExclusiveQueryConditionInput,
   QueryConditionInput,
   RelationQueryConditionInput,
   TimeConditionInput,
@@ -145,7 +146,8 @@ export class GraphqlHelper {
     MixedEntity
   >(opts: {
     cls: ClassType<Entity>;
-    query: QueryConditionInput;
+    categoryCls?: ClassType<AbstractCategoryEntity>;
+    query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -159,7 +161,8 @@ export class GraphqlHelper {
     DataLoaders extends DefaultRegisteredLoaders
   >(opts: {
     cls: ClassType<Entity>;
-    query: QueryConditionInput;
+    categoryCls?: ClassType<AbstractCategoryEntity>;
+    query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -181,9 +184,11 @@ export class GraphqlHelper {
     pageInfo,
     loader,
     mapper,
+    categoryCls,
   }: {
     cls: ClassType<Entity>;
-    query: QueryConditionInput;
+    categoryCls?: ClassType<AbstractCategoryEntity>;
+    query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
@@ -237,6 +242,8 @@ export class GraphqlHelper {
       pageRequest: pageInfo,
       info,
       relationPath,
+      categoryCls,
+      query: { category: query.category },
       // skip: pageInfo.skip,
       // take: pageInfo.take,
     });

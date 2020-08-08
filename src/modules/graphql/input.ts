@@ -1,5 +1,7 @@
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNumber, IsOptional, IsString, Validate, ValidateNested } from 'class-validator';
 import { Order, PageInfo, PageRequest, toPage } from '../core/helpers';
+import { ExclusiveConstraintValidator } from '../common/helpers/validate';
+import { Type } from 'class-transformer';
 
 export class SorterInput {
   @IsString()
@@ -40,12 +42,37 @@ export class PageRequestInput implements PageRequest {
   info = (): PageInfo => toPage(this);
 }
 
+/**
+ * @deprecated {@see ExclusiveQueryConditionInput}
+ */
 export class QueryConditionInput {
   @IsOptional()
   ids?: string[] | number[];
 
   @IsOptional()
   random?: number;
+}
+
+export class ExclusiveQueryConditionInput {
+  @Validate(ExclusiveConstraintValidator)
+  @IsOptional()
+  ids?: string[] | number[];
+
+  @Validate(ExclusiveConstraintValidator)
+  @IsNumber()
+  @IsOptional()
+  random?: number;
+
+  @Validate(ExclusiveConstraintValidator)
+  @IsString()
+  @IsOptional()
+  category?: string;
+}
+
+export abstract class QueryInput {
+  @ValidateNested()
+  @Type(() => ExclusiveQueryConditionInput)
+  exclusive: ExclusiveQueryConditionInput;
 }
 
 export class RelationQueryConditionInput {
