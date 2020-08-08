@@ -4204,10 +4204,18 @@ crc32@^0.2.2:
   resolved "https://registry.yarnpkg.com/crc32/-/crc32-0.2.2.tgz#7ad220d6ffdcd119f9fc127a7772cacea390a4ba"
   integrity sha1-etIg1v/c0Rn5/BJ6d3LKzqOQpLo=
 
-cron-parser@^2.13.0, cron-parser@^2.15.0:
+cron-parser@^2.13.0:
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.15.0.tgz#04803cd51d8efcfcc6f83ac08e60f3f8c40c7ec5"
   integrity sha512-rMFkrQw8+oG5OuwjiXesup4KeIlEG/IU82YtG4xyAHbO5jhKmYaHPp/ZNhq9+7TjSJ65E3zV3kQPUbmXSff2/g==
+  dependencies:
+    is-nan "^1.3.0"
+    moment-timezone "^0.5.31"
+
+cron-parser@^2.16.2:
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/cron-parser/-/cron-parser-2.16.2.tgz#2fa3ac4dcbb8624df52abb4a35a73a6982d4b71c"
+  integrity sha512-h6PufI9EryZT35SzSg1NNA6Iagn4Hjxj/G9ketPKvh+OCkSLVV3y7b2u3q+M+HPSb4mgjPOTayqirar7RtO8vg==
   dependencies:
     is-nan "^1.3.0"
     moment-timezone "^0.5.31"
