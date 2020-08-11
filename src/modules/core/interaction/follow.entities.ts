@@ -4,8 +4,8 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { InteractionFollowEnumValue, InteractionFollowType } from './enum-values';
 import { UserProfile } from '../auth/user.entities';
 
-@EntityMetaInfo({ name: 'user__follow', internal: true })
-@Entity('user__t_follow')
+@EntityMetaInfo({ name: 'user__follows', internal: true })
+@Entity('user__t_follows')
 export class UserFollow extends AbstractTimeBasedBaseEntity {
   constructor() {
     super('uf');
@@ -18,6 +18,10 @@ export class UserFollow extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ accessible: 'readonly' })
   @Column({ nullable: true, length: 50 })
   following: string;
+
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 36, name: 'follower__id' })
+  followerId?: string;
 
   @MetaInfo({ accessible: 'readonly' })
   @ManyToOne('UserProfile', (inverse: UserProfile) => inverse.follows)

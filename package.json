@@ -113,7 +113,7 @@
     "winston": "^3.3.3",
     "xlsx": "^0.16.5",
     "xml2js": "^0.4.23",
-    "snyk": "^1.370.1"
+    "snyk": "^1.372.0"
   },
   "devDependencies": {
     "@nestjs/testing": "^7.4.2",
@@ -155,7 +155,7 @@
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.0.1",
     "@types/xml2js": "^0.4.5",
-    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
     "eslint": "^7.6.0",
     "eslint-config-airbnb-typescript": "^9.0.0",
     "eslint-config-prettier": "^6.11.0",
