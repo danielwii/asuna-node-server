@@ -1,6 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
-import { emptyOr, r } from '../common/helpers';
+import * as F from 'futil';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtPayload } from '../core/auth';
 import { Pageable } from '../core/helpers';
@@ -78,7 +79,7 @@ export class PropertyQueryResolver {
         cls: ExchangeObject,
         relationPath: `${PropertyQueryResolver.prototype.api_exchangeObjects.name}.items`,
         info,
-        where: { ...emptyOr(!!usage, { usage }) },
+        where: { ...F.when(!!usage, () => ({ usage }), {}) },
         order: toOrder(orderBy),
       }),
     );

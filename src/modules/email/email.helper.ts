@@ -5,9 +5,10 @@ import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
 import { Attachment, Options } from 'nodemailer/lib/mailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
+import * as F from 'futil';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
-import { emptyOr, r } from '../common/helpers/utils';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger/factory';
 import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamic_configs';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
@@ -112,7 +113,7 @@ export class EmailHelper {
           ? { filename: attachment.name, path: `${domain}/${attachment.prefix}/${attachment.filename}` }
           : (attachment as Attachment),
       ),
-      ...emptyOr(!!content, { html: content }),
+      ...F.when(!!content, () => ({ html: content }), {}),
     };
     logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);

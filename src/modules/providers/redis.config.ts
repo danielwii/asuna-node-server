@@ -1,6 +1,7 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
-import { emptyOr, r } from '../common/helpers';
+import * as F from 'futil';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
 
@@ -59,7 +60,7 @@ export class RedisConfigObject {
     return {
       host: this.host,
       port: this.port,
-      ...emptyOr(!!this.password, { password: this.password }),
+      ...F.when(!!this.password, () => ({ password: this.password }), {}),
       db: this.db,
       // connect_timeout: 10_000,
       retry_strategy: (options) => {

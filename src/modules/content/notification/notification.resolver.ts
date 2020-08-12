@@ -1,7 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
-import { emptyOr, r } from '../../common/helpers';
+import * as F from 'futil';
+import { r } from '../../common/helpers';
 import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { NotificationType } from './enum-values';
 import { Notification } from './notification.entities';
@@ -38,7 +39,7 @@ export class NotificationQueryResolver extends QueryResolver {
       ctx,
       loader: (loaders) => loaders.notifications,
       query: {},
-      where: { ...emptyOr(!!usage, { usage }), ...emptyOr(!!type, { type }) },
+      where: { ...F.when(!!usage, () => ({ usage }), {}), ...F.when(!!type, () => ({ type }), {}) },
       mapper: NotificationHelper.loadMixedNotification,
     });
   }

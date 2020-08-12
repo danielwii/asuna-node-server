@@ -2,13 +2,13 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
+import * as F from 'futil';
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
 import {
   AsunaErrorCode,
   AsunaException,
   deserializeSafely,
-  emptyOr,
   IdentifierHelper,
   r,
   StaticImplements,
@@ -278,7 +278,7 @@ export class KvHelper {
     }
 
     logger.debug(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...emptyOr(!!exists, { id: exists?.id }), ...entity } as any).finally(() =>
+    return KeyValuePair.save({ ...F.when(!!exists, () => ({ id: exists?.id }), {}), ...entity }).finally(() =>
       CacheUtils.clear({ prefix: 'kv', key: { collection, key } }),
     );
   }
@@ -318,7 +318,7 @@ export class KvHelper {
   static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return KeyValuePair.find({
       collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
-      ...emptyOr(!!key, { key }),
+      ...F.when(!!key, () => ({ key }), {}),
     }).then(
       fp.map((item) => {
         // eslint-disable-next-line no-param-reassign

@@ -3,9 +3,9 @@ import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Secret, SignOptions } from 'jsonwebtoken';
 import * as _ from 'lodash';
+import * as F from 'futil';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
-import { emptyOr } from '../../common';
 import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
@@ -54,7 +54,7 @@ export class TokenHelper {
   }
 
   static createCustomToken(
-    payload: string | Buffer | object,
+    payload: string | Buffer | Record<string, unknown>,
     secretOrPrivateKey: Secret,
     options?: SignOptions,
   ): string {
@@ -115,9 +115,9 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     options?: FindOneOptions<U>,
   ): Promise<U> {
     const condition = {
-      ...emptyOr(!!identifier.email, { email: identifier.email }),
-      ...emptyOr(!!identifier.username, { username: identifier.username }),
-      ...emptyOr(!_.isNil(isActive), { isActive }),
+      ...F.when(!!identifier.email, () => ({ email: identifier.email }), {}),
+      ...F.when(!!identifier.username, () => ({ username: identifier.username }), {}),
+      ...F.when(!_.isNil(isActive), () => ({ isActive }), {}),
     };
     logger.debug(`get user by condition ${r(condition)}`);
     return this.userRepository.findOne(condition as any, options);
@@ -126,10 +126,10 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.userRepository.findOne(
       {
-        ...emptyOr(!!identifier.email, { email: identifier.email }),
-        ...emptyOr(!!identifier.username, { username: identifier.username }),
+        ...F.when(!!identifier.email, () => ({ email: identifier.email }), {}),
+        ...F.when(!!identifier.username, () => ({ username: identifier.username }), {}),
         isActive,
-      } as any,
+      },
       { select: ['id', 'username', 'email', 'channel', 'password', 'salt'] },
     );
   }

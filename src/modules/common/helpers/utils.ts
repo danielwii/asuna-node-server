@@ -29,14 +29,6 @@ export function execAsync(command: string): Promise<string> {
   });
 }
 
-export function emptyOr<Value>(
-  condition: boolean,
-  value: Value,
-  defaultValue?: Record<string, unknown>,
-): Value | Record<string, unknown> {
-  return condition ? value : defaultValue ?? {};
-}
-
 export const withP = <P, R>(parameter: P, fn: (p: P) => R) => fn(parameter);
 export const withP2 = <P1, P2, R>(parameter1: P1, parameter2: P2, fn: (p1: P1, p2: P2) => R) =>
   fn(parameter1, parameter2);
@@ -148,7 +140,7 @@ export function parseJSONIfCould(value?: string): any {
   try {
     if (value) return JSON.parse(value);
     // eslint-disable-next-line no-empty
-  } catch (e) {}
+  } catch {}
   return value;
 }
 

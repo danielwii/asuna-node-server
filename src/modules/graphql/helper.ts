@@ -16,7 +16,7 @@ import {
 } from 'typeorm';
 import { AbstractCategoryEntity } from '../base';
 import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
-import { emptyOr, r } from '../common/helpers';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { CursoredPageable, PageInfo, PageRequest, toPage } from '../core/helpers';
@@ -95,7 +95,7 @@ export class GraphqlHelper {
     const includeOrdinal = DBHelper.getPropertyNames(cls).includes('ordinal');
     return pageRequest && pageRequest.orderBy
       ? ({ [pageRequest.orderBy.column]: pageRequest.orderBy.order } as any)
-      : { ...emptyOr(includeOrdinal, { ordinal: 'DESC' }), createdAt: 'DESC' };
+      : { ...F.when(includeOrdinal, () => ({ ordinal: 'DESC' }), {}), createdAt: 'DESC' };
   }
 
   static async handlePagedDefaultQueryRequest<
@@ -207,7 +207,7 @@ export class GraphqlHelper {
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls))) as any;
     const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
     // eslint-disable-next-line no-param-reassign
-    where = _.isString(where) ? where : { ...where, ...emptyOr(publishable, { isPublished: true }) };
+    where = _.isString(where) ? where : { ...where, ...F.when(publishable, () => ({ isPublished: true }), {}) };
 
     if (query.random > 0) {
       logger.debug(`parse where ${r({ publishable, cls, where })}`);
@@ -319,20 +319,24 @@ export class GraphqlHelper {
     }
 
     if (timeCondition && typeof where === 'object') {
-      const afterCondition = emptyOr(!!(timeCondition && timeCondition.after), {
-        [timeCondition.column]: MoreThan(timeCondition.after),
-      });
-      const beforeCondition = emptyOr(!!(timeCondition && timeCondition.before), {
-        [timeCondition.column]: LessThan(timeCondition.before),
-      });
+      const afterCondition = F.when(
+        !!(timeCondition && timeCondition.after),
+        () => ({ [timeCondition.column]: MoreThan(timeCondition.after) }),
+        {},
+      );
+      const beforeCondition = F.when(
+        !!(timeCondition && timeCondition.before),
+        () => ({ [timeCondition.column]: LessThan(timeCondition.before) }),
+        {},
+      );
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
     logger.debug(`loadRelationIds: ${r({ relations, relationPath, loadRelationIds })}`);
     const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
-      ...emptyOr(!!pageRequest, toPage(pageRequest)),
-      ...emptyOr(selectFields && selectFields.length > 0, { select: selectFields }),
+      ...F.when(!!pageRequest, () => toPage(pageRequest), {}),
+      ...F.when(selectFields && selectFields.length > 0, () => ({ select: selectFields }), {}),
       where: whereCondition,
       join,
       loadRelationIds,
