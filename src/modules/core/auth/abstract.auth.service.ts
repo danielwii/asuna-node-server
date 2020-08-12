@@ -54,7 +54,7 @@ export class TokenHelper {
   }
 
   static createCustomToken(
-    payload: string | Buffer | Record<string, unknown>,
+    payload: string | Buffer | object,
     secretOrPrivateKey: Secret,
     options?: SignOptions,
   ): string {
