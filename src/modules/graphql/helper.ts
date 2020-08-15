@@ -402,17 +402,23 @@ export class GraphqlHelper {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
     }
 
-    const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-    const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
-      loadRelationIds: { relations: [opts.key as string] },
-      cache: opts.cache,
-    })) as Entity;
-    const ids = result[opts.key] as any;
+    // logger.debug(`load ids by ${r(opts)}`);
+    let ids = opts.instance[opts.key];
+    if (_.isNil(ids)) {
+      const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
+      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+        loadRelationIds: { relations: [opts.key as string] },
+        cache: opts.cache,
+      })) as Entity;
+      ids = result[opts.key] as any;
+    }
     if (_.isEmpty(ids)) return [];
+
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
       return _opts.loader.load(ids as PrimaryKey[]).then((items) => mapItems(items, mapper));
     }
+
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
     return targetRepo.findByIds(ids).then((items) => mapItems(items, mapper));

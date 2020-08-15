@@ -200,6 +200,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  // see https://expressjs.com/en/guide/behind-proxies.html
+  app.set('trust proxy', 1);
 
   if (options.redisMode === 'redis') {
     app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter').RedisIoAdapter)(app));

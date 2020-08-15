@@ -34,7 +34,7 @@ export class GraphqlModule implements OnModuleInit {
       `${join(dir)}/**/src/**/*.graphql`,
       `${join(process.mainModule.path, '../src')}/**/*.graphql`,
     ]);
-    logger.log(`typePaths is ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
+    logger.log(`init graphql ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();

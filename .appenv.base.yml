@@ -46,9 +46,9 @@ uploader: # TODO
 
 graphql:
   # default: false
-  debug: true
+  debug: false
   # default: false
-  playground_enable: true
+  playground_enable: false
 
 # -- sentry --
 sentry:

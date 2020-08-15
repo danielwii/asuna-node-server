@@ -51,17 +51,17 @@ export type RedeemTokenOpts = {
 
 export class OperationTokenOpts {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly key: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly service: string;
 
   readonly role: keyof typeof TokenRule;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform((value) => _.trim(value))
   readonly identifier: string;
 
   readonly payload?: object;
@@ -69,14 +69,14 @@ export class OperationTokenOpts {
   readonly type: 'Unlimited' | 'OneTime' | 'MultiTimes' | 'TimeBased' | 'TimeBased';
 
   @IsInt()
-  @Transform(value => (value || value === 0 ? Number(value) : null))
+  @Transform((value) => (value || value === 0 ? Number(value) : null))
   readonly remainingCount?: number;
 
   @IsDate()
   readonly expiredAt?: Date;
 
   @IsInt()
-  @Transform(value => (value || value === 0 ? Number(value) : null))
+  @Transform((value) => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   constructor(o: OperationTokenOpts) {
@@ -123,11 +123,7 @@ export class OperationTokenHelper {
       //       .toDate(),
       // },
       [OperationTokenType.TimeBased]: {
-        expiredAt:
-          _.get(opts, 'expiredAt') ||
-          moment()
-            .add(_.get(opts, 'expiredInMinutes'), 'minutes')
-            .toDate(),
+        expiredAt: _.get(opts, 'expiredAt') || moment().add(_.get(opts, 'expiredInMinutes'), 'minutes').toDate(),
       },
     }[type];
 
@@ -186,13 +182,7 @@ export class OperationTokenHelper {
     return null;
   }
 
-  static async getToken({
-    token,
-    shortId,
-  }: {
-    token?: string;
-    shortId?: string;
-  }): Promise<OperationToken | undefined> | null {
+  static async getToken({ token, shortId }: { token?: string; shortId?: string }): Promise<OperationToken | undefined> {
     if ((token && token.trim()) || (shortId && shortId.trim())) {
       return OperationToken.findOne({
         where: {
@@ -215,6 +205,13 @@ export class OperationTokenHelper {
       return operationToken.reload();
     }
     throw new AsunaException(AsunaErrorCode.Unprocessable, 'invalid token');
+  }
+
+  static checkAvailableByToken = async (token: string): Promise<boolean> =>
+    OperationTokenHelper.checkAvailable(await OperationTokenHelper.getTokenByToken(token));
+
+  static extend(operationToken: OperationToken, minutes: number): Promise<void> {
+    operationToken.expiredAt = moment().add(minutes, 'minutes').toDate();
   }
 
   static async checkAvailable(operationToken: OperationToken): Promise<boolean> {

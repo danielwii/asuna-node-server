@@ -7,6 +7,7 @@ import { ColumnTypeHelper } from '../helpers';
 export const TokenRule = {
   sys: 'sys',
   auth: 'auth',
+  live: 'live',
   operation: 'operation',
   other: 'other',
 };
