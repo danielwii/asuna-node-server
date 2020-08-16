@@ -210,7 +210,7 @@ export class OperationTokenHelper {
   static checkAvailableByToken = async (token: string): Promise<boolean> =>
     OperationTokenHelper.checkAvailable(await OperationTokenHelper.getTokenByToken(token));
 
-  static extend(operationToken: OperationToken, minutes: number): Promise<void> {
+  static extend(operationToken: OperationToken, minutes: number): void {
     operationToken.expiredAt = moment().add(minutes, 'minutes').toDate();
   }
 

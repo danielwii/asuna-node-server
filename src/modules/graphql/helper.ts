@@ -365,7 +365,7 @@ export class GraphqlHelper {
     })) as Entity;
     const id = result[opts.key] as any;
     // logger.debug(`resolveProperty ${r({ result, opts, id })}`);
-    if (!id) return undefined;
+    if (!id) return;
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
       return _opts.loader.load(id);
@@ -416,12 +416,12 @@ export class GraphqlHelper {
 
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
-      return _opts.loader.load(ids as PrimaryKey[]).then((items) => mapItems(items, mapper));
+      return _opts.loader.load((ids as any) as any[]).then((items) => mapItems(items, mapper));
     }
 
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
-    return targetRepo.findByIds(ids).then((items) => mapItems(items, mapper));
+    return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }
 
   static pagedResult<Entity>({
@@ -474,7 +474,7 @@ export class GraphqlHelper {
     // cls: Job;
     // key: string;
   }) {
-    if (!origin) return undefined;
+    if (!origin) return;
 
     const targetRepo = (targetCls as any) as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
