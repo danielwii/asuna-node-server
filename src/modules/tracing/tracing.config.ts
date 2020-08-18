@@ -29,12 +29,12 @@ export class TracingConfigObject {
       ([prefix, config, keys]) =>
         new TracingConfigObject({
           enabled: withP(keys.enabled, (p) =>
-            configLoader.loadBoolConfig(_.upperCase(`${prefix}${p}`), _.get(config, p)),
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
           ),
           service_name: withP(keys.service_name, (p) =>
-            configLoader.loadConfig(_.upperCase(`${prefix}${p}`), _.get(config, p)),
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
           ),
-          endpoint: withP(keys.enabled, (p) => configLoader.loadConfig(_.upperCase(`${prefix}${p}`), _.get(config, p))),
+          endpoint: withP(keys.enabled, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
         }),
     );
 }

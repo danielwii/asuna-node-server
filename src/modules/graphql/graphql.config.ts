@@ -9,8 +9,9 @@ export enum GraphQLConfigKeys {
   playground_enable = 'playground_enable',
 }
 
+const logger = LoggerFactory.getLogger('GraphQLConfigObject');
+
 export class GraphQLConfigObject {
-  static logger = LoggerFactory.getLogger('GraphQLConfigObject');
   static key = YamlConfigKeys.graphql;
   static prefix = `${GraphQLConfigObject.key}_`;
 
@@ -28,9 +29,9 @@ export class GraphQLConfigObject {
       GraphQLConfigKeys,
       (prefix, config, keys) =>
         new GraphQLConfigObject({
-          debug: withP(keys.debug, (p) => configLoader.loadBoolConfig(_.upperCase(`${prefix}${p}`), _.get(config, p))),
+          debug: withP(keys.debug, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           playground_enable: withP(keys.playground_enable, (p) =>
-            configLoader.loadBoolConfig(_.upperCase(`${prefix}${p}`), _.get(config, p)),
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
           ),
         }),
     );

@@ -44,25 +44,21 @@ export class EmailConfigObject {
       (prefix, config, keys) =>
         new EmailConfigObject({
           enable: withP(keys.enable, (p) =>
-            configLoader.loadBoolConfig(_.upperCase(`${prefix}${p}`), _.get(config, p) ?? false),
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
           ),
           host: withP(keys.host, (p) =>
-            configLoader.loadConfig(_.upperCase(`${prefix}${p}`), _.get(config, p) ?? 'localhost'),
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 'localhost'),
           ),
           port: withP(keys.port, (p) =>
-            configLoader.loadNumericConfig(_.upperCase(`${prefix}${p}`), _.get(config, p) ?? 465),
+            configLoader.loadNumericConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 465),
           ),
           ssl: withP(keys.ssl, (p) =>
-            configLoader.loadBoolConfig(_.upperCase(`${prefix}${p}`), _.get(config, p) ?? false),
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
           ),
-          username: withP(keys.username, (p) =>
-            configLoader.loadConfig(_.upperCase(`${prefix}${p}`), _.get(config, p)),
-          ),
-          password: withP(keys.password, (p) =>
-            configLoader.loadConfig(_.upperCase(`${prefix}${p}`), _.get(config, p)),
-          ),
+          username: withP(keys.username, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          password: withP(keys.password, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           interval: withP(keys.interval, (p) =>
-            configLoader.loadNumericConfig(_.upperCase(`${prefix}${p}`), _.get(config, p) ?? 2000),
+            configLoader.loadNumericConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 2000),
           ),
         }),
     );
