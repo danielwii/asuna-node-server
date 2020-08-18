@@ -54,6 +54,7 @@ export class AdminAuthController extends RestCrudController {
 
   // TODO need role: SYS_ADMIN
   // FIXME type ResetPasswordDto not recognise email
+  @HttpCode(200)
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<UpdateResult> {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);

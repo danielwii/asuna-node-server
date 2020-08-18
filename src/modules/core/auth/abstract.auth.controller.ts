@@ -25,18 +25,20 @@ export abstract class AbstractAuthController {
     } = {},
   ) {}
 
+  @HttpCode(200)
   @Post('reset-password')
   @UseGuards(new JwtAuthGuard())
   async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
-    const { payload, user } = req;
-    logger.log(`reset password: ${r({ dto, payload, user })}`);
+    const { payload } = req;
+    logger.log(`reset password: ${r({ dto, payload })}`);
 
     const { hash, salt } = PasswordHelper.encrypt(dto.password);
     return this.authService
-      .updatePassword(user.id, hash, salt)
+      .updatePassword(payload.id, hash, salt)
       .then((result) => this.handlers.onResetPassword?.(result, dto));
   }
 
+  @HttpCode(200)
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
   async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<void> {
