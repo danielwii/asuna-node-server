@@ -16,6 +16,7 @@ import {
   OriginSchema,
   parseFields,
   parseNormalWhereAndRelatedFields,
+  parseNormalWheres,
   parseOrder,
   parseWhere,
 } from '../core/db';
@@ -23,6 +24,8 @@ import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
 import { AnyAuthRequest } from '../helper/interfaces';
 import { Tenant, TenantHelper } from '../tenant';
+import * as F from 'futil';
+
 // import { AdminUser } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('RestCrudController');
@@ -113,9 +116,12 @@ export abstract class RestCrudController {
 
     if (order) queryBuilder.orderBy(order as any);
 
-    const { normalWhere } = parseNormalWhereAndRelatedFields(where, repository);
-    logger.log(`list ${r(modelName)} with ${r({ where, normalWhere })}`);
-    DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWhere);
+    const normalWheres = parseNormalWheres(where, repository);
+    logger.log(`list ${r(modelName)} with ${r({ where, normalWheres })}`);
+
+    // TODO 这里在 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
+    if (_.isArray(normalWheres)) queryBuilder.where(where);
+    else DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWheres);
 
     if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 

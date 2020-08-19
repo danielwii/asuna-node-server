@@ -64,10 +64,6 @@ export interface MetaInfoBaseOptions {
 
 export interface NormalMetaInfoOptions extends MetaInfoBaseOptions {
   type?:
-    | 'Image'
-    | 'Images'
-    | 'File'
-    | 'Files'
     | 'Video'
     | 'Videos'
     | 'Authorities'
@@ -148,6 +144,11 @@ export interface STIMetaInfoOptions extends MetaInfoBaseOptions {
   defaultValue?: string;
 }
 
+export interface UploadMetaInfoOptions extends MetaInfoBaseOptions {
+  type: 'Image' | 'Images' | 'File' | 'Files';
+  uploadOpts?: { bucket?: string; prefix?: string };
+}
+
 export type MetaInfoOptions =
   | StringTmplMetaInfoOptions
   | AddressMetaInfoOptions
@@ -155,7 +156,8 @@ export type MetaInfoOptions =
   | EnumFilterMetaInfoOptions
   | EnumMetaInfoOptions
   | EditableEnumMetaInfoOptions
-  | JSONMetaInfoOptions;
+  | JSONMetaInfoOptions
+  | UploadMetaInfoOptions;
 
 /**
  * 为对象附加 `info` 信息

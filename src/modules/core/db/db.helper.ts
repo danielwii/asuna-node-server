@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
+import * as F from 'futil';
 import {
   Any,
   BaseEntity,
@@ -72,13 +73,26 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
   if (value) {
     try {
       const parsed = JSON.parse(value);
-      return R.map(parseCondition)(parsed);
-    } catch (error) {
-      logger.warn(error);
+      const result = R.ifElse(
+        _.isArray,
+        (v) => _.map(v, R.map(parseCondition)),
+        (v) => R.map(parseCondition)(v),
+      )(parsed);
+      logger.debug(`condition is ${r({ parsed, result })}`);
+      return result;
+    } catch (reason) {
+      logger.warn(`parse where error ${r(reason)}`);
     }
   }
   return null;
 }
+
+export const parseNormalWheres = (where, repository): any | any[] =>
+  R.ifElse(
+    _.isArray,
+    (v) => _.map(v, (str) => parseNormalWhereAndRelatedFields(str, repository).normalWhere),
+    (v) => parseNormalWhereAndRelatedFields(v, repository).normalWhere,
+  )(where);
 
 export function parseNormalWhereAndRelatedFields(
   where,
@@ -100,6 +114,7 @@ export function parseNormalWhereAndRelatedFields(
       normalWhere.push({ field, value });
     }
   });
+  logger.debug(`parsed conditions is ${r({ normalWhere, relatedFields, relatedWhere, allRelations })}`);
   return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
