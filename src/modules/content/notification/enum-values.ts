@@ -5,14 +5,14 @@ import { StaticImplements } from '../../common';
 @StaticImplements<EnumValueStatic>()
 export class NotificationEnumValue {
   static key = 'Notification';
-  static types = { float: 'float', system: 'system' };
+  static types = { live_float: 'float', live_in: 'live_in', app_in: 'app_in' };
 
   static get keys(): string[] {
     return _.keys(NotificationEnumValue.types);
   }
 
   static get data(): { [key in keyof typeof NotificationEnumValue.types]: string } {
-    return { float: '浮动', system: '系统' };
+    return { live_float: 'live 浮动', live_in: 'live 进入', app_in: '进入 app' };
   }
 }
 export type NotificationType = ValueOf<typeof NotificationEnumValue.types>;

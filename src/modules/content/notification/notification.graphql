@@ -1,6 +1,7 @@
 enum NotificationType {
-  float
-  system
+  live_float
+  live_in
+  app_in
 }
 
 type Notification implements BaseEntity {
