@@ -1,10 +1,15 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger/factory';
 import { KeyValueType, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper, KvModule } from '../core/kv';
-import { FinancialTransactionEventKey } from './financial.entities';
+import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 import { PointExchangeEventKey } from './points.entities';
 import { HermesEventKey, PropertyHelper } from './property.helper';
 import { PropertyQueryResolver } from './property.resolver';
+import { getManager } from 'typeorm';
+import { ConfigKeys, configLoader } from '../config';
+import { PageHelper } from '../core/helpers';
+import { r } from '../common/helpers';
+import * as R from 'ramda';
 
 const logger = LoggerFactory.getLogger('PropertyModule');
 
@@ -17,6 +22,35 @@ export class PropertyModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     logger.log('init...');
     await this.initKV();
+
+    {
+      const where = { totalRecharge: -1 };
+      const total = await Wallet.count(where);
+      logger.log(`${total} wallets waiting for init...`);
+      if (total) {
+        const size = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 500);
+        await PageHelper.doPageSeries(total, size, async ({ page, totalPages }) => {
+          logger.log(`do ${page}/${totalPages}...${total}`);
+          const wallets = await Wallet.find({ where, take: size /* , skip: size * (page - 1) */ });
+          return new Promise((resolve) => {
+            getManager().transaction(async (entityManager) => {
+              await Promise.all(
+                wallets.map(async (wallet) => {
+                  const transactions = await entityManager.find(FinancialTransaction, {
+                    profileId: wallet.profileId,
+                    type: 'adminBalanceChange',
+                  });
+                  const totalRecharge = R.pipe(R.map(R.prop('change')) /*, R.negate*/, R.sum)(transactions) ?? 0;
+                  logger.debug(`loaded transactions ${r({ wallet, transactions, totalRecharge })}`);
+                  await entityManager.update(Wallet, { id: wallet.id }, { totalRecharge });
+                }),
+              ).catch((reason) => logger.error(reason));
+              resolve();
+            });
+          });
+        }).catch((reason) => logger.error(reason));
+      }
+    }
   }
 
   async initKV(): Promise<void> {

@@ -6,10 +6,7 @@ import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.ent
 import { AbstractTransactionEntity } from './base.entities';
 import { ExchangeObject } from './exchange.entities';
 
-export type ExchangeEventPayload = {
-  key: string;
-  userId: string | number;
-};
+export type ExchangeEventPayload = { key: string; profileId: string };
 
 export type FinancialTransactionEventKey = 'adminBalanceChange';
 
@@ -41,8 +38,13 @@ export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
   @Column({ nullable: false })
   withdrawals: number;
 
+  @MetaInfo({ name: '积分' })
   @Column({ nullable: false })
   points: number;
+
+  @MetaInfo({ name: '总充值' })
+  @Column({ nullable: false, name: 'total_recharge', default: -1 })
+  totalRecharge: number;
 
   // --------------------------------------------------------------
   // Relations

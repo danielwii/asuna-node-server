@@ -147,7 +147,7 @@ export class OperationTokenHelper {
   }
 
   /**
-   * 同一个 key 下的 service 下只有一个可用的 token
+   * 同一个 key 下的 service 下只有一个可用的 token，失效的 token 可以尝试一定时间后移除。
    * @param key
    * @param role
    * @param identifier
