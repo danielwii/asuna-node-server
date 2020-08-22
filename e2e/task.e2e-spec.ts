@@ -40,7 +40,7 @@ describe('AppRestController (e2e)', () => {
       .get('/admin/rest/sys/tasks')
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
-      .expect(expected => {
+      .expect((expected) => {
         expect(JSON.parse(expected.text).total).toBe(2);
       });
   });
@@ -50,7 +50,7 @@ describe('AppRestController (e2e)', () => {
       .get(`/admin/rest/sys/tasks?fields=id,uniqueId&where=${JSON.stringify({ uniqueId: 'u1' })}`)
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
-      .expect(expected => {
+      .expect((expected) => {
         const response = JSON.parse(expected.text);
         expect(response.total).toBe(1);
         expect(response.items[0].uniqueId).toBe('u1');
@@ -67,7 +67,7 @@ describe('AppRestController (e2e)', () => {
       )
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
-      .expect(expected => {
+      .expect((expected) => {
         const response = JSON.parse(expected.text);
         expect(response.total).toBe(1);
         expect(response.items[0].uniqueId).toEqual('u1');
@@ -75,17 +75,31 @@ describe('AppRestController (e2e)', () => {
       });
   });
 
-  it('fuzzy query', async () => {
+  it('fuzzy query 1', async () => {
     const params = querystring.stringify({
-      where: JSON.stringify({
-        uniqueId: { $like: '%u%' },
-      }),
+      where: JSON.stringify({ uniqueId: { $like: '%u%' } }),
     });
     return supertest(app.getHttpServer())
       .get(`/admin/rest/sys/tasks?${params}`)
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
-      .expect(expected => {
+      .expect((expected) => {
+        const response = JSON.parse(expected.text);
+        expect(response.total).toBe(2);
+        expect(response.items[0].uniqueId).toBe('u1');
+        expect(response.items[0].id).toContain('st');
+      });
+  });
+
+  it('fuzzy query 2', async () => {
+    const params = querystring.stringify({
+      where: JSON.stringify([{ uniqueId: { $like: '%u%' } }, { uniqueId: { $like: '%1%' } }]),
+    });
+    return supertest(app.getHttpServer())
+      .get(`/admin/rest/sys/tasks?${params}`)
+      .set('Authorization', `Mgmt ${token}`)
+      .expect(200)
+      .expect((expected) => {
         const response = JSON.parse(expected.text);
         expect(response.total).toBe(2);
         expect(response.items[0].uniqueId).toBe('u1');
@@ -103,7 +117,7 @@ describe('AppRestController (e2e)', () => {
       .get(`/admin/rest/sys/tasks?${params}`)
       .set('Authorization', `Mgmt ${token}`)
       .expect(200)
-      .expect(expected => {
+      .expect((expected) => {
         const response = JSON.parse(expected.text);
         expect(response.total).toBe(2);
       });

@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
 import { BaseEntity, DeleteResult } from 'typeorm';
+import * as F from 'futil';
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
@@ -24,7 +25,6 @@ import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
 import { AnyAuthRequest } from '../helper/interfaces';
 import { Tenant, TenantHelper } from '../tenant';
-import * as F from 'futil';
 
 // import { AdminUser } from '../../core/auth';
 
@@ -120,8 +120,8 @@ export abstract class RestCrudController {
     logger.log(`list ${r(modelName)} with ${r({ where, normalWheres })}`);
 
     // TODO 这里在 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
-    if (_.isArray(normalWheres)) queryBuilder.where(where);
-    else DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWheres);
+    if (normalWheres.length > 1) queryBuilder.where(where);
+    else if (normalWheres.length === 1) DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWheres[0]);
 
     if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 

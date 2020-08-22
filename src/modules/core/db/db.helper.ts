@@ -91,7 +91,7 @@ export const parseNormalWheres = (where, repository): any | any[] =>
   R.ifElse(
     _.isArray,
     (v) => _.map(v, (str) => parseNormalWhereAndRelatedFields(str, repository).normalWhere),
-    (v) => parseNormalWhereAndRelatedFields(v, repository).normalWhere,
+    (v) => [parseNormalWhereAndRelatedFields(v, repository).normalWhere],
   )(where);
 
 export function parseNormalWhereAndRelatedFields(
@@ -167,7 +167,6 @@ export function parseListParam(value: string | string[], map?: (field: any) => a
     const list = _.isArray(value) ? (value as string[]) : (value as string).split(',').map(_.trim);
     return _.compact(_.uniq(list && map ? R.map(map, list) : list));
   }
-  return undefined;
 }
 
 export type ParsedFields = {
@@ -270,14 +269,14 @@ export class DBHelper {
     entity: ObjectType<E>,
     excludes?: typeof BaseEntity[],
   ): (typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[] {
-    const excludeNames = _.map(excludes, fp.get('name'));
+    const excludeNames = new Set(_.map(excludes, fp.get('name')));
     return this.loadMetadatas()
       .filter((metadata) => {
         const included = metadata.relations
           .map(fp.get('type'))
           .find(
             (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) =>
-              type.name === entity.name && !excludeNames.includes(type.name),
+              type.name === entity.name && !excludeNames.has(type.name),
           );
         return !_.isEmpty(included);
       })
