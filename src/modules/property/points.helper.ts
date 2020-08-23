@@ -86,7 +86,7 @@ export class PointsHelper {
     const profile = await UserProfile.findOneOrFail(profileId, { relations: ['wallet'] });
     if (!profile.wallet) {
       profile.wallet = await manager.save<Wallet>(
-        new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0 }),
+        new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0, totalRecharge: 0 }),
       );
     }
     const [before, after] = [profile.wallet.points, profile.wallet.points + change];
