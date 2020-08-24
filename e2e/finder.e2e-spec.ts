@@ -26,8 +26,8 @@ describe('FinderModule (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
-    await app.close();
+  afterAll(() => {
+    app.close();
   });
 
   it('/GET /api/v1/finder', async () => {
@@ -46,7 +46,7 @@ describe('FinderModule (e2e)', () => {
     return supertest(app.getHttpServer())
       .get(`/api/v1/finder?${query}`)
       .expect(HttpStatus.FOUND)
-      .expect(expected => {
+      .expect((expected) => {
         expect(expected.text).toBe('Found. Redirecting to https://hostname/1/2/3.png');
         expect(expected.header.location).toBe('https://hostname/1/2/3.png');
       });
@@ -66,7 +66,7 @@ describe('FinderModule (e2e)', () => {
     return supertest(app.getHttpServer())
       .get(`/f/${query}`)
       .expect(HttpStatus.FOUND)
-      .expect(expected => {
+      .expect((expected) => {
         expect(expected.text).toBe('Found. Redirecting to https://hostname/1/2/3.png');
         expect(expected.header.location).toBe('https://hostname/1/2/3.png');
       });
@@ -90,7 +90,7 @@ describe('FinderModule (e2e)', () => {
     return supertest(app.getHttpServer())
       .get(`/api/v1/finder?${query}`)
       .expect(HttpStatus.FOUND)
-      .expect(expected => {
+      .expect((expected) => {
         expect(expected.text).toBe('Found. Redirecting to /s3/1/2/3.png');
         expect(expected.header.location).toBe('/s3/1/2/3.png');
       });

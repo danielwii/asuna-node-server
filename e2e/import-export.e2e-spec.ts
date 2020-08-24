@@ -18,10 +18,10 @@ describe('Excel (e2e)', () => {
     await app.init();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     const connection = app.get(Connection);
     connection.close();
-    await app.close();
+    app.close();
   });
 
   it('/POST /api/v1/import-export', async () => {
@@ -30,7 +30,7 @@ describe('Excel (e2e)', () => {
       .set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       .attach('file', `${__dirname}/Book1.xlsx`)
       .expect(201)
-      .then(async response => {
+      .then(async (response) => {
         const resCount = await getManager().findAndCount(AppInfo);
         expect(resCount.length).not.toBeLessThan(1);
         return true;
@@ -46,7 +46,7 @@ describe('Excel (e2e)', () => {
       ])
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(response => {
+      .then((response) => {
         const file = response.files;
         expect(file).not.toBeNull();
         return true;
@@ -58,7 +58,7 @@ describe('Excel (e2e)', () => {
       .get('/api/v1/import-export/model?name=app__infos')
       .set('Content-Type', 'application/json')
       .expect(200)
-      .then(response => {
+      .then((response) => {
         const file = response.files;
         expect(file).not.toBeNull();
         return true;
