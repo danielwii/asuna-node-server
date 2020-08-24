@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
-import * as F from 'futil';
 import {
   Any,
   BaseEntity,
@@ -19,7 +18,7 @@ import {
   Not,
   ObjectType,
   Raw,
-  Repository,
+  Repository, SelectQueryBuilder,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
@@ -543,8 +542,8 @@ export class DBHelper {
    */
   public static wrapProfile(
     model: string,
-    queryBuilder,
-    repository,
+    queryBuilder: SelectQueryBuilder<any>,
+    repository: Repository<any>,
     profile: Profile,
     relationsStr: string | string[],
     parsedFields: ParsedFields,
