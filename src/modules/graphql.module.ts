@@ -30,10 +30,8 @@ export class GraphqlModule implements OnModuleInit {
     const tracingConfig = TracingConfigObject.load();
     const config = GraphQLConfigObject.load();
     const typePaths = _.uniq([
-      // '../**/*.graphql',
-      // `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
+      dir,
       path.resolve(__dirname, '../../src/**/*.graphql'),
-      // `${join(dir)}/**/src/**/*.graphql`,
       `${join(process.mainModule.path, '../src')}/**/*.graphql`,
     ]);
     logger.log(`init graphql ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
