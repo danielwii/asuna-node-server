@@ -8,6 +8,7 @@ import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
+import * as path from 'path';
 import { join } from 'path';
 import { AppModule } from './app';
 import { r } from './common/helpers';
@@ -31,7 +32,8 @@ export class GraphqlModule implements OnModuleInit {
     const typePaths = _.uniq([
       // '../**/*.graphql',
       // `${join(__dirname, '../../..')}/**/src/**/*.graphql`,
-      `${join(dir)}/**/src/**/*.graphql`,
+      path.resolve(__dirname, '../../src/**/*.graphql'),
+      // `${join(dir)}/**/src/**/*.graphql`,
       `${join(process.mainModule.path, '../src')}/**/*.graphql`,
     ]);
     logger.log(`init graphql ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
