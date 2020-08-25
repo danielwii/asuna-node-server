@@ -17,12 +17,12 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "emitDeclarationOnly": true,
-    "declarationDir": "declaration",
-    "outDir": "dist",
+    //    "emitDeclarationOnly": true,
+    //    "declarationDir": "declaration",
+    "outDir": "./dist",
     "baseUrl": "src"
   },
   "files": ["@types/global.d.ts"],
   "include": ["src/**/*.*"],
-  "exclude": ["**/node_modules/*", "**/*.spec.ts"]
+  "exclude": ["**/node_modules/*", "**/*.spec.ts", "./dist"]
 }

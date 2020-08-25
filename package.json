@@ -1,6 +1,6 @@
 {
   "name": "asuna-node-server",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "types": "declaration/index.d.ts",
@@ -11,7 +11,7 @@
     "dev": "ts-node --transpile-only src/dev.ts",
     "dev:watch": "nodemon --exec ts-node --transpile-only src/dev.ts",
     "prebuild": "yarn clean",
-    "postinstall!": "yarn build",
+    "postinstall": "yarn build",
     "test": "ENV=test jest",
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
