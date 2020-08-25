@@ -48,6 +48,11 @@ export class AuthedUserHelper {
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(fixedId, options as any) as any;
   }
 
+  static async getProfileByUserId(userId: string): Promise<UserProfile> {
+    const user: any = await (UserRegister.Entity as typeof BaseEntity).findOneOrFail(userId);
+    return UserProfile.findOne(user.profileId);
+  }
+
   static getUserByProfileId<User = any>(profileId: string, relations?: string[]): Promise<User> {
     ow(profileId, 'profileId', ow.string.nonEmpty);
     // const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);

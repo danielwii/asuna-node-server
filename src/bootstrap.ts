@@ -10,7 +10,7 @@ import * as rateLimit from 'express-rate-limit';
 import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
-import { dirname, resolve } from 'path';
+import { dirname, extname, resolve } from 'path';
 // import * as rookout from 'rookout';
 import * as requestIp from 'request-ip';
 import * as responseTime from 'response-time';
@@ -262,16 +262,16 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const rootDir = dirname(process.mainModule.filename);
   logger.log(`main entrance is ${r(process.mainModule.filename)}`);
   const { packageDir } = global;
-  const suffix = packageDir.includes('node_modules') ? 'js' : 'ts';
+  const suffix = extname(process.mainModule.filename).slice(1);
   const entities = _.uniq([
     `${resolve(packageDir)}/**/*entities.${suffix}`,
-    `${resolve(rootDir, '../..')}/packages/*/src/**/*entities.${suffix}`,
-    `${resolve(rootDir)}/**/*entities.ts`,
+    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
+    `${resolve(rootDir)}/**/*entities.${suffix}`,
     ...(options.typeormEntities || []),
   ]);
   const subscribers = _.uniq([
     `${resolve(packageDir)}/**/*subscriber.${suffix}`,
-    `${resolve(rootDir)}/**/*subscriber.ts`,
+    `${resolve(rootDir)}/**/*subscriber.${suffix}`,
   ]);
   logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers })}`);
 
