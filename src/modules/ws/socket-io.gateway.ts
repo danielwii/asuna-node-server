@@ -12,9 +12,6 @@ import { Client, Server } from 'socket.io';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require('../../../package.json');
-
 const logger = LoggerFactory.getLogger('SocketIOGateway');
 
 export class AdminWsHelper {
@@ -79,7 +76,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @SubscribeMessage('events')
   onHeartbeat(client: Client, data: any): WsResponse<string> {
     const event = 'events';
-    const response = `admin-${pkg.version}-${this.timestamp}`;
+    const response = `admin-${process.env.npm_package_version}-${this.timestamp}`;
     return { event, data: response };
   }
 

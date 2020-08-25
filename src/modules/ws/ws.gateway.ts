@@ -10,9 +10,6 @@ import {
 import { Server } from 'ws';
 import { LoggerFactory } from '../common/logger';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require('../../../package.json');
-
 const logger = LoggerFactory.getLogger('WSGateway(default)');
 
 @WebSocketGateway(3002, {
@@ -31,7 +28,7 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
   onHeartbeat(client: any, data: any): WsResponse<string> {
     console.log(data);
     const event = 'events';
-    const response = `events-${pkg.version}-${this.timestamp}`;
+    const response = `events-${process.env.npm_package_version}-${this.timestamp}`;
     return { event, data: response };
   }
 
@@ -39,7 +36,7 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
   onEvents2(client: any, data: any): WsResponse<string> {
     console.log(data);
     const event = 'events';
-    const response = `events-${pkg.version}-${this.timestamp}`;
+    const response = `events-${process.env.npm_package_version}-${this.timestamp}`;
     return { event, data: response };
   }
 

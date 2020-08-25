@@ -39,7 +39,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 */
 const startAt = Date.now();
-const pkg = require('../package.json');
 
 export interface BootstrapOptions {
   // server folder
@@ -50,7 +49,6 @@ export interface BootstrapOptions {
   viewsDir?: string;
   viewEngine?: string;
   typeormEntities?: string[];
-  version?: string;
   /**
    * io     - socket.io
    * redis  - 基于 redis 共享 websocket 信息
@@ -235,7 +233,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()
       .setTitle('API Server')
-      .setVersion(`${options.version}, Core: ${pkg.version}`)
+      .setVersion(process.env.npm_package_version)
       .build();
     const document = SwaggerModule.createDocument(app, swaggerOptions);
     SwaggerModule.setup('/swagger', app, document);

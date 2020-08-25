@@ -1,14 +1,12 @@
 import { LoggerFactory } from '../common/logger';
 
-const pkg = require('../../../package.json');
-
 const logger = LoggerFactory.getLogger('AppContext');
 
 export class AppContext {
   public static readonly instance = new AppContext();
 
   private state = {
-    version: pkg.version,
+    version: process.env.npm_package_version,
     upTime: new Date(),
   };
 

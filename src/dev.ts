@@ -17,9 +17,4 @@ export class ApplicationModule implements OnModuleInit {
   }
 }
 
-const pkg = require('../package.json');
-
-bootstrap(ApplicationModule, {
-  version: pkg.version,
-  redisMode: 'io',
-}).catch(console.error);
+bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
