@@ -19,9 +19,10 @@
     "emitDecoratorMetadata": true,
     "emitDeclarationOnly": true,
     "declarationDir": "declaration",
-    "baseUrl": "."
+    "outDir": "dist",
+    "baseUrl": "src"
   },
   "files": ["@types/global.d.ts"],
-  "include": ["index.ts", "src/**/*.*"],
+  "include": ["src/**/*.*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts"]
 }
