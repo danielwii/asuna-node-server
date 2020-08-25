@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "repository": "git@github.com:danielwii/asuna-node-server.git",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
-  "types": "declaration/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist && rm -rf ./declaration",
     "tsc": "tsc",

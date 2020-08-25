@@ -17,6 +17,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "incremental": true,
     //    "emitDeclarationOnly": true,
     //    "declarationDir": "declaration",
     "outDir": "./dist",
