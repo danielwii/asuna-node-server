@@ -14,7 +14,7 @@ const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
 
 export class PaymentWxpayHelper {
-  static async createPaymentOrder(
+  static async createOrder(
     method: PaymentMethod,
     goods: {
       // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
@@ -23,16 +23,31 @@ export class PaymentWxpayHelper {
       fee: number;
       clientIp: string;
     },
-    returnUrl?: string,
   ): Promise<string> {
-    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
+    logger.debug(`create order ${r({ method, goods })}`);
+    const xmlData = await this.createXmlData(method, goods);
+    const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
+    const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
+    const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
+    logger.debug(`response is ${r(data)}`);
+    if (data.return_code !== 'SUCCESS') {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
+    }
+    return data.prepay_id;
+  }
+
+  private static async createXmlData(
+    method: PaymentMethod,
+    goods: { tradeNo: string; name: string; fee: number; clientIp: string },
+  ): Promise<string> {
+    logger.debug(`create xml data ${r({ method, goods })}`);
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
-    const notify_url = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
-    if (_.isEmpty(notify_url)) {
+    const notifyUrl = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
+    if (_.isEmpty(notifyUrl)) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');
     }
 
-    const total_fee = _.toNumber(goods.fee) * 100;
+    const totalFee = _.toNumber(goods.fee) * 100;
     const signObject = {
       appid: method.apiKey,
       mch_id: method.merchant,
@@ -40,10 +55,10 @@ export class PaymentWxpayHelper {
       body: goods.name,
       nonce_str: chance.string({ length: 32, alpha: true, numeric: true }),
       out_trade_no: goods.tradeNo,
-      total_fee,
+      total_fee: totalFee,
       trade_type: 'MWEB',
       spbill_create_ip: goods.clientIp,
-      notify_url,
+      notify_url: notifyUrl,
     };
     const secretKey = _.get(method.extra, 'secretKey') as string;
     if (_.isEmpty(secretKey)) {
@@ -57,14 +72,25 @@ export class PaymentWxpayHelper {
 
     const postBody = { ...signObject, sign };
 
-    const xmlData = new xml2js.Builder({
-      xmldec: null,
-      rootName: 'xml',
-      // allowSurrogateChars: true,
-      cdata: true,
-    }).buildObject(postBody);
+    const xmlData = new xml2js.Builder({ xmldec: undefined, rootName: 'xml', cdata: true }).buildObject(postBody);
 
-    logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url })}`);
+    logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url: notifyUrl })}`);
+    return xmlData;
+  }
+
+  static async createPaymentOrder(
+    method: PaymentMethod,
+    goods: {
+      // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
+      tradeNo: string;
+      name: string;
+      fee: number;
+      clientIp: string;
+    },
+    returnUrl?: string,
+  ): Promise<string> {
+    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
+    const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));

@@ -121,7 +121,7 @@ export class PaymentHelper {
 
   static async pay(
     transactionId: string,
-    { callback, clientIp }: { callback?: string; clientIp?: string },
+    { callback, clientIp, wxJsApi }: { callback?: string; clientIp?: string; wxJsApi?: boolean },
   ): Promise<string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string }> {
     logger.log(`pay ${r({ transactionId, callback, clientIp })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
@@ -131,28 +131,22 @@ export class PaymentHelper {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
     }
 
+    const name = order.name ? `${order.name}-${order.id}` : order.id;
     if (method.type === PaymentMethodEnumValue.types.alipay) {
       return PaymentAlipayHelper.createPaymentOrder(
         method,
-        {
-          cost: order.amount,
-          name: order.name ? `${order.id}-${order.name}` : order.id,
-          packParams: { ...(transaction.paymentInfo ?? {}), orderId: order.id },
-        },
+        { cost: order.amount, name, packParams: { ...(transaction.paymentInfo ?? {}), orderId: order.id } },
         callback,
       );
     }
     if (method.type === PaymentMethodEnumValue.types.wxpay) {
-      return PaymentWxpayHelper.createPaymentOrder(
-        method,
-        {
-          tradeNo: order.id,
-          fee: order.amount,
-          name: order.name ? `${order.id}-${order.name}` : order.id,
-          clientIp,
-        },
-        callback,
-      );
+      return wxJsApi
+        ? PaymentWxpayHelper.createOrder(method, { tradeNo: order.id, fee: order.amount, name, clientIp })
+        : PaymentWxpayHelper.createPaymentOrder(
+            method,
+            { tradeNo: order.id, fee: order.amount, name, clientIp },
+            callback,
+          );
     }
 
     const { context, signed, md5sign } = await this.sign(transactionId);
