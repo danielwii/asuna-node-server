@@ -23,7 +23,7 @@ export class PaymentWxpayHelper {
       fee: number;
       clientIp: string;
     },
-  ): Promise<string> {
+  ): Promise<Record<string, any>> {
     logger.debug(`create order ${r({ method, goods })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
@@ -33,7 +33,7 @@ export class PaymentWxpayHelper {
     if (data.return_code !== 'SUCCESS') {
       throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
     }
-    return data.prepay_id;
+    return data;
   }
 
   private static async createXmlData(
