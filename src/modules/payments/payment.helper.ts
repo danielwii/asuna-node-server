@@ -122,7 +122,9 @@ export class PaymentHelper {
   static async pay(
     transactionId: string,
     { callback, clientIp, wxJsApi }: { callback?: string; clientIp?: string; wxJsApi?: boolean },
-  ): Promise<string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string }> {
+  ): Promise<
+    string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
+  > {
     logger.log(`pay ${r({ transactionId, callback, clientIp })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;

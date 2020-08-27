@@ -23,7 +23,7 @@ export class PaymentWxpayHelper {
       fee: number;
       clientIp: string;
     },
-  ): Promise<Record<string, any>> {
+  ): Promise<Record<string, unknown>> {
     logger.debug(`create order ${r({ method, goods })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
