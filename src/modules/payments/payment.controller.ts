@@ -46,6 +46,7 @@ export class PaymentController {
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<void> {
+    logger.log(`createOrder ${r(body)}`);
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
     const result = await PaymentHelper.pay(order.transactionId, {
       callback: body.callback,

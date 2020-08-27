@@ -24,7 +24,7 @@ export class PaymentWxpayHelper {
       clientIp: string;
     },
   ): Promise<Record<string, unknown>> {
-    logger.debug(`create order ${r({ method, goods })}`);
+    logger.log(`create order ${r({ method, goods })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
@@ -89,7 +89,7 @@ export class PaymentWxpayHelper {
     },
     returnUrl?: string,
   ): Promise<string> {
-    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
+    logger.log(`create payment order ${r({ method, goods, returnUrl })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };

@@ -125,7 +125,7 @@ export class PaymentHelper {
   ): Promise<
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
-    logger.log(`pay ${r({ transactionId, callback, clientIp })}`);
+    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
