@@ -1,5 +1,5 @@
 import { Body, Controller, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
-import { IsBoolean, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
+import { IsBooleanString, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
@@ -19,7 +19,7 @@ class CreateOrderDTO {
   paymentInfo: Record<string, unknown>;
   @IsOptional()
   extra?: Record<string, unknown>;
-  @IsBoolean()
+  @IsBooleanString()
   @IsOptional()
   useWxJsApi?: boolean;
 }
