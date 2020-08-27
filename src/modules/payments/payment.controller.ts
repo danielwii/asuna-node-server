@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
-import { IsBooleanString, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
+import { Body, Controller, Post, Put, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { IsDefined, IsOptional, IsString, isURL } from 'class-validator';
 import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
@@ -19,9 +19,6 @@ class CreateOrderDTO {
   paymentInfo: Record<string, unknown>;
   @IsOptional()
   extra?: Record<string, unknown>;
-  @IsBooleanString()
-  @IsOptional()
-  useWxJsApi?: boolean;
 }
 
 class UpdateOrderDTO {
@@ -45,13 +42,18 @@ export class PaymentController {
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @Post('order')
-  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<void> {
+  async createOrder(
+    @Query('useWxJsApi') useWxJsApi: boolean,
+    @Body() body: CreateOrderDTO,
+    @Req() req: JwtAuthRequest,
+    @Res() res: Response,
+  ): Promise<void> {
     logger.log(`createOrder ${r(body)}`);
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
     const result = await PaymentHelper.pay(order.transactionId, {
       callback: body.callback,
       clientIp: req.clientIp,
-      wxJsApi: body.useWxJsApi,
+      wxJsApi: useWxJsApi,
     });
     if (_.isString(result) && isURL(result)) {
       res.redirect(result);
