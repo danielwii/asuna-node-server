@@ -262,18 +262,21 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const rootDir = dirname(process.mainModule.filename);
   logger.log(`main entrance is ${r(process.mainModule.filename)}`);
   const { packageDir } = global;
-  const suffix = extname(process.mainModule.filename).slice(1);
+  const suffix = extname(__filename).slice(1);
+  const currentSuffix = extname(process.mainModule.filename).slice(1);
+  // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
   const entities = _.uniq([
-    `${resolve(packageDir)}/**/*entities.${suffix}`,
     `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
-    `${resolve(rootDir)}/**/*entities.${suffix}`,
+    `${resolve(packageDir)}/**/*entities.${suffix}`,
+    `${resolve(rootDir)}/**/*entities.${currentSuffix}`,
     ...(options.typeormEntities || []),
   ]);
   const subscribers = _.uniq([
+    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*subscriber.${suffix}`,
     `${resolve(packageDir)}/**/*subscriber.${suffix}`,
-    `${resolve(rootDir)}/**/*subscriber.${suffix}`,
+    `${resolve(rootDir)}/**/*subscriber.${currentSuffix}`,
   ]);
-  logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers })}`);
+  logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers, __filename })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
