@@ -125,12 +125,12 @@ export class PaymentHelper {
       callback,
       clientIp,
       wxJsApi,
-      openId,
-    }: { callback?: string; clientIp?: string; wxJsApi?: boolean; openId?: string },
+      openid,
+    }: { callback?: string; clientIp?: string; wxJsApi?: boolean; openid?: string },
   ): Promise<
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
-    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openId })}`);
+    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
@@ -148,7 +148,7 @@ export class PaymentHelper {
     }
     if (method.type === PaymentMethodEnumValue.types.wxpay) {
       return wxJsApi
-        ? PaymentWxpayHelper.createOrder(method, openId, { tradeNo: order.id, fee: order.amount, name, clientIp })
+        ? PaymentWxpayHelper.createOrder(method, openid, { tradeNo: order.id, fee: order.amount, name, clientIp })
         : PaymentWxpayHelper.createPaymentOrder(
             method,
             { tradeNo: order.id, fee: order.amount, name, clientIp },

@@ -24,7 +24,7 @@ class CreateOrderDTO {
   useWxJsApi?: boolean;
   @IsString()
   @IsOptional()
-  openId?: string;
+  openid?: string;
 }
 
 class UpdateOrderDTO {
@@ -55,7 +55,7 @@ export class PaymentController {
       callback: body.callback,
       clientIp: req.clientIp,
       wxJsApi: body.useWxJsApi,
-      openId: body.openId,
+      openid: body.openid,
     });
     if (_.isString(result) && isURL(result)) {
       res.redirect(result);

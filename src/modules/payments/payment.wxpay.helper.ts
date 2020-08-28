@@ -16,7 +16,7 @@ const chance = new Chance();
 export class PaymentWxpayHelper {
   static async createOrder(
     method: PaymentMethod,
-    openId: string,
+    openid: string,
     goods: {
       // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
       tradeNo: string;
@@ -25,8 +25,8 @@ export class PaymentWxpayHelper {
       clientIp: string;
     },
   ): Promise<Record<string, unknown>> {
-    logger.log(`create order ${r({ method, goods, openId })}`);
-    const xmlData = await this.createXmlData(method, goods, 'JSAPI', { openId });
+    logger.log(`create order ${r({ method, goods, openid })}`);
+    const xmlData = await this.createXmlData(method, goods, 'JSAPI', { openid });
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
@@ -41,7 +41,7 @@ export class PaymentWxpayHelper {
     method: PaymentMethod,
     goods: { tradeNo: string; name: string; fee: number; clientIp: string },
     tradeType: 'MWEB' | 'JSAPI' | 'APP' = 'MWEB',
-    extra: { openId?: string } = {},
+    extra: { openid?: string } = {},
   ): Promise<string> {
     logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
