@@ -1,4 +1,4 @@
-import { CacheModule, Module, OnModuleInit } from '@nestjs/common';
+import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
 import { AdminController } from './admin.controller';
@@ -36,6 +36,7 @@ import { SearchController } from './search/search.controller';
 import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
+import { DeviceMiddleware, LandingUrlMiddleware } from './common';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -85,7 +86,12 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule],
 })
-export class AdminInternalModule implements OnModuleInit {
+export class AdminInternalModule implements NestModule, OnModuleInit {
+  configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(DeviceMiddleware).forRoutes('*');
+    consumer.apply(LandingUrlMiddleware).forRoutes('*');
+  }
+
   async onModuleInit(): Promise<void> {
     {
       const processLogger = LoggerFactory.getLogger('process');

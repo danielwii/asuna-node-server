@@ -11,20 +11,21 @@ import * as helmet from 'helmet';
 import * as _ from 'lodash';
 import * as morgan from 'morgan';
 import { dirname, extname, resolve } from 'path';
-// import * as rookout from 'rookout';
+import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 import * as requestIp from 'request-ip';
 import * as responseTime from 'response-time';
+import * as uuid from 'uuid';
 import { Connection, getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
-import { CacheUtils } from './modules/cache/utils';
+import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, LoggerHelper } from './modules/common/logger';
 import { LoggerConfigObject } from './modules/common/logger/config';
 import { ConfigKeys, configLoader } from './modules/config';
-import { AccessControlHelper, AsunaContext, IAsunaContextOpts } from './modules/core';
-import { Global } from './modules/core/global';
+import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find
 import './typeorm.fixture';
@@ -110,6 +111,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const beforeSyncDB = Date.now();
   const connection = app.get<Connection>(Connection);
+  logger.log(`db connected: ${connection.isConnected}`);
 
   logger.log('sync db ...');
   const queryRunner = connection.createQueryRunner();
@@ -150,7 +152,21 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // setup application
   // --------------------------------------------------------------
 
+  // see https://expressjs.com/en/guide/behind-proxies.html
+  app.set('trust proxy', 1);
+
+  const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY);
   app.use(requestIp.mw());
+  app.use(cookieParser(secret));
+  app.use(
+    session({
+      secret,
+      resave: false,
+      cookie: { secure: true },
+      saveUninitialized: true,
+      genid: (req) => uuid.v4(),
+    }),
+  );
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -198,8 +214,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  // see https://expressjs.com/en/guide/behind-proxies.html
-  app.set('trust proxy', 1);
 
   if (options.redisMode === 'redis') {
     app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter').RedisIoAdapter)(app));
