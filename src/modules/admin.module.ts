@@ -37,6 +37,7 @@ import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
 import { DeviceMiddleware, LandingUrlMiddleware } from './common';
+import { ConfigKeys, configLoader } from './config';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -88,8 +89,10 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 })
 export class AdminInternalModule implements NestModule, OnModuleInit {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(DeviceMiddleware).forRoutes('*');
-    consumer.apply(LandingUrlMiddleware).forRoutes('*');
+    if (configLoader.loadBoolConfig('COOKIE_SUPPORT')) {
+      consumer.apply(DeviceMiddleware).forRoutes('*');
+      consumer.apply(LandingUrlMiddleware).forRoutes('*');
+    }
   }
 
   async onModuleInit(): Promise<void> {

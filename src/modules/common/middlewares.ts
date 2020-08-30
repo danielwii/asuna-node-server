@@ -11,7 +11,7 @@ export class DeviceMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: () => void) {
     const cookies = req.signedCookies;
     logger.debug(`cookies is ${r(cookies)}`);
-    if (!cookies.deviceId) {
+    if (!cookies?.deviceId) {
       res.cookie('deviceId', uuid.v4(), { signed: true, httpOnly: true });
     }
     next();
@@ -21,7 +21,7 @@ export class DeviceMiddleware implements NestMiddleware {
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
   use(req: any, res: Response, next: () => void): any {
-    if (!req.session.landingUrl) {
+    if (!req.session?.landingUrl) {
       req.session.landingUrl = req.url;
     }
 
