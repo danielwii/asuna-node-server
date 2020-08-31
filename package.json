@@ -90,7 +90,6 @@
     "luxon": "^1.25.0",
     "mime-types": "^2.1.27",
     "minio": "^7.0.16",
-    "mongoose": "^5.10.2",
     "mongoose-autopopulate": "^0.12.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",

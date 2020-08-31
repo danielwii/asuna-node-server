@@ -17,7 +17,7 @@ export class MongoProvider {
         }
         const options = {
           uri,
-          connectionFactory: connection => {
+          connectionFactory: (connection) => {
             // eslint-disable-next-line global-require,@typescript-eslint/no-var-requires
             connection.plugin(require('mongoose-autopopulate'));
             return connection;
