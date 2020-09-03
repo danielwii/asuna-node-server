@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
@@ -11,12 +11,12 @@ export class ApiController {
   private readonly appContent = AppContext.instance;
 
   @Get('version')
-  currentVersion(): string {
+  public currentVersion(): string {
     return `${this.appContent.version}-${this.appContent.upTime.toISOString()}`;
   }
 
   @Get('info')
-  info() {
+  public info(@Req() req) {
     return {
       upTime: this.appContent.upTime.toISOString(),
       version: this.appContent.version,

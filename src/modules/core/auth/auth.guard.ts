@@ -4,23 +4,22 @@ import { Response } from 'express';
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { auth } from '../../helper/auth';
-import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
+import { AnyAuthRequest, auth, AuthInfo } from '../../helper';
 import { AdminUser } from './auth.entities';
 import { JwtPayload } from './auth.interfaces';
 
 export type JwtAuthRequest<User = any> = AnyAuthRequest<JwtPayload, User>;
 
 export class JwtAuthRequestExtractor {
-  static of = <User>(req: JwtAuthRequest): AuthInfo<JwtPayload, User> =>
+  public static of = <User>(req: JwtAuthRequest): AuthInfo<JwtPayload, User> =>
     _.pick(req, 'user', 'profile', 'payload', 'identifier', 'tenant', 'roles');
 }
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  logger = LoggerFactory.getLogger('JwtAuthGuard');
+  private logger = LoggerFactory.getLogger('JwtAuthGuard');
 
-  constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
+  public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
   }
 
@@ -43,9 +42,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  logger = LoggerFactory.getLogger('AnyAuthGuard');
+  private logger = LoggerFactory.getLogger('AnyAuthGuard');
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();
     const next = context.switchToHttp().getNext();

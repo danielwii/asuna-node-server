@@ -1,8 +1,8 @@
-import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk';
+import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk/lib/alipay';
 import AlipayFormData from 'alipay-sdk/lib/form';
 import * as _ from 'lodash';
 import { AsunaErrorCode, AsunaException, parseJSONIfCould } from '../common';
-import { r } from '../common/helpers/utils';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { PaymentMethod } from './payment.entities';
@@ -11,7 +11,7 @@ import { PaymentMethodEnumValue } from './payment.enum-values';
 const logger = LoggerFactory.getLogger('PaymentAlipayHelper');
 
 export class PaymentAlipayHelper {
-  static async sdk(): Promise<AlipaySdk> {
+  public static async sdk(): Promise<AlipaySdk> {
     const method = await PaymentMethod.findOne({ type: PaymentMethodEnumValue.types.alipay, isPublished: true });
     if (!method) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `no alipay method exists`);
@@ -25,7 +25,7 @@ export class PaymentAlipayHelper {
     return new AlipaySdk(config);
   }
 
-  static async authToken(): Promise<AlipaySdkCommonResult | string> {
+  public static async authToken(): Promise<AlipaySdkCommonResult | string> {
     const sdk = await this.sdk();
     logger.debug(`alipay sdk is ${r(sdk)}`);
 
@@ -46,17 +46,17 @@ export class PaymentAlipayHelper {
     return result;
   }
 
-  static async createPaymentOrder(
+  public static async createPaymentOrder(
     method: PaymentMethod,
     goods: { cost: number; name: string; packParams: object },
-    returnUrl?: string,
+    { returnUrl, isMobile }: { returnUrl?: string; isMobile?: boolean },
   ): Promise<AlipaySdkCommonResult | string> {
     logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
     // const token = await this.authToken();
 
     const sdk = await this.sdk();
 
-    const execMethod = 'alipay.trade.wap.pay'; // 统一收单下单并支付页面接口
+    const execMethod = isMobile ? 'alipay.trade.wap.pay' : 'alipay.trade.page.pay'; // 统一收单下单并支付页面接口
     // 公共参数 可根据业务需要决定是否传入，当前不用
     // const params = {
     //     app_id: '2016101000654289', // 应用 id
@@ -94,7 +94,7 @@ export class PaymentAlipayHelper {
     return result;
   }
 
-  static async validateSign(postData: object): Promise<boolean> {
+  public static async validateSign(postData: object): Promise<boolean> {
     const sdk = await this.sdk();
 
     return sdk.checkNotifySign(postData);

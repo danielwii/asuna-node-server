@@ -18,10 +18,19 @@ import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
-export class PaymentHelper {
-  static notifyHandlers: Record<string, (order: PaymentOrder) => any> = {};
+interface PaymentContext {
+  method: PaymentMethod;
+  order: PaymentOrder;
+  transaction: PaymentTransaction;
+  callback: string;
+  notify: string;
+  createdAt: Date;
+}
 
-  static async createOrder({
+export class PaymentHelper {
+  public static notifyHandlers: Record<string, (order: PaymentOrder) => any> = {};
+
+  public static async createOrder({
     itemId,
     methodId,
     paymentInfo,
@@ -56,7 +65,7 @@ export class PaymentHelper {
     return order;
   }
 
-  static async validateSign(orderId: string, body): Promise<boolean> {
+  public static async validateSign(orderId: string, body): Promise<boolean> {
     const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
     const transaction = await PaymentTransaction.findOneOrFail(order.transaction.id, { relations: ['method'] });
     const { method, sign } = transaction;
@@ -84,18 +93,11 @@ export class PaymentHelper {
     return true;
   }
 
-  static async extraContext(
+  public static async extraContext(
     transaction: PaymentTransaction,
     method: PaymentMethod,
     order: PaymentOrder,
-  ): Promise<{
-    method: PaymentMethod;
-    order: PaymentOrder;
-    transaction: PaymentTransaction;
-    callback: string;
-    notify: string;
-    createdAt: Date;
-  }> {
+  ): Promise<PaymentContext> {
     const { createdAt } = transaction;
     const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
     const callback = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`);
@@ -103,7 +105,9 @@ export class PaymentHelper {
     return { method, order, transaction, createdAt, callback, notify };
   }
 
-  static async sign(transactionId: string): Promise<{ context; signed: string; md5sign: string }> {
+  public static async sign(
+    transactionId: string,
+  ): Promise<{ context: PaymentContext; signed: string; md5sign: string }> {
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     if (!method) {
@@ -119,14 +123,15 @@ export class PaymentHelper {
     return { context, signed, md5sign };
   }
 
-  static async pay(
+  public static async pay(
     transactionId: string,
     {
       callback,
       clientIp,
       wxJsApi,
       openid,
-    }: { callback?: string; clientIp?: string; wxJsApi?: boolean; openid?: string },
+      isMobile,
+    }: { callback?: string; clientIp?: string; wxJsApi?: boolean; openid?: string; isMobile?: boolean },
   ): Promise<
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
@@ -143,7 +148,7 @@ export class PaymentHelper {
       return PaymentAlipayHelper.createPaymentOrder(
         method,
         { cost: order.amount, name, packParams: { ...(transaction.paymentInfo ?? {}), orderId: order.id } },
-        callback,
+        { returnUrl: callback, isMobile },
       );
     }
     if (method.type === PaymentMethodEnumValue.types.wxpay) {
@@ -185,13 +190,13 @@ export class PaymentHelper {
     return { payload };
   }
 
-  static async updateOrder(orderId: string, data: any): Promise<PaymentOrder> {
+  public static async updateOrder(orderId: string, data: any): Promise<PaymentOrder> {
     const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
     order.transaction.data = data;
     return order.save();
   }
 
-  static async cleanExpiredPayments(): Promise<void> {
+  public static async cleanExpiredPayments(): Promise<void> {
     const oneDayAgo = sub(new Date(), { days: 1 });
     const transactions = await PaymentTransaction.count({ createdAt: LessThan(oneDayAgo), status: IsNull() });
     logger.debug(`remove expired transactions: ${transactions}`);
@@ -204,7 +209,7 @@ export class PaymentHelper {
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 
-  static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<void> {
+  public static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<void> {
     if (isWxPay) {
       const body = data as {
         appid: string;

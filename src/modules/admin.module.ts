@@ -36,8 +36,8 @@ import { SearchController } from './search/search.controller';
 import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
-import { DeviceMiddleware, LandingUrlMiddleware } from './common';
-import { ConfigKeys, configLoader } from './config';
+import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
+import { configLoader } from './config';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -88,14 +88,15 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule],
 })
 export class AdminInternalModule implements NestModule, OnModuleInit {
-  configure(consumer: MiddlewareConsumer): any {
+  public configure(consumer: MiddlewareConsumer): any {
+    consumer.apply(IsMobileMiddleware).forRoutes('*');
     if (configLoader.loadBoolConfig('COOKIE_SUPPORT')) {
       consumer.apply(DeviceMiddleware).forRoutes('*');
       consumer.apply(LandingUrlMiddleware).forRoutes('*');
     }
   }
 
-  async onModuleInit(): Promise<void> {
+  public async onModuleInit(): Promise<void> {
     {
       const processLogger = LoggerFactory.getLogger('process');
       process.on('unhandledRejection', (reason, p) =>
@@ -107,7 +108,7 @@ export class AdminInternalModule implements NestModule, OnModuleInit {
     await this.initConstants();
   }
 
-  async initConstants(): Promise<void> {
+  public async initConstants(): Promise<void> {
     await KvHelper.mergeConstantMapsForEnumValue(SexEnumValue);
   }
 }
