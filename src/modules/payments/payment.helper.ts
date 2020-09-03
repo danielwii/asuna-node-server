@@ -135,7 +135,7 @@ export class PaymentHelper {
   ): Promise<
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
-    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid })}`);
+    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid, isMobile })}`);
     const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
@@ -160,16 +160,16 @@ export class PaymentHelper {
         );
       }
       if (isMobile) {
-        return PaymentWxpayHelper.createOrder(
+        return PaymentWxpayHelper.createPaymentOrder(
           method,
-          { openid, tradeType: 'NATIVE' },
           { tradeNo: order.id, fee: order.amount, name, clientIp },
+          { returnUrl: callback, isMobile },
         );
       }
-      return PaymentWxpayHelper.createPaymentOrder(
+      return PaymentWxpayHelper.createOrder(
         method,
+        { openid, tradeType: 'NATIVE' },
         { tradeNo: order.id, fee: order.amount, name, clientIp },
-        { returnUrl: callback, isMobile },
       );
     }
 
