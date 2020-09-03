@@ -1,11 +1,9 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-await-in-loop,no-restricted-syntax */
 import { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as Sentry from '@sentry/node';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { IdGenerators } from './modules/base/generator';
+import { IdGenerators } from './modules/base';
 import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
@@ -16,21 +14,21 @@ import { RedisProvider } from './modules/providers';
 const logger = LoggerFactory.getLogger('Lifecycle');
 
 export interface AppLifecycleType {
-  beforeBootstrap?(app: NestExpressApplication): Promise<void>;
-  appStarted?(): Promise<void>;
+  beforeBootstrap?: (app: NestExpressApplication) => Promise<void>;
+  appStarted?: () => Promise<void>;
 }
 
 export class LifecycleRegister {
-  static handlers: AppLifecycleType[] = [];
+  public static handlers: AppLifecycleType[] = [];
 
-  static reg(handler: AppLifecycleType): void {
+  public static reg(handler: AppLifecycleType): void {
     this.handlers.push(handler);
     logger.debug(`reg handler ${r(handler)} total: ${this.handlers.length}`);
   }
 }
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
-  static async onInit(app: NestExpressApplication): Promise<void> {
+  public static async onInit(app: NestExpressApplication): Promise<void> {
     const config = SentryConfigObject.load();
     logger.debug(`[onInit] ... ${r(config)}`);
     if (config.enable) {
@@ -51,7 +49,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     logger.debug(`[onInit] done`);
   }
 
-  static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
+  public static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
     logger.debug(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
       await handler?.beforeBootstrap?.(app);
@@ -59,12 +57,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     logger.debug(`[beforeBootstrap] done`);
   }
 
-  async onApplicationBootstrap(): Promise<void> {
-    logger.debug(`[onApplicationBootstrap] ...`);
-    logger.debug(`[onApplicationBootstrap] done`);
-  }
-
-  static async onAppStartListening(app: NestExpressApplication): Promise<void> {
+  public static async onAppStartListening(app: NestExpressApplication): Promise<void> {
     logger.debug(`[onAppStartListening] ...`);
 
     logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.instance.clients, fp.omit('client')))}`);
@@ -78,11 +71,16 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     }
   }
 
-  async beforeApplicationShutdown(signal?: string): Promise<void> {
+  public async onApplicationBootstrap(): Promise<void> {
+    logger.debug(`[onApplicationBootstrap] ...`);
+    logger.debug(`[onApplicationBootstrap] done`);
+  }
+
+  public async beforeApplicationShutdown(signal?: string): Promise<void> {
     logger.debug(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
 
-  async onApplicationShutdown(signal?: string): Promise<void> {
+  public async onApplicationShutdown(signal?: string): Promise<void> {
     logger.debug(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }
