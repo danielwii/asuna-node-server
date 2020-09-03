@@ -8,7 +8,7 @@ import {
 import { AbstractNameEntity, Publishable } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 
-@EntityMetaInfo({ name: 'notifications', displayName: '通知' })
+@EntityMetaInfo({ name: 'notifications', displayName: '通知', internal: true })
 @Entity('content__t_notifications')
 export class Notification extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '类型', type: 'Enum', enumData: NotificationEnumValue.data })

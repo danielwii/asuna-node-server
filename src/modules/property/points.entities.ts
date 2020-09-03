@@ -56,7 +56,7 @@ export const PointExchangeTypeSettings: {
 /**
  * UserPointChangeRecord
  */
-@EntityMetaInfo({ name: 'point_exchanges' })
+@EntityMetaInfo({ name: 'point_exchanges', internal: true })
 @Entity('property__t_point_exchanges')
 export class PointExchange extends InjectMultiUserProfile(AbstractTransactionEntity) {
   @MetaInfo({ name: '变化类别', type: 'EnumFilter', enumData: PointExchangeTypeSettings })

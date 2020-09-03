@@ -14,7 +14,7 @@ export const HermesExchangeEventKeys = {
   financialExchange: 'user.financial.exchange',
 };
 
-@EntityMetaInfo({ name: 'wallets' })
+@EntityMetaInfo({ name: 'wallets', internal: true })
 @Entity('property__t_wallets')
 export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
   constructor(o: EntityConstructorObject<Wallet>) {
@@ -57,7 +57,7 @@ export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
 */
 }
 
-@EntityMetaInfo({ name: 'financial_transactions' })
+@EntityMetaInfo({ name: 'financial_transactions', internal: true })
 @Entity('property__t_financial_transactions')
 export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransactionEntity) {
   constructor(o: EntityConstructorObject<FinancialTransaction>) {

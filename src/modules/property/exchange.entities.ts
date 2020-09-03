@@ -9,7 +9,7 @@ import {
   ExchangeObjectUsageType,
 } from './enum-values';
 
-@EntityMetaInfo({ name: 'exchange_objects' })
+@EntityMetaInfo({ name: 'exchange_objects', internal: true })
 @Entity('property__t_exchange_objects')
 export class ExchangeObject extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: 'Key' })
