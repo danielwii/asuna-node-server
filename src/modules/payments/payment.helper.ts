@@ -152,13 +152,25 @@ export class PaymentHelper {
       );
     }
     if (method.type === PaymentMethodEnumValue.types.wxpay) {
-      return wxJsApi
-        ? PaymentWxpayHelper.createOrder(method, openid, { tradeNo: order.id, fee: order.amount, name, clientIp })
-        : PaymentWxpayHelper.createPaymentOrder(
-            method,
-            { tradeNo: order.id, fee: order.amount, name, clientIp },
-            callback,
-          );
+      if (wxJsApi) {
+        return PaymentWxpayHelper.createOrder(
+          method,
+          { openid, tradeType: 'JSAPI' },
+          { tradeNo: order.id, fee: order.amount, name, clientIp },
+        );
+      }
+      if (isMobile) {
+        return PaymentWxpayHelper.createOrder(
+          method,
+          { openid, tradeType: 'NATIVE' },
+          { tradeNo: order.id, fee: order.amount, name, clientIp },
+        );
+      }
+      return PaymentWxpayHelper.createPaymentOrder(
+        method,
+        { tradeNo: order.id, fee: order.amount, name, clientIp },
+        { returnUrl: callback, isMobile },
+      );
     }
 
     const { context, signed, md5sign } = await this.sign(transactionId);

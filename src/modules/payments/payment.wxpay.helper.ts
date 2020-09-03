@@ -13,10 +13,12 @@ import { PaymentMethod } from './payment.entities';
 const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
 
+type TradeType = 'MWEB' | 'JSAPI' | 'APP' | 'NATIVE';
+
 export class PaymentWxpayHelper {
-  static async createOrder(
+  public static async createOrder(
     method: PaymentMethod,
-    openid: string,
+    { openid, tradeType }: { openid: string; tradeType: TradeType },
     goods: {
       // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
       tradeNo: string;
@@ -26,7 +28,7 @@ export class PaymentWxpayHelper {
     },
   ): Promise<Record<string, unknown>> {
     logger.log(`create order ${r({ method, goods, openid })}`);
-    const xmlData = await this.createXmlData(method, goods, 'JSAPI', { openid });
+    const xmlData = await this.createXmlData(method, goods, tradeType, { openid });
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
@@ -37,10 +39,39 @@ export class PaymentWxpayHelper {
     return data;
   }
 
+  public static async createPaymentOrder(
+    method: PaymentMethod,
+    goods: {
+      // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
+      tradeNo: string;
+      name: string;
+      fee: number;
+      clientIp: string;
+    },
+    { returnUrl, isMobile }: { returnUrl?: string; isMobile?: boolean },
+  ): Promise<string> {
+    logger.log(`create payment order ${r({ method, goods, returnUrl })}`);
+    const xmlData = await this.createXmlData(method, goods);
+    const response = await axios.post(method.endpoint, xmlData);
+    const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
+    const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
+    logger.debug(`response is ${r(data)}`);
+
+    if (data.return_code !== 'SUCCESS') {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
+    }
+    return data.mweb_url;
+  }
+
+  public static async validateSign(body: Record<string, string>): Promise<boolean> {
+    // const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
+    return true; // todo ...
+  }
+
   private static async createXmlData(
     method: PaymentMethod,
     goods: { tradeNo: string; name: string; fee: number; clientIp: string },
-    tradeType: 'MWEB' | 'JSAPI' | 'APP' = 'MWEB',
+    tradeType: TradeType = 'MWEB',
     extra: { openid?: string } = {},
   ): Promise<string> {
     logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
@@ -80,34 +111,5 @@ export class PaymentWxpayHelper {
 
     logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url: notifyUrl })}`);
     return xmlData;
-  }
-
-  static async createPaymentOrder(
-    method: PaymentMethod,
-    goods: {
-      // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|* 且在同一个商户号下唯一。
-      tradeNo: string;
-      name: string;
-      fee: number;
-      clientIp: string;
-    },
-    returnUrl?: string,
-  ): Promise<string> {
-    logger.log(`create payment order ${r({ method, goods, returnUrl })}`);
-    const xmlData = await this.createXmlData(method, goods);
-    const response = await axios.post(method.endpoint, xmlData);
-    const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
-    const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
-    logger.debug(`response is ${r(data)}`);
-
-    if (data.return_code !== 'SUCCESS') {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
-    }
-    return data.mweb_url;
-  }
-
-  static async validateSign(body: Record<string, string>): Promise<boolean> {
-    // const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
-    return true; // todo ...
   }
 }
