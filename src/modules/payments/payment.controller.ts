@@ -62,6 +62,7 @@ export class PaymentController {
       openid: body.openid,
       isMobile: req.isMobile,
     });
+    logger.log(`payment result is ${r(result)}`);
     if (_.isString(result) && isURL(result)) {
       res.redirect(result);
     } else {
