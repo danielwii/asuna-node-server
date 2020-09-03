@@ -48,9 +48,9 @@ export class PaymentWxpayHelper {
       fee: number;
       clientIp: string;
     },
-    { returnUrl, isMobile }: { returnUrl?: string; isMobile?: boolean },
+    { redirectUrl, isMobile }: { redirectUrl?: string; isMobile?: boolean },
   ): Promise<string> {
-    logger.log(`create payment order ${r({ method, goods, returnUrl })}`);
+    logger.log(`create payment order ${r({ method, goods, redirectUrl })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
@@ -60,7 +60,7 @@ export class PaymentWxpayHelper {
     if (data.return_code !== 'SUCCESS') {
       throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
     }
-    return data.mweb_url;
+    return `${data.mweb_url}&redirect_url=${redirectUrl}`;
   }
 
   public static async validateSign(body: Record<string, string>): Promise<boolean> {

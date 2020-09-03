@@ -163,7 +163,7 @@ export class PaymentHelper {
         return PaymentWxpayHelper.createPaymentOrder(
           method,
           { tradeNo: order.id, fee: order.amount, name, clientIp },
-          { returnUrl: callback, isMobile },
+          { redirectUrl: callback, isMobile },
         );
       }
       return PaymentWxpayHelper.createOrder(
