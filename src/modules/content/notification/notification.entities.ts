@@ -8,12 +8,12 @@ import {
 import { AbstractNameEntity, Publishable } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 
-@EntityMetaInfo({ name: 'notifications', displayName: '通知', internal: true })
+@EntityMetaInfo({ name: 'content__notifications', displayName: '通知', internal: true })
 @Entity('content__t_notifications')
 export class Notification extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '类型', type: 'Enum', enumData: NotificationEnumValue.data })
   @Column('varchar', { nullable: false })
-  type: NotificationType;
+  public type: NotificationType;
 
   // --------------------------------------------------------------
   // Optional
@@ -21,7 +21,7 @@ export class Notification extends Publishable(AbstractNameEntity) {
 
   @MetaInfo({ name: '通知发出类型', type: 'EditableEnum', enumData: NotificationUsageEnumValue.data })
   @Column('varchar', { nullable: true })
-  usage: NotificationUsageType;
+  public usage: NotificationUsageType;
 
   // --------------------------------------------------------------
   // Status
