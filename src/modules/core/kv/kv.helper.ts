@@ -2,9 +2,8 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import * as F from 'futil';
-import { CacheUtils } from '../../cache/utils';
-import { CacheWrapper } from '../../cache/wrapper';
+import * as R from 'ramda';
+import { CacheUtils, CacheWrapper } from '../../cache';
 import {
   AsunaErrorCode,
   AsunaException,
@@ -16,9 +15,8 @@ import {
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
 import { EnumValueStatic } from '../../enum-values';
-import { auth } from '../../helper/auth';
-import { AdminUser } from '../auth/auth.entities';
-import { AdminUserIdentifierHelper } from '../auth/identifier';
+import { auth } from '../../helper';
+import { AdminUser, AdminUserIdentifierHelper } from '../auth';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 
@@ -42,13 +40,13 @@ const toJson = (value): JSON => {
   }
 };
 
-export type KVField = {
+export interface KVField {
   name: string;
   type: 'number' | 'string' | 'text' | 'json' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'email-tmpl-data' | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
-};
+}
 
 export interface KVFieldsList<V> {
   type: string;
@@ -89,7 +87,7 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
       if (type === KeyValueType.boolean) {
         newValue = castToBoolean(value);
       } else if (type === KeyValueType.number) {
-        newValue = +value;
+        newValue = Number(value);
       } else if (['json', 'images', 'videos'].includes(type)) {
         newValue = _.isString(value) ? toJson(value) : value;
       }
@@ -97,9 +95,9 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
   } else if (value === 'true' || value === 'false') {
     newType = KeyValueType.boolean;
     newValue = castToBoolean(value);
-  } else if (!_.isNaN(+value)) {
+  } else if (!_.isNaN(Number(value))) {
     newType = KeyValueType.number;
-    newValue = +value;
+    newValue = Number(value);
   } else if (isJson(value)) {
     newType = KeyValueType.json;
     newValue = toJson(value);
@@ -127,36 +125,33 @@ export const AsunaCollections = {
 };
 
 export class KvDef {
-  @IsString() collection: string;
+  @IsString() public collection: string;
+  @IsString() public key: string;
 
-  @IsString() key: string;
-
-  constructor(o: KvDef) {
+  public constructor(o: KvDef) {
     Object.assign(this, deserializeSafely(KvDef, o));
   }
 }
 
 @StaticImplements<IdentifierHelper<KvDef>>()
 export class KvDefIdentifierHelper {
-  static parse = (identifier: string): KvDef => ({
+  public static parse = (identifier: string): KvDef => ({
     collection: identifier.split('#')[0],
     key: identifier.split('#')[1],
   });
 
-  static stringify = (payload: KvDef): string => `${payload.collection}#${payload.key}`;
+  public static stringify = (payload: KvDef): string => `${payload.collection}#${payload.key}`;
 }
 
 export type ConstantsKeys = 'WXMessageIds';
 
 export class KvHelper {
-  static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
-
+  public static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
-  static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
+  public static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
 
   private static constantMapsPair: KeyValuePair;
-
   private static enumValueConstantMapsPair: KeyValuePair;
 
   /**
@@ -164,7 +159,7 @@ export class KvHelper {
    * @param key
    * @param constantMap
    */
-  static async mergeConstantMaps(
+  public static async mergeConstantMaps(
     key: ConstantsKeys | string,
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
@@ -186,7 +181,7 @@ export class KvHelper {
    * call syncMergedConstants to sync constants
    * @param enumValue
    */
-  static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
+  public static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
     const value = { [enumValue.key]: enumValue.data };
     if (!this.enumValueConstantMapsPair) {
       this.enumValueConstantMapsPair = await this.get(this.constantKvDef, {
@@ -201,7 +196,7 @@ export class KvHelper {
     return this.enumValueConstantMapsPair;
   }
 
-  static async syncMergedConstants(): Promise<void> {
+  public static async syncMergedConstants(): Promise<void> {
     logger.log(`merge constants ${r(this.constantMapsPair)}`);
     if (this.constantMapsPair) {
       await this.set(this.constantMapsPair);
@@ -212,7 +207,7 @@ export class KvHelper {
     }
   }
 
-  static regInitializer<V = KVGroupFieldsValue>(
+  public static regInitializer<V = KVGroupFieldsValue>(
     kvDef: KvDef,
     opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
     config: { formatType?: KVModelFormatType; noUpdate?: boolean; merge?: boolean },
@@ -222,7 +217,7 @@ export class KvHelper {
     KvHelper.initializers[identifier]();
   }
 
-  static async set<V = any>(
+  public static async set<V = any>(
     opts: { collection?: string; key: string; name?: string; type?: KeyValueType; value?: V; extra?: any },
     {
       formatType,
@@ -254,7 +249,7 @@ export class KvHelper {
       type: newType,
       value: stringifyValue as any,
       extra: opts.extra,
-      collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
+      collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
     };
     const exists = await this.get(entity);
     if (exists && opts.name) {
@@ -278,12 +273,13 @@ export class KvHelper {
     }
 
     logger.debug(`set ${r(entity)}`);
-    return KeyValuePair.save({ ...F.when(!!exists, () => ({ id: exists?.id }), {}), ...entity }).finally(() =>
-      CacheUtils.clear({ prefix: 'kv', key: { collection, key } }),
-    );
+    return KeyValuePair.save({
+      ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
+      ...entity,
+    }).finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
   }
 
-  static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
+  public static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
 
     const entity = await KeyValuePair.findOne(id);
@@ -295,14 +291,14 @@ export class KvHelper {
     return KeyValuePair.save(entityTo);
   }
 
-  static async delete(kvDef: KvDef): Promise<void> {
+  public static async delete(kvDef: KvDef): Promise<void> {
     const exists = await this.get(kvDef);
     if (exists) {
       await KeyValuePair.delete(kvDef);
     }
   }
 
-  static async get(
+  public static async get(
     kvDef: KvDef,
     defaultPair?: { name: string; type: KeyValueType; value: any },
   ): Promise<KeyValuePair> {
@@ -315,10 +311,10 @@ export class KvHelper {
     return keyValuePair;
   }
 
-  static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
+  public static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return KeyValuePair.find({
-      collection: collection && collection.includes('.') ? collection : `user.${collection || 'default'}`,
-      ...F.when(!!key, () => ({ key }), {}),
+      collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
+      ...R.ifElse(R.identity, R.always({ key }), R.always({}))(!!key),
     }).then(
       fp.map((item) => {
         // eslint-disable-next-line no-param-reassign
@@ -328,14 +324,14 @@ export class KvHelper {
     );
   }
 
-  static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
+  public static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
     kvDef: KvDef,
     keyValues: KeyValues,
   ): Promise<{ [key in keyof KeyValues]: any }> {
     return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 
-  static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
+  public static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
     const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
     return field?.value ?? _.get(field, 'field.defaultValue');
   }
@@ -345,7 +341,7 @@ export class KvHelper {
    * @param kvDef
    * @param identifier
    */
-  static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
+  public static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
     if (kvDef.collection.startsWith('system.')) {
       if (AdminUserIdentifierHelper.identify(identifier)) {
         const resolved = AdminUserIdentifierHelper.resolve(identifier);
@@ -359,13 +355,13 @@ export class KvHelper {
     // todo 非系统配置暂时直接略过权限，之后可通过 kv 本身提供更多待认证信息
   }
 
-  static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
+  public static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
     if (collection.toUpperCase().startsWith(AsunaColletionPrefix.SYSTEM)) {
       await auth(req, res, 'admin');
     }
   }
 
-  static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
+  public static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
     const value = (await KvHelper.get(kvDef))?.value;
     return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value });
   }

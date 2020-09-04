@@ -163,7 +163,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
       resave: false,
       cookie: { secure: true },
       saveUninitialized: true,
-      genid: (req) => uuid.v4(),
+      genid: () => uuid.v4(),
     }),
   );
   app.use(

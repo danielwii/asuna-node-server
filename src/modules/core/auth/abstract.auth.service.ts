@@ -3,7 +3,7 @@ import { differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import { Secret, SignOptions } from 'jsonwebtoken';
 import * as _ from 'lodash';
-import * as F from 'futil';
+import * as R from 'ramda';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 import { formatTime, r } from '../../common/helpers';
@@ -16,26 +16,29 @@ import { UserProfile } from './user.entities';
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
 export class PasswordHelper {
-  static readonly cryptor = new Cryptor();
+  private static readonly cryptor = new Cryptor();
 
-  static encrypt(password: string): { hash: string; salt: string } {
+  public static encrypt(password: string): { hash: string; salt: string } {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  static passwordVerify(password: string, user: AuthUser): boolean {
+  public static passwordVerify(password: string, user: AuthUser): boolean {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 }
 
-export type CreatedToken = { expiresIn: number; accessToken: string };
+export interface CreatedToken {
+  expiresIn: number;
+  accessToken: string;
+}
 
 export class TokenHelper {
-  static decode<Payload = JwtPayload>(token: string): Payload {
+  public static decode<Payload = JwtPayload>(token: string): Payload {
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  static async createToken(user: AuthUser, extra?: { uid: string }): Promise<CreatedToken> {
+  public static async createToken(user: AuthUser, extra?: { uid: string }): Promise<CreatedToken> {
     logger.log(`createToken >> ${r(user)}`);
     const expiresIn = 60 * 60 * 24 * 30; // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -53,7 +56,7 @@ export class TokenHelper {
     };
   }
 
-  static createCustomToken(
+  public static createCustomToken(
     payload: string | Buffer | object,
     secretOrPrivateKey: Secret,
     options?: SignOptions,
@@ -72,7 +75,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
    * @param jwtPayload
    * @returns {Promise<boolean>}
    */
-  async validateUser(jwtPayload: JwtPayload): Promise<boolean> {
+  public async validateUser(jwtPayload: JwtPayload): Promise<boolean> {
     const identifier = { email: jwtPayload.email, username: jwtPayload.username };
     const user = await this.getUser(identifier, true);
 
@@ -87,14 +90,14 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return validated;
   }
 
-  createToken(profile: UserProfile, extra?: { uid: string }): Promise<CreatedToken> {
+  public createToken(profile: UserProfile, extra?: { uid: string }): Promise<CreatedToken> {
     // eslint-disable-next-line no-param-reassign
     profile.lastSignedAt = new Date();
     profile.save().catch((reason) => logger.error(reason));
     return TokenHelper.createToken(profile, extra);
   }
 
-  async updateLastLoginDate(profileId: string | number): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
+  public async updateLastLoginDate(profileId: string | number): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
     const profile = await this.userRepository.findOne(profileId);
     if (profile) {
       const currentDate = new Date();
@@ -109,32 +112,32 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return {};
   }
 
-  async getUser(
+  public async getUser(
     identifier: { email?: string; username?: string },
     isActive?: boolean,
     options?: FindOneOptions<U>,
   ): Promise<U> {
     const condition = {
-      ...F.when(!!identifier.email, () => ({ email: identifier.email }), {}),
-      ...F.when(!!identifier.username, () => ({ username: identifier.username }), {}),
-      ...F.when(!_.isNil(isActive), () => ({ isActive }), {}),
+      ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
+      ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
+      ...R.ifElse(R.identity, R.always({ isActive }), R.always({}))(!_.isNil(isActive)),
     };
     logger.debug(`get user by condition ${r(condition)}`);
     return this.userRepository.findOne(condition as any, options);
   }
 
-  getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
+  public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.userRepository.findOne(
       {
-        ...F.when(!!identifier.email, () => ({ email: identifier.email }), {}),
-        ...F.when(!!identifier.username, () => ({ username: identifier.username }), {}),
+        ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
+        ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
         isActive,
       },
       { select: ['id', 'username', 'email', 'channel', 'password', 'salt'] },
     );
   }
 
-  updatePassword(profileId: string, password: string, salt: string): Promise<UpdateResult> {
+  public updatePassword(profileId: string, password: string, salt: string): Promise<UpdateResult> {
     return this.userRepository.update(profileId, { password, salt } as any);
     // return UserProfile.update(profileId, { password, salt });
   }

@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
-import * as F from 'futil';
+import * as R from 'ramda';
 import { r } from '../../common/helpers';
 import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { NotificationType } from './enum-values';
@@ -12,14 +12,14 @@ import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader'
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {
-  logger = new Logger(this.constructor.name);
+  private logger = new Logger('NotificationQueryResolver');
 
-  constructor() {
+  public constructor() {
     super(Notification);
   }
 
   @Query()
-  async api_notification(@Args('id') id: number, @Context() ctx: GraphqlContext): Promise<MixedNotification> {
+  public async api_notification(@Args('id') id: number, @Context() ctx: GraphqlContext): Promise<MixedNotification> {
     this.logger.log(`api_notification: ${r({ id })}`);
     const { notifications: loader } = ctx.getDataLoaders();
     const origin = await loader.load(id);
@@ -27,7 +27,7 @@ export class NotificationQueryResolver extends QueryResolver {
   }
 
   @Query()
-  async api_notifications(
+  public async api_notifications(
     @Args('type') type: NotificationType,
     @Args('usage') usage: string,
     @Context() ctx: GraphqlContext,
@@ -39,7 +39,10 @@ export class NotificationQueryResolver extends QueryResolver {
       ctx,
       loader: (loaders) => loaders.notifications,
       query: {},
-      where: { ...F.when(!!usage, () => ({ usage }), {}), ...F.when(!!type, () => ({ type }), {}) },
+      where: {
+        ...R.ifElse(R.identity, R.always({ usage }), R.always({}))(!!usage),
+        ...R.ifElse(R.identity, R.always({ type }), R.always({}))(!!type),
+      },
       mapper: NotificationHelper.loadMixedNotification,
     });
   }

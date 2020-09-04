@@ -23,7 +23,7 @@ export interface EnumValueStatic<T = {}> {
 }
 
 export abstract class CanRegEnumValue {
-  static reg(key: string, value?: string, desc?: string) {
+  public static reg(key: string, value?: string, desc?: string) {
     _.set(_.get(this, 'types'), key, value ?? key);
     _.set(_.get(this, 'desc'), key, desc ?? value ?? key);
   }
@@ -31,17 +31,17 @@ export abstract class CanRegEnumValue {
 
 @StaticImplements<EnumValueStatic>()
 export class SexEnumValue {
-  static key = 'Sex';
-  static types = {
+  public static key = 'Sex';
+  public static types = {
     male: 'male',
     female: 'female',
   };
 
-  static get keys(): string[] {
+  public static get keys(): string[] {
     return _.keys(SexEnumValue.types);
   }
 
-  static get data(): { [key in keyof typeof SexEnumValue.types]: string } {
+  public static get data(): { [key in keyof typeof SexEnumValue.types]: string } {
     return { male: '男', female: '女' };
   }
 }

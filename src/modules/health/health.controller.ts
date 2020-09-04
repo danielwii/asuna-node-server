@@ -11,7 +11,7 @@ import * as checkDiskSpace from 'check-disk-space';
 import * as _ from 'lodash';
 import { dirname, resolve } from 'path';
 import { getConnection } from 'typeorm';
-import { r } from '../common/helpers/utils';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQHealthIndicator, MQProvider, RedisHealthIndicator, RedisProvider } from '../providers';
 
@@ -23,7 +23,8 @@ export class HealthController {
   private redis = new RedisHealthIndicator();
   private path = resolve(dirname(process.mainModule.filename), '../..');
 
-  constructor(
+  // eslint-disable-next-line max-params
+  public constructor(
     private health: HealthCheckService,
     private dns: DNSHealthIndicator,
     private typeorm: TypeOrmHealthIndicator,
@@ -33,7 +34,7 @@ export class HealthController {
 
   @Get()
   @HealthCheck()
-  async healthCheck() {
+  public async healthCheck() {
     const diskSpace = await checkDiskSpace(this.path);
     logger.debug(`check disk path ${r({ path: this.path, diskSpace })}`);
     return this.health.check(

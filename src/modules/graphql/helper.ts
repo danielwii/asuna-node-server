@@ -1,6 +1,5 @@
 import { Promise } from 'bluebird';
 import { ClassType } from 'class-transformer/ClassTransformer';
-import * as F from 'futil';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -93,9 +92,9 @@ export class GraphqlHelper {
     [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
   } {
     const includeOrdinal = DBHelper.getPropertyNames(cls).includes('ordinal');
-    return pageRequest && pageRequest.orderBy
+    return pageRequest?.orderBy
       ? ({ [pageRequest.orderBy.column]: pageRequest.orderBy.order } as any)
-      : { ...F.when(includeOrdinal, () => ({ ordinal: 'DESC' }), {}), createdAt: 'DESC' };
+      : { ...(includeOrdinal ? { ordinal: 'DESC' } : {}), createdAt: 'DESC' };
   }
 
   static async handlePagedDefaultQueryRequest<
@@ -207,7 +206,7 @@ export class GraphqlHelper {
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(cls))) as any;
     const publishable = DBHelper.getPropertyNames(cls).includes('isPublished');
     // eslint-disable-next-line no-param-reassign
-    where = _.isString(where) ? where : { ...where, ...F.when(publishable, () => ({ isPublished: true }), {}) };
+    where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : {}) };
 
     if (query.random > 0) {
       logger.debug(`parse where ${r({ publishable, cls, where })}`);
@@ -319,24 +318,16 @@ export class GraphqlHelper {
     }
 
     if (timeCondition && typeof where === 'object') {
-      const afterCondition = F.when(
-        !!(timeCondition && timeCondition.after),
-        () => ({ [timeCondition.column]: MoreThan(timeCondition.after) }),
-        {},
-      );
-      const beforeCondition = F.when(
-        !!(timeCondition && timeCondition.before),
-        () => ({ [timeCondition.column]: LessThan(timeCondition.before) }),
-        {},
-      );
+      const afterCondition = timeCondition?.after ? { [timeCondition.column]: MoreThan(timeCondition.after) } : {};
+      const beforeCondition = timeCondition?.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : {};
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
     logger.debug(`loadRelationIds: ${r({ relations, relationPath, loadRelationIds })}`);
     const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
-      ...F.when(!!pageRequest, () => toPage(pageRequest), {}),
-      ...F.when(selectFields && selectFields.length > 0, () => ({ select: selectFields }), {}),
+      ...(pageRequest ? toPage(pageRequest) : {}),
+      ...(selectFields?.length > 0 ? { select: selectFields } : {}),
       where: whereCondition,
       join,
       loadRelationIds,
@@ -500,19 +491,19 @@ export class GraphqlHelper {
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
   }): Promise<CursoredPageable<Entity>> {
     const entityRepo = (cls as any) as Repository<Entity>;
-    const countOptions = F.when(!!where, () => where, {});
-    const total = await entityRepo.count(countOptions);
+    const countOptions = where || {};
+    const total = await entityRepo.count(countOptions as FindConditions<Entity>);
     // const offsetOptions = await F.when(
     //   cursoredRequest.after,
     //   () => this.genericFindOptions({ cls, pageRequest: { size: first } }),
     //   {},
     // );
     // const offset = await entityRepo.find(offsetOptions);
-    const first = F.when(cursoredRequest.first > 0 && cursoredRequest.first <= 20, () => cursoredRequest.first, 10);
+    const first = cursoredRequest.first > 0 && cursoredRequest.first <= 20 ? cursoredRequest.first : 10;
     const hasNextPage = first < total;
     const findOptions = await this.genericFindOptions({
       cls,
-      where: { ...F.when(!!cursoredRequest.after, () => ({ id: MoreThan(cursoredRequest.after) }), {}) },
+      where: { ...(cursoredRequest.after ? { id: MoreThan(cursoredRequest.after) } : {}) },
       pageRequest: { size: first },
     });
     const items = await entityRepo.find(findOptions);

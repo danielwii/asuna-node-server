@@ -5,25 +5,21 @@ import * as _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
 import { BaseEntity, DeleteResult } from 'typeorm';
-import * as F from 'futil';
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile, r } from '../common';
 import { LoggerFactory } from '../common/logger';
-import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { Role } from '../core/auth/auth.entities';
-import { JwtPayload } from '../core/auth/auth.interfaces';
+import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
 import {
   ColumnSchema,
   DBHelper,
   OriginSchema,
   parseFields,
-  parseNormalWhereAndRelatedFields,
   parseNormalWheres,
   parseOrder,
   parseWhere,
 } from '../core/db';
 import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
-import { AnyAuthRequest } from '../helper/interfaces';
+import { AnyAuthRequest } from '../helper';
 import { Tenant, TenantHelper } from '../tenant';
 
 // import { AdminUser } from '../../core/auth';
@@ -209,7 +205,7 @@ export abstract class RestCrudController {
 
     const entity = await repository.findOneOrFail({ where: whereOptions });
 
-    const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username });
+    const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username } as any);
     logger.log(`patch ${r({ entityTo })}`);
     return repository.save(entityTo);
   }

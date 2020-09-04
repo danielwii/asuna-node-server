@@ -1,6 +1,5 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
-import * as F from 'futil';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtPayload } from '../core/auth';
@@ -13,11 +12,11 @@ import { PointExchange } from './points.entities';
 
 @Resolver()
 export class PropertyQueryResolver {
-  logger = LoggerFactory.getLogger('UserQueryResolver');
+  private logger = LoggerFactory.getLogger('UserQueryResolver');
 
   @UseGuards(new GqlAuthGuard())
   @Query()
-  async user_paged_exchangeRecords(
+  public async user_paged_exchangeRecords(
     @Args('type') type: string,
     @Args('refId') refId: string,
     @Args('pageRequest') pageRequest: PageRequestInput,
@@ -42,7 +41,7 @@ export class PropertyQueryResolver {
 
   @UseGuards(new GqlAuthGuard())
   @Query()
-  async user_paged_financialTransactions(
+  public async user_paged_financialTransactions(
     @Args('type') type: string,
     @Args('refId') refId: string,
     @Args('pageRequest') pageRequest: PageRequestInput,
@@ -66,7 +65,7 @@ export class PropertyQueryResolver {
   }
 
   @Query()
-  async api_exchangeObjects(
+  public async api_exchangeObjects(
     @Args('type') type: ExchangeCurrencyType,
     @Args('usage') usage: string,
     @Args('orderBy') orderBy: SorterInput,
@@ -79,7 +78,7 @@ export class PropertyQueryResolver {
         cls: ExchangeObject,
         relationPath: `${PropertyQueryResolver.prototype.api_exchangeObjects.name}.items`,
         info,
-        where: { ...F.when(!!usage, () => ({ usage }), {}) },
+        where: { ...(usage ? { usage } : {}) },
         order: toOrder(orderBy),
       }),
     );

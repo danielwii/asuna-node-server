@@ -9,7 +9,6 @@ import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import * as path from 'path';
-import { join } from 'path';
 import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
@@ -24,7 +23,7 @@ const logger = LoggerFactory.getLogger('GraphqlModule');
 
 @Module({})
 export class GraphqlModule implements OnModuleInit {
-  static forRoot(dir: string, modules = [], options?): DynamicModule {
+  public static forRoot(dir: string, modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
     const tracingConfig = TracingConfigObject.load();
@@ -32,7 +31,7 @@ export class GraphqlModule implements OnModuleInit {
     const typePaths = _.uniq([
       dir,
       path.resolve(__dirname, '../../src/**/*.graphql'),
-      `${join(process.mainModule.path, '../src')}/**/*.graphql`,
+      `${path.join(process.mainModule.path, '../src')}/**/*.graphql`,
     ]);
     logger.log(`init graphql ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
 
@@ -112,7 +111,7 @@ export class GraphqlModule implements OnModuleInit {
     };
   }
 
-  onModuleInit(): void {
+  public onModuleInit(): void {
     logger.log('init...');
   }
 }

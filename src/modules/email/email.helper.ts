@@ -5,15 +5,13 @@ import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
 import { Attachment, Options } from 'nodemailer/lib/mailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
-import * as F from 'futil';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
-import { r } from '../common/helpers/utils';
-import { LoggerFactory } from '../common/logger/factory';
-import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamic_configs';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
+import { DynamicConfigKeys, DynamicConfigs } from '../config';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
-import { MinioConfigObject, QiniuConfigObject } from '../core/storage/storage.config';
-import { StorageMode } from '../core/storage/storage.engines';
+import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core/storage';
 import { WeChatHelper } from '../wechat';
 import { EmailTmplConfigKeys, EmailTmplConfigObject } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
@@ -113,7 +111,7 @@ export class EmailHelper {
           ? { filename: attachment.name, path: `${domain}/${attachment.prefix}/${attachment.filename}` }
           : (attachment as Attachment),
       ),
-      ...F.when(!!content, () => ({ html: content }), {}),
+      ...(content ? { html: content } : {}),
     };
     logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);

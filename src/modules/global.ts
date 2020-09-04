@@ -1,5 +1,5 @@
 export class GlobalVariables {
-  static rootDir: string;
+  public static rootDir: string;
 
-  static packageDir: string;
+  public static packageDir: string;
 }
