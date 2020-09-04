@@ -56,7 +56,7 @@ export class RestHelper {
         // console.log('one-2-one', originSchema.oneToOneRelations);
         // console.log('many-2-one', originSchema.manyToOneRelations);
         const relationSchema = originSchema.manyToOneRelations.find(
-          relation => relation.config.selectable === config.firstModelName,
+          (relation) => relation.config.selectable === config.firstModelName,
         );
         const firsModel = DBHelper.getModelNameObject(config.firstModelName);
         const primaryKey = DBHelper.getPrimaryKeyByModel(firsModel);
@@ -76,9 +76,9 @@ export class RestHelper {
     }
 
     const repository = DBHelper.repo(model);
-    const relationKeys = repository.metadata.relations.map(relation => relation.propertyName);
-    const relationIds = R.map(value => (_.isArray(value) ? (value as any[]).map(id => ({ id })) : { id: value }))(
-      R.pick(relationKeys, body),
+    const relationKeys = repository.metadata.relations.map((relation) => relation.propertyName);
+    const relationIds = R.map((value) => (_.isArray(value) ? (value as any[]).map((id) => ({ id })) : { id: value }))(
+      R.pick(relationKeys, body) as any,
     );
 
     const entity = repository.create({
@@ -127,8 +127,8 @@ export class RestHelper {
     // _.assign({}, ..._.map(raw, o => ({ [o[column]]: _.toNumber(o.count) })));
     const stats = _.flow(
       fp.groupBy(fp.get(field)), // group by field
-      fp.mapValues(fp.map(o => ({ [o[column]]: _.toNumber(o.count) }))), // convert
-      fp.mapValues(v => _.assign({}, ...v)), // merge values
+      fp.mapValues(fp.map((o) => ({ [o[column]]: _.toNumber(o.count) }))), // convert
+      fp.mapValues((v) => _.assign({}, ...v)), // merge values
       // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
     )(raw);
     logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ whereSql, stats })}`);

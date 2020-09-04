@@ -18,7 +18,8 @@ import {
   Not,
   ObjectType,
   Raw,
-  Repository, SelectQueryBuilder,
+  Repository,
+  SelectQueryBuilder,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
@@ -119,10 +120,10 @@ export function parseNormalWhereAndRelatedFields(
 
 function parseCondition(value: Condition): string | Condition | FindOperator<any> {
   if (_.has(value, '$and')) {
-    return { $and: R.map(parseCondition)(value.$and) };
+    return { $and: R.map(parseCondition)(value.$and as any) as any };
   }
   if (_.has(value, '$or')) {
-    return { $or: R.map(parseCondition)(value.$or) };
+    return { $or: R.map(parseCondition)(value.$or as any) as any };
   }
 
   if (_.has(value, '$like')) return Like(value.$like);
@@ -409,7 +410,7 @@ export class DBHelper {
 
     const columns = R.compose(
       // 更新可能的 STI 信息
-      R.map((column) => {
+      R.map((column: any) => {
         const currentEntityInfo = parentEntityInfo || entityInfo;
         if (currentEntityInfo.sti && currentEntityInfo.sti.name === column.name) {
           return R.mergeDeepRight(column, {
@@ -423,7 +424,7 @@ export class DBHelper {
         }
         return column;
       }),
-      R.map((column: ColumnMetadata) => ({
+      R.map<ColumnMetadata, ColumnSchema>((column) => ({
         name: column.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByColumn(column, opts),
@@ -434,11 +435,12 @@ export class DBHelper {
           info: info ? info[column.propertyName] : undefined,
         },
       })),
-      R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)),
+      R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)) as any,
+      R.identity,
     )(repository.metadata.nonVirtualColumns);
 
     const manyToOneRelations = R.compose(
-      R.map((relation: RelationMetadata) => ({
+      R.map<RelationMetadata, ColumnSchema>((relation) => ({
         name: relation.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),
@@ -447,47 +449,44 @@ export class DBHelper {
           info: info ? info[relation.propertyName] : undefined,
         },
       })),
-      R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)),
+      R.filter((column: ColumnMetadata) => !R.path([column.propertyName, 'ignore'])(info)) as any,
+      R.identity,
     )(repository.metadata.manyToOneRelations);
 
     const manyToManyRelations = R.compose(
-      R.map(
-        (relation: RelationMetadata): ColumnSchema => ({
-          name: relation.propertyName,
-          config: {
-            selectable: DBHelper.extractSelectableByRelation(relation, opts),
-            type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
-            // nullable  : relation.isNullable,
-            many: true,
-            relation: 'ManyToMany',
-            info: info ? info[relation.propertyName] : undefined,
-          },
-        }),
-      ),
+      R.map<RelationMetadata, ColumnSchema>((relation) => ({
+        name: relation.propertyName,
+        config: {
+          selectable: DBHelper.extractSelectableByRelation(relation, opts),
+          type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
+          // nullable  : relation.isNullable,
+          many: true,
+          relation: 'ManyToMany',
+          info: info ? info[relation.propertyName] : undefined,
+        },
+      })),
       // R.filter(R.prop('isPrimary')),
     )(repository.metadata.manyToManyRelations);
 
     // 加载 OneToMany 数据
     const oneToManyRelations = R.compose(
-      R.map(
-        (relation: RelationMetadata): ColumnSchema => ({
-          name: relation.propertyName,
-          config: {
-            selectable: DBHelper.extractSelectableByRelation(relation, opts),
-            type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
-            // nullable  : relation.isNullable,
-            many: true,
-            relation: 'OneToMany',
-            info: info ? info[relation.propertyName] : undefined,
-          },
-        }),
-      ),
+      R.map<RelationMetadata, ColumnSchema>((relation) => ({
+        name: relation.propertyName,
+        config: {
+          selectable: DBHelper.extractSelectableByRelation(relation, opts),
+          type: _.isString(relation.type) ? relation.type : (relation.type as Function).name,
+          // nullable  : relation.isNullable,
+          many: true,
+          relation: 'OneToMany',
+          info: info ? info[relation.propertyName] : undefined,
+        },
+      })),
       // R.filter((relation: RelationMetadata) => info[relation.propertyName]),
     )(repository.metadata.oneToManyRelations);
 
     // 加载 OneToOne 数据
     const oneToOneRelations = R.compose(
-      R.map((relation: RelationMetadata) => ({
+      R.map<RelationMetadata, ColumnSchema>((relation) => ({
         name: relation.propertyName,
         config: {
           selectable: DBHelper.extractSelectableByRelation(relation, opts),

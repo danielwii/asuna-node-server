@@ -1,5 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../common/logger/factory';
+import { LoggerFactory } from '../common/logger';
 import { KeyValueType, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper, KvModule } from '../core/kv';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 import { PointExchangeEventKey } from './points.entities';
@@ -40,7 +40,11 @@ export class PropertyModule implements OnModuleInit {
                     profileId: wallet.profileId,
                     type: 'adminBalanceChange',
                   });
-                  const totalRecharge = R.pipe(R.map(R.prop('change')) /*, R.negate*/, R.sum)(transactions) ?? 0;
+                  const totalRecharge =
+                    R.pipe(
+                      R.map<FinancialTransaction, number>(R.prop('change')) /* , R.negate */,
+                      R.sum,
+                    )(transactions) ?? 0;
                   logger.debug(`loaded transactions ${r({ wallet, transactions, totalRecharge })}`);
                   await entityManager.update(Wallet, { id: wallet.id }, { totalRecharge });
                 }),
