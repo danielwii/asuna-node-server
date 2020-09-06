@@ -27,6 +27,7 @@ export enum YamlConfigKeys {
   tracing = 'tracing',
   email = 'email',
   live = 'live',
+  sms = 'sms',
 }
 
 export const ConfigKeys = {
