@@ -11,17 +11,21 @@ import { KeyValueModel } from './kv.isolated.entities';
 
 @Resolver()
 export class KvQueryResolver {
-  logger = LoggerFactory.getLogger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('KvQueryResolver');
 
   @Query()
-  async kv(@Args('collection') collection: string, @Args('key') key: string, @Context() ctx): Promise<KeyValuePair> {
+  public async kv(
+    @Args('collection') collection: string,
+    @Args('key') key: string,
+    @Context() ctx,
+  ): Promise<KeyValuePair> {
     this.logger.log(`kv: ${r({ collection, key })}`);
-    await KvHelper.auth(ctx, { collection });
+    // await KvHelper.auth(ctx, { collection });
     return KvHelper.get({ collection, key });
   }
 
   @Query()
-  async kvs(@Args('collection') collection: string, @Context() ctx): Promise<KeyValuePair[]> {
+  public async kvs(@Args('collection') collection: string, @Context() ctx): Promise<KeyValuePair[]> {
     this.logger.log(`kvs: ${r({ collection })}`);
     await KvHelper.auth(ctx, { collection });
     return KvHelper.find(collection);
@@ -29,17 +33,17 @@ export class KvQueryResolver {
 
   @UseGuards(GqlAdminAuthGuard)
   @Query()
-  async kv_models(@Context() ctx: GraphqlContext): Promise<KeyValueModel[]> {
+  public async kv_models(@Context() ctx: GraphqlContext): Promise<KeyValueModel[]> {
     return KeyValueModel.find();
   }
 }
 
 @Resolver(KeyValueModel)
 export class KeyValueModelResolver {
-  logger = LoggerFactory.getLogger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('KeyValueModelResolver');
 
   @ResolveField()
-  async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
+  public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
     this.logger.debug(`load pair for ${model.id}`);
     return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
       cls: KeyValueModel,
@@ -48,7 +52,6 @@ export class KeyValueModelResolver {
       targetCls: KeyValuePair,
       loader: ctx.getDataLoaders().keyValuePairs,
     }).then((item) => {
-      // eslint-disable-next-line no-param-reassign
       [, item.value] = recognizeTypeValue(item.type, item.value);
       return item;
     });

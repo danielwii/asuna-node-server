@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../base';
-import { CacheUtils } from '../../cache/utils';
+import { CacheUtils } from '../../cache';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
-import { ColumnTypeHelper } from '../helpers/column.helper';
+import { ColumnTypeHelper } from '../helpers';
 import type { KeyValueModel } from './kv.isolated.entities';
 
 export enum KeyValueType {
@@ -23,33 +23,33 @@ export enum KeyValueType {
 export class KeyValuePair extends AbstractBaseEntity {
   @MetaInfo({ name: 'Collection' })
   @Column({ nullable: false, length: 100 })
-  collection: string;
+  public collection: string;
 
   @MetaInfo({ name: 'Key' })
   @Column({ nullable: false, length: 100 })
-  key: string;
+  public key: string;
 
   @MetaInfo({ name: 'Name' })
   @Column({ nullable: true, length: 255 })
-  name?: string;
+  public name?: string;
 
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: KeyValueType })
   @Column('varchar', { nullable: true })
-  type?: KeyValueType;
+  public type?: KeyValueType;
 
   @MetaInfo({ name: 'Value' })
   @Column('text', { nullable: true })
-  value?: any;
+  public value?: any;
 
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  extra?: JsonMap;
+  public extra?: JsonMap;
 
   @OneToOne('KeyValueModel', (inverse: KeyValueModel) => inverse.pair)
-  model: KeyValueModel;
+  public model: KeyValueModel;
 
   @AfterUpdate()
-  afterUpdate(): void {
+  public afterUpdate(): void {
     CacheUtils.clear({ prefix: 'kv', key: _.pick(this, 'collection', 'key') });
   }
 }

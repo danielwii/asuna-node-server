@@ -13,12 +13,12 @@ const logger = LoggerFactory.getLogger('KvModule');
   exports: [],
 })
 export class KvModule implements OnModuleInit {
-  onModuleInit(): void {
+  public onModuleInit(): void {
     logger.log('init...');
 
     LifecycleRegister.reg(
       new (class implements AppLifecycleType {
-        async appStarted(): Promise<void> {
+        public async appStarted(): Promise<void> {
           await KvHelper.syncMergedConstants();
         }
       })(),

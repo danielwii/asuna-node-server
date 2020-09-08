@@ -4,8 +4,8 @@ import { IsOptional, IsString } from 'class-validator';
 import { Response } from 'express';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest } from '../../helper/interfaces';
-import { JwtAdminAuthGuard } from '../auth/admin-auth.guard';
+import { AnyAuthRequest } from '../../helper';
+import { JwtAdminAuthGuard } from '../auth';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';
 
@@ -14,42 +14,42 @@ const logger = LoggerFactory.getLogger('KvController');
 class KvPair {
   @IsString()
   @IsOptional()
-  collection?: string;
+  public collection?: string;
 
   @IsString()
-  key: string;
-
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsOptional()
-  type?: KeyValueType;
-
-  @IsString()
-  value: any;
+  public key: string;
 
   @IsString()
   @IsOptional()
-  extra?: any;
+  public name?: string;
 
-  toKvDef(): KvDef {
+  @IsOptional()
+  public type?: KeyValueType;
+
+  @IsString()
+  public value: any;
+
+  @IsString()
+  @IsOptional()
+  public extra?: any;
+
+  public toKvDef(): KvDef {
     return { collection: this.collection, key: this.key };
   }
 }
 
 class GetKvPairRequest {
   @IsString()
-  collection: string;
+  public collection: string;
 
   @IsString()
-  key: string;
+  public key: string;
 
   @IsString()
   @IsOptional()
-  transform?: string;
+  public transform?: string;
 
-  toKvDef(): KvDef {
+  public toKvDef(): KvDef {
     return { collection: this.collection, key: this.key };
   }
 }
@@ -59,7 +59,7 @@ class GetKvPairRequest {
 export class KvController {
   @UseGuards(JwtAdminAuthGuard)
   @Post('kv')
-  async set(@Body() kvPair: KvPair, @Req() req: AnyAuthRequest): Promise<KeyValuePair> {
+  public async set(@Body() kvPair: KvPair, @Req() req: AnyAuthRequest): Promise<KeyValuePair> {
     const { user, identifier } = req;
     logger.log(`set ${r({ kvPair, user, identifier })}`);
     return KvHelper.set(KeyValuePair.create(kvPair));
@@ -67,7 +67,7 @@ export class KvController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Post('kv/destroy')
-  async destroy(@Body() kvDef: KvDef, @Req() req: AnyAuthRequest): Promise<void> {
+  public async destroy(@Body() kvDef: KvDef, @Req() req: AnyAuthRequest): Promise<void> {
     const { user, identifier } = req;
     logger.log(`destroy ${r({ kvDef, user, identifier })}`);
     await KvHelper.delete(kvDef);
@@ -77,7 +77,11 @@ export class KvController {
   }
 
   @Get('kv')
-  async get(@Query() query: GetKvPairRequest, @Req() req: AnyAuthRequest, @Res() res: Response): Promise<KeyValuePair> {
+  public async get(
+    @Query() query: GetKvPairRequest,
+    @Req() req: AnyAuthRequest,
+    @Res() res: Response,
+  ): Promise<KeyValuePair> {
     const { user, identifier } = req;
     logger.log(`get ${r({ query, user, identifier })}`);
     await KvHelper.auth({ req, res }, query);
@@ -88,7 +92,7 @@ export class KvController {
   }
 
   @Get('kvs')
-  async collection(
+  public async collection(
     @Query('collection') collection: string,
     @Req() req: AnyAuthRequest,
     @Res() res: Response,

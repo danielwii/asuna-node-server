@@ -106,7 +106,7 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
   return [newType || KeyValueType.string, newValue];
 }
 
-export enum AsunaColletionPrefix {
+export enum AsunaCollectionPrefix {
   // 限制只有管理员可以访问该前缀的 kv
   SYSTEM = 'SYSTEM',
   // 目前不限制权限
@@ -314,7 +314,7 @@ export class KvHelper {
   public static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return KeyValuePair.find({
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
-      ...R.ifElse(R.identity, R.always({ key }), R.always({}))(!!key),
+      ...(key ? { key } : {}),
     }).then(
       fp.map((item) => {
         // eslint-disable-next-line no-param-reassign
@@ -356,7 +356,7 @@ export class KvHelper {
   }
 
   public static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
-    if (collection.toUpperCase().startsWith(AsunaColletionPrefix.SYSTEM)) {
+    if (collection.toUpperCase().startsWith(AsunaCollectionPrefix.SYSTEM)) {
       await auth(req, res, 'admin');
     }
   }

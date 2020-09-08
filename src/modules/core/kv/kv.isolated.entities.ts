@@ -11,15 +11,15 @@ export enum KVModelFormatType {
 @EntityMetaInfo({ name: 'kv__models', internal: true })
 @Entity('kv__t_models')
 export class KeyValueModel extends Publishable(AbstractNameEntity) {
+  @MetaInfo({ name: 'FormatType', type: 'Enum', enumData: KVModelFormatType })
+  @Column('varchar', { nullable: true, name: 'format_type' })
+  public formatType?: KVModelFormatType;
+
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, /* length: 36, */ name: 'pair__id' })
-  pairId?: number;
+  public pairId?: number;
 
   @OneToOne('KeyValuePair', (inverse: KeyValuePair) => inverse.model, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pair__id' })
-  pair: KeyValuePair;
-
-  @MetaInfo({ name: 'FormatType', type: 'Enum', enumData: KVModelFormatType })
-  @Column('varchar', { nullable: true, name: 'format_type' })
-  formatType?: KVModelFormatType;
+  public pair: KeyValuePair;
 }
