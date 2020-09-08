@@ -36,3 +36,5 @@ patch:
         patched: '2020-05-01T08:30:18.091Z'
     - futil > lodash:
         patched: '2020-08-07T12:44:44.978Z'
+    - snyk > snyk-docker-plugin > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2020-09-08T16:43:15.625Z'
