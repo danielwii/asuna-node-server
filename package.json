@@ -79,7 +79,7 @@
     "graphql-type-json": "^0.3.2",
     "hashids": "^2.2.1",
     "hbs": "^4.1.1",
-    "helmet": "^4.1.0",
+    "helmet": "^4.1.1",
     "highland": "^3.0.0-beta.10",
     "ismobilejs": "^1.1.1",
     "jaeger-client": "^3.18.1",
