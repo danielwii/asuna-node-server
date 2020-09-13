@@ -1,0 +1,537 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model app__t_infos {
+  id              Int               @default(autoincrement()) @id
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @default(now())
+  updated_by      String?
+  name            String            @unique
+  description     String?
+  is_published    Int?
+  key             String            @unique
+  mode            String?
+  app__t_releases app__t_releases[]
+}
+
+model app__t_releases {
+  id           Int           @default(autoincrement()) @id
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  updated_by   String?
+  is_published Int?
+  version_code String
+  build_number Int
+  upgrade_mode String?
+  platform     String?
+  description  String?
+  paths        Json
+  app_info__id Int?
+  app__t_infos app__t_infos? @relation(fields: [app_info__id], references: [id])
+
+  @@index([app_info__id], name: "FK_297f3d3b3e0b92a3ad8470bd818")
+}
+
+model auth__tr_users_roles {
+  user__id      String
+  role__id      Int
+  auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id])
+  auth__t_users auth__t_users @relation(fields: [user__id], references: [id])
+
+  @@id([user__id, role__id])
+  @@index([role__id], name: "IDX_3c04c4b2407cda34444ccb47d9")
+  @@index([user__id], name: "IDX_8977e1e734c29dccaf68a6bede")
+}
+
+model auth__t_api_keys {
+  id           Int      @default(autoincrement()) @id
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  updated_by   String?
+  name         String   @unique
+  description  String?
+  is_published Int?
+  key          String
+  whitelist    Json?
+}
+
+model auth__t_roles {
+  id                   Int                    @default(autoincrement()) @id
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now())
+  updated_by           String?
+  name                 String                 @unique
+  description          String?
+  authorities          Json?
+  auth__tr_users_roles auth__tr_users_roles[]
+}
+
+model auth__t_users {
+  id                   String                 @id
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @default(now())
+  updated_by           String?
+  username             String                 @unique
+  email                String?                @unique
+  nickname             String?                @unique
+  portrait             String?
+  channel              String?                @default("default")
+  password             String?
+  salt                 String?
+  last_signed_at       DateTime?
+  last_login_at        DateTime?
+  description          String?
+  is_active            Int?
+  is_bound             Int?                   @default(0)
+  tenant__id           String?
+  sys__t_tenants       sys__t_tenants?        @relation(fields: [tenant__id], references: [id])
+  auth__tr_users_roles auth__tr_users_roles[]
+  wx__t_users          wx__t_users?
+
+  @@index([tenant__id], name: "FK_8cfa67a6ea28205d4054ef9f6ad")
+}
+
+model auth__t_user_profiles {
+  id                                 String                               @id
+  created_at                         DateTime                             @default(now())
+  updated_at                         DateTime                             @default(now())
+  updated_by                         String?
+  username                           String                               @unique
+  email                              String?                              @unique
+  nickname                           String?                              @unique
+  portrait                           String?
+  channel                            String?                              @default("default")
+  password                           String?
+  salt                               String?
+  last_signed_at                     DateTime?
+  last_login_at                      DateTime?
+  description                        String?
+  is_active                          Int?
+  is_bound                           Int?                                 @default(0)
+  content__t_feedback                content__t_feedback[]
+  payment__t_orders                  payment__t_orders[]
+  payment__t_transactions            payment__t_transactions[]
+  property__t_financial_transactions property__t_financial_transactions[]
+  property__t_point_exchanges        property__t_point_exchanges[]
+  property__t_wallets                property__t_wallets?
+  user__t_activities                 user__t_activities[]
+  user__t_follows                    user__t_follows[]
+  wx__t_mini_app_users               wx__t_mini_app_users?
+}
+
+model client__t_users {
+  uuid       String   @id
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model content__t_drafts {
+  id         Int      @default(autoincrement()) @id
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  updated_by String?
+  content    Json
+  ref_id     String
+  type       String
+}
+
+model content__t_feedback {
+  id                          Int                           @default(autoincrement()) @id
+  created_at                  DateTime                      @default(now())
+  updated_at                  DateTime                      @default(now())
+  updated_by                  String?
+  profile__id                 String?
+  name                        String?
+  description                 String?
+  type                        String?
+  images                      Json?
+  status                      String
+  auth__t_user_profiles       auth__t_user_profiles?        @relation(fields: [profile__id], references: [id])
+  content__t_feedback_replies content__t_feedback_replies[]
+
+  @@index([profile__id], name: "FK_f909b9eac784fd3622ae398e6fc")
+}
+
+model content__t_feedback_replies {
+  id                  Int                  @default(autoincrement()) @id
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now())
+  updated_by          String?
+  ref_id              String
+  images              Json?
+  description         String
+  sender_type         String
+  feedback__id        Int?
+  content__t_feedback content__t_feedback? @relation(fields: [feedback__id], references: [id])
+
+  @@index([feedback__id], name: "FK_664489527fd4888cfe12591feed")
+}
+
+model content__t_notifications {
+  id           Int      @default(autoincrement()) @id
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  updated_by   String?
+  name         String   @unique
+  description  String?
+  is_published Int?
+  type         String
+  usage        String?
+}
+
+model kv__t_models {
+  id           Int          @default(autoincrement()) @id
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @default(now())
+  updated_by   String?
+  name         String       @unique
+  description  String?
+  is_published Int?
+  format_type  String?
+  pair__id     Int?         @unique
+  kv__t_pairs  kv__t_pairs? @relation(fields: [pair__id], references: [id])
+}
+
+model kv__t_pairs {
+  id           Int           @default(autoincrement()) @id
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  updated_by   String?
+  collection   String
+  key          String
+  name         String?
+  type         String?
+  value        String?
+  extra        Json?
+  kv__t_models kv__t_models?
+}
+
+model migrations {
+  id        Int    @default(autoincrement()) @id
+  timestamp Int
+  name      String
+}
+
+model page__t_views {
+  id           Int      @default(autoincrement()) @id
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  updated_by   String?
+  name         String   @unique
+  description  String?
+  is_published Int?
+  path         String
+  main_file    String?
+  files        Json?
+  images       Json?
+}
+
+model payment__tr_order_items {
+  order__id         String
+  item__id          String
+  payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id])
+  payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id])
+
+  @@id([order__id, item__id])
+  @@index([item__id], name: "IDX_46c05f9d98ca4e16836ab89fae")
+  @@index([order__id], name: "IDX_aaaffec287d62170d792eef4e9")
+}
+
+model payment__t_items {
+  id                      String                    @id
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @default(now())
+  updated_by              String?
+  name                    String                    @unique
+  description             String?
+  is_published            Int?
+  key                     String                    @unique
+  summary                 String?
+  price                   Float?
+  cover                   String?
+  images                  Json?
+  payment__tr_order_items payment__tr_order_items[]
+}
+
+model payment__t_methods {
+  id                      String                    @id
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @default(now())
+  updated_by              String?
+  name                    String                    @unique
+  description             String?
+  is_published            Int?
+  display_name            String?
+  endpoint                String?
+  merchant                String?
+  apiKey                  String?
+  private_key             String?
+  extra                   Json?
+  sign_tmpl               String?
+  body_tmpl               String?
+  type                    String?                   @default("third")
+  payment__t_transactions payment__t_transactions[]
+}
+
+model payment__t_orders {
+  id                      String                    @id
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @default(now())
+  updated_by              String?
+  profile__id             String?
+  name                    String?
+  amount                  Float
+  status                  String?
+  transaction__id         String?                   @unique
+  auth__t_user_profiles   auth__t_user_profiles?    @relation(fields: [profile__id], references: [id])
+  payment__t_transactions payment__t_transactions?  @relation(fields: [transaction__id], references: [id])
+  payment__tr_order_items payment__tr_order_items[]
+
+  @@index([profile__id], name: "FK_8f41cad8ace463ec57036efaecc")
+}
+
+model payment__t_transactions {
+  id                    String                 @id
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  profile__id           String?
+  status                String?
+  sign                  String?
+  payment_info          Json?
+  extra                 Json?
+  data                  Json?
+  method__id            String?
+  payment__t_methods    payment__t_methods?    @relation(fields: [method__id], references: [id])
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [profile__id], references: [id])
+  payment__t_orders     payment__t_orders?
+
+  @@index([method__id], name: "FK_e15010b86bdf88783447bc62057")
+  @@index([profile__id], name: "FK_efddbdc437038a75d15ef0ae750")
+}
+
+model property__t_exchange_objects {
+  id                                 Int                                  @default(autoincrement()) @id
+  created_at                         DateTime                             @default(now())
+  updated_at                         DateTime                             @default(now())
+  updated_by                         String?
+  name                               String                               @unique
+  description                        String?
+  is_published                       Int?
+  key                                String                               @unique
+  type                               String
+  price                              Float
+  value                              String
+  cover                              String?
+  usage                              String?
+  property__t_financial_transactions property__t_financial_transactions[]
+}
+
+model property__t_financial_transactions {
+  id                           Int                           @default(autoincrement()) @id
+  created_at                   DateTime                      @default(now())
+  updated_at                   DateTime                      @default(now())
+  updated_by                   String?
+  change                       Int
+  type                         String
+  before                       Int
+  after                        Int
+  ref_id                       String?
+  extra                        Json?
+  remark                       String?
+  profile__id                  String?
+  exchange_object__id          Int?
+  property__t_exchange_objects property__t_exchange_objects? @relation(fields: [exchange_object__id], references: [id])
+  auth__t_user_profiles        auth__t_user_profiles?        @relation(fields: [profile__id], references: [id])
+
+  @@index([exchange_object__id], name: "FK_66319aeac147cdacaaa6d3972c1")
+  @@index([profile__id], name: "FK_971dbdb2ea844a15d0809c9bd39")
+}
+
+model property__t_point_exchanges {
+  id                    Int                    @default(autoincrement()) @id
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  change                Int
+  type                  String
+  before                Int
+  after                 Int
+  ref_id                String?
+  extra                 Json?
+  remark                String?
+  profile__id           String?
+  body                  Json?
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [profile__id], references: [id])
+
+  @@index([profile__id], name: "FK_71e71a796ec68bd891e63d37a5f")
+}
+
+model property__t_wallets {
+  id                    Int                    @default(autoincrement()) @id
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  profile__id           String?                @unique
+  balance               Int
+  available             Int
+  frozen                Int
+  withdrawals           Int
+  points                Int
+  total_recharge        Int                    @default(dbgenerated())
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [profile__id], references: [id])
+}
+
+model sys__t_audit_records {
+  id             Int      @default(autoincrement()) @id
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
+  updated_by     String?
+  type           String?
+  action         String?
+  identification Json?
+  from           Json?
+  to             Json?
+  diff           Json?
+}
+
+model sys__t_operation_tokens {
+  id            Int       @default(autoincrement()) @id
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @default(now())
+  updated_by    String?
+  role          String
+  type          String
+  identifier    String
+  key           String?
+  token         String
+  short_id      String
+  body          Json?
+  service       String
+  left          Int?
+  used_count    Int?      @default(0)
+  expired_at    DateTime?
+  is_used       Int?      @default(0)
+  is_deprecated Int?      @default(0)
+  is_active     Int?      @default(1)
+  is_expired    Int?      @default(0)
+}
+
+model sys__t_tasks {
+  id                 String               @id
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @default(now())
+  updated_by         String?
+  identifier         String?
+  unique_id          String?
+  service            String?
+  type               String?
+  channel            String?
+  state              String?
+  body               Json?
+  sys__t_task_events sys__t_task_events[]
+}
+
+model sys__t_task_events {
+  id           Int           @default(autoincrement()) @id
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @default(now())
+  updated_by   String?
+  message      String?
+  body         Json?
+  task__id     String?
+  sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id])
+
+  @@index([task__id], name: "FK_b9db76df8c6d282adb47c191808")
+}
+
+model sys__t_tenants {
+  id            String          @id
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  updated_by    String?
+  name          String          @unique
+  description   String?
+  is_published  Int?
+  auth__t_users auth__t_users[]
+  wx__t_users   wx__t_users[]
+}
+
+model user__t_activities {
+  id                    String                 @id
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  profile__id           String?
+  ref_id                String
+  type                  String
+  service               String
+  operation             String
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [profile__id], references: [id])
+
+  @@index([profile__id], name: "FK_89b4fa3d94c3a2c8464feb0c279")
+}
+
+model user__t_follows {
+  id                    String                 @id
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  type                  String?
+  following             String?
+  follower__id          String?
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [follower__id], references: [id])
+
+  @@index([follower__id], name: "FK_ab5a56d5c89e147cc87c96b6a7d")
+}
+
+model wx__t_mini_app_users {
+  open_id               String                 @id
+  nickname              String?
+  gender                Int?
+  language              String?
+  mobile                String?
+  city                  String?
+  province              String?
+  country               String?
+  avatar                String?
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  updated_by            String?
+  profile__id           String?                @unique
+  auth__t_user_profiles auth__t_user_profiles? @relation(fields: [profile__id], references: [id])
+}
+
+model wx__t_users {
+  tenant__id      String?
+  open_id         String          @id
+  nickname        String?
+  head_img        String?
+  remark          String?
+  group_id        Int?
+  union_id        String?
+  tag_ids         Json?
+  sex             Int?
+  subscribe       Int?
+  subscribe_time  Int?
+  subscribe_scene String?
+  country         String?
+  city            String?
+  province        String?
+  language        String?
+  qr_scene        Int?
+  qr_scene_str    String?
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @default(now())
+  admin__id       String?         @unique
+  auth__t_users   auth__t_users?  @relation(fields: [admin__id], references: [id])
+  sys__t_tenants  sys__t_tenants? @relation(fields: [tenant__id], references: [id])
+
+  @@index([tenant__id], name: "FK_84c91d701b8ae841a49bf00352f")
+}
