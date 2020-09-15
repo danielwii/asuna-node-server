@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-await-in-loop,@typescript-eslint/explicit-function-return-type,no-restricted-syntax */
 import { Injectable } from '@nestjs/common';
 import { read, utils, write } from 'xlsx';
 import { LoggerFactory } from '../common/logger';
@@ -11,7 +9,7 @@ const logger = LoggerFactory.getLogger('ImportExportService');
 @Injectable()
 export class ImportExportService {
   // 获取repo
-  private async getRepository(model: string) {
+  private static getRepository(model: string) {
     const modelName = DBHelper.getModelNameObject(model, '');
     return DBHelper.repo(modelName);
     // return DBHelper.extractAsunaSchemas(repository,{ module: 'www__', prefix: 't_' });
@@ -21,7 +19,7 @@ export class ImportExportService {
   private async getSchemas(repository) {
     const schemas = DBHelper.extractAsunaSchemas(repository, { module: '', prefix: 't' });
     const res = [];
-    schemas.forEach(value => {
+    schemas.forEach((value) => {
       if (
         value.name !== 'ordinal' &&
         value.name !== 'logoAlt' &&
@@ -48,7 +46,7 @@ export class ImportExportService {
     const workbook = read(fileBuffer, {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonArray = utils.sheet_to_json(worksheet, { header: 1 });
-    const repository = await this.getRepository(modelName);
+    const repository = await ImportExportService.getRepository(modelName);
     const schemas = await this.getSchemas(repository);
     const status = [];
     for (let row = 1; row < jsonArray.length; row += 1) {
@@ -59,7 +57,7 @@ export class ImportExportService {
           let value = jsonArray[row][column];
           // 如果是外键关系表，则需要处理外键表数据
           if (element.config.selectable !== undefined) {
-            const tempRepo = await this.getRepository(element.config.selectable);
+            const tempRepo = await ImportExportService.getRepository(element.config.selectable);
             if (!element.config.many) {
               const res = await tempRepo.findOne({ name: jsonArray[row][column] } as any);
               value = res;
@@ -69,7 +67,7 @@ export class ImportExportService {
               if (content !== undefined) {
                 const contentArray = content.split('、');
                 const resArray = [];
-                contentArray.forEach(async temp => {
+                contentArray.forEach(async (temp) => {
                   const res = await tempRepo.findOne({ name: temp.trim() } as any);
                   if (res !== undefined) {
                     resArray.push(res);
@@ -98,7 +96,7 @@ export class ImportExportService {
   }
 
   // 导出Excel
-  exportExcel(json: any[]): any {
+  public exportExcel(json: any[]): any {
     const ss = utils.json_to_sheet(json); // 通过工具将json转表对象'
     const keys = Object.keys(ss).sort(); // 排序 [需要注意，必须从A1开始]
     // 构建 workbook 对象
@@ -106,7 +104,7 @@ export class ImportExportService {
       // 定义 作文档
       SheetNames: ['sheet1'], // 定义表明
       Sheets: {
-        sheet1: { ...ss, }, // 表对象[注意表明]
+        sheet1: { ...ss }, // 表对象[注意表明]
       },
     };
     const buf = write(workbook, { type: 'buffer', bookType: 'xlsx' });
@@ -114,11 +112,11 @@ export class ImportExportService {
   }
 
   // 导出Excel模板
-  async exportModel(tableName: string) {
-    const repository = await this.getRepository(tableName);
+  public async exportModel(tableName: string): Promise<any> {
+    const repository = await ImportExportService.getRepository(tableName);
     const schemas = await this.getSchemas(repository);
     const json = [];
-    schemas.forEach(value => {
+    schemas.forEach((value) => {
       const temp = [];
       temp[value.config.info.name] = null;
       json.push(temp);
@@ -130,7 +128,7 @@ export class ImportExportService {
       // 定义 作文档
       SheetNames: ['sheet1'], // 定义表明
       Sheets: {
-        sheet1: { ...ss, }, // 表对象[注意表明]
+        sheet1: { ...ss }, // 表对象[注意表明]
       },
     };
     const buf = write(workbook, { type: 'buffer', bookType: 'xlsx' });

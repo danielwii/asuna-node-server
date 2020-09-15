@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../base';
-import { CacheUtils } from '../../cache';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
 import type { KeyValueModel } from './kv.isolated.entities';
+import { CacheUtils } from '../../cache/utils';
 
 export enum KeyValueType {
   string = 'string',

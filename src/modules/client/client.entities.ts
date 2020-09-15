@@ -6,18 +6,18 @@ import { AbstractBaseEntity } from '../base';
 @Entity('client__t_users')
 export class ClientUser extends BaseEntity {
   @PrimaryColumn({ length: 36 })
-  uuid: string;
+  public uuid: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  public updatedAt: Date;
 }
 
 export abstract class AbstractClientUserFavorite extends AbstractBaseEntity {
   @MetaInfo({})
   @ManyToOne('ClientUser')
   @JoinColumn({ name: 'client__id' })
-  clientUser: ClientUser;
+  public clientUser: ClientUser;
 }

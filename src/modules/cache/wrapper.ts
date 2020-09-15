@@ -1,24 +1,24 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
-import { LoggerFactory } from '../common/logger/factory';
+import { LoggerFactory } from '../common/logger';
 import { InMemoryDB } from './db';
 
 const logger = LoggerFactory.getLogger('CacheWrapper');
 
-type CacheWrapperDoOptions<V> = {
+interface CacheWrapperDoOptions<V> {
   prefix?: string;
   key: any;
   resolver: () => Promise<V>;
   expiresInSeconds?: number;
   strategy?: 'cache-only' | 'cache-first';
-};
+}
 
 export class CacheWrapper {
-  static calcKey({ prefix, key }: { prefix?: string; key: any }): string {
+  public static calcKey({ prefix, key }: { prefix?: string; key: any }): string {
     return `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
   }
 
-  static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
+  public static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds, strategy } = opts;
     // const cacheKey = this.calcKey({ prefix, key });
     // logger.debug(`get cache ${cacheKey}`);
@@ -63,7 +63,7 @@ export class CacheWrapper {
     return value; */
   }
 
-  static async clear(opts: { prefix?: string; key: any }): Promise<void> {
+  public static async clear(opts: { prefix?: string; key: any }): Promise<void> {
     return InMemoryDB.clear(opts);
     /*
     const { key, prefix } = opts;

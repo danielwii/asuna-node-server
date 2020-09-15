@@ -28,6 +28,7 @@ export enum YamlConfigKeys {
   email = 'email',
   live = 'live',
   sms = 'sms',
+  redis = 'redis',
 }
 
 export const ConfigKeys = {

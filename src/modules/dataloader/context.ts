@@ -1,15 +1,15 @@
-import { AppInfo } from '../app/app.entities';
+import { AppInfo } from '../app';
 import { Feedback, FeedbackReply } from '../content/feedback.entities';
 import { Notification } from '../content/notification';
 import { UserProfile } from '../core/auth';
-import { UserActivity } from '../core/interaction/activities.entities';
+import { UserActivity } from '../core/interaction';
 import { KeyValuePair } from '../core/kv/kv.entities';
-import { KeyValueModel } from '../core/kv/kv.isolated.entities';
 import { PaymentItem, PaymentMethod } from '../payments';
-import { WXMiniAppUserInfo } from '../wechat/wechat.entities';
+import { WXMiniAppUserInfo } from '../wechat';
 import { DataLoaderFunction, loader } from './dataloader';
+import { KeyValueModel } from '../core/kv/kv.isolated.entities';
 
-export type DefaultRegisteredLoaders = {
+export interface DefaultRegisteredLoaders {
   wxMiniAppUserInfo: DataLoaderFunction<WXMiniAppUserInfo>;
   keyValuePairs: DataLoaderFunction<KeyValuePair>;
   keyValueModels: DataLoaderFunction<KeyValueModel>;
@@ -21,7 +21,7 @@ export type DefaultRegisteredLoaders = {
   feedbackReplies: DataLoaderFunction<FeedbackReply>;
   userActivities: DataLoaderFunction<UserActivity>;
   notifications: DataLoaderFunction<Notification>;
-};
+}
 
 export const defaultDataLoaders = {
   wxMiniAppUserInfo: loader<WXMiniAppUserInfo>(WXMiniAppUserInfo),

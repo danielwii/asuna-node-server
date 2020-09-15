@@ -1,8 +1,9 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
-import { r } from '../common/helpers';
+import { fnWithP3, getIgnoreCase, r, withP } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { configLoader } from '../config';
+import { configLoader, YamlConfigKeys } from '../config';
+import * as _ from 'lodash';
 
 const logger = LoggerFactory.getLogger('RedisConfig');
 
@@ -14,34 +15,60 @@ export const RedisConfigKeys = {
   REDIS_DB: 'REDIS_DB',
 };
 
+export enum RedisConfigKeys2 {
+  enable = 'enable',
+  host = 'host',
+  port = 'port',
+  password = 'password',
+  db = 'db',
+}
+
 export class RedisConfigObject {
-  host?: string;
-  port?: number;
-  db?: number;
-  enable?: boolean;
+  private static key = YamlConfigKeys.redis;
+  private static prefix = `${RedisConfigObject.key}_`;
+
+  public host?: string;
+  public port?: number;
+  public db?: number;
+  public enable?: boolean;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
   @Transform((value) => !!value, { toPlainOnly: true })
-  password?: string;
+  public password?: string;
 
-  constructor(o: Partial<RedisConfigObject>) {
+  public constructor(o: Partial<RedisConfigObject>) {
     Object.assign(this, plainToClass(RedisConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(prefix = ''): RedisConfigObject {
-    const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    logger.verbose(`try load env: ${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`);
-    return new RedisConfigObject({
-      enable: configLoader.loadBoolConfig(`${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`, false),
-      host: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_HOST}`, 'localhost'),
-      port: configLoader.loadNumericConfig(`${appendPrefix}${RedisConfigKeys.REDIS_PORT}`, 6379),
-      password: configLoader.loadConfig(`${appendPrefix}${RedisConfigKeys.REDIS_PASSWORD}`),
-      db: configLoader.loadNumericConfig(`${appendPrefix}${RedisConfigKeys.REDIS_DB}`) ?? 0,
-    });
+  public static load(redisPrefix = ''): RedisConfigObject {
+    const appendPrefix = `${this.prefix}${redisPrefix ? `${redisPrefix}_`.toUpperCase() : ''}`;
+    logger.verbose(`try load env: ${appendPrefix}${RedisConfigKeys2.enable}`);
+    return <RedisConfigObject>fnWithP3(
+      appendPrefix,
+      configLoader.loadConfig<object>(RedisConfigObject.key),
+      RedisConfigKeys2,
+    )(
+      (prefix, config, keys): RedisConfigObject =>
+        new RedisConfigObject({
+          enable: withP(keys.enable, (v) =>
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
+          ),
+          host: withP(keys.host, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
+          port: withP(keys.port, (v) =>
+            configLoader.loadNumericConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
+          ),
+          password: withP(keys.password, (v) =>
+            configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
+          ),
+          db: withP(keys.db, (v) =>
+            configLoader.loadNumericConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
+          ),
+        }),
+    );
   }
 
   // using default configs when specific not found
-  static loadOr(prefix = ''): RedisConfigObject | null {
+  public static loadOr(prefix = ''): RedisConfigObject | null {
     const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
     const key = `${appendPrefix}${RedisConfigKeys.REDIS_ENABLE}`;
     const enable = configLoader.loadBoolConfig(key);
@@ -55,7 +82,7 @@ export class RedisConfigObject {
     return RedisConfigObject.load();
   }
 
-  get options(): Redis.ClientOpts {
+  public get options(): Redis.ClientOpts {
     return {
       host: this.host,
       port: this.port,
@@ -91,7 +118,7 @@ export class RedisConfigObject {
     };
   }
 
-  getOptions(db?: number): Redis.ClientOpts {
+  public getOptions(db?: number): Redis.ClientOpts {
     return { ...this.options, db: db ?? this.db };
   }
 }

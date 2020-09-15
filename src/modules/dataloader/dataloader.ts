@@ -64,22 +64,22 @@ export const dataLoaderCleaner = {
 };
 
 export class GenericDataLoader {
-  static _loaders;
+  public static _loaders;
 
-  constructor() {
+  public constructor() {
     logger.log('init ...');
   }
 
-  static loaders<Loaders = DefaultRegisteredLoaders>(): Loaders {
+  public static loaders<Loaders = DefaultRegisteredLoaders>(): Loaders {
     return GenericDataLoader._loaders;
   }
 
-  initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
+  public initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
     logger.debug(`init loaders ${r(loaders)}`);
     GenericDataLoader._loaders = loaders;
   }
 
-  createLoaders(): { [key: string]: DataLoaderFunction<any> } {
+  public createLoaders(): { [key: string]: DataLoaderFunction<any> } {
     return _.memoize(() => GenericDataLoader._loaders)();
   }
 }

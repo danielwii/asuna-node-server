@@ -7,7 +7,7 @@ export const Publishable = <TBase extends Constructor<BaseEntity>>(Base: TBase) 
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '是否发布？' })
     @Column({ nullable: true, name: 'is_published' })
-    isPublished: boolean;
+    public isPublished: boolean;
   }
 
   return ExtendableEntity;
@@ -17,7 +17,7 @@ export const Featuredable = <TBase extends Constructor<BaseEntity>>(Base: TBase)
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '是否推荐？' })
     @Column({ nullable: true, name: 'is_featured' })
-    isFeatured: boolean;
+    public isFeatured: boolean;
   }
 
   return ExtendableEntity;
@@ -27,11 +27,11 @@ export const NameDescAttachable = <TBase extends Constructor<BaseEntity>>(Base: 
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '名称' })
     @Column({ nullable: false, length: 100, unique: true, name: 'name' })
-    name: string;
+    public name: string;
 
     @MetaInfo({ name: '描述' })
     @Column('text', { nullable: true, name: 'description' })
-    description: string;
+    public description: string;
   }
   return ExtendableEntity;
 };

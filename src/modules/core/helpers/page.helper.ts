@@ -1,8 +1,6 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
-import { PrimaryKey } from '../../common';
-import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 
 export const DEFAULT_PAGE = 1;

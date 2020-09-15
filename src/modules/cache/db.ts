@@ -12,7 +12,7 @@ const isPrefixObject = (key): key is { prefix?: string; key: any } => _.isObject
 const logger = LoggerFactory.getLogger('InMemoryDB');
 
 export class InMemoryDB {
-  static async insert<Key extends string | { prefix?: string; key: any }, Value extends any>(
+  public static async insert<Key extends string | { prefix?: string; key: any }, Value extends any>(
     key: Key,
     resolver: () => Promise<Value>,
     options?: { length?: number; strategy?: 'default' | 'cache-first' },
@@ -51,7 +51,9 @@ export class InMemoryDB {
     return primeToRedis();
   }
 
-  static async list<Key extends string | { prefix?: string; key: any }, Value extends any>(key: Key): Promise<Value[]> {
+  public static async list<Key extends string | { prefix?: string; key: any }, Value extends any>(
+    key: Key,
+  ): Promise<Value[]> {
     const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
@@ -64,7 +66,7 @@ export class InMemoryDB {
     return Promise.promisify(redis.client.lrange).bind(redis.client)(cacheKey, 0, -1);
   }
 
-  static async get<Key extends string | { prefix?: string; key: any }>(key: Key) {
+  public static async get<Key extends string | { prefix?: string; key: any }>(key: Key) {
     const cacheKey = isPrefixObject(key) ? CacheWrapper.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
@@ -76,7 +78,7 @@ export class InMemoryDB {
     return parseJSONIfCould(value);
   }
 
-  static async save<Key extends string | { prefix?: string; key: any }, Value extends any>(
+  public static async save<Key extends string | { prefix?: string; key: any }, Value extends any>(
     key: Key,
     resolver: (saved?) => Promise<Value>,
     options?: {
@@ -130,7 +132,7 @@ export class InMemoryDB {
     return primeToRedis();
   }
 
-  static async clear(opts: { prefix?: string; key: any }): Promise<void> {
+  public static async clear(opts: { prefix?: string; key: any }): Promise<void> {
     const { key, prefix } = opts;
     const cacheKey = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
     logger.debug(`remove ${cacheKey}`);

@@ -37,6 +37,7 @@ describe('Excel (e2e)', () => {
       });
   });
 
+  /*
   it('/GET /api/v1/import-export/export', async () => {
     await supertest(app.getHttpServer())
       .get('/api/v1/import-export/export')
@@ -64,4 +65,5 @@ describe('Excel (e2e)', () => {
         return true;
       });
   });
+*/
 });

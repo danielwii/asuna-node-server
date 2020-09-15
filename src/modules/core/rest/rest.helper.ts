@@ -8,7 +8,8 @@ import { r, validateObject } from '../../common/helpers';
 import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
-import { KeyValuePair, KvHelper } from '../kv';
+import { KeyValuePair } from '../kv/kv.entities';
+import { KvHelper } from '../kv/kv.helper';
 
 const logger = LoggerFactory.getLogger('RestHelper');
 

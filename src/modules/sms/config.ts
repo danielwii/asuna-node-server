@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import { fnWithP3, withP } from '../common/helpers';
+import { fnWithP3, parseJSONIfCould, withP } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config';
 
@@ -9,8 +9,9 @@ export enum SMSConfigKeys {
   provider = 'provider',
   accessKeyId = 'accessKeyId',
   accessKeySecret = 'accessKeySecret',
-  endpoint = 'endpoint',
-  apiVersion = 'apiVersion',
+  // endpoint = 'endpoint',
+  // apiVersion = 'apiVersion',
+  extra = 'extra',
 }
 
 export class SMSConfigObject {
@@ -22,8 +23,9 @@ export class SMSConfigObject {
   public provider: 'aliyun';
   public accessKeyId: string;
   public accessKeySecret: string;
-  public endpoint: string;
-  public apiVersion: string;
+  // public endpoint: string;
+  // public apiVersion: string;
+  public extra: Record<string, unknown>;
 
   public constructor(o: Partial<SMSConfigObject>) {
     Object.assign(this, plainToClass(SMSConfigObject, o, { enableImplicitConversion: true }));
@@ -44,10 +46,11 @@ export class SMSConfigObject {
           accessKeySecret: withP(keys.accessKeySecret, (p) =>
             configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
           ),
-          endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          apiVersion: withP(keys.apiVersion, (p) =>
-            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
+          // endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          extra: withP(keys.extra, (p) =>
+            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           ),
+          // apiVersion: withP(keys.apiVersion, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),),
         }),
     );
 }

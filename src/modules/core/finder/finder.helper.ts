@@ -1,13 +1,15 @@
 import { Promise } from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
-import { join } from 'path';
 import * as url from 'url';
 import { AsunaErrorCode, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');
 
-export type HostExchange = { regex: string; endpoint: string };
+export interface HostExchange {
+  regex: string;
+  endpoint: string;
+}
 
 export enum FinderFieldKeys {
   endpoint = 'endpoint',
@@ -16,20 +18,20 @@ export enum FinderFieldKeys {
 }
 
 export class FinderAssetsSettings {
-  @IsString() @IsOptional() endpoint?: string;
-  @IsString() @IsOptional() internalEndpoint?: string;
+  @IsString() @IsOptional() public endpoint?: string;
+  @IsString() @IsOptional() public internalEndpoint?: string;
 
-  @IsOptional() hostExchanges?: string;
+  @IsOptional() public hostExchanges?: string;
 }
 
 export class FinderHelper {
-  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
+  public static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
 
-  static async getConfig(): Promise<FinderAssetsSettings> {
+  public static async getConfig(): Promise<FinderAssetsSettings> {
     return deserializeSafely(FinderAssetsSettings, await KvHelper.getConfigsByEnumKeys(this.kvDef, FinderFieldKeys));
   }
 
-  static async resolveUrl({
+  public static async resolveUrl({
     type,
     name,
     path,

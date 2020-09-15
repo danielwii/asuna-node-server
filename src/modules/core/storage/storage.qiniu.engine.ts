@@ -3,7 +3,8 @@ import { Response } from 'express';
 import * as _ from 'lodash';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
-import { AsunaErrorCode, AsunaException, convertFilename, ErrorException, r } from '../../common';
+import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
+import { convertFilename, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { QiniuConfigObject } from './storage.config';
@@ -106,7 +107,7 @@ export class QiniuStorage implements IStorageEngine {
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig, query } = opts;
     // 识别七牛的视频处理参数
-    const resolvedQuery = _.find(_.keys(query), key => key.startsWith('avvod'));
+    const resolvedQuery = _.find(_.keys(query), (key) => key.startsWith('avvod'));
     // const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
     // const appendPrefix = this.configObject.path;
     // const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)

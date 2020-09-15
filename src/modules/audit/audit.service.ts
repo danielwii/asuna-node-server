@@ -5,7 +5,7 @@ import { AuditRecord, AuditType } from './audit.entities';
 const logger = LoggerFactory.getLogger('AuditService');
 
 export class AuditService {
-  addRecord(
+  public addRecord(
     type: keyof typeof AuditType,
     action: string,
     identification: { type: string; id?: number | string },
@@ -16,7 +16,7 @@ export class AuditService {
     switch (type) {
       case 'entity':
         return identification.type !== 'AuditRecord'
-          ? AuditRecord.save({
+          ? AuditRecord.create({
               type,
               action,
               identification,
@@ -24,7 +24,7 @@ export class AuditService {
               to: { content: to },
               diff: diff(from, to),
               updatedBy: by,
-            } as AuditRecord)
+            }).save()
           : Promise.resolve(null);
       default:
         logger.warn(`Not implemented: ${{ type, action }}`);

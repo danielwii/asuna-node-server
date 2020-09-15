@@ -4,6 +4,8 @@ import * as redis from 'redis';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { RedisConfigObject } from './redis.config';
+import { configLoader, YamlConfigKeys } from '../config';
+import { SMSConfigObject } from '../sms/config';
 
 const logger = LoggerFactory.getLogger('RedisProvider');
 

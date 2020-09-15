@@ -18,8 +18,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "incremental": true,
-    //    "emitDeclarationOnly": true,
-    //    "declarationDir": "declaration",
+    "allowJs": true,
     "outDir": "./dist",
     "baseUrl": "src"
   },

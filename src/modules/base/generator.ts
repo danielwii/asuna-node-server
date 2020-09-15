@@ -1,14 +1,15 @@
 import * as _ from 'lodash';
-import { AsunaErrorCode, AsunaException, LoggerFactory } from '../common';
+import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { SimpleIdGenerator } from '../ids';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');
 
 export class IdGenerators {
-  static handlers: Record<string, SimpleIdGenerator> = {};
-  static handlersByEntity: Record<string, SimpleIdGenerator> = {};
+  public static handlers: Record<string, SimpleIdGenerator> = {};
+  public static handlersByEntity: Record<string, SimpleIdGenerator> = {};
 
-  static exists(prefix: string, entity: string): boolean {
+  public static exists(prefix: string, entity: string): boolean {
     const prefixExists = _.keys(this.handlers).includes(prefix);
     const entityExists = _.keys(this.handlersByEntity).includes(entity);
     if (prefixExists && entityExists) {
@@ -22,20 +23,20 @@ export class IdGenerators {
     return false;
   }
 
-  static reg(prefix: string, entity: string): void {
+  public static reg(prefix: string, entity: string): void {
     // this.exists(prefix, entity);
     this.handlers[prefix] = new SimpleIdGenerator(prefix);
     this.handlersByEntity[entity] = this.handlers[prefix];
   }
 
-  static nextId(prefix: string): string {
+  public static nextId(prefix: string): string {
     if (!_.keys(this.handlers).includes(prefix)) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `prefix ${prefix} not found in id generators.`);
     }
     return this.handlers[prefix].nextId();
   }
 
-  static nextIdByEntity(entity: string): string {
+  public static nextIdByEntity(entity: string): string {
     if (!_.keys(this.handlersByEntity).includes(entity)) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `entity ${entity} not found in id generators.`);
     }

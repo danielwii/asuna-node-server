@@ -2,8 +2,9 @@ import * as _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity } from 'typeorm';
 import { FindOneOptions } from 'typeorm/find-options/FindOneOptions';
-import { AsunaErrorCode, AsunaException, LoggerFactory } from '../../common';
-import { DBHelper } from '../db';
+import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
+import { LoggerFactory } from '../../common/logger';
+import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 

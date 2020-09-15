@@ -23,18 +23,12 @@ import {
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import {
-  AsunaErrorCode,
-  AsunaException,
-  Condition,
-  EntityMetaInfoOptions,
-  ErrorException,
-  MetaInfoOptions,
-  Profile,
-  r,
-} from '../../common';
+import { r } from '../../common/helpers/utils';
+import { Condition, EntityMetaInfoOptions, MetaInfoOptions } from '../../common/decorators/meta.decorator';
+import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
 import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
+import { Profile } from '../../common/helpers/normal';
 
 const logger = LoggerFactory.getLogger('DBHelper');
 

@@ -1,2 +1,2 @@
-export * from './app.module';
 export * from './app.entities';
+export * from './app.module';

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as passport from 'passport';
-import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../common';
+import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { r } from '../common/helpers/utils';
 import { AdminUser } from '../core/auth/auth.entities';
 import { JwtPayload } from '../core/auth/auth.interfaces';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
@@ -12,6 +13,7 @@ import { WXJwtPayload } from '../wechat/interfaces';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { WxCodeSession } from '../wechat/wx.interfaces';
 import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
+import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 

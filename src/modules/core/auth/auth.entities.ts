@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../../common/decorators';
-import { ColumnTypeHelper } from '../helpers';
+import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 import type { Tenant } from '../../tenant';

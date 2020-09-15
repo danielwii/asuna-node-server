@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import { join } from 'path';
-import { r } from '../common';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { Global } from './global';
@@ -17,7 +17,6 @@ import { UploaderConfig } from './uploader/config';
 
 const logger = LoggerFactory.getLogger('AsunaContext');
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IAsunaContextOpts {
   /**
    * default: app
@@ -62,7 +61,7 @@ export class AsunaContext {
     if (configLoader.loadBoolConfig(ConfigKeys.UPLOADER_ENABLE, true))
       this.initStorageEngine(`${process.cwd()}/uploads`);
     // this.tempPath = `${process.cwd()}/temp`;
-    fs.mkdirs(join(Global.tempPath)).catch(error => logger.warn(r(error)));
+    fs.mkdirs(join(Global.tempPath)).catch((error) => logger.warn(r(error)));
   }
 
   setup(opts: Partial<IAsunaContextOpts> = {}): void {

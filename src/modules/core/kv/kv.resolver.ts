@@ -3,7 +3,7 @@ import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/grap
 import { Promise } from 'bluebird';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { GraphqlContext } from '../../dataloader';
+import { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 import { GqlAdminAuthGuard, GraphqlHelper } from '../../graphql';
 import { KeyValuePair } from './kv.entities';
 import { KvHelper, recognizeTypeValue } from './kv.helper';

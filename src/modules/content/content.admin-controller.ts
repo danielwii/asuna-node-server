@@ -9,7 +9,7 @@ import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';
 import { RestHelper } from '../core/rest/rest.helper';
 import { AnyAuthRequest } from '../helper/interfaces';
-import { TenantHelper } from '../tenant';
+import { TenantHelper } from '../tenant/tenant.helper';
 import { Draft } from './draft.entities';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { FeedbackReply } from './feedback.entities';

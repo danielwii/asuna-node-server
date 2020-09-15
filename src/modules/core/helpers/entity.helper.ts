@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-param-reassign */
 import * as _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';

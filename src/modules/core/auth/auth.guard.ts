@@ -2,11 +2,13 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import * as _ from 'lodash';
-import { AsunaErrorCode, AsunaException, r } from '../../common';
+import { r } from '../../common/helpers/utils';
+import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
 import { LoggerFactory } from '../../common/logger';
-import { AnyAuthRequest, auth, AuthInfo } from '../../helper';
+import { auth } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 import { JwtPayload } from './auth.interfaces';
+import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 
 export type JwtAuthRequest<User = any> = AnyAuthRequest<JwtPayload, User>;
 

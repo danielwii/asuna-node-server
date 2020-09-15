@@ -4,5 +4,6 @@ export * from './helpers';
 export * from './logger';
 export * from './exceptions';
 export * from './identifier';
+export * from './guards';
 export * from './middlewares';
 export * from './types';

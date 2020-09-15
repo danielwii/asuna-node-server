@@ -17,33 +17,24 @@ const logger = LoggerFactory.getLogger('AuditSubscriber');
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
   private map = new Map();
-
   private auditService: AuditService = new AuditService();
-
   private enabled = configLoader.loadBoolConfig(ConfigKeys.AUDIT, false);
 
-  constructor() {
+  public constructor() {
     logger.log(`init ... audit: ${this.enabled}`);
   }
 
-  afterInsert(event: InsertEvent<any>) {
+  public afterInsert(event: InsertEvent<any>) {
     if (!this.enabled) return;
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     // logger.verbose(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
-      .addRecord(
-        'entity',
-        'insert',
-        { type: event.entity.constructor.name },
-        null,
-        event.entity,
-        null,
-      )
-      .catch(error => logger.warn(r(error)));
+      .addRecord('entity', 'insert', { type: event.entity.constructor.name }, null, event.entity, null)
+      .catch((error) => logger.warn(r(error)));
   }
 
-  async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
+  public async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
     if (!this.enabled) return;
     // console.log('beforeUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
@@ -53,11 +44,11 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     });
     if (entity) {
       // logger.verbose(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
-      this.map.set(`${event.entity.name}-${event.entity.id}`, { ...entity as any });
+      this.map.set(`${event.entity.name}-${event.entity.id}`, { ...(entity as any) });
     }
   }
 
-  afterUpdate(event: InsertEvent<any>) {
+  public afterUpdate(event: InsertEvent<any>) {
     if (!this.enabled) return;
     // console.log('afterUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
@@ -78,10 +69,10 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
       )
       .then(() => this.map.delete(`${event.entity.name}-${event.entity.id}`))
-      .catch(error => logger.warn(r(error)));
+      .catch((error) => logger.warn(r(error)));
   }
 
-  afterRemove(event: RemoveEvent<any>) {
+  public afterRemove(event: RemoveEvent<any>) {
     if (!this.enabled) return;
     // console.log('afterRemove', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
@@ -96,6 +87,6 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
         null,
       )
-      .catch(error => logger.warn(r(error)));
+      .catch((error) => logger.warn(r(error)));
   }
 }

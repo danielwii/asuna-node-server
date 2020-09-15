@@ -25,42 +25,42 @@ export const Mode = {
 export class AppInfo extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: '唯一识别 Key' })
   @Column({ nullable: false, length: 50, unique: true })
-  key: string;
+  public key: string;
 
   @MetaInfo({ name: 'Mode', type: 'Enum', enumData: Mode })
   @Column('varchar', { nullable: true, name: 'mode' })
-  mode: keyof typeof Mode;
+  public mode: keyof typeof Mode;
 
   @OneToMany('AppRelease', (inverse: AppRelease) => inverse.appInfo)
-  releases: AppRelease[];
+  public releases: AppRelease[];
 }
 
 @EntityMetaInfo({ name: 'app__releases', internal: true })
 @Entity('app__t_releases')
 export class AppRelease extends Publishable(AbstractBaseEntity) {
   @Column({ nullable: false, length: 10, name: 'version_code' })
-  versionCode: string;
+  public versionCode: string;
 
   @Column({ nullable: false, name: 'build_number' })
-  buildNumber: number;
+  public buildNumber: number;
 
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: AppUpgradeMode })
   @Column('varchar', { nullable: true, name: 'upgrade_mode' })
-  upgradeMode: keyof typeof AppUpgradeMode;
+  public upgradeMode: keyof typeof AppUpgradeMode;
 
   @MetaInfo({ name: 'Platform', type: 'Enum', enumData: Platform })
   @Column('varchar', { nullable: true, name: 'platform' })
-  platform: keyof typeof Platform;
+  public platform: keyof typeof Platform;
 
   @Column('text', { nullable: true })
-  description: string;
+  public description: string;
 
   @MetaInfo({ name: 'File', type: 'File', safeReload: 'json-array' })
   @Column(ColumnTypeHelper.JSON, { nullable: false, name: 'paths' })
-  paths: JsonArray;
+  public paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })
   @ManyToOne('AppInfo', (inverse: AppInfo) => inverse.releases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'app_info__id' })
-  appInfo: AppInfo;
+  public appInfo: AppInfo;
 }

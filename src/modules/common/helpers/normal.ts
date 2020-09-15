@@ -16,9 +16,9 @@ export class NameDescValue<T = any> {
 }
 
 export class NameValueHelper {
-  static names = nameValues => _.map(nameValues, fp.get('name'));
+  static names = (nameValues) => _.map(nameValues, fp.get('name'));
 
-  static values = nameValues => _.map(nameValues, fp.get('value'));
+  static values = (nameValues) => _.map(nameValues, fp.get('value'));
 }
 
 export function convertFilename(filename: string): string {
@@ -26,8 +26,7 @@ export function convertFilename(filename: string): string {
 }
 
 export function getIgnoreCase(o: object, key: string): any {
-  const compareWith = key.toLowerCase();
-  return _.find(o, (v, k) => k.toLowerCase() === compareWith);
+  return _.find(o, (v, k) => k.toLowerCase() === key.toLowerCase());
 }
 
 const format = (n: string | number): string => {

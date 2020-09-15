@@ -50,6 +50,16 @@ graphql:
   # default: false
   playground_enable: false
 
+# -- sms --
+sms:
+  enable: false
+  provider: aliyun
+  extra: |
+    {
+      "SignName": "xxx",
+      "RegionId": "xxx"
+    }
+
 # -- sentry --
 sentry:
   enable:
@@ -67,7 +77,7 @@ mq: # TODO
   #USERNAME:
 
 # --- redis ---
-redis: # TODO
+redis:
   ENABLE: false
   HOST: localhost
   PORT: 6379
@@ -80,6 +90,7 @@ redis: # TODO
   WS_REDIS_DB: 1
   # default: 2
   JOB_REDIS_DB: 2
+
 
   # redis 部分支持设置前缀来定义多个数据源
   #PREFIX_REDIS_ENABLE: false
@@ -106,6 +117,7 @@ db: # TODO
   TYPEORM_DATABASE: db_name
   TYPEORM_USERNAME:
   TYPEORM_PASSWORD:
+
 
   # --- db-cache ---
   #TYPEORM_CACHE_ALWAYS_ENABLED: true

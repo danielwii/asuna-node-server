@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { MetaInfo } from '../common/decorators/meta.decorator';
-import { fixTZ } from '../core/helpers/entity.helper';
+import { MetaInfo } from '../common/decorators';
+import { fixTZ } from '../core/helpers';
 import { SimpleIdGenerator } from '../ids';
 import { NameDescAttachable, Publishable } from './abilities';
 
@@ -24,20 +24,20 @@ export type EntityConstructorObject<Entity> = Omit<
 >;
 
 export class AbstractBaseEntity extends BaseEntity {
-  @PrimaryGeneratedColumn() id?: number;
+  @PrimaryGeneratedColumn() public id?: number;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt?: Date;
+  public createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt?: Date;
+  public updatedAt?: Date;
 
   @MetaInfo({ accessible: 'hidden' })
   @Column('varchar', { nullable: true, length: 100, name: 'updated_by' })
-  updatedBy?: string;
+  public updatedBy?: string;
 
   @AfterLoad()
-  afterLoad(): void {
+  public afterLoad(): void {
     fixTZ(this);
   }
 }
@@ -49,31 +49,31 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   readonly #idPrefix: string;
   readonly #generator: SimpleIdGenerator;
 
-  @PrimaryColumn('varchar', { length: 36 }) id?: string;
+  @PrimaryColumn('varchar', { length: 36 }) public id?: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt?: Date;
+  public createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt?: Date;
+  public updatedAt?: Date;
 
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
-  updatedBy?: string;
+  public updatedBy?: string;
 
-  constructor(idPrefix: string = '') {
+  public constructor(idPrefix = '') {
     super();
     this.#idPrefix = idPrefix;
     this.#generator = new SimpleIdGenerator(idPrefix);
   }
 
   @BeforeInsert()
-  beforeInsert(): void {
+  public beforeInsert(): void {
     if (!this.id) this.id = this.#generator.nextId();
   }
 
   @AfterLoad()
-  afterLoad(): void {
+  public afterLoad(): void {
     fixTZ(this);
   }
 }
@@ -83,20 +83,20 @@ export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTime
 export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {}
 
 export class AbstractUUIDBaseEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid') uuid!: string;
+  @PrimaryGeneratedColumn('uuid') public uuid!: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  public updatedAt: Date;
 
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
-  updatedBy: string;
+  public updatedBy: string;
 
   @AfterLoad()
-  afterLoad(): void {
+  public afterLoad(): void {
     fixTZ(this);
   }
 }
@@ -104,20 +104,20 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
 export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {}
 
 export class AbstractUUID2BaseEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid') id!: string;
+  @PrimaryGeneratedColumn('uuid') public id!: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  public updatedAt: Date;
 
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
-  updatedBy: string;
+  public updatedBy: string;
 
   @AfterLoad()
-  afterLoad(): void {
+  public afterLoad(): void {
     fixTZ(this);
   }
 }
@@ -127,5 +127,5 @@ export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2Bas
 export class AbstractCategoryEntity extends Publishable(NameDescAttachable(AbstractBaseEntity)) {
   @MetaInfo({ name: '是否系统数据？', type: 'Deletable', help: '系统数据无法删除' })
   @Column({ nullable: true, name: 'is_system' })
-  isSystem: boolean;
+  public isSystem: boolean;
 }

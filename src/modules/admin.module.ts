@@ -38,6 +38,7 @@ import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { configLoader } from './config';
+import { SMSModule } from './sms';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -60,6 +61,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ImportExportModule,
     TenantModule,
     PropertyModule,
+    SMSModule,
     TracingModule,
     CacheModule.registerAsync({
       useFactory: () => {
