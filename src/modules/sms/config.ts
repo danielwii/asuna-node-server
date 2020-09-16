@@ -12,6 +12,12 @@ export enum SMSConfigKeys {
   // endpoint = 'endpoint',
   // apiVersion = 'apiVersion',
   extra = 'extra',
+  templates = 'templates',
+}
+
+export interface AliSMSExtra {
+  RegionId: string;
+  SignName: string;
 }
 
 export class SMSConfigObject {
@@ -25,7 +31,8 @@ export class SMSConfigObject {
   public accessKeySecret: string;
   // public endpoint: string;
   // public apiVersion: string;
-  public extra: Record<string, unknown>;
+  public extra: AliSMSExtra;
+  public templates: Record<'verify-code', string>;
 
   public constructor(o: Partial<SMSConfigObject>) {
     Object.assign(this, plainToClass(SMSConfigObject, o, { enableImplicitConversion: true }));
@@ -48,6 +55,9 @@ export class SMSConfigObject {
           ),
           // endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           extra: withP(keys.extra, (p) =>
+            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          ),
+          templates: withP(keys.templates, (p) =>
             parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           ),
           // apiVersion: withP(keys.apiVersion, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),),

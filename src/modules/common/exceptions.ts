@@ -46,7 +46,7 @@ export const AsunaErrorCode = {
  * 该异常构造前端可以进行交互的格式
  */
 export class AsunaBaseException extends Error {
-  constructor(
+  public constructor(
     public httpStatus: HttpStatus,
     public code: string,
     public name: string,
@@ -59,11 +59,11 @@ export class AsunaBaseException extends Error {
 }
 
 export class AsunaException extends AsunaBaseException {
-  constructor(nameValue: NameValue, message?: string, errors?: any) {
+  public constructor(nameValue: NameValue, message?: string, errors?: any) {
     super(nameValue.value, null, nameValue.name, message, null, errors);
   }
 
-  static of(
+  public static of(
     nameValue: NameValue,
     code?: string,
     message?: string,
@@ -78,13 +78,13 @@ export class AsunaException extends AsunaBaseException {
 }
 
 export class ErrorException extends AsunaBaseException {
-  constructor(name: string, message?: string, errors?: any) {
+  public constructor(name: string, message?: string, errors?: any) {
     super(AsunaErrorCode.Unprocessable.value, name, AsunaErrorCode.Unprocessable.name, message, null, errors);
   }
 }
 
 export class ValidationException extends AsunaException {
-  constructor(model, errors) {
+  public constructor(model, errors) {
     super(AsunaErrorCode.InvalidParameter, `validate '${model}' error`, errors);
   }
 }
@@ -98,15 +98,16 @@ export enum AsunaExceptionTypes {
   ResourceLimit = 'ResourceLimit',
   InvalidAccount = 'InvalidAccount',
   AccountExists = 'AccountExists',
+  FormatError = 'FormatError',
   Upload = 'Upload',
 }
 
-type AsunaExceptionOpts = {
+interface AsunaExceptionOpts {
   code: string;
   nameValue: NameValue;
   message: (...params) => string;
   localMessage: (...params) => string;
-};
+}
 
 export class AsunaExceptionHelper {
   private static registers = {
@@ -131,8 +132,10 @@ export class AsunaExceptionHelper {
     [AsunaExceptionTypes.AccountExists]: {
       code: 'E01004',
       nameValue: AsunaErrorCode.InvalidCredentials,
-      message: (email: string, username: string) => `${email ? `email:${email}` : ''} ${username ? `username:${username}` : ''} already exists`,
-      localMessage: (email: string, username: string) => `${email ? `邮件:${email}` : ''} ${username ? `用户名:${username}` : ''} 已存在`,
+      message: (email: string, username: string) =>
+        `${email ? `email:${email}` : ''} ${username ? `username:${username}` : ''} already exists`,
+      localMessage: (email: string, username: string) =>
+        `${email ? `邮件:${email}` : ''} ${username ? `用户名:${username}` : ''} 已存在`,
     },
     [AsunaExceptionTypes.Unpublished]: {
       code: 'E01010',
@@ -164,16 +167,22 @@ export class AsunaExceptionHelper {
       message: () => `upload file(s) error`,
       localMessage: () => '上传文件失败',
     },
+    [AsunaExceptionTypes.FormatError]: {
+      code: 'E04002',
+      nameValue: AsunaErrorCode.Unprocessable,
+      message: () => `format error`,
+      localMessage: () => '格式错误',
+    },
   };
 
-  static reg(type: string, opts: AsunaExceptionOpts): void {
+  public static reg(type: string, opts: AsunaExceptionOpts): void {
     if (_.has(this.registers, type)) {
       throw new Error(`'${type}' already exists in asuna exception registers.`);
     }
     this.registers[type] = opts;
   }
 
-  static genericException<T extends keyof typeof AsunaExceptionHelper.registers>(
+  public static genericException<T extends keyof typeof AsunaExceptionHelper.registers>(
     type: T,
     params?: Parameters<typeof AsunaExceptionHelper.registers[T]['message']>,
     errors?: any,

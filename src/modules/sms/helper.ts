@@ -1,17 +1,19 @@
 import * as AliPopCore from '@alicloud/pop-core';
-import _ from 'lodash';
 import * as Chance from 'chance';
-import { SMSConfigObject } from './config';
-import { LoggerFactory } from '../common/logger';
-import { r } from '../common/helpers';
+import _ from 'lodash';
 import { InMemoryDB } from '../cache';
+import { r } from '../common/helpers';
+import { LoggerFactory } from '../common/logger';
+import { RequestInfo } from '../helper';
+import { SMSConfigObject } from './config';
 
 const logger = LoggerFactory.getLogger('SMSHelper');
 
 const chance = new Chance();
 
 export interface SMSAdapter {
-  send: (id: string, phoneNumber: string, params: Record<string, unknown>) => Promise<void>;
+  send: (id: string, phoneNumber: string, tmplData: Record<string, unknown>) => Promise<void>;
+  getTmplId: (type: 'verify-code') => string;
 }
 
 interface AliSendSMSParams {
@@ -38,13 +40,17 @@ export class AliyunSMSAdapter implements SMSAdapter {
 
   public send(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<void> {
     const params: AliSendSMSParams = {
-      RegionId: _.get<any, string>(this.config.extra, 'RegionId'),
+      RegionId: this.config.extra?.RegionId,
       PhoneNumbers: phoneNumber,
-      SignName: _.get<any, string>(this.config.extra, 'SignName'),
+      SignName: this.config.extra?.SignName,
       TemplateCode: id,
       TemplateParam: JSON.stringify(tmplData),
     };
     return this.client.request('SendSms', params, { method: 'POST' });
+  }
+
+  public getTmplId(type: 'verify-code'): string {
+    return _.get(this.config.templates, type);
   }
 }
 
@@ -71,7 +77,13 @@ export class SMSHelper {
     return InMemoryDB.save({ prefix: 'verify-code', key }, code, { expiresInSeconds: 56 });
   }
 
-  public static sendSMS(id: string, phoneNumber: string, params: Record<string, unknown>) {
-    this.adapter.send(id, phoneNumber, params).catch((reason) => logger.error(reason));
+  public static async sendVerifyCode(req: RequestInfo, phoneNumber: string): Promise<void> {
+    const code = await this.generateVerifyCode(req.sessionID);
+    const id = this.adapter.getTmplId('verify-code');
+    return this.sendSMS(id, phoneNumber, { code });
+  }
+
+  public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<void> {
+    return this.adapter.send(id, phoneNumber, tmplData);
   }
 }

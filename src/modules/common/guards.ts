@@ -2,13 +2,12 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Promise } from 'bluebird';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import { JwtAuthRequest } from '../core/auth/auth.guard';
-import { PrimaryKey } from './identifier';
-import { configLoader } from '../config';
-import { r } from './helpers';
-import { AsunaErrorCode, AsunaException } from './exceptions';
-import { LoggerFactory } from './logger';
 import { InMemoryDB } from '../cache/db';
+import { JwtAuthRequest } from '../core/auth/auth.guard';
+import { AsunaErrorCode, AsunaException } from './exceptions';
+import { r } from './helpers';
+import { PrimaryKey } from './identifier';
+import { LoggerFactory } from './logger';
 
 const logger = LoggerFactory.getLogger('ActionGuard');
 
@@ -36,14 +35,9 @@ class ActionHelper {
     userId: PrimaryKey,
     expires: number,
   ): Promise<void> {
-    const isRedisEnabled = configLoader.loadBoolConfig('REDIS_ENABLE', true);
-    if (!isRedisEnabled) {
-      logger.warn(`limit action need redis enabled`);
-      return;
-    }
     const md5 = crypto.createHash('md5');
     const actionStr = qs.stringify(
-      { actionJson, ip: req.clientIp, id: req.sessionID, pid: req.payload?.id },
+      { actionJson, ip: req.clientIp, /* id: req.sessionID, */ pid: req.payload?.id },
       { encode: false },
     );
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
