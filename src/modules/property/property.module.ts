@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
-import { KeyValueType, KvDefIdentifierHelper, KVGroupFieldsValue, KvHelper, KvModule } from '../core/kv';
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../core/kv';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 import { PointExchangeEventKey } from './points.entities';
 import { HermesEventKey, PropertyHelper } from './property.helper';
@@ -58,10 +58,9 @@ export class PropertyModule implements OnModuleInit {
   }
 
   async initKV(): Promise<void> {
-    const propertyIdentifier = KvDefIdentifierHelper.stringify(PropertyHelper.kvDef);
-    KvHelper.initializers[propertyIdentifier] = () =>
-      KvHelper.get(PropertyHelper.kvDef, {
-        ...PropertyHelper.kvDef,
+    KvHelper.regInitializer<KVGroupFieldsValue>(
+      PropertyHelper.kvDef,
+      {
         name: '积分兑换配置',
         type: KeyValueType.json,
         value: {
@@ -106,9 +105,10 @@ export class PropertyModule implements OnModuleInit {
             },
           },
           values: {},
-        } as KVGroupFieldsValue,
-      });
-    KvHelper.initializers[propertyIdentifier]();
+        },
+      },
+      { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
+    );
 
     await KvHelper.mergeConstantMaps('PointExchange', {
       userCreated: '新用户',

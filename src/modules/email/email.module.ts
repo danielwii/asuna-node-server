@@ -10,7 +10,7 @@ const logger = LoggerFactory.getLogger('EmailModule');
 
 @Module({})
 export class EmailModule implements OnModuleInit {
-  async onModuleInit(): Promise<void> {
+  public async onModuleInit(): Promise<void> {
     logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
 
     await this.initKV();

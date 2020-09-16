@@ -7,7 +7,7 @@ import { LoggerFactory } from '../../common/logger';
 import { AnyAuthRequest } from '../../helper';
 import { JwtAdminAuthGuard } from '../auth';
 import { KeyValuePair, KeyValueType } from './kv.entities';
-import { KvDef, KvDefIdentifierHelper, KvHelper } from './kv.helper';
+import { KvDef, KvHelper } from './kv.helper';
 
 const logger = LoggerFactory.getLogger('KvController');
 
@@ -71,9 +71,7 @@ export class KvController {
     const { user, identifier } = req;
     logger.log(`destroy ${r({ kvDef, user, identifier })}`);
     await KvHelper.delete(kvDef);
-    const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
-    if (initializer) await initializer();
-    return null;
+    await KvHelper.reInitInitializer(kvDef);
   }
 
   @Get('kv')

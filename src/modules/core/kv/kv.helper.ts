@@ -146,7 +146,7 @@ export class KvDefIdentifierHelper {
 export type ConstantsKeys = 'WXMessageIds';
 
 export class KvHelper {
-  public static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
+  private static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
   public static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
@@ -205,6 +205,11 @@ export class KvHelper {
     if (this.enumValueConstantMapsPair) {
       await this.set(this.enumValueConstantMapsPair);
     }
+  }
+
+  public static reInitInitializer(kvDef: KvDef) {
+    const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
+    if (initializer) return initializer();
   }
 
   public static regInitializer<V = KVGroupFieldsValue>(
