@@ -4,6 +4,7 @@ import * as Chance from 'chance';
 import { SMSConfigObject } from './config';
 import { LoggerFactory } from '../common/logger';
 import { r } from '../common/helpers';
+import { InMemoryDB } from '../cache';
 
 const logger = LoggerFactory.getLogger('SMSHelper');
 
@@ -65,9 +66,9 @@ export class SMSHelper {
     }
   }
 
-  public static generateVerifyCode(): string {
+  public static generateVerifyCode(key: string): Promise<string> {
     const code = chance.string({ length: 6, pool: '1234567890' });
-    return code;
+    return InMemoryDB.save({ prefix: 'verify-code', key }, code, { expiresInSeconds: 56 });
   }
 
   public static sendSMS(id: string, phoneNumber: string, params: Record<string, unknown>) {

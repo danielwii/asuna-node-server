@@ -1,14 +1,14 @@
-import { JwtAuthRequest } from '../core/auth/auth.guard';
-import { PrimaryKey } from './identifier';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Promise } from 'bluebird';
-import { configLoader } from '../config';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import { RedisLockProvider } from '../providers';
+import { JwtAuthRequest } from '../core/auth/auth.guard';
+import { PrimaryKey } from './identifier';
+import { configLoader } from '../config';
 import { r } from './helpers';
 import { AsunaErrorCode, AsunaException } from './exceptions';
 import { LoggerFactory } from './logger';
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { InMemoryDB } from '../cache/db';
 
 const logger = LoggerFactory.getLogger('ActionGuard');
 
@@ -22,7 +22,7 @@ export class ActionRateLimitGuard implements CanActivate {
     const next = context.switchToHttp().getNext();
 
     logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
-    await ActionHelper.check(this.key, req, req.body, req.user?.id, this.expires);
+    await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expires);
 
     return true;
   }
@@ -42,16 +42,17 @@ class ActionHelper {
       return;
     }
     const md5 = crypto.createHash('md5');
-    const actionStr = qs.stringify({ actionJson, ip: req.clientIp, id: req.payload?.id }, { encode: false });
+    const actionStr = qs.stringify(
+      { actionJson, ip: req.clientIp, id: req.sessionID, pid: req.payload?.id },
+      { encode: false },
+    );
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
-    const redis = RedisLockProvider.instance;
-    const existAction = await Promise.promisify(redis.client.get).bind(redis.client)(key);
-    logger.log(`action ${r({ existAction, actionStr, key })}`);
-    if (existAction) {
+    const calcKey = { prefix: 'action', key };
+    const exists = await InMemoryDB.get(calcKey);
+    logger.log(`action ${r({ exists, actionStr, key })}`);
+    if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
-
-    Promise.promisify(redis.client.set).bind(redis.client)(key, actionStr);
-    Promise.promisify(redis.client.expire).bind(redis.client)(key, expires || 5);
+    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expires || 5 }).catch((reason) => logger.error(reason));
   }
 }

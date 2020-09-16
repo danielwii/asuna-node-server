@@ -1,5 +1,4 @@
 import { Promise } from 'bluebird';
-import * as _ from 'lodash';
 import { LoggerFactory } from '../common/logger';
 import { InMemoryDB } from './db';
 
@@ -14,10 +13,6 @@ interface CacheWrapperDoOptions<V> {
 }
 
 export class CacheWrapper {
-  public static calcKey({ prefix, key }: { prefix?: string; key: any }): string {
-    return `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
-  }
-
   public static async do<V>(opts: CacheWrapperDoOptions<V>): Promise<V> {
     const { key, prefix, resolver, expiresInSeconds, strategy } = opts;
     // const cacheKey = this.calcKey({ prefix, key });

@@ -178,7 +178,7 @@
     "jest": "^26.4.2",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.4",
-    "prettier": "^2.1.1",
+    "prettier": "^2.1.2",
     "pretty-quick": "^3.0.2",
     "sqlite3": "^5.0.0",
     "supertest": "^4.0.2",

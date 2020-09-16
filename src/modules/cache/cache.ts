@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as LRU from 'lru-cache';
-import { r } from '../common/helpers';
+import { fnResolve, FutureResolveType, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { CacheTTL } from './constants';
 
@@ -8,7 +8,6 @@ const logger = LoggerFactory.getLogger('CacheManager');
 
 export class CacheManager {
   public static cache = new LRU<string, any>({ max: 500, maxAge: CacheTTL.LONG_1 });
-
   public static shortCache = new LRU<string, any>({ max: 50, maxAge: CacheTTL.SHORT });
 
   /**
@@ -17,13 +16,13 @@ export class CacheManager {
    * @param resolver
    * @param seconds
    */
-  public static async cacheable<T>(key: any, resolver: () => Promise<T>, seconds?: number): Promise<T> {
+  public static async cacheable<T>(key: any, resolver: FutureResolveType<T>, seconds?: number): Promise<T> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const cacheValue = this.cache.get(cacheKey);
     // logger.debug(`cacheable ${r({ key, cacheKey, cacheValue })}`);
     if (cacheValue) return cacheValue;
 
-    const value = await resolver();
+    const value = await fnResolve(resolver)();
     this.cache.set(cacheKey, value, seconds ? seconds * 1000 : undefined);
     logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
@@ -49,6 +48,7 @@ export class CacheManager {
   }
 }
 
+// TODO not implemented
 export function Cacheable(options: { type?: 'default' | 'short'; key: string }) {
   return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
     let { cache } = CacheManager;

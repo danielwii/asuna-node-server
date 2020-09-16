@@ -149,3 +149,12 @@ export function parseJSONIfCould(value?: string): any {
 export function promisify<T extends (...args) => R, R>(fn: T, bind?): (...args: Parameters<T>) => Promise<R> {
   return Promise.promisify(fn).bind(bind);
 }
+
+export function isPromiseAlike<T>(value: any): value is Promise<T> {
+  return !!value.then;
+}
+
+export type FutureResolveType<T> = ((...args) => Promise<T> | T) | T;
+
+export const fnResolve = <T>(fn: FutureResolveType<T>): ((...args) => Promise<T>) => async (...args): Promise<T> =>
+  _.isFunction(fn) ? (isPromiseAlike(fn) ? fn(...args) : Promise.resolve(fn(...args))) : Promise.resolve(fn);
