@@ -1,15 +1,15 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import * as R from 'ramda';
+import { getManager } from 'typeorm';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { ConfigKeys, configLoader } from '../config';
+import { PageHelper } from '../core/helpers';
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../core/kv';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 import { PointExchangeEventKey } from './points.entities';
 import { HermesEventKey, PropertyHelper } from './property.helper';
 import { PropertyQueryResolver } from './property.resolver';
-import { getManager } from 'typeorm';
-import { ConfigKeys, configLoader } from '../config';
-import { PageHelper } from '../core/helpers';
-import { r } from '../common/helpers';
-import * as R from 'ramda';
 
 const logger = LoggerFactory.getLogger('PropertyModule');
 
@@ -57,7 +57,7 @@ export class PropertyModule implements OnModuleInit {
     }
   }
 
-  async initKV(): Promise<void> {
+  public async initKV(): Promise<void> {
     KvHelper.regInitializer<KVGroupFieldsValue>(
       PropertyHelper.kvDef,
       {
@@ -118,10 +118,10 @@ export class PropertyModule implements OnModuleInit {
       firstLoginEveryday: '登录积分',
       adminPointsChange: '系统增减',
       vipVideoExchange: '购买会员视频',
-    } as { [key in PointExchangeEventKey]: string });
+    } as Record<PointExchangeEventKey, string>);
 
-    await KvHelper.mergeConstantMaps('FinancialTransaction', { adminBalanceChange: '系统增减' } as {
-      [key in FinancialTransactionEventKey]: string;
-    });
+    await KvHelper.mergeConstantMaps('FinancialTransaction', {
+      adminBalanceChange: '系统增减',
+    } as Record<FinancialTransactionEventKey, string>);
   }
 }

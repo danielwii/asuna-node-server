@@ -1,7 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
-import { KeyValueType, KvHelper, KVModelFormatType, KvModule } from '../kv';
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from "../kv";
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderFieldKeys, FinderHelper } from './finder.helper';
 
@@ -23,7 +23,7 @@ export class FinderModule implements OnModuleInit {
     const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     const internalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
 
-    KvHelper.regInitializer(
+    KvHelper.regInitializer<KVGroupFieldsValue>(
       FinderHelper.kvDef,
       {
         name: '资源位置配置',

@@ -2,10 +2,21 @@ import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } fro
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
 import { AdminController } from './admin.controller';
+import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
+import { configLoader } from './config';
 import { ContentModule } from './content';
-import { CommandController, GetUploadsModule, KvHelper, UserController } from './core';
+import {
+  CommandController,
+  GetUploadsModule,
+  KeyValueType,
+  KVFieldsValue,
+  KVGroupFieldsValue,
+  KvHelper,
+  KVModelFormatType,
+  UserController,
+} from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
 import { DBModule } from './core/db';
@@ -33,12 +44,10 @@ import {
   WwwRestController,
 } from './rest';
 import { SearchController } from './search/search.controller';
+import { SMSModule } from './sms';
 import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
-import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
-import { configLoader } from './config';
-import { SMSModule } from './sms';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -107,7 +116,41 @@ export class AdminInternalModule implements NestModule, OnModuleInit {
     }
 
     logger.log('init...');
+    await this.initKV();
     await this.initConstants();
+  }
+
+  public async initKV(): Promise<void> {
+    KvHelper.regInitializer<KVFieldsValue>(
+      { collection: 'app.settings', key: 'site' },
+      {
+        name: '网站设置',
+        type: KeyValueType.json,
+        value: {
+          fields: {
+            logo: { name: 'Logo', type: 'image' },
+            title: { name: 'Title', type: 'string' },
+            primaryColor: { name: 'Primary Color', type: 'color' },
+          },
+          values: {},
+        },
+      },
+      { merge: true, formatType: KVModelFormatType.Fields },
+    );
+    KvHelper.regInitializer<KVGroupFieldsValue>(
+      { collection: 'app.settings', key: 'sms.notice' },
+      {
+        name: '短信配置',
+        type: KeyValueType.json,
+        value: {
+          form: {
+            // default: { name: 'Default', fields: [{ name: 'Receivers', field: { name: 'receivers', type: 'json' } }] },
+          },
+          values: {},
+        },
+      },
+      { merge: true, formatType: KVModelFormatType.Fields },
+    );
   }
 
   public async initConstants(): Promise<void> {

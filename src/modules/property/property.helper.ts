@@ -56,10 +56,10 @@ const logger = LoggerFactory.getLogger('PropertyHelper');
  * 资产帮助类
  */
 export class PropertyHelper {
-  static kvDef = { collection: 'app.settings', key: 'exchange-points' };
+  public static kvDef = { collection: 'app.settings', key: 'exchange-points' };
 
   @Transaction()
-  static async getUserProfileWithWallet(
+  public static async getUserProfileWithWallet(
     profileId: string,
     @TransactionManager() manager?: EntityManager,
   ): Promise<UserProfile> {
@@ -73,7 +73,7 @@ export class PropertyHelper {
   }
 
   @Transaction()
-  static async topUp(
+  public static async topUp(
     payload: TopUpPayload,
     @TransactionManager() manager?: EntityManager,
   ): Promise<FinancialTransaction> {
@@ -101,7 +101,7 @@ export class PropertyHelper {
   }
 
   @Transaction()
-  static async exchange(
+  public static async exchange(
     payload: ExchangePayload,
     @TransactionManager() manager?: EntityManager,
   ): Promise<FinancialTransaction> {

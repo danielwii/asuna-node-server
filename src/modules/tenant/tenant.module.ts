@@ -5,7 +5,7 @@ import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
 import { DBHelper } from '../core/db';
-import { KeyValueType, KvHelper, KVModelFormatType } from '../core/kv';
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from "../core/kv";
 import { CronHelper } from '../helper';
 import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
@@ -46,7 +46,7 @@ export class TenantModule implements OnModuleInit {
       (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
 
-    KvHelper.regInitializer(
+    KvHelper.regInitializer<KVGroupFieldsValue>(
       TenantHelper.kvDef,
       {
         name: 'Tenant 配置',

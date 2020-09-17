@@ -6,6 +6,7 @@ import type { KeyValuePair } from './kv.entities';
 export enum KVModelFormatType {
   KVGroupFieldsValue = 'KVGroupFieldsValue',
   LIST = 'LIST',
+  Fields = 'Fields',
 }
 
 @EntityMetaInfo({ name: 'kv__models', internal: true })

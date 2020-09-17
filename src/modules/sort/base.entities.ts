@@ -6,5 +6,5 @@ import { ColumnTypeHelper } from '../core';
 export abstract class AbstractSort extends AbstractNameEntity {
   @MetaInfo({ type: 'SortPosition', accessible: 'readonly', safeReload: 'json-array' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  positions: JsonArray;
+  public positions: JsonArray;
 }

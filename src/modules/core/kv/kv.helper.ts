@@ -42,16 +42,21 @@ const toJson = (value): JSON => {
 
 export interface KVField {
   name: string;
-  type: 'number' | 'string' | 'text' | 'json' | 'wx-subscribe-data' | 'wx-tmpl-data' | 'email-tmpl-data' | 'boolean';
+  type:
+    | 'number'
+    | 'string'
+    | 'stringArray'
+    | 'text'
+    | 'json'
+    | 'image'
+    | 'color'
+    | 'wxSubscribeData'
+    | 'wxTmplData'
+    | 'emailTmplData'
+    | 'boolean';
   help?: string;
   required?: boolean;
   defaultValue?: boolean | number | string;
-}
-
-export interface KVFieldsList<V> {
-  type: string;
-  fields: { name?: string; field: KVField }[];
-  values: V[];
 }
 
 export interface KVFields {
@@ -74,9 +79,20 @@ export interface KVGroupFields {
   };
 }
 
+export interface KVListFieldsValue<V> {
+  type: string;
+  fields: { name?: string; field: KVField }[];
+  values: V[];
+}
+
+export interface KVFieldsValue {
+  fields: Record<string, KVField>;
+  values: any;
+}
+
 export interface KVGroupFieldsValue {
   form?: KVGroupFields;
-  values: { [key: string]: any };
+  values: any;
 }
 
 export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueType, string] {

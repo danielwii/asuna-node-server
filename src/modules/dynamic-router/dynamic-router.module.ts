@@ -1,30 +1,30 @@
 import { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
 import { LoggerFactory } from '../common/logger';
-import { KeyValueType, KVFieldsList, KvHelper, KVModelFormatType } from '../core/kv';
+import { KeyValueType, KVListFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
 import { DynamicRouterMiddleware } from './dynamic-router.middleware';
 
 const logger = LoggerFactory.getLogger('DynamicRouterModule');
 
 export class DynamicTextRouter {
-  path: string;
-  text: string;
-  description: string;
+  public path: string;
+  public text: string;
+  public description: string;
 }
 
 export class DynamicRouterModule implements NestModule, OnModuleInit {
-  configure(consumer: MiddlewareConsumer): any {
+  public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(DynamicRouterMiddleware).forRoutes('*');
   }
 
-  async onModuleInit(): Promise<void> {
+  public async onModuleInit(): Promise<void> {
     logger.log('init...');
 
     await this.initKV();
   }
 
-  async initKV(): Promise<void> {
-    KvHelper.regInitializer<KVFieldsList<DynamicTextRouter>>(
+  public async initKV(): Promise<void> {
+    KvHelper.regInitializer<KVListFieldsValue<DynamicTextRouter>>(
       DynamicRouterHelper.kvDef,
       {
         name: '文本路由配置',

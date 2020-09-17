@@ -4,10 +4,14 @@ import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('StateMachine');
 
-export type StateMachineAction<Action, State> = { type: Action; from: State; to: State };
+export interface StateMachineAction<Action, State> {
+  type: Action;
+  from: State;
+  to: State;
+}
 
 export abstract class AbstractStateMachine<StatusType, ActionType> {
-  constructor(
+  public constructor(
     public readonly key,
     public readonly stateKey,
     public readonly actionKey,
@@ -15,13 +19,13 @@ export abstract class AbstractStateMachine<StatusType, ActionType> {
     public readonly actions: StateMachineAction<ActionType, StatusType>[],
   ) {}
 
-  do(from: StatusType, type: ActionType): StatusType {
+  public do(from: StatusType, type: ActionType): StatusType {
     const found = _.find(this.actions, (action) => action.from === from && action.type === type);
     logger.debug(`do ${this.key} ${r({ found, from, type })}`);
     return found?.to ?? from;
   }
 
-  toJson(): object {
+  public toJson(): object {
     return {
       key: this.key,
       stateKey: this.stateKey,

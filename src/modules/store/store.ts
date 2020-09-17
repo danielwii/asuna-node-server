@@ -7,13 +7,13 @@ import { RedisClientObject, RedisProvider } from '../providers';
 const logger = LoggerFactory.getLogger('Store');
 
 export class Store {
+  public static readonly Global = new Store('global');
+
   private readonly prefix: string;
   private readonly redis: RedisClientObject;
   private readonly redisMode: boolean;
 
-  public static readonly Global = new Store('global');
-
-  constructor(prefix: string) {
+  public constructor(prefix: string) {
     this.prefix = `store_${prefix}`;
 
     this.redis = RedisProvider.instance.getRedisClient(this.prefix);
@@ -21,7 +21,7 @@ export class Store {
     logger.log(`init with ${this.prefix} redis: ${this.redisMode}`);
   }
 
-  setItem = async <T>(key: any, value: T, expiresInSeconds: number = Number.MAX_SAFE_INTEGER): Promise<void> => {
+  public setItem = async <T>(key: any, value: T, expiresInSeconds: number = Number.MAX_SAFE_INTEGER): Promise<void> => {
     const itemKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     if (this.redisMode) {
       await Promise.promisify(this.redis.client.setex).bind(this.redis.client)(
@@ -35,7 +35,7 @@ export class Store {
     }
   };
 
-  getItem = async <T>(key: any, opts?: { json?: boolean }): Promise<T> => {
+  public getItem = async <T>(key: any, opts?: { json?: boolean }): Promise<T> => {
     const itemKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     if (this.redisMode) {
       const result = await Promise.promisify(this.redis.client.get).bind(this.redis.client)(itemKey);

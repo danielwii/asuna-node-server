@@ -1,6 +1,7 @@
 enum KVModelFormatType {
   KVGroupFieldsValue
   LIST
+  Fields
 }
 
 enum KeyValueType {

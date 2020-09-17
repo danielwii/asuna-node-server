@@ -17,17 +17,17 @@ const logger = LoggerFactory.getLogger('SortResolver');
  */
 @Resolver('Sort')
 export class SortResolver {
-  constructor(private readonly sortService: SortService, private readonly Sort) {}
+  public constructor(private readonly sortService: SortService, private readonly Sort) {}
 
   @Query()
-  async sort(@Args('name') name: string, @Args('type') sortType: string) {
+  public async sort(@Args('name') name: string, @Args('type') sortType: string) {
     logger.log(`sort: ${util.inspect({ name, sortType })}`);
     const sort = await this.Sort.findOne({ name }, { cache: true });
     return sort || this.Sort.getRepository().save({ name, type: sortType });
   }
 
   @ResolveField()
-  items(@Root() sort) {
+  public items(@Root() sort) {
     return this.sortService.findItems(sort);
   }
 }

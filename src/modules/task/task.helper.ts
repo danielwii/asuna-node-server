@@ -13,7 +13,7 @@ export enum TaskState {
 export class TaskHelper {
   private static readonly mq = MQProvider.instance;
 
-  static create(
+  public static create(
     identifier: string,
     uniqueId: string,
     type: string,
@@ -33,7 +33,7 @@ export class TaskHelper {
     return record.save();
   }
 
-  static async invoke(id: PrimaryKey): Promise<void> {
+  public static async invoke(id: PrimaryKey): Promise<void> {
     const task = await TaskRecord.findOne(id);
     logger.log(`invoke ${r(task)}`);
     await this.mq
@@ -41,7 +41,7 @@ export class TaskHelper {
       .catch((reason) => logger.error(`send message to mq error: ${r(reason)}`));
   }
 
-  static search(type: string, service: string, identifier: string): Promise<TaskRecord> {
+  public static search(type: string, service: string, identifier: string): Promise<TaskRecord> {
     return TaskRecord.findOne({ type, service, identifier });
   }
 }

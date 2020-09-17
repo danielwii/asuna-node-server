@@ -1,7 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { KeyValueType, KvHelper, KVModelFormatType } from '../core/kv';
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from "../core/kv";
 import { EmailTmplConfigKeys } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { EmailHelper } from './email.helper';
@@ -23,8 +23,8 @@ export class EmailModule implements OnModuleInit {
 */
   }
 
-  async initKV(): Promise<void> {
-    KvHelper.regInitializer(
+  public async initKV(): Promise<void> {
+    KvHelper.regInitializer<KVGroupFieldsValue>(
       EmailHelper.kvDef,
       {
         name: '邮件配置',
@@ -50,7 +50,7 @@ export class EmailModule implements OnModuleInit {
       },
       { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
     );
-    KvHelper.regInitializer(
+    KvHelper.regInitializer<KVGroupFieldsValue>(
       EmailHelper.tmplKvDef,
       {
         name: '邮件模版配置',
@@ -59,7 +59,7 @@ export class EmailModule implements OnModuleInit {
           form: {
             default: {
               name: 'default',
-              fields: [{ name: 'templates', field: { name: EmailTmplConfigKeys.templates, type: 'email-tmpl-data' } }],
+              fields: [{ name: 'templates', field: { name: EmailTmplConfigKeys.templates, type: 'emailTmplData' } }],
             },
           },
           values: {},

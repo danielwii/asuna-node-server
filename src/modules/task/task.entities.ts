@@ -9,7 +9,7 @@ import { ColumnTypeHelper } from '../core/helpers';
 @EntityMetaInfo({ name: 'sys__tasks', internal: true })
 @Entity('sys__t_tasks')
 export class TaskRecord extends AbstractTimeBasedBaseEntity {
-  constructor() {
+  public constructor() {
     super('st');
   }
 
@@ -18,53 +18,53 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'Identifier', help: 'user.id / admin.id' })
   @Column({ nullable: true, length: 50, name: 'identifier' })
-  identifier: string;
+  public identifier: string;
 
   @IsString()
   @IsNotEmpty()
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'UniqueID' })
   @Column({ nullable: true, length: 50, name: 'unique_id' })
-  uniqueId: string;
+  public uniqueId: string;
 
   @IsString()
   @IsNotEmpty()
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'service' })
   @Column({ nullable: true, length: 50, name: 'service' })
-  service: string;
+  public service: string;
 
   @IsString()
   @IsNotEmpty()
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'type' })
   @Column({ nullable: true, length: 50, name: 'type' })
-  type: string;
+  public type: string;
 
   @IsString()
   @IsNotEmpty()
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'channel' })
   @Column({ nullable: true, length: 50, name: 'channel' })
-  channel: string;
+  public channel: string;
 
   @IsString()
   @IsNotEmpty()
   @Transform((value) => _.trim(value))
   @MetaInfo({ name: 'state' })
   @Column({ nullable: true, length: 20, name: 'state' })
-  state: string;
+  public state: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
-  body: JsonMap;
+  public body: JsonMap;
 
   // --------------------------------------------------------------
   // Relations
   // --------------------------------------------------------------
 
   @OneToMany('TaskEvent', (inverse: TaskEvent) => inverse.task)
-  events: TaskEvent[];
+  public events: TaskEvent[];
 }
 
 @EntityMetaInfo({ name: 'sys__task_events', internal: true })
