@@ -43,7 +43,7 @@
     "@nestjs/terminus": "^7.0.1",
     "@nestjs/typeorm": "^7.1.4",
     "@nestjs/websockets": "^7.4.4",
-    "@prisma/client": "2.7.0",
+    "@prisma/client": "2.7.1",
     "@sentry/node": "^5.23.0",
     "accesscontrol": "^2.2.1",
     "alipay-sdk": "^3.1.4",
