@@ -46,6 +46,7 @@ export class AliyunSMSAdapter implements SMSAdapter {
       TemplateCode: id,
       TemplateParam: JSON.stringify(tmplData),
     };
+    logger.log(`[Aliyun] send ${r(params)}`);
     return this.client.request('SendSms', params, { method: 'POST' });
   }
 
