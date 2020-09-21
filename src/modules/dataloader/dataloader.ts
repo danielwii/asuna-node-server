@@ -104,15 +104,13 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
         { batchScheduleFn: (callback) => setTimeout(callback, 20), cache: false },
       ),
       {
-        // caching here is a local in memory cache. Caching is always done
-        // to redis.
+        // caching here is a local in memory cache. Caching is always done to redis.
         cache: true,
         // if set redis keys will be set to expire after this many seconds
         // this may be useful as a fallback for a redis cache.
         expire: 60 * 10,
-        // can include a custom serialization and deserialization for
-        // storage in redis.
-        serialize: (o) => JSON.stringify(o),
+        // can include a custom serialization and deserialization for storage in redis.
+        serialize: (o) => JSON.stringify(o) || '',
         deserialize: (s) => JSON.parse(s),
       },
     );
