@@ -25,6 +25,7 @@ export enum YamlConfigKeys {
   graphql = 'graphql',
   sentry = 'sentry',
   tracing = 'tracing',
+  mq = 'mq',
   email = 'email',
   live = 'live',
   sms = 'sms',

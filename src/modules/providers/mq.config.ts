@@ -1,54 +1,55 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import { LoggerFactory } from '../common/logger';
-import { configLoader } from '../config';
+import { configLoader, YamlConfigKeys } from '../config';
+import { fnWithP3, getIgnoreCase, withP } from '../common/helpers';
 
 const logger = LoggerFactory.getLogger('MQConfig');
 
-export const MQConfigKeys = {
-  MQ_ENABLE: 'MQ_ENABLE',
-  MQ_URL: 'MQ_URL',
-
-  MQ_HOST: 'MQ_HOST',
-  MQ_PORT: 'MQ_PORT',
-  MQ_PASSWORD: 'MQ_PASSWORD',
-  MQ_USERNAME: 'MQ_USERNAME',
-};
+export enum MQConfigKeys {
+  enable = 'enable',
+  url = 'url',
+  host = 'host',
+  port = 'port',
+  username = 'username',
+  password = 'password',
+}
 
 export class MQConfigObject {
-  enable?: boolean;
-  url?: string;
-  host?: string;
-  port?: number;
-  username?: string;
+  private static logger = LoggerFactory.getLogger('MQConfigObject');
+  private static key = YamlConfigKeys.mq;
+  private static prefix = `${MQConfigObject.key}_`;
+
+  public enable?: boolean;
+  public url?: string;
+  public host?: string;
+  public port?: number;
+  public username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
   @Transform((value) => !!value, { toPlainOnly: true })
-  password?: string;
+  public password?: string;
 
-  constructor(o: Partial<MQConfigObject>) {
+  public constructor(o: Partial<MQConfigObject>) {
     Object.assign(this, plainToClass(MQConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(prefix = ''): MQConfigObject {
-    const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
-    return new MQConfigObject({
-      enable: configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`, false),
-      url: configLoader.loadConfig(`${appendPrefix}${MQConfigKeys.MQ_URL}`, 'amqp://localhost'),
-      host: configLoader.loadConfig(`${appendPrefix}${MQConfigKeys.MQ_HOST}`),
-      port: configLoader.loadNumericConfig(`${appendPrefix}${MQConfigKeys.MQ_PORT}`),
-      username: configLoader.loadConfig(`${appendPrefix}${MQConfigKeys.MQ_USERNAME}`),
-      password: configLoader.loadConfig(`${appendPrefix}${MQConfigKeys.MQ_PASSWORD}`),
-    });
-  }
-
-  static loadOr(prefix = ''): MQConfigObject {
-    const appendPrefix = (prefix.length > 0 ? `${prefix}_` : '').toUpperCase();
-    logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
-    const enable = configLoader.loadBoolConfig(`${appendPrefix}${MQConfigKeys.MQ_ENABLE}`);
-    if (enable === true) {
-      return MQConfigObject.load(prefix);
-    }
-    return enable !== false ? MQConfigObject.load() : undefined;
+  public static load(mqPrefix = ''): MQConfigObject {
+    const appendPrefix = `${this.prefix}${mqPrefix ? `${mqPrefix}_`.toUpperCase() : ''}`;
+    logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.enable}`);
+    return <MQConfigObject>fnWithP3(
+      appendPrefix,
+      configLoader.loadConfig<object>(MQConfigObject.key),
+      MQConfigKeys,
+    )(
+      (prefix, config, keys): MQConfigObject =>
+        new MQConfigObject({
+          enable: withP(keys.enable, (v) => configLoader.loadBoolConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+          url: withP(keys.url, (v) => configLoader.loadConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+          host: withP(keys.host, (v) => configLoader.loadConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+          port: withP(keys.port, (v) => configLoader.loadNumericConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+          password: withP(keys.password, (v) => configLoader.loadConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+          username: withP(keys.username, (v) => configLoader.loadConfig(`${prefix}${v}`, getIgnoreCase(config, v))),
+        }),
+    );
   }
 }

@@ -34,7 +34,7 @@ features: # TODO
 
 tracing:
   enabled: false
-  serviceName: my-service
+  service_name: my-service
   endpoint: http://localhost:14268/api/traces
 
 uploader: # TODO
@@ -66,7 +66,7 @@ sentry:
   dsn:
 
 # --- mq ---
-mq: # TODO
+mq:
   # default: false
   ENABLE: false
   # default: amqp://localhost ; 存在 url 时忽略其他参数
@@ -90,7 +90,6 @@ redis:
   WS_REDIS_DB: 1
   # default: 2
   JOB_REDIS_DB: 2
-
 
   # redis 部分支持设置前缀来定义多个数据源
   #PREFIX_REDIS_ENABLE: false
@@ -117,7 +116,6 @@ db: # TODO
   TYPEORM_DATABASE: db_name
   TYPEORM_USERNAME:
   TYPEORM_PASSWORD:
-
 
   # --- db-cache ---
   #TYPEORM_CACHE_ALWAYS_ENABLED: true

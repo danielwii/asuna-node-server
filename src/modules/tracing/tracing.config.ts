@@ -6,30 +6,30 @@ import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',
-  serviceName = 'serviceName',
+  service_name = 'service_name',
   endpoint = 'endpoint',
 }
 
 export class TracingConfigObject {
-  static logger = LoggerFactory.getLogger('TracingConfigObject');
-  static key = YamlConfigKeys.tracing;
-  static prefix = `${TracingConfigObject.key}_`;
+  private static logger = LoggerFactory.getLogger('TracingConfigObject');
+  private static key = YamlConfigKeys.tracing;
+  private static prefix = `${TracingConfigObject.key}_`;
 
-  enabled: boolean;
-  serviceName: string;
-  endpoint: string;
+  public enabled: boolean;
+  public service_name: string;
+  public endpoint: string;
 
-  constructor(o: Partial<TracingConfigObject>) {
+  public constructor(o: Partial<TracingConfigObject>) {
     Object.assign(this, plainToClass(TracingConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load = (): TracingConfigObject =>
+  public static load = (): TracingConfigObject =>
     withP(
       [TracingConfigObject.prefix, configLoader.loadConfig(TracingConfigObject.key) as any, TracingConfigKeys],
       ([prefix, config, keys]) =>
         new TracingConfigObject({
           enabled: withP(keys.enabled, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
-          serviceName: withP(keys.serviceName, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
+          service_name: withP(keys.service_name, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
           endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
         }),
     );

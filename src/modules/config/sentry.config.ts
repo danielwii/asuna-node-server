@@ -28,10 +28,8 @@ export class SentryConfigObject {
     )(
       (prefix, config, keys) =>
         new SentryConfigObject({
-          enable: withP(keys.enable, (p) =>
-            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
-          ),
-          dsn: withP(keys.dsn, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
+          dsn: withP(keys.dsn, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
         }),
     );
 }

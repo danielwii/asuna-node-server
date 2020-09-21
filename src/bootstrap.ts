@@ -28,6 +28,7 @@ import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find
 import './typeorm.fixture';
+import { MQConfigObject } from './modules/providers';
 
 /*
 if (process.env.NODE_ENV === 'production') {
