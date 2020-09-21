@@ -5,12 +5,14 @@ import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
+import * as RedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
 import { CacheTTL } from '../cache/constants';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
+import { RedisProvider } from '../providers';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 import type { DefaultRegisteredLoaders } from './context';
@@ -18,6 +20,7 @@ import type { DefaultRegisteredLoaders } from './context';
 const logger = LoggerFactory.getLogger('DataLoader');
 
 const cacheMap = new Map();
+let redisLoader;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load(id?: PrimaryKey): Promise<Entity>;
@@ -59,7 +62,9 @@ export function loader<Entity extends BaseEntity>(
 export const dataLoaderCleaner = {
   clear(segment: string, id: PrimaryKey): void {
     logger.debug(`remove loader cache ... ${segment}-${id}`);
-    cacheMap.delete(`${segment}-${id}`);
+    const key = `${segment}-${id}`;
+    cacheMap.delete(key);
+    redisLoader?.clear(key);
   },
 };
 
@@ -85,56 +90,35 @@ export class GenericDataLoader {
 }
 
 export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
-  /* dataloader is a internal cache, not support distributed
   const redis = RedisProvider.instance.getRedisClient('dataloader');
   if (redis.isEnabled) {
-    return new DataLoader(
-      ids => {
-        logger.log(`dataloader load ${segment}: ${ids}`);
-        return fn(ids);
-      },
-      {
-        batchScheduleFn: callback => setTimeout(callback, 100),
-        cacheMap: {
-          get: (id: PrimaryKey) => {
-            const key = `${segment}-${id}`;
-            const exists = redis.client.EXISTS(key);
-            logger.debug(`dataloader exists ${key} ${exists}`);
-            if (!exists) return; // Not cached. Sorry.
-            // eslint-disable-next-line no-async-promise-executor
-            return new Promise(async resolve => {
-              const entry = await promisify(redis.client.GET, redis.client)(key);
-              logger.debug(`dataloader get ${key} ${r(entry)}`);
-              if (!entry) {
-                promisify(redis.client.DEL, redis.client)(key);
-                const reload = await fn([id]).catch(reason => logger.error(reason));
-                logger.debug(`dataloader reload ${key} ${r(reload)}`);
-                resolve(reload);
-              } else {
-                resolve(entry);
-              }
-            });
-          },
-          set: async (id: PrimaryKey, value: Promise<any>) => {
-            const key = `${segment}-${id}`;
-            const entry = await value;
-            logger.debug(`dataloader set ${key}`);
-            Promise.promisify(redis.client.SET).bind(redis.client)(key, entry);
-          },
-          delete(id: PrimaryKey): void {
-            const key = `${segment}-${id}`;
-            logger.log(`dataloader delete $key`);
-            promisify(redis.client.DEL, redis.client)(key);
-          },
-          clear(): void {
-            logger.log(`dataloader clear (${segment})`);
-            Promise.promisify(redis.client.FLUSHDB).bind(redis.client)();
-          },
+    logger.log(`init redis dataloader for ${segment} ... ${r(redis.redisOptions)}`);
+    redisLoader = new (RedisDataloader({ redis: redis.client }))(
+      `dataloader-${segment}`,
+      // create a regular dataloader. This should always be set with caching disabled.
+      new DataLoader(
+        (ids) => {
+          logger.debug(`redis dataloader load ${segment}: ${ids}`);
+          return fn(ids);
         },
+        { batchScheduleFn: (callback) => setTimeout(callback, 20), cache: false },
+      ),
+      {
+        // caching here is a local in memory cache. Caching is always done
+        // to redis.
+        cache: true,
+        // if set redis keys will be set to expire after this many seconds
+        // this may be useful as a fallback for a redis cache.
+        expire: 60 * 10,
+        // can include a custom serialization and deserialization for
+        // storage in redis.
+        serialize: (o) => JSON.stringify(o),
+        deserialize: (s) => JSON.parse(s),
       },
     );
+    return redisLoader;
   }
-*/
+
   return new DataLoader(
     (ids) => {
       logger.debug(`dataloader load ${segment}: ${ids}`);
@@ -169,6 +153,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
             cacheMap.delete(key);
             return null;
           }
+          logger.debug(`dataloader loaded cached ${key}`);
           return value;
         },
         set: async (id: string, value) => {
@@ -244,9 +229,11 @@ export function resolveRelationsFromInfo(
         }
       });
     });
-    const relations = (selectionNode || fieldNode).selectionSet.selections
-      .filter((node) => node.selectionSet)
-      .map((node) => node.name.value);
+    const relations = _.uniq<string>(
+      (selectionNode || fieldNode).selectionSet.selections
+        .filter((node) => node.selectionSet)
+        .map((node) => node.name.value),
+    );
     logger.debug(`resolved relations ${r({ path, locations, relations })}`);
     return { relations };
   } catch (error) {

@@ -10,7 +10,7 @@ import { LoggerFactory } from './factory';
 const logger = LoggerFactory.getLogger('LoggerInterceptor');
 
 export class LoggerInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
+  public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     let request = context.switchToHttp().getRequest<Request>();
     if (!request) {
       request = GqlExecutionContext.create(context).getContext().req;
@@ -30,15 +30,16 @@ export class LoggerInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    // logger.debug(`${context.getClass().name}.${context.getHandler().name} info: ${r(info)}`);
+    const TAG = `${context.getClass().name}.${context.getHandler().name}`;
+    logger.debug(`${TAG} call...`);
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () => logger.debug(`${context.getClass().name}.${context.getHandler().name} spent ${Date.now() - now}ms`),
-        e => {
+        () => logger.debug(`${TAG} spent ${Date.now() - now}ms`),
+        (e) => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {
-            logger.warn(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+            logger.warn(`${TAG} ${r(info)}`);
           }
         },
       ),

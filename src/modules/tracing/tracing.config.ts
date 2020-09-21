@@ -6,7 +6,7 @@ import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',
-  service_name = 'service_name',
+  serviceName = 'serviceName',
   endpoint = 'endpoint',
 }
 
@@ -16,7 +16,7 @@ export class TracingConfigObject {
   static prefix = `${TracingConfigObject.key}_`;
 
   enabled: boolean;
-  service_name: string;
+  serviceName: string;
   endpoint: string;
 
   constructor(o: Partial<TracingConfigObject>) {
@@ -28,13 +28,9 @@ export class TracingConfigObject {
       [TracingConfigObject.prefix, configLoader.loadConfig(TracingConfigObject.key) as any, TracingConfigKeys],
       ([prefix, config, keys]) =>
         new TracingConfigObject({
-          enabled: withP(keys.enabled, (p) =>
-            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
-          ),
-          service_name: withP(keys.service_name, (p) =>
-            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
-          ),
-          endpoint: withP(keys.enabled, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          enabled: withP(keys.enabled, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
+          serviceName: withP(keys.serviceName, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
+          endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
         }),
     );
 }

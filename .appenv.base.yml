@@ -34,7 +34,7 @@ features: # TODO
 
 tracing:
   enabled: false
-  service_name: my-service
+  serviceName: my-service
   endpoint: http://localhost:14268/api/traces
 
 uploader: # TODO
