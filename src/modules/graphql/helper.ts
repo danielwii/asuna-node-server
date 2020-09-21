@@ -338,7 +338,7 @@ export class GraphqlHelper {
     return options;
   }
 
-  static async resolveProperty<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+  static async resolveProperty_DO_NOT_USE<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity> {

@@ -10,17 +10,17 @@ import { GqlAdminAuthGuard } from '../auth.guard';
 import { GraphqlHelper } from '../helper';
 
 export class UserProfileQueryResolver {
-  logger = LoggerFactory.getLogger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('UserProfileQueryResolver');
 
   @UseGuards(new GqlWXAuthGuard())
   @Query()
-  async user_profile(@Context() ctx: GraphqlContext): Promise<UserProfile> {
+  public async user_profile(@Context() ctx: GraphqlContext): Promise<UserProfile> {
     return UserProfile.findOne(ctx.getCurrentUser().id);
   }
 
   @UseGuards(new GqlAdminAuthGuard())
   @Query()
-  async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext): Promise<UserProfile> {
+  public async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext): Promise<UserProfile> {
     const { profiles: loader } = ctx.getDataLoaders();
     return loader.load(id);
   }
@@ -28,12 +28,15 @@ export class UserProfileQueryResolver {
 
 @Resolver(UserProfile)
 export class UserProfileResolver {
-  logger = LoggerFactory.getLogger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('UserProfileResolver');
 
   @ResolveField()
-  async miniAppUserInfo(@Root() profile: UserProfile, @Context() ctx: GraphqlContext): Promise<WXMiniAppUserInfo> {
+  public async miniAppUserInfo(
+    @Root() profile: UserProfile,
+    @Context() ctx: GraphqlContext,
+  ): Promise<WXMiniAppUserInfo> {
     this.logger.debug(`load event for ${profile.id}`);
-    return GraphqlHelper.resolveProperty<UserProfile, WXMiniAppUserInfo>({
+    return GraphqlHelper.resolveProperty_DO_NOT_USE<UserProfile, WXMiniAppUserInfo>({
       cls: UserProfile,
       instance: profile,
       key: 'miniAppUserInfo',
@@ -43,8 +46,8 @@ export class UserProfileResolver {
   }
 
   @ResolveField()
-  wallet(@Root() profile: UserProfile) {
-    return GraphqlHelper.resolveProperty<UserProfile, Wallet>({
+  public wallet(@Root() profile: UserProfile) {
+    return GraphqlHelper.resolveProperty_DO_NOT_USE<UserProfile, Wallet>({
       cls: UserProfile,
       instance: profile,
       key: 'wallet',

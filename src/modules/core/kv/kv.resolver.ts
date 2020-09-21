@@ -4,7 +4,7 @@ import { Promise } from 'bluebird';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { GraphqlContext } from '../../dataloader/dataloader.interceptor';
-import { GqlAdminAuthGuard, GraphqlHelper } from '../../graphql';
+import { GqlAdminAuthGuard } from '../../graphql';
 import { KeyValuePair } from './kv.entities';
 import { KvHelper, recognizeTypeValue } from './kv.helper';
 import { KeyValueModel } from './kv.isolated.entities';
@@ -44,14 +44,9 @@ export class KeyValueModelResolver {
 
   @ResolveField()
   public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
+    const { keyValuePairs: loader } = ctx.getDataLoaders();
     this.logger.debug(`load pair for ${model.id}`);
-    return GraphqlHelper.resolveProperty<KeyValueModel, KeyValuePair>({
-      cls: KeyValueModel,
-      instance: model,
-      key: 'pair',
-      targetCls: KeyValuePair,
-      loader: ctx.getDataLoaders().keyValuePairs,
-    }).then((item) => {
+    return loader.load(model.pairId).then((item) => {
       [, item.value] = recognizeTypeValue(item.type, item.value);
       return item;
     });
