@@ -6,7 +6,7 @@ import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',
-  service_name = 'service_name',
+  serviceName = 'serviceName',
   endpoint = 'endpoint',
 }
 
@@ -16,7 +16,7 @@ export class TracingConfigObject {
   private static prefix = `${TracingConfigObject.key}_`;
 
   public enabled: boolean;
-  public service_name: string;
+  public serviceName: string;
   public endpoint: string;
 
   public constructor(o: Partial<TracingConfigObject>) {
@@ -29,7 +29,7 @@ export class TracingConfigObject {
       ([prefix, config, keys]) =>
         new TracingConfigObject({
           enabled: withP(keys.enabled, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
-          service_name: withP(keys.service_name, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
+          serviceName: withP(keys.serviceName, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
           endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
         }),
     );

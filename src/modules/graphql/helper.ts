@@ -314,7 +314,7 @@ export class GraphqlHelper {
 
       logger.debug(`category is ${r(category)}`);
       // if (category != null) {}
-      Object.assign(whereCondition, { [categoryRef || 'category']: _.get(category, 'id') });
+      Object.assign(whereCondition, { [categoryRef || 'categoryId']: _.get(category, 'id') });
     }
 
     if (timeCondition && typeof where === 'object') {
