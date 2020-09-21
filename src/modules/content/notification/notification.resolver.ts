@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { Args, Context, Query, Resolver } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
 import * as R from 'ramda';
@@ -7,12 +6,13 @@ import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { NotificationType } from './enum-values';
 import { Notification } from './notification.entities';
 import { MixedNotification, NotificationHelper } from './notification.helper';
+import { LoggerFactory } from '../../common/logger';
 
 import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader';
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {
-  private logger = new Logger('NotificationQueryResolver');
+  private logger = LoggerFactory.getLogger('NotificationQueryResolver');
 
   public constructor() {
     super(Notification);

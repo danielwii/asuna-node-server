@@ -69,6 +69,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`options: ${r(options)}`);
   // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
+  process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = '1000';
   const dbConfig = await getConnectionOptions();
   logger.log(
     `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ******${_.get(dbConfig, 'password').slice(-4)}`,

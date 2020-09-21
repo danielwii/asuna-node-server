@@ -9,10 +9,11 @@ import { GraphqlContext } from '../dataloader/dataloader.interceptor';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, QueryResolver } from '../graphql';
 import { named } from '../helper';
 import { Feedback, FeedbackReply } from './feedback.entities';
+import { LoggerFactory } from '../common/logger';
 
 @Resolver()
 export class FeedbackQueryResolver extends QueryResolver {
-  logger = new Logger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('FeedbackQueryResolver');
 
   constructor() {
     super(Feedback);
@@ -48,7 +49,7 @@ export class FeedbackQueryResolver extends QueryResolver {
 
 @Resolver(Feedback)
 export class UserFeedbackResolver {
-  logger = new Logger(this.constructor.name);
+  private logger = LoggerFactory.getLogger('UserFeedbackResolver');
 
   @ResolveField('replies')
   async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {
