@@ -1,6 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
-import { fnWithP3, parseJSONIfCould, withP } from '../common/helpers';
+import { parseJSONIfCould, withP, withP2 } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config';
 
@@ -38,27 +37,18 @@ export class SMSConfigObject {
     Object.assign(this, plainToClass(SMSConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  public static load = (): SMSConfigObject => <SMSConfigObject>fnWithP3(
-      SMSConfigObject.prefix,
-      configLoader.loadConfig(SMSConfigObject.key),
+  public static load = (): SMSConfigObject =>
+    withP2(
+      (p): any => configLoader.loadConfig2(SMSConfigObject.key, p),
       SMSConfigKeys,
-    )(
-      (prefix, config, keys): SMSConfigObject =>
+      (loader, keys): SMSConfigObject =>
         new SMSConfigObject({
-          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          provider: withP(keys.provider, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          accessKeyId: withP(keys.accessKeyId, (p) =>
-            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
-          ),
-          accessKeySecret: withP(keys.accessKeySecret, (p) =>
-            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
-          ),
-          extra: withP(keys.extra, (p) =>
-            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          ),
-          templates: withP(keys.templates, (p) =>
-            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          ),
+          enable: withP(keys.enable, loader),
+          provider: withP(keys.provider, loader),
+          accessKeyId: withP(keys.accessKeyId, loader),
+          accessKeySecret: withP(keys.accessKeySecret, loader),
+          extra: withP(keys.extra, (p) => parseJSONIfCould(loader(p))),
+          templates: withP(keys.templates, (p) => parseJSONIfCould(loader(p))),
         }),
     );
 }

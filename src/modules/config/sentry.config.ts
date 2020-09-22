@@ -1,6 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
-import { fnWithP3, withP } from '../common/helpers';
+import { withP, withP2 } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from './loader';
 
@@ -10,26 +9,24 @@ export enum SentryConfigKeys {
 }
 
 export class SentryConfigObject {
-  static logger = LoggerFactory.getLogger('SentryConfigObject');
-  static key = YamlConfigKeys.sentry;
-  static prefix = `${SentryConfigObject.key}_`;
+  private static logger = LoggerFactory.getLogger('SentryConfigObject');
+  private static key = YamlConfigKeys.sentry;
 
-  enable: boolean;
-  dsn: string;
+  public enable: boolean;
+  public dsn: string;
 
-  constructor(o: Partial<SentryConfigObject>) {
+  public constructor(o: Partial<SentryConfigObject>) {
     Object.assign(this, plainToClass(SentryConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load = (): SentryConfigObject => <SentryConfigObject>fnWithP3(
-      SentryConfigObject.prefix,
-      configLoader.loadConfig(SentryConfigObject.key),
+  public static load = (): SentryConfigObject =>
+    withP2(
+      (p): any => configLoader.loadConfig2(SentryConfigObject.key, p),
       SentryConfigKeys,
-    )(
-      (prefix, config, keys) =>
+      (loader, keys) =>
         new SentryConfigObject({
-          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
-          dsn: withP(keys.dsn, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          enable: withP(keys.enable, loader),
+          dsn: withP(keys.dsn, loader),
         }),
     );
 }

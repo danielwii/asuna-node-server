@@ -1,8 +1,7 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config';
-import { fnWithP3, getIgnoreCase, withP } from '../common/helpers';
-import * as _ from 'lodash';
+import { withP, withP2 } from '../common/helpers';
 
 const logger = LoggerFactory.getLogger('MQConfig');
 
@@ -37,19 +36,17 @@ export class MQConfigObject {
   public static load(mqPrefix = ''): MQConfigObject {
     const appendPrefix = `${this.prefix}${mqPrefix ? `${mqPrefix}_`.toUpperCase() : ''}`;
     logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.enable}`);
-    return <MQConfigObject>fnWithP3(
-      appendPrefix,
-      configLoader.loadConfig<object>(MQConfigObject.key),
+    return withP2(
+      (p): any => configLoader.loadConfig2(MQConfigObject.key, p),
       MQConfigKeys,
-    )(
-      (prefix, config, keys): MQConfigObject =>
+      (loader, keys) =>
         new MQConfigObject({
-          enable: withP(keys.enable, (v) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          url: withP(keys.url, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          host: withP(keys.host, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          port: withP(keys.port, (v) => configLoader.loadNumericConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          password: withP(keys.password, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          username: withP(keys.username, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
+          enable: withP(keys.enable, loader),
+          url: withP(keys.url, loader),
+          host: withP(keys.host, loader),
+          port: withP(keys.port, loader),
+          password: withP(keys.password, loader),
+          username: withP(keys.username, loader),
         }),
     );
   }

@@ -13,24 +13,24 @@ PAYLOAD_LIMIT: 200mb
 
 app: # TODO
   # default: admin@example.com
-  SYS_ADMIN_EMAIL: admin@example.com
+  sys_admin_email: admin@example.com
   # 为空时生成随机密码
-  SYS_ADMIN_PASSWORD:
+  sys_admin_password:
   # default: 500
-  BATCH_SIZE:
-  FIX_TZ:
+  batch_size:
+  fix_tz:
   # --- default assets endpoint
-  ASSETS_ENDPOINT:
-  ASSETS_INTERNAL_ENDPOINT:
+  assets_endpoint:
+  assets_internal_endpoint:
   # default: http://127.0.0.1:5000
-  MASTER_ADDRESS: http://127.0.0.1:5000
+  master_address: http://127.0.0.1:5000
 
 features: # TODO
   # 是否开启审计模式
-  AUDIT: false
+  audit: false
   # ; endpoint is /swagger
-  SWAGGER: false
-  CRON_ENABLE: true
+  swagger: false
+  cron_enable: true
 
 tracing:
   enabled: false
@@ -38,11 +38,11 @@ tracing:
   endpoint: http://localhost:14268/api/traces
 
 uploader: # TODO
-  ENABLE: true
+  enable: true
   # default: 3
-  MAX_COUNT: 10
+  max_count: 10
   # default: /uploads
-  RESOURCE_PATH: /uploads
+  resource_path: /uploads
 
 graphql:
   # default: false
@@ -56,7 +56,7 @@ sms:
   provider: aliyun
   extra: |
     {
-      "SignName": "xxx",
+      "SignName": "xxx", //
       "RegionId": "xxx"
     }
 
@@ -68,28 +68,28 @@ sentry:
 # --- mq ---
 mq:
   # default: false
-  ENABLE: false
+  enable: false
   # default: amqp://localhost ; 存在 url 时忽略其他参数
-  URL: amqp://localhost
-  #HOST: localhost
-  #PORT: 5672
-  #PASSWORD:
-  #USERNAME:
+  url: amqp://localhost
+  #host: localhost
+  #port: 5672
+  #password:
+  #username:
 
 # --- redis ---
 redis:
-  ENABLE: false
-  HOST: localhost
-  PORT: 6379
+  enable: false
+  host: localhost
+  port: 6379
   # (Optional)
-  PASSWORD:
+  password:
   # default: 0
-  DB: 0
+  db: 0
   # other modules used
   # default: 1
-  WS_REDIS_DB: 1
+  ws_redis_db: 1
   # default: 2
-  JOB_REDIS_DB: 2
+  job_redis_db: 2
 
   # redis 部分支持设置前缀来定义多个数据源
   #PREFIX_REDIS_ENABLE: false
@@ -148,7 +148,7 @@ db: # TODO
 #IMAGES|VIDEOS|FILES|CHUNKS_STORAGE: local|minio|qiniu
 
 storage: # TODO
-  DEFAULT_STORAGE: local
+  default_storage: local
   #IMAGES|[ANY]_STORAGE
   #VIDEOS|[ANY]_STORAGE:
   #FILES|[ANY]_STORAGE:
@@ -156,15 +156,15 @@ storage: # TODO
   minio:
     # --- minio storage config ---
     # true or false
-    ENABLE: false
+    enable: false
     # minio.domain.io
-    #ENDPOINT:
+    #endpoint:
     # 9000
-    PORT: 9000
+    port: 9000
     # true or false
-    USE_SSL: false
-    #ACCESS_KEY:
-    #SECRET_KEY:
+    use_ssl: false
+    #access_key:
+    #secret_key:
 
 # --- mail ---
 email:

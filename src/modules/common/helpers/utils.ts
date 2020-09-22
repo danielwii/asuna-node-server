@@ -6,6 +6,7 @@ import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
 import * as path from 'path';
+import * as JSON5 from 'json5';
 import { Between, FindOperator } from 'typeorm';
 import { inspect } from 'util';
 
@@ -140,7 +141,7 @@ export function numberInterval(min: number, max: number, num: number): number {
 
 export function parseJSONIfCould(value?: string): any {
   try {
-    if (value) return JSON.parse(value);
+    return JSON5.parse(value);
     // eslint-disable-next-line no-empty
   } catch {}
   return value;

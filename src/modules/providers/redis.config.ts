@@ -1,7 +1,6 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
-import * as _ from 'lodash';
 import * as Redis from 'redis';
-import { fnWithP3, getIgnoreCase, r, withP } from '../common/helpers';
+import { r, withP, withP2 } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config';
 
@@ -43,26 +42,16 @@ export class RedisConfigObject {
   public static load(redisPrefix = ''): RedisConfigObject {
     const appendPrefix = `${this.prefix}${redisPrefix ? `${redisPrefix}_`.toUpperCase() : ''}`;
     logger.verbose(`try load env: ${appendPrefix}${RedisConfigKeys2.enable}`);
-    return <RedisConfigObject>fnWithP3(
-      appendPrefix,
-      configLoader.loadConfig<object>(RedisConfigObject.key),
+    return withP2(
+      (p): any => configLoader.loadConfig2(RedisConfigObject.key, p),
       RedisConfigKeys2,
-    )(
-      (prefix, config, keys): RedisConfigObject =>
+      (loader, keys) =>
         new RedisConfigObject({
-          enable: withP(keys.enable, (v) =>
-            configLoader.loadBoolConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
-          ),
-          host: withP(keys.host, (v) => configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v))),
-          port: withP(keys.port, (v) =>
-            configLoader.loadNumericConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
-          ),
-          password: withP(keys.password, (v) =>
-            configLoader.loadConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
-          ),
-          db: withP(keys.db, (v) =>
-            configLoader.loadNumericConfig(_.toUpper(`${prefix}${v}`), getIgnoreCase(config, v)),
-          ),
+          enable: withP(keys.enable, loader),
+          host: withP(keys.host, loader),
+          port: withP(keys.port, loader),
+          password: withP(keys.password, loader),
+          db: withP(keys.db, loader),
         }),
     );
   }
