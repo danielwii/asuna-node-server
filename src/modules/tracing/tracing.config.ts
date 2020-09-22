@@ -28,9 +28,13 @@ export class TracingConfigObject {
       [TracingConfigObject.prefix, configLoader.loadConfig(TracingConfigObject.key) as any, TracingConfigKeys],
       ([prefix, config, keys]) =>
         new TracingConfigObject({
-          enabled: withP(keys.enabled, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
-          serviceName: withP(keys.serviceName, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
-          endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
+          enabled: withP(keys.enabled, (p) =>
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
+          ),
+          serviceName: withP(keys.serviceName, (p) =>
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
+          ),
+          endpoint: withP(keys.endpoint, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
         }),
     );
 }

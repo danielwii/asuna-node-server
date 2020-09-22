@@ -1,6 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
-import { withP, withP3 } from '../common/helpers';
+import { withP2, withP3 } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config/loader';
 
@@ -12,27 +12,30 @@ export enum GraphQLConfigKeys {
 const logger = LoggerFactory.getLogger('GraphQLConfigObject');
 
 export class GraphQLConfigObject {
-  static key = YamlConfigKeys.graphql;
-  static prefix = `${GraphQLConfigObject.key}_`;
+  private static key = YamlConfigKeys.graphql;
+  private static prefix = `${GraphQLConfigObject.key}_`;
 
   debug: boolean;
   playground_enable: boolean;
 
-  constructor(o: Partial<GraphQLConfigObject>) {
+  public constructor(o: Partial<GraphQLConfigObject>) {
     Object.assign(this, plainToClass(GraphQLConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load = (): GraphQLConfigObject =>
+  public static load = (): GraphQLConfigObject =>
     withP3(
       GraphQLConfigObject.prefix,
       configLoader.loadConfig(YamlConfigKeys.graphql),
       GraphQLConfigKeys,
       (prefix, config, keys) =>
         new GraphQLConfigObject({
-          debug: withP(keys.debug, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
-          playground_enable: withP(keys.playground_enable, (p) =>
-            configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p)),
+          debug: withP2(_.toUpper(`${prefix}${keys.debug}`), keys.debug, (key, p) =>
+            configLoader.loadBoolConfig(key, _.get(config, p)),
+          ),
+          playground_enable: withP2(_.toUpper(`${prefix}${keys.playground_enable}`), keys.playground_enable, (key, p) =>
+            configLoader.loadBoolConfig(key, _.get(config, p)),
           ),
         }),
     );
+  Z;
 }

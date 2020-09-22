@@ -45,15 +45,19 @@ export class SMSConfigObject {
     )(
       (prefix, config, keys): SMSConfigObject =>
         new SMSConfigObject({
-          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(`${prefix}${p}`, _.get(config, p))),
-          provider: withP(keys.provider, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
-          accessKeyId: withP(keys.accessKeyId, (p) => configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
-          accessKeySecret: withP(keys.accessKeySecret, (p) =>
-            configLoader.loadConfig(`${prefix}${p}`, _.get(config, p)),
+          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          provider: withP(keys.provider, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          accessKeyId: withP(keys.accessKeyId, (p) =>
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
           ),
-          extra: withP(keys.extra, (p) => parseJSONIfCould(configLoader.loadConfig(`${prefix}${p}`, _.get(config, p)))),
+          accessKeySecret: withP(keys.accessKeySecret, (p) =>
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p)),
+          ),
+          extra: withP(keys.extra, (p) =>
+            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          ),
           templates: withP(keys.templates, (p) =>
-            parseJSONIfCould(configLoader.loadConfig(`${prefix}${p}`, _.get(config, p))),
+            parseJSONIfCould(configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           ),
         }),
     );
