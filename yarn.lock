@@ -8367,10 +8367,10 @@ node-addon-api@^3.0.2:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.0.2.tgz#04bc7b83fd845ba785bb6eae25bc857e1ef75681"
   integrity sha512-+D4s2HCnxPd5PjjI0STKwncjXTUKKqm74MDMz9OPXavjsGmjkvwgLtA5yoxJUdmpj52+2u+RrXgPipahKczMKg==
 
-node-buffs@^0.8.7:
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.7.tgz#974edf738ce27fdcf10f5ceca1d468037cf4459f"
-  integrity sha512-cGPRzKhe/CLFf5tdEYeNGdIFxivdGazG7/aTJ00KmzHeple14X5ecFiZuiXmdmfXInzwwEWI5SVGR5PcjomntA==
+node-buffs@^0.8.9:
+  version "0.8.9"
+  resolved "https://registry.yarnpkg.com/node-buffs/-/node-buffs-0.8.9.tgz#45b57361deadfbf4d8a2f17d59c9335bc3fb3417"
+  integrity sha512-aLfbF/BenJJzmMeRuWtuGaHN7hxDhbO8/u1Jndqkbs+mlqrguY+FT+gOkk97Pr6X44DldLZPqDmjSOT4got8mw==
   dependencies:
     dotenv "^8.2.0"
     js-yaml "^3.14.0"

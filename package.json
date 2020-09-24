@@ -95,7 +95,7 @@
     "mongoose-autopopulate": "^0.12.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
-    "node-buffs": "^0.8.7",
+    "node-buffs": "^0.8.9",
     "node-fetch": "^2.6.1",
     "nodemailer": "^6.4.11",
     "opentracing": "^0.14.4",
