@@ -1,7 +1,15 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AdminInternalModule, bootstrap, GraphqlModule, LoggerFactory, WSModule } from '.';
+import {
+  AdminInternalModule,
+  bootstrap,
+  defaultDataLoaders,
+  GenericDataLoader,
+  GraphqlModule,
+  LoggerFactory,
+  WSModule,
+} from '.';
 
 const logger = LoggerFactory.getLogger('ApplicationModule');
 
@@ -12,6 +20,7 @@ const logger = LoggerFactory.getLogger('ApplicationModule');
 export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {
     logger.log('init...');
+    new GenericDataLoader().initLoaders(defaultDataLoaders);
   }
 }
 

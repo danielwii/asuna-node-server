@@ -4,14 +4,14 @@ import { CanRegEnumValue, EnumValueStatic, ValueOf } from '../enum-values';
 
 @StaticImplements<EnumValueStatic>()
 export class ExchangeCurrencyEnumValue {
-  static key = 'ExchangeCurrency';
-  static types = { points: 'points', balance: 'balance' };
+  public static key = 'ExchangeCurrency';
+  public static types = { points: 'points', balance: 'balance' };
 
-  static get keys(): string[] {
+  public static get keys(): string[] {
     return _.keys(ExchangeCurrencyEnumValue.types);
   }
 
-  static get data(): { [key in keyof typeof ExchangeCurrencyEnumValue.types]: string } {
+  public static get data(): { [key in keyof typeof ExchangeCurrencyEnumValue.types]: string } {
     return { points: '积分', balance: '余额' };
   }
 }
@@ -19,15 +19,15 @@ export type ExchangeCurrencyType = ValueOf<typeof ExchangeCurrencyEnumValue.type
 
 @StaticImplements<EnumValueStatic>()
 export class ExchangeObjectUsageEnumValue extends CanRegEnumValue {
-  static key = 'ExchangeObjectUsage';
-  static types = {};
-  static desc = {};
+  public static key = 'ExchangeObjectUsage';
+  public static types = {};
+  public static desc = {};
 
-  static get keys(): string[] {
+  public static get keys(): string[] {
     return _.keys(ExchangeObjectUsageEnumValue.types);
   }
 
-  static get data(): { [key in keyof typeof ExchangeObjectUsageEnumValue.types]: string } {
+  public static get data(): { [key in keyof typeof ExchangeObjectUsageEnumValue.types]: string } {
     return this.desc;
   }
 }

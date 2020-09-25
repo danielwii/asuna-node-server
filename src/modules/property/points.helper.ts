@@ -8,23 +8,25 @@ import { UserProfile } from '../core/auth';
 import { Hermes } from '../core/bus';
 import { KvHelper } from '../core/kv';
 import { Wallet } from './financial.entities';
-import { HermesPointChangeEventKeys, PointExchange, PointExchangeTypeSettings } from './points.entities';
+import { HermesPointChangeEventKeys, PointExchange } from './points.entities';
 import { PropertyHelper } from './property.helper';
 
 const logger = LoggerFactory.getLogger('PointsHelper');
 
-export type PointChangeEventPayload = {
+export interface PointChangeEventPayload {
   point: number;
-  type: keyof typeof PointExchangeTypeSettings;
+  type: string;
   event: string;
   profileId: string;
   remark?: string;
-};
+}
 
-export type VipVideoExchangeBody = { uuid: string };
+export interface VipVideoExchangeBody {
+  uuid: string;
+}
 
 export class PointsHelper {
-  static async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
+  public static async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
     const exists = await PointExchange.findOne({ type: 'vipVideoExchange', profileId, refId: uuid } as PointExchange);
     logger.log(`pointExchange ${r(exists)}`);
     if (exists) return exists;
@@ -57,16 +59,12 @@ export class PointsHelper {
     return exchange;
   }
 
-  static async checkExchange(
-    type: keyof typeof PointExchangeTypeSettings,
-    profileId: string,
-    body: any,
-  ): Promise<PointExchange> {
+  public static async checkExchange(type: string, profileId: string, body: any): Promise<PointExchange> {
     return PointExchange.findOne({ type, profileId, body: JSON.stringify(body) } as PointExchange);
   }
 
-  static async getPointsByType(
-    type: keyof typeof PointExchangeTypeSettings,
+  public static async getPointsByType(
+    type: string,
     profileId: string,
     after?: Date,
   ): Promise<{ total: number; items: PointExchange[] }> {
@@ -75,9 +73,9 @@ export class PointsHelper {
   }
 
   @Transaction()
-  static async savePoints(
+  public static async savePoints(
     change: number,
-    type: keyof typeof PointExchangeTypeSettings,
+    type: string,
     profileId: string,
     remark: string,
     @TransactionManager() manager?: EntityManager,
@@ -98,8 +96,8 @@ export class PointsHelper {
     return exchange;
   }
 
-  static async handlePoints(
-    type: keyof typeof PointExchangeTypeSettings,
+  public static async handlePoints(
+    type: string,
     profileId: string,
     event: string,
     change?: number,

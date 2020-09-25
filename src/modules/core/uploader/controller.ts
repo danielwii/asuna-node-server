@@ -52,27 +52,27 @@ const fileInterceptorOptions: MulterOptions = {
 class CreateChunksUploadTaskDto {
   @IsString()
   @Transform((value) => _.trim(value))
-  filename: string;
+  public filename: string;
 
   @IsNumber()
   @Min(1)
-  totalChunks: number;
+  public totalChunks: number;
 }
 
 class CreateChunksUploadTaskQuery {
   @IsString()
   @Transform((value) => _.trim(value))
-  readonly key: string;
+  public readonly key: string;
 
   @IsString()
   @Transform((value) => _.trim(value))
-  readonly filename: string;
+  public readonly filename: string;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
   @Transform((value) => Number(value))
-  readonly totalChunks: number = 1;
+  public readonly totalChunks: number = 1;
 }
 
 @ApiTags('core')
@@ -80,7 +80,7 @@ class CreateChunksUploadTaskQuery {
 export class UploaderController {
   private context = AsunaContext.instance;
 
-  constructor(private readonly uploaderService: UploaderService) {}
+  public constructor(private readonly uploaderService: UploaderService) {}
 
   /**
    * 创建 chunk 上传任务
@@ -89,7 +89,7 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
-  createChunksUploadTask(
+  public createChunksUploadTask(
     @Query() query: CreateChunksUploadTaskQuery,
     @Req() req: AnyAuthRequest,
   ): Promise<OperationToken> {
@@ -110,7 +110,7 @@ export class UploaderController {
   @ApiQuery({ name: 'chunk', required: false, description: 'chunked upload file index' })
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks-stream')
-  async streamChunkedUploader(
+  public async streamChunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: string,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
@@ -131,7 +131,7 @@ export class UploaderController {
     });
 
     const { token } = req;
-    return this.uploaderService.uploadChunks(token, filename, tempFile, +chunk);
+    return this.uploaderService.uploadChunks(token, filename, tempFile, Number(chunk));
   }
 
   /**
@@ -148,7 +148,7 @@ export class UploaderController {
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
   @UseInterceptors(FileInterceptor('file', fileInterceptorOptions))
-  async chunkedUploader(
+  public async chunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
@@ -167,7 +167,7 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  async mergeChunks(
+  public async mergeChunks(
     @Query('filename') filename: string,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
   ): Promise<RemoteFileInfo> {
@@ -197,7 +197,7 @@ export class UploaderController {
     // new FastifyFileInterceptor('files'),
     FilesInterceptor('files', configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3), fileInterceptorOptions),
   )
-  async uploader(
+  public async uploader(
     @Query('bucket') bucket = '',
     @Query('prefix') prefix = '',
     @Query('local') local: string, // 是否使用本地存储
@@ -223,7 +223,7 @@ export class UploaderController {
    */
   // @UseGuards(AnyAuthGuard)
   @Post('stream')
-  async streamUpload(
+  public async streamUpload(
     @Query('bucket') bucket = '',
     @Query('prefix') prefix = '',
     @Query('filename') filename: string,

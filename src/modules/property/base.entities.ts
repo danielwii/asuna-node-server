@@ -5,23 +5,23 @@ import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 export class AbstractTransactionEntity extends AbstractBaseEntity {
   @Column({ nullable: false, name: 'change' })
-  change: number;
+  public change: number;
 
   @Column('varchar', { nullable: false, length: 50, name: 'type' })
-  type: string;
+  public type: string;
 
   @Column({ nullable: false, name: 'before' })
-  before: number;
+  public before: number;
 
   @Column({ nullable: false, name: 'after' })
-  after: number;
+  public after: number;
 
   @Column({ nullable: true, name: 'ref_id' })
-  refId?: string;
+  public refId?: string;
 
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'extra' })
-  extra?: JsonMap;
+  public extra?: JsonMap;
 
   @Column('text', { nullable: true, name: 'remark' })
-  remark?: string;
+  public remark?: string;
 }

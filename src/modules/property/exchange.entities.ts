@@ -14,18 +14,18 @@ import {
 export class ExchangeObject extends Publishable(AbstractNameEntity) {
   @MetaInfo({ name: 'Key' })
   @Column({ nullable: false, unique: true, length: 50, name: 'key' })
-  key: string;
+  public key: string;
 
   @MetaInfo({ name: '类型', type: 'Enum', enumData: ExchangeCurrencyEnumValue.data })
   @Column('varchar', { nullable: false })
-  type: ExchangeCurrencyType;
+  public type: ExchangeCurrencyType;
 
   @MetaInfo({ name: '价格' })
   @Column({ ...ColumnTypeHelper.money(), nullable: false, name: 'price' })
-  price: number;
+  public price: number;
 
   @Column({ nullable: false })
-  value: string;
+  public value: string;
 
   // --------------------------------------------------------------
   // Optional
@@ -33,11 +33,11 @@ export class ExchangeObject extends Publishable(AbstractNameEntity) {
 
   @MetaInfo({ type: 'Image' })
   @Column({ nullable: true, length: 1000, name: 'cover' })
-  cover: string;
+  public cover: string;
 
   @MetaInfo({ type: 'EditableEnum', enumData: ExchangeObjectUsageEnumValue.data })
   @Column('varchar', { nullable: true })
-  usage: ExchangeObjectUsageType;
+  public usage: ExchangeObjectUsageType;
 
   // --------------------------------------------------------------
   // Status

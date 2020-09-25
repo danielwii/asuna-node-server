@@ -17,34 +17,34 @@ export const HermesExchangeEventKeys = {
 @EntityMetaInfo({ name: 'wallets', internal: true })
 @Entity('property__t_wallets')
 export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
-  constructor(o: EntityConstructorObject<Wallet>) {
+  public constructor(o: EntityConstructorObject<Wallet>) {
     super();
     Object.assign(this, deserializeSafely(Wallet, o));
   }
 
   @MetaInfo({ name: '余额' })
   @Column({ nullable: false })
-  balance: number;
+  public balance: number;
 
   @MetaInfo({ name: '可用额度' })
   @Column({ nullable: false })
-  available: number;
+  public available: number;
 
   @MetaInfo({ name: '冻结额度' })
   @Column({ nullable: false })
-  frozen: number;
+  public frozen: number;
 
   @MetaInfo({ name: '提款额' })
   @Column({ nullable: false })
-  withdrawals: number;
+  public withdrawals: number;
 
   @MetaInfo({ name: '积分' })
   @Column({ nullable: false })
-  points: number;
+  public points: number;
 
   @MetaInfo({ name: '总充值' })
   @Column({ nullable: false, name: 'total_recharge', default: -1 })
-  totalRecharge: number;
+  public totalRecharge: number;
 
   // --------------------------------------------------------------
   // Relations
@@ -60,7 +60,7 @@ export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
 @EntityMetaInfo({ name: 'financial_transactions', internal: true })
 @Entity('property__t_financial_transactions')
 export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransactionEntity) {
-  constructor(o: EntityConstructorObject<FinancialTransaction>) {
+  public constructor(o: EntityConstructorObject<FinancialTransaction>) {
     super();
     Object.assign(this, deserializeSafely(FinancialTransaction, o));
   }
@@ -71,7 +71,7 @@ export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransac
 
   @ManyToOne('ExchangeObject')
   @JoinColumn({ name: 'exchange_object__id' })
-  exchangeObject?: ExchangeObject;
+  public exchangeObject?: ExchangeObject;
 
   /*
   @MetaInfo({ accessible: 'hidden' })

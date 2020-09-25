@@ -28,7 +28,6 @@ import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find
 import './typeorm.fixture';
-import { MQConfigObject } from './modules/providers';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -195,7 +194,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   );
   app.use(compression());
   app.use(responseTime());
-  if (configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT_ENABLED))
+  if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED))
     app.use(
       rateLimit({
         windowMs: 60 * 1e3, // 1 minute(s)

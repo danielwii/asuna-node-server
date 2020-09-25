@@ -2,12 +2,12 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Promise } from 'bluebird';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
-import { InMemoryDB } from '../cache/db';
-import { JwtAuthRequest } from '../core/auth/auth.guard';
-import { AsunaErrorCode, AsunaException } from './exceptions';
-import { r } from './helpers';
-import { PrimaryKey } from './identifier';
-import { LoggerFactory } from './logger';
+import { InMemoryDB } from '../../cache/db';
+import { JwtAuthRequest } from '../../core/auth/auth.guard';
+import { AsunaErrorCode, AsunaException } from '../exceptions';
+import { r } from '../helpers';
+import { PrimaryKey } from '../identifier';
+import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('ActionGuard');
 
@@ -43,7 +43,7 @@ class ActionHelper {
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
     const calcKey = { prefix: 'action', key };
     const exists = await InMemoryDB.get(calcKey);
-    logger.log(`action ${r({ exists, actionStr, key })}`);
+    logger.log(`action ${r({ exists, actionStr, calcKey })}`);
     if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }

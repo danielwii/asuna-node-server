@@ -1,3 +1,3 @@
 export class UploaderConfig {
-  static uploadPath: string;
+  public static uploadPath: string;
 }

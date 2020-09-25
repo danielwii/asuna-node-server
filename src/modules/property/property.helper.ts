@@ -3,52 +3,49 @@ import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { deserializeSafely } from '../common/helpers';
 import { LoggerFactory } from '../common/logger/factory';
-import { HermesAuthEventKeys, UserProfile } from '../core/auth';
+import { UserProfile } from '../core/auth';
 import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
-import { HermesUserEventKeys } from './points.entities';
 
 export class TopUpPayload {
   @IsString()
-  type: FinancialTransactionEventKey;
+  public type: FinancialTransactionEventKey;
 
   @IsString()
-  profileId: string;
+  public profileId: string;
 
   @IsInt()
   // @Min(1) // must gt 0
-  amount: number;
+  public amount: number;
 
   @IsString()
   @IsOptional()
-  remark?: string;
+  public remark?: string;
 
   @IsBoolean()
   @IsOptional()
-  rebate?: boolean;
+  public rebate?: boolean;
 
-  constructor(o: TopUpPayload) {
+  public constructor(o: TopUpPayload) {
     Object.assign(this, deserializeSafely(TopUpPayload, o));
   }
 }
 
 export class ExchangePayload {
   @IsString()
-  key: string; // key of ExchangeObject
+  public key: string; // key of ExchangeObject
 
   @IsString()
-  profileId: string;
+  public profileId: string;
 
   // 相关资源 id
   @IsString()
-  refId: string;
+  public refId: string;
 
-  constructor(o: ExchangePayload) {
+  public constructor(o: ExchangePayload) {
     Object.assign(this, deserializeSafely(ExchangePayload, o));
   }
 }
-
-export type HermesEventKey = keyof typeof HermesAuthEventKeys | keyof typeof HermesUserEventKeys;
 
 const logger = LoggerFactory.getLogger('PropertyHelper');
 
