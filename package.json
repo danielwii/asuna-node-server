@@ -116,7 +116,7 @@
     "rxjs": "^6.6.3",
     "sharp": "^0.26.1",
     "shortid": "^2.2.15",
-    "snyk": "^1.400.0",
+    "snyk": "^1.401.0",
     "socket.io": "^2.3.0",
     "socket.io-redis": "^5.4.0",
     "swagger-ui-express": "^4.1.4",
