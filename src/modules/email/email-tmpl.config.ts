@@ -6,11 +6,11 @@ export const EmailTmplConfigKeys = {
 };
 
 export class EmailTmplConfigObject {
-  static logger = LoggerFactory.getLogger('EmailTmplConfigObject');
+  private static logger = LoggerFactory.getLogger('EmailTmplConfigObject');
 
-  templates: Record<'key', string>[];
+  public templates: Record<'key', string>[];
 
-  constructor(o: Partial<EmailTmplConfigObject>) {
+  public constructor(o: Partial<EmailTmplConfigObject>) {
     Object.assign(this, plainToClass(EmailTmplConfigObject, o, { enableImplicitConversion: true }));
   }
 }

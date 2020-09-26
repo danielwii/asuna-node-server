@@ -10,26 +10,26 @@ const logger = LoggerFactory.getLogger('EmailController');
 
 class MailBody {
   @IsArray({ always: false })
-  to: string[];
+  public to: string[];
 
-  cc: string[];
+  public cc: string[];
 
-  bcc: string[];
-
-  @IsString()
-  subject: string;
+  public bcc: string[];
 
   @IsString()
-  content: string;
+  public subject: string;
 
-  attachments: MailAttachment[];
+  @IsString()
+  public content: string;
+
+  public attachments: MailAttachment[];
 }
 
 @ApiTags('core')
 @Controller('api/email')
 export class EmailController {
   @Post()
-  send(@Body() body: MailBody): void {
+  public send(@Body() body: MailBody): void {
     logger.log(`send ${r(body)}`);
 
     EmailHelper.send(body)

@@ -26,20 +26,20 @@ const env = process.env.ENV;
 const TIME_INTERVAL = 2000;
 
 export class EmailHelper {
-  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'config' };
-  static tmplKvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'templates' };
+  public static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'config' };
+  public static tmplKvDef: KvDef = { collection: AsunaCollections.SYSTEM_EMAIL, key: 'templates' };
 
-  static async getConfig(): Promise<EmailConfigObject> {
+  public static async getConfig(): Promise<EmailConfigObject> {
     const kv = await KvHelper.get(this.kvDef);
     const configObject = new EmailConfigObject(await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys));
     return !_.isEmpty(kv) ? configObject : EmailConfigObject.load();
   }
 
-  static async getTmplConfig(): Promise<EmailTmplConfigObject> {
+  public static async getTmplConfig(): Promise<EmailTmplConfigObject> {
     return new EmailTmplConfigObject(await KvHelper.getConfigsByEnumKeys(this.tmplKvDef, EmailTmplConfigKeys));
   }
 
-  static sender = new Subject<{ email: MailInfo; cb: (info: MailInfo) => void }>();
+  public static sender = new Subject<{ email: MailInfo; cb: (info: MailInfo) => void }>();
 
   private static sender$ = new Observable<{ email: MailInfo; cb: (info: MailInfo) => void }>((fn) =>
     EmailHelper.sender.subscribe(fn),
@@ -52,7 +52,7 @@ export class EmailHelper {
   private static transporter: Transporter;
   private static emailTemplate: EmailTemplate;
 
-  static async init(): Promise<void> {
+  public static async init(): Promise<void> {
     const config = await this.getConfig();
 
     if (config.enable) {
@@ -87,7 +87,7 @@ export class EmailHelper {
     logger.log(`initialized done ...`);
   }
 
-  static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
+  public static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
     logger.debug(`send ${r(_.omit(mailInfo, 'content'))}`);
     const { to, cc, bcc, subject, content, attachments } = mailInfo;
     const { from } = await this.getConfig();
@@ -117,7 +117,7 @@ export class EmailHelper {
     return EmailHelper.transporter.sendMail(mailOptions);
   }
 
-  static async sendByTemplateKey(
+  public static async sendByTemplateKey(
     key: string,
     { to, attachments, context }: { to: string[]; attachments?: Attachment[]; context?: Record<string, string> },
   ): Promise<MailInfo> {
@@ -137,7 +137,7 @@ export class EmailHelper {
     });
   }
 
-  static async sendByTemplate(
+  public static async sendByTemplate(
     template: string,
     data,
     { to, cc, bcc, subject, content, attachments }: MailInfo,

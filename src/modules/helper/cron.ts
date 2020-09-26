@@ -19,14 +19,14 @@ const logger = LoggerFactory.getLogger('CronHelper');
 export class CronHelper {
   private static readonly redis = RedisLockProvider.instance;
 
-  static crons = {};
+  public static crons = {};
 
-  static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
+  public static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
     const next = cronParser.parseExpression(cronTime).next().toDate();
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
   }
 
-  static reg<Value extends any>(
+  public static reg<Value extends any>(
     operation: string,
     cronTime: string,
     handler: () => Promise<StatsResult<Value> | any>,

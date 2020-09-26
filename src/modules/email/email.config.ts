@@ -16,37 +16,45 @@ export enum EmailConfigKeys {
 }
 
 export class EmailConfigObject {
-  static logger = LoggerFactory.getLogger('EmailConfigObject');
-  static key = YamlConfigKeys.email;
-  static prefix = `${EmailConfigObject.key}_`;
+  public static logger = LoggerFactory.getLogger('EmailConfigObject');
+  public static key = YamlConfigKeys.email;
+  public static prefix = `${EmailConfigObject.key}_`;
 
-  enable: boolean;
-  host: string;
-  port: number;
-  ssl: boolean;
-  username: string;
-  from: string;
-  interval: number;
+  public enable: boolean;
+  public host: string;
+  public port: number;
+  public ssl: boolean;
+  public username: string;
+  public from: string;
+  public interval: number;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
   @Transform((value) => !!value, { toPlainOnly: true })
-  password: string;
+  public password: string;
 
-  constructor(o: Partial<EmailConfigObject>) {
+  public constructor(o: Partial<EmailConfigObject>) {
     Object.assign(this, plainToClass(EmailConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load = (): EmailConfigObject =>
+  public static load = (): EmailConfigObject =>
     withP3(
       EmailConfigObject.prefix,
       configLoader.loadConfig(EmailConfigObject.key),
       EmailConfigKeys,
       (prefix, config, keys) =>
         new EmailConfigObject({
-          enable: withP(keys.enable, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false)),
-          host: withP(keys.host, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 'localhost')),
-          port: withP(keys.port, (p) => configLoader.loadNumericConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 465)),
-          ssl: withP(keys.ssl, (p) => configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false)),
+          enable: withP(keys.enable, (p) =>
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
+          ),
+          host: withP(keys.host, (p) =>
+            configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 'localhost'),
+          ),
+          port: withP(keys.port, (p) =>
+            configLoader.loadNumericConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 465),
+          ),
+          ssl: withP(keys.ssl, (p) =>
+            configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
+          ),
           username: withP(keys.username, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           password: withP(keys.password, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           interval: withP(keys.interval, (p) =>

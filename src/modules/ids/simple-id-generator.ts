@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-bitwise */
 import { oneLineTrim } from 'common-tags';
 
 /**
@@ -20,7 +18,7 @@ export class SimpleDistributedIdGenerator {
   private readonly workerShift: number = this.sequenceBits;
   private readonly timestampShift: number = this.workerBits + this.workerShift;
 
-  constructor(workerId: number = 0) {
+  public constructor(workerId = 0) {
     if (workerId < 0 || workerId > ~(-1 << this.workerBits)) {
       throw new Error(`worker id must in [0, ${~(-1 << this.workerBits)}]`);
     }
@@ -57,11 +55,11 @@ export class SimpleIdGenerator {
   private static startEpoch = 1_546_300_800_000; // 2019/1/1
   private readonly workerId: number;
 
-  constructor(private readonly prefix: string = '', workerId: number = 0) {
+  public constructor(private readonly prefix: string = '', workerId = 0) {
     this.workerId = Math.abs(workerId) % 10;
   }
 
-  nextId(): string {
+  public nextId(): string {
     return oneLineTrim`
       ${this.prefix}
       ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
@@ -70,7 +68,7 @@ export class SimpleIdGenerator {
     `;
   }
 
-  static nextId(prefix?: string, workerId?: number): string {
+  public static nextId(prefix?: string, workerId?: number): string {
     return oneLineTrim`
       ${prefix}
       ${(Date.now() - SimpleIdGenerator.startEpoch).toString().slice(0, 7)}
@@ -81,13 +79,13 @@ export class SimpleIdGenerator {
 }
 
 export class SimpleIdGeneratorHelper {
-  static registeredTypes: { [key: string]: string } = {};
+  public static registeredTypes: { [key: string]: string } = {};
 
-  static nextId(prefix?: string, workerId?: number): string {
+  public static nextId(prefix?: string, workerId?: number): string {
     return SimpleIdGenerator.nextId(prefix, workerId);
   }
 
-  static nextIdByType(type: string, workerId?: number): string {
+  public static nextIdByType(type: string, workerId?: number): string {
     return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
   }
 }

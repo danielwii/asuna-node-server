@@ -30,7 +30,7 @@ export class LifecycleRegister {
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   public static async onInit(app: NestExpressApplication): Promise<void> {
     const config = SentryConfigObject.load();
-    logger.debug(`[onInit] ... ${r(config)}`);
+    logger.log(`[onInit] ... ${r(config)}`);
     if (config.enable) {
       const { dsn } = config;
       logger.debug(`[onInit] sentry ... ${dsn}`);
@@ -46,19 +46,19 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       });
 */
     }
-    logger.debug(`[onInit] done`);
+    logger.log(`[onInit] done`);
   }
 
   public static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
-    logger.debug(`[beforeBootstrap] ...`);
+    logger.log(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
       await handler?.beforeBootstrap?.(app);
     }
-    logger.debug(`[beforeBootstrap] done`);
+    logger.log(`[beforeBootstrap] done`);
   }
 
   public static async onAppStartListening(app: NestExpressApplication): Promise<void> {
-    logger.debug(`[onAppStartListening] ...`);
+    logger.log(`[onAppStartListening] ...`);
 
     logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.instance.clients, fp.omit('client')))}`);
     logger.debug(`inspect crons: ${r(CronHelper.crons)}`);
@@ -69,18 +69,19 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     for (const handler of LifecycleRegister.handlers) {
       await handler?.appStarted?.();
     }
+    logger.log(`[onAppStartListening] done`);
   }
 
   public async onApplicationBootstrap(): Promise<void> {
-    logger.debug(`[onApplicationBootstrap] ...`);
-    logger.debug(`[onApplicationBootstrap] done`);
+    logger.log(`[onApplicationBootstrap] ...`);
+    logger.log(`[onApplicationBootstrap] done`);
   }
 
   public async beforeApplicationShutdown(signal?: string): Promise<void> {
-    logger.debug(`[beforeApplicationShutdown] ... signal: ${signal}`);
+    logger.log(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
 
   public async onApplicationShutdown(signal?: string): Promise<void> {
-    logger.debug(`[onApplicationShutdown] ... signal: ${signal}`);
+    logger.log(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }

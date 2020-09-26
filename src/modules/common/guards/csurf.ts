@@ -16,7 +16,13 @@ export class CsurfGuard implements CanActivate {
     const res = context.switchToHttp().getResponse<Response>();
     const next = context.switchToHttp().getNext();
 
-    const token = req.query._csurf;
+    const token =
+      req.body._csurf ??
+      req.query._csurf ??
+      req.headers['csrf-token'] ??
+      req.headers['xsrf-token'] ??
+      req.headers['x-csrf-token'] ??
+      req.headers['x-xsrf-token'];
     logger.log(`check url: ${req.url} - ${token}`);
 
     const calcKey: CacheKey = { prefix: 'csurf', key: token };

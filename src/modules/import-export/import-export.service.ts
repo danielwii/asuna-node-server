@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { read, utils, write } from 'xlsx';
+import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
-import { r } from '../common/helpers';
 
 const logger = LoggerFactory.getLogger('ImportExportService');
 
@@ -42,7 +42,7 @@ export class ImportExportService {
   }
 
   // 导入Excel
-  async importExcel(fileBuffer: any, modelName: string) {
+  public async importExcel(fileBuffer: any, modelName: string) {
     const workbook = read(fileBuffer, {});
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonArray = utils.sheet_to_json(worksheet, { header: 1 });

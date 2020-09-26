@@ -1,6 +1,6 @@
 import * as AliPopCore from '@alicloud/pop-core';
 import * as Chance from 'chance';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { InMemoryDB } from '../cache';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -51,6 +51,7 @@ export class AliyunSMSAdapter implements SMSAdapter {
   }
 
   public getTmplId(type: 'verify-code'): string {
+    logger.debug(`getTmplId ${r({ templates: this.config.templates, type })}`);
     return _.get(this.config.templates, type);
   }
 }
