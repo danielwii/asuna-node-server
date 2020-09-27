@@ -59,6 +59,10 @@ sms:
       "SignName": "xxx", //
       "RegionId": "xxx"
     }
+  verify_code_checks:
+    force_all: false
+    locations:
+      payment_order: false
 
 # -- sentry --
 sentry:

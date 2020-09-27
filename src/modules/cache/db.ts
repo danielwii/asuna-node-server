@@ -83,6 +83,11 @@ export class InMemoryDB {
     return parseJSONIfCould(value);
   }
 
+  public static async has<Key extends string | CacheKey>(key: Key): Promise<boolean> {
+    const value = await this.get(key);
+    return !!value;
+  }
+
   public static async save<Key extends string | CacheKey, Value extends any>(
     key: Key,
     resolver: ((saved?) => Promise<Value> | Value) | Value,

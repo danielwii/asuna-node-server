@@ -13,12 +13,12 @@ const logger = LoggerFactory.getLogger('CsurfGuard');
 export class CsurfGuard implements CanActivate {
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
-    const res = context.switchToHttp().getResponse<Response>();
-    const next = context.switchToHttp().getNext();
+    // const res = context.switchToHttp().getResponse<Response>();
+    // const next = context.switchToHttp().getNext();
 
     const token =
-      req.body._csurf ??
-      req.query._csurf ??
+      req.body.$csurf ??
+      req.query.$csurf ??
       req.headers['csrf-token'] ??
       req.headers['xsrf-token'] ??
       req.headers['x-csrf-token'] ??

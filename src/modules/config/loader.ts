@@ -9,13 +9,13 @@ const logger = LoggerFactory.getLogger('ConfigLoader');
  * all fields need null as default value to load all keys
  */
 export class AbstractConfigLoader<Config> {
-  constructor(o?: Config) {
-    Object.assign(this, deserializeSafely(this as any, o));
+  public constructor(o?: Omit<Config, 'fromConfigurator'>) {
+    Object.assign(this, deserializeSafely(this.constructor as any, o));
   }
 
-  fromConfigurator(): Config {
+  public fromConfigurator(): Config {
     Object.keys(this).forEach((key) => {
-      this[key] = configLoader.loadConfig(key, undefined, true);
+      this[key] = configLoader.loadConfig2(key, undefined, true);
     });
     return this as any;
   }

@@ -30,13 +30,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
     const res = context.switchToHttp().getResponse();
-    this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
         return undefined;
       }
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
     }
+    this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     await auth(req, res, 'client');
     return req.user;
   }
@@ -49,7 +49,7 @@ export class AnyAuthGuard implements CanActivate {
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();
-    const next = context.switchToHttp().getNext();
+    // const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res);

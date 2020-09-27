@@ -17,5 +17,6 @@ module.exports = {
     'max-params': 'off',
     // Use function hoisting to improve code readability
     '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/member-ordering': 'off',
   },
 };

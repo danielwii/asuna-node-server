@@ -7,6 +7,7 @@ import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
+import { SMSVerifyCodeGuard } from '../sms/guards';
 
 class CreateOrderDTO {
   @IsString()
@@ -46,7 +47,7 @@ export class PaymentController {
     return PaymentHelper.handleNotify(body?.id, data, isWxPay);
   }
 
-  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
+  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)
   @Post('order')
   public async createOrder(
     @Body() body: CreateOrderDTO,

@@ -26,6 +26,8 @@ export const AsunaErrorCode = {
   InvalidCredentials: new NameValue('Invalid Credentials', 401),
   InsufficientPermissions: new NameValue('Insufficient Permissions', 403),
   InvalidCsrfToken: new NameValue('Invalid CSRF Token', 403),
+  // InvalidVerifyToken: new NameValue('Invalid Verify Token', 403),
+  InvalidToken: new NameValue('Invalid Token', 403),
   NotFound: new NameValue('Not Found', 404),
   Conflict: new NameValue('Conflict', 409),
   Duplicate: new NameValue('Duplicate', 409),
@@ -99,6 +101,8 @@ export enum AsunaExceptionTypes {
   ResourceLimit = 'ResourceLimit',
   InvalidAccount = 'InvalidAccount',
   AccountExists = 'AccountExists',
+  BadRequest = 'BadRequest',
+  InvalidToken = 'InvalidToken',
   FormatError = 'FormatError',
   Upload = 'Upload',
 }
@@ -173,6 +177,18 @@ export class AsunaExceptionHelper {
       nameValue: AsunaErrorCode.Unprocessable,
       message: () => `format error`,
       localMessage: () => '格式错误',
+    },
+    [AsunaExceptionTypes.BadRequest]: {
+      code: 'E04003',
+      nameValue: AsunaErrorCode.BadRequest,
+      message: (message: string) => `bad request: ${message}`,
+      localMessage: (message: string) => `参数异常：${message}`,
+    },
+    [AsunaExceptionTypes.InvalidToken]: {
+      code: 'E04004',
+      nameValue: AsunaErrorCode.InvalidToken,
+      message: (message: string) => `invalid token: ${message}`,
+      localMessage: (message: string) => `无效的参数：${message}`,
     },
   };
 

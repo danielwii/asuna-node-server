@@ -1,7 +1,6 @@
-import { plainToClass } from 'class-transformer';
 import { parseJSONIfCould, withP, withP2 } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { configLoader, YamlConfigKeys } from '../config';
+import { AbstractConfigLoader, configLoader, YamlConfigKeys } from '../config';
 
 export enum SMSConfigKeys {
   enable = 'enable',
@@ -12,6 +11,7 @@ export enum SMSConfigKeys {
   // apiVersion = 'apiVersion',
   extra = 'extra',
   templates = 'templates',
+  verify_code_checks = 'verify_code_checks',
 }
 
 export interface AliSMSExtra {
@@ -19,10 +19,9 @@ export interface AliSMSExtra {
   SignName: string;
 }
 
-export class SMSConfigObject {
+export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
   private static logger = LoggerFactory.getLogger('SMSConfigObject');
   private static key = YamlConfigKeys.sms;
-  private static prefix = `${SMSConfigObject.key}_`;
 
   public enable: boolean;
   public provider: 'aliyun';
@@ -32,10 +31,7 @@ export class SMSConfigObject {
   // public apiVersion: string;
   public extra: AliSMSExtra;
   public templates: Record<'verify-code', string>;
-
-  public constructor(o: Partial<SMSConfigObject>) {
-    Object.assign(this, plainToClass(SMSConfigObject, o, { enableImplicitConversion: true }));
-  }
+  public verify_code_checks: { force_all: boolean; locations: Record<string, boolean> };
 
   public static load = (): SMSConfigObject =>
     withP2(
@@ -49,6 +45,7 @@ export class SMSConfigObject {
           accessKeySecret: withP(keys.accessKeySecret, loader),
           extra: withP(keys.extra, (p) => parseJSONIfCould(loader(p))),
           templates: withP(keys.templates, (p) => parseJSONIfCould(loader(p))),
+          verify_code_checks: withP(keys.verify_code_checks, (p) => parseJSONIfCould(loader(p))),
         }),
     );
 }

@@ -85,6 +85,10 @@ export class SMSHelper {
     return this.sendSMS(id, phoneNumber, { code });
   }
 
+  public static async checkVerifyCode(code: string): Promise<boolean> {
+    return InMemoryDB.has({ prefix: 'verify-code', key: code });
+  }
+
   public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<void> {
     return this.adapter.send(id, phoneNumber, tmplData);
   }

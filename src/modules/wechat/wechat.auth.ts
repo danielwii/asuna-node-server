@@ -21,7 +21,7 @@ export class WXAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<WXAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();
-    const next = context.switchToHttp().getNext();
+    // const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
     const result = await auth(req, res, 'client');
