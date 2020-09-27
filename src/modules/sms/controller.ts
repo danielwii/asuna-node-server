@@ -17,6 +17,6 @@ export class SMSController {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.FormatError);
     }
     logger.log(`sendVerifyCode ${r({ ..._.pick(req, 'sessionId', 'payload.id'), body })}`);
-    return SMSHelper.sendVerifyCode(req, body.phoneNumber);
+    await SMSHelper.sendVerifyCode(req, body.phoneNumber);
   }
 }

@@ -11,23 +11,23 @@ const logger = LoggerFactory.getLogger('LoggerInterceptor');
 
 export class LoggerInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
-    let request = context.switchToHttp().getRequest<Request>();
-    if (!request) {
-      request = GqlExecutionContext.create(context).getContext().req;
+    let req = context.switchToHttp().getRequest<Request>();
+    if (!req) {
+      req = GqlExecutionContext.create(context).getContext().req;
     }
     const info = {
-      path: request.url,
-      body: request.body,
-      query: request.query,
-      params: request.params,
-      headers: request.headers,
+      path: req.url,
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      headers: req.headers,
       /*
-      raw: request.raw,
-      id: request.id,
+      raw: req.raw,
+      id: req.id,
       */
-      ip: request.ip,
-      ips: request.ips,
-      hostname: request.hostname,
+      ip: req.ip,
+      ips: req.ips,
+      hostname: req.hostname,
     };
 
     const TAG = `${context.getClass().name}.${context.getHandler().name}`;

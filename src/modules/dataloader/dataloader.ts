@@ -64,7 +64,7 @@ export const dataLoaderCleaner = {
     logger.debug(`remove loader cache ... ${segment}-${id}`);
     const key = `${segment}-${id}`;
     cacheMap.delete(key);
-    redisLoader?.clear(key);
+    redisLoader?.clearAllLocal(key);
   },
 };
 
@@ -108,7 +108,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
         cache: true,
         // if set redis keys will be set to expire after this many seconds
         // this may be useful as a fallback for a redis cache.
-        expire: 60 * 10,
+        expire: 60 * 2,
         // can include a custom serialization and deserialization for storage in redis.
         serialize: (o) => JSON.stringify(o) || '',
         deserialize: (s) => JSON.parse(s),

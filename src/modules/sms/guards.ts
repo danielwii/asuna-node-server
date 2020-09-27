@@ -6,6 +6,7 @@ import { CacheKey, InMemoryDB } from '../cache';
 import { r } from '../common/helpers';
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '../common';
 import { SMSConfigObject } from './config';
+import { SMSHelper } from './helper';
 
 export class SMSVerifyCodeGuard implements CanActivate {
   private logger = LoggerFactory.getLogger('SMSVerifyCodeGuard');
@@ -17,7 +18,7 @@ export class SMSVerifyCodeGuard implements CanActivate {
     // const next = context.switchToHttp().getNext();
 
     const enabled =
-      this.config.verify_code_checks.locations['payment_order'] || this.config.verify_code_checks.force_all;
+      this.config.verify_code_checks.locations?.['payment_order'] || this.config.verify_code_checks.force_all;
 
     if (!enabled) return true;
 
@@ -29,14 +30,11 @@ export class SMSVerifyCodeGuard implements CanActivate {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidToken, ['验证码错误']);
     }
 
-    const calcKey: CacheKey = { prefix: 'verify-code', key: token };
-    const exists = await InMemoryDB.get(calcKey);
-    this.logger.log(`verify-code ${r({ exists, calcKey })}`);
+    const exists = await SMSHelper.redeemVerifyCode(req, token);
     if (!exists) {
       // throw new AsunaException(AsunaErrorCode.InvalidVerifyToken);
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidToken, ['验证码无效']);
     }
-    InMemoryDB.clear(calcKey).catch((reason) => this.logger.error(reason));
 
     return true;
   }

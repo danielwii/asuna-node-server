@@ -12,7 +12,7 @@ const logger = LoggerFactory.getLogger('SMSHelper');
 const chance = new Chance();
 
 export interface SMSAdapter {
-  send: (id: string, phoneNumber: string, tmplData: Record<string, unknown>) => Promise<void>;
+  send: (id: string, phoneNumber: string, tmplData: Record<string, unknown>) => Promise<boolean>;
   getTmplId: (type: 'verify-code') => string;
 }
 
@@ -38,7 +38,7 @@ export class AliyunSMSAdapter implements SMSAdapter {
     });
   }
 
-  public send(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<void> {
+  public async send(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<boolean> {
     const params: AliSendSMSParams = {
       RegionId: this.config.extra?.RegionId,
       PhoneNumbers: phoneNumber,
@@ -47,7 +47,10 @@ export class AliyunSMSAdapter implements SMSAdapter {
       TemplateParam: JSON.stringify(tmplData),
     };
     logger.log(`[Aliyun] send ${r(params)}`);
-    return this.client.request('SendSms', params, { method: 'POST' });
+    // const res: any = await this.client.request('SendSms', params, { method: 'POST' });
+    // logger.log(`[Aliyun] sent response is ${r(res)}`);
+    // return res.status === 201;
+    return true;
   }
 
   public getTmplId(type: 'verify-code'): string {
@@ -76,20 +79,28 @@ export class SMSHelper {
 
   public static generateVerifyCode(key: string): Promise<string> {
     const code = chance.string({ length: 6, pool: '1234567890' });
-    return InMemoryDB.save({ prefix: 'verify-code', key }, code, { expiresInSeconds: 56 });
+    const calcKey = { prefix: 'verify-code', key: code };
+    logger.log(`generate verify-code ${r({ calcKey, code })}`);
+    return InMemoryDB.save(calcKey, code, { expiresInSeconds: 56 });
   }
 
-  public static async sendVerifyCode(req: RequestInfo, phoneNumber: string): Promise<void> {
+  public static async sendVerifyCode(req: RequestInfo, phoneNumber: string): Promise<string> {
     const code = await this.generateVerifyCode(req.sessionID);
     const id = this.adapter.getTmplId('verify-code');
-    return this.sendSMS(id, phoneNumber, { code });
+    await this.sendSMS(id, phoneNumber, { code });
+    return code;
   }
 
-  public static async checkVerifyCode(code: string): Promise<boolean> {
-    return InMemoryDB.has({ prefix: 'verify-code', key: code });
+  public static async redeemVerifyCode(req: RequestInfo, code: string): Promise<boolean> {
+    const calcKey = { prefix: 'verify-code', key: code };
+    const exists = await InMemoryDB.get(calcKey);
+    const validated = exists === code;
+    InMemoryDB.clear(calcKey).catch((reason) => logger.error(reason));
+    logger.log(`check verify-code ${r({ calcKey, code, exists, validated })}`);
+    return validated;
   }
 
-  public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<void> {
+  public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<boolean> {
     return this.adapter.send(id, phoneNumber, tmplData);
   }
 }

@@ -3,11 +3,11 @@ import { Promise } from 'bluebird';
 import * as R from 'ramda';
 import { r } from '../../common/helpers';
 import { GraphqlHelper, QueryResolver } from '../../graphql';
-import { NotificationType } from './enum-values';
 import { Notification } from './notification.entities';
 import { MixedNotification, NotificationHelper } from './notification.helper';
 import { LoggerFactory } from '../../common/logger';
 
+import type { NotificationType } from './enum-values';
 import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader';
 
 @Resolver()

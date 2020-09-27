@@ -45,7 +45,7 @@ export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
           accessKeySecret: withP(keys.accessKeySecret, loader),
           extra: withP(keys.extra, (p) => parseJSONIfCould(loader(p))),
           templates: withP(keys.templates, (p) => parseJSONIfCould(loader(p))),
-          verify_code_checks: withP(keys.verify_code_checks, (p) => parseJSONIfCould(loader(p))),
+          verify_code_checks: withP(keys.verify_code_checks, (p) => parseJSONIfCould(loader(p))) ?? {},
         }),
     );
 }
