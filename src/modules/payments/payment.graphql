@@ -65,6 +65,7 @@ type APICursoredPaymentOrder implements CursoredQuery {
 extend type Query {
   api_payment_methods: [PaymentMethod]
 
+  api_payment_item(id: String): PaymentItem
   api_paged_payment_items(pageRequest: PageRequest): APIPagedPaymentItem
 
   admin_paged_payment_orders(cursoredRequest: CursoredRequest): APICursoredPaymentOrder

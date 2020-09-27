@@ -113,7 +113,7 @@ export class GraphqlHelper {
     relationPath,
   }: {
     cls: ClassType<Entity>;
-    query: QueryConditionInput;
+    query: ExclusiveQueryConditionInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
     relationPath?: string;
     info?: GraphQLResolveInfo;
