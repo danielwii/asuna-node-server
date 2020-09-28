@@ -7,13 +7,13 @@ import { LoggerFactory } from '../../common/logger';
 const logger = LoggerFactory.getLogger('DBCacheCleaner');
 
 export class DBCacheCleaner {
-  static registers: { Entity: typeof BaseEntity; trigger: string }[] = [];
+  public static registers: { Entity: typeof BaseEntity; trigger: string }[] = [];
 
-  static regTrigger(Entity: typeof BaseEntity, trigger: string): void {
+  public static regTrigger(Entity: typeof BaseEntity, trigger: string): void {
     this.registers.push({ Entity, trigger });
   }
 
-  static clear(name: string): void {
+  public static clear(name: string): void {
     const triggers = _.flow([fp.filter(({ Entity }) => Entity.name === name), fp.map(fp.get('trigger'))])(
       this.registers,
     );
