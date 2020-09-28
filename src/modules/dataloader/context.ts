@@ -4,7 +4,7 @@ import { Notification } from '../content/notification';
 import { UserProfile } from '../core/auth';
 import { UserActivity } from '../core/interaction';
 import { KeyValuePair } from '../core/kv/kv.entities';
-import { PaymentItem, PaymentMethod } from '../payments';
+import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from '../payments';
 import { WXMiniAppUserInfo } from '../wechat';
 import { DataLoaderFunction, loader } from './dataloader';
 import { KeyValueModel } from '../core/kv/kv.isolated.entities';
@@ -17,6 +17,8 @@ export interface DefaultRegisteredLoaders {
   appInfos: DataLoaderFunction<AppInfo>;
   paymentMethods: DataLoaderFunction<PaymentMethod>;
   paymentItems: DataLoaderFunction<PaymentItem>;
+  paymentOrders: DataLoaderFunction<PaymentOrder>;
+  paymentTransactions: DataLoaderFunction<PaymentTransaction>;
   feedback: DataLoaderFunction<Feedback>;
   feedbackReplies: DataLoaderFunction<FeedbackReply>;
   userActivities: DataLoaderFunction<UserActivity>;
@@ -31,6 +33,8 @@ export const defaultDataLoaders = {
   appInfos: loader<AppInfo>(AppInfo, { isPublished: true }),
   paymentMethods: loader<PaymentMethod>(PaymentMethod, { isPublished: true }),
   paymentItems: loader<PaymentItem>(PaymentItem, { isPublished: true }),
+  paymentOrders: loader<PaymentOrder>(PaymentOrder),
+  paymentTransactions: loader<PaymentTransaction>(PaymentTransaction),
   feedback: loader<Feedback>(Feedback),
   feedbackReplies: loader<FeedbackReply>(FeedbackReply),
   userActivities: loader<UserActivity>(UserActivity),
