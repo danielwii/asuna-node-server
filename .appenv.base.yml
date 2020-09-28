@@ -53,6 +53,7 @@ graphql:
 # -- sms --
 sms:
   enable: false
+  fake_mode: true
   provider: aliyun
   extra: |
     {

@@ -12,6 +12,7 @@ export enum SMSConfigKeys {
   extra = 'extra',
   templates = 'templates',
   verify_code_checks = 'verify_code_checks',
+  fake_mode = 'fake_mode',
 }
 
 export interface AliSMSExtra {
@@ -27,6 +28,7 @@ export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
   public provider: 'aliyun';
   public accessKeyId: string;
   public accessKeySecret: string;
+  public fakeMode: boolean;
   // public endpoint: string;
   // public apiVersion: string;
   public extra: AliSMSExtra;
@@ -43,6 +45,7 @@ export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
           provider: withP(keys.provider, loader),
           accessKeyId: withP(keys.accessKeyId, loader),
           accessKeySecret: withP(keys.accessKeySecret, loader),
+          fakeMode: withP(keys.fake_mode, loader),
           extra: withP(keys.extra, (p) => parseJSONIfCould(loader(p))),
           templates: withP(keys.templates, (p) => parseJSONIfCould(loader(p))),
           verify_code_checks: withP(keys.verify_code_checks, (p) => parseJSONIfCould(loader(p))) ?? {},

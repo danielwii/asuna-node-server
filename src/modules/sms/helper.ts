@@ -46,11 +46,13 @@ export class AliyunSMSAdapter implements SMSAdapter {
       TemplateCode: id,
       TemplateParam: JSON.stringify(tmplData),
     };
-    logger.log(`[Aliyun] send ${r(params)}`);
-    // const res: any = await this.client.request('SendSms', params, { method: 'POST' });
-    // logger.log(`[Aliyun] sent response is ${r(res)}`);
-    // return res.status === 201;
-    return true;
+    logger.log(`[Aliyun] send ${r({ params, fakeMode: this.config.fakeMode })}`);
+
+    if (this.config.fakeMode) return true;
+
+    const res: any = await this.client.request('SendSms', params, { method: 'POST' });
+    logger.log(`[Aliyun] sent response is ${r(res)}`);
+    return res.status === 201;
   }
 
   public getTmplId(type: 'verify-code'): string {
