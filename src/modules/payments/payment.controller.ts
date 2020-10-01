@@ -67,7 +67,7 @@ export class PaymentController {
     if (_.isString(result) && isURL(result)) {
       res.redirect(result);
     } else {
-      res.send(result);
+      res.send({ result, order });
     }
   }
 
