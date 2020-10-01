@@ -96,7 +96,7 @@ export class SMSHelper {
   public static async redeemVerifyCode(req: RequestInfo, code: string): Promise<boolean> {
     const calcKey = { prefix: 'verify-code', key: code };
     const exists = await InMemoryDB.get(calcKey);
-    const validated = exists === code;
+    const validated = `${exists}` === `${code}`;
     InMemoryDB.clear(calcKey).catch((reason) => logger.error(reason));
     logger.log(`check verify-code ${r({ calcKey, code, exists, validated })}`);
     return validated;

@@ -53,7 +53,7 @@ graphql:
 # -- sms --
 sms:
   enable: false
-  fake_mode: true
+  fake_mode: false
   provider: aliyun
   extra: |
     {
@@ -61,7 +61,7 @@ sms:
       "RegionId": "xxx"
     }
   verify_code_checks:
-    force_all: false
+    force_all: true
     locations:
       payment_order: false
 
