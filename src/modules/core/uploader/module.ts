@@ -4,6 +4,7 @@ import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
 import { UploaderService } from './service';
+import { UploaderConfigObject } from './config';
 
 const logger = LoggerFactory.getLogger('UploaderModule');
 
@@ -13,8 +14,9 @@ const logger = LoggerFactory.getLogger('UploaderModule');
   exports: [UploaderService],
 })
 export class UploaderModule implements OnModuleInit {
-  onModuleInit(): void {
-    Hermes.subscribe(this.constructor.name, /^commands$/, event => {
+  public onModuleInit(): void {
+    logger.log(`init ${r(UploaderConfigObject.instance)}`);
+    Hermes.subscribe(this.constructor.name, /^commands$/, (event) => {
       logger.log(r(event));
     });
   }

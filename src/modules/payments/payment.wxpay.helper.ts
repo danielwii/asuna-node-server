@@ -9,6 +9,7 @@ import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { PaymentMethod } from './payment.entities';
+import { AppConfigObject } from '../config/app.config';
 
 const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
@@ -75,7 +76,7 @@ export class PaymentWxpayHelper {
     extra: { openid?: string } = {},
   ): Promise<string> {
     logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
-    const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
+    const MASTER_HOST = AppConfigObject.load().masterAddress;
     const notifyUrl = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
     if (_.isEmpty(notifyUrl)) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');

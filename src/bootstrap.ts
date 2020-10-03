@@ -26,6 +26,8 @@ import { LoggerConfigObject } from './modules/common/logger/config';
 import { ConfigKeys, configLoader } from './modules/config';
 import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
+import { FeaturesConfigObject } from './modules/config/features.config';
+import { AppConfigObject } from './modules/config/app.config';
 // add condition function in typeorm find
 import './typeorm.fixture';
 
@@ -74,6 +76,10 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ******${_.get(dbConfig, 'password').slice(-4)}`,
   );
 
+  const appSettings = AppConfigObject.load();
+  const features = FeaturesConfigObject.load();
+  logger.log(`load app settings ${r(appSettings)}`);
+  logger.log(`load features ${r(features)}`);
   logger.log(
     `init logger: ${r({
       config: LoggerConfigObject.load(),
@@ -204,7 +210,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     );
   app.use(morgan('combined'));
 
-  const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '20mb');
+  const limit = appSettings.payloadLimit;
   logger.log(`set json payload limit to ${limit}`);
   app.use(bodyParser.json({ limit }));
   app.use(bodyParser.urlencoded({ limit, extended: true }));
@@ -243,7 +249,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // Setup Swagger
   // --------------------------------------------------------------
 
-  if (configLoader.loadBoolConfig(ConfigKeys.SWAGGER)) {
+  if (features.swaggerEnable) {
     logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()
       .setTitle('API Server')

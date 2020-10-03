@@ -8,6 +8,7 @@ import { convertFilename, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 import { Global } from '../global';
+import { UploaderConfigObject } from '../uploader/config';
 import { MinioConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
@@ -15,10 +16,11 @@ const logger = LoggerFactory.getLogger('MinioStorage');
 
 export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;
+  private readonly config = UploaderConfigObject.load();
 
   private readonly configObject: MinioConfigObject;
 
-  constructor(configure: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
+  public constructor(configure: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
     this.defaultBucket = opts.defaultBucket || 'default';
     this.configObject = configure();
     if (this.configObject.enable !== true) {
@@ -32,7 +34,7 @@ export class MinioStorage implements IStorageEngine {
     logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject), opts })}`);
   }
 
-  get client(): minio.Client {
+  public get client(): minio.Client {
     return new minio.Client({
       endPoint: this.configObject.endpoint,
       port: this.configObject.port,
@@ -42,9 +44,9 @@ export class MinioStorage implements IStorageEngine {
     });
   }
 
-  resolveUrl(opts: ResolverOpts): Promise<string>;
-  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+  public async resolveUrl(opts: ResolverOpts): Promise<string>;
+  public async resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  public async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, resolver } = opts;
@@ -58,7 +60,7 @@ export class MinioStorage implements IStorageEngine {
     // return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }
 
-  async saveEntity(
+  public async saveEntity(
     file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
@@ -67,7 +69,7 @@ export class MinioStorage implements IStorageEngine {
     const region = opts.region || 'local';
     const items: minio.BucketItemFromList[] = await this.client.listBuckets();
     logger.log(`found buckets: ${r(items)} current is ${bucket}`);
-    if (!(items && items.find((item) => item.name === bucket))) {
+    if (!items?.find((item) => item.name === bucket)) {
       logger.log(`create bucket [${bucket}] for region [${region}]`);
       await this.client.makeBucket(bucket, region);
     }
@@ -126,11 +128,11 @@ export class MinioStorage implements IStorageEngine {
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
       filename,
-      fullpath: join(configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'), bucket, resolvedPrefix, filename),
+      fullpath: join(this.config.resourcePath, bucket, resolvedPrefix, filename),
     });
   }
 
-  listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+  public listEntities({ bucket, prefix }: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     const currentBucket = bucket || this.defaultBucket;
     return new Promise<SavedFile[]>((resolve) => {
       const savedFiles: SavedFile[] = [];
@@ -147,12 +149,7 @@ export class MinioStorage implements IStorageEngine {
             prefix,
             filename, // item.name 是包含 prefix 的完成名字
             mode: StorageMode.MINIO,
-            fullpath: join(
-              configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
-              currentBucket,
-              prefix,
-              filename,
-            ),
+            fullpath: join(this.config.resourcePath, currentBucket, prefix, filename),
           }),
         );
       });
@@ -160,7 +157,9 @@ export class MinioStorage implements IStorageEngine {
         logger.log('bucketStream on end');
         return resolve(
           savedFiles.sort(
-            (a, b) => +a.filename.slice(a.filename.lastIndexOf('.')) - +b.filename.slice(b.filename.lastIndexOf('.')),
+            (a, b) =>
+              Number(a.filename.slice(a.filename.lastIndexOf('.'))) -
+              Number(b.filename.slice(b.filename.lastIndexOf('.'))),
           ),
         );
       });
@@ -171,7 +170,7 @@ export class MinioStorage implements IStorageEngine {
     });
   }
 
-  getEntity(fileInfo: SavedFile, destDirectory?: string): Promise<string> {
+  public getEntity(fileInfo: SavedFile, destDirectory?: string): Promise<string> {
     const bucket = fileInfo.bucket || this.defaultBucket;
     const objectName = join(fileInfo.prefix, fileInfo.filename);
     const filepath = join(destDirectory || Global.tempPath, fileInfo.bucket, objectName);
@@ -179,7 +178,7 @@ export class MinioStorage implements IStorageEngine {
     return this.client.fGetObject(bucket, objectName, filepath).then(() => filepath);
   }
 
-  async removeEntities({
+  public async removeEntities({
     bucket,
     prefix,
     filename,

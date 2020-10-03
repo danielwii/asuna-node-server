@@ -5,11 +5,11 @@ import * as shortid from 'shortid';
 import { Connection, getManager } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { ConfigKeys, configLoader } from '../../config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
 import { RoleRepository } from './auth.repositories';
+import { AppConfigObject } from '../../config/app.config';
 
 const logger = LoggerFactory.getLogger('AdminAuthService');
 
@@ -17,12 +17,12 @@ const logger = LoggerFactory.getLogger('AdminAuthService');
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
   private readonly roleRepository: RoleRepository;
 
-  constructor(@InjectConnection() private readonly connection: Connection) {
+  public constructor(@InjectConnection() private readonly connection: Connection) {
     super(connection.getRepository<AdminUser>(AdminUser));
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
-  async createUser(username: string, email: string, password: string, roleNames?: string[]): Promise<AdminUser> {
+  public async createUser(username: string, email: string, password: string, roleNames?: string[]): Promise<AdminUser> {
     const { hash, salt } = PasswordHelper.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
 
@@ -42,9 +42,9 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
    * 如果没有则创建预设用户 admin@example.com - password
    * @returns {Promise<void>}
    */
-  async initSysAccount(): Promise<void> {
-    const email = configLoader.loadConfig(ConfigKeys.SYS_ADMIN_EMAIL, 'admin@example.com');
-    const password = configLoader.loadConfig(ConfigKeys.SYS_ADMIN_PASSWORD, shortid.generate());
+  public async initSysAccount(): Promise<void> {
+    const email = AppConfigObject.load().sysAdminEmail;
+    const password = AppConfigObject.load().sysAdminPassword ?? shortid.generate();
     const role = await this.roleRepository.findOne({ name: SYS_ROLE });
 
     if (!role) {
@@ -66,7 +66,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
       logger.log(`---------------------------------------------------------------`);
       logger.log(`create SYS_ADMIN account: ${email}:${password}`);
       logger.log(`---------------------------------------------------------------`);
-      this.createUser('Administrator', email, password, [SYS_ROLE]).catch(error => {
+      this.createUser('Administrator', email, password, [SYS_ROLE]).catch((error) => {
         logger.warn('cannot create default SYS_ADMIN account', error);
       });
     }

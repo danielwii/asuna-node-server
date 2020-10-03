@@ -1,26 +1,31 @@
-import { plainToClass } from 'class-transformer';
 import { withP, withP2 } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { configLoader, YamlConfigKeys } from './loader';
+import { AbstractConfigLoader, configLoader, YamlConfigKeys } from './loader';
 
 export enum SentryConfigKeys {
   enable = 'enable',
   dsn = 'dsn',
 }
 
-export class SentryConfigObject {
-  private static logger = LoggerFactory.getLogger('SentryConfigObject');
+export class SentryConfigObject extends AbstractConfigLoader<SentryConfigObject> {
   private static key = YamlConfigKeys.sentry;
+  private static _: SentryConfigObject;
+
+  public static get instance() {
+    if (SentryConfigObject._) {
+      return SentryConfigObject._;
+    }
+    SentryConfigObject._ = this.load();
+    return SentryConfigObject._;
+  }
 
   public enable: boolean;
   public dsn: string;
 
-  public constructor(o: Partial<SentryConfigObject>) {
-    Object.assign(this, plainToClass(SentryConfigObject, o, { enableImplicitConversion: true }));
-  }
-
-  public static load = (): SentryConfigObject =>
-    withP2(
+  public static load = (reload = false): SentryConfigObject => {
+    if (SentryConfigObject._ && !reload) {
+      return SentryConfigObject._;
+    }
+    SentryConfigObject._ = withP2(
       (p): any => configLoader.loadConfig2(SentryConfigObject.key, p),
       SentryConfigKeys,
       (loader, keys) =>
@@ -29,4 +34,6 @@ export class SentryConfigObject {
           dsn: withP(keys.dsn, loader),
         }),
     );
+    return SentryConfigObject._;
+  };
 }

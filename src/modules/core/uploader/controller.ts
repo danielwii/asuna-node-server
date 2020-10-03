@@ -15,7 +15,6 @@ import { basename, dirname, join } from 'path';
 import * as uuid from 'uuid';
 import { AsunaExceptionHelper, AsunaExceptionTypes, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { ConfigKeys, configLoader } from '../../config';
 import { AnyAuthRequest } from '../../helper/interfaces';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { AsunaContext } from '../context';
@@ -24,6 +23,7 @@ import { DocMimeType, FileInfo, ImageMimeType, SavedFile, VideoMimeType } from '
 import { OperationToken, OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderHelper } from './helper';
 import { RemoteFileInfo, UploaderService } from './service';
+import { UploaderConfigObject } from './config';
 
 const logger = LoggerFactory.getLogger('UploaderController');
 
@@ -195,7 +195,7 @@ export class UploaderController {
   @Post()
   @UseInterceptors(
     // new FastifyFileInterceptor('files'),
-    FilesInterceptor('files', configLoader.loadNumericConfig(ConfigKeys.UPLOADER_MAX_COUNT, 3), fileInterceptorOptions),
+    FilesInterceptor('files', UploaderConfigObject.instance.maxCount, fileInterceptorOptions),
   )
   public async uploader(
     @Query('bucket') bucket = '',

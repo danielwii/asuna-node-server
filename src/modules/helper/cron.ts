@@ -6,10 +6,10 @@ import * as relativeTime from 'dayjs/plugin/relativeTime';
 import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { ConfigKeys, configLoader } from '../config';
 import { RedisLockProvider } from '../providers';
 import { StatsHelper } from '../stats/stats.helper';
 import { StatsResult } from '../stats/stats.interface';
+import { FeaturesConfigObject } from '../config/features.config';
 
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -37,8 +37,8 @@ export class CronHelper {
   ): CronJob {
     this.crons[operation] = { cronTime, nextTime: this.nextTime(cronTime) };
 
-    if (!configLoader.loadBoolConfig(ConfigKeys.CRON_ENABLE)) {
-      logger.warn(`skip ${operation} cron not enabled.`);
+    if (!FeaturesConfigObject.load().cronEnable) {
+      logger.warn(`skip ${operation} because cron was not enabled.`);
       return undefined;
     }
 

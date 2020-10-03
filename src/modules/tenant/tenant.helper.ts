@@ -172,7 +172,7 @@ export class TenantHelper {
   static async getTenantRoles(roles: Role[]): Promise<string[]> {
     const config = await TenantHelper.getConfig();
     const roleNames = _.map(roles, fp.get('name'));
-    const bindRoles = _.split(config.bindRoles, ',');
+    const bindRoles = _.compact(_.split(config.bindRoles, ','));
     const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
     logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
     return results;

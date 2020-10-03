@@ -6,9 +6,8 @@ import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exc
 import { join } from 'path';
 import * as sharp from 'sharp';
 import { LoggerFactory } from '../../common/logger';
-import { ConfigKeys, configLoader } from '../../config';
 import { Global } from '../global';
-import { UploaderConfig } from '../uploader/config';
+import { UploaderConfigObject } from '../uploader/config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 import { convertFilename, r } from '../../common/helpers';
 
@@ -18,8 +17,9 @@ export class LocalStorage implements IStorageEngine {
   private readonly storagePath: string;
 
   private readonly bucket: string;
+  private readonly config = UploaderConfigObject.load();
 
-  constructor(storagePath: string, defaultBucket = 'default') {
+  public constructor(storagePath: string, defaultBucket = 'default') {
     this.bucket = defaultBucket || 'default';
     this.storagePath = storagePath;
     logger.log(oneLineTrim`
@@ -28,7 +28,10 @@ export class LocalStorage implements IStorageEngine {
     fs.mkdirs(join(this.storagePath, this.bucket)).catch((error) => logger.warn(r(error)));
   }
 
-  saveEntity(file: FileInfo, opts: { bucket?: string; prefix?: string; region?: string } = {}): Promise<SavedFile> {
+  public saveEntity(
+    file: FileInfo,
+    opts: { bucket?: string; prefix?: string; region?: string } = {},
+  ): Promise<SavedFile> {
     if (!file) {
       throw new ErrorException('LocalStorage', 'file must not be null.');
     }
@@ -48,17 +51,17 @@ export class LocalStorage implements IStorageEngine {
         mimetype: file.mimetype,
         mode: StorageMode.LOCAL,
         filename,
-        fullpath: join(configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'), bucket, prefix, filename),
+        fullpath: join(this.config.resourcePath, bucket, prefix, filename),
       }),
     );
   }
 
-  async getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
+  public async getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
     logger.debug(`getEntity ${r({ fileInfo, toPath })}`);
     return join(Global.uploadPath, fileInfo.bucket ?? '', fileInfo.prefix ?? '', fileInfo.path);
   }
 
-  async listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+  public async listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     const path = join(Global.uploadPath, opts.bucket ?? '', opts.prefix ?? '');
     const directory = fs.readdirSync(path);
     logger.debug(`listEntities ${r({ opts, directory })}`);
@@ -71,29 +74,24 @@ export class LocalStorage implements IStorageEngine {
         mimetype: fileInfo.mimetype,
         mode: StorageMode.LOCAL,
         filename,
-        fullpath: join(
-          configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads'),
-          opts.bucket ?? '',
-          opts.prefix ?? '',
-          filename,
-        ),
+        fullpath: join(this.config.resourcePath, opts.bucket ?? '', opts.prefix ?? '', filename),
       });
     });
   }
 
-  removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
+  public removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
     logger.debug(`removeEntities ${r(opts)}`);
     throw new Error('Method not implemented.');
   }
 
-  resolveUrl(opts: ResolverOpts): Promise<string>;
-  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+  public async resolveUrl(opts: ResolverOpts): Promise<string>;
+  public async resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  public async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig } = opts;
-    const fullFilePath = join(UploaderConfig.uploadPath, bucket, prefix || '', filename);
-    if (!fullFilePath.startsWith(UploaderConfig.uploadPath)) {
+    const fullFilePath = join(UploaderConfigObject.uploadPath, bucket, prefix || '', filename);
+    if (!fullFilePath.startsWith(UploaderConfigObject.uploadPath)) {
       throw new Error('filePath must startsWith upload-path');
     }
 

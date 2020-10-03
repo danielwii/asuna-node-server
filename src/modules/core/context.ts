@@ -13,7 +13,7 @@ import {
   QiniuStorage,
   StorageMode,
 } from './storage';
-import { UploaderConfig } from './uploader/config';
+import { UploaderConfigObject } from './uploader/config';
 
 const logger = LoggerFactory.getLogger('AsunaContext');
 
@@ -28,6 +28,8 @@ export interface IAsunaContextOpts {
 export type StorageEngineMode = 'chunks';
 
 export class AsunaContext {
+  private readonly config = UploaderConfigObject.load();
+
   public static readonly instance = new AsunaContext();
 
   public opts: IAsunaContextOpts;
@@ -58,13 +60,12 @@ export class AsunaContext {
       // root: resolve(__dirname, '../..'),
     });
 
-    if (configLoader.loadBoolConfig(ConfigKeys.UPLOADER_ENABLE, true))
-      this.initStorageEngine(`${process.cwd()}/uploads`);
+    if (this.config.enable) this.initStorageEngine(`${process.cwd()}/uploads`);
     // this.tempPath = `${process.cwd()}/temp`;
     fs.mkdirs(join(Global.tempPath)).catch((error) => logger.warn(r(error)));
   }
 
-  setup(opts: Partial<IAsunaContextOpts> = {}): void {
+  public setup(opts: Partial<IAsunaContextOpts> = {}): void {
     logger.log(`setup ${r(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
@@ -73,7 +74,7 @@ export class AsunaContext {
     };
   }
 
-  getStorageEngine(bucket: string): IStorageEngine {
+  public getStorageEngine(bucket: string): IStorageEngine {
     const KEY = `${bucket.toUpperCase()}_STORAGE`;
     const storageType = configLoader.loadConfig(KEY);
     logger.debug(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
@@ -86,8 +87,8 @@ export class AsunaContext {
     return this.defaultStorageEngine;
   }
 
-  initStorageEngine(uploadPath: string): void {
-    UploaderConfig.uploadPath = uploadPath;
+  public initStorageEngine(uploadPath: string): void {
+    UploaderConfigObject.uploadPath = uploadPath;
     Global.uploadPath = uploadPath;
 
     const defaultStorage = configLoader.loadConfig(ConfigKeys.DEFAULT_STORAGE);
@@ -166,15 +167,15 @@ export class AsunaContext {
     );
   }
 
-  getFilePath(fullpath: string): string {
+  public getFilePath(fullpath: string): string {
     return join(Global.uploadPath, '../', fullpath);
   }
 
-  get defaultModulePrefix(): string {
+  public get defaultModulePrefix(): string {
     return this.opts.defaultModulePrefix || 'www';
   }
 
-  static get isDebugMode(): boolean {
+  public static get isDebugMode(): boolean {
     return configLoader.loadConfig(ConfigKeys.DEBUG);
   }
 }

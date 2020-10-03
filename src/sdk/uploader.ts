@@ -4,9 +4,9 @@ import * as _ from 'lodash';
 import * as querystring from 'querystring';
 import { r } from '../modules/common/helpers';
 import { LoggerFactory } from '../modules/common/logger';
-import { ConfigKeys, configLoader } from '../modules/config';
 import { Hermes, InMemoryAsunaQueue } from '../modules/core/bus';
 import { handleAxiosResponseError } from './helper';
+import { AppConfigObject } from '../modules/config/app.config';
 
 const logger = LoggerFactory.getLogger('Uploader');
 
@@ -16,6 +16,7 @@ export class Uploader {
   private queueName = 'IN_MEMORY_CHUNKED_UPLOAD';
 
   private static instance = new Uploader();
+  private static readonly appSettings = AppConfigObject.load();
 
   private constructor() {
     this.asunaQueue = Hermes.regInMemoryQueue(this.queueName);
@@ -32,14 +33,13 @@ export class Uploader {
     const totalChunks = Math.ceil(file.size / chunkSize);
   }
 
-  static async upload(bucket: string, prefix: string, path: string, filename): Promise<AxiosResponse<any> | string> {
-    const defaultPort = configLoader.loadConfig(ConfigKeys.PORT, 5000);
-    const host = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS, `http://127.0.0.1:${defaultPort}`);
+  public static async upload(bucket: string, prefix: string, path: string, filename): Promise<AxiosResponse | string> {
+    const host = this.appSettings.masterAddress;
     const endpoint = `${host}/api/v1/uploader/stream`;
 
-    const limit = configLoader.loadConfig(ConfigKeys.PAYLOAD_LIMIT, '2mb');
+    const limit = this.appSettings.payloadLimit;
     const stat = await fs.stat(path);
-    const maxContentLength = 1000 * 1000 * +limit.slice(0, -2);
+    const maxContentLength = 1000 * 1000 * Number(limit.slice(0, -2));
     logger.log(`upload: ${r({ endpoint, path, bucket, prefix, filename, stat, maxContentLength })}`);
 
     if (stat.size > maxContentLength) {

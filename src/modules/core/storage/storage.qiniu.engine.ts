@@ -6,16 +6,17 @@ import * as qiniu from 'qiniu';
 import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
 import { convertFilename, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { ConfigKeys, configLoader } from '../../config';
+import { UploaderConfigObject } from '../uploader/config';
 import { QiniuConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 export class QiniuStorage implements IStorageEngine {
   private static readonly logger = LoggerFactory.getLogger(QiniuStorage.name);
 
+  private readonly config = UploaderConfigObject.load();
   private readonly configObject: QiniuConfigObject;
 
-  constructor(configure: () => QiniuConfigObject) {
+  public constructor(configure: () => QiniuConfigObject) {
     this.configObject = configure();
     QiniuStorage.logger.log(`[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`);
 
@@ -58,7 +59,7 @@ export class QiniuStorage implements IStorageEngine {
             // throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
           } else {
             QiniuStorage.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
-            const resourcePath = configLoader.loadConfig(ConfigKeys.RESOURCE_PATH, '/uploads');
+            const resourcePath = this.config.resourcePath;
             const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
               ? join(bucket)
               : join(resourcePath, bucket);
@@ -88,21 +89,21 @@ export class QiniuStorage implements IStorageEngine {
     });
   }
 
-  getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
+  public getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
+  public listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     throw new Error('Method not implemented.');
   }
 
-  removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
+  public removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  resolveUrl(opts: ResolverOpts): Promise<string>;
-  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
-  async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
+  public async resolveUrl(opts: ResolverOpts): Promise<string>;
+  public async resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  public async resolveUrl(opts: ResolverOpts, res?: Response): Promise<string | void> {
     if (!res) throw new AsunaException(AsunaErrorCode.Unprocessable, 'not implemented for non-res exists.');
 
     const { filename, bucket, prefix, thumbnailConfig, jpegConfig, query } = opts;

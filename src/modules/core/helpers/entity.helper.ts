@@ -3,8 +3,8 @@ import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger/factory';
-import { ConfigKeys, configLoader } from '../../config';
 import { ColumnTypeHelper } from './column.helper';
+import { AppConfigObject } from '../../config/app.config';
 
 const logger = LoggerFactory.getLogger('EntityHelper');
 
@@ -71,7 +71,7 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
 }
 
 export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
-  const hours = configLoader.loadNumericConfig(ConfigKeys.FIX_TZ);
+  const hours = AppConfigObject.instance.fixTz;
   if (hours) {
     if (entity.createdAt) {
       entity.createdAt = DateTime.fromJSDate(entity.createdAt).plus(Duration.fromObject({ hours })).toJSDate();

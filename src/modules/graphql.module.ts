@@ -37,7 +37,7 @@ export class GraphqlModule implements OnModuleInit {
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
-    logger.log(`cache is ${r(cache, { depth: 1 })}`);
+    logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
     return {
       module: GraphqlModule,

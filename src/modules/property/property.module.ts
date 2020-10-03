@@ -8,6 +8,7 @@ import { PageHelper } from '../core/helpers';
 import { KvModule } from '../core/kv';
 import { FinancialTransaction, Wallet } from './financial.entities';
 import { PropertyQueryResolver } from './property.resolver';
+import { AppConfigObject } from '../config/app.config';
 
 const logger = LoggerFactory.getLogger('PropertyModule');
 
@@ -25,7 +26,7 @@ export class PropertyModule implements OnModuleInit {
       const total = await Wallet.count(where);
       logger.log(`${total} wallets waiting for init...`);
       if (total) {
-        const size = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 500);
+        const size = AppConfigObject.load().batchSize;
         await PageHelper.doPageSeries(total, size, async ({ page, totalPages }) => {
           logger.log(`do ${page}/${totalPages}...${total}`);
           const wallets = await Wallet.find({ where, take: size /* , skip: size * (page - 1) */ });

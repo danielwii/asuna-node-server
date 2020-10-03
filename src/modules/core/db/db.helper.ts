@@ -75,7 +75,7 @@ export function parseWhere(value: string): string[] | FindOperator<any>[] | null
       logger.debug(`condition is ${r({ parsed, result })}`);
       return result;
     } catch (reason) {
-      logger.warn(`parse where error ${r(reason)}`);
+      logger.warn(`parse where error ${r({ reason, value })}`);
     }
   }
   return null;

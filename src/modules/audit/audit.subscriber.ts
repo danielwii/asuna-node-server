@@ -11,6 +11,7 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { AuditService } from './audit.service';
+import { FeaturesConfigObject } from '../config/features.config';
 
 const logger = LoggerFactory.getLogger('AuditSubscriber');
 
@@ -18,7 +19,7 @@ const logger = LoggerFactory.getLogger('AuditSubscriber');
 export class AuditSubscriber implements EntitySubscriberInterface {
   private map = new Map();
   private auditService: AuditService = new AuditService();
-  private enabled = configLoader.loadBoolConfig(ConfigKeys.AUDIT, false);
+  private enabled = FeaturesConfigObject.load().auditEnable;
 
   public constructor() {
     logger.log(`init ... audit: ${this.enabled}`);

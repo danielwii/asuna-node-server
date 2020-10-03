@@ -9,12 +9,12 @@ import { IsNull, LessThan } from 'typeorm';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { ConfigKeys, configLoader } from '../config';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
 import { PaymentOrder } from './payment.order.entities';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
+import { AppConfigObject } from '../config/app.config';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
@@ -99,7 +99,7 @@ export class PaymentHelper {
     order: PaymentOrder,
   ): Promise<PaymentContext> {
     const { createdAt } = transaction;
-    const MASTER_HOST = configLoader.loadConfig(ConfigKeys.MASTER_ADDRESS);
+    const MASTER_HOST = AppConfigObject.load().masterAddress;
     const callback = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`);
     const notify = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`);
     return { method, order, transaction, createdAt, callback, notify };

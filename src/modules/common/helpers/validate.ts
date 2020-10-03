@@ -17,17 +17,15 @@ const logger = LoggerFactory.getLogger('Validator');
 
 @ValidatorConstraint({ name: 'exclusiveConstraint', async: false })
 export class ExclusiveConstraintValidator implements ValidatorConstraintInterface {
-  defaultMessage = (validationArguments?: ValidationArguments): string =>
+  public defaultMessage = (validationArguments?: ValidationArguments): string =>
     `Exclusive constraint occurred: ${r(validationArguments, { stringify: true })}.`;
 
-  validate = (value: any, validationArguments?: ValidationArguments): Promise<boolean> | boolean =>
+  public validate = (value: any, validationArguments?: ValidationArguments): Promise<boolean> | boolean =>
     _.keys(_.omitBy(validationArguments.object, _.isNil)).length <= 1;
 }
 
 export async function validateObject(object): Promise<ValidationError[]> {
-  if (!object) {
-    return;
-  }
+  if (!object) return;
   const errors = await validate(object);
   if (errors.length > 0) {
     logger.warn(`async validate ${r(object)} error: ${r(errors)}`);
@@ -36,9 +34,7 @@ export async function validateObject(object): Promise<ValidationError[]> {
 }
 
 export function validateObjectSync(object): ValidationError[] {
-  if (!object) {
-    return;
-  }
+  if (!object) return;
   const errors = validateSync(object);
   if (errors.length > 0) {
     logger.warn(`sync validate ${r(object)} error: ${r(errors)}`);
@@ -51,10 +47,7 @@ export function deserializeSafely<T>(
   json: string | JSON | T,
   options: ClassTransformOptions = { enableCircularCheck: true },
 ): T {
-  if (!json) {
-    return undefined;
-  }
-
+  if (!json) return undefined;
   if (json instanceof cls) {
     validateObjectSync(json);
     return json as T;

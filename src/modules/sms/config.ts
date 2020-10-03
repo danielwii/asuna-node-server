@@ -23,6 +23,15 @@ export interface AliSMSExtra {
 export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
   private static logger = LoggerFactory.getLogger('SMSConfigObject');
   private static key = YamlConfigKeys.sms;
+  private static _: SMSConfigObject;
+
+  public static get instance() {
+    if (SMSConfigObject._) {
+      return SMSConfigObject._;
+    }
+    SMSConfigObject._ = this.load();
+    return SMSConfigObject._;
+  }
 
   public enable: boolean;
   public provider: 'aliyun';
@@ -35,8 +44,11 @@ export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
   public templates: Record<'verify-code', string>;
   public verify_code_checks: { force_all: boolean; locations: Record<string, boolean> };
 
-  public static load = (): SMSConfigObject =>
-    withP2(
+  public static load = (reload = false): SMSConfigObject => {
+    if (SMSConfigObject._ && !reload) {
+      return SMSConfigObject._;
+    }
+    SMSConfigObject._ = withP2(
       (p): any => configLoader.loadConfig2(SMSConfigObject.key, p),
       SMSConfigKeys,
       (loader, keys): SMSConfigObject =>
@@ -51,4 +63,6 @@ export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
           verify_code_checks: withP(keys.verify_code_checks, (p) => parseJSONIfCould(loader(p))) ?? {},
         }),
     );
+    return SMSConfigObject._;
+  };
 }

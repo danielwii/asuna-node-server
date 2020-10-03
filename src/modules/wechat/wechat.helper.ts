@@ -34,6 +34,7 @@ import {
   WxSendTemplateInfo,
 } from './wx.interfaces';
 import { WxUserInfo } from './wx.vo';
+import { AppConfigObject } from '../config/app.config';
 
 const logger = LoggerFactory.getLogger('WeChatHelper');
 
@@ -145,17 +146,17 @@ export interface WXSubscribedQrSceneMessage {
 export type WXEventMessage = WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage;
 
 export class WXEventMessageHelper {
-  static isWXSubscribeMessage = (message: WXEventMessage): boolean =>
+  public static isWXSubscribeMessage = (message: WXEventMessage): boolean =>
     message.MsgType === 'event' && ['subscribe', 'unsubscribe'].includes(message.Event);
-  static isWXTextMessage = (message: WXEventMessage): boolean => message.MsgType === 'text';
-  static isWXSubscribedQrSceneMessage = (message: WXEventMessage): boolean =>
+  public static isWXTextMessage = (message: WXEventMessage): boolean => message.MsgType === 'text';
+  public static isWXSubscribedQrSceneMessage = (message: WXEventMessage): boolean =>
     message.MsgType === 'event' && message.Event === 'SCAN';
 }
 
 export class WeChatHelper {
-  static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
+  public static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
 
-  static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
+  public static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
     const config = await WxHelper.getServiceConfig();
     const validation = [config.token, opts.timestamp, opts.nonce].sort().join('');
     const hashCode = crypto.createHash('sha1');
@@ -165,25 +166,25 @@ export class WeChatHelper {
     return validated;
   }
 
-  static async parseXmlToJson<T = any>(req: Request): Promise<T> {
+  public static async parseXmlToJson<T = any>(req: Request): Promise<T> {
     const value = await rawBody(req);
     const json = (await Promise.promisify(xml2js.parseString)(value)) as { xml: { [key: string]: any[] } };
     logger.debug(`parsed json is ${r(json)}`);
     return _.mapValues(json.xml, (values) => (values.length === 1 ? values[0] : values)) as T;
   }
 
-  static async getTicketByType(type: WxTicketType, value: string): Promise<WxQrTicketInfo> {
+  public static async getTicketByType(type: WxTicketType, value: string): Promise<WxQrTicketInfo> {
     return WxApi.createQrTicket({
       action_name: 'QR_STR_SCENE',
       action_info: { scene: { scene_str: `${WxTicketType['admin-login']}:${value}` } },
     });
   }
 
-  static async syncAdminUsers(): Promise<void> {
+  public static async syncAdminUsers(): Promise<void> {
     const config = await WxHelper.getServiceConfig();
     logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
-      const BATCH_SIZE = configLoader.loadNumericConfig(ConfigKeys.BATCH_SIZE, 100);
+      const BATCH_SIZE = AppConfigObject.load().batchSize;
       await PageHelper.doCursorPageSeries(async (next) => {
         const userList = await WxApi.getUserList(next);
         logger.debug(`userList is ${r(_.omit(userList, 'data'))}`);
@@ -193,7 +194,7 @@ export class WeChatHelper {
           const currentUsers = await WxApi.batchGetUserInfo(currentUserIds);
           return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
         });
-        await Promise.mapSeries<string, void>(users, (openId) =>
+        await Promise.mapSeries<string, unknown>(users, (openId) =>
           WeChatHelper.syncAdminUser(openId).catch((reason) => logger.error(reason)),
         );
         // 10000 is the max count of a request
@@ -202,7 +203,7 @@ export class WeChatHelper {
     }
   }
 
-  static async syncAdminUser(openId: string): Promise<void> {
+  public static async syncAdminUser(openId: string): Promise<void> {
     const user = await WeChatHelper.updateWeChatUser(openId);
     logger.log(`sync user '${user?.openId}' to admin`);
     if (user) {
@@ -210,7 +211,7 @@ export class WeChatHelper {
     }
   }
 
-  static async handleEvent(
+  public static async handleEvent(
     message: WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage,
   ): Promise<string> {
     const config = await WxHelper.getServiceConfig();
@@ -244,7 +245,7 @@ export class WeChatHelper {
   }
 
   // TODO move to utils
-  static parseTemplateData(data: object, context: object): TemplateData {
+  public static parseTemplateData(data: object, context: object): TemplateData {
     const tmplData = _.assign(
       {},
       ..._.chain(data)
@@ -262,7 +263,7 @@ export class WeChatHelper {
     ) as any;
   }
 
-  static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {
+  public static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {
     const [type, sid] = message.EventKey.split(':');
     const user = await WeChatUser.findOne({ openId: message.FromUserName });
     const admin = await AdminUser.findOne({ email: `${message.FromUserName}@wx.openid` });
@@ -279,7 +280,7 @@ export class WeChatHelper {
     }
   }
 
-  static async updateAdmin(user: WeChatUser): Promise<void> {
+  public static async updateAdmin(user: WeChatUser): Promise<void> {
     const isActive = user.subscribe !== 0;
     logger.log(`admin is ${r(user.admin)}`);
     if (!user.admin) {
@@ -301,7 +302,7 @@ export class WeChatHelper {
     }
   }
 
-  static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser | undefined> {
+  public static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser | undefined> {
     if (!userInfo?.openid) {
       logger.warn(`unresolved userInfo: ${r(userInfo)}`);
       return undefined;
@@ -317,13 +318,13 @@ export class WeChatHelper {
     return WeChatUser.save(userInfo.toWeChatUser());
   }
 
-  static async updateWeChatUser(openId: string): Promise<WeChatUser | undefined> {
+  public static async updateWeChatUser(openId: string): Promise<WeChatUser | undefined> {
     const userInfo = await WeChatHelper.getUserInfo(openId);
     logger.log(`get user info ${r(userInfo)}`);
     return WeChatHelper.updateWeChatUserByUserInfo(userInfo);
   }
 
-  static async updateUserInfo(user: Pick<UserProfile, 'id' | 'username'>, userInfo: UserInfo): Promise<void> {
+  public static async updateUserInfo(user: Pick<UserProfile, 'id' | 'username'>, userInfo: UserInfo): Promise<void> {
     await WXMiniAppUserInfo.create({
       openId: user.username,
       nickname: userInfo.nickName,
@@ -337,12 +338,12 @@ export class WeChatHelper {
     }).save();
   }
 
-  static async getSessionKey(payload: WXJwtPayload): Promise<string> {
+  public static async getSessionKey(payload: WXJwtPayload): Promise<string> {
     const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
     return codeSession.session_key;
   }
 
-  static async decryptData<T>(key: string, encryptedData: string, iv: string): Promise<T> {
+  public static async decryptData<T>(key: string, encryptedData: string, iv: string): Promise<T> {
     // base64 decode
     const sessionKey = Buffer.from(key, 'base64');
     const encodedEncryptedData = Buffer.from(encryptedData, 'base64');
@@ -365,7 +366,7 @@ export class WeChatHelper {
     return decoded;
   }
 
-  static async updateUserPhoneNumber(
+  public static async updateUserPhoneNumber(
     payload: WXJwtPayload,
     user: UserProfile,
     body: { encryptedData: string; errMsg: string; iv: string },
@@ -378,7 +379,7 @@ export class WeChatHelper {
     await userInfo.save();
   }
 
-  static async code2Session(code: string): Promise<string> {
+  public static async code2Session(code: string): Promise<string> {
     const codeSession = await WxApi.code2Session(code);
     logger.log(`code2session ${r({ code, codeSession })}`);
     const key = shortid.generate();
@@ -408,11 +409,11 @@ export class WeChatHelper {
     );
   }
 
-  static async getUserInfo(openId: string): Promise<WxUserInfo> {
+  public static async getUserInfo(openId: string): Promise<WxUserInfo> {
     return WxApi.getUserInfo(openId);
   }
 
-  static async sendTemplateMsg({
+  public static async sendTemplateMsg({
     openId,
     templateId,
     url,
@@ -435,7 +436,7 @@ export class WeChatHelper {
     });
   }
 
-  static async sendMiniSubscribeMsg({
+  public static async sendMiniSubscribeMsg({
     openId,
     page,
     subscribeId,
