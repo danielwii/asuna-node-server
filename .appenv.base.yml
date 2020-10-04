@@ -30,7 +30,7 @@ features:
   audit_enable: false
   # ; endpoint is /swagger
   swagger_enable: false
-  cron_enable: true
+  cron_enable: false
 
 tracing:
   enabled: false

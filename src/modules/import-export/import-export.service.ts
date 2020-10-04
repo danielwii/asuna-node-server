@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { read, utils, write } from 'xlsx';
+import { Promise } from 'bluebird';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
@@ -67,11 +68,9 @@ export class ImportExportService {
               if (content !== undefined) {
                 const contentArray = content.split('、');
                 const resArray = [];
-                contentArray.forEach(async (temp) => {
+                await Promise.each(contentArray, async (temp) => {
                   const res = await tempRepo.findOne({ name: temp.trim() } as any);
-                  if (res !== undefined) {
-                    resArray.push(res);
-                  }
+                  if (res !== undefined) resArray.push(res);
                 });
                 value = resArray;
               }

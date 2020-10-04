@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request, Response } from 'express';
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { ImportExportService } from './import-export.service';
 
@@ -13,14 +14,13 @@ export class ImportExportController {
   // 导入Excel 请求地址传入param参数，传入导入的表名
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  public async importExcel(@UploadedFile() file, @Req() req: Request) {
-    const modelName = req.query.name as string;
+  public async importExcel(@UploadedFile() file, @Query('name') name: string, @Req() req: Request) {
     if (!file) return '上传文件为空！';
     if (file.originalname.substr(-5) !== '.xlsx' && file.originalname.substr(-4) !== '.xls') {
-      return '文件格式有误！';
+      return '文件格式有误！(.xlsx, .xls)';
     }
-    const resEntity = await this.importExportService.importExcel(file.buffer, modelName);
-    logger.log(`import excel ${JSON.stringify(resEntity)}`);
+    const resEntity = await this.importExportService.importExcel(file.buffer, name);
+    logger.log(`imported excel is ${r(resEntity)}`);
     return resEntity;
   }
 

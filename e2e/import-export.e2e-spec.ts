@@ -3,7 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as supertest from 'supertest';
-import { Connection, getManager } from 'typeorm';
+import { getManager } from 'typeorm';
 import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
 
 describe('Excel (e2e)', () => {
@@ -19,8 +19,6 @@ describe('Excel (e2e)', () => {
   });
 
   afterAll(() => {
-    const connection = app.get(Connection);
-    connection.close();
     app.close();
   });
 
