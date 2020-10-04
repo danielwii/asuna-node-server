@@ -5,6 +5,10 @@ import { AdminUser } from '../auth.entities';
 
 export const API_KEY_HEADER = 'X-API-KEY';
 
+export interface ApiKeyRequest {
+  isApiKeyRequest: boolean;
+}
+
 export function isApiKeyRequest(req: Request): req is AnyAuthRequest<ApiKeyPayload, AdminUser> {
   return !!getIgnoreCase(req.headers, API_KEY_HEADER);
 }

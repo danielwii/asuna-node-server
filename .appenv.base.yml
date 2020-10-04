@@ -31,6 +31,7 @@ features:
   # ; endpoint is /swagger
   swagger_enable: false
   cron_enable: false
+  error_stats: false
 
 tracing:
   enabled: false

@@ -44,21 +44,21 @@ export abstract class RestCrudController {
   })
   @UseGuards(JwtAdminAuthGuard)
   @Options(':model')
-  options(@Param('model') model: string): ColumnSchema[] {
+  public options(@Param('model') model: string): ColumnSchema[] {
     const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Get('schema/:model')
-  schema(@Param('model') model: string): OriginSchema {
+  public schema(@Param('model') model: string): OriginSchema {
     const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractOriginAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/unique')
-  unique(@Param('model') model: string, @Query('column') column: string): Promise<string[]> {
+  public unique(@Param('model') model: string, @Query('column') column: string): Promise<string[]> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
     return RestHelper.unique(modelNameObject, column);
@@ -66,7 +66,7 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/group-counts')
-  groupCounts(
+  public groupCounts(
     @Param('model') model: string,
     @Query('where') whereStr: string,
     @Query('column') column: string,
@@ -78,7 +78,7 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model')
-  async list(
+  public async list(
     @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
     @CurrentRoles() roles: Role[],
@@ -97,7 +97,7 @@ export abstract class RestCrudController {
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
     const order = parseOrder(modelName.model, sortStr);
-    const query = { where, order, parsedFields, skip: (page - 1) * size, take: +size };
+    const query = { where, order, parsedFields, skip: (page - 1) * size, take: Number(size) };
 
     // logger.log(`list ${r({ whereStr, query, order })}`);
 
@@ -125,12 +125,12 @@ export abstract class RestCrudController {
 
     logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
 
-    return { query, items: classToPlain(items) as any[], total, page: +page, size: +size };
+    return { query, items: classToPlain(items) as any[], total, page: Number(page), size: Number(size) };
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/:id')
-  async get(
+  public async get(
     @Param('model') model: string,
     @Param('id') id: PrimaryKey,
     @Req() req: AnyAuthRequest,
@@ -146,7 +146,7 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Delete(':model/:id')
-  async delete(
+  public async delete(
     @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
     @Param('model') model: string,
@@ -160,13 +160,17 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Post(':model')
-  async save(@Param('model') model: string, @Body() updateTo: JsonMap, @Req() req: AnyAuthRequest): Promise<any> {
+  public async save(
+    @Param('model') model: string,
+    @Body() updateTo: JsonMap,
+    @Req() req: AnyAuthRequest,
+  ): Promise<any> {
     return RestHelper.save({ model: DBHelper.getModelNameObject(model, this.module), body: updateTo }, req);
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Patch(':model/:id')
-  async patch(
+  public async patch(
     @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
     @CurrentRoles() roles: Role[],

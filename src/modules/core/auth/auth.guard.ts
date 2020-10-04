@@ -25,9 +25,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type,@typescript-eslint/ban-ts-comment
   // @ts-ignore
-  async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
+  public async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
     const res = context.switchToHttp().getResponse();
     if (err || !payload) {

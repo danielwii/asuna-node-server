@@ -72,13 +72,13 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
 export class TaskEvent extends AbstractBaseEntity {
   @MetaInfo({ name: 'message' })
   @Column({ nullable: true, name: 'message' })
-  message: string;
+  public message: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
-  body: JsonMap;
+  public body: JsonMap;
 
   @ManyToOne('TaskRecord', (inverse: TaskRecord) => inverse.events, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'task__id' })
-  task: TaskRecord;
+  public task: TaskRecord;
 }

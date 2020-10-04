@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  AdminApiKeys,
   AdminInternalModule,
   bootstrap,
   defaultDataLoaders,
@@ -21,6 +22,8 @@ export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {
     logger.log('init...');
     new GenericDataLoader().initLoaders(defaultDataLoaders);
+
+    AdminApiKeys.create({ name: 'test-only', key: 'test-key', isPublished: true }).save();
   }
 }
 

@@ -4,16 +4,21 @@ import { InMemoryDB } from '../cache/db';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { CronStatsInterface } from './stats.interface';
+import { FeaturesConfigObject } from '../config/features.config';
 
 type CronStat = Omit<CronStatsInterface, 'events'>;
 
 const logger = LoggerFactory.getLogger('StatsHelper');
 
 export class StatsHelper {
+  private static enable = FeaturesConfigObject.instance.errorStats;
+
   public static prefix = 'stats';
   public static keys = new Set<string>();
 
   public static async addErrorInfo(type: string, info): Promise<void> {
+    if (!this.enable) return;
+
     const key = `error-${type}`;
     this.keys.add(key);
     // logger.debug(`add error info ${r({ key, info })}`);

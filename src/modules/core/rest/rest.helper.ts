@@ -14,7 +14,7 @@ import { KvHelper } from '../kv/kv.helper';
 const logger = LoggerFactory.getLogger('RestHelper');
 
 export class RestHelper {
-  static async get<T extends BaseEntity>(
+  public static async get<T extends BaseEntity>(
     {
       model,
       id,
@@ -42,7 +42,7 @@ export class RestHelper {
     return queryBuilder.getOne();
   }
 
-  static async save<T extends BaseEntity | ObjectLiteral>(
+  public static async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
@@ -96,7 +96,7 @@ export class RestHelper {
     return getManager().save(entity as any);
   }
 
-  static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
+  public static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
     const repository = DBHelper.repo(modelNameObject);
     const raw = await repository
       .createQueryBuilder(modelNameObject.model)
@@ -108,7 +108,7 @@ export class RestHelper {
     return arr;
   }
 
-  static async groupCounts(
+  public static async groupCounts(
     modelNameObject: ModelNameObject,
     where: string[] | FindOperator<any>[] | null,
     column: string,
@@ -116,9 +116,9 @@ export class RestHelper {
     const repository = DBHelper.repo(modelNameObject);
     const [[relation, value]] = _.toPairs(where);
     const field = `${relation}__id`;
-    const whereSql = DBHelper.toSqlValue({ field, value });
-    const raw = await repository
-      .createQueryBuilder()
+    const queryBuilder = repository.createQueryBuilder();
+    const whereSql = DBHelper.toSqlValue(queryBuilder, { field, value });
+    const raw = await queryBuilder
       .select(`${column}, ${field}, COUNT(${column}) as count`)
       .where(whereSql)
       .groupBy(`${column}, ${field}`)

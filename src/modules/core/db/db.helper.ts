@@ -17,6 +17,7 @@ import {
   MoreThan,
   Not,
   ObjectType,
+  QueryBuilder,
   Raw,
   Repository,
   SelectQueryBuilder,
@@ -45,7 +46,7 @@ export interface ColumnSchema {
   };
 }
 
-export type ModelNameObject = {
+export interface ModelNameObject {
   model: string;
   module: string;
   /**
@@ -56,7 +57,7 @@ export type ModelNameObject = {
    * EntityInfo 注解的名称，约定上，应该是 module 和 name 的组合
    */
   entityName: string;
-};
+}
 
 /**
  * https://github.com/typeorm/typeorm/issues/1101
@@ -108,7 +109,7 @@ export function parseNormalWhereAndRelatedFields(
       normalWhere.push({ field, value });
     }
   });
-  logger.debug(`parsed conditions is ${r({ normalWhere, relatedFields, relatedWhere, allRelations })}`);
+  logger.verbose(`parsed conditions is ${r({ normalWhere, relatedFields, relatedWhere, allRelations })}`);
   return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
@@ -140,12 +141,7 @@ function parseCondition(value: Condition): string | Condition | FindOperator<any
 
 export function parseOrder(model: string, value: string): { [name: string]: string } {
   return value
-    ? _.assign(
-        {},
-        ..._.map(JSON.parse(value), (direction, key) => ({
-          [`${model}.${key}`]: _.upperCase(direction),
-        })),
-      )
+    ? _.assign({}, ..._.map(JSON.parse(value), (direction, key) => ({ [`${model}.${key}`]: _.upperCase(direction) })))
     : undefined;
 }
 
@@ -163,10 +159,10 @@ export function parseListParam(value: string | string[], map?: (field: any) => a
   }
 }
 
-export type ParsedFields = {
+export interface ParsedFields {
   fields: string[];
   relatedFieldsMap: object;
-};
+}
 
 export function parseFields(value: string | string[], allRelations?: string[]): ParsedFields {
   const fields = parseListParam(value);
@@ -184,19 +180,19 @@ export function parseFields(value: string | string[], allRelations?: string[]): 
   return { fields, relatedFieldsMap };
 }
 
-export type OriginSchema = {
+export interface OriginSchema {
   info: EntityMetaInfoOptions;
   columns: ColumnSchema[];
   manyToManyRelations: ColumnSchema[];
   manyToOneRelations: ColumnSchema[];
   oneToManyRelations: ColumnSchema[];
   oneToOneRelations: ColumnSchema[];
-};
+}
 
 export class DBHelper {
-  static metadatas: EntityMetadata[] = [];
+  public static metadatas: EntityMetadata[] = [];
 
-  static isValidEntity(metadata): boolean {
+  public static isValidEntity(metadata): boolean {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
     const isRelation = _.includes(metadata.target as string, '__tr_');
     if (isNotEntityInfo && !isRelation) {
@@ -561,7 +557,7 @@ export class DBHelper {
 
       // 处理条件关联
       const { relatedFields, relatedWhere, allRelations } = parseNormalWhereAndRelatedFields(where, repository);
-      logger.debug(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
+      logger.verbose(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach((field) => {
         const [relatedModel, relatedField] = _.split(field, '.');
         // logger.log('[innerJoinAndSelect]', { field, model, where });
@@ -630,18 +626,18 @@ export class DBHelper {
     }
   }
 
-  public static wrapNormalWhere(model: string, queryBuilder, normalWhere): void {
-    // console.log({ normalWhere });
-    normalWhere.forEach((condition) => {
+  public static wrapNormalWhere(model: string, queryBuilder, normalWheres): void {
+    // console.log({ normalWheres });
+    normalWheres.forEach((condition) => {
       // console.log('condition', condition);
 
       if (condition.value?.$or) {
         condition.value.$or.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = this.toSqlValue(currentCondition);
+          const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
 
-          // console.log('[normalWhere-or]', { currentCondition, elementCondition, sqlValue });
+          // console.log('[normalWheres-or]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
             queryBuilder.orWhere(`${model}.${sqlValue}`);
@@ -653,9 +649,9 @@ export class DBHelper {
         condition.value.$and.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = this.toSqlValue(currentCondition);
+          const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
 
-          // console.log('[normalWhere-and]', { currentCondition, elementCondition, sqlValue });
+          // console.log('[normalWheres-and]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
             queryBuilder.andWhere(`${model}.${sqlValue}`);
@@ -666,9 +662,9 @@ export class DBHelper {
       } else {
         const elementCondition = condition.value;
 
-        const sqlValue = this.toSqlValue(condition);
+        const sqlValue = this.toSqlValue(queryBuilder, condition);
 
-        // console.log('[normalWhere-default]', { condition, elementCondition, sqlValue });
+        logger.verbose(`[normalWheres-default] ${r({ condition, elementCondition, sqlValue })}`);
 
         if (_.isObject(elementCondition)) {
           queryBuilder.andWhere(`${model}.${sqlValue}`);
@@ -681,7 +677,11 @@ export class DBHelper {
 
   public static wrapParsedFields(
     model: string,
-    { queryBuilder, parsedFields, primaryKeys }: { queryBuilder; parsedFields: ParsedFields; primaryKeys?: string[] },
+    {
+      queryBuilder,
+      parsedFields,
+      primaryKeys,
+    }: { queryBuilder: QueryBuilder<any>; parsedFields: ParsedFields; primaryKeys?: string[] },
   ): void {
     if (!_.isEmpty(parsedFields.fields)) {
       const primaryKeyColumns = primaryKeys || ['id']; // id for default
@@ -694,12 +694,15 @@ export class DBHelper {
   }
 
   public static toSqlValue(
+    queryBuilder: any,
     condition: { field: string; value: string | FindOperator<any> },
     suffix = '',
   ): string | { [key: string]: string | FindOperator<any> } {
     if (_.isObjectLike(condition.value)) {
       const elementCondition = condition.value as any;
-      if (_.isObjectLike(elementCondition) && elementCondition.toSql) {
+      logger.verbose(`[toSqlValue] ${r({ condition, elementCondition })}`);
+      if (_.isObjectLike(elementCondition)) {
+        const aliasPath = `${condition.field}${suffix}`; // condition.field;
         let innerValue = elementCondition._value;
 
         // console.log({ elementCondition }, elementCondition._type);
@@ -715,7 +718,7 @@ export class DBHelper {
 
           // console.log('[not]', { parameters });
 
-          innerValue = innerValue.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
+          innerValue = innerValue.toSql(getConnection(), aliasPath, parameters);
 
           const temp = innerValue.split(' ');
           temp.splice(1, 0, 'not');
@@ -725,10 +728,11 @@ export class DBHelper {
           // console.warn('not implemented   <-----', { innerValue });
         } else if (elementCondition._type === 'like') {
           const parameters = [`'${elementCondition._value}'`];
-
-          // console.log('[strict]', { parameters });
-
-          innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
+          // const operator = condition.value;
+          // const parameters = _.isArray(elementCondition.value) ? elementCondition.value : [elementCondition.value];
+          innerValue = queryBuilder.computeFindOperatorExpression(elementCondition, aliasPath, parameters);
+          // innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
+          logger.verbose(`[condition] like ${r({ elementCondition, innerValue, parameters })}`);
         } else {
           const parameters = _.isArray(elementCondition._value)
             ? _.map(elementCondition._value, (v) => `'${v}'`)
@@ -736,7 +740,7 @@ export class DBHelper {
 
           // console.log('[strict]', { parameters });
 
-          innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
+          innerValue = queryBuilder.computeFindOperatorExpression(elementCondition, aliasPath, parameters);
         }
         // queryBuilder.andWhere(`${model}.${sqlValue}`);
         return innerValue;

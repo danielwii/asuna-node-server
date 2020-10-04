@@ -5,6 +5,7 @@ export enum FeaturesConfigKeys {
   auditEnable = 'audit_enable',
   swaggerEnable = 'swagger_enable',
   cronEnable = 'cron_enable',
+  errorStats = 'error_stats',
 }
 
 export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObject> {
@@ -19,9 +20,10 @@ export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObj
     return FeaturesConfigObject._;
   }
 
-  public auditEnable: string;
-  public swaggerEnable: string;
-  public cronEnable: string;
+  public auditEnable: boolean;
+  public swaggerEnable: boolean;
+  public cronEnable: boolean;
+  public errorStats: boolean;
 
   public static load = (reload = false): FeaturesConfigObject => {
     if (FeaturesConfigObject._ && !reload) {
@@ -35,6 +37,7 @@ export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObj
           auditEnable: withP(keys.auditEnable, loader),
           swaggerEnable: withP(keys.swaggerEnable, loader),
           cronEnable: withP(keys.cronEnable, loader),
+          errorStats: withP(keys.errorStats, loader),
         }),
     );
     return FeaturesConfigObject._;

@@ -120,6 +120,15 @@ export async function auth<Payload = PayloadType>(
   res: Response,
   type: 'admin' | 'client' | 'all' = 'all',
 ): Promise<AuthResult<Payload>> {
+  logger.verbose(
+    `auth ${r({
+      type,
+      isApiKeyRequest: isApiKeyRequest(req),
+      isAdminAuthRequest: isAdminAuthRequest(req),
+      isWXAuthRequest: isWXAuthRequest(req),
+    })}`,
+  );
+
   if (type !== 'client') {
     if (isApiKeyRequest(req)) {
       return (await AuthHelper.authAdminApiKey(req, res)) as any;
