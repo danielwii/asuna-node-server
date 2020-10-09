@@ -5,9 +5,11 @@ import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
+import { SMSConfigObject } from '../sms';
+import { SMSVerifyCodeGuard } from '../sms/guards';
+import { SMSHelper } from '../sms/helper';
 import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
-import { SMSVerifyCodeGuard } from '../sms/guards';
 
 class CreateOrderDTO {
   @IsString()
@@ -17,7 +19,7 @@ class CreateOrderDTO {
   @IsDefined()
   public methodId: number;
   @IsDefined()
-  public paymentInfo: Record<string, unknown>;
+  public paymentInfo: Record<'mobile' | string, unknown>;
   @IsOptional()
   public extra?: Record<string, unknown>;
   @IsBoolean()
@@ -39,6 +41,8 @@ const logger = LoggerFactory.getLogger('PaymentController');
 
 @Controller('api/v1/payment')
 export class PaymentController {
+  private config = SMSConfigObject.load();
+
   @Post('notify')
   public async postNotify(@Body() body, @Req() req: Request) {
     const isWxPay = _.isEmpty(body);
@@ -62,6 +66,19 @@ export class PaymentController {
       wxJsApi: body.useWxJsApi,
       openid: body.openid,
       isMobile: req.isMobile,
+    }).then((value) => {
+      const tmplPath = 'templates.payment-success';
+      const tmplId = _.get(this.config.templates, tmplPath);
+      const phonePath = 'paymentInfo.mobile';
+      const phoneNumber = _.get(body, phonePath);
+      if (this.config.enable) {
+        if (tmplId && phoneNumber) {
+          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
+        } else {
+          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
+        }
+      }
+      return value;
     });
     logger.log(`payment result is ${r(result)}`);
     if (_.isString(result) && isURL(result)) {

@@ -102,7 +102,7 @@ export class SMSHelper {
     return validated;
   }
 
-  public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown>): Promise<boolean> {
+  public static sendSMS(id: string, phoneNumber: string, tmplData: Record<string, unknown> = {}): Promise<boolean> {
     return this.adapter.send(id, phoneNumber, tmplData);
   }
 }
