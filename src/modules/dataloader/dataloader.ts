@@ -23,8 +23,7 @@ const cacheMap = new Map();
 let redisLoader;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
-  load(id?: PrimaryKey): Promise<Entity>;
-  load(ids?: PrimaryKey[]): Promise<Entity[]>;
+  load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
 }
 
 function resolveIds(ids: PrimaryKey[], primaryKey: PrimaryKey) {
@@ -101,7 +100,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           logger.debug(`redis dataloader load ${segment}: ${ids}`);
           return fn(ids);
         },
-        { batchScheduleFn: (callback) => setTimeout(callback, 20), cache: false },
+        { batchScheduleFn: (callback) => setTimeout(callback, 10), cache: false },
       ),
       {
         // caching here is a local in memory cache. Caching is always done to redis.
@@ -123,7 +122,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
       return fn(ids);
     },
     {
-      batchScheduleFn: (callback) => setTimeout(callback, 20),
+      batchScheduleFn: (callback) => setTimeout(callback, 10),
       cacheMap: {
         get: (id: string) => {
           // const cachedObject = await client.get({ segment, id });

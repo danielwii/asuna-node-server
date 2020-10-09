@@ -299,7 +299,7 @@ export class PaymentHelper {
       const validated = await PaymentAlipayHelper.validateSign(body);
       logger.debug(`validated alipay is ${r(validated)}`);
       if (!validated) {
-        // logger.error(`${body.subject} not validated.`);
+        logger.error(`${body.subject} not validated. ${r(body)}`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
       }
 
