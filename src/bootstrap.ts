@@ -164,9 +164,11 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.set('trust proxy', 1);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY);
-  const sessionRedis = RedisProvider.instance.getRedisClient('session');
   app.use(requestIp.mw());
   app.use(cookieParser(secret));
+  /*
+  FIXME Cannot read property 'set' of undefined
+  const sessionRedis = RedisProvider.instance.getRedisClient('session');
   const sessionOptions = {
     store: sessionRedis.isEnabled
       ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
@@ -178,7 +180,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     genid: () => SimpleIdGeneratorHelper.randomId('se'),
   };
   logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.client'))}`);
-  app.use(session(sessionOptions));
+  app.use(session(sessionOptions)); */
   app.use(
     helmet({
       contentSecurityPolicy: {

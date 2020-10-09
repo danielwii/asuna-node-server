@@ -20,12 +20,12 @@ const logger = LoggerFactory.getLogger('AdminAuthController');
 @ApiTags('sys-admin')
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
-  constructor(private readonly adminAuthService: AdminAuthService) {
+  public constructor(private readonly adminAuthService: AdminAuthService) {
     super('auth');
   }
 
   @Post('otp')
-  async otp(@Req() request, @Res() res): Promise<void> {
+  public async otp(@Req() request, @Res() res): Promise<void> {
     const { user } = request;
     if (!user) {
       return res.status(HttpStatus.I_AM_A_TEAPOT).send();
@@ -56,7 +56,7 @@ export class AdminAuthController extends RestCrudController {
   // FIXME type ResetPasswordDto not recognise email
   @HttpCode(200)
   @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<UpdateResult> {
+  public async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<UpdateResult> {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
     const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
     logger.log(`reset password: ${r({ resetPasswordDto, data })}`);
@@ -72,7 +72,7 @@ export class AdminAuthController extends RestCrudController {
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  async getToken(@Body() signDto: SignDto): Promise<{ expiresIn: number; accessToken: string }> {
+  public async getToken(@Body() signDto: SignDto): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`getToken() >> ${r(_.omit(signDto, 'password'))}`);
     const user = await this.adminAuthService.getUserWithPassword(
       _.omitBy({ email: signDto.email, username: signDto.username }, _.isNil),
@@ -93,7 +93,7 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Get('authorized')
-  authorized(): void {
+  public authorized(): void {
     logger.log('Authorized route...');
     const ac = new AccessControl();
     // prettier-ignore
@@ -118,7 +118,7 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Get('current')
-  async current(@Req() req: AnyAuthRequest): Promise<AdminUser> {
+  public async current(@Req() req: AnyAuthRequest): Promise<AdminUser> {
     const { user } = req;
     logger.log(`current... ${r(user)}`);
     const currentUser = await this.adminAuthService.getUser(user, true, { relations: ['roles'] });
