@@ -12,9 +12,9 @@ import * as morgan from 'morgan';
 import { dirname, extname, resolve } from 'path';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+import * as RedisStoreCreator from 'connect-redis';
 import * as requestIp from 'request-ip';
 import * as responseTime from 'response-time';
-import * as uuid from 'uuid';
 import { Connection, getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
@@ -28,6 +28,8 @@ import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './
 import { TracingInterceptor } from './modules/tracing';
 import { FeaturesConfigObject } from './modules/config/features.config';
 import { AppConfigObject } from './modules/config/app.config';
+import { SimpleIdGeneratorHelper } from './modules/ids';
+import { RedisProvider } from './modules/providers';
 // add condition function in typeorm find
 import './typeorm.fixture';
 
@@ -162,17 +164,21 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.set('trust proxy', 1);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY);
+  const sessionRedis = RedisProvider.instance.getRedisClient('session');
   app.use(requestIp.mw());
   app.use(cookieParser(secret));
-  app.use(
-    session({
-      secret,
-      resave: false,
-      cookie: { secure: true },
-      saveUninitialized: true,
-      genid: () => uuid.v4(),
-    }),
-  );
+  const sessionOptions = {
+    store: sessionRedis.isEnabled
+      ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
+      : new session.MemoryStore(),
+    secret,
+    resave: false,
+    cookie: { secure: true },
+    saveUninitialized: true,
+    genid: () => SimpleIdGeneratorHelper.randomId('se'),
+  };
+  logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.client'))}`);
+  app.use(session(sessionOptions));
   app.use(
     helmet({
       contentSecurityPolicy: {

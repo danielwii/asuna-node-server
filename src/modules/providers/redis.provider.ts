@@ -4,30 +4,28 @@ import * as redis from 'redis';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { RedisConfigObject } from './redis.config';
-import { configLoader, YamlConfigKeys } from '../config';
-import { SMSConfigObject } from '../sms/config';
 
 const logger = LoggerFactory.getLogger('RedisProvider');
 
 export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })
   @Transform((value) => !!value, { toPlainOnly: true })
-  client: redis.RedisClient;
+  public client: redis.RedisClient;
 
-  isEnabled: boolean;
-  isHealthy: boolean;
-  redisOptions: redis.ClientOpts;
+  public isEnabled: boolean;
+  public isHealthy: boolean;
+  public redisOptions: redis.ClientOpts;
 }
 
 export class RedisProvider {
-  clients: { [key: string]: RedisClientObject } = {};
+  public clients: { [key: string]: RedisClientObject } = {};
 
   public static readonly instance = new RedisProvider();
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
-  getRedisClient(prefix = 'default', db = 0): RedisClientObject {
+  public getRedisClient(prefix = 'default', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;
     if (this.clients[key] /* && this.clients[key].isHealthy */) {
       return this.clients[key];

@@ -1,4 +1,5 @@
 import { oneLineTrim } from 'common-tags';
+import * as Chance from 'chance';
 
 /**
  * ?????????????????? - 0000     - 000000
@@ -79,7 +80,10 @@ export class SimpleIdGenerator {
 }
 
 export class SimpleIdGeneratorHelper {
+  private static readonly chance = new Chance();
+
   public static registeredTypes: { [key: string]: string } = {};
+  public static registeredRandomPrefixes = new Set();
 
   public static nextId(prefix?: string, workerId?: number): string {
     return SimpleIdGenerator.nextId(prefix, workerId);
@@ -87,5 +91,10 @@ export class SimpleIdGeneratorHelper {
 
   public static nextIdByType(type: string, workerId?: number): string {
     return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
+  }
+
+  public static randomId(prefix = '') {
+    SimpleIdGeneratorHelper.registeredRandomPrefixes.add(prefix);
+    return prefix + SimpleIdGeneratorHelper.chance.string({ alpha: true, numeric: true, length: 12 });
   }
 }
