@@ -48,7 +48,20 @@ export class PaymentController {
     const isWxPay = _.isEmpty(body);
     const data = isWxPay ? await WeChatHelper.parseXmlToJson(req) : body;
     logger.log(`notify ${r(data)}`);
-    return PaymentHelper.handleNotify(body?.id, data, isWxPay);
+    const order = await PaymentHelper.handleNotify(body?.id, data, isWxPay);
+    if (order) {
+      const tmplPath = 'payment-success';
+      const tmplId = _.get(this.config.templates, tmplPath);
+      const phonePath = 'paymentInfo.mobile';
+      const phoneNumber = _.get(body, phonePath);
+      if (this.config.enable) {
+        if (tmplId && phoneNumber) {
+          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
+        } else {
+          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
+        }
+      }
+    }
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)
@@ -66,19 +79,6 @@ export class PaymentController {
       wxJsApi: body.useWxJsApi,
       openid: body.openid,
       isMobile: req.isMobile,
-    }).then((value) => {
-      const tmplPath = 'templates.payment-success';
-      const tmplId = _.get(this.config.templates, tmplPath);
-      const phonePath = 'paymentInfo.mobile';
-      const phoneNumber = _.get(body, phonePath);
-      if (this.config.enable) {
-        if (tmplId && phoneNumber) {
-          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
-        } else {
-          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
-        }
-      }
-      return value;
     });
     logger.log(`payment result is ${r(result)}`);
     if (_.isString(result) && isURL(result)) {

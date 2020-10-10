@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { LoggerFactory } from '../common/logger';
-import { AppContext } from './app.context';
 import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
+import { LoggerFactory } from '../common/logger';
+import { AppContext } from './app.context';
+import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('ApiController');
 
@@ -18,10 +19,13 @@ export class ApiController {
   }
 
   @Get('info')
-  public info(@Req() req) {
+  public info(@Req() req: RequestInfo) {
     return {
       upTime: this.appContent.upTime.toISOString(),
       version: this.appContent.version,
+      clientIp: req.clientIp,
+      isMobile: req.isMobile,
+      headers: req.headers,
     };
   }
 

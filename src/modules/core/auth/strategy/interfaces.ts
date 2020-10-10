@@ -1,7 +1,7 @@
-import { Request } from 'express';
 import { getIgnoreCase } from '../../../common/helpers';
-import { AnyAuthRequest, ApiKeyPayload } from '../../../helper/interfaces';
 import { AdminUser } from '../auth.entities';
+import type { Request } from 'express';
+import type { AnyAuthRequest, ApiKeyPayload } from '../../../helper/interfaces';
 
 export const API_KEY_HEADER = 'X-API-KEY';
 

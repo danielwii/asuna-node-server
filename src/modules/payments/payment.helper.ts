@@ -221,7 +221,7 @@ export class PaymentHelper {
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 
-  public static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<void> {
+  public static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
     if (isWxPay) {
       const body = data as {
         appid: string;
@@ -256,7 +256,7 @@ export class PaymentHelper {
 
       if (order.transaction.status === 'done') {
         logger.debug(`already done, skip.`);
-        return;
+        return order;
       }
 
       order.transaction.status = 'done';
@@ -266,7 +266,7 @@ export class PaymentHelper {
       await order.save();
 
       _.each(this.notifyHandlers, (handler) => handler(order));
-      return;
+      return order;
     } else {
       // handle as alipay
       const body = data as {
@@ -310,7 +310,7 @@ export class PaymentHelper {
 
       if (order.transaction.status === 'done') {
         logger.debug(`already done, skip.`);
-        return;
+        return order;
       }
 
       order.transaction.status = 'done';
@@ -320,7 +320,7 @@ export class PaymentHelper {
       await order.save();
 
       _.each(this.notifyHandlers, (handler) => handler(order));
-      return;
+      return order;
     }
 
     // throw new AsunaException(AsunaErrorCode.Unprocessable, 'alipay or wxpay support only');

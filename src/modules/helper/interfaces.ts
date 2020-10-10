@@ -3,7 +3,7 @@ import type { CommonRequest } from '../common';
 import type { AdminUser, JwtPayload, Role, UserProfile } from '../core/auth';
 import type { Tenant } from '../tenant';
 import type { WXJwtPayload } from '../wechat';
-import { ApiKeyRequest } from '../core/auth/strategy';
+import type { ApiKeyRequest } from '../core/auth/strategy';
 
 export type PayloadType = JwtPayload | WXJwtPayload | ApiKeyPayload;
 export type AuthInfo<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = Partial<{
