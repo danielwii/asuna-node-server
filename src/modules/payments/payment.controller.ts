@@ -53,7 +53,7 @@ export class PaymentController {
       const tmplPath = 'payment-success';
       const tmplId = _.get(this.config.templates, tmplPath);
       const phonePath = 'paymentInfo.mobile';
-      const phoneNumber = _.get(body, phonePath);
+      const phoneNumber = _.get(order.transaction, phonePath);
       if (this.config.enable) {
         if (tmplId && phoneNumber) {
           SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
