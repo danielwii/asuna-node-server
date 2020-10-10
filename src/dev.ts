@@ -8,6 +8,7 @@ import {
   defaultDataLoaders,
   GenericDataLoader,
   GraphqlModule,
+  HealthController,
   LoggerFactory,
   WSModule,
 } from '.';
@@ -16,7 +17,7 @@ const logger = LoggerFactory.getLogger('ApplicationModule');
 
 @Module({
   imports: [TypeOrmModule.forRoot(), AdminInternalModule, GraphqlModule.forRoot(__dirname), WSModule, TerminusModule],
-  controllers: [],
+  controllers: [HealthController],
 })
 export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {

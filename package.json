@@ -23,7 +23,8 @@
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
     "snyk-protect": "snyk protect",
-    "prepare": "yarn run snyk-protect"
+    "prepare": "yarn run snyk-protect",
+    "doc": "npx @compodoc/compodoc -p tsconfig.json -s"
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.9",
@@ -92,7 +93,7 @@
     "luxon": "^1.25.0",
     "mime-types": "^2.1.27",
     "minio": "^7.0.16",
-    "mongoose": "^5.10.8",
+    "mongoose": "^5.10.9",
     "mongoose-autopopulate": "^0.12.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
@@ -117,7 +118,7 @@
     "rxjs": "^6.6.3",
     "sharp": "^0.26.1",
     "shortid": "^2.2.15",
-    "snyk": "^1.410.4",
+    "snyk": "^1.413.2",
     "socket.io": "^2.3.0",
     "socket.io-redis": "^5.4.0",
     "swagger-ui-express": "^4.1.4",
@@ -129,6 +130,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.11",
     "@nestjs/testing": "^7.4.4",
     "@prisma/cli": "2.8.1",
     "@types/amqplib": "^0.5.14",
@@ -175,7 +177,7 @@
     "@types/xml2js": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
-    "eslint": "^7.10.0",
+    "eslint": "^7.11.0",
     "eslint-config-alloy": "^3.8.0",
     "eslint-plugin-import": "^2.22.1",
     "husky": "^4.3.0",

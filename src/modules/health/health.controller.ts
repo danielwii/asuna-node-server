@@ -41,9 +41,9 @@ export class HealthController {
       _.compact([
         async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
         async () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() }),
-        async () => this.memory.checkHeap('memory_heap', 200 * 1024 * 1024),
-        async () => this.memory.checkRSS('memory_rss', 3000 * 1024 * 1024),
-        async () => this.disk.checkStorage('storage', { thresholdPercent: 0.99, path: this.path }),
+        async () => this.memory.checkHeap('memory_heap', 1024 * 1024 * 1024),
+        async () => this.memory.checkRSS('memory_rss', 3072 * 1024 * 1024),
+        async () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: this.path }),
         MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
         RedisProvider.instance.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
       ]),
