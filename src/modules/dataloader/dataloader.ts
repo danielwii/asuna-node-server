@@ -63,6 +63,7 @@ export const dataLoaderCleaner = {
     logger.debug(`remove loader cache ... ${segment}-${id}`);
     const key = `${segment}-${id}`;
     cacheMap.delete(key);
+    redisLoader?.clear(key);
     redisLoader?.clearAllLocal(key);
   },
 };
