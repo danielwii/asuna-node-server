@@ -5,9 +5,7 @@ import * as _ from 'lodash';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
-import { SMSConfigObject } from '../sms';
 import { SMSVerifyCodeGuard } from '../sms/guards';
-import { SMSHelper } from '../sms/helper';
 import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
 
@@ -41,27 +39,17 @@ const logger = LoggerFactory.getLogger('PaymentController');
 
 @Controller('api/v1/payment')
 export class PaymentController {
-  private config = SMSConfigObject.load();
+  // @Get('query/:id')
+  // public async queryOrder(@Param('id') id) {
+  //   return PaymentWxpayHelper.query(id);
+  // }
 
   @Post('notify')
   public async postNotify(@Body() body, @Req() req: Request) {
     const isWxPay = _.isEmpty(body);
     const data = isWxPay ? await WeChatHelper.parseXmlToJson(req) : body;
     logger.log(`notify ${r(data)}`);
-    const order = await PaymentHelper.handleNotify(body?.id, data, isWxPay);
-    if (order) {
-      const tmplPath = 'payment-success';
-      const tmplId = _.get(this.config.templates, tmplPath);
-      const phonePath = 'paymentInfo.mobile';
-      const phoneNumber = _.get(order.transaction, phonePath);
-      if (this.config.enable) {
-        if (tmplId && phoneNumber) {
-          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
-        } else {
-          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
-        }
-      }
-    }
+    await PaymentHelper.handlePaymentNotify(data, isWxPay);
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)

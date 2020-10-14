@@ -5,6 +5,7 @@ import { CronHelper } from '../helper';
 import { PaymentController } from './payment.controller';
 import { PaymentHelper } from './payment.helper';
 import { PaymentQueryResolver, UserPaymentOrderResolver } from './payment.resolver';
+import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 const logger = LoggerFactory.getLogger('PaymentModule');
 
@@ -21,6 +22,10 @@ export class PaymentModule implements OnModuleInit {
 
   public async initCron(): Promise<void> {
     CronHelper.reg('clean-expired-payments', CronExpression.EVERY_HOUR, PaymentHelper.cleanExpiredPayments, {
+      runOnInit: true,
+      ttl: 300,
+    });
+    CronHelper.reg('check-wx-payment-status', CronExpression.EVERY_5_MINUTES, PaymentWxpayHelper.checkPaymentStatus, {
       runOnInit: true,
       ttl: 300,
     });

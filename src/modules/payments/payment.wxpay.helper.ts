@@ -1,15 +1,17 @@
-import axios from 'axios';
-import { Promise } from 'bluebird';
-import * as Chance from 'chance';
-import * as crypto from 'crypto';
-import * as _ from 'lodash';
-import * as qs from 'qs';
-import * as xml2js from 'xml2js';
-import { AsunaErrorCode, AsunaException, r } from '../common';
-import { LoggerFactory } from '../common/logger';
-import { ConfigKeys, configLoader } from '../config';
-import { PaymentMethod } from './payment.entities';
-import { AppConfigObject } from '../config/app.config';
+import axios from "axios";
+import { Promise } from "bluebird";
+import * as Chance from "chance";
+import * as crypto from "crypto";
+import * as _ from "lodash";
+import * as qs from "qs";
+import { IsNull } from "typeorm";
+import * as xml2js from "xml2js";
+import { AsunaErrorCode, AsunaException, r } from "../common";
+import { LoggerFactory } from "../common/logger";
+import { AppConfigObject } from "../config/app.config";
+import { PaymentMethod } from "./payment.entities";
+import { PaymentHelper } from "./payment.helper";
+import { PaymentOrder } from "./payment.order.entities";
 
 const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
@@ -17,6 +19,69 @@ const chance = new Chance();
 type TradeType = 'MWEB' | 'JSAPI' | 'APP' | 'NATIVE';
 
 export class PaymentWxpayHelper {
+  public static async checkPaymentStatus() {
+    const [orders, count] = await PaymentOrder.findAndCount({
+      where: { status: IsNull() },
+      relations: ['transaction', 'transaction.method'],
+    });
+    if (count) {
+      logger.log(`check payment orders: ${count}`);
+      await Promise.mapSeries(orders, async (order) => {
+        if (order.transaction.method.type === 'wxpay') {
+          logger.debug(`order type is ${order.transaction.method.type}, ignore it.`);
+          return Promise.resolve();
+        }
+        await order.reload();
+        if (order.status === 'done') {
+          logger.debug(`${order.id} already handled`);
+          return Promise.resolve();
+        }
+        const queried = await PaymentWxpayHelper.query(order.id);
+        if (queried.trade_state === 'SUCCESS') {
+          order.transaction.status = 'done';
+          order.transaction.data = queried;
+          await order.transaction.save();
+          order.status = 'done';
+          await order.save();
+
+          _.each(PaymentHelper.notifyHandlers, (handler) => handler(order));
+          return order;
+        }
+      });
+    }
+  }
+
+  public static async query(id: string): Promise<any> {
+    const order = await PaymentOrder.findOneOrFail(id, { relations: ['transaction', 'transaction.method'] });
+    const method = order.transaction.method;
+    logger.log(`query order ${r({ id, order })}`);
+    const queryObject = {
+      appid: method.apiKey,
+      mch_id: method.merchant,
+      device_info: 'WEB',
+      nonce_str: chance.string({ length: 32, alpha: true, numeric: true }),
+      out_trade_no: id,
+    };
+    const secretKey = _.get(method.extra, 'secretKey') as string;
+    if (_.isEmpty(secretKey)) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `secretKey not found`);
+    }
+    const signStr = `${qs.stringify(queryObject, {
+      encode: false,
+      sort: (a, b) => a.localeCompare(b),
+    })}&key=${secretKey}`;
+    const sign = crypto.createHash('md5').update(signStr).digest('hex').toUpperCase();
+    const signedQueryObject = { ...queryObject, sign };
+    const xmlData = new xml2js.Builder({ xmldec: undefined, rootName: 'xml', cdata: true }).buildObject(
+      signedQueryObject,
+    );
+    const response = await axios.post('https://api.mch.weixin.qq.com/pay/orderquery', xmlData);
+    const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
+    const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
+    logger.debug(`response is ${r(data)}`);
+    return data;
+  }
+
   public static async createOrder(
     method: PaymentMethod,
     { openid, tradeType }: { openid: string; tradeType: TradeType },

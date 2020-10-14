@@ -9,12 +9,13 @@ import { IsNull, LessThan } from 'typeorm';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { AppConfigObject } from '../config/app.config';
+import { SMSConfigObject, SMSHelper } from '../sms';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
 import { PaymentOrder } from './payment.order.entities';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
-import { AppConfigObject } from '../config/app.config';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 
@@ -28,6 +29,7 @@ interface PaymentContext {
 }
 
 export class PaymentHelper {
+  private static config = SMSConfigObject.load();
   public static notifyHandlers: Record<string, (order: PaymentOrder) => any> = {};
 
   public static async createOrder({
@@ -221,7 +223,25 @@ export class PaymentHelper {
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 
-  public static async handleNotify(orderId: string | undefined, data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
+  public static async handlePaymentNotify(data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
+    const order = await PaymentHelper.handleNotify(data, isWxPay);
+    if (order) {
+      const tmplPath = 'payment-success';
+      const tmplId = _.get(PaymentHelper.config.templates, tmplPath);
+      const phonePath = 'paymentInfo.mobile';
+      const phoneNumber = _.get(order.transaction, phonePath);
+      if (PaymentHelper.config.enable) {
+        if (tmplId && phoneNumber) {
+          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
+        } else {
+          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
+        }
+      }
+    }
+    return order;
+  }
+
+  public static async handleNotify(data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
     if (isWxPay) {
       const body = data as {
         appid: string;
@@ -255,8 +275,8 @@ export class PaymentHelper {
       logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
-        logger.debug(`already done, skip.`);
-        return order;
+        logger.log(`already done, skip.`);
+        return undefined;
       }
 
       order.transaction.status = 'done';
@@ -309,8 +329,8 @@ export class PaymentHelper {
       logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
-        logger.debug(`already done, skip.`);
-        return order;
+        logger.log(`already done, skip.`);
+        return undefined;
       }
 
       order.transaction.status = 'done';
