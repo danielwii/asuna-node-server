@@ -243,16 +243,16 @@ export class PaymentHelper {
         transaction_id: string;
       };
       const validated = await PaymentWxpayHelper.validateSign(body);
-      logger.debug(`validated wxpay is ${r(validated)}`);
+      logger.log(`validated wxpay is ${r(validated)}`);
       if (!validated) {
         // logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.out_trade_no} not validated.`);
       }
 
       // const params = parseJSONIfCould(body.passback_params);
-      logger.debug(`find order ${body.out_trade_no}`);
+      logger.log(`find order ${body.out_trade_no}`);
       const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
-      logger.debug(`update order ${r({ order, body })} status to done`);
+      logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
         logger.debug(`already done, skip.`);
@@ -297,16 +297,16 @@ export class PaymentHelper {
       };
 
       const validated = await PaymentAlipayHelper.validateSign(body);
-      logger.debug(`validated alipay is ${r(validated)}`);
+      logger.log(`validated alipay is ${r(validated)}`);
       if (!validated) {
         logger.error(`${body.subject} not validated. ${r(body)}`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
       }
 
       const params = parseJSONIfCould(body.passback_params);
-      logger.debug(`find order ${params.orderId ?? body.subject}`);
+      logger.log(`find order ${params.orderId ?? body.subject}`);
       const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
-      logger.debug(`update order ${r({ order, body })} status to done`);
+      logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
         logger.debug(`already done, skip.`);
