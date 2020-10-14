@@ -46,6 +46,7 @@ export class PaymentWxpayHelper {
           await order.save();
 
           _.each(PaymentHelper.notifyHandlers, (handler) => handler(order));
+          PaymentHelper.noticePaymentOrderUser(order);
           return order;
         }
       });

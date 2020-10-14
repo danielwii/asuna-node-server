@@ -225,6 +225,11 @@ export class PaymentHelper {
 
   public static async handlePaymentNotify(data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
     const order = await PaymentHelper.handleNotify(data, isWxPay);
+    PaymentHelper.noticePaymentOrderUser(order);
+    return order;
+  }
+
+  public static noticePaymentOrderUser(order: PaymentOrder): void {
     if (order) {
       const tmplPath = 'payment-success';
       const tmplId = _.get(PaymentHelper.config.templates, tmplPath);
@@ -238,7 +243,6 @@ export class PaymentHelper {
         }
       }
     }
-    return order;
   }
 
   public static async handleNotify(data: any, isWxPay?: boolean): Promise<PaymentOrder | undefined> {
