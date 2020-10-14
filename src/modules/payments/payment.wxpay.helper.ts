@@ -1,17 +1,17 @@
-import axios from "axios";
-import { Promise } from "bluebird";
-import * as Chance from "chance";
-import * as crypto from "crypto";
-import * as _ from "lodash";
-import * as qs from "qs";
-import { IsNull } from "typeorm";
-import * as xml2js from "xml2js";
-import { AsunaErrorCode, AsunaException, r } from "../common";
-import { LoggerFactory } from "../common/logger";
-import { AppConfigObject } from "../config/app.config";
-import { PaymentMethod } from "./payment.entities";
-import { PaymentHelper } from "./payment.helper";
-import { PaymentOrder } from "./payment.order.entities";
+import axios from 'axios';
+import { Promise } from 'bluebird';
+import * as Chance from 'chance';
+import * as crypto from 'crypto';
+import * as _ from 'lodash';
+import * as qs from 'qs';
+import { IsNull } from 'typeorm';
+import * as xml2js from 'xml2js';
+import { AsunaErrorCode, AsunaException, r } from '../common';
+import { LoggerFactory } from '../common/logger';
+import { AppConfigObject } from '../config/app.config';
+import { PaymentMethod } from './payment.entities';
+import { PaymentHelper } from './payment.helper';
+import { PaymentOrder } from './payment.order.entities';
 
 const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
@@ -27,7 +27,7 @@ export class PaymentWxpayHelper {
     if (count) {
       logger.log(`check payment orders: ${count}`);
       await Promise.mapSeries(orders, async (order) => {
-        if (order.transaction.method.type === 'wxpay') {
+        if (order.transaction.method.type !== 'wxpay') {
           logger.debug(`order type is ${order.transaction.method.type}, ignore it.`);
           return Promise.resolve();
         }
@@ -38,6 +38,7 @@ export class PaymentWxpayHelper {
         }
         const queried = await PaymentWxpayHelper.query(order.id);
         if (queried.trade_state === 'SUCCESS') {
+          logger.log(`update order ${order.id} status to done.`);
           order.transaction.status = 'done';
           order.transaction.data = queried;
           await order.transaction.save();
