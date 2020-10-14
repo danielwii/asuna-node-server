@@ -22,7 +22,7 @@ export class PaymentModule implements OnModuleInit {
 
   public async initCron(): Promise<void> {
     CronHelper.reg('clean-expired-payments', CronExpression.EVERY_HOUR, PaymentHelper.cleanExpiredPayments, {
-      runOnInit: true,
+      runOnInit: false,
       ttl: 300,
     });
     CronHelper.reg('check-wx-payment-status', CronExpression.EVERY_5_MINUTES, PaymentWxpayHelper.checkPaymentStatus, {
