@@ -40,7 +40,8 @@ export class ExchangePayload {
 
   // 相关资源 id
   @IsString()
-  public refId: string;
+  @IsOptional()
+  public refId?: string;
 
   public constructor(o: ExchangePayload) {
     Object.assign(this, deserializeSafely(ExchangePayload, o));
