@@ -1,12 +1,12 @@
-import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { GraphQLResolveInfo } from 'graphql';
-import { DataLoaderFunction } from './dataloader';
+import type { ExecutionContext } from '@nestjs/common';
+import type { GraphQLResolveInfo } from 'graphql';
+import type { DefaultRegisteredLoaders } from './context';
 
-export type GraphqlRequest = Request & {
+export type GraphqlRequest<RegisteredLoaders = DefaultRegisteredLoaders> = Request & {
   id?: string;
   user?: string;
-  dataLoaders: { [key: string]: DataLoaderFunction<any> };
+  dataLoaders: RegisteredLoaders;
 };
 
 export function getRequestFromContext(context: ExecutionContext): GraphqlRequest {

@@ -68,7 +68,7 @@ export const dataLoaderCleaner = {
   },
 };
 
-export class GenericDataLoader {
+export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
   public static _loaders;
 
   public constructor() {
@@ -79,12 +79,12 @@ export class GenericDataLoader {
     return GenericDataLoader._loaders;
   }
 
-  public initLoaders(loaders: { [key: string]: DataLoaderFunction<any> }): void {
+  public initLoaders(loaders: T): void {
     logger.debug(`init loaders ${r(loaders)}`);
     GenericDataLoader._loaders = loaders;
   }
 
-  public createLoaders(): { [key: string]: DataLoaderFunction<any> } {
+  public createLoaders(): T {
     return _.memoize(() => GenericDataLoader._loaders)();
   }
 }
