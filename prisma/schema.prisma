@@ -8,7 +8,7 @@ datasource db {
 }
 
 model app__t_infos {
-  id              Int               @default(autoincrement()) @id
+  id              Int               @id @default(autoincrement())
   created_at      DateTime          @default(now())
   updated_at      DateTime          @default(now())
   updated_by      String?
@@ -21,7 +21,7 @@ model app__t_infos {
 }
 
 model app__t_releases {
-  id           Int           @default(autoincrement()) @id
+  id           Int           @id @default(autoincrement())
   created_at   DateTime      @default(now())
   updated_at   DateTime      @default(now())
   updated_by   String?
@@ -50,7 +50,7 @@ model auth__tr_users_roles {
 }
 
 model auth__t_api_keys {
-  id           Int      @default(autoincrement()) @id
+  id           Int      @id @default(autoincrement())
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
   updated_by   String?
@@ -62,7 +62,7 @@ model auth__t_api_keys {
 }
 
 model auth__t_roles {
-  id                   Int                    @default(autoincrement()) @id
+  id                   Int                    @id @default(autoincrement())
   created_at           DateTime               @default(now())
   updated_at           DateTime               @default(now())
   updated_by           String?
@@ -132,7 +132,7 @@ model client__t_users {
 }
 
 model content__t_drafts {
-  id         Int      @default(autoincrement()) @id
+  id         Int      @id @default(autoincrement())
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
   updated_by String?
@@ -142,7 +142,7 @@ model content__t_drafts {
 }
 
 model content__t_feedback {
-  id                          Int                           @default(autoincrement()) @id
+  id                          Int                           @id @default(autoincrement())
   created_at                  DateTime                      @default(now())
   updated_at                  DateTime                      @default(now())
   updated_by                  String?
@@ -159,7 +159,7 @@ model content__t_feedback {
 }
 
 model content__t_feedback_replies {
-  id                  Int                  @default(autoincrement()) @id
+  id                  Int                  @id @default(autoincrement())
   created_at          DateTime             @default(now())
   updated_at          DateTime             @default(now())
   updated_by          String?
@@ -174,7 +174,7 @@ model content__t_feedback_replies {
 }
 
 model content__t_notifications {
-  id           Int      @default(autoincrement()) @id
+  id           Int      @id @default(autoincrement())
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
   updated_by   String?
@@ -186,7 +186,7 @@ model content__t_notifications {
 }
 
 model kv__t_models {
-  id           Int          @default(autoincrement()) @id
+  id           Int          @id @default(autoincrement())
   created_at   DateTime     @default(now())
   updated_at   DateTime     @default(now())
   updated_by   String?
@@ -199,7 +199,7 @@ model kv__t_models {
 }
 
 model kv__t_pairs {
-  id           Int           @default(autoincrement()) @id
+  id           Int           @id @default(autoincrement())
   created_at   DateTime      @default(now())
   updated_at   DateTime      @default(now())
   updated_by   String?
@@ -213,13 +213,13 @@ model kv__t_pairs {
 }
 
 model migrations {
-  id        Int    @default(autoincrement()) @id
+  id        Int    @id @default(autoincrement())
   timestamp Int
   name      String
 }
 
 model page__t_views {
-  id           Int      @default(autoincrement()) @id
+  id           Int      @id @default(autoincrement())
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
   updated_by   String?
@@ -317,7 +317,7 @@ model payment__t_transactions {
 }
 
 model property__t_exchange_objects {
-  id                                 Int                                  @default(autoincrement()) @id
+  id                                 Int                                  @id @default(autoincrement())
   created_at                         DateTime                             @default(now())
   updated_at                         DateTime                             @default(now())
   updated_by                         String?
@@ -334,7 +334,7 @@ model property__t_exchange_objects {
 }
 
 model property__t_financial_transactions {
-  id                           Int                           @default(autoincrement()) @id
+  id                           Int                           @id @default(autoincrement())
   created_at                   DateTime                      @default(now())
   updated_at                   DateTime                      @default(now())
   updated_by                   String?
@@ -355,7 +355,7 @@ model property__t_financial_transactions {
 }
 
 model property__t_point_exchanges {
-  id                    Int                    @default(autoincrement()) @id
+  id                    Int                    @id @default(autoincrement())
   created_at            DateTime               @default(now())
   updated_at            DateTime               @default(now())
   updated_by            String?
@@ -374,7 +374,7 @@ model property__t_point_exchanges {
 }
 
 model property__t_wallets {
-  id                    Int                    @default(autoincrement()) @id
+  id                    Int                    @id @default(autoincrement())
   created_at            DateTime               @default(now())
   updated_at            DateTime               @default(now())
   updated_by            String?
@@ -389,7 +389,7 @@ model property__t_wallets {
 }
 
 model sys__t_audit_records {
-  id             Int      @default(autoincrement()) @id
+  id             Int      @id @default(autoincrement())
   created_at     DateTime @default(now())
   updated_at     DateTime @default(now())
   updated_by     String?
@@ -402,7 +402,7 @@ model sys__t_audit_records {
 }
 
 model sys__t_operation_tokens {
-  id            Int       @default(autoincrement()) @id
+  id            Int       @id @default(autoincrement())
   created_at    DateTime  @default(now())
   updated_at    DateTime  @default(now())
   updated_by    String?
@@ -439,7 +439,7 @@ model sys__t_tasks {
 }
 
 model sys__t_task_events {
-  id           Int           @default(autoincrement()) @id
+  id           Int           @id @default(autoincrement())
   created_at   DateTime      @default(now())
   updated_at   DateTime      @default(now())
   updated_by   String?
