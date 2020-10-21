@@ -20,7 +20,6 @@ import type { DefaultRegisteredLoaders } from './context';
 const logger = LoggerFactory.getLogger('DataLoader');
 
 const cacheMap = new Map();
-let redisLoader;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
@@ -58,15 +57,26 @@ export function loader<Entity extends BaseEntity>(
   );
 }
 
-export const dataLoaderCleaner = {
-  clear(segment: string, id: PrimaryKey): void {
-    logger.debug(`remove loader cache ... ${segment}-${id}`);
-    const key = `${segment}-${id}`;
+export class DataloaderCleaner {
+  public static redisLoaders: Record<string, any> = {};
+
+  public static reg(segment: string, loader) {
+    // logger.log(`reg redis cleaner ${segment}`);
+    DataloaderCleaner.redisLoaders[segment] = loader;
+  }
+
+  public static clear(segment: string, id: PrimaryKey): void {
+    const key = `${segment}:${id}`;
+    logger.log(`remove loader cache ... ${r(key)}`);
     cacheMap.delete(key);
-    redisLoader?.clear(key);
-    redisLoader?.clearAllLocal(key);
-  },
-};
+    // if (DataloaderCleaner.redisLoaders[segment]) {
+    const redisLoader = DataloaderCleaner.redisLoaders[segment];
+    redisLoader.clear(id);
+    redisLoader.clearLocal(id);
+    redisLoader.clearAllLocal(id);
+    // }
+  }
+}
 
 export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
   public static _loaders;
@@ -93,7 +103,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   const redis = RedisProvider.instance.getRedisClient('dataloader');
   if (redis.isEnabled) {
     logger.log(`init redis dataloader for ${segment} ... ${r(redis.redisOptions)}`);
-    redisLoader = new (RedisDataloader({ redis: redis.client }))(
+    const redisLoader = new (RedisDataloader({ redis: redis.client }))(
       `dataloader-${segment}`,
       // create a regular dataloader. This should always be set with caching disabled.
       new DataLoader(
@@ -114,6 +124,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
         deserialize: (s) => JSON.parse(s),
       },
     );
+    DataloaderCleaner.reg(segment, redisLoader);
     return redisLoader;
   }
 
@@ -131,10 +142,10 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           // logger.debug(`get (${segment}:${id})`);
           // return cachedObject;
           const now = Date.now();
-          const key = `${segment}-${id}`;
+          const key = `${segment}:${id}`;
           const { value, expires } = cacheMap.get(key) || ({} as any);
           logger.verbose(
-            `get (${segment}:${id}) ${r({
+            `get (${key}) ${r({
               exists: !!value,
               expires: new Date(expires),
               now: new Date(now),
@@ -155,7 +166,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           return value;
         },
         set: async (id: string, value) => {
-          const key = `${segment}-${id}`;
+          const key = `${segment}:${id}`;
           const promised = await value;
           if (promised) {
             logger.debug(`dataloader set ${key}`);
@@ -170,7 +181,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
         },
         delete: (id: string) => {
           // logger.log(`delete (${segment}:${id})`);
-          const key = `${segment}-${id}`;
+          const key = `${segment}:${id}`;
           cacheMap.delete(key);
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch((reason) =>
             logger.error(reason),
