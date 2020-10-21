@@ -6,7 +6,7 @@ import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',
-  serviceName = 'serviceName',
+  serviceName = 'service_name',
   endpoint = 'endpoint',
 }
 

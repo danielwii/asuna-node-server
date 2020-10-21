@@ -1,7 +1,7 @@
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import { default as OpenTracingExtension } from 'apollo-opentracing';
+import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -33,7 +33,7 @@ export class GraphqlModule implements OnModuleInit {
       path.resolve(__dirname, '../../src/**/*.graphql'),
       `${path.join(process.mainModule.path, '../src')}/**/*.graphql`,
     ]);
-    logger.log(`init graphql ${r({ typePaths, config, main: process.mainModule.path, dir, options })}`);
+    logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: process.mainModule.path, dir, options })}`);
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
@@ -87,12 +87,12 @@ export class GraphqlModule implements OnModuleInit {
           extensions: _.compact([
             tracingConfig.enabled
               ? _.memoize(() => {
-                  const openTracingExtension = new OpenTracingExtension({
+                  const openTracingExtension = new (OpenTracingExtension as any)({
                     server: tracer,
                     local: tracer,
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
-                  }) as any;
+                  });
                   logger.log(`load open tracing extension ...`);
                   return openTracingExtension;
                 })
