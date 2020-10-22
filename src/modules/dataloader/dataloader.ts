@@ -69,12 +69,12 @@ export class DataloaderCleaner {
     const key = `${segment}:${id}`;
     logger.log(`remove loader cache ... ${r(key)}`);
     cacheMap.delete(key);
-    // if (DataloaderCleaner.redisLoaders[segment]) {
-    const redisLoader = DataloaderCleaner.redisLoaders[segment];
-    redisLoader.clear(id);
-    redisLoader.clearLocal(id);
-    redisLoader.clearAllLocal(id);
-    // }
+    if (DataloaderCleaner.redisLoaders[segment]) {
+      const redisLoader = DataloaderCleaner.redisLoaders[segment];
+      redisLoader.clear(id);
+      redisLoader.clearLocal(id);
+      redisLoader.clearAllLocal(id);
+    }
   }
 }
 

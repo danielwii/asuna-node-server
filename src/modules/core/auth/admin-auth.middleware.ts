@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('AdminAuthMiddleware');
  * 在生产环境中服务端应该只能通过 IP 白名单访问
  */
 export class AdminAuthMiddleware {
-  static forRoutes(...routeFilters: string[]) {
+  public static forRoutes(...routeFilters: string[]) {
     return async (req: Request, res: Response, next: () => void) => {
       const url = req.originalUrl;
       const matched = _.find(routeFilters, (routeFilter) => url.startsWith(routeFilter));

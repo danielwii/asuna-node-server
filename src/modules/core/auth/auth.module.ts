@@ -28,15 +28,15 @@ const logger = LoggerFactory.getLogger('AuthModule');
   exports: [AuthService],
 })
 export class AuthModule implements NestModule, OnModuleInit {
-  constructor(private readonly adminAuthService: AdminAuthService) {}
+  public constructor(private readonly adminAuthService: AdminAuthService) {}
 
-  configure(consumer: MiddlewareConsumer): void {
+  public configure(consumer: MiddlewareConsumer): void {
     logger.log('configure...');
-    consumer.apply(AdminAuthMiddleware.forRoutes('/admin', '/rest')).forRoutes('*');
+    consumer.apply(AdminAuthMiddleware.forRoutes('/admin', /*'/rest'*/)).forRoutes('*');
   }
 
-  onModuleInit(): void {
+  public onModuleInit(): void {
     logger.log('init...');
-    this.adminAuthService.initSysAccount().catch(error => logger.error(error));
+    this.adminAuthService.initSysAccount().catch((error) => logger.error(error));
   }
 }

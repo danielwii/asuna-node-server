@@ -24,7 +24,7 @@ import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
 import { LoggerFactory, LoggerHelper } from './modules/common/logger';
 import { LoggerConfigObject } from './modules/common/logger/config';
 import { ConfigKeys, configLoader } from './modules/config';
-import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './modules/core';
+import { AccessControlHelper, AsunaContext, DBHelper, Global, IAsunaContextOpts } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
 import { FeaturesConfigObject } from './modules/config/features.config';
 import { AppConfigObject } from './modules/config/app.config';
@@ -155,6 +155,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   // may add bootstrap lifecycle for static initialize
   AccessControlHelper.init();
+  await DBHelper.initPrismaClient();
 
   // --------------------------------------------------------------
   // setup application

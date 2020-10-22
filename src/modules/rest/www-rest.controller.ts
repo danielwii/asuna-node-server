@@ -4,7 +4,7 @@ import { RestCrudController } from './base.controllers';
 
 @Controller('rest')
 export class WwwRestController extends RestCrudController {
-  constructor() {
+  public constructor() {
     super(AsunaContext.instance.defaultModulePrefix);
   }
 }

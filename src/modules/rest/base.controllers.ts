@@ -76,6 +76,16 @@ export abstract class RestCrudController {
     return RestHelper.groupCounts(modelNameObject, parseWhere(whereStr), column);
   }
 
+  /*
+  @Get('query/:model')
+  public query(@Param('model') model: string, @Query('action') action: string, @Query('args') args: string) {
+    const modelNameObject = DBHelper.getModelNameObject(model, this.module);
+    const opts = parseJSONIfCould(args);
+    logger.log(`query ${r({ model, modelNameObject, action, opts, args })}`);
+    return DBHelper.prismaClient[modelNameObject.dbName][action][opts];
+  }
+*/
+
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model')
   public async list(

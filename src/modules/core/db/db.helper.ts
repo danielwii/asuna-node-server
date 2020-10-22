@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -9,6 +10,7 @@ import {
   Equal,
   FindOperator,
   getConnection,
+  getConnectionOptions,
   getRepository,
   In,
   IsNull,
@@ -191,6 +193,37 @@ export interface OriginSchema {
 
 export class DBHelper {
   public static metadatas: EntityMetadata[] = [];
+
+  private static _prismaClient: PrismaClient;
+  public static get prismaClient() {
+    return DBHelper._prismaClient;
+  }
+
+  public static async initPrismaClient(): Promise<void> {
+    if (!DBHelper._prismaClient) {
+      const dbConfig = await getConnectionOptions();
+      if (!['mysql', 'postgres'].includes(dbConfig.type)) {
+        logger.warn(`not support db type '${dbConfig.type}' for prisma`);
+        return;
+      }
+
+      if (dbConfig.type === 'mysql') {
+        const url =
+          dbConfig.url ??
+          `${dbConfig.type}://${dbConfig.username}:${dbConfig.password}@${dbConfig.host ?? 'localhost'}:${
+            dbConfig.port ?? 3306
+          }/${dbConfig.database}`;
+        logger.log(`init db with ${url}`);
+        this._prismaClient = new PrismaClient({
+          datasources: { db: { url } },
+          log: [{ emit: 'event', level: 'query' }],
+          errorFormat: 'pretty',
+        });
+      } else {
+        logger.warn(`postgres prisma client init not implemented yet.`);
+      }
+    }
+  }
 
   public static isValidEntity(metadata): boolean {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
