@@ -535,3 +535,14 @@ model wx__t_users {
 
   @@index([tenant__id], name: "FK_84c91d701b8ae841a49bf00352f")
 }
+
+model sys__t_devices {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  updated_by String?
+  device_id  String?
+  session_id String?
+  ua         String
+  client_ip  String?
+}

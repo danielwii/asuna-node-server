@@ -6,14 +6,14 @@ import { AbstractBaseEntity } from '../../base';
 @Entity('sys__t_devices')
 export class Device extends AbstractBaseEntity {
   @Column({ nullable: true, length: 36, name: 'device_id' })
-  deviceId: string;
+  public deviceId: string;
 
   @Column({ nullable: true, length: 36, name: 'session_id' })
-  sessionId: string;
+  public sessionId: string;
 
   @Column()
-  ua: string;
+  public ua: string;
 
   @Column({ nullable: true, length: 36, name: 'client_ip' })
-  clientIp: string;
+  public clientIp: string;
 }

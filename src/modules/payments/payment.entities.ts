@@ -13,31 +13,31 @@ import type { PaymentOrder } from './payment.order.entities';
 @EntityMetaInfo({ name: 'payment__methods', internal: true })
 @Entity('payment__t_methods')
 export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
-  constructor() {
+  public constructor() {
     super('pm');
   }
 
   @MetaInfo({ name: '显示名称' })
   @Column({ nullable: true, name: 'display_name' })
-  displayName: string;
+  public displayName: string;
 
   @MetaInfo({ name: 'Endpoint' })
   @Column({ nullable: true })
-  endpoint: string;
+  public endpoint: string;
 
   @MetaInfo({ name: 'Merchant ID' })
   @Column({ nullable: true })
-  merchant: string;
+  public merchant: string;
 
   // @Expose({ name: 'with-api-key', toPlainOnly: true })
   @MetaInfo({ name: 'API Key' })
   @Column({ nullable: true })
-  apiKey: string;
+  public apiKey: string;
 
   // @Expose({ name: 'with-private-key', toPlainOnly: true })
   @MetaInfo({ name: 'Private Key' })
   @Column(ColumnTypeHelper.text(), { nullable: true, name: 'private_key' })
-  privateKey: string;
+  public privateKey: string;
 
   @MetaInfo({
     name: '附加信息',
@@ -53,7 +53,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
     `,
   })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'extra' })
-  extra: Record<string, string | number>;
+  public extra: Record<string, string | number>;
 
   @MetaInfo({
     name: '签名模版',
@@ -70,7 +70,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
     ],
   })
   @Column(ColumnTypeHelper.text(), { nullable: true, name: 'sign_tmpl' })
-  signTmpl: string;
+  public signTmpl: string;
 
   @MetaInfo({
     name: 'Body 模版',
@@ -89,14 +89,14 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
     // extra: { jsonMode: true },
   })
   @Column(ColumnTypeHelper.text(), { nullable: true, name: 'body_tmpl' })
-  bodyTmpl: string;
+  public bodyTmpl: string;
 
   @MetaInfo({ name: '支付类型', type: 'EnumFilter', enumData: PaymentMethodEnumValue.data })
   @Column('varchar', { nullable: true, name: 'type', default: PaymentMethodEnumValue.types.third })
-  type: PaymentMethodType;
+  public type: PaymentMethodType;
 
   @OneToMany('PaymentTransaction', (inverse: PaymentTransaction) => inverse.method)
-  transactions: PaymentTransaction[];
+  public transactions: PaymentTransaction[];
 }
 
 /**
@@ -105,67 +105,67 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
 @EntityMetaInfo({ name: 'payment__items', internal: true })
 @Entity('payment__t_items')
 export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
-  constructor() {
+  public constructor() {
     super('pi');
   }
 
   @MetaInfo({ name: 'Key' })
   @Column({ nullable: false, unique: true, length: 50, name: 'key' })
-  key: string;
+  public key: string;
 
   @MetaInfo({ name: '简要' })
   @Column(ColumnTypeHelper.text(), { nullable: true, name: 'summary' })
-  summary: string;
+  public summary: string;
 
   @MetaInfo({ name: '价格' })
   @Column({ ...ColumnTypeHelper.money(), nullable: true })
-  price: number;
+  public price: number;
 
   @MetaInfo({ name: '封面', type: 'Image' })
   @Column({ nullable: true, length: 1000 })
-  cover: string;
+  public cover: string;
 
   @MetaInfo({ name: '图片', type: 'Images' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  images: JsonArray;
+  public images: JsonArray;
 
   @ManyToMany('PaymentOrder', (inverse: PaymentOrder) => inverse.items)
-  orders: PaymentOrder[];
+  public orders: PaymentOrder[];
 }
 
 @EntityMetaInfo({ name: 'payment__transactions', internal: true, displayName: '交易' })
 @Entity('payment__t_transactions')
 export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBasedBaseEntity) {
-  constructor() {
+  public constructor() {
     super('pt');
   }
 
   @MetaInfo({ name: '状态' })
   @Column({ nullable: true })
-  status: string;
+  public status: string;
 
   @MetaInfo({ name: '签名' })
   @Column({ nullable: true })
-  sign: string;
+  public sign: string;
 
   @MetaInfo({ name: '支付相关信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'payment_info' })
-  paymentInfo: Record<string, unknown>;
+  public paymentInfo: Record<string, unknown>;
 
   @MetaInfo({ name: '附加信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  extra: Record<string, unknown>;
+  public extra: Record<string, unknown>;
 
   @MetaInfo({ name: '返回信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  data: Record<string, unknown>;
+  public data: Record<string, unknown>;
 
   @MetaInfo({ name: '支付类型' })
   @ManyToOne('PaymentMethod', (inverse: PaymentMethod) => inverse.transactions, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'method__id' })
-  method: PaymentMethod;
+  public method: PaymentMethod;
 
   @MetaInfo({ name: '订单' })
   @OneToOne('PaymentOrder', (inverse: PaymentOrder) => inverse.transaction, { onDelete: 'CASCADE' })
-  order: PaymentOrder;
+  public order: PaymentOrder;
 }

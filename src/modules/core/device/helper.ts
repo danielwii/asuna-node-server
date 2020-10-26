@@ -2,7 +2,7 @@ import { RequestInfo } from '../../helper';
 import { Device } from './entities';
 
 export class DeviceHelper {
-  static async reg(req: RequestInfo): Promise<Device> {
+  public static async reg(req: RequestInfo): Promise<Device> {
     const exists = await Device.findOne({ deviceId: req.session.deviceId, sessionId: req.sessionID });
     if (!exists) {
       return Device.create({

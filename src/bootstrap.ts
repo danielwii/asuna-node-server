@@ -195,7 +195,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(compression());
 
   const sessionRedis = RedisProvider.instance.getRedisClient('session');
-  logger.log(`session redis connected: ${sessionRedis.client.connected}`);
+  logger.log(`session redis connected: ${sessionRedis.client?.connected}`);
   const sessionOptions = {
     store: sessionRedis.isEnabled
       ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
