@@ -164,24 +164,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // see https://expressjs.com/en/guide/behind-proxies.html
   app.set('trust proxy', 1);
 
-  const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY);
+  const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
   app.use(requestIp.mw());
   app.use(cookieParser(secret));
-  /*
-  FIXME Cannot read property 'set' of undefined
-  const sessionRedis = RedisProvider.instance.getRedisClient('session');
-  const sessionOptions = {
-    store: sessionRedis.isEnabled
-      ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
-      : new session.MemoryStore(),
-    secret,
-    resave: false,
-    cookie: { secure: true },
-    saveUninitialized: true,
-    genid: () => SimpleIdGeneratorHelper.randomId('se'),
-  };
-  logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.client'))}`);
-  app.use(session(sessionOptions)); */
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -208,6 +193,22 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     }),
   );
   app.use(compression());
+
+  const sessionRedis = RedisProvider.instance.getRedisClient('session');
+  logger.log(`session redis connected: ${sessionRedis.client.connected}`);
+  const sessionOptions = {
+    store: sessionRedis.isEnabled
+      ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
+      : new session.MemoryStore(),
+    secret,
+    resave: false,
+    // cookie: { secure: true },
+    // saveUninitialized: true,
+    genid: () => SimpleIdGeneratorHelper.randomId('se-'),
+  };
+  logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.options.client'))}`);
+  app.use(session(sessionOptions));
+
   app.use(responseTime());
   if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED))
     app.use(

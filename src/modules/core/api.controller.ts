@@ -4,6 +4,9 @@ import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
 import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
+import { r } from '../common/helpers/utils';
+import { DeviceHelper } from './device/helper';
+
 import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('ApiController');
@@ -38,4 +41,10 @@ export class ApiController {
   @UseGuards(CsurfGuard)
   @Post('v1/csurf-test')
   public csurfTest() {}
+
+  @Post('v1/reg-device')
+  public async regDevice(@Req() req: RequestInfo) {
+    const device = await DeviceHelper.reg(req);
+    logger.log(`reg device ${r(device)}`);
+  }
 }

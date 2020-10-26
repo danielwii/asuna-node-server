@@ -1,16 +1,19 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as uuid from 'uuid';
 import isMobile from 'ismobilejs';
 import { LoggerFactory } from './logger';
 import { r } from './helpers';
+import { SimpleIdGeneratorHelper } from '../ids';
 
-const logger = LoggerFactory.getLogger('CommonMiddleware');
-
-export type CommonRequest = { isMobile?: boolean } & { sessionID?: string } & { session?: { landingUrl: string } };
+export type CommonRequest = { isMobile?: boolean } & { sessionID?: string } & {
+  session?: { landingUrl: string; referer: string; deviceId: string };
+  signedCookies?: { deviceId?: string };
+};
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
+  private logger = LoggerFactory.getLogger('IsMobileMiddleware');
+
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
     req.isMobile = isMobile(userAgent).any;
@@ -20,11 +23,16 @@ export class IsMobileMiddleware implements NestMiddleware {
 
 @Injectable()
 export class DeviceMiddleware implements NestMiddleware {
-  public use(req: Request, res: Response, next: () => void) {
+  private logger = LoggerFactory.getLogger('DeviceMiddleware');
+
+  public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies = req.signedCookies;
-    logger.debug(`cookies is ${r(cookies)}`);
+    this.logger.debug(`cookies is ${r(cookies)}`);
     if (!cookies?.deviceId) {
-      res.cookie('deviceId', uuid.v4(), { signed: true, httpOnly: true });
+      const id = SimpleIdGeneratorHelper.randomId('r-');
+      this.logger.debug(`set device id ${id}`);
+      res.cookie('deviceId', id, { signed: true, httpOnly: true, maxAge: 10 * 365 * 24 * 60 * 60 * 1000 });
+      req.session.deviceId = id;
     }
     next();
   }
@@ -32,12 +40,16 @@ export class DeviceMiddleware implements NestMiddleware {
 
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
+  private logger = LoggerFactory.getLogger('LandingUrlMiddleware');
+
   public use(req: Request & CommonRequest, res: Response, next: () => void): any {
     if (!req.session?.landingUrl) {
       req.session.landingUrl = req.url;
+      req.session.referer = req.headers.referer;
+      this.logger.debug(`set landing ${r(req.session)}`);
     }
 
-    logger.debug(`session id ${req.sessionID} session: ${r(req.session)}`);
+    this.logger.debug(`session id ${req.sessionID}`);
     next();
   }
 }

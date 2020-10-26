@@ -5,7 +5,7 @@ import { AdminController } from './admin.controller';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
-import { configLoader } from './config';
+import { ConfigKeys, configLoader } from "./config";
 import { ContentModule } from './content';
 import {
   CommandController,
@@ -101,7 +101,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
 export class AdminInternalModule implements NestModule, OnModuleInit {
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');
-    if (configLoader.loadBoolConfig('COOKIE_SUPPORT')) {
+    if (configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       consumer.apply(DeviceMiddleware).forRoutes('*');
       consumer.apply(LandingUrlMiddleware).forRoutes('*');
     }

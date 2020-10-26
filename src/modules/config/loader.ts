@@ -42,6 +42,7 @@ export const ConfigKeys = {
   DEBUG: 'DEBUG',
   PORT: 'PORT',
   DB_TYPE: 'DB_TYPE',
+  COOKIE_SUPPORT: 'COOKIE_SUPPORT',
 
   LOGGER_LEVEL: 'LOGGER_LEVEL',
 
