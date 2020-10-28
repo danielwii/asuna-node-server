@@ -21,7 +21,7 @@ const logger = LoggerFactory.getLogger('HealthController');
 export class HealthController {
   private mq = new MQHealthIndicator();
   private redis = new RedisHealthIndicator();
-  private path = resolve(dirname(process.mainModule.filename), '../..');
+  private path = resolve(dirname(require.main.filename), '../..');
 
   // eslint-disable-next-line max-params
   public constructor(

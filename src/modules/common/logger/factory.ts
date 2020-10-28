@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { dirname, join, resolve } from 'path';
 
-const root = dirname(process.mainModule.filename);
+const root = dirname(require.main.filename);
 const { packageDir } = global;
 
 export class LoggerFactory {

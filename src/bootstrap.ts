@@ -289,11 +289,11 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
-  const rootDir = dirname(process.mainModule.filename);
-  logger.log(`main entrance is ${r(process.mainModule.filename)}`);
+  const rootDir = dirname(require.main.filename);
+  logger.log(`main entrance is ${r(require.main.filename)}`);
   const { packageDir } = global;
   const suffix = extname(__filename).slice(1);
-  const currentSuffix = extname(process.mainModule.filename).slice(1);
+  const currentSuffix = extname(require.main.filename).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
   const entities = _.uniq([
     `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
