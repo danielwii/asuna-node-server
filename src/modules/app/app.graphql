@@ -25,7 +25,7 @@ type AppInfo implements BaseEntity {
   key: String
   mode: Mode
 
-  releases: [AppRelease] # TODO not implemented
+  releases: [AppRelease]
 }
 
 type AppRelease implements BaseEntity {
@@ -40,7 +40,7 @@ type AppRelease implements BaseEntity {
   description: String
   paths: [String]
 
-  appInfo: AppInfo # TODO not implemented
+  appInfo: AppInfo
 }
 
 type PagedAppRelease implements PagedQuery {

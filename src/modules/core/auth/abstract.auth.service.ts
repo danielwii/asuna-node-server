@@ -70,11 +70,6 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   // eslint-disable-next-line @typescript-eslint/no-parameter-properties
   protected constructor(protected readonly userRepository: Repository<U>) {}
 
-  /**
-   * TODO using db repo instead
-   * @param jwtPayload
-   * @returns {Promise<boolean>}
-   */
   public async validateUser(jwtPayload: JwtPayload): Promise<boolean> {
     const identifier = { email: jwtPayload.email, username: jwtPayload.username };
     const user = await this.getUser(identifier, true);

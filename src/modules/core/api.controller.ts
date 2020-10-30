@@ -26,9 +26,21 @@ export class ApiController {
     return {
       upTime: this.appContent.upTime.toISOString(),
       version: this.appContent.version,
+    };
+  }
+
+  @Get('verbose')
+  public debug(@Req() req: RequestInfo) {
+    return {
       clientIp: req.clientIp,
       isMobile: req.isMobile,
       headers: req.headers,
+      address: {
+        forwarded: req.header('x-forwarded-for'), // 各阶段ip的CSV, 最左侧的是原始ip
+        remote: req.connection.remoteAddress,
+        ips: req.ips, // 相当于(req.header('x-forwarded-for') || '').split(',')
+        ip: req.ip, // 同req.connection.remoteAddress, 但是格式要好一些
+      },
     };
   }
 

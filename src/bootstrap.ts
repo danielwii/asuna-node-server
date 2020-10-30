@@ -15,19 +15,22 @@ import * as session from 'express-session';
 import * as RedisStoreCreator from 'connect-redis';
 import * as requestIp from 'request-ip';
 import * as responseTime from 'response-time';
-import { Connection, getConnectionOptions } from 'typeorm';
+import { AdvancedConsoleLogger, Connection, createConnection, getConnectionOptions, QueryRunner } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
 import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerInterceptor, r } from './modules/common';
-import { LoggerFactory, LoggerHelper } from './modules/common/logger';
-import { LoggerConfigObject } from './modules/common/logger/config';
-import { ConfigKeys, configLoader } from './modules/config';
+import {
+  AnyExceptionFilter,
+  LoggerConfigObject,
+  LoggerFactory,
+  LoggerHelper,
+  LoggerInterceptor,
+  r,
+} from './modules/common';
+import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
 import { AccessControlHelper, AsunaContext, DBHelper, Global, IAsunaContextOpts } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
-import { FeaturesConfigObject } from './modules/config/features.config';
-import { AppConfigObject } from './modules/config/app.config';
 import { SimpleIdGeneratorHelper } from './modules/ids';
 import { RedisProvider } from './modules/providers';
 // add condition function in typeorm find
@@ -162,7 +165,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // --------------------------------------------------------------
 
   // see https://expressjs.com/en/guide/behind-proxies.html
-  app.set('trust proxy', 1);
+  // 设置以后，req.ips是ip数组；如果未经过代理，则为[]. 若不设置，则req.ips恒为[]
+  app.set('trust proxy', true);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
   app.use(requestIp.mw());
@@ -203,7 +207,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     secret,
     resave: false,
     // cookie: { secure: true },
-    // saveUninitialized: true,
+    saveUninitialized: true,
     genid: () => SimpleIdGeneratorHelper.randomId('se-'),
   };
   logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.options.client'))}`);

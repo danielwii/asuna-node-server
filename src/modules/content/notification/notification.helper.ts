@@ -5,14 +5,17 @@ import { Notification } from './notification.entities';
 
 const logger = LoggerFactory.getLogger('LiveHelper');
 
-export type MixedNotification = { origin: Notification; read: boolean };
+export interface MixedNotification {
+  origin: Notification;
+  read: boolean;
+}
 
 export class NotificationHelper {
-  static notification: string[] = [];
+  public static notification: string[] = [];
 
-  static loadMixedNotification(origin: Notification): Promise<MixedNotification> {
+  public static loadMixedNotification(origin: Notification): Promise<MixedNotification> {
     /**
-     * TODO
+     * TODO not implemented read flag
      * @type {boolean}
      */
     const read = false;
