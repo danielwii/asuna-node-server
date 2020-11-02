@@ -5,6 +5,7 @@ import { classToPlain } from 'class-transformer';
 import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
 import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 import * as path from 'path';
 import * as JSON5 from 'json5';
 import { Between, FindOperator } from 'typeorm';
@@ -159,3 +160,10 @@ export type FutureResolveType<T> = ((...args) => Promise<T> | T) | T;
 
 export const fnResolve = <T>(fn: FutureResolveType<T>): ((...args) => Promise<T>) => async (...args): Promise<T> =>
   _.isFunction(fn) ? (isPromiseAlike(fn) ? fn(...args) : Promise.resolve(fn(...args))) : Promise.resolve(fn);
+
+export const noNullFilter = <T>(source: Partial<T>) => {
+  const noNullSource = _.omitBy(source, _.isNull);
+  const predicate = _.isEmpty(noNullSource) ? _.stubTrue : _.matches(noNullSource);
+  // logger.log(`[noNullFilter] ${r({ source, noNullSource, predicate })}`);
+  return fp.filter<T>(predicate);
+};
