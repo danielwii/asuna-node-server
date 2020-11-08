@@ -189,7 +189,9 @@ export abstract class RestCrudController {
     @Body() updateTo: { [member: string]: any },
   ): Promise<any> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
-    const whereOptions = { id };
+    const primaryKey = DBHelper.getPrimaryKeyByModel(modelName);
+    // const whereOptions = { [primaryKey]: id };
+    const whereOptions = {};
     if (tenant) {
       await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
       if (await TenantHelper.tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
@@ -214,10 +216,11 @@ export abstract class RestCrudController {
       return _.isArray(value)
         ? (value as any[]).map((currentId) => ({ [_.first(primaryKeys)]: currentId }))
         : { [_.first(primaryKeys)]: value };
+
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
-    const entity = await repository.findOneOrFail({ where: whereOptions });
+    const entity = await repository.findOneOrFail(id, { where: whereOptions });
 
     const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username } as any);
     logger.log(`patch ${r({ entityTo })}`);
