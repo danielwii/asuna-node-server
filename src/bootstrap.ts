@@ -15,7 +15,7 @@ import * as session from 'express-session';
 import * as RedisStoreCreator from 'connect-redis';
 import * as requestIp from 'request-ip';
 import * as responseTime from 'response-time';
-import { AdvancedConsoleLogger, Connection, createConnection, getConnectionOptions, QueryRunner } from 'typeorm';
+import { Connection, getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
 import { renameTables, runCustomMigrations } from './migrations';
@@ -202,7 +202,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   logger.log(`session redis connected: ${sessionRedis.client?.connected}`);
   const sessionOptions = {
     store: sessionRedis.isEnabled
-      ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
+      ? new (RedisStoreCreator(session as any))({ client: sessionRedis.client })
       : new session.MemoryStore(),
     secret,
     resave: false,

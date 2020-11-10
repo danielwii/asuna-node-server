@@ -8,7 +8,7 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import * as _ from 'lodash';
-import { Client, Server } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 
@@ -59,14 +59,14 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
 
         if (this.server) {
           const rooms = {
-            namespace: this.server.clients().name,
-            sids: this.server.clients().adapter.sids,
-            rooms: this.server.clients().adapter.rooms,
+            namespace: this.server.sockets.name,
+            sids: this.server.sockets._ids,
+            rooms: this.server.sockets._rooms,
           };
           this.server.volatile.emit('views', { count: this.views, rooms });
           logger.debug(`clients: ${r(rooms)}`);
 
-          const id = _.head(_.keys(this.server.clients().adapter.sids));
+          const id = _.head(_.keys(this.server.sockets._ids));
           this.server.to(id).emit('first', 'hello world');
         }
       }
@@ -74,7 +74,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   @SubscribeMessage('events')
-  onHeartbeat(client: Client, data: any): WsResponse<string> {
+  onHeartbeat(client: Socket, data: any): WsResponse<string> {
     const event = 'events';
     const response = `admin-${process.env.npm_package_version}-${this.timestamp}`;
     return { event, data: response };
@@ -86,12 +86,12 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
     AdminWsHelper.ws = server;
   }
 
-  public handleConnection(client: Client): any {
+  public handleConnection(client: Socket): any {
     this.views += 1;
     logger.log(`[${client.id}] connected (${this.views})`);
   }
 
-  public handleDisconnect(client: Client): any {
+  public handleDisconnect(client: Socket): any {
     this.views -= 1;
     logger.log(`[${client.id}] disconnect (${this.views})`);
   }
