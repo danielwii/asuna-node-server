@@ -37,7 +37,9 @@ export class ApiController {
       headers: req.headers,
       address: {
         forwarded: req.header('x-forwarded-for'), // 各阶段ip的CSV, 最左侧的是原始ip
-        remote: req.connection.remoteAddress,
+        remoteAddress: req.connection.remoteAddress,
+        remoteFamily: req.connection.remoteFamily,
+        remotePort: req.connection.remotePort,
         ips: req.ips, // 相当于(req.header('x-forwarded-for') || '').split(',')
         ip: req.ip, // 同req.connection.remoteAddress, 但是格式要好一些
       },
