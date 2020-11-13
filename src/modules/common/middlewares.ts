@@ -6,7 +6,7 @@ import { r } from './helpers';
 import { SimpleIdGeneratorHelper } from '../ids';
 
 export type CommonRequest = { isMobile?: boolean } & { sessionID?: string } & {
-  session?: { landingUrl: string; referer: string; deviceId: string };
+  session?: { landingUrl: string; referer: string; origin: string; deviceId: string };
   signedCookies?: { deviceId?: string };
 };
 
@@ -46,6 +46,7 @@ export class LandingUrlMiddleware implements NestMiddleware {
     if (!req.session?.landingUrl) {
       req.session.landingUrl = req.url;
       req.session.referer = req.headers.referer;
+      req.session.origin = req.headers.origin;
       this.logger.debug(`set landing ${r(req.session)}`);
     }
 

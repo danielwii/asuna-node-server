@@ -199,7 +199,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(compression());
 
   const sessionRedis = RedisProvider.instance.getRedisClient('session');
-  logger.log(`session redis connected: ${sessionRedis.client?.connected}`);
+  logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   const sessionOptions = {
     store: sessionRedis.isEnabled
       ? new (RedisStoreCreator(session as any))({ client: sessionRedis.client })
@@ -210,7 +210,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     saveUninitialized: true,
     genid: () => SimpleIdGeneratorHelper.randomId('se-'),
   };
-  logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.options.client'))}`);
+  // logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.options.client', 'store.client'))}`);
   app.use(session(sessionOptions));
 
   app.use(responseTime());
