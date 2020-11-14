@@ -66,7 +66,7 @@ export class GraphqlModule implements OnModuleInit {
               },
             },
             (responseCachePlugin as any)({
-              sessionId: (requestContext) => {
+              sessionID: (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
                 if (sessionID) logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;

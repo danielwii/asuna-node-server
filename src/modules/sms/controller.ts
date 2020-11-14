@@ -16,7 +16,7 @@ export class SMSController {
     if (!/^1[3456789]\d{9}$/.test(body.phoneNumber)) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.FormatError);
     }
-    logger.log(`sendVerifyCode ${r({ ..._.pick(req, 'sessionId', 'payload.id'), body })}`);
+    logger.log(`sendVerifyCode ${r({ ..._.pick(req, 'sessionID', 'payload.id'), body })}`);
     await SMSHelper.sendVerifyCode(req, body.phoneNumber);
   }
 }

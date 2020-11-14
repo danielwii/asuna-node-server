@@ -23,9 +23,7 @@ export type EntityConstructorObject<Entity> = Omit<
   keyof typeof BaseEntity | 'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
 >;
 
-export class AbstractBaseEntity extends BaseEntity {
-  @PrimaryGeneratedColumn() public id?: number;
-
+export class NoPrimaryKeyBaseEntity extends BaseEntity {
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;
 
@@ -40,6 +38,10 @@ export class AbstractBaseEntity extends BaseEntity {
   public afterLoad(): void {
     fixTZ(this);
   }
+}
+
+export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
+  @PrimaryGeneratedColumn() public id?: number;
 }
 
 /**
