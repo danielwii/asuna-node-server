@@ -1,26 +1,34 @@
 import ow from 'ow';
 import { RequestInfo } from '../../helper';
 import { VirtualDevice, VirtualSession } from './entities';
+import { getManager } from 'typeorm';
+import { LoggerFactory } from '../../common/logger';
+import { r } from '../../common/helpers/utils';
+
+const logger = LoggerFactory.getLogger('DeviceHelper');
 
 export class DeviceHelper {
   public static async reg(req: RequestInfo): Promise<VirtualSession> {
     ow(req.session.deviceId, 'deviceId', ow.string.nonEmpty);
     ow(req.sessionID, 'sessionID', ow.string.nonEmpty);
 
-    let device = await VirtualDevice.findOne(req.session.deviceId);
-    if (!device) {
-      device = await VirtualDevice.create({ id: req.session.deviceId }).save();
-    }
+    let device: VirtualDevice;
+    let session: VirtualSession;
+    await getManager().transaction(async (manager) => {
+      device = await VirtualDevice.findOne(req.session.deviceId);
+      if (!device) {
+        device = await manager.save(new VirtualDevice({ id: req.session.deviceId }));
+      }
 
-    const exists = await VirtualSession.findOne(req.sessionID);
-    if (!exists) {
-      return VirtualSession.create({
-        id: req.sessionID,
-        ua: req.headers['user-agent'],
-        clientIp: req.clientIp,
-        device,
-      }).save();
-    }
-    return exists;
+      session = await VirtualSession.findOne(req.sessionID);
+      if (!session) {
+        session = await manager.save(
+          new VirtualSession({ id: req.sessionID, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
+        );
+      }
+    });
+
+    logger.debug(`registered device ${r({ device, session })}`);
+    return session;
   }
 }

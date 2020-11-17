@@ -5,13 +5,14 @@ import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { r } from '../helpers/utils';
+import { CommonRequest } from '../middlewares';
 import { LoggerFactory } from './factory';
 
 const logger = LoggerFactory.getLogger('LoggerInterceptor');
 
 export class LoggerInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
-    let req = context.switchToHttp().getRequest<Request>();
+    let req = context.switchToHttp().getRequest<Request & CommonRequest>();
     if (!req) {
       req = GqlExecutionContext.create(context).getContext().req;
     }
@@ -28,6 +29,10 @@ export class LoggerInterceptor implements NestInterceptor {
       ip: req.ip,
       ips: req.ips,
       hostname: req.hostname,
+      isMobile: req.isMobile,
+      sessionID: req.sessionID,
+      signedCookies: req.signedCookies,
+      session: req.session,
     };
 
     const TAG = `${context.getClass().name}.${context.getHandler().name}`;

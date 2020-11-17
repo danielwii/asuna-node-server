@@ -45,6 +45,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 export class AnyAuthGuard implements CanActivate {
   private logger = LoggerFactory.getLogger('AnyAuthGuard');
 
+  // public constructor(private readonly opts: {}) {}
+
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
     const res = context.switchToHttp().getResponse<Response>();

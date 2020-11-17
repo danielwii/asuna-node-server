@@ -17,12 +17,13 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
   const { info }: { info: { [key: string]: MetaInfoOptions } } = (metadata.target as Function).prototype;
   metadata.columns.forEach((column) => {
     if (column.type === ColumnTypeHelper.JSON) {
+      // if (!info) throw new Error(`no meta info for json field ${r({ entity, field: column.propertyName })}`);
       // const entityInfo = (column.target as any).entityInfo as MetaInfoBaseOptions;
       const defaultValue = _.cond([
         [_.matches('json-array'), _.constant([])],
         [_.matches('json-map'), _.constant({})],
         [_.stubTrue, _.constant(null)],
-      ])(info[column.propertyName]?.safeReload);
+      ])(info?.[column.propertyName]?.safeReload);
       safeReloadJSON(entity as any, column.propertyName, defaultValue);
     } else if (column.type === 'decimal') {
       entity[column.propertyName] = _.toNumber(entity[column.propertyName]);

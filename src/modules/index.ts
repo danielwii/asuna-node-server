@@ -5,6 +5,7 @@ export * from './dataloader';
 export * from './admin.module';
 export * from './graphql.module';
 export * from './core/bus';
+export * from './core/device';
 export * from './cache';
 export * from './client';
 export * from './config';
