@@ -24,6 +24,7 @@ export class LoggerFactory {
       flows.push(
         fp.replace(resolve(packageDir, '../dist'), ''),
         fp.replace(resolve(packageDir, '../src'), ''),
+        fp.replace(resolve(callerPath, '../..'), ''),
         fp.replace(packageDir, ''),
       );
     }
