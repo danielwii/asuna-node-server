@@ -113,7 +113,10 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
   }
 
-  const app = await NestFactory.create<NestExpressApplication>(appModule, { logger: LoggerHelper.getLoggerService() });
+  const app = await NestFactory.create<NestExpressApplication>(appModule, {
+    logger: LoggerHelper.getLoggerService(),
+    cors: true,
+  });
   await AppLifecycle.onInit(app);
 
   // --------------------------------------------------------------
@@ -200,18 +203,18 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const sessionRedis = RedisProvider.instance.getRedisClient('session');
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
-  const sessionOptions = {
-    store: sessionRedis.isEnabled
-      ? new (RedisStoreCreator(session as any))({ client: sessionRedis.client })
-      : new session.MemoryStore(),
-    secret,
-    resave: false,
-    // cookie: { secure: true },
-    saveUninitialized: true,
-    genid: () => SimpleIdGeneratorHelper.randomId('se-'),
-  };
-  // logger.log(`init express session: ${r(_.omit(sessionOptions, 'store.options.client', 'store.client'))}`);
-  app.use(session(sessionOptions));
+  app.use(
+    session({
+      store: sessionRedis.isEnabled
+        ? (new (RedisStoreCreator(session as any))({ client: sessionRedis.client }) as any)
+        : new session.MemoryStore(),
+      secret,
+      resave: false,
+      // cookie: { secure: true },
+      saveUninitialized: true,
+      genid: () => SimpleIdGeneratorHelper.randomId('se'),
+    }),
+  );
 
   app.use(responseTime());
   if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED))
@@ -252,7 +255,6 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   }
 
   // app.use(csurf());
-  // app.enableCors(); fixme temp disable for allow OPTIONS
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {

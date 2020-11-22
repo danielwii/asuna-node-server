@@ -1,7 +1,7 @@
 import { AuthUserChannel } from './base.entities';
 
 export interface JwtPayload {
-  uid: string;
+  uid?: string;
   id: string;
   email: string;
   username: string;

@@ -31,9 +31,9 @@ export class DeviceMiddleware implements NestMiddleware {
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies = req.signedCookies;
     const hasDevice = !!cookies?.deviceId;
-    this.logger.debug(`cookies is ${r(cookies)}`);
+    this.logger.debug(`cookies is ${r({ cookies, session: req.session, hasDevice })}`);
     if (!hasDevice) {
-      const id = SimpleIdGeneratorHelper.randomId('vd-');
+      const id = SimpleIdGeneratorHelper.randomId('vd');
       this.logger.debug(`set device id ${id}`);
       res.cookie('deviceId', id, { signed: true, httpOnly: true, maxAge: 10 * 365 * 24 * 60 * 60 * 1000 });
       req.session.deviceId = id;

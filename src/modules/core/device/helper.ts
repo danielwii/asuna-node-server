@@ -12,8 +12,8 @@ export class DeviceHelper {
     ow(req.session.deviceId, 'deviceId', ow.string.nonEmpty);
     ow(req.sessionID, 'sessionID', ow.string.nonEmpty);
 
-    let device: VirtualDevice;
-    let session: VirtualSession;
+    let device: VirtualDevice = undefined;
+    let session: VirtualSession = undefined;
     await getManager().transaction(async (manager) => {
       device = await VirtualDevice.findOne(req.session.deviceId);
       if (!device) {
@@ -25,10 +25,10 @@ export class DeviceHelper {
         session = await manager.save(
           new VirtualSession({ id: req.sessionID, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
         );
+        logger.debug(`registered device ${r({ device, session })}`);
       }
     });
 
-    logger.debug(`registered device ${r({ device, session })}`);
     return session;
   }
 }

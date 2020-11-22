@@ -120,7 +120,7 @@ export async function auth<Payload = PayloadType>(
   res: Response,
   type: 'admin' | 'client' | 'all' = 'all',
 ): Promise<AuthResult<Payload>> {
-  logger.verbose(
+  logger.debug(
     `auth ${r({
       type,
       isApiKeyRequest: isApiKeyRequest(req),
