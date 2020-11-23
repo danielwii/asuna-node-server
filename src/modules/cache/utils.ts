@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+
 import { LoggerFactory, promisify, r } from '../common';
 import { RedisProvider } from '../providers';
 import { CacheManager } from './cache';

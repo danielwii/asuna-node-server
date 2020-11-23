@@ -1,4 +1,5 @@
 import { BaseEntity, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AbstractBaseEntity } from '../base';
 

@@ -7,9 +7,9 @@ import {
   RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { ConfigKeys, configLoader } from '../config';
 import { AuditService } from './audit.service';
 import { FeaturesConfigObject } from '../config/features.config';
 

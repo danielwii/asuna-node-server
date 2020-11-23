@@ -1,4 +1,5 @@
 import { diff } from 'jsondiffpatch';
+
 import { LoggerFactory } from '../common/logger';
 import { AuditRecord, AuditType } from './audit.entities';
 

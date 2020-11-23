@@ -1,5 +1,6 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
+
 import { fnResolve, parseJSONIfCould, promisify, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { RedisProvider } from '../providers';

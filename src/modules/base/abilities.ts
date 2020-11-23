@@ -1,4 +1,5 @@
 import { BaseEntity, Column } from 'typeorm';
+
 import { MetaInfo } from '../common/decorators';
 
 export type Constructor<T = {}> = new (...args: any[]) => T;

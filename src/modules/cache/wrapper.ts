@@ -1,4 +1,5 @@
 import { Promise } from 'bluebird';
+
 import { LoggerFactory } from '../common/logger';
 import { InMemoryDB } from './db';
 

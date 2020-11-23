@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { AbstractBaseEntity } from '../base';
 import { EntityMetaInfo } from '../common/decorators';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';

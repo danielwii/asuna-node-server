@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Promise } from 'bluebird';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
+
 import { InMemoryDB } from '../../cache/db';
 import { JwtAuthRequest } from '../../core/auth/auth.guard';
 import { AsunaErrorCode, AsunaException } from '../exceptions';

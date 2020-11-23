@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+
 import { LoggerFactory } from '../common/logger';
 import { AppQueryResolver } from './app.resolver';
 
