@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MetaInfo } from '../common/decorators';
-import { fixTZ } from '../core/helpers';
+import { fixTZ } from '../core/helpers/entity.helper';
 import { SimpleIdGenerator } from '../ids';
 import { NameDescAttachable, Publishable } from './abilities';
 

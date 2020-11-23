@@ -7,6 +7,7 @@ import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
 import * as RedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
+
 import { CacheTTL } from '../cache/constants';
 import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';

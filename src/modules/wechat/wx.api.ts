@@ -4,6 +4,7 @@ import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
 import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
 import ow from 'ow';
+
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { deserializeSafely } from '../common/helpers';
 import { r } from '../common/helpers/utils';

@@ -1,5 +1,6 @@
 import { BaseEntity } from 'typeorm';
 import * as _ from 'lodash';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from './db/db.helper';

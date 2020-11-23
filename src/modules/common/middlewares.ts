@@ -1,17 +1,13 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response } from 'express';
 import isMobile from 'ismobilejs';
+
 import { LoggerFactory } from './logger';
 import { r } from './helpers';
 import { SimpleIdGeneratorHelper } from '../ids';
 import { VirtualDevice, VirtualSession } from '../core/device';
 
-export type CommonRequest = { isMobile?: boolean } & { sessionID?: string } & {
-  session?: { landingUrl: string; referer: string; origin: string; deviceId: string };
-  signedCookies?: { deviceId?: string };
-  virtualSession?: VirtualSession;
-  virtualDevice?: VirtualDevice;
-};
+import type { CommonRequest } from './interface';
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
@@ -47,7 +43,7 @@ export class DeviceMiddleware implements NestMiddleware {
     if (!req.virtualDevice) {
       req.virtualDevice = await VirtualDevice.findOne(req.session.deviceId);
     }
-    res.set("X-Session-ID", req.sessionID);
+    res.set('X-Session-ID', req.sessionID);
     next();
   }
 }

@@ -1,5 +1,5 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import * as redisIoAdapter from 'socket.io-redis';
+import * as adapter from 'socket.io-redis';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
@@ -26,13 +26,13 @@ export class RedisIoAdapter extends IoAdapter {
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
       logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
-      RedisIoAdapter.redisAdapter = redisIoAdapter(
+      RedisIoAdapter.redisAdapter = adapter(
         {
           host: configObject.host,
           port: configObject.port,
           ...(configObject.password ? { password: configObject.password } : undefined),
           db,
-        } as any /* db is not included in redisIoAdapter */,
+        } as any /* db is not included in adapter */,
       );
     }
   }

@@ -1,8 +1,10 @@
 import { IsEmail, IsOptional } from 'class-validator';
 import { Column } from 'typeorm';
+
 import { MetaInfo } from '../../common/decorators';
+import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base/base.entity';
+
 import type { UserProfile } from './user.entities';
-import { AbstractTimeBasedBaseEntity, AbstractBaseEntity } from '../../base/base.entity';
 
 export enum AuthUserChannel {
   default = 'default',

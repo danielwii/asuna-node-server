@@ -1,13 +1,7 @@
 import 'jest';
 import { r } from '../../common/helpers';
 import { AbstractAuthUser } from '../auth';
-import {
-  AsunaDefaultEvent,
-  AsunaSystemQueue,
-  Hermes,
-  HermesExchange,
-  HermesProcessManager,
-} from './hermes';
+import { AsunaDefaultEvent, AsunaSystemQueue, Hermes, HermesExchange, HermesProcessManager } from './hermes';
 import { IAsunaCommand, IAsunaEvent } from './interfaces';
 
 describe('Hermes', () => {
@@ -42,19 +36,13 @@ describe('Hermes', () => {
 
     HermesExchange.regCommandResolver('upload-command-resolver', {
       identifier: { version: 'default/v1alpha', type: 'Command' },
-      resolve: command => {
+      resolve: (command) => {
         console.log(`resolve command to actions ${r(command)}`);
         return [
-          new AsunaDefaultEvent(
-            'default-upload-event',
-            'test',
-            'UploadEvent',
-            { data: 'test' },
-            ({ payload }) => {
-              console.log({ payload });
-              return Promise.resolve('done');
-            },
-          ),
+          new AsunaDefaultEvent('default-upload-event', 'test', 'UploadEvent', { data: 'test' }, ({ payload }) => {
+            console.log({ payload });
+            return Promise.resolve('done');
+          }),
           /*
           new (class UploadEvent implements IAsunaEvent {
             createdAt: any;
@@ -94,13 +82,10 @@ describe('Hermes', () => {
     HermesProcessManager.handleCommand(command);
     console.log(2, command);
     console.log(3, JSON.stringify(Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_JOB).status));
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        console.log(
-          4,
-          JSON.stringify(Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_JOB).status),
-        );
-        resolve();
+        console.log(4, JSON.stringify(Hermes.getInMemoryQueue(AsunaSystemQueue.IN_MEMORY_JOB).status));
+        resolve(undefined);
       }, 1000);
     });
   });

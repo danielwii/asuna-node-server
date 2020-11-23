@@ -1,12 +1,13 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Request } from 'express';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { r } from '../helpers/utils';
-import { CommonRequest } from '../middlewares';
 import { LoggerFactory } from './factory';
+
+import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import type { Request } from 'express';
+import type { CommonRequest } from '../interface';
 
 const logger = LoggerFactory.getLogger('LoggerInterceptor');
 

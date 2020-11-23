@@ -1,4 +1,4 @@
-import { withP, withP2 } from '../common/helpers';
+import { withP, withP2 } from '../common/helpers/utils';
 import { AbstractConfigLoader, ConfigKeys, configLoader, YamlConfigKeys } from './loader';
 
 export enum AppConfigKeys {
