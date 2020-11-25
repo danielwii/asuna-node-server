@@ -1,12 +1,12 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
 import isMobile from 'ismobilejs';
 
 import { LoggerFactory } from './logger';
 import { r } from './helpers';
 import { SimpleIdGeneratorHelper } from '../ids';
-import { VirtualDevice, VirtualSession } from '../core/device';
+import { VirtualDevice, VirtualSession } from '../client';
 
+import type { Request, Response } from 'express';
 import type { CommonRequest } from './interface';
 
 @Injectable()

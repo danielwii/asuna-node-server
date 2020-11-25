@@ -133,7 +133,10 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
       logger.log(`rename table ${r({ from, to })}`);
       const fromTable = await queryRunner.getTable(from);
-      if (fromTable) {
+      const toTable = await queryRunner.getTable(to);
+      if (toTable) {
+        logger.warn(`Table ${to} already exists.`);
+      } else if (fromTable) {
         logger.log(`rename ${from} -> ${to}`);
         await queryRunner.renameTable(fromTable, to);
       }

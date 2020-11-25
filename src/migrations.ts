@@ -2,10 +2,11 @@ import { Promise } from 'bluebird';
 import { AuthMigrations } from './modules/core/auth/auth.migrations';
 
 export const renameTables = [
-  // { from: 'content__t_slides', to: 'www__t_slides' },
-  // { from: 'content__t_slide_categories', to: 'www__t_slide_categories' },
-  // { from: 'www__t_point_exchanges', to: 'property__t_point_exchanges' },
-  // { from: 'audit__t_recordsHide', to: 'sys__t_audit_records' },
+  { from: 'sys__t_tenants', to: 'sass__t_tenants' },
+  { from: 'sys__t_virtual_devices', to: 'client__t_virtual_devices' },
+  { from: 'sys__t_virtual_sessions', to: 'client__t_virtual_sessions' },
+  { from: 'auth__t_user_profiles', to: 'user__profiles' },
+  { from: 'im__t_timeline_session_users', to: 'client__t_session_users' },
 ];
 
 export const runCustomMigrations = async (migrations: any[]): Promise<void> => {

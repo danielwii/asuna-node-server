@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
 import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
 import { LoggerFactory } from '../common/logger';
 import { AppContext } from './app.context';
 import { r } from '../common/helpers/utils';
-import { DeviceHelper } from './device/helper';
+import { ClientHelper } from '../client/helper';
 
 import type { RequestInfo } from '../helper';
 
@@ -58,7 +59,7 @@ export class ApiController {
 
   @Post('v1/reg-device')
   public async regDevice(@Req() req: RequestInfo) {
-    const device = await DeviceHelper.reg(req);
+    const device = await ClientHelper.reg(req);
     logger.log(`reg device ${r(device)}`);
   }
 }

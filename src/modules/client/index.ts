@@ -1,1 +1,2 @@
-export * from './client.entities';
+export * from './entities';
+export * from './helper';

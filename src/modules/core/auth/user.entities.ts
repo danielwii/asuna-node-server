@@ -1,4 +1,5 @@
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
@@ -8,8 +9,8 @@ import type { FinancialTransaction, PointExchange, Wallet } from '../../property
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';
 
-@EntityMetaInfo({ name: 'auth__user_profiles', internal: true })
-@Entity('auth__t_user_profiles')
+@EntityMetaInfo({ name: 'user__profiles', internal: true })
+@Entity('user__t_profiles')
 export class UserProfile extends AbstractTimeBasedAuthUser {
   constructor() {
     super('u');
