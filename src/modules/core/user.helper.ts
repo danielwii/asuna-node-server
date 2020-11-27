@@ -1,8 +1,10 @@
+import { DeleteResult } from 'typeorm';
+
 import { UserProfile } from './auth';
-import { InteractionFollowType } from './interaction/enum-values';
 import { UserFollow } from './interaction/follow.entities';
 import { LoggerFactory } from '../common/logger';
-import { DeleteResult } from 'typeorm';
+
+import type { InteractionFollowType } from './interaction/enum-values';
 
 const logger = LoggerFactory.getLogger('UserHelper');
 

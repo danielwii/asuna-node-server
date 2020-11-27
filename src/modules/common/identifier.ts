@@ -6,15 +6,15 @@ export interface IdentifierHelper<T = object> {
 }
 
 export interface IdentifierStatic {
-  resolve(identifier: string): { type: string; id: number | string };
+  resolve: (identifier: string) => { type: string; id: number | string };
 
-  identify(identifier: string): boolean;
+  identify: (identifier: string) => boolean;
 }
 
 export interface Identifier<T = any> {
-  payload(): Partial<T>;
+  payload: () => Partial<T>;
 
-  identifier(): string;
+  identifier: () => string;
 
-  identifierObject(): { type: string; id: number | string };
+  identifierObject: () => { type: string; id: number | string };
 }

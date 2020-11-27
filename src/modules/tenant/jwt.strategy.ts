@@ -2,21 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AsunaErrorCode, AsunaException, r } from '../../../common';
-import { LoggerFactory } from '../../../common/logger';
-import { ConfigKeys, configLoader } from '../../../config';
-import { AuthService } from '../auth.service';
+import { AsunaErrorCode, AsunaException, r } from '../common';
+import { LoggerFactory } from '../common/logger';
+import { ConfigKeys, configLoader } from '../config';
+import { TenantAuthService } from './auth.service';
 
-import type { JwtPayload } from '../auth.interfaces';
+import type { JwtPayload } from '../core/auth';
 
 const logger = LoggerFactory.getLogger('JwtStrategy');
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private readonly authService: AuthService) {
+export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {
+  constructor(private readonly authService: TenantAuthService) {
     super(
       {
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Org'),
         // passReqToCallback: true,
         secretOrKey: configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret'),
       },
@@ -25,10 +25,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload): Promise<JwtPayload> {
-    logger.log(`validate ${r(payload)}`);
+    logger.debug(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {
-      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth strategy failed');
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'org jwt auth strategy failed');
     }
     return payload;
   }

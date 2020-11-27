@@ -1,21 +1,24 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 import * as _ from 'lodash';
+
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AccessControlHelper, ACResource } from '../core/auth';
 import { DBHelper } from '../core/db';
-import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from "../core/kv";
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
 import { CronHelper } from '../helper';
-import { TenantController } from './tenant.controller';
+import { TenantAdminController, TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
+import { TenantAuthService } from './auth.service';
+import { TenantAuthController } from './auth.controller';
+import { OrgJwtStrategy } from './jwt.strategy';
 
 const logger = LoggerFactory.getLogger('TenantModule');
 
 /**
- * tenant WIP️ 需要绑定一个特定的角色，用于识别用户
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
  * tenant WIP 可以配置一个待创建的模型入口，用于首次创建
  *          - 目前没有区分后台管理员和用户，通过角色和入口模型的创建作为 tenant 创建的依据
@@ -28,13 +31,14 @@ const logger = LoggerFactory.getLogger('TenantModule');
  * tenant 🤔 的所有表理论上对于数据更新应该包含一个状态位，用于管理员进行审核
  */
 @Module({
-  providers: [],
-  controllers: [TenantController],
+  providers: [TenantAuthService, OrgJwtStrategy],
+  controllers: [TenantController, TenantAdminController, TenantAuthController],
 })
 export class TenantModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     await TenantHelper.preload();
     logger.log(`init... ${r(await TenantHelper.getConfig())}`);
+
     await this.initKV();
     await this.initAC();
     await this.initCron();

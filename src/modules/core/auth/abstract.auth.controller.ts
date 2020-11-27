@@ -3,23 +3,26 @@ import { Promise } from 'bluebird';
 import * as Chance from 'chance';
 import * as _ from 'lodash';
 import { DeepPartial, UpdateResult } from 'typeorm';
+
 import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory } from '../../common';
 import { r } from '../../common/helpers';
 import { Hermes } from '../bus';
-import { CreatedToken, PasswordHelper } from './abstract.auth.service';
+import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
-import { AuthService } from './auth.service';
-import { AuthUserChannel, WithProfileUser, WithProfileUserInstance } from './base.entities';
+import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
+import { DBHelper } from '../db';
+
+import type { Constructor } from '../../base';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
-export abstract class AbstractAuthController {
-  constructor(
-    private readonly UserEntity: WithProfileUser,
-    private readonly authService: AuthService,
-    private readonly handlers: {
+export abstract class AbstractAuthController<U extends AuthUser> {
+  public constructor(
+    public readonly UserEntity: Constructor<U> & AuthUserType,
+    public readonly authService: AbstractAuthService<U>,
+    public readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
       onSignUp?: <Result>(result: Result, body) => Promise<void>;
     } = {},
@@ -27,7 +30,7 @@ export abstract class AbstractAuthController {
 
   @HttpCode(200)
   @Post('reset-password')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
     const { payload } = req;
     logger.log(`reset password: ${r({ dto, payload })}`);
@@ -72,7 +75,7 @@ export abstract class AbstractAuthController {
 
     // const email = `${username}@quick.passport`;
     const signed = await this.authService
-      .createUser<WithProfileUserInstance>(username, undefined, password, AuthUserChannel.quickpass)
+      .createUser(username, undefined, password, AuthUserChannel.quickpass)
       .then(async (result) => {
         if (this.handlers.onSignUp) {
           await this.handlers.onSignUp(result, body);
@@ -86,12 +89,12 @@ export abstract class AbstractAuthController {
     await signed.user.save();
 */
     const profile = await this.authService.getUserWithPassword({ username });
-    const token = await this.authService.createToken(profile, { uid: signed.user.id });
+    const token = await this.authService.createToken(profile, { uid: `${signed.user.id}` });
     return { username, defaultPassword: password, token };
   }
 
   @Post('sign-up')
-  async signUp(@Body() body): Promise<WithProfileUserInstance> {
+  async signUp(@Body() body) {
     logger.log(`sign-up: ${r(body)}`);
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
 
@@ -100,13 +103,15 @@ export abstract class AbstractAuthController {
     }
 
     return this.authService
-      .createUser<WithProfileUserInstance>(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
+      .createUser(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
       .then(async (result) => {
+        logger.log(`created user ${r(result)}`);
         if (this.handlers.onSignUp) {
           await this.handlers.onSignUp(result, body);
         }
-        const user = await this.UserEntity.findOne(result.user.id, { relations: ['profile'] });
-        return _.get(user, 'profile');
+        const relations = _.intersection(DBHelper.getColumnNames(this.UserEntity), ['profile']);
+        return this.UserEntity.findOne(result.user.id, { relations });
+        // return _.get(user, 'profile');
       });
   }
 
@@ -114,32 +119,35 @@ export abstract class AbstractAuthController {
   @HttpCode(HttpStatus.OK)
   async getToken(@Body() signInDto: SignInDto): Promise<CreatedToken> {
     logger.log(`getToken() >> ${signInDto.username}`);
-    const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
+    const user = await this.authService.getUserWithPassword({ username: signInDto.username });
 
-    logger.debug(`get user ${r(profile)}`);
-    if (!profile || !profile?.password) {
+    logger.debug(`get user ${r(user)}`);
+    if (!user || !user?.password) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
-    const verified = PasswordHelper.passwordVerify(signInDto.password, profile);
+    const verified = PasswordHelper.passwordVerify(signInDto.password, user);
 
     if (!verified) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.WrongPassword);
     }
-    Hermes.emit('user.activity.event', 'login', { userId: profile.id });
+    Hermes.emit('user.activity.event', 'login', { userId: user.id });
 
-    const user = await this.UserEntity.findOneOrFail({ where: { profileId: profile.id } });
+    const hasProfile = DBHelper.getColumnNames(this.UserEntity).includes('profile');
+    const authUser = hasProfile
+      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: user.id } })
+      : user;
     // return TokenHelper.createToken(profile, { uid: user.id });
-    return this.authService.createToken(profile, { uid: user.id });
+    return this.authService.createToken(authUser as any, hasProfile ? { uid: `${authUser.id}` } : undefined);
   }
 
   @Get('current')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
-    const loaded = await this.UserEntity.findOne<WithProfileUserInstance>(payload.uid, {
+    const loaded = await this.UserEntity.findOne(payload.uid, {
       // maybe get relations from a register, cause user side relations won't load here.
       // relations: ['profile'],
     });
@@ -156,13 +164,16 @@ export abstract class AbstractAuthController {
       .catch((reason) => logger.error(reason));
     logger.debug(`current authed user is ${r(loaded)}`);
     const result = _.omit(loaded, 'channel', 'info'); // ...
-    result.profile = await UserProfile.findOne(result.profileId, { relations: ['wallet'] });
-    _.set(result, 'profile', _.omit(result.profile, 'salt', 'password', 'info'));
+    if (DBHelper.getColumnNames(this.UserEntity).includes('profile')) {
+      const profileId = _.get(result, 'profileId');
+      const profile = await UserProfile.findOne(profileId, { relations: ['wallet'] });
+      _.set(result, 'profile', _.omit(profile, 'salt', 'password', 'info'));
+    }
     return result;
   }
 
   @Get('authorized')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async authorized(): Promise<void> {
     logger.log('Authorized route...');
   }

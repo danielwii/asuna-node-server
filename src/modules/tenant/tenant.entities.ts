@@ -1,34 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
-import { AbstractTimeBasedNameEntity, Constructor, Publishable } from '../base';
+import { AbstractBaseEntity, AbstractTimeBasedNameEntity, Constructor, Publishable } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
-import { AdminUser } from '../core/auth/auth.entities';
-import { AbstractTimeBasedAuthUser } from '../core/auth';
+import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
-@EntityMetaInfo({ name: 'sass__users', internal: true })
-@Entity('sass__t_users')
-export class SassUser extends AbstractTimeBasedAuthUser {
-  @MetaInfo({ name: 'Tenant' })
-  @ManyToOne('Tenant', (inverse: Tenant) => inverse.users, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'tenant__id' })
-  public tenant: Tenant;
-
-  // @MetaInfo({ name: '角色' })
-  // @ManyToMany('Role', (inverse: Role) => inverse.users, { primary: true })
-  // @JoinTable({
-  //   name: 'sass__tr_users_roles',
-  //   joinColumn: { name: 'user__id' },
-  //   inverseJoinColumn: { name: 'role__id' },
-  // })
-  // public roles: Role[];
-
-  public constructor() {
-    super('ss');
-  }
-}
-
-@EntityMetaInfo({ name: 'sass__tenants', internal: true })
-@Entity('sass__t_tenants')
+@EntityMetaInfo({ name: 'ss__tenants', internal: true })
+@Entity('ss__t_tenants')
 export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   constructor() {
     super('t');
@@ -42,12 +19,12 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   // --------------------------------------------------------------
 
   @MetaInfo({ name: '管理员' })
-  @OneToMany('AdminUser', (inverse: AdminUser) => inverse.tenant)
-  users: AdminUser[];
+  @OneToMany('OrgUser', (inverse: OrgUser) => inverse.tenant)
+  users: OrgUser[];
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
+export const InjectTenant = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'tenant__id' })
@@ -61,3 +38,48 @@ export const InjectTenant = <TBase extends Constructor>(Base: TBase) => {
 
   return ExtendableEntity;
 };
+
+@EntityMetaInfo({ name: 'ss__org_roles', internal: true })
+@Entity('ss__t_org_roles')
+export class OrgRole extends AbstractBaseEntity {
+  @MetaInfo({ name: '名称' })
+  @Column({ nullable: false, length: 80, unique: true })
+  public name: string;
+
+  @MetaInfo({ name: '描述' })
+  @Column({ nullable: true })
+  public description: string;
+
+  /*
+  @MetaInfo({ name: '权限', type: 'Authorities', safeReload: 'json-map' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
+  public authorities: JsonMap;
+*/
+
+  @ManyToMany('OrgUser', (inverse: OrgUser) => inverse.roles)
+  public users: OrgUser[];
+}
+
+@EntityMetaInfo({ name: 'ss__org_users', internal: true })
+@Entity('ss__t_org_users')
+export class OrgUser extends InjectTenant(AbstractTimeBasedAuthUser) {
+  public constructor() {
+    super('ss');
+  }
+
+  /*
+  @MetaInfo({ name: 'Tenant' })
+  @ManyToOne('Tenant', (inverse: Tenant) => inverse.users, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'tenant__id' })
+  public tenant: Tenant;
+*/
+
+  @MetaInfo({ name: '角色' })
+  @ManyToMany('OrgRole', (inverse: OrgRole) => inverse.users, { primary: true })
+  @JoinTable({
+    name: 'ss__tr_org_users_roles',
+    joinColumn: { name: 'org_user__id' },
+    inverseJoinColumn: { name: 'role__id' },
+  })
+  public roles: OrgRole[];
+}

@@ -2,11 +2,11 @@ import { Promise } from 'bluebird';
 import * as EmailTemplate from 'email-templates';
 import * as _ from 'lodash';
 import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
-import { Attachment, Options } from 'nodemailer/lib/mailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import * as path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DynamicConfigKeys, DynamicConfigs } from '../config';
@@ -16,6 +16,8 @@ import { WeChatHelper } from '../wechat';
 import { EmailTmplConfigKeys, EmailTmplConfigObject } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { isMailAttachment, MailInfo } from './email.interface';
+
+import type { Attachment, Options } from 'nodemailer/lib/mailer';
 
 const logger = LoggerFactory.getLogger('EmailHelper');
 const env = process.env.ENV;

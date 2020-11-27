@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 
-import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { Hermes } from '../bus';
@@ -18,7 +18,10 @@ export const HermesAuthEventKeys = {
   userCreated: 'user.created',
 };
 
-export type CreatedUser<U> = { profile: UserProfile; user: U };
+export interface CreatedUser<U> {
+  profile?: UserProfile;
+  user: U;
+}
 
 @Injectable()
 export class AuthService extends AbstractAuthService<UserProfile> {
@@ -31,6 +34,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
    */
   constructor(@InjectConnection() private readonly connection: Connection) {
     super(
+      UserProfile,
       connection.getRepository(UserProfile),
       /* 历史 User 对象的认证数据已经迁移到了 UserProfile 中
       ((): Repository<AdminUser> => {
@@ -67,7 +71,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
     }
 
-    const entity = this.userRepository.create({
+    const entity = this.authUserRepository.create({
       email: email || undefined,
       username: username || undefined,
       isActive: true,
@@ -83,6 +87,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     });
   }
 
+  /*
   async updateAccount(
     profileId: string,
     { username, email }: { username: string; email?: string },
@@ -93,4 +98,5 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     profile.isBound = true;
     return profile.save();
   }
+*/
 }

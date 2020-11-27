@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+
 import { LoggerFactory } from '../../common/logger';
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
@@ -32,7 +33,7 @@ export class AuthModule implements NestModule, OnModuleInit {
 
   public configure(consumer: MiddlewareConsumer): void {
     logger.log('configure...');
-    consumer.apply(AdminAuthMiddleware.forRoutes('/admin', /*'/rest'*/)).forRoutes('*');
+    consumer.apply(AdminAuthMiddleware.forRoutes('/admin' /* '/rest' */)).forRoutes('*');
   }
 
   public onModuleInit(): void {

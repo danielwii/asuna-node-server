@@ -1,25 +1,35 @@
-import { Request, Response } from 'express';
 import * as passport from 'passport';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AdminUser } from '../core/auth/auth.entities';
-import { JwtPayload } from '../core/auth/auth.interfaces';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
 import { isApiKeyRequest } from '../core/auth/strategy/interfaces';
 import { UserProfile } from '../core/auth/user.entities';
 import { AuthedUserHelper } from '../core/auth/user.helper';
 import { Store } from '../store';
-import { WXJwtPayload } from '../wechat/interfaces';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
-import { WxCodeSession } from '../wechat/wx.interfaces';
-import { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
+import { OrgUser } from '../tenant/tenant.entities';
+import { OrgAuthHelper } from '../tenant/auth';
+import { wrapErrorInfo } from './utils';
+
+import type { JwtPayload } from '../core/auth/auth.interfaces';
+import type { WXJwtPayload } from '../wechat/interfaces';
+import type { WxCodeSession } from '../wechat/wx.interfaces';
+import type { Request, Response } from 'express';
+import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 
 const logger = LoggerFactory.getLogger('AuthHelper');
 
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
+}
+
+export function isOrgAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, OrgUser> {
+  const { authorization } = req.headers;
+  return authorization ? authorization.startsWith('Org ') : false;
 }
 
 export class AuthHelper {
@@ -50,7 +60,7 @@ export class AuthHelper {
           req.profile = await UserProfile.findOne(payload.id);
           req.user = admin;
           req.payload = payload;
-          req.tenant = admin?.tenant;
+          // req.tenant = admin?.tenant;
           req.roles = admin?.roles;
         }
         resolve({ err: err || wrapErrorInfo(info), payload, info });
@@ -137,6 +147,10 @@ export async function auth<Payload = PayloadType>(
     if (isAdminAuthRequest(req)) {
       return (await AuthHelper.authAdmin(req, res)) as any;
     }
+
+    if (isOrgAuthRequest(req)) {
+      return (await OrgAuthHelper.auth(req, res)) as any;
+    }
   }
 
   if (type !== 'admin') {
@@ -147,11 +161,4 @@ export async function auth<Payload = PayloadType>(
   }
 
   throw new AsunaException(AsunaErrorCode.InvalidCredentials);
-}
-
-function wrapErrorInfo(info: any): any {
-  if (info instanceof Error) {
-    return new AsunaException(AsunaErrorCode.InvalidCredentials, info.message, info);
-  }
-  return info;
 }

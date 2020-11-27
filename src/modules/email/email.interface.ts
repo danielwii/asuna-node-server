@@ -1,4 +1,4 @@
-import { Attachment } from 'nodemailer/lib/mailer';
+import type { Attachment } from 'nodemailer/lib/mailer';
 
 export interface MailInfo {
   to: string[];

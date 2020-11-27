@@ -3,6 +3,7 @@ import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import * as shortid from 'shortid';
 import { Connection, getManager } from 'typeorm';
+
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
@@ -10,6 +11,9 @@ import { SYS_ROLE } from './auth.constants';
 import { AdminUser } from './auth.entities';
 import { RoleRepository } from './auth.repositories';
 import { AppConfigObject } from '../../config/app.config';
+import { AuthUserChannel } from './base.entities';
+
+import type { CreatedUser } from './auth.service';
 
 const logger = LoggerFactory.getLogger('AdminAuthService');
 
@@ -18,23 +22,31 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
   private readonly roleRepository: RoleRepository;
 
   public constructor(@InjectConnection() private readonly connection: Connection) {
-    super(connection.getRepository<AdminUser>(AdminUser));
+    super(AdminUser, connection.getRepository<AdminUser>(AdminUser));
     this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
-  public async createUser(username: string, email: string, password: string, roleNames?: string[]): Promise<AdminUser> {
+  public async createUser(
+    username: string,
+    email: string,
+    password: string,
+    channel?: AuthUserChannel,
+    roleNames?: string[],
+  ): Promise<CreatedUser<AdminUser>> {
     const { hash, salt } = PasswordHelper.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
 
     let user = await this.getUser({ username, email });
     if (!user) {
-      user = this.userRepository.create({ email, username, isActive: true });
+      user = this.authUserRepository.create({ email, username, isActive: true });
     }
     logger.log(`found user ${r(user)}`);
     user.password = hash;
     user.salt = salt;
     user.roles = roles;
-    return getManager().save(user);
+    return getManager()
+      .save(user)
+      .then((user) => ({ user }));
   }
 
   /**
@@ -66,7 +78,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
       logger.log(`---------------------------------------------------------------`);
       logger.log(`create SYS_ADMIN account: ${email}:${password}`);
       logger.log(`---------------------------------------------------------------`);
-      this.createUser('Administrator', email, password, [SYS_ROLE]).catch((error) => {
+      this.createUser('Administrator', email, password, undefined, [SYS_ROLE]).catch((error) => {
         logger.warn('cannot create default SYS_ADMIN account', error);
       });
     }

@@ -3,6 +3,7 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { EntityMetadata } from 'typeorm';
+
 import { CacheManager } from '../cache';
 import {
   AsunaErrorCode,
@@ -14,10 +15,9 @@ import {
   r,
 } from '../common';
 import { deserializeSafely } from '../common/helpers';
-import { AdminUser, Role } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
-import { Tenant } from './tenant.entities';
+import { OrgRole, OrgUser, Tenant } from './tenant.entities';
 
 export class TenantConfig {
   @IsBoolean() @IsOptional() enabled?: boolean;
@@ -37,12 +37,12 @@ export class TenantConfig {
   }
 }
 
-export type TenantInfo = {
+export interface TenantInfo {
   config: TenantConfig;
   tenant: Tenant;
   roles: string[];
   recordCounts: { [name: string]: { total: number; published?: number } };
-};
+}
 
 export enum TenantFieldKeys {
   enabled = 'enabled',
@@ -122,7 +122,7 @@ export class TenantHelper {
   static async info(userId: PrimaryKey): Promise<TenantInfo> {
     const { config, admin } = await Promise.props({
       config: TenantHelper.getConfig(),
-      admin: AdminUser.findOne(userId, { relations: ['roles', 'tenant'] }),
+      admin: OrgUser.findOne(userId, { relations: ['roles', 'tenant'] }),
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
@@ -158,18 +158,18 @@ export class TenantHelper {
     return DBHelper.hasRelation(fullModelName, Tenant);
   }
 
-  static async hasTenantRole(roles: Role[]): Promise<boolean> {
+  static async hasTenantRole(roles: OrgRole[]): Promise<boolean> {
     return !_.isEmpty(await this.getTenantRoles(roles));
   }
 
-  static async tenantSupport(fullModelName: string, roles: Role[]): Promise<boolean> {
+  static async tenantSupport(fullModelName: string, roles: OrgRole[]): Promise<boolean> {
     const isTenantEntity = await this.isTenantEntity(fullModelName);
     const hasTenantRoles = await this.hasTenantRole(roles);
     logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
     return isTenantEntity && hasTenantRoles;
   }
 
-  static async getTenantRoles(roles: Role[]): Promise<string[]> {
+  static async getTenantRoles(roles: OrgRole[]): Promise<string[]> {
     const config = await TenantHelper.getConfig();
     const roleNames = _.map(roles, fp.get('name'));
     const bindRoles = _.compact(_.split(config.bindRoles, ','));
@@ -184,7 +184,7 @@ export class TenantHelper {
       return;
     }
 
-    const admin = await AdminUser.findOne(userId, { relations: ['roles', 'tenant'] });
+    const admin = await OrgUser.findOne(userId, { relations: ['roles', 'tenant'] });
     if (!admin.tenant) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.TenantNeeded, []);
     }

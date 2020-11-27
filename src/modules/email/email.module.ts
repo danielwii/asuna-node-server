@@ -1,7 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from "../core/kv";
+import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
 import { EmailTmplConfigKeys } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { EmailHelper } from './email.helper';

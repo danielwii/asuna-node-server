@@ -45,7 +45,7 @@ export class AuthedUserHelper {
     }
     ow(id, 'id', ow.string.nonEmpty);
     const entity = await UserRegister.Entity.findOne({ cache: true });
-    const fixedId = _.isNumber(entity.id) ? +id.slice(1) : id;
+    const fixedId = _.isNumber(entity.id) ? Number(id.slice(1)) : id;
     return (UserRegister.Entity as typeof BaseEntity).findOneOrFail(fixedId, options as any) as any;
   }
 

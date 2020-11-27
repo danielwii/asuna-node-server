@@ -1,10 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { IsArray, IsString } from 'class-validator';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { EmailHelper } from './email.helper';
-import { MailAttachment } from './email.interface';
+
+import type { MailAttachment } from './email.interface';
 
 const logger = LoggerFactory.getLogger('EmailController');
 

@@ -1,4 +1,5 @@
 import { plainToClass } from 'class-transformer';
+
 import { LoggerFactory } from '../common/logger';
 
 export const EmailTmplConfigKeys = {

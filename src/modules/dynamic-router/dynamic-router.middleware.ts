@@ -1,11 +1,12 @@
 import { NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
 import * as _ from 'lodash';
 import { resolve } from 'path';
 
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DynamicRouterHelper } from './dynamic-router.helper';
+
+import type { Request, Response } from 'express';
 
 const logger = LoggerFactory.getLogger('DynamicRouterMiddleware');
 
@@ -22,7 +23,7 @@ export class DynamicRouterMiddleware implements NestMiddleware {
 
     const config = await DynamicRouterHelper.getConfig();
 
-    const found = _.find(config?.textRouter, field => resolve(`/${field.path}`) === req.baseUrl);
+    const found = _.find(config?.textRouter, (field) => resolve(`/${field.path}`) === req.baseUrl);
     if (found) {
       logger.log(`found ${r({ config, found })}`);
       res.send(found.text);

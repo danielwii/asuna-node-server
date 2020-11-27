@@ -12,7 +12,7 @@ export enum AuthUserChannel {
   quickpass = 'quickpass',
 }
 
-export abstract class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
+export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '用户名' })
   @Column({ nullable: false, length: 50, unique: true })
   username: string;

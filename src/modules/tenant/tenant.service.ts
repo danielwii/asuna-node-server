@@ -1,6 +1,7 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
+
 import {
   AsunaErrorCode,
   AsunaException,
@@ -10,14 +11,14 @@ import {
   PrimaryKey,
   r,
 } from '../common';
-import { AdminUser } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
-import { StatsResult } from '../stats';
 import { WeChatUser } from '../wechat/wechat.entities';
 import { WxHelper } from '../wechat/wx.helper';
-import { Tenant } from './tenant.entities';
+import { OrgUser, Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
+
+import type { StatsResult } from '../stats';
 
 const logger = LoggerFactory.getLogger('TenantService');
 
@@ -35,34 +36,34 @@ export class TenantService {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
-    const admin = await AdminUser.findOne(userId, { relations: ['tenant'] });
-    if (admin.tenant) {
-      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, ['tenant', admin.tenant.name]);
+    const user = await OrgUser.findOne(userId, { relations: ['tenant'] });
+    if (user.tenant) {
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, ['tenant', user.tenant.name]);
     }
 
-    admin.tenant = await Tenant.create({ ...body, isPublished: info.config.activeByDefault }).save();
-    await admin.save();
+    user.tenant = await Tenant.create({ ...body, isPublished: info.config.activeByDefault }).save();
+    await user.save();
 
     if (info.config.firstModelBind && info.config.firstModelName) {
-      logger.log(`bind ${info.config.firstModelName} with tenant ${admin.tenant.id}`);
+      logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
 
       await RestHelper.save(
         { model: DBHelper.getModelNameObject(info.config.firstModelName), body: payload },
-        { user: admin as any, tenant: admin.tenant, roles: admin.roles },
+        { user: user as any, tenant: user.tenant /* roles: admin.roles */ },
       );
     }
 
     // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
     const config = await WxHelper.getServiceConfig();
     if (config.enabled && config.saveToAdmin) {
-      const weChatUser = await WeChatUser.findOne({ admin });
+      const weChatUser = await WeChatUser.findOne({ admin: user });
       if (weChatUser) {
-        weChatUser.tenant = admin.tenant;
+        weChatUser.tenant = user.tenant;
         await weChatUser.save();
       }
     }
 
-    return admin.tenant;
+    return user.tenant;
   }
 
   static async populateTenantForEntitiesWithNoTenant(): Promise<StatsResult> {

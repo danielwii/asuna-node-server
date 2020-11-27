@@ -1,5 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 import * as _ from 'lodash';
+
 import { NameValue } from './helpers/normal';
 import { r } from './helpers/utils';
 import { LoggerFactory } from './logger/factory';
@@ -138,9 +139,9 @@ export class AsunaExceptionHelper {
       code: 'E01004',
       nameValue: AsunaErrorCode.InvalidCredentials,
       message: (email: string, username: string) =>
-        `${email ? `email:${email}` : ''} ${username ? `username:${username}` : ''} already exists`,
+        `${email ? `email:${email} ` : ''}${username ? `username:${username}` : ''} already exists`,
       localMessage: (email: string, username: string) =>
-        `${email ? `邮件:${email}` : ''} ${username ? `用户名:${username}` : ''} 已存在`,
+        `${email ? `邮件:${email} ` : ''}${username ? `用户名:${username}` : ''} 已存在`,
     },
     [AsunaExceptionTypes.Unpublished]: {
       code: 'E01010',

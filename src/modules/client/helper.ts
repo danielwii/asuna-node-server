@@ -15,8 +15,8 @@ export class ClientHelper {
     ow(req.session.deviceId, 'deviceId', ow.string.nonEmpty);
     ow(req.sessionID, 'sessionID', ow.string.nonEmpty);
 
-    let device: VirtualDevice = undefined;
-    let session: VirtualSession = undefined;
+    let device: VirtualDevice;
+    let session: VirtualSession;
     await getManager().transaction(async (manager) => {
       device = await VirtualDevice.findOne(req.session.deviceId);
       if (!device) {
