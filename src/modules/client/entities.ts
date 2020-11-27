@@ -74,6 +74,7 @@ export class VirtualSession extends NoPrimaryKeyBaseEntity {
   public device?: VirtualDevice;
 }
 
+@EntityMetaInfo({ name: 'client__t_session_users', internal: true })
 @Entity('client__t_session_users')
 export class SessionUser extends InjectMultiUserProfile(NoPrimaryKeyBaseEntity) {
   public static generator = new SimpleIdGenerator('imu');
