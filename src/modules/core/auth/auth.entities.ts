@@ -4,6 +4,7 @@ import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base'
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
+import { InjectTenant } from '../../tenant/tenant.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
@@ -37,14 +38,7 @@ export class Role extends AbstractBaseEntity {
 
 @EntityMetaInfo({ name: 'auth__users', internal: true })
 @Entity('auth__t_users')
-export class AdminUser extends AbstractTimeBasedAuthUser {
-  /*
-  @MetaInfo({ name: 'Tenant' })
-  @ManyToOne('Tenant', (inverse: Tenant) => inverse.users, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'tenant__id' })
-  public tenant: Tenant;
-*/
-
+export class AdminUser extends AbstractTimeBasedAuthUser /* InjectTenant(AbstractTimeBasedAuthUser) */ {
   @MetaInfo({ name: '角色' })
   @ManyToMany('Role', (inverse: Role) => inverse.users, { primary: true })
   @JoinTable({

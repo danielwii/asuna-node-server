@@ -1,4 +1,4 @@
-import { AsunaErrorCode, AsunaException } from '../common';
+import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 
 export function wrapErrorInfo(info: any): any {
   if (info instanceof Error) {

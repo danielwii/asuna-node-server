@@ -55,7 +55,7 @@ export class AuthHelper {
         if (err || info) {
           logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
         } else {
-          const admin = await AdminUser.findOne(payload.id, { relations: ['roles', 'tenant'] });
+          const admin = await AdminUser.findOne(payload.id, { relations: ['roles' /* , 'tenant' */] });
           req.identifier = AdminUserIdentifierHelper.stringify(payload);
           req.profile = await UserProfile.findOne(payload.id);
           req.user = admin;
