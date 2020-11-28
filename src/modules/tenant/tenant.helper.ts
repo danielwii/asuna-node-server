@@ -128,7 +128,7 @@ export class TenantHelper {
 
     logger.log(`tenant info for ${r({ admin, config })}`);
 
-    const { tenant } = admin;
+    const { tenant } = admin ?? {};
     const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
       (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
@@ -151,7 +151,7 @@ export class TenantHelper {
       : {};
 
     const filtered = _.assign({}, ...entities.map((entity) => ({ [entity.entityInfo.name]: entity.entityInfo })));
-    return Promise.props({ entities: filtered, config, recordCounts, tenant, roles: this.getTenantRoles(admin.roles) });
+    return Promise.props({ entities: filtered, config, recordCounts, tenant, roles: this.getTenantRoles(admin?.roles) });
   }
 
   static async isTenantEntity(fullModelName: string): Promise<boolean> {

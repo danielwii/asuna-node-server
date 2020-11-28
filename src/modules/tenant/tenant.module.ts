@@ -61,7 +61,10 @@ export class TenantModule implements OnModuleInit {
               name: 'Default',
               fields: [
                 { name: 'Multi-tenants Support', field: { name: TenantFieldKeys.enabled, type: 'boolean' } },
-                { name: '默认激活状态', field: { name: TenantFieldKeys.activeByDefault, type: 'boolean' } },
+                {
+                  name: '默认激活状态',
+                  field: { name: TenantFieldKeys.activeByDefault, type: 'boolean', help: 'Tenant 的 isPublished 状态' },
+                },
                 {
                   name: 'Bind Roles',
                   field: {
@@ -121,7 +124,7 @@ export class TenantModule implements OnModuleInit {
       .map((entity) => entity.entityInfo.name);
     AccessControlHelper.setup((ac) =>
       ac
-        .grant('hunter')
+        .grant('manager')
         .createOwn([...entityNames, ACResource.draft])
         .readOwn([...entityNames, ACResource.draft])
         .updateOwn([...entityNames, ACResource.draft])
