@@ -2,15 +2,7 @@ import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
 
-import {
-  AsunaErrorCode,
-  AsunaException,
-  AsunaExceptionHelper,
-  AsunaExceptionTypes,
-  LoggerFactory,
-  PrimaryKey,
-  r,
-} from '../common';
+import { AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory, PrimaryKey, r } from '../common';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
 import { WeChatUser } from '../wechat/wechat.entities';
@@ -26,14 +18,16 @@ export class TenantService {
   /**
    * @param userId
    * @param body
-   * @param payload 用来新建需要绑定的核心模型数据
+   * @param firstModelPayload 用来新建需要绑定的核心模型数据
    */
-  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, payload?: object): Promise<Tenant> {
+  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
+    logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
     const info = await TenantHelper.info(userId);
     if (info.tenant) return info.tenant;
 
     if (_.isEmpty(info.roles)) {
-      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
+      logger.warn(`no tenant roles found for user. ${r({ userId, info })}`);
+      // throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
     const user = await OrgUser.findOne(userId, { relations: ['tenant'] });
@@ -44,12 +38,12 @@ export class TenantService {
     user.tenant = await Tenant.create({ ...body, isPublished: info.config.activeByDefault }).save();
     await user.save();
 
-    if (info.config.firstModelBind && info.config.firstModelName) {
+    if (info.config.firstModelBind && info.config.firstModelName && firstModelPayload) {
       logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
 
       await RestHelper.save(
-        { model: DBHelper.getModelNameObject(info.config.firstModelName), body: payload },
-        { user: user as any, tenant: user.tenant /* roles: admin.roles */ },
+        { model: DBHelper.getModelNameObject(info.config.firstModelName), body: firstModelPayload },
+        { user: user, tenant: user.tenant /* roles: admin.roles */ },
       );
     }
 

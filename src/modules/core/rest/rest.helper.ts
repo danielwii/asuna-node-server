@@ -46,6 +46,7 @@ export class RestHelper {
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
+    logger.log(`save ${r({ model, body })}`);
     const tenantRelatedFields = {};
     if (tenant) {
       await TenantHelper.checkPermission(user.id as string, model.entityName);
@@ -78,8 +79,9 @@ export class RestHelper {
 
     const repository = DBHelper.repo(model);
     const relationKeys = repository.metadata.relations.map((relation) => relation.propertyName);
-    const relationIds = R.map((value) => (_.isArray(value) ? (value as any[]).map((id) => ({ id })) : { id: value }))(
-      R.pick(relationKeys, body) as any,
+    logger.log(`pick ${r({ relationKeys, body })}`);
+    const relationIds = R.map((value) => (_.isArray(value) ? value.map((id) => ({ id })) : { id: value }))(
+      R.pick(relationKeys, body || {}) as any,
     );
 
     const entity = repository.create({
