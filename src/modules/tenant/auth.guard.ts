@@ -7,7 +7,7 @@ import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { r } from '../common/helpers/utils';
 import { OrgAuthHelper } from './auth';
 
-import type { JwtAuthRequest, JwtPayload } from '../core/auth';
+import type { JwtAuthRequest, JwtPayload } from '../core';
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {

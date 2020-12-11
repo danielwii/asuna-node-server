@@ -93,8 +93,8 @@ export class SimpleIdGeneratorHelper {
     return SimpleIdGenerator.nextId(this.registeredTypes[type], workerId);
   }
 
-  public static randomId(prefix = '') {
+  public static randomId(prefix = '', length = 12) {
     SimpleIdGeneratorHelper.registeredRandomPrefixes.add(prefix);
-    return prefix + SimpleIdGeneratorHelper.chance.string({ alpha: true, numeric: true, length: 12 });
+    return prefix + SimpleIdGeneratorHelper.chance.string({ alpha: true, numeric: true, length });
   }
 }

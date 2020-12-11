@@ -9,13 +9,13 @@ import * as RedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
-import { PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
 import { RedisProvider } from '../providers';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
+import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoader');

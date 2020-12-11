@@ -35,7 +35,7 @@ export class ClientHelper {
     return session;
   }
 
-  public static async getSessionUserByDevice(profileId: string, deviceId: string): Promise<SessionUser[]> {
+  public static async getSessionUsersByDevice(profileId: string, deviceId: string): Promise<SessionUser[]> {
     if (profileId) {
       throw new Error('get session user by profileId is not implemented');
     }
