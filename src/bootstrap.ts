@@ -113,10 +113,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
   }
 
-  const app = await NestFactory.create<NestExpressApplication>(appModule, {
-    logger: LoggerHelper.getLoggerService(),
-    cors: true,
-  });
+  const app = await NestFactory.create<NestExpressApplication>(appModule, { logger: LoggerHelper.getLoggerService() });
   await AppLifecycle.onInit(app);
 
   // --------------------------------------------------------------
@@ -169,6 +166,8 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   // --------------------------------------------------------------
   // setup application
   // --------------------------------------------------------------
+
+  app.enableCors({ credentials: true, origin: true });
 
   // see https://expressjs.com/en/guide/behind-proxies.html
   // 设置以后，req.ips是ip数组；如果未经过代理，则为[]. 若不设置，则req.ips恒为[]

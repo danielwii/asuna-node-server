@@ -31,7 +31,13 @@ export class DeviceMiddleware implements NestMiddleware {
     if (!hasDevice) {
       const id = SimpleIdGeneratorHelper.randomId('vd');
       this.logger.debug(`set device id ${id}`);
-      res.cookie('deviceId', id, { signed: true, httpOnly: true, maxAge: 10 * 365 * 24 * 60 * 60 * 1000 });
+      res.cookie('deviceId', id, {
+        signed: true,
+        httpOnly: true,
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000,
+        sameSite: 'none',
+        secure: true,
+      });
       req.session.deviceId = id;
     }
     if (hasDevice && !req.session.deviceId) {
