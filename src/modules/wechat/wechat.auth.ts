@@ -8,9 +8,10 @@ import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth/user.entities';
 import { auth } from '../helper/auth';
 import { Store } from '../store';
-import { WXJwtPayload } from './interfaces';
-import { WXAuthRequest } from './wechat.interfaces';
-import { WxCodeSession } from './wx.interfaces';
+
+import type { WXJwtPayload } from './interfaces';
+import type { WXAuthRequest } from './wechat.interfaces';
+import type { WxCodeSession } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WXAuth');
 

@@ -1,6 +1,7 @@
 import { plainToClass } from 'class-transformer';
 import { WeChatUser } from './wechat.entities';
-import { WxSubscribeSceneType } from './wx.interfaces';
+
+import type { WxSubscribeSceneType } from './wx.interfaces';
 
 export class WxUserList {
   total: number;
