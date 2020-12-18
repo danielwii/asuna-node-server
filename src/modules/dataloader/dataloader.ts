@@ -4,7 +4,7 @@ import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
-import * as RedisDataloader from 'redis-dataloader';
+import RedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
