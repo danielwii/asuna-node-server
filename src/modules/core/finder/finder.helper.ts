@@ -1,4 +1,3 @@
-import { Promise } from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
 import * as url from 'url';
 import { AsunaErrorCode, AsunaException, deserializeSafely, LoggerFactory, r } from '../../common';

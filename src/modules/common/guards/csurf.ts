@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Promise } from 'bluebird';
 
 import { LoggerFactory } from '../logger';
 import { JwtAuthRequest } from '../../core/auth';
