@@ -3,7 +3,7 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as querystring from 'querystring';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
 import {
   AdminInternalModule,
   AsunaCollections,

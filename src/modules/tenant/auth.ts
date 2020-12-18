@@ -1,4 +1,4 @@
-import * as passport from 'passport';
+import passport from 'passport';
 
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';

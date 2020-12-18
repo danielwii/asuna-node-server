@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as supertest from 'supertest';
+import supertest from 'supertest';
 import { getManager } from 'typeorm';
 import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
 
