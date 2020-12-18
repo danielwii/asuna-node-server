@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
 import * as _ from 'lodash';
 

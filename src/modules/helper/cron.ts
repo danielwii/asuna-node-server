@@ -1,8 +1,8 @@
 import { CronJob, CronJobParameters } from 'cron';
 import * as cronParser from 'cron-parser';
-import * as dayjs from 'dayjs';
-import * as calendar from 'dayjs/plugin/calendar';
-import * as relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+import calendar from 'dayjs/plugin/calendar';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import * as _ from 'lodash';
 
 import { r } from '../common/helpers';

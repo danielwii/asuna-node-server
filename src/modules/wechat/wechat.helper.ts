@@ -4,7 +4,7 @@ import * as crypto from 'crypto';
 import { Request } from 'express';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
-import * as rawBody from 'raw-body';
+import rawBody from 'raw-body';
 import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
@@ -402,8 +402,9 @@ export class WeChatHelper {
         }),
       );
     }
+    const payload: Partial<WXJwtPayload> = { key };
     return TokenHelper.createCustomToken(
-      { key } as WXJwtPayload,
+      payload,
       configLoader.loadConfig(ConfigKeys.WX_SECRET_KEY, 'wx-secret'),
       // { expiresIn: 60 * 60 * 24 },
     );

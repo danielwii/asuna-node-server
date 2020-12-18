@@ -7,7 +7,7 @@ import {
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
-import * as checkDiskSpace from 'check-disk-space';
+import checkDiskSpace from 'check-disk-space';
 import * as _ from 'lodash';
 import { dirname, resolve } from 'path';
 import { getConnection } from 'typeorm';

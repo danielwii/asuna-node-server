@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
 import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
 import { join } from 'path';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { LoggerFactory } from '../../common/logger';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';

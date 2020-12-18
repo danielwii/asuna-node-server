@@ -1,5 +1,4 @@
-import { Promise } from 'bluebird';
-import * as DataLoader from 'dataloader';
+import DataLoader from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql';
 import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';

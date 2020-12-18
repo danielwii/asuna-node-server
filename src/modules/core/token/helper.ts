@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
+import dayjs from 'dayjs';
 import * as _ from 'lodash';
-import * as moment from 'moment';
 import { UpdateResult } from 'typeorm';
 import { AsunaErrorCode, AsunaException, deserializeSafely, r } from '../../common';
 import { LoggerFactory } from '../../common/logger';
@@ -121,7 +121,7 @@ export class OperationTokenHelper {
       //       .toDate(),
       // },
       [OperationTokenType.TimeBased]: {
-        expiredAt: _.get(opts, 'expiredAt') || moment().add(_.get(opts, 'expiredInMinutes'), 'minutes').toDate(),
+        expiredAt: _.get(opts, 'expiredAt') || dayjs().add(_.get(opts, 'expiredInMinutes'), 'minute').toDate(),
       },
     }[type];
 
@@ -209,7 +209,7 @@ export class OperationTokenHelper {
     OperationTokenHelper.checkAvailable(await OperationTokenHelper.getTokenByToken(token));
 
   static extend(operationToken: OperationToken, minutes: number): void {
-    operationToken.expiredAt = moment().add(minutes, 'minutes').toDate();
+    operationToken.expiredAt = dayjs().add(minutes, 'minute').toDate();
   }
 
   static async checkAvailable(operationToken: OperationToken): Promise<boolean> {
@@ -224,7 +224,7 @@ export class OperationTokenHelper {
     }
 
     // 标记过期的 token
-    if (operationToken.expiredAt && moment().isAfter(moment(operationToken.expiredAt))) {
+    if (operationToken.expiredAt && dayjs().isAfter(dayjs(operationToken.expiredAt))) {
       operationToken.isExpired = true;
       operationToken.isDeprecated = true;
       await operationToken.save();

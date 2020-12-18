@@ -1,5 +1,5 @@
 import { Promise } from 'bluebird';
-import * as EmailTemplate from 'email-templates';
+import EmailTemplate from 'email-templates';
 import * as _ from 'lodash';
 import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
 import * as SMTPTransport from 'nodemailer/lib/smtp-transport';

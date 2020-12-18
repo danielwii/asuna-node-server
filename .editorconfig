@@ -2,34 +2,17 @@
 root = true
 
 [*]
+indent_style = space
+indent_size = 2
 charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-; HTML
-[*.{html,jade,pug,tpl,nunj}]
-indent_style = space
-indent_size = 2
+max_line_length = 120
 
 ; JS
 [*.{js,es6,ts,tsx}]
-indent_style = space
-indent_size = 2
-
-; GraphQL
-[*.graphql]
-indent_style = space
-indent_size = 2
-
-; Styles
-[*.{css,scss,sass,less}]
-indent_style = space
-indent_size = 2
-
-[*.yaml]
-indent_style = space
-indent_size = 2
+quote_type = single
 
 ; Markdown
 [*.md]
@@ -46,6 +29,5 @@ indent_size = 4
 
 ; Python
 [*.py]
-max_line_length = 120
 indent_style = space
 indent_size = 4
