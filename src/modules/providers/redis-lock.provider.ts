@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as redis from 'redis';
-import * as RedLock from 'redlock';
+import RedLock from 'redlock';
 import { promisify, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';

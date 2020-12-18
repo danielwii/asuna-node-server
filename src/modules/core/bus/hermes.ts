@@ -1,4 +1,4 @@
-import * as BullQueue from 'bull';
+import BullQueue from 'bull';
 import { validate } from 'class-validator';
 import * as _ from 'lodash';
 import ow from 'ow';

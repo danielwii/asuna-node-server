@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Promise } from 'bluebird';
-import * as Chance from 'chance';
+import Chance from 'chance';
 import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import * as qs from 'qs';

@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import * as fs from 'fs-extra';
 import * as os from 'os';
-import * as pump from 'pump';
+import pump from 'pump';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 
@@ -18,7 +18,7 @@ export class ReqHelper {
     const stream = fs.createWriteStream(tempfile);
     req.pipe(stream);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       req.on('end', () => {
         logger.log(`save to ${tempfile} done.`);
         resolve(tempfile);
@@ -30,9 +30,7 @@ export class ReqHelper {
     const tempfile = `${os.tmpdir()}/${filename}`;
     logger.log(`save file to ${r({ filename, tempfile })}`);
     return new Promise((resolve, reject) =>
-      pump(fileStream, fs.createWriteStream(tempfile), err =>
-        err ? reject(err) : resolve(tempfile),
-      ),
+      pump(fileStream, fs.createWriteStream(tempfile), (err) => (err ? reject(err) : resolve(tempfile))),
     );
   }
 }

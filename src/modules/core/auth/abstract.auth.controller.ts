@@ -1,6 +1,6 @@
 import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { Promise } from 'bluebird';
-import * as Chance from 'chance';
+import Chance from 'chance';
 import * as _ from 'lodash';
 import { DeepPartial, UpdateResult } from 'typeorm';
 

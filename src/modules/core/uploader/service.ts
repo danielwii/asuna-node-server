@@ -4,7 +4,7 @@ import { Promise } from 'bluebird';
 import { plainToClass, Transform } from 'class-transformer';
 import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
-import * as highland from 'highland';
+import highland from 'highland';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { join } from 'path';

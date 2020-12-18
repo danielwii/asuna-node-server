@@ -1,5 +1,5 @@
-import * as AliPopCore from '@alicloud/pop-core';
-import * as Chance from 'chance';
+import AliPopCore from '@alicloud/pop-core';
+import Chance from 'chance';
 import * as _ from 'lodash';
 import { InMemoryDB } from '../cache';
 import { r } from '../common/helpers';
