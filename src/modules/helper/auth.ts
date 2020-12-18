@@ -1,6 +1,6 @@
-import * as passport from 'passport';
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import passport from 'passport';
 
+import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { AdminUser } from '../core/auth/auth.entities';

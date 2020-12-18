@@ -1,7 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Request, Response } from 'express';
-import * as passport from 'passport';
+import passport from 'passport';
 import { Observable } from 'rxjs';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
