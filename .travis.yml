@@ -5,7 +5,7 @@ node_js:
 os: linux
 install:
   - yarn
-  - yarn global add codecov
+  - yarn dlx codecov
 after_success:
   - codecov
 #cache:
