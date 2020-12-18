@@ -1,5 +1,4 @@
 import ow from 'ow';
-import { Promise } from 'bluebird';
 import { getManager } from 'typeorm';
 
 import { SessionUser, VirtualDevice, VirtualSession } from './entities';

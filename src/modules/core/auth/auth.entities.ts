@@ -4,7 +4,6 @@ import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base'
 import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
-import { InjectTenant } from '../../tenant/tenant.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')

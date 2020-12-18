@@ -1,4 +1,4 @@
-import { Logger, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { Args, Context, Info, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 import { Promise } from 'bluebird';
 import { GraphQLResolveInfo } from 'graphql';

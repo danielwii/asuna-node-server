@@ -5,7 +5,7 @@ import { DaprConfigObject } from './dapr.config';
 const logger = LoggerFactory.getLogger('DaprProvider');
 
 export class DaprProvider {
-  private _stateUrl;
+  private readonly _stateUrl;
 
   private static instance = new DaprProvider();
 

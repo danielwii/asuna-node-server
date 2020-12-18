@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Promise } from 'bluebird';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
 

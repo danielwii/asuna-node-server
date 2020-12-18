@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable no-param-reassign,no-return-await */
 import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
 import * as _ from 'lodash';
@@ -17,13 +15,13 @@ export const SysTokenServiceName = {
   SysInvite: 'sys#sys-invite',
 };
 
-export type CommonTokenOpts = {
+export interface CommonTokenOpts {
   payload?: object;
   identifier: string;
   role: keyof typeof TokenRule;
   service: string;
   key: string;
-};
+}
 
 /**
  * @param payload
@@ -42,12 +40,12 @@ export type ObtainTokenOpts = (
 ) &
   CommonTokenOpts;
 
-export type RedeemTokenOpts = {
+export interface RedeemTokenOpts {
   key?: string;
   identifier: string;
   role: keyof typeof TokenRule;
   service: string;
-};
+}
 
 export class OperationTokenOpts {
   @IsString()
@@ -88,12 +86,12 @@ export class OperationTokenOpts {
   }
 }
 
-export type DeprecateTokenParams = {
+export interface DeprecateTokenParams {
   identifier: string;
   role: keyof typeof TokenRule;
   service: string;
   key: string;
-};
+}
 
 export class OperationTokenHelper {
   static resolver: { [key: string]: ({ identifier, user }) => Promise<OperationToken> } = {};
@@ -183,7 +181,7 @@ export class OperationTokenHelper {
   }
 
   static async getToken({ token, shortId }: { token?: string; shortId?: string }): Promise<OperationToken | undefined> {
-    if ((token && token.trim()) || (shortId && shortId.trim())) {
+    if (token?.trim() || shortId?.trim()) {
       return OperationToken.findOne({
         where: {
           ...(token ? { token } : null),
