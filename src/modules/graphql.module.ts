@@ -4,7 +4,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
-import * as responseCachePlugin from 'apollo-server-plugin-response-cache';
+import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
