@@ -122,7 +122,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   const beforeSyncDB = Date.now();
   const connection = app.get<Connection>(Connection);
-  logger.log(`db connected: ${connection.isConnected}`);
+  logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
 
   logger.log('sync db ...');
   const queryRunner = connection.createQueryRunner();
