@@ -161,7 +161,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
 
   // may add bootstrap lifecycle for static initialize
   AccessControlHelper.init();
-  await DBHelper.initPrismaClient();
+  // await DBHelper.initPrismaClient();
 
   // --------------------------------------------------------------
   // setup application

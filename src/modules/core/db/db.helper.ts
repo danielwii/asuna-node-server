@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
@@ -194,11 +194,12 @@ export interface OriginSchema {
 export class DBHelper {
   public static metadatas: EntityMetadata[] = [];
 
-  private static _prismaClient: PrismaClient;
-  public static get prismaClient() {
-    return DBHelper._prismaClient;
-  }
+  // private static _prismaClient: PrismaClient;
+  // public static get prismaClient() {
+  //   return DBHelper._prismaClient;
+  // }
 
+  /*
   public static async initPrismaClient(): Promise<void> {
     if (!DBHelper._prismaClient) {
       const dbConfig = await getConnectionOptions();
@@ -224,6 +225,7 @@ export class DBHelper {
       }
     }
   }
+*/
 
   public static isValidEntity(metadata): boolean {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
