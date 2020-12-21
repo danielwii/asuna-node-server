@@ -11,8 +11,10 @@ uploads/
 coverage/
 yarn-error.log
 database.db
+
 .yarn/*
 #!.yarn/cache
+.pnp.*
 !.yarn/releases
 !.yarn/plugins
 !.yarn/sdks
