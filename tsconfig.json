@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     // Target latest version of ECMAScript.
-    "module": "commonjs",
-    "target": "es2017",
+    "module": "CommonJS",
+    "target": "ES2017",
     // Search under node_modules for non-relative imports.
     "moduleResolution": "node",
     // Enable strictest settings like strictNullChecks & noImplicitAny. :P
