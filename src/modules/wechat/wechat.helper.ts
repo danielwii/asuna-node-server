@@ -354,7 +354,7 @@ export class WeChatHelper {
       const decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, encodedIV);
       // 设置自动 padding 为 true，删除填充补位
       decipher.setAutoPadding(true);
-      decoded = decipher.update(encodedEncryptedData, 'binary', 'utf8');
+      decoded = decipher.update(encodedEncryptedData, 'binary' as any, 'utf8');
       decoded += decipher.final('utf8');
 
       decoded = JSON.parse(decoded);
