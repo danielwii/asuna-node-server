@@ -8,5 +8,5 @@ install:
   - yarn dlx codecov
 after_success:
   - codecov
-#cache:
-#  yarn: true
+cache:
+  yarn: true
