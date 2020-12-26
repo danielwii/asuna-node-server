@@ -2097,12 +2097,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:^9.0.5":
-  version: 9.0.5
-  resolution: "@types/fs-extra@npm:9.0.5"
+"@types/fs-extra@npm:^9.0.6":
+  version: 9.0.6
+  resolution: "@types/fs-extra@npm:9.0.6"
   dependencies:
     "@types/node": "*"
-  checksum: ee2a945e940c75f80aa40d2ea5da9d7ae7ff92c0f5a603024d2eb5c6ebb581ecb6af4dc66ee012f31d1b544803f5921199a78bea3f6d40447cc6d3c1a7e39d3b
+  checksum: 8a5df0d8e4b3590a6c9bc6db050143b1cbd742566a2aaac4ed3679bcb607756fb2d6d4ff896a304f3c4603fd996a6ba085a64310deb13839dfc7663351b5b626
   languageName: node
   linkType: hard
 
@@ -2313,10 +2313,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:^4.14.165":
-  version: 4.14.165
-  resolution: "@types/lodash@npm:4.14.165"
-  checksum: 525bfc34b0b591cc957125a961c70e63e5ad8b23cbd89b7594a5ea74823285b6d96993a7eec506e26b379ee52dc9dcd3a894ff210be4c97bccb536e62361dbc8
+"@types/lodash@npm:^4.14.166":
+  version: 4.14.166
+  resolution: "@types/lodash@npm:4.14.166"
+  checksum: e8ce1ef9980f494d1da0bd3ac16ba0046b5c1097ff5c9446eb1bd167871d2e8edd2e8e8344a1dbb0134a1c12c29591cf8f950e083adb7e237d5cfeac228abb7d
   languageName: node
   linkType: hard
 
@@ -3903,13 +3903,13 @@ __metadata:
     "@types/express": 4.17.9
     "@types/express-rate-limit": ^5.1.0
     "@types/express-session": ^1.17.3
-    "@types/fs-extra": ^9.0.5
+    "@types/fs-extra": ^9.0.6
     "@types/glob": ^7.1.3
     "@types/highland": ^2.12.10
     "@types/jaeger-client": ^3.15.4
     "@types/jest": ^26.0.19
     "@types/js-yaml": ^3.12.5
-    "@types/lodash": ^4.14.165
+    "@types/lodash": ^4.14.166
     "@types/lru-cache": ^5.1.0
     "@types/luxon": ^1.25.0
     "@types/mime-types": ^2.1.0
@@ -3970,7 +3970,7 @@ __metadata:
     dayjs: ^1.9.7
     email-templates: ^8.0.2
     eslint: ^7.16.0
-    eslint-config-alloy: ^3.8.2
+    eslint-config-alloy: ^3.9.0
     eslint-plugin-import: ^2.22.1
     express: ^4.17.1
     express-rate-limit: ^5.2.3
@@ -7145,10 +7145,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-alloy@npm:^3.8.2":
-  version: 3.8.2
-  resolution: "eslint-config-alloy@npm:3.8.2"
-  checksum: 9f93801a80465e8a33610ad512b917325c7f883e7987e613789e02158c4e85a2ce38e8679824265723cd2252a8fec88e1499056dec65634b01dd7c574af7861d
+"eslint-config-alloy@npm:^3.9.0":
+  version: 3.9.0
+  resolution: "eslint-config-alloy@npm:3.9.0"
+  checksum: e8d4125a9e8b7aadfa04112651d1c271ce3ef9ed2b925e8adf4f345beec87bfb25aa2a754eeaf249410786de43c7178557aded657162925d634160a197b072bb
   languageName: node
   linkType: hard
 
