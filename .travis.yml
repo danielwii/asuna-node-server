@@ -9,4 +9,9 @@ install:
 after_success:
   - codecov
 cache:
-  yarn: true
+  # Yarn 2 does not store dependencies in node_modules anymore, at least not by default.
+  # If you are using the node-modules plugin, remove the `npm: false` line.
+  npm: false
+  # Yarn 2 caches to the local .yarn directory, not the Travis default `$HOME/.yarn`
+  directories:
+    - ./.yarn/cache
