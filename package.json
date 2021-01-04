@@ -20,7 +20,6 @@
     "test": "ENV=test jest",
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
-    "snyk-protect": "snyk protect",
     "doc": "npx @compodoc/compodoc -p tsconfig.json -s"
   },
   "dependencies": {
@@ -72,7 +71,7 @@
     "cron-parser": "^2.18.0",
     "dataloader": "^2.0.0",
     "date-fns": "^2.16.1",
-    "dayjs": "^1.9.8",
+    "dayjs": "^1.10.1",
     "email-templates": "^8.0.2",
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.3",
@@ -96,7 +95,7 @@
     "lru-cache": "^6.0.0",
     "lru_map": "^0.4.1",
     "luxon": "^1.25.0",
-    "mime-types": "^2.1.27",
+    "mime-types": "^2.1.28",
     "minio": "^7.0.18",
     "mongoose": "^5.11.9",
     "mongoose-autopopulate": "^0.12.3",
@@ -126,7 +125,6 @@
     "rxjs": "^6.6.3",
     "sharp": "^0.27.0",
     "shortid": "^2.2.16",
-    "snyk": "^1.437.3",
     "socket.io": "^3.0.4",
     "socket.io-redis": "^5.4.0",
     "swagger-ui-express": "^4.1.6",
@@ -162,8 +160,7 @@
     "@types/highland": "^2.12.10",
     "@types/jaeger-client": "^3.15.4",
     "@types/jest": "^26.0.19",
-    "@types/js-yaml": "^3.12.5",
-    "@types/lodash": "^4.14.166",
+    "@types/lodash": "^4.14.167",
     "@types/lru-cache": "^5.1.0",
     "@types/luxon": "^1.25.0",
     "@types/mime-types": "^2.1.0",
@@ -191,13 +188,12 @@
     "@types/xml2js": "^0.4.7",
     "@typescript-eslint/eslint-plugin": "^4.11.1",
     "@typescript-eslint/parser": "^4.11.1",
-    "eslint": "^7.16.0",
+    "eslint": "^7.17.0",
     "eslint-config-alloy": "^3.10.0",
     "eslint-plugin-import": "^2.22.1",
     "glob": "^7.1.6",
     "husky": "^4.3.6",
     "jest": "^26.6.3",
-    "js-yaml": "^3.14.1",
     "minimatch": "^3.0.4",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.6",
@@ -214,6 +210,5 @@
     "hooks": {
       "pre-commit": "pretty-quick --staged"
     }
-  },
-  "snyk": true
+  }
 }
