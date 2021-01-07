@@ -168,9 +168,11 @@ export class WinstonLoggerService {
 
 export class LoggerHelper {
   static getLoggerService(): LoggerService | LogLevel[] | boolean {
-    if (process.env.NODE_ENV === 'production') {
-      return new WinstonLoggerService();
-    }
+    /* TODO https://github.com/nestjs/nest/issues/5709
+        if (process.env.NODE_ENV === 'production') {
+          return new WinstonLoggerService();
+        }
+    */
 
     return new SimpleLoggerService();
   }
