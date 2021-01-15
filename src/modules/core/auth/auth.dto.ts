@@ -6,12 +6,12 @@ import * as _ from 'lodash';
 export class AdminResetPasswordDto {
   @ApiProperty({ type: 'username' })
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly username: string;
 
   @ApiProperty({ type: 'email' })
   @IsEmail()
-  @Transform((value) => (value ? _.trim(value) : undefined))
+  @Transform(({ value }) => (value ? _.trim(value) : undefined))
   @IsOptional()
   readonly email?: string;
 
@@ -31,12 +31,12 @@ export class ResetPasswordDto {
 export class ResetAccountDto {
   @ApiProperty({ type: 'username' })
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly username: string;
 
   @ApiProperty({ type: 'email' })
   @IsEmail()
-  @Transform((value) => (value ? _.trim(value) : undefined))
+  @Transform(({ value }) => (value ? _.trim(value) : undefined))
   @IsOptional()
   readonly email?: string;
 }
@@ -46,16 +46,16 @@ export class ResetAccountDto {
  */
 export class SignDto {
   @ApiProperty({ type: 'email' })
-  @ValidateIf(o => _.isEmpty(o.username))
+  @ValidateIf((o) => _.isEmpty(o.username))
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @IsNotEmpty()
   readonly email: string;
 
   @ApiProperty({ type: 'username' })
-  @ValidateIf(o => _.isEmpty(o.email))
+  @ValidateIf((o) => _.isEmpty(o.email))
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @IsNotEmpty()
   readonly username: string;
 
@@ -66,7 +66,7 @@ export class SignDto {
 
 export class SignInDto {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @IsNotEmpty()
   readonly username: string;
 
@@ -77,13 +77,13 @@ export class SignInDto {
 
 export class SignUpDto {
   @IsEmail()
-  @Transform((value) => (value ? _.trim(value) : undefined))
+  @Transform(({ value }) => (value ? _.trim(value) : undefined))
   @IsOptional()
   readonly email?: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly username: string;
 
   @IsNotEmpty()

@@ -26,7 +26,7 @@ export class MQConfigObject {
   public username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public password?: string;
 
   public constructor(o: Partial<MQConfigObject>) {

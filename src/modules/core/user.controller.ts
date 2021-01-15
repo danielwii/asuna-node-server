@@ -12,7 +12,7 @@ const logger = LoggerFactory.getLogger('UserController');
 
 export class UpdatePortraitDto {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   portrait: string;
 }
 

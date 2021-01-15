@@ -51,7 +51,7 @@ const fileInterceptorOptions: MulterOptions = {
 
 class CreateChunksUploadTaskDto {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   public filename: string;
 
   @IsNumber()
@@ -61,17 +61,17 @@ class CreateChunksUploadTaskDto {
 
 class CreateChunksUploadTaskQuery {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   public readonly key: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   public readonly filename: string;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @Transform((value) => Number(value))
+  @Transform(({ value }) => Number(value))
   public readonly totalChunks: number = 1;
 }
 

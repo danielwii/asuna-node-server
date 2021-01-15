@@ -9,7 +9,7 @@ const logger = LoggerFactory.getLogger('RedisProvider');
 
 export class RedisClientObject {
   @Expose({ name: 'created-client', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public client: redis.RedisClient;
 
   public isEnabled: boolean;

@@ -12,11 +12,11 @@ const logger = LoggerFactory.getLogger('InteractionController');
 
 export class UserFollowDto {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   type: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   refId: string;
 }
 

@@ -18,17 +18,17 @@ export class ObtainOperationTokenDto {
   readonly payload?: object;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly service: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly key: string;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @Transform(value => (value || value === 0 ? Number(value) : null))
+  @Transform(({ value }) => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   @ValidateIf((o, value: Date) => value == null || Date.now() < value.getTime())
@@ -40,7 +40,7 @@ export class ObtainOperationTokenDto {
   @Max(999)
   @Min(1)
   @IsOptional()
-  @Transform(value => (value || value === 0 ? Number(value) : null))
+  @Transform(({ value }) => (value || value === 0 ? Number(value) : null))
   readonly remainingCount?: number;
 
   constructor(o: ObtainOperationTokenDto) {
@@ -53,17 +53,17 @@ class RedeemQuery {
   readonly role: keyof typeof TokenRule = 'operation';
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly key: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly service: string;
 }
 
 class GetParams {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly token: string;
 }
 

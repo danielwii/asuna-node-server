@@ -11,18 +11,18 @@ const logger = LoggerFactory.getLogger('UploaderHelper');
 
 export class ChunksUploadPayload {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   filename: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   fingerprint: string;
 
   finished?: number[];
 
   @IsInt()
   @Min(1)
-  @Transform(value => Number(value))
+  @Transform(({ value }) => Number(value))
   totalChunks: number;
 
   constructor(o: ChunksUploadPayload) {
@@ -38,20 +38,20 @@ export class ChunksUploadPayload {
 
 export class CreateChunksUploadTaskOpts {
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly identifier: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly key: string;
 
   @IsString()
-  @Transform(value => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly filename: string;
 
   @IsInt()
   @Min(1)
-  @Transform(value => Number(value))
+  @Transform(({ value }) => Number(value))
   readonly totalChunks: number;
 }
 

@@ -1,5 +1,4 @@
 import { Promise } from 'bluebird';
-import { ClassType } from 'class-transformer/ClassTransformer';
 import { GraphQLResolveInfo } from 'graphql';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -14,7 +13,7 @@ import {
   Repository,
 } from 'typeorm';
 import { AbstractCategoryEntity } from '../base';
-import { AsunaErrorCode, AsunaException, PrimaryKey } from '../common';
+import { AsunaErrorCode, AsunaException, ClassType, PrimaryKey } from '../common';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
@@ -25,7 +24,6 @@ import {
   CategoryInputQuery,
   CursoredRequestInput,
   ExclusiveQueryConditionInput,
-  QueryConditionInput,
   RelationQueryConditionInput,
   TimeConditionInput,
 } from './input';

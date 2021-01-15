@@ -30,7 +30,7 @@ export class EmailConfigObject {
   public interval: number;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public password: string;
 
   public constructor(o: Partial<EmailConfigObject>) {

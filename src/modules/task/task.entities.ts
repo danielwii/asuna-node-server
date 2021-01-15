@@ -15,42 +15,42 @@ export class TaskRecord extends AbstractTimeBasedBaseEntity {
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'Identifier', help: 'user.id / admin.id' })
   @Column({ nullable: true, length: 50, name: 'identifier' })
   public identifier: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'UniqueID' })
   @Column({ nullable: true, length: 50, name: 'unique_id' })
   public uniqueId: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'service' })
   @Column({ nullable: true, length: 50, name: 'service' })
   public service: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'type' })
   @Column({ nullable: true, length: 50, name: 'type' })
   public type: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'channel' })
   @Column({ nullable: true, length: 50, name: 'channel' })
   public channel: string;
 
   @IsString()
   @IsNotEmpty()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   @MetaInfo({ name: 'state' })
   @Column({ nullable: true, length: 20, name: 'state' })
   public state: string;

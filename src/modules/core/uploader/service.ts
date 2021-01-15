@@ -22,17 +22,17 @@ const logger = LoggerFactory.getLogger('UploaderService');
 
 export class ChunkFileInfo {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly chunkname: string;
 
   readonly file: FileInfo;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly identifier: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly fingerprint: string;
 
   @IsInt()
@@ -45,15 +45,15 @@ export class ChunkFileInfo {
 
 export class RemoteFileInfo extends FileInfo {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly fullpath: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly bucket: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly prefix: string;
 
   constructor(o: RemoteFileInfo) {

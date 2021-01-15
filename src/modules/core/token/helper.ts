@@ -49,17 +49,17 @@ export interface RedeemTokenOpts {
 
 export class OperationTokenOpts {
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly key: string;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly service: string;
 
   readonly role: keyof typeof TokenRule;
 
   @IsString()
-  @Transform((value) => _.trim(value))
+  @Transform(({ value }) => _.trim(value))
   readonly identifier: string;
 
   readonly payload?: object;
@@ -67,14 +67,14 @@ export class OperationTokenOpts {
   readonly type: 'Unlimited' | 'OneTime' | 'MultiTimes' | 'TimeBased' | 'TimeBased';
 
   @IsInt()
-  @Transform((value) => (value || value === 0 ? Number(value) : null))
+  @Transform(({ value }) => (value || value === 0 ? Number(value) : null))
   readonly remainingCount?: number;
 
   @IsDate()
   readonly expiredAt?: Date;
 
   @IsInt()
-  @Transform((value) => (value || value === 0 ? Number(value) : null))
+  @Transform(({ value }) => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
   constructor(o: OperationTokenOpts) {
