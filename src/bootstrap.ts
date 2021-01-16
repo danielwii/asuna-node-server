@@ -89,7 +89,7 @@ async function syncDbWithLockIfPossible(app: NestExpressApplication, options: Bo
     const { exists, results } = await RedisLockProvider.instance.lockProcess(
       'sync-db',
       async () => syncDb(app, options),
-      { ttl: 3 * 60 * 1000 },
+      { ttl: 3 * 60 * 1000, waiting: true },
     );
     logger.log(`sync results is ${r({ exists, results })}`);
     if (exists) {

@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as redis from 'redis';
 import RedLock from 'redlock';
+import { Promise } from 'bluebird';
 
 import { promisify, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
@@ -10,10 +11,33 @@ import { RedisProvider } from './redis.provider';
 
 const logger = LoggerFactory.getLogger('RedisLockProvider');
 
+async function waitUtil<T>(fn: () => Promise<T>): Promise<T> {
+  const exists = await fn();
+  if (exists) {
+    logger.debug(`found wait ${r(exists)}, waiting 1s...`);
+    await Promise.delay(1000);
+    return waitUtil(fn);
+  }
+  return exists;
+}
+
+process.on('SIGINT', () => {
+  logger.log(`signal: SIGINT. Release locks ${r(_.keys(RedisLockProvider.locks))}`);
+  _.forEach(RedisLockProvider.locks, (lock, resource) => {
+    lock
+      .unlock()
+      .catch((err) => {
+        logger.error(`unlock [${resource}] error: ${err}`);
+      })
+      .finally(() => logger.verbose(`unlock [${resource}]`));
+  });
+});
+
 export class RedisLockProvider {
   public readonly client: redis.RedisClient;
   public readonly redLock: RedLock;
 
+  public static locks: Record<string, RedLock.Lock> = {};
   public static readonly instance: RedisLockProvider = new RedisLockProvider();
 
   constructor() {
@@ -48,7 +72,7 @@ export class RedisLockProvider {
       }
 
       process.on('SIGINT', () => {
-        logger.log(`SIGINT ...`);
+        logger.log(`signal: SIGINT. Remove all listeners.`);
         this.redLock.removeAllListeners();
       });
       process.on('beforeExit', () => {
@@ -68,6 +92,10 @@ export class RedisLockProvider {
 
   isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE);
 
+  async checkLock(resource: string): Promise<string> {
+    return (await promisify(this.client.get, this.client)(resource)) as string;
+  }
+
   async lockProcess<T>(
     // the string identifier for the resource you want to lock
     operation: string,
@@ -77,6 +105,8 @@ export class RedisLockProvider {
       // keeping in mind that you can extend the lock up until
       // the point when it expires
       ttl: number;
+      // waiting for lock released
+      waiting?: boolean;
     },
   ): Promise<{ exists: boolean; results: T | void }> {
     if (!this.redLock) {
@@ -87,15 +117,22 @@ export class RedisLockProvider {
     const resource = `lock:${operation}`;
 
     // const exists = this.client.get
-    const exists = await promisify(this.client.get, this.client)(resource);
+    const exists = await this.checkLock(resource);
     if (exists) {
       logger.verbose(`lock [${resource}] already exists: ${exists}`);
+
+      if (options.waiting) {
+        const exists = await waitUtil(() => this.checkLock(resource));
+        return { exists: !!exists, results: void 0 };
+      }
+
       return { exists: true, results: void 0 };
     }
 
     // eslint-disable-next-line consistent-return
     return this.redLock.lock(resource, ttl).then(
       async (lock) => {
+        RedisLockProvider.locks[resource] = lock;
         logger.verbose(`lock [${resource}]: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
         const results = await handler()
           .then((value) => {
@@ -111,6 +148,7 @@ export class RedisLockProvider {
               })
               .finally(() => logger.verbose(`unlock [${resource}]`)),
           );
+        delete RedisLockProvider.locks[resource];
         return { exists: false, results };
       },
       (err) => {
