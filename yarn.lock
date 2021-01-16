@@ -580,9 +580,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/eslintrc@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "@eslint/eslintrc@npm:0.2.2"
+"@eslint/eslintrc@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@eslint/eslintrc@npm:0.3.0"
   dependencies:
     ajv: ^6.12.4
     debug: ^4.1.1
@@ -591,10 +591,10 @@ __metadata:
     ignore: ^4.0.6
     import-fresh: ^3.2.1
     js-yaml: ^3.13.1
-    lodash: ^4.17.19
+    lodash: ^4.17.20
     minimatch: ^3.0.4
     strip-json-comments: ^3.1.1
-  checksum: 049c98898934100aa5ad4912242ecbec136454787c00776a236e5321c73176dbc813917445a3d50d230a5a84531a99ec0e2885dd7a6838be68b46b6720fa1459
+  checksum: 00e87c194672eb85dcea22ba749fb3cabdd9768e952e748b2c727940f06691c873369d75cf3bddb239301eca8c38de6e098b0de4839fa7c16a2062e536e8ff5a
   languageName: node
   linkType: hard
 
@@ -1016,25 +1016,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/graphql@npm:^7.9.4":
-  version: 7.9.4
-  resolution: "@nestjs/graphql@npm:7.9.4"
+"@nestjs/graphql@npm:^7.9.5":
+  version: 7.9.5
+  resolution: "@nestjs/graphql@npm:7.9.5"
   dependencies:
     "@apollo/gateway": ^0.17.0
     "@graphql-tools/merge": 6.2.6
     "@graphql-tools/schema": 6.2.4
     "@graphql-tools/utils": 6.2.4
-    "@nestjs/mapped-types": 0.1.1
+    "@nestjs/mapped-types": 0.2.0
     apollo-env: 0.6.5
     apollo-server-core: 2.16.1
     apollo-server-testing: ^2.16.1
-    chokidar: 3.4.3
+    chokidar: 3.5.0
     fast-glob: 3.2.4
     iterall: 1.2.2
     lodash: 4.17.20
     normalize-path: 3.0.0
     ts-morph: ^9.0.0
-    tslib: 2.0.3
+    tslib: 2.1.0
     uuid: 8.3.2
   peerDependencies:
     "@nestjs/common": ^7.0.0
@@ -1048,7 +1048,7 @@ __metadata:
       optional: true
     ts-morph:
       optional: true
-  checksum: 1c1047d3fed196c16a01347754828f623b882b780607fc89fcd83cb15a017b27b96d51f7636d91949a757a0d5b2d8d0e79d3bbd006f72fe6b63bfd7a0e1ff757
+  checksum: 27a2f39ad42f99e04af5177c67702966d49722b07ea95d975f708aa1a668c05023d2d4f30f933d3abd8c335aee4d5e35124a22806a81ae982f9cc704b451d9f8
   languageName: node
   linkType: hard
 
@@ -1064,15 +1064,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/mapped-types@npm:0.1.1":
-  version: 0.1.1
-  resolution: "@nestjs/mapped-types@npm:0.1.1"
+"@nestjs/mapped-types@npm:0.2.0":
+  version: 0.2.0
+  resolution: "@nestjs/mapped-types@npm:0.2.0"
   peerDependencies:
     "@nestjs/common": ^7.0.8
-    class-transformer: ^0.3.0
+    class-transformer: ^0.2.0 || ^0.3.0
     class-validator: ^0.11.1 || ^0.12.0
     reflect-metadata: ^0.1.12
-  checksum: c44a7298980eab84b591683dbbc38f57f1b7c2c7b6117d6256e92c5da9ce0434ef38352b6383a9a6ef9d13c8250312ed327d999c0d01a74ae80b229fc53dec61
+  checksum: d15c2a1aa2a3c311784ea5c04ae7a3ad50581411e55ff0d3a04949889c42dd3a0daae95da4ab7e9fa66100a05200e9b4cb797ae2162fa0ee7cf8829ce20f0df1
   languageName: node
   linkType: hard
 
@@ -1156,18 +1156,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/swagger@npm:^4.7.10":
-  version: 4.7.10
-  resolution: "@nestjs/swagger@npm:4.7.10"
+"@nestjs/swagger@npm:^4.7.11":
+  version: 4.7.11
+  resolution: "@nestjs/swagger@npm:4.7.11"
   dependencies:
-    "@nestjs/mapped-types": 0.1.1
+    "@nestjs/mapped-types": 0.2.0
     lodash: 4.17.20
     path-to-regexp: 3.2.0
   peerDependencies:
     "@nestjs/common": ^6.8.0 || ^7.0.0
     "@nestjs/core": ^6.8.0 || ^7.0.0
     reflect-metadata: ^0.1.12
-  checksum: 03849829f77ec1843abb75c8a463da503b280a8a4afc5433b4de3684c6244f4f9beb7c20b2eb25ea5a6a1644478183052c942f551c8097d86001ea3a7a5f7ccb
+  checksum: 064a9cda0fea09bbd3cbe87261b71f74cf8a323b736ed052ba57659abf5aa753ec2275a123bb895b9222565cdd62309f95671e651859e5c7f33f7ecb3e1578f9
   languageName: node
   linkType: hard
 
@@ -1932,12 +1932,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/highland@npm:^2.12.10":
-  version: 2.12.10
-  resolution: "@types/highland@npm:2.12.10"
+"@types/highland@npm:^2.12.11":
+  version: 2.12.11
+  resolution: "@types/highland@npm:2.12.11"
   dependencies:
     "@types/node": "*"
-  checksum: 97bef16b5c7b24150c8f2cd582715290c84c147a9262081486070f81c551be3b5a5651f934ffe682c7ae395b5faf741ba1406fa962f20913c7650435d1067601
+  checksum: a838c163870b71d2e01ae8df20719a30b3976664ef1c4450bbc8018d0f8b58072ab68b564054b4f3625ed9d1e69b4b64080e1874f48e944e4ecde714636c7309
   languageName: node
   linkType: hard
 
@@ -3627,7 +3627,7 @@ __metadata:
     "@nestjs/common": ^7.6.5
     "@nestjs/core": ^7.6.5
     "@nestjs/cqrs": ^7.0.1
-    "@nestjs/graphql": ^7.9.4
+    "@nestjs/graphql": ^7.9.5
     "@nestjs/jwt": ^7.2.0
     "@nestjs/mongoose": ^7.2.2
     "@nestjs/passport": ^7.1.5
@@ -3635,7 +3635,7 @@ __metadata:
     "@nestjs/platform-socket.io": ^7.6.5
     "@nestjs/platform-ws": ^7.6.5
     "@nestjs/schedule": ^0.4.1
-    "@nestjs/swagger": ^4.7.10
+    "@nestjs/swagger": ^4.7.11
     "@nestjs/terminus": ^7.0.1
     "@nestjs/testing": ^7.6.5
     "@nestjs/typeorm": ^7.1.5
@@ -3658,7 +3658,7 @@ __metadata:
     "@types/express-session": ^1.17.3
     "@types/fs-extra": ^9.0.6
     "@types/glob": ^7.1.3
-    "@types/highland": ^2.12.10
+    "@types/highland": ^2.12.11
     "@types/jaeger-client": ^3.15.4
     "@types/jest": ^26.0.20
     "@types/lodash": ^4.14.167
@@ -3721,7 +3721,7 @@ __metadata:
     date-fns: ^2.16.1
     dayjs: ^1.10.3
     email-templates: ^8.0.3
-    eslint: ^7.17.0
+    eslint: ^7.18.0
     eslint-config-alloy: ^3.10.0
     eslint-plugin-import: ^2.22.1
     express: ^4.17.1
@@ -3737,7 +3737,7 @@ __metadata:
     hbs: ^4.1.1
     helmet: ^4.3.1
     highland: ^3.0.0-beta.10
-    husky: ^4.3.7
+    husky: ^4.3.8
     iconv-lite: ^0.6.2
     ismobilejs: ^1.1.1
     jaeger-client: ^3.18.1
@@ -3787,7 +3787,7 @@ __metadata:
     socket.io: ^3.1.0
     socket.io-redis: ^5.4.0
     sqlite3: ^5.0.1
-    supertest: ^6.0.1
+    supertest: ^6.1.1
     swagger-ui-express: ^4.1.6
     tmp: ^0.2.1
     ts-jest: ^26.4.4
@@ -4781,13 +4781,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:3.4.3, chokidar@npm:^3.1.1, chokidar@npm:^3.2.2":
-  version: 3.4.3
-  resolution: "chokidar@npm:3.4.3"
+"chokidar@npm:3.5.0, chokidar@npm:^3.1.1, chokidar@npm:^3.2.2":
+  version: 3.5.0
+  resolution: "chokidar@npm:3.5.0"
   dependencies:
     anymatch: ~3.1.1
     braces: ~3.0.2
-    fsevents: ~2.1.2
+    fsevents: ~2.3.1
     glob-parent: ~5.1.0
     is-binary-path: ~2.1.0
     is-glob: ~4.0.1
@@ -4796,7 +4796,7 @@ __metadata:
   dependenciesMeta:
     fsevents:
       optional: true
-  checksum: b5a566b31267b1a71c2e7544fbf8c21f597883515d9bfc0356719be6c3b34ee51b0329f3ee5f5d98060ce2930be68f8c33b53f8b3659dc101fd51be265831deb
+  checksum: 36c67d9d4b5a96006bc023b8c4799b4a5697ac602b3bd1cbcec54f8516c5625382aaee0bc9e2325b7fa288b1d67ecdc308911f7448b55cfe37c384ff1f8cb62a
   languageName: node
   linkType: hard
 
@@ -6833,12 +6833,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^7.17.0":
-  version: 7.17.0
-  resolution: "eslint@npm:7.17.0"
+"eslint@npm:^7.18.0":
+  version: 7.18.0
+  resolution: "eslint@npm:7.18.0"
   dependencies:
     "@babel/code-frame": ^7.0.0
-    "@eslint/eslintrc": ^0.2.2
+    "@eslint/eslintrc": ^0.3.0
     ajv: ^6.10.0
     chalk: ^4.0.0
     cross-spawn: ^7.0.2
@@ -6862,7 +6862,7 @@ __metadata:
     js-yaml: ^3.13.1
     json-stable-stringify-without-jsonify: ^1.0.1
     levn: ^0.4.1
-    lodash: ^4.17.19
+    lodash: ^4.17.20
     minimatch: ^3.0.4
     natural-compare: ^1.4.0
     optionator: ^0.9.1
@@ -6876,7 +6876,7 @@ __metadata:
     v8-compile-cache: ^2.0.3
   bin:
     eslint: bin/eslint.js
-  checksum: 12b09a972eb0b81fabf9c1b38b3e9ada0cc051a22ee5022e31852e7babde6fe02a0135be3027451ee02c9ff4a6f738b55205d2953f98eb16a43350ad73070b27
+  checksum: 5c6f6ca0eb6c3738a0d14d3441a23f045ef9e7f73aaba4848aea0877c5fd50ec42937ccdaf53fb9107694f5700a9989bca55334b7b17e5d3be2f6e69a42241fa
   languageName: node
   linkType: hard
 
@@ -7712,12 +7712,12 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-fsevents@^2.1.2:
-  version: 2.2.1
-  resolution: "fsevents@npm:2.2.1"
+"fsevents@^2.1.2, fsevents@~2.3.1":
+  version: 2.3.1
+  resolution: "fsevents@npm:2.3.1"
   dependencies:
     node-gyp: latest
-  checksum: 7cc4cdc3b027f7ff6f6dee69492d460948db719393865cd29f2e6cfbcc64fecde964ef10a614f762be4212403097a2fc4088686b1b70b41a9fc117b2cc4bfecd
+  checksum: 32619a121e7f9ac8a5ce4954f5fdf06be68b7b1c16e4ac8fa6e5e13cbf97d83c86cdcdf872ab7b188ebb07b34d2271b7818aebfc305b4a7d5b35f4bc2117f8be
   languageName: node
   linkType: hard
 
@@ -7731,30 +7731,12 @@ fsevents@^2.1.2:
   languageName: node
   linkType: hard
 
-"fsevents@patch:fsevents@^2.1.2#builtin<compat/fsevents>":
-  version: 2.2.1
-  resolution: "fsevents@patch:fsevents@npm%3A2.2.1#builtin<compat/fsevents>::version=2.2.1&hash=11e9ea"
+"fsevents@patch:fsevents@^2.1.2#builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.1#builtin<compat/fsevents>":
+  version: 2.3.1
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.1#builtin<compat/fsevents>::version=2.3.1&hash=11e9ea"
   dependencies:
     node-gyp: latest
-  checksum: 6ccb7efcb79e504f4361f344413927e5aaf0789e1498c58f0c27cd7031bf84e50830395241eac79c20e99498a0352f08223f1e9e7aa5f19bbae00bdac17ab2a5
-  languageName: node
-  linkType: hard
-
-"fsevents@patch:fsevents@~2.1.2#builtin<compat/fsevents>":
-  version: 2.1.3
-  resolution: "fsevents@patch:fsevents@npm%3A2.1.3#builtin<compat/fsevents>::version=2.1.3&hash=11e9ea"
-  dependencies:
-    node-gyp: latest
-  checksum: e2b8c379340e21a786d32c653854c8876f94eb1202dd5be378fd42c062bc123aab5051c32bf0011865257c85982c41ded203f9fe8c9f9c8f8c84dc4672abc0e0
-  languageName: node
-  linkType: hard
-
-fsevents@~2.1.2:
-  version: 2.1.3
-  resolution: "fsevents@npm:2.1.3"
-  dependencies:
-    node-gyp: latest
-  checksum: 8977781884d06c5bcb97b5f909efdce9683c925f2a0ce7e098d2cdffe2e0a0a50b1868547bb94dca75428c06535a4a70517a7bb3bb5a974d93bf9ffc067291eb
+  checksum: 66b24358e15cdd0f705b456346e58b4613f2bf54206b47874decda4152614fb0632d2d662c92b0ea54810109f646e5233e4cdd64dbb2a1949070ee5dc14dab87
   languageName: node
   linkType: hard
 
@@ -8555,9 +8537,9 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"husky@npm:^4.3.7":
-  version: 4.3.7
-  resolution: "husky@npm:4.3.7"
+"husky@npm:^4.3.8":
+  version: 4.3.8
+  resolution: "husky@npm:4.3.8"
   dependencies:
     chalk: ^4.0.0
     ci-info: ^2.0.0
@@ -8572,7 +8554,7 @@ fsevents@~2.1.2:
   bin:
     husky-run: bin/run.js
     husky-upgrade: lib/upgrader/bin.js
-  checksum: 799b1484e47f868760a612d8578f0bc2cf8848a55719ad00bfbd6bec3d094afaca024631949157390a05616a1c83242c3d917f33c049d9161f7af3ec313b6870
+  checksum: 1ac4fb51ffd93547ec861f185d86bdbfbac8ee24ce60417d531dbe5222e33fc754436e87e4e2b37a44dcefdc78c151f9ba4ac57c05773f5c36377cc4eb73732b
   languageName: node
   linkType: hard
 
@@ -10941,7 +10923,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"methods@npm:1.1.2, methods@npm:^1.1.2, methods@npm:~1.1.2":
+"methods@npm:^1.1.2, methods@npm:~1.1.2":
   version: 1.1.2
   resolution: "methods@npm:1.1.2"
   checksum: 450e4ea0fd4a0f3de8c0593d753c7d6c8f2ee49766f5ef35c68cc2ac41699d5e295b7d6330fc2b7271b8569a07857e3eb0b5df0599a353c5808265b4b5066168
@@ -15025,7 +15007,7 @@ resolve@1.1.7:
   languageName: node
   linkType: hard
 
-"superagent@npm:6.1.0":
+"superagent@npm:^6.1.0":
   version: 6.1.0
   resolution: "superagent@npm:6.1.0"
   dependencies:
@@ -15044,13 +15026,13 @@ resolve@1.1.7:
   languageName: node
   linkType: hard
 
-"supertest@npm:^6.0.1":
-  version: 6.0.1
-  resolution: "supertest@npm:6.0.1"
+"supertest@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "supertest@npm:6.1.1"
   dependencies:
-    methods: 1.1.2
-    superagent: 6.1.0
-  checksum: 6083017645fe078eb81ec5c99d72dfcc53e9d73815514e47c7b3a5feb6a7d46b1cae781293c816d68cf181a7f3e842b06de796f3da79cfe76ce9160891618d7b
+    methods: ^1.1.2
+    superagent: ^6.1.0
+  checksum: 18b03819aff3df43d130df197707c16fbe672694431bb8dd0414640c2abeda4baa0beb7f4feeef76ca9f49712194eb241f37858ac6d3a0b239d4f0fcfe5c95cb
   languageName: node
   linkType: hard
 
@@ -15676,17 +15658,17 @@ resolve@1.1.7:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.1.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "tslib@npm:2.1.0"
+  checksum: d8f5bdd067611651c6b846c2388f4dc8ba1f5af124e66105f5263d1ad56da17f4b8c6566887ca2f205c5a9758451871ceca87d5d06087af2dca1699c5e33db69
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.10.0, tslib@npm:^1.13.0, tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: f44fe7f216946b17d3e3074df3746372703cf24e9127b4c045511456e8e4bf25515fb0a1bb3937676cc305651c5d4fcb6377b0588a4c6a957e748c4c28905d17
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "tslib@npm:2.1.0"
-  checksum: d8f5bdd067611651c6b846c2388f4dc8ba1f5af124e66105f5263d1ad56da17f4b8c6566887ca2f205c5a9758451871ceca87d5d06087af2dca1699c5e33db69
   languageName: node
   linkType: hard
 
