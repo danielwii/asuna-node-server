@@ -2,30 +2,19 @@ import { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdow
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as Sentry from '@sentry/node';
 import * as _ from 'lodash';
+import { Promise } from 'bluebird';
 import * as fp from 'lodash/fp';
+
 import { IdGenerators } from './modules/base';
 import { r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { CronHelper } from './modules/helper';
+import { LifecycleRegister } from './register';
 import { RedisProvider } from './modules/providers';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
-
-export interface AppLifecycleType {
-  beforeBootstrap?: (app: NestExpressApplication) => Promise<void>;
-  appStarted?: () => Promise<void>;
-}
-
-export class LifecycleRegister {
-  public static handlers: AppLifecycleType[] = [];
-
-  public static reg(handler: AppLifecycleType): void {
-    this.handlers.push(handler);
-    logger.debug(`reg handler ${r(handler)} total: ${this.handlers.length}`);
-  }
-}
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   public static async onInit(app: NestExpressApplication): Promise<void> {
@@ -46,6 +35,18 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       });
 */
     }
+    process.on('SIGINT', () => {
+      logger.log(`signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`);
+      Promise.all(
+        _.map(LifecycleRegister.exitProcessors, (processor, resource) => {
+          logger.log(`Run exit processor: ${resource}`);
+          return processor();
+        }),
+      ).finally(() => {
+        logger.log('Exit app gracefully.');
+        return process.exit(0);
+      });
+    });
     logger.log(`[onInit] done`);
   }
 

@@ -4,6 +4,7 @@ import * as redis from 'redis';
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { RedisConfigObject } from './redis.config';
+import { LifecycleRegister } from '../../register';
 
 const logger = LoggerFactory.getLogger('RedisProvider');
 
@@ -62,12 +63,16 @@ export class RedisProvider {
       logger.error(`Redis ${key} connection error ${r(err)}`);
     });
 
-    process.on('SIGINT', () =>
-      client.quit((err: Error, res: string) => {
-        redisClientObject.isHealthy = false;
-        logger.log(`signal: SIGINT. Redis ${key} connection disconnected ${r({ err, res })}`);
-        process.exit(0);
-      }),
+    LifecycleRegister.regExitProcessor(
+      `Redis(${key})`,
+      async () =>
+        new Promise((resolve) => {
+          client.quit((err: Error, res: string) => {
+            redisClientObject.isHealthy = false;
+            logger.log(`signal: SIGINT. Redis ${key} connection disconnected ${r({ err, res })}`);
+            resolve();
+          });
+        }),
     );
 
     process.on('beforeExit', () =>

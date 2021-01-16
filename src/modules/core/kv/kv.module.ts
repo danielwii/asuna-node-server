@@ -1,9 +1,10 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { AppLifecycleType, LifecycleRegister } from '../../../lifecycle';
+import { AppLifecycleType } from '../../../register';
 import { LoggerFactory } from '../../common/logger';
 import { KvController } from './kv.controller';
 import { KvHelper } from './kv.helper';
 import { KeyValueModelResolver, KvQueryResolver } from './kv.resolver';
+import { LifecycleRegister } from '../../../register';
 
 const logger = LoggerFactory.getLogger('KvModule');
 

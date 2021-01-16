@@ -8,6 +8,7 @@ import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
 import { RedisConfigKeys } from './redis.config';
 import { RedisProvider } from './redis.provider';
+import { LifecycleRegister } from '../../register';
 
 const logger = LoggerFactory.getLogger('RedisLockProvider');
 
@@ -20,18 +21,6 @@ async function waitUtil<T>(fn: () => Promise<T>): Promise<T> {
   }
   return exists;
 }
-
-process.on('SIGINT', () => {
-  logger.log(`signal: SIGINT. Release locks ${r(_.keys(RedisLockProvider.locks))}`);
-  _.forEach(RedisLockProvider.locks, (lock, resource) => {
-    lock
-      .unlock()
-      .catch((err) => {
-        logger.error(`unlock [${resource}] error: ${err}`);
-      })
-      .finally(() => logger.verbose(`unlock [${resource}]`));
-  });
-});
 
 export class RedisLockProvider {
   public readonly client: redis.RedisClient;
@@ -71,20 +60,24 @@ export class RedisLockProvider {
         this.redLock.on('clientError', (err) => logger.error('A redis error has occurred:', err));
       }
 
-      process.on('SIGINT', () => {
+      LifecycleRegister.regExitProcessor('RedisLock', async () => {
+        logger.log(`signal: SIGINT. Release locks ${r(_.keys(RedisLockProvider.locks))}`);
+        await Promise.all(
+          _.map(RedisLockProvider.locks, (lock, resource) =>
+            lock
+              .unlock()
+              .catch((err) => logger.error(`unlock [${resource}] error: ${err}`))
+              .finally(() => logger.verbose(`unlock [${resource}]`)),
+          ),
+        );
         logger.log(`signal: SIGINT. Remove all listeners.`);
-        this.redLock.removeAllListeners();
+        return this.redLock.removeAllListeners();
       });
+
       process.on('beforeExit', () => {
         logger.log(`beforeExit ...`);
         this.redLock.removeAllListeners();
       });
-      /*
-      process.on('removeListener', () => {
-        logger.log(`removeListener ...`);
-        this.redLock.removeAllListeners();
-      });
-*/
     } else {
       logger.log(`skip setup redis, REDIS_ENABLE is ${redisClientObject.isEnabled}`);
     }

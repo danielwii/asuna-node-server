@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
-import { RedisLockProvider } from '../providers';
+import { RedisLockProvider } from '../providers/redis-lock.provider';
 import { StatsHelper } from '../stats/stats.helper';
 import { StatsResult } from '../stats/stats.interface';
 import { FeaturesConfigObject } from '../config/features.config';
