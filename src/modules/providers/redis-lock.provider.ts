@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as redis from 'redis';
 import RedLock from 'redlock';
+
 import { promisify, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { configLoader } from '../config';
@@ -77,7 +78,7 @@ export class RedisLockProvider {
       // the point when it expires
       ttl: number;
     },
-  ): Promise<T | void> {
+  ): Promise<{ exists: boolean; results: T | void }> {
     if (!this.redLock) {
       throw new Error(`can not get redLock instance, REDIS_ENABLE: ${this.isEnabled()}`);
     }
@@ -89,14 +90,14 @@ export class RedisLockProvider {
     const exists = await promisify(this.client.get, this.client)(resource);
     if (exists) {
       logger.verbose(`lock [${resource}] already exists: ${exists}`);
-      return;
+      return { exists: true, results: void 0 };
     }
 
     // eslint-disable-next-line consistent-return
     return this.redLock.lock(resource, ttl).then(
-      (lock) => {
+      async (lock) => {
         logger.verbose(`lock [${resource}]: ${r(_.omit(lock, 'redlock', 'unlock', 'extend'))} ttl: ${ttl}ms`);
-        return handler()
+        const results = await handler()
           .then((value) => {
             logger.verbose(`release lock [${resource}], result is ${r(value)}`);
             return value;
@@ -110,8 +111,12 @@ export class RedisLockProvider {
               })
               .finally(() => logger.verbose(`unlock [${resource}]`)),
           );
+        return { exists: false, results };
       },
-      (err) => logger.error(`get [${resource}] lock error: ${err} ${r(options)}`),
+      (err) => {
+        logger.error(`get [${resource}] lock error: ${err} ${r(options)}`);
+        return { exists: false, results: void 0 };
+      },
     );
   }
 }

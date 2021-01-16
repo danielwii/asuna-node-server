@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -29,10 +28,10 @@ import {
   r,
 } from './modules/common';
 import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
-import { AccessControlHelper, AsunaContext, DBHelper, Global, IAsunaContextOpts } from './modules/core';
+import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
 import { SimpleIdGeneratorHelper } from './modules/ids';
-import { RedisProvider } from './modules/providers';
+import { RedisLockProvider, RedisProvider } from './modules/providers';
 // add condition function in typeorm find
 import './typeorm.fixture';
 
@@ -67,7 +66,91 @@ export interface BootstrapOptions {
   migrations?: any[];
 }
 
+function validateOptions(options: BootstrapOptions): void {
+  const config = configLoader.loadConfigs();
+  const redisEnabled = configLoader.loadConfig2('redis', 'enable');
+
+  if (options.redisMode === 'redis' && !redisEnabled) {
+    throw new Error('RedisMode need redis enabled!');
+  }
+
+  if (redisEnabled) {
+    const instance = RedisLockProvider.instance;
+    console.log('get redis lock instance ->', instance);
+  }
+  // process.exit(0);
+}
+
+async function syncDbWithLockIfPossible(app: NestExpressApplication, options: BootstrapOptions) {
+  const logger = LoggerFactory.getLogger('sync');
+  const redisEnabled = configLoader.loadConfig2('redis', 'enable');
+  if (redisEnabled) {
+    logger.log('try sync db with redis redlock...');
+    const { exists, results } = await RedisLockProvider.instance.lockProcess(
+      'sync-db',
+      async () => syncDb(app, options),
+      { ttl: 3 * 60 * 1000 },
+    );
+    logger.log(`sync results is ${r({ exists, results })}`);
+    if (exists) {
+      logger.log('another runner is syncing db now, skip.');
+    }
+    return results;
+  } else {
+    return syncDb(app, options);
+  }
+}
+
+async function syncDb(app: NestExpressApplication, options: BootstrapOptions): Promise<void> {
+  const logger = LoggerFactory.getLogger('sync');
+
+  // --------------------------------------------------------------
+  // rename old tables to newer
+  // --------------------------------------------------------------
+
+  const beforeSyncDB = Date.now();
+  const connection = app.get<Connection>(Connection);
+  logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
+
+  logger.log('sync db ...');
+  const queryRunner = connection.createQueryRunner();
+  await Promise.all(
+    _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
+      logger.log(`rename table ${r({ from, to })}`);
+      const fromTable = await queryRunner.getTable(from);
+      const toTable = await queryRunner.getTable(to);
+      if (toTable) {
+        logger.warn(`Table ${to} already exists.`);
+      } else if (fromTable) {
+        logger.log(`rename ${from} -> ${to}`);
+        await queryRunner.renameTable(fromTable, to);
+      }
+    }),
+  );
+
+  if (Global.dbType !== 'sqlite') {
+    await connection.query('SET FOREIGN_KEY_CHECKS=0');
+  }
+
+  logger.log(`synchronize ...`);
+  await connection.synchronize();
+  logger.log(`synchronize ... done`);
+
+  logger.log(`run custom migrations ...`);
+  await runCustomMigrations(options.migrations);
+  logger.log(`run custom migrations ... done`);
+
+  if (Global.dbType !== 'sqlite') {
+    await connection.query('SET FOREIGN_KEY_CHECKS=1');
+  }
+  logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
+
+  logger.log(`pending migrations: ${await connection.showMigrations()}`);
+}
+
 export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
+  validateOptions(options);
+
   require('events').EventEmitter.defaultMaxListeners = 15;
 
   await CacheUtils.clearAll();
@@ -116,48 +199,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   const app = await NestFactory.create<NestExpressApplication>(appModule, { logger: LoggerHelper.getLoggerService() });
   await AppLifecycle.onInit(app);
 
-  // --------------------------------------------------------------
-  // rename old tables to newer
-  // --------------------------------------------------------------
-
-  const beforeSyncDB = Date.now();
-  const connection = app.get<Connection>(Connection);
-  logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
-
-  logger.log('sync db ...');
-  const queryRunner = connection.createQueryRunner();
-  await Promise.all(
-    _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
-      logger.log(`rename table ${r({ from, to })}`);
-      const fromTable = await queryRunner.getTable(from);
-      const toTable = await queryRunner.getTable(to);
-      if (toTable) {
-        logger.warn(`Table ${to} already exists.`);
-      } else if (fromTable) {
-        logger.log(`rename ${from} -> ${to}`);
-        await queryRunner.renameTable(fromTable, to);
-      }
-    }),
-  );
-
-  if (Global.dbType !== 'sqlite') {
-    await connection.query('SET FOREIGN_KEY_CHECKS=0');
-  }
-
-  logger.log(`synchronize ...`);
-  await connection.synchronize();
-  logger.log(`synchronize ... done`);
-
-  logger.log(`run custom migrations ...`);
-  await runCustomMigrations(options.migrations);
-  logger.log(`run custom migrations ... done`);
-
-  if (Global.dbType !== 'sqlite') {
-    await connection.query('SET FOREIGN_KEY_CHECKS=1');
-  }
-  logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
-
-  logger.log(`pending migrations: ${await connection.showMigrations()}`);
+  await syncDbWithLockIfPossible(app, options);
 
   // may add bootstrap lifecycle for static initialize
   AccessControlHelper.init();
@@ -241,9 +283,9 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   if (options.redisMode === 'redis') {
-    app.useWebSocketAdapter(new (require('./modules/ws/redis.adapter').RedisIoAdapter)(app));
+    app.useWebSocketAdapter(new (await import('./modules/ws/redis.adapter')).RedisIoAdapter(app));
   } else if (options.redisMode === 'ws') {
-    app.useWebSocketAdapter(new (require('@nestjs/platform-ws').WsAdapter)(app));
+    app.useWebSocketAdapter(new (await import('@nestjs/platform-ws')).WsAdapter(app));
   }
 
   if (options.staticAssets) {
