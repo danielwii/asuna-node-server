@@ -1,6 +1,5 @@
 import { oneLine } from 'common-tags';
 import { differenceInCalendarDays } from 'date-fns';
-import type { Secret, SignOptions } from 'jsonwebtoken';
 import * as jwt from 'jsonwebtoken';
 import * as _ from 'lodash';
 import * as R from 'ramda';
@@ -11,6 +10,7 @@ import { formatTime, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 
+import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';

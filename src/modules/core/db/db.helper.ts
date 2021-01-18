@@ -10,7 +10,6 @@ import {
   Equal,
   FindOperator,
   getConnection,
-  getConnectionOptions,
   getRepository,
   In,
   IsNull,

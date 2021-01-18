@@ -2030,7 +2030,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonwebtoken@npm:*, @types/jsonwebtoken@npm:8.5.0":
+"@types/json5@npm:^0.0.30":
+  version: 0.0.30
+  resolution: "@types/json5@npm:0.0.30"
+  checksum: af9d434f14dc6337e16454944bca5eadbdf5d0e85a0ef59fe5e011eadabfe126f42f3913bf7fee478747cf34efd88061ac0e15ede07b83986ae31aa2ddda6232
+  languageName: node
+  linkType: hard
+
+"@types/jsonwebtoken@npm:*, @types/jsonwebtoken@npm:8.5.0, @types/jsonwebtoken@npm:^8.5.0":
   version: 8.5.0
   resolution: "@types/jsonwebtoken@npm:8.5.0"
   dependencies:
@@ -2216,7 +2223,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/nodemailer@npm:*":
+"@types/nodemailer@npm:*, @types/nodemailer@npm:^6.4.0":
   version: 6.4.0
   resolution: "@types/nodemailer@npm:6.4.0"
   dependencies:
@@ -2250,7 +2257,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/passport-strategy@npm:*":
+"@types/passport-strategy@npm:*, @types/passport-strategy@npm:^0.2.35":
   version: 0.2.35
   resolution: "@types/passport-strategy@npm:0.2.35"
   dependencies:
@@ -3661,6 +3668,8 @@ __metadata:
     "@types/highland": ^2.12.11
     "@types/jaeger-client": ^3.15.4
     "@types/jest": ^26.0.20
+    "@types/json5": ^0.0.30
+    "@types/jsonwebtoken": ^8.5.0
     "@types/lodash": ^4.14.167
     "@types/lru-cache": ^5.1.0
     "@types/luxon": ^1.25.1
@@ -3670,8 +3679,10 @@ __metadata:
     "@types/morgan": ^1.9.2
     "@types/multer": ^1.4.5
     "@types/node-fetch": ^2.5.8
+    "@types/nodemailer": ^6.4.0
     "@types/passport": ^1.0.5
     "@types/passport-jwt": ^3.0.3
+    "@types/passport-strategy": ^0.2.35
     "@types/pump": ^1.1.0
     "@types/qs": ^6.9.5
     "@types/ramda": ^0.27.34

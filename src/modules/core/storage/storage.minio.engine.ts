@@ -6,7 +6,6 @@ import { join } from 'path';
 import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
 import { convertFilename, r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
-import { ConfigKeys, configLoader } from '../../config';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
 import { MinioConfigObject } from './storage.config';
