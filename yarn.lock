@@ -3735,7 +3735,7 @@ __metadata:
     handlebars: ^4.7.6
     hashids: ^2.2.8
     hbs: ^4.1.1
-    helmet: ^4.3.1
+    helmet: ^4.4.0
     highland: ^3.0.0-beta.10
     husky: ^4.3.8
     iconv-lite: ^0.6.2
@@ -8276,10 +8276,10 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"helmet@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "helmet@npm:4.3.1"
-  checksum: 77f74eab6a58bb33f99cdaf80c3c803a5d1dda9695a2b15ddd4ae158758a5d05c6e9361a9e1f58229dc185348c543a36fef7553f9579605efdc2efd8b17abeae
+"helmet@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "helmet@npm:4.4.0"
+  checksum: 00a8e0796f7ee86fcf357db266fc893eb1007dc968a4df069ffbcf856c15d4fb0c677a8692f731b496f1101dcbf471b4b735a62cbf0183e9ae61c9d6557868a3
   languageName: node
   linkType: hard
 

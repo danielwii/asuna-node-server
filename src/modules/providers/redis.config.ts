@@ -84,24 +84,28 @@ export class RedisConfigObject {
           if (options.error && options.error.code === 'ECONNREFUSED') {
             // End reconnecting on a specific error and flush all commands with
             // a individual error
-            logger.error('The server refused the connection');
+            logger.error(`The server refused the connection, wait for 10s.`);
             // return new Error('The server refused the connection');
             return 10_000;
           }
           if (options.total_retry_time > 1000 * 60 * 60) {
             // End reconnecting after a specific timeout and flush all commands
             // with a individual error
-            logger.error('Retry time exhausted');
+            logger.error(`Retry time exhausted, wait for 10s.`);
             // return new Error('Retry time exhausted');
             return 10_000;
           }
           if (options.attempt > 10) {
+            logger.error(`Reach to 10 times, wait for 30s.`);
             // End reconnecting with built in error
-            return 60_000;
+            return 30_000;
           }
           // reconnect after
-          return Math.min(options.attempt * 100, 3000);
+          const waitFor = Math.min(options.attempt * 100, 3000);
+          logger.error(`Reconnect after ${waitFor / 1000}s`);
+          return waitFor;
         }
+        logger.verbose(`Connect in 3s...`);
         return 3_000;
       },
     };

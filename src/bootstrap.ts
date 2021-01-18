@@ -74,10 +74,10 @@ function validateOptions(options: BootstrapOptions): void {
     throw new Error('RedisMode need redis enabled!');
   }
 
-  if (redisEnabled) {
-    const instance = RedisLockProvider.instance;
-    console.log('get redis lock instance ->', instance);
-  }
+  // if (redisEnabled) {
+  //   const instance = RedisLockProvider.instance;
+  //   console.log('get redis lock instance ->', instance);
+  // }
   // process.exit(0);
 }
 
