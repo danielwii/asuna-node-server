@@ -4,7 +4,7 @@ import { FieldNode } from 'graphql/language/ast';
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
-import RedisDataloader from 'redis-dataloader';
+import createRedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
@@ -103,7 +103,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   const redis = RedisProvider.instance.getRedisClient('dataloader');
   if (redis.isEnabled) {
     logger.log(`init redis dataloader for ${segment} ... ${r(redis.redisOptions)}`);
-    const redisLoader = new (RedisDataloader({ redis: redis.client }))(
+    const redisLoader = new (createRedisDataloader({ redis: redis.client }))(
       `dataloader-${segment}`,
       // create a regular dataloader. This should always be set with caching disabled.
       new DataLoader(
