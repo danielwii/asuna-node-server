@@ -58,6 +58,22 @@ export function toHHMMSS(num: string): string {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+export const safeStringify = (obj, indent = 2) => {
+  let cache = [];
+  const retVal = JSON.stringify(
+    obj,
+    (key, value) =>
+      typeof value === 'object' && value !== null
+        ? cache.includes(value)
+          ? undefined // Duplicate reference found, discard key
+          : cache.push(value) && value // Store value in our collection
+        : value,
+    indent,
+  );
+  cache = null;
+  return retVal;
+};
+
 export function r(
   o: any,
   { transform, stringify, depth }: { transform?: boolean; stringify?: boolean; depth?: number } = {},
@@ -66,7 +82,7 @@ export function r(
     return o;
   }
   const value = transform || stringify ? classToPlain(o) : o;
-  return isProductionEnv || stringify ? JSON.stringify(value) : inspect(value, { colors: true, depth: depth ?? 5 });
+  return isProductionEnv || stringify ? safeStringify(value) : inspect(value, { colors: true, depth: depth ?? 5 });
 }
 
 /**
