@@ -121,8 +121,8 @@ export abstract class AbstractAuthController<U extends AuthUser> {
     logger.log(`getToken() >> ${signInDto.username}`);
     const user = await this.authService.getUserWithPassword({ username: signInDto.username });
 
-    logger.debug(`get user ${r(user)}`);
-    if (!user || !user?.password) {
+    logger.debug(`get user fron token ${r(user)}`);
+    if (!user?.password) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
@@ -146,14 +146,14 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
+    if (!payload) {
+      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
+    }
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
     const loaded = await this.UserEntity.findOne(payload.uid, {
       // maybe get relations from a register, cause user side relations won't load here.
       // relations: ['profile'],
     });
-    if (!payload) {
-      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
-    }
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {

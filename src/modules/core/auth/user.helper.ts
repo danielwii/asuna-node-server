@@ -60,7 +60,7 @@ export class AuthedUserHelper {
   }
 
   static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {
-    if (!email && !email) {
+    if (!email && !username) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
 

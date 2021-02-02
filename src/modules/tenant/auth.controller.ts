@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 
 import { LoggerFactory } from '../common/logger';
-import { AbstractAuthController, AnyAuthGuard, JwtAuthRequest, UserProfile, WithProfileUser } from '../core/auth';
+import { AbstractAuthController } from '../core/auth';
 import { OrgUser } from './tenant.entities';
 import { TenantAuthService } from './auth.service';
 import { Promise } from 'bluebird';
@@ -9,8 +9,6 @@ import { DeepPartial } from 'typeorm';
 import { r } from '../common/helpers';
 import { AsunaErrorCode, AsunaException } from '../common';
 import { Hermes } from '../core/bus';
-import * as _ from 'lodash';
-import { DBHelper } from '../core/db';
 import { OrgJwtAuthGuard } from './auth.guard';
 import { OrgJwtAuthRequest } from './auth';
 
@@ -27,14 +25,14 @@ export class TenantAuthController extends AbstractAuthController<OrgUser> {
   async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
+    if (!payload) {
+      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
+    }
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
     const loaded = await this.UserEntity.findOne(payload.uid, {
       // maybe get relations from a register, cause user side relations won't load here.
       // relations: ['profile'],
     });
-    if (!payload) {
-      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
-    }
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {

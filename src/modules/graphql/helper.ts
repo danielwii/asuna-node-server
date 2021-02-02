@@ -316,8 +316,8 @@ export class GraphqlHelper {
     }
 
     if (timeCondition && typeof where === 'object') {
-      const afterCondition = timeCondition?.after ? { [timeCondition.column]: MoreThan(timeCondition.after) } : {};
-      const beforeCondition = timeCondition?.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : {};
+      const afterCondition = timeCondition.after ? { [timeCondition.column]: MoreThan(timeCondition.after) } : {};
+      const beforeCondition = timeCondition.before ? { [timeCondition.column]: LessThan(timeCondition.before) } : {};
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
