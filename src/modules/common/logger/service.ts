@@ -1,8 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { LoggerService, LogLevel } from '@nestjs/common/services/logger.service';
-import * as clc from 'cli-color';
-import * as winston from 'winston';
-import { fixedPath, r } from '../helpers/utils';
+
+import { r } from '../helpers/utils';
 import { LoggerConfigObject } from './config';
 import { LoggerFactory } from './factory';
 
@@ -57,6 +56,7 @@ export class SimpleLoggerService extends Logger {
   }
 }
 
+/*
 export class WinstonLoggerService {
   private logger: winston.Logger;
   private requestId: string;
@@ -165,6 +165,7 @@ export class WinstonLoggerService {
     return colorFunc(`[${level.toUpperCase()}]`).padEnd(17);
   }
 }
+*/
 
 export class LoggerHelper {
   static getLoggerService(): LoggerService | LogLevel[] | boolean {

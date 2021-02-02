@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { LoggerFactory } from '../logger';
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as amqp from 'amqplib';
 import * as _ from 'lodash';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQConfigObject } from './mq.config';

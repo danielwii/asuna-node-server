@@ -212,7 +212,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.enableCors({ credentials: true, origin: true });
 
   // see https://expressjs.com/en/guide/behind-proxies.html
-  // 设置以后，req.ips是ip数组；如果未经过代理，则为[]. 若不设置，则req.ips恒为[]
+  // 设置以后，req.ips 是 ip 数组；如果未经过代理，则为 []. 若不设置，则 req.ips 恒为 []
   app.set('trust proxy', true);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
@@ -250,7 +250,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
   app.use(
     session({
       store: sessionRedis.isEnabled
-        ? (new (RedisStoreCreator(session as any))({ client: sessionRedis.client }) as any)
+        ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
         : new session.MemoryStore(),
       secret,
       resave: false,
