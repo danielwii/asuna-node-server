@@ -62,7 +62,7 @@ export class PropertyHelper {
     @TransactionManager() manager?: EntityManager,
   ): Promise<UserProfile> {
     const profile = await UserProfile.findOne(profileId, { relations: ['wallet'] });
-    if (!profile.wallet) {
+    if (!profile?.wallet) {
       profile.wallet = await manager.save<Wallet>(
         new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0, totalRecharge: 0 }),
       );
