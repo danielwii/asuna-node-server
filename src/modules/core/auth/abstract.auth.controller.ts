@@ -150,10 +150,12 @@ export abstract class AbstractAuthController<U extends AuthUser> {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
     }
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
+    /*
     const loaded = await this.UserEntity.findOne(payload.uid, {
       // maybe get relations from a register, cause user side relations won't load here.
       // relations: ['profile'],
     });
+*/
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {
@@ -162,12 +164,17 @@ export abstract class AbstractAuthController<U extends AuthUser> {
         // !sameDay && Hermes.emit(AuthController.name, HermesUserEventKeys.firstLoginEveryday, payload);
       })
       .catch((reason) => logger.error(reason));
-    logger.debug(`current authed user is ${r(loaded)}`);
-    const result = _.omit(loaded, 'channel', 'info'); // ...
-    if (DBHelper.getColumnNames(this.UserEntity).includes('profile')) {
+    // logger.debug(`current authed user is ${r(loaded)}`);
+    const result = _.omit(user, 'channel', 'info'); // ...
+    const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
+    logger.debug(`relations is ${r(relations)}`);
+    if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
       const profile = await UserProfile.findOne(profileId, { relations: ['wallet'] });
-      _.set(result, 'profile', _.omit(profile, 'salt', 'password', 'info'));
+      // const desensitized = _.omit(profile, 'salt', 'password', 'info');
+      const { salt, password, ...desensitized } = profile;
+      // logger.debug(`current profile is ${r({ profile, desensitized })}`);
+      _.set(result, 'profile', desensitized);
     }
     return result;
   }

@@ -133,7 +133,8 @@ export class GraphqlHelper {
       relationPath,
       loader,
     });
-    const total = await entityRepo.count(where ? { where } : {});
+    const total = await entityRepo.count({ where: where ?? {} });
+    logger.debug(`handlePagedDefaultQueryRequest  ${r({ where, total })}`);
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
@@ -210,6 +211,7 @@ export class GraphqlHelper {
       logger.debug(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.count({ where });
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
+      logger.debug(`ready for random ${r({ count, skip })}`);
       const opts = await this.genericFindOptions<Entity>({
         cls,
         select: [primaryKey],
