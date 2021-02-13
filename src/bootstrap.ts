@@ -83,6 +83,12 @@ function validateOptions(options: BootstrapOptions): void {
 
 async function syncDbWithLockIfPossible(app: NestExpressApplication, options: BootstrapOptions) {
   const logger = LoggerFactory.getLogger('sync');
+  const syncEnabled = configLoader.loadBoolConfig('DB_SYNCHRONIZE');
+  if (!syncEnabled) {
+    return logger.log(`DB_SYNCHRONIZE disabled.`);
+  }
+
+  logger.log(`DB_SYNCHRONIZE: ${syncEnabled}`);
   const redisEnabled = configLoader.loadConfig2('redis', 'enable');
   if (redisEnabled) {
     logger.log('try sync db with redis redlock...');
