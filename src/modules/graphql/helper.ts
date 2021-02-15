@@ -366,6 +366,20 @@ export class GraphqlHelper {
     return targetRepo.findOne(id);
   }
 
+  /**
+   * target 的 relation 包含待拉取的 id 数组时切包含一个 dataloader，这里将通过 loader 的 batch 进行拉取
+   * 这里在没有包含 loader 时无法通过 loader 的 batch 进行优化。
+   * 同时，如果没有包含待拉取的 id 数组，那么这里还会多进行一步拉取关联主键数组的操作
+   * 还有另外一种方法，即通过反向逻辑，构建拉取关联的 dataloader，然后通过 dataloader 的 batch 策略拉取。
+   *
+   private static async adsLoaderFn(categoryIds: Array<number>): Promise<Ad[][]> {
+    AdCategoryResolver.logger.debug(`load ads by ads loader ${r(categoryIds)}`);
+    // TODO 这里会报 ·but the function did not return a Promise of an Array of the same length as the Array of keys· 暂时通过嵌套数组的方式处理
+    return Promise.all([Ad.find({ where: { category: In(categoryIds) } })]);
+  }
+
+   static adsLoader = new DataLoader(AdCategoryResolver.adsLoaderFn);
+   */
   static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
@@ -396,6 +410,7 @@ export class GraphqlHelper {
     // logger.debug(`load ids by ${r(opts)}`);
     let ids = opts.instance[opts.key];
     if (_.isNil(ids)) {
+      logger.debug(`no ids for ${opts.key} found for ${opts.cls.constructor.name}...`);
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
       const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
         loadRelationIds: { relations: [opts.key as string] },
@@ -411,6 +426,7 @@ export class GraphqlHelper {
     }
 
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
+    logger.warn(`no loader found for ${_opts.targetCls.constructor.name}... may cause performance issue`);
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
     return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }
