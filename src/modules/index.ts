@@ -32,3 +32,4 @@ export * from './wechat';
 export * from './ws';
 export * from './enum-values';
 export * from './admin.controller';
+export * from './no.module';
