@@ -56,3 +56,10 @@ export class AdminAuthRestController extends RestCrudController {
     super('auth');
   }
 }
+
+@Controller('admin/rest/user')
+export class AdminRestRestController extends RestCrudController {
+  constructor() {
+    super('user');
+  }
+}

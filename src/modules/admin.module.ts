@@ -1,11 +1,12 @@
 import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import * as redisStore from 'cache-manager-redis-store';
+
 import { AdminController } from './admin.controller';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';
-import { ConfigKeys, configLoader } from "./config";
+import { ConfigKeys, configLoader } from './config';
 import { ContentModule } from './content';
 import {
   CommandController,
@@ -39,6 +40,7 @@ import {
   AdminContentRestController,
   AdminPaymentRestController,
   AdminRestController,
+  AdminRestRestController,
   AdminSysRestController,
   AdminWxRestController,
   WwwRestController,
@@ -89,6 +91,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     AdminWxRestController,
     AdminPaymentRestController,
     AdminAuthRestController,
+    AdminRestRestController,
     WwwRestController,
     CommandController,
     UserController,
