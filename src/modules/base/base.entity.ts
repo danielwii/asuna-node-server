@@ -4,6 +4,7 @@ import {
   BeforeInsert,
   Column,
   CreateDateColumn,
+  Index,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -25,9 +26,11 @@ export type EntityConstructorObject<Entity> = Omit<
 >;
 
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
+  @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;
 
+  @Index()
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt?: Date;
 
