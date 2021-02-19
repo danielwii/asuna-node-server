@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import _ from 'lodash';
 import { join } from 'path';
 
 import { r } from '../common/helpers/utils';
@@ -75,18 +76,20 @@ export class AsunaContext {
     };
   }
 
-  public getStorageEngine(bucket: string): IStorageEngine {
-    const KEY = `${bucket.toUpperCase()}_STORAGE`;
-    const storageType = configLoader.loadConfig(KEY);
-    logger.debug(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
-    if (storageType === StorageMode.QINIU) {
-      return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
-    }
-    if (storageType === StorageMode.MINIO) {
-      return new MinioStorage(() => MinioConfigObject.load(), { defaultBucket: bucket });
-    }
-    return this.defaultStorageEngine;
-  }
+  public getStorageEngine = _.memoize(
+    (bucket: string): IStorageEngine => {
+      const KEY = `${bucket.toUpperCase()}_STORAGE`;
+      const storageType = configLoader.loadConfig(KEY);
+      logger.debug(`getStorageEngine by ${bucket}, ${KEY} : ${storageType}, fallback is default`);
+      if (storageType === StorageMode.QINIU) {
+        return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
+      }
+      if (storageType === StorageMode.MINIO) {
+        return new MinioStorage(() => MinioConfigObject.load(), { defaultBucket: bucket });
+      }
+      return this.defaultStorageEngine;
+    },
+  );
 
   public initStorageEngine(uploadPath: string): void {
     UploaderConfigObject.uploadPath = uploadPath;
