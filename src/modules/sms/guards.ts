@@ -1,9 +1,6 @@
 import { LoggerFactory } from '../common/logger';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Promise } from 'bluebird';
 import { JwtAuthRequest } from '../core/auth';
-import { CacheKey, InMemoryDB } from '../cache';
-import { r } from '../common/helpers';
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '../common';
 import { SMSConfigObject } from './config';
 import { SMSHelper } from './helper';
