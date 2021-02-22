@@ -204,19 +204,20 @@ export abstract class RestCrudController {
     }
 
     const repository = DBHelper.repo(modelName);
+    // const relations = DBHelper.getRelationPropertyNames(repository.target as any);
     const relationKeys = _.merge(
       {},
       ...repository.metadata.relations.map((relation) => ({
-        [relation.propertyName]: _.get(relation, 'type.entityInfo.name'),
+        [relation.propertyName]: _.get(relation, 'target.entityInfo.name'),
       })),
     );
+    logger.log(`load relationIds ${r({ modelName, id, relationKeys })}`);
     const relationIds = R.mapObjIndexed((value, relation) => {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
       logger.debug(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
         ? (value as any[]).map((currentId) => ({ [_.first(primaryKeys)]: currentId }))
         : { [_.first(primaryKeys)]: value };
-
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
