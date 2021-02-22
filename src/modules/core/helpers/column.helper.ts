@@ -16,7 +16,7 @@ export class ColumnTypeHelper {
 
   static get JSON(): 'simple-json' | 'json' | 'jsonb' {
     const { dbType } = Global;
-    if (dbType === 'mysql57') {
+    if (dbType === 'mysql57' || dbType === 'mariadb') {
       return 'json';
     }
     if (dbType === 'postgres') {

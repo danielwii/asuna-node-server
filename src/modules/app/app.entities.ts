@@ -57,7 +57,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   public description: string;
 
   @MetaInfo({ name: 'File', type: 'File', safeReload: 'json-array' })
-  @Column(ColumnTypeHelper.JSON, { nullable: false, name: 'paths' })
+  @Column(ColumnTypeHelper.JSON, { nullable: false, name: 'paths', array: true })
   public paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })
