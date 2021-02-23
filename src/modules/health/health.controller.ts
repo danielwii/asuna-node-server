@@ -1,16 +1,17 @@
 import { Controller, Get } from '@nestjs/common';
 import {
   DiskHealthIndicator,
-  DNSHealthIndicator,
+  HttpHealthIndicator,
   HealthCheck,
   HealthCheckService,
   MemoryHealthIndicator,
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 import checkDiskSpace from 'check-disk-space';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { dirname, resolve } from 'path';
 import { getConnection } from 'typeorm';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { MQHealthIndicator, MQProvider, RedisHealthIndicator, RedisProvider } from '../providers';
@@ -26,7 +27,7 @@ export class HealthController {
   // eslint-disable-next-line max-params
   public constructor(
     private health: HealthCheckService,
-    private dns: DNSHealthIndicator,
+    private dns: HttpHealthIndicator,
     private typeorm: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,

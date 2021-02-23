@@ -34,6 +34,7 @@ import { SimpleIdGeneratorHelper } from './modules/ids';
 import { RedisLockProvider, RedisProvider } from './modules/providers';
 // add condition function in typeorm find
 import './typeorm.fixture';
+import { DefaultModule } from './modules';
 
 /*
 if (process.env.NODE_ENV === 'production') {
@@ -51,6 +52,7 @@ export interface BootstrapOptions {
   // root?: string;
   // package folder
   // dirname?: string;
+  loadDefaultModule?: boolean;
   staticAssets?: string;
   viewsDir?: string;
   viewEngine?: string;
@@ -154,14 +156,17 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
   logger.log(`pending migrations: ${await connection.showMigrations()}`);
 }
 
-export async function bootstrap(appModule, options: BootstrapOptions = {}): Promise<NestExpressApplication> {
+export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
+  Object.assign(options, { loadDefaultModule: true });
   validateOptions(options);
 
   require('events').EventEmitter.defaultMaxListeners = 15;
 
-  await CacheUtils.clearAll();
   const logger = LoggerFactory.getLogger('bootstrap');
   logger.log(`options: ${r(options)}`);
+
+  await AppLifecycle.preload();
+  await CacheUtils.clearAll();
   // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
   process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = '1000';
@@ -202,13 +207,14 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
     process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
   }
 
-  const app = await NestFactory.create<NestExpressApplication>(appModule, { logger: LoggerHelper.getLoggerService() });
-  await AppLifecycle.onInit(app);
+  const app = await NestFactory.create<NestExpressApplication>(
+    options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule,
+    { logger: LoggerHelper.getLoggerService() },
+  );
 
   await syncDbWithLockIfPossible(app, options);
+  await AppLifecycle.onInit(app);
 
-  // may add bootstrap lifecycle for static initialize
-  AccessControlHelper.init();
   // await DBHelper.initPrismaClient();
 
   // --------------------------------------------------------------
@@ -342,7 +348,7 @@ export async function bootstrap(appModule, options: BootstrapOptions = {}): Prom
  * 根据环境变量调整要拉取的实体
  * @param options
  */
-export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
+export function resolveTypeormPaths(options: BootstrapOptions): void {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);
@@ -355,7 +361,7 @@ export function resolveTypeormPaths(options: BootstrapOptions = {}): void {
     `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
     `${resolve(packageDir)}/**/*entities.${suffix}`,
     `${resolve(rootDir)}/**/*entities.${currentSuffix}`,
-    ...(options.typeormEntities || []),
+    ...(options?.typeormEntities || []),
   ]);
   const subscribers = _.uniq([
     `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*subscriber.${suffix}`,

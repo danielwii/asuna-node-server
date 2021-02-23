@@ -21,10 +21,14 @@ export class RedisClientObject {
 export class RedisProvider {
   public clients: { [key: string]: RedisClientObject } = {};
 
-  public static readonly instance = new RedisProvider();
+  public static instance: RedisProvider;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
+
+  public static async init(): Promise<void> {
+    if (this.instance == null) this.instance = new RedisProvider();
+  }
 
   public getRedisClient(prefix = 'default', db = 0): RedisClientObject {
     const key = `${prefix}-${db}`;

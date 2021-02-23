@@ -101,20 +101,20 @@ export class Hermes {
 
   private static initialized: boolean;
 
-  private static instance = new Hermes();
+  private static instance: Hermes;
 
   private static queues: { [key: string]: AsunaQueue };
 
   private static inMemoryQueues: { [key: string]: InMemoryAsunaQueue };
 
-  constructor() {
-    this.initialize();
-  }
+  constructor() {}
 
-  initialize() {
+  public static async initialize(): Promise<void> {
     if (Hermes.initialized) {
       return;
     }
+
+    Hermes.instance = new Hermes();
 
     logger.log('init ...');
     Hermes.observers = [];

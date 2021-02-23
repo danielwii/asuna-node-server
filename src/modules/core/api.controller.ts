@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
 import { LoggerFactory } from '../common/logger';
-import { AppContext } from './app.context';
+import { AppEnv } from './app.env';
 import { r } from '../common/helpers/utils';
 import { ClientHelper } from '../client/helper';
 
@@ -15,7 +15,7 @@ const logger = LoggerFactory.getLogger('ApiController');
 @ApiTags('core')
 @Controller('api')
 export class ApiController {
-  private readonly appContent = AppContext.instance;
+  private readonly appContent = AppEnv.instance;
 
   @Get('version')
   public currentVersion(): string {

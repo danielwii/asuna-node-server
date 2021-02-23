@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { AppInfo } from '../app';
 import { Feedback, FeedbackReply } from '../content/feedback.entities';
 import { Notification } from '../content/notification';
@@ -25,7 +27,7 @@ export interface DefaultRegisteredLoaders {
   notifications: DataLoaderFunction<Notification>;
 }
 
-export const defaultDataLoaders = {
+export const getDefaultDataLoaders = _.memoize(() => ({
   wxMiniAppUserInfo: loader<WXMiniAppUserInfo>(WXMiniAppUserInfo),
   keyValuePairs: loader<KeyValuePair>(KeyValuePair),
   keyValueModels: loader<KeyValueModel>(KeyValueModel, { isPublished: true }),
@@ -39,4 +41,4 @@ export const defaultDataLoaders = {
   feedbackReplies: loader<FeedbackReply>(FeedbackReply),
   userActivities: loader<UserActivity>(UserActivity),
   notifications: loader<Notification>(Notification),
-};
+}));

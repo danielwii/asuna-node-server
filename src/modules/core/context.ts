@@ -32,7 +32,7 @@ export type StorageEngineMode = 'chunks';
 export class AsunaContext {
   private readonly config = UploaderConfigObject.load();
 
-  public static readonly instance = new AsunaContext();
+  public static instance: AsunaContext;
 
   public opts: IAsunaContextOpts;
   public readonly dirname: string;
@@ -65,6 +65,10 @@ export class AsunaContext {
     if (this.config.enable) this.initStorageEngine(`${process.cwd()}/uploads`);
     // this.tempPath = `${process.cwd()}/temp`;
     fs.mkdirs(join(Global.tempPath)).catch((error) => logger.warn(r(error)));
+  }
+
+  public static async init() {
+    if (this.instance == null) this.instance = new AsunaContext();
   }
 
   public setup(opts: Partial<IAsunaContextOpts> = {}): void {

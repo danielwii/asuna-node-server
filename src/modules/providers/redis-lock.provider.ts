@@ -27,7 +27,7 @@ export class RedisLockProvider {
   public readonly redLock: RedLock;
 
   public static locks: Record<string, RedLock.Lock> = {};
-  public static readonly instance: RedisLockProvider = new RedisLockProvider();
+  public static instance: RedisLockProvider;
 
   constructor() {
     const redisClientObject = RedisProvider.instance.getRedisClient('lock');
@@ -81,6 +81,10 @@ export class RedisLockProvider {
     } else {
       logger.log(`skip setup redis, REDIS_ENABLE is ${redisClientObject.isEnabled}`);
     }
+  }
+
+  public static async init(): Promise<void> {
+    if (this.instance == null) this.instance = new RedisLockProvider();
   }
 
   isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE);

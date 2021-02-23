@@ -6,17 +6,31 @@ import { Promise } from 'bluebird';
 import * as fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
-import { r } from './modules/common/helpers';
+import { HandlebarsHelper, r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { CronHelper } from './modules/helper';
 import { LifecycleRegister } from './register';
-import { RedisProvider } from './modules/providers';
+import { RedisLockProvider, RedisProvider } from './modules/providers';
+import { AsunaContext } from './modules/core/context';
+import { Store } from './modules/store/store';
+import { Hermes } from './modules/core/bus';
+import { AccessControlHelper } from './modules';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
+  public static async preload(): Promise<void> {
+    logger.log(`[preload] ...`);
+    await HandlebarsHelper.init();
+    await AsunaContext.init();
+    await RedisProvider.init();
+    await RedisLockProvider.init();
+    await Store.init();
+    await Hermes.initialize();
+  }
+
   public static async onInit(app: NestExpressApplication): Promise<void> {
     const config = SentryConfigObject.load();
     logger.log(`[onInit] ... ${r(config)}`);
@@ -35,6 +49,9 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       });
 */
     }
+
+    AccessControlHelper.init();
+
     process.on('SIGINT', () => {
       logger.log(`signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`);
       Promise.all(

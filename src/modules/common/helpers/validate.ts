@@ -61,7 +61,6 @@ export function deserializeSafely<T>(
     o = deserialize(cls, json as string, options);
   }
 
-  logger.verbose(`deserializeSafely: ${r({ cls, o, json, options })}`);
   validateObjectSync(o);
   return o;
 }

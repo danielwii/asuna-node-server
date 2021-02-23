@@ -2,6 +2,7 @@
 #debug: false
 # default: info, info | debug | error
 LOGGER_LEVEL: info
+LOGGER_LEVEL_modules_core_kv_KvHelper: info
 #NO_COLOR:
 #ADMIN_SECRET_KEY:
 # default: secret

@@ -15,15 +15,22 @@ export class Uploader {
 
   private queueName = 'IN_MEMORY_CHUNKED_UPLOAD';
 
-  private static instance = new Uploader();
-  private static readonly appSettings = AppConfigObject.load();
+  private static instance: Uploader;
+  private static appSettings: AppConfigObject;
 
   private constructor() {
-    this.asunaQueue = Hermes.regInMemoryQueue(this.queueName);
-    Hermes.setupJobProcessor(this.queueName, (payload) => {
-      logger.log(`queue(${this.queueName}): ${r(payload)}`);
-      return payload;
+    Uploader.appSettings = AppConfigObject.load();
+    Hermes.initialize().then(() => {
+      this.asunaQueue = Hermes.regInMemoryQueue(this.queueName);
+      Hermes.setupJobProcessor(this.queueName, (payload) => {
+        logger.log(`queue(${this.queueName}): ${r(payload)}`);
+        return payload;
+      });
     });
+  }
+
+  public static async init(): Promise<void> {
+    if (Uploader.instance === null) Uploader.instance = new Uploader();
   }
 
   // TODO not implemented

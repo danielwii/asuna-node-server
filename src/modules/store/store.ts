@@ -7,7 +7,7 @@ import { RedisClientObject, RedisProvider } from '../providers';
 const logger = LoggerFactory.getLogger('Store');
 
 export class Store {
-  public static readonly Global = new Store('global');
+  public static Global: Store;
 
   private readonly prefix: string;
   private readonly redis: RedisClientObject;
@@ -19,6 +19,10 @@ export class Store {
     this.redis = RedisProvider.instance.getRedisClient(this.prefix);
     this.redisMode = this.redis.isEnabled;
     logger.log(`init with ${this.prefix} redis: ${this.redisMode}`);
+  }
+
+  public static async init(): Promise<void> {
+    if (Store.Global === null) Store.Global = new Store('global');
   }
 
   public setItem = async <T>(key: any, value: T, expiresInSeconds: number = Number.MAX_SAFE_INTEGER): Promise<void> => {

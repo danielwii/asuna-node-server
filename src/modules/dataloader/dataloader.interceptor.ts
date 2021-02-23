@@ -16,8 +16,6 @@ export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U 
   getTrace: () => SpanContext;
 }
 
-const genericDataLoader = new GenericDataLoader();
-
 @Injectable()
 export class DataLoaderInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
@@ -32,7 +30,7 @@ export class DataLoaderInterceptor implements NestInterceptor {
         logger.error(`no data loaders for request found, may not initialized at startup.`);
       }
       // logger.debug(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
-      request.dataLoaders = genericDataLoader.createLoaders();
+      request.dataLoaders = new GenericDataLoader().createLoaders();
     }
 
     return next.handle();

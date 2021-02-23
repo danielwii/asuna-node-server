@@ -9,6 +9,7 @@ import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import * as path from 'path';
+
 import { AppModule } from './app';
 import { r } from './common/helpers';
 import { LoggerFactory } from './common/logger';

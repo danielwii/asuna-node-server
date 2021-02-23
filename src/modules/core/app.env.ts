@@ -1,9 +1,10 @@
+import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 
-const logger = LoggerFactory.getLogger('AppContext');
+const logger = LoggerFactory.getLogger('AppEnv');
 
-export class AppContext {
-  public static readonly instance = new AppContext();
+export class AppEnv {
+  public static readonly instance = new AppEnv();
 
   private state = {
     version: process.env.npm_package_version,
@@ -11,7 +12,7 @@ export class AppContext {
   };
 
   private constructor() {
-    logger.log('constructor...');
+    logger.log(`initialized. ${r(this.state)}`);
   }
 
   get version() {
