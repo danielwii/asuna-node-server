@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
+
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger/factory';
 import { ColumnTypeHelper } from './column.helper';

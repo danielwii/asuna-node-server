@@ -11,7 +11,7 @@ export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {
     logger.log('init...');
 
-    AdminApiKeys.create({ name: 'test-only', key: 'test-key', isPublished: true }).save();
+    // AdminApiKeys.create({ name: 'test-only', key: 'test-key', isPublished: true }).save();
   }
 }
 

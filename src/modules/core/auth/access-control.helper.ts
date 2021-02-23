@@ -56,7 +56,13 @@ export class AccessControlHelper {
     // .deleteAny('video')
     ;
 
-    logger.log(`init ${r({ resources: this.accessControl.getResources(), roles: this.accessControl.getRoles() })}`);
+    logger.log(
+      `init ${r({
+        // grants: this.accessControl.getGrants(),
+        resources: this.accessControl.getResources(),
+        roles: this.accessControl.getRoles(),
+      })}`,
+    );
   }
 
   static setup(fn: (ac: AccessControl) => Access): void {

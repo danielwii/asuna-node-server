@@ -31,6 +31,10 @@ export class Role extends AbstractBaseEntity {
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public authorities: JsonMap;
 
+  @MetaInfo({ name: 'Data Filter', type: 'JSON', safeReload: 'json-map' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'data_filter' })
+  public dataFilter: JsonMap;
+
   @ManyToMany('AdminUser', (inverse: AdminUser) => inverse.roles)
   public users: AdminUser[];
 }
@@ -38,6 +42,10 @@ export class Role extends AbstractBaseEntity {
 @EntityMetaInfo({ name: 'auth__users', internal: true })
 @Entity('auth__t_users')
 export class AdminUser extends AbstractTimeBasedAuthUser /* InjectTenant(AbstractTimeBasedAuthUser) */ {
+  public constructor() {
+    super('sa');
+  }
+
   @MetaInfo({ name: '角色' })
   @ManyToMany('Role', (inverse: Role) => inverse.users, { primary: true })
   @JoinTable({
@@ -46,8 +54,4 @@ export class AdminUser extends AbstractTimeBasedAuthUser /* InjectTenant(Abstrac
     inverseJoinColumn: { name: 'role__id' },
   })
   public roles: Role[];
-
-  public constructor() {
-    super('sa');
-  }
 }

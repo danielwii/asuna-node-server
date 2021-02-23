@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
 
 import { MetaInfo } from '../../common/decorators';
@@ -14,6 +14,7 @@ export enum AuthUserChannel {
 
 export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   @MetaInfo({ name: '用户名' })
+  @IsString()
   @Column({ nullable: false, length: 50, unique: true })
   username: string;
 
@@ -28,23 +29,33 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   email?: string;
 
   @MetaInfo({ name: '昵称' })
+  @IsString()
+  @IsOptional()
   @Column({ nullable: true, length: 50, unique: true })
   nickname?: string;
 
   // https://api.adorable.io/avatars/64/{id}.png
   @MetaInfo({ name: '头像', type: 'Image' })
+  @IsString()
+  @IsOptional()
   @Column({ nullable: true, name: 'portrait' })
   portrait?: string;
 
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
+  @IsString()
+  @IsOptional()
   @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
   channel: AuthUserChannel;
 
   @MetaInfo({ ignore: true })
+  @IsString()
+  @IsOptional()
   @Column({ nullable: true, select: false })
   password?: string;
 
   @MetaInfo({ ignore: true })
+  @IsString()
+  @IsOptional()
   @Column({ nullable: true, select: false })
   salt?: string;
 
@@ -57,6 +68,8 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   lastLoginAt?: Date;
 
   @MetaInfo({ name: '描述' })
+  @IsString()
+  @IsOptional()
   @Column('text', { nullable: true, name: 'description' })
   description?: string;
 

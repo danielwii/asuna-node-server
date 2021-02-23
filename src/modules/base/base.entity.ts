@@ -38,6 +38,12 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
   @Column('varchar', { nullable: true, length: 100, name: 'updated_by' })
   public updatedBy?: string;
 
+  /*
+  @MetaInfo({ accessible: 'hidden' })
+  @Column('varchar', { nullable: true, length: 100, name: 'created_by' })
+  public createdBy?: string;
+*/
+
   @AfterLoad()
   public afterLoad(): void {
     fixTZ(this);
@@ -109,6 +115,9 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
 
 export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {}
 
+/**
+ * really not recommended
+ */
 export class AbstractUUID2BaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') public id!: string;
 

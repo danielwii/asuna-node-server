@@ -336,10 +336,10 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   await AppLifecycle.beforeBootstrap(app);
   logger.log('bootstrap app ...');
   return app.listenAsync(port).then(async () => {
+    await AppLifecycle.onAppStartListening(app);
     logger.log(`===============================================================`);
     logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}`);
     logger.log(`===============================================================`);
-    await AppLifecycle.onAppStartListening(app);
     return app;
   });
 }
