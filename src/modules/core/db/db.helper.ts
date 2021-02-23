@@ -31,6 +31,7 @@ import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exc
 import { LoggerFactory } from '../../common/logger';
 import { AsunaContext } from '../context';
 import { Profile } from '../../common/helpers/normal';
+import { Role } from '../auth/auth.entities';
 
 const logger = LoggerFactory.getLogger('DBHelper');
 
@@ -783,5 +784,11 @@ export class DBHelper {
     }
     // queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
     return { [condition.field]: condition.value };
+  }
+
+  static loadDataFilter(roles: Role[], entityName: string) {
+    const dataFilters = _.merge({}, ..._.map(roles, (role) => role.dataFilter));
+    logger.log(`loaded data filter ${r({ entityName, dataFilters })}`);
+    return _.get(dataFilters, entityName);
   }
 }
