@@ -348,7 +348,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
  * 根据环境变量调整要拉取的实体
  * @param options
  */
-export function resolveTypeormPaths(options: BootstrapOptions): void {
+export function resolveTypeormPaths(options?: BootstrapOptions): void {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);

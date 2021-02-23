@@ -3,34 +3,27 @@ import { r } from '../../common/helpers';
 import { AbstractAuthUser } from '../auth';
 import { AsunaDefaultEvent, AsunaSystemQueue, Hermes, HermesExchange, HermesProcessManager } from './hermes';
 import { IAsunaCommand, IAsunaEvent } from './interfaces';
+import { AppLifecycle } from '../../../lifecycle';
 
 describe('Hermes', () => {
-  beforeAll(async () => {});
+  beforeAll(async () => {
+    await AppLifecycle.preload();
+  });
 
   afterAll(async () => {});
 
   it('simulate user upload command', () => {
     const command = new (class UploadCommand implements IAsunaCommand {
       createdAt: any;
-
       createdBy: any;
-
       events: IAsunaEvent[] = [];
-
       extra?: object;
-
       name = 'upload portrait';
-
       payload: any = { filepath: 'somewhere' };
-
       service = 'user.upload';
-
       tracking?: object;
-
       version = 'default/v1alpha';
-
       type = 'Command';
-
       user: AbstractAuthUser;
     })();
 

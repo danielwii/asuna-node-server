@@ -7,12 +7,14 @@ import supertest from 'supertest';
 
 import { AdminAuthService, AdminInternalModule, LoggerHelper, TokenHelper } from '../src/modules';
 import { TaskEvent, TaskRecord } from '../src/modules/task';
+import { AppLifecycle } from '../src/lifecycle';
 
 describe('AppRestController (e2e)', () => {
   let app: INestApplication;
   let token;
 
   beforeAll(async () => {
+    await AppLifecycle.preload();
     const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();

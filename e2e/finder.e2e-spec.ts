@@ -12,11 +12,13 @@ import {
   KvHelper,
   LoggerHelper,
 } from '../src/modules';
+import { AppLifecycle } from '../src/lifecycle';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    await AppLifecycle.preload();
     const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();

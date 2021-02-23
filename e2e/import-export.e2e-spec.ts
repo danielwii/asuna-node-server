@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import supertest from 'supertest';
 import { getManager } from 'typeorm';
 import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
+import { AppLifecycle } from '../src/lifecycle';
 
 describe('Excel (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     resolveTypeormPaths();
+    await AppLifecycle.preload();
     const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
