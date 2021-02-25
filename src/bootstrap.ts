@@ -1,6 +1,5 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
@@ -8,16 +7,14 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import * as _ from 'lodash';
 import morgan from 'morgan';
-import { dirname, extname, resolve } from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import RedisStoreCreator from 'connect-redis';
 import * as requestIp from 'request-ip';
 import responseTime from 'response-time';
-import { Connection, getConnectionOptions } from 'typeorm';
+import { getConnectionOptions } from 'typeorm';
 
 import { AppLifecycle } from './lifecycle';
-import { renameTables, runCustomMigrations } from './migrations';
 import { CacheUtils } from './modules/cache';
 import {
   AnyExceptionFilter,
@@ -28,135 +25,20 @@ import {
   r,
 } from './modules/common';
 import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
-import { AccessControlHelper, AsunaContext, Global, IAsunaContextOpts } from './modules/core';
+import { AsunaContext, Global } from './modules/core';
 import { TracingInterceptor } from './modules/tracing';
 import { SimpleIdGeneratorHelper } from './modules/ids';
-import { RedisLockProvider, RedisProvider } from './modules/providers';
+import { RedisProvider } from './modules/providers';
+import { DefaultModule } from './modules/default.module';
+import { syncDbWithLockIfPossible, validateOptions, resolveTypeormPaths } from './helper';
 // add condition function in typeorm find
 import './typeorm.fixture';
-import { DefaultModule } from './modules';
 
-/*
-if (process.env.NODE_ENV === 'production') {
-  logger.log(`[X] run as production mode at ${__dirname}`);
-  const moduleAlias = require('module-alias');
-  moduleAlias.addPath(__dirname as any);
-} else {
-  logger.log(`[X] run as non-production mode at ${__dirname}`);
-}
-*/
-const startAt = Date.now();
-
-export interface BootstrapOptions {
-  // server folder
-  // root?: string;
-  // package folder
-  // dirname?: string;
-  loadDefaultModule?: boolean;
-  staticAssets?: string;
-  viewsDir?: string;
-  viewEngine?: string;
-  typeormEntities?: string[];
-  /**
-   * io     - socket.io
-   * redis  - 基于 redis 共享 websocket 信息
-   * ws     - websocket
-   */
-  redisMode?: 'io' | 'redis' | 'ws';
-  context?: IAsunaContextOpts;
-  renamer?: { from: string; to: string }[];
-  migrations?: any[];
-}
-
-function validateOptions(options: BootstrapOptions): void {
-  const config = configLoader.loadConfigs();
-  const redisEnabled = configLoader.loadConfig2('redis', 'enable');
-
-  if (options.redisMode === 'redis' && !redisEnabled) {
-    throw new Error('RedisMode need redis enabled!');
-  }
-
-  // if (redisEnabled) {
-  //   const instance = RedisLockProvider.instance;
-  //   console.log('get redis lock instance ->', instance);
-  // }
-  // process.exit(0);
-}
-
-async function syncDbWithLockIfPossible(app: NestExpressApplication, options: BootstrapOptions) {
-  const logger = LoggerFactory.getLogger('sync');
-  const syncEnabled = configLoader.loadBoolConfig('DB_SYNCHRONIZE');
-  if (!syncEnabled) {
-    return logger.log(`DB_SYNCHRONIZE disabled.`);
-  }
-
-  logger.log(`DB_SYNCHRONIZE: ${syncEnabled}`);
-  const redisEnabled = configLoader.loadConfig2('redis', 'enable');
-  if (redisEnabled) {
-    logger.log('try sync db with redis redlock...');
-    const { exists, results } = await RedisLockProvider.instance.lockProcess(
-      'sync-db',
-      async () => syncDb(app, options),
-      { ttl: 3 * 60 * 1000, waiting: true },
-    );
-    logger.log(`sync results is ${r({ exists, results })}`);
-    if (exists) {
-      logger.log('another runner is syncing db now, skip.');
-    }
-    return results;
-  } else {
-    return syncDb(app, options);
-  }
-}
-
-async function syncDb(app: NestExpressApplication, options: BootstrapOptions): Promise<void> {
-  const logger = LoggerFactory.getLogger('sync');
-
-  // --------------------------------------------------------------
-  // rename old tables to newer
-  // --------------------------------------------------------------
-
-  const beforeSyncDB = Date.now();
-  const connection = app.get<Connection>(Connection);
-  logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
-
-  logger.log('sync db ...');
-  const queryRunner = connection.createQueryRunner();
-  await Promise.all(
-    _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
-      logger.log(`rename table ${r({ from, to })}`);
-      const fromTable = await queryRunner.getTable(from);
-      const toTable = await queryRunner.getTable(to);
-      if (toTable) {
-        logger.warn(`Table ${to} already exists.`);
-      } else if (fromTable) {
-        logger.log(`rename ${from} -> ${to}`);
-        await queryRunner.renameTable(fromTable, to);
-      }
-    }),
-  );
-
-  if (Global.dbType !== 'sqlite') {
-    await connection.query('SET FOREIGN_KEY_CHECKS=0');
-  }
-
-  logger.log(`synchronize ...`);
-  await connection.synchronize();
-  logger.log(`synchronize ... done`);
-
-  logger.log(`run custom migrations ...`);
-  await runCustomMigrations(options.migrations);
-  logger.log(`run custom migrations ... done`);
-
-  if (Global.dbType !== 'sqlite') {
-    await connection.query('SET FOREIGN_KEY_CHECKS=1');
-  }
-  logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
-
-  logger.log(`pending migrations: ${await connection.showMigrations()}`);
-}
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { BootstrapOptions } from './interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
+  const startAt = Date.now();
   Object.assign(options, { loadDefaultModule: true });
   validateOptions(options);
 
@@ -342,37 +224,4 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
     logger.log(`===============================================================`);
     return app;
   });
-}
-
-/**
- * 根据环境变量调整要拉取的实体
- * @param options
- */
-export function resolveTypeormPaths(options?: BootstrapOptions): void {
-  const logger = LoggerFactory.getLogger('resolveTypeormPaths');
-  // const wasBuilt = __filename.endsWith('js');
-  const rootDir = dirname(require.main.filename);
-  logger.log(`main entrance is ${r(require.main.filename)}`);
-  const { packageDir } = global;
-  const suffix = extname(__filename).slice(1);
-  const currentSuffix = extname(require.main.filename).slice(1);
-  // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
-  const entities = _.uniq([
-    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
-    `${resolve(packageDir)}/**/*entities.${suffix}`,
-    `${resolve(rootDir)}/**/*entities.${currentSuffix}`,
-    ...(options?.typeormEntities || []),
-  ]);
-  const subscribers = _.uniq([
-    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*subscriber.${suffix}`,
-    `${resolve(packageDir)}/**/*subscriber.${suffix}`,
-    `${resolve(rootDir)}/**/*subscriber.${currentSuffix}`,
-  ]);
-  logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers, __filename })}`);
-
-  logger.log(`resolve typeorm entities: ${r(entities)}`);
-  logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
-
-  process.env.TYPEORM_ENTITIES = entities.join();
-  process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
 }
