@@ -93,10 +93,11 @@ export class ContentAdminController {
     if (!drafts) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid operation`);
     }
-    logger.log(`get drafts ${r({ query, roles, rolesStr })}`);
-    const permission = AccessControlHelper.ac.can(rolesStr).create(query.type);
-    const permissionAny = AccessControlHelper.ac.can(rolesStr).createAny(query.type);
-    const permissionOwn = AccessControlHelper.ac.can(rolesStr).createOwn(query.type);
+    const filteredRoles = await AccessControlHelper.filterRoles(rolesStr);
+    logger.log(`get drafts ${r({ query, roles, rolesStr, filteredRoles })}`);
+    const permission = AccessControlHelper.ac.can(filteredRoles).create(query.type);
+    const permissionAny = AccessControlHelper.ac.can(filteredRoles).createAny(query.type);
+    const permissionOwn = AccessControlHelper.ac.can(filteredRoles).createOwn(query.type);
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;

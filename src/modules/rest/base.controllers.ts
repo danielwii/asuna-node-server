@@ -125,12 +125,12 @@ export abstract class RestCrudController {
 
     const dataFilter = DBHelper.loadDataFilter(roles, modelName.entityName);
     const filterWheres = parseWhere(JSON.stringify(dataFilter));
-    const normalWheres = parseNormalWheres(where, repository);
-    logger.log(`list ${r(modelName)} with ${r({ where, normalWheres, filterWheres })}`);
+    const parsedNormalWheres = parseNormalWheres(where, repository);
+    logger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
 
-    // TODO 这里在 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
-    if (normalWheres.length > 1) queryBuilder.where(where);
-    else if (normalWheres.length === 1) DBHelper.wrapNormalWhere(modelName.model, queryBuilder, normalWheres[0]);
+    // TODO 这里的 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
+    if (parsedNormalWheres.length > 1) queryBuilder.where(where);
+    else if (parsedNormalWheres.length === 1) DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres[0]);
 
     if (filterWheres) queryBuilder.andWhere(filterWheres as any);
 

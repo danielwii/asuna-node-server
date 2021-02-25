@@ -661,10 +661,10 @@ export class DBHelper {
     }
   }
 
-  public static wrapNormalWhere(model: string, queryBuilder, normalWheres): void {
-    // console.log({ normalWheres });
-    normalWheres.forEach((condition) => {
-      // console.log('condition', condition);
+  public static wrapNormalWhere(model: string, queryBuilder, wheres): void {
+    // logger.log(`handle wheres ${r(wheres)}`);
+    wheres.forEach((condition) => {
+      logger.verbose(`handle condition ${r(condition)}`);
 
       if (condition.value?.$or) {
         condition.value.$or.forEach((elementCondition) => {
@@ -672,7 +672,7 @@ export class DBHelper {
 
           const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
 
-          // console.log('[normalWheres-or]', { currentCondition, elementCondition, sqlValue });
+          // console.log('[wheres-or]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
             queryBuilder.orWhere(`${model}.${sqlValue}`);
@@ -686,7 +686,7 @@ export class DBHelper {
 
           const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
 
-          // console.log('[normalWheres-and]', { currentCondition, elementCondition, sqlValue });
+          // console.log('[wheres-and]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
             queryBuilder.andWhere(`${model}.${sqlValue}`);

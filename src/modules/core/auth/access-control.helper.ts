@@ -1,9 +1,11 @@
 import { Access, AccessControl } from 'accesscontrol';
 import * as _ from 'lodash';
+import fp from 'lodash/fp';
 
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { DBHelper } from '../db';
+import { Role } from './auth.entities';
 
 export enum ACRole {
   // 系统预留
@@ -63,6 +65,10 @@ export class AccessControlHelper {
         roles: this.accessControl.getRoles(),
       })}`,
     );
+  }
+
+  static async filterRoles(roles: string[]): Promise<string[]> {
+    return _.filter(roles, (role) => this.ac.hasRole(role));
   }
 
   static setup(fn: (ac: AccessControl) => Access): void {
