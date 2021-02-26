@@ -3811,7 +3811,7 @@ __metadata:
     mysql: ^2.18.1
     node-buffs: ^0.8.11
     node-fetch: ^2.6.1
-    nodemailer: ^6.4.18
+    nodemailer: ^6.5.0
     nodemon: ^2.0.7
     opentracing: ^0.14.5
     otplib: ^12.0.1
@@ -11529,10 +11529,17 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"nodemailer@npm:6.4.18, nodemailer@npm:^6.4.16, nodemailer@npm:^6.4.17, nodemailer@npm:^6.4.18":
+"nodemailer@npm:6.4.18":
   version: 6.4.18
   resolution: "nodemailer@npm:6.4.18"
   checksum: 56b5e39bc5d34988102bbc6c7eb8eaa7ac64a4daed55d2610c379ad04268d76399ab51b74965001fd2768763750b290785488b8fd1ccdf8274b91ff6ca3ec793
+  languageName: node
+  linkType: hard
+
+"nodemailer@npm:^6.4.16, nodemailer@npm:^6.4.17, nodemailer@npm:^6.5.0":
+  version: 6.5.0
+  resolution: "nodemailer@npm:6.5.0"
+  checksum: 9611c14a6f52475a0bea626fa342cf263a67d324c30b6349da099164ab66c6d63bc3d67453fe5d41ae7ab13d9a42cfb45cb5623f1a2e91135a929bada7f9bf83
   languageName: node
   linkType: hard
 

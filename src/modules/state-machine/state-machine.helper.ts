@@ -10,12 +10,20 @@ export interface StateMachineAction<Action, State> {
   to: State;
 }
 
+export interface StateJson<StatusType, ActionType> {
+  key: string;
+  stateKey: string;
+  actionKey: string;
+  defaultState: StatusType;
+  actions: StateMachineAction<ActionType, StatusType>[];
+}
+
 export abstract class AbstractStateMachine<StatusType, ActionType> {
   public constructor(
-    public readonly key,
-    public readonly stateKey,
-    public readonly actionKey,
-    public readonly defaultState,
+    public readonly key: string,
+    public readonly stateKey: string,
+    public readonly actionKey: string,
+    public readonly defaultState: StatusType,
     public readonly actions: StateMachineAction<ActionType, StatusType>[],
   ) {}
 
@@ -25,7 +33,7 @@ export abstract class AbstractStateMachine<StatusType, ActionType> {
     return found?.to ?? from;
   }
 
-  public toJson(): object {
+  public toJson(): StateJson<StatusType, ActionType> {
     return {
       key: this.key,
       stateKey: this.stateKey,
