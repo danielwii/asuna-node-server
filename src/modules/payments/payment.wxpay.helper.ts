@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import * as qs from 'qs';
 import { IsNull } from 'typeorm';
 import * as xml2js from 'xml2js';
+
 import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { AppConfigObject } from '../config/app.config';
@@ -27,13 +28,22 @@ export class PaymentWxpayHelper {
     if (count) {
       logger.log(`check payment orders: ${count}`);
       await Promise.mapSeries(orders, async (order) => {
+        // logger.log(`handle order ${r(order)}`);
+        if (!order.transaction) {
+          logger.error(`no transaction found for transaction ${r(order)}`);
+          return Promise.resolve();
+        }
+        if (!order.transaction.method) {
+          logger.error(`no method found for transaction ${r(order.transaction)}`);
+          return Promise.resolve();
+        }
         if (order.transaction.method.type !== 'wxpay') {
-          logger.debug(`order type is ${order.transaction.method.type}, ignore it.`);
+          logger.verbose(`order type is ${order.transaction.method.type}, ignore it.`);
           return Promise.resolve();
         }
         await order.reload();
         if (order.status === 'done') {
-          logger.debug(`${order.id} already handled`);
+          logger.verbose(`${order.id} already handled`);
           return Promise.resolve();
         }
         const queried = await PaymentWxpayHelper.query(order.id);
