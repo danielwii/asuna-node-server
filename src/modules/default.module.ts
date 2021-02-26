@@ -1,13 +1,12 @@
+import { Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from './common/logger/factory';
 import { AdminInternalModule } from './admin.module';
+import { LoggerFactory } from './common/logger/factory';
 import { GraphqlModule } from './graphql.module';
-import { WSModule } from './ws';
 import { HealthController } from './health/health.controller';
-import { GenericDataLoader, getDefaultDataLoaders } from './dataloader';
+import { WSModule } from './ws';
 
 const logger = LoggerFactory.getLogger('<DefaultModule>');
 
@@ -27,6 +26,5 @@ export class DefaultModule implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     logger.log('init ...');
-    new GenericDataLoader().initLoaders(getDefaultDataLoaders());
   }
 }

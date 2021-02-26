@@ -407,16 +407,17 @@ export class GraphqlHelper {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
     }
 
-    // logger.debug(`load ids by ${r(opts)}`);
+    // logger.debug(`resolve properties by ${r(opts)}`);
     let ids = opts.instance[opts.key];
     if (_.isNil(ids)) {
-      logger.debug(`no ids for ${opts.key} found for ${opts.cls.constructor.name}...`);
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+      logger.debug(`no ids for ${opts.key} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`);
+      const result: any = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
         loadRelationIds: { relations: [opts.key as string] },
         cache: opts.cache,
       })) as Entity;
-      ids = result[opts.key] as any;
+      logger.debug(`load ${result[opts.key].length} ${opts.key} for ${opts.cls.name} ${opts.instance[primaryKey]}`);
+      ids = result[opts.key];
     }
     if (_.isEmpty(ids)) return [];
 
@@ -426,7 +427,7 @@ export class GraphqlHelper {
     }
 
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
-    logger.warn(`no loader found for ${_opts.targetCls.constructor.name}... may cause performance issue`);
+    logger.warn(`no loader found for ${_opts.targetCls.name}... may cause performance issue`);
     const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
     return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }

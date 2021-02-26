@@ -39,7 +39,7 @@ import type { BootstrapOptions } from './interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
-  Object.assign(options, { loadDefaultModule: true });
+  Object.assign(options, _.merge({ loadDefaultModule: true }, options));
   validateOptions(options);
 
   require('events').EventEmitter.defaultMaxListeners = 15;
