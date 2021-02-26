@@ -29,6 +29,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     await RedisLockProvider.init();
     await Store.init();
     await Hermes.initialize();
+    logger.log(`[preload] ... done`);
   }
 
   public static async onInit(app: NestExpressApplication): Promise<void> {

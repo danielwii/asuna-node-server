@@ -27,7 +27,7 @@ export class RedisProvider {
   private constructor() {}
 
   public static async init(): Promise<void> {
-    if (this.instance == null) this.instance = new RedisProvider();
+    if (!this.instance) this.instance = new RedisProvider();
   }
 
   public getRedisClient(prefix = 'default', db = 0): RedisClientObject {

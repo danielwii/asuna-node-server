@@ -84,7 +84,7 @@ export class RedisLockProvider {
   }
 
   public static async init(): Promise<void> {
-    if (this.instance == null) this.instance = new RedisLockProvider();
+    if (!this.instance) this.instance = new RedisLockProvider();
   }
 
   isEnabled = (): boolean => configLoader.loadBoolConfig(RedisConfigKeys.REDIS_ENABLE);

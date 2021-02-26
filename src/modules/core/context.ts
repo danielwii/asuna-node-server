@@ -68,7 +68,7 @@ export class AsunaContext {
   }
 
   public static async init() {
-    if (this.instance == null) this.instance = new AsunaContext();
+    if (!this.instance) this.instance = new AsunaContext();
   }
 
   public setup(opts: Partial<IAsunaContextOpts> = {}): void {

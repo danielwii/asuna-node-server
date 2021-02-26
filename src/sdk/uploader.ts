@@ -30,7 +30,7 @@ export class Uploader {
   }
 
   public static async init(): Promise<void> {
-    if (Uploader.instance === null) Uploader.instance = new Uploader();
+    if (!Uploader.instance) Uploader.instance = new Uploader();
   }
 
   // TODO not implemented

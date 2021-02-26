@@ -22,7 +22,7 @@ export class Store {
   }
 
   public static async init(): Promise<void> {
-    if (Store.Global === null) Store.Global = new Store('global');
+    if (!Store.Global) Store.Global = new Store('global');
   }
 
   public setItem = async <T>(key: any, value: T, expiresInSeconds: number = Number.MAX_SAFE_INTEGER): Promise<void> => {

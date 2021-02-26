@@ -18,8 +18,6 @@ dayjs.extend(relativeTime);
 const logger = LoggerFactory.getLogger('CronHelper');
 
 export class CronHelper {
-  private static readonly redis = RedisLockProvider.instance;
-
   public static crons = {};
 
   public static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
@@ -44,11 +42,13 @@ export class CronHelper {
     }
 
     const ttl = opts.ttl ?? 10;
-    const enabled = this.redis.isEnabled();
+    const enabled = RedisLockProvider.instance.isEnabled();
     logger.debug(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
     const callPromise = () =>
       enabled
-        ? this.redis.lockProcess(operation, handler, { ttl: ttl * 1000 }).catch((reason) => logger.error(reason))
+        ? RedisLockProvider.instance
+            .lockProcess(operation, handler, { ttl: ttl * 1000 })
+            .catch((reason) => logger.error(reason))
         : handler().catch((reason) => logger.error(reason));
 
     return new CronJob({
