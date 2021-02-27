@@ -8,7 +8,7 @@ import * as fp from 'lodash/fp';
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper, r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
-import { ConfigKeys, configLoader } from './modules/config';
+import { ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { CronHelper } from './modules/helper';
 import { LifecycleRegister } from './register';
@@ -16,7 +16,7 @@ import { RedisLockProvider, RedisProvider } from './modules/providers';
 import { AsunaContext } from './modules/core/context';
 import { Store } from './modules/store/store';
 import { Hermes } from './modules/core/bus';
-import { AccessControlHelper } from './modules';
+import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 
@@ -33,11 +33,12 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   }
 
   public static async onInit(app: NestExpressApplication): Promise<void> {
-    const config = SentryConfigObject.load();
-    logger.log(`[onInit] ... ${r(config)}`);
-    if (config.enable) {
-      const { dsn } = config;
-      logger.debug(`[onInit] sentry ... ${dsn}`);
+    const sentryConfig = SentryConfigObject.load();
+    const featuresConfig = FeaturesConfigObject.load();
+    logger.log(`[onInit] ... ${r({ sentryConfig, featuresConfig })}`);
+    if (sentryConfig.enable) {
+      const { dsn } = sentryConfig;
+      logger.log(`[onInit] sentry ... ${dsn}`);
       Sentry.init({ dsn, debug: configLoader.loadConfig(ConfigKeys.DEBUG) });
 
       // The request handler must be the first middleware on the app
@@ -49,6 +50,24 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         throw new Error('My first Sentry error!');
       });
 */
+    }
+
+    if (featuresConfig.apmEnabled) {
+      logger.log(`[onInit] apm ...`);
+      const apm = require('elastic-apm-node').start({
+        // Override the service name from package.json
+        // Allowed characters: a-z, A-Z, 0-9, -, _, and space
+        serviceName: featuresConfig.apmServiceName,
+
+        // Use if APM Server requires a secret token
+        secretToken: featuresConfig.apmSecretToken,
+
+        // Set the custom APM Server URL (default: http://localhost:8200)
+        serverUrl: featuresConfig.apmServerUrl,
+
+        // Set the service environment
+        environment: process.env.NODE_ENV ?? 'development',
+      });
     }
 
     AccessControlHelper.init();

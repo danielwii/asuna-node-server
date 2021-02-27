@@ -33,6 +33,12 @@ features:
   swagger_enable: false
   cron_enable: false
   error_stats: false
+  # elastic-apm-node
+  apm:
+    enabled: false
+    service_name: node-server
+    secret_token:
+    server_url: http://localhost:8200
 
 tracing:
   enabled: false
