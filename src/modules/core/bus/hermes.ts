@@ -57,22 +57,22 @@ export class AsunaEvent implements IAsunaEvent {
   }
 }
 
-export type AsunaQueue = {
+export interface AsunaQueue {
   name: string;
   opts?: BullQueue.QueueOptions;
   queue: BullQueue.Queue;
   handle?: (payload: any) => Promise<any>;
-};
+}
 
-export type EventRuleResolver = {
+export interface EventRuleResolver {
   identifier: { version: 'default/v1alpha'; type: 'EventRule' };
   resolve: (event: IAsunaEvent) => IAsunaAction[];
-};
+}
 
-export type CommandResolver = {
+export interface CommandResolver {
   identifier: { version: 'default/v1alpha'; type: 'Command' };
   resolve: (command: IAsunaCommand) => IAsunaEvent[];
-};
+}
 
 export class HermesExchange {
   private static _commands: IAsunaCommand[];
@@ -107,7 +107,7 @@ export class Hermes {
 
   private static inMemoryQueues: { [key: string]: InMemoryAsunaQueue };
 
-  constructor() {}
+  // constructor() {}
 
   public static async initialize(): Promise<void> {
     if (Hermes.initialized) {
@@ -161,10 +161,10 @@ export class Hermes {
     }
   }
 
-  static emit(
+  static emit<Payload = any>(
     source: string,
     event: string,
-    payload: any,
+    payload: Payload,
     extras: { identifier?: any; user?: AbstractAuthUser; type?: string } = {},
   ) {
     logger.log(`emit events from [${source}: ${event}]`);
@@ -274,7 +274,7 @@ export class Hermes {
     const queue = new BullQueue(queueName, opts);
     queue.process((job: BullQueue.Job, done) => {
       logger.log(`queue(${queueName}) run job ${job.name} with ${r(job.data)}`);
-      return this.getQueue(queueName).handle != null
+      return this.getQueue(queueName).handle
         ? this.getQueue(queueName).handle(job)
         : done(new Error(`no processor registered for ${queueName}`));
     });

@@ -27,7 +27,7 @@ export interface VipVideoExchangeBody {
 
 export class PointsHelper {
   public static async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
-    const exists = await PointExchange.findOne({ type: 'vipVideoExchange', profileId, refId: uuid } as PointExchange);
+    const exists = await PointExchange.findOne(PointExchange.of({ type: 'vipVideoExchange', profileId, refId: uuid }));
     logger.log(`pointExchange ${r(exists)}`);
     if (exists) return exists;
 
@@ -44,15 +44,17 @@ export class PointsHelper {
       );
     }
 
-    const exchange = await PointExchange.save({
-      type: 'vipVideoExchange',
-      profileId: profileId,
-      body: { uuid } as VipVideoExchangeBody,
-      refId: uuid,
-      change: -cost,
-      before: current.wallet.points,
-      after: current.wallet.points - cost,
-    } as PointExchange);
+    const exchange = await PointExchange.save(
+      new PointExchange<VipVideoExchangeBody>({
+        type: 'vipVideoExchange',
+        profileId: profileId,
+        body: { uuid },
+        refId: uuid,
+        change: -cost,
+        before: current.wallet.points,
+        after: current.wallet.points - cost,
+      }),
+    );
 
     current.wallet.points = exchange.after;
     await current.wallet.save();
@@ -60,7 +62,7 @@ export class PointsHelper {
   }
 
   public static async checkExchange(type: string, profileId: string, body: any): Promise<PointExchange> {
-    return PointExchange.findOne({ type, profileId, body: JSON.stringify(body) } as PointExchange);
+    return PointExchange.findOne(PointExchange.of({ type, profileId, body: JSON.stringify(body) }));
   }
 
   public static async getPointsByType(
@@ -106,13 +108,13 @@ export class PointsHelper {
     const point = (await KvHelper.getValueByGroupFieldKV(PropertyHelper.kvDef, type)) || change;
     logger.log(`get point ${r({ point, change })}`);
     if (_.isNumber(point)) {
-      Hermes.emit(PointsHelper.name, HermesPointChangeEventKeys.pointsChange, {
+      Hermes.emit<PointChangeEventPayload>(PointsHelper.name, HermesPointChangeEventKeys.pointsChange, {
         point,
         type,
         event,
         profileId,
         remark,
-      } as PointChangeEventPayload);
+      });
     }
   }
 }

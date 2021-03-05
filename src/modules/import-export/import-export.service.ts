@@ -60,8 +60,7 @@ export class ImportExportService {
           if (element.config.selectable !== undefined) {
             const tempRepo = await ImportExportService.getRepository(element.config.selectable);
             if (!element.config.many) {
-              const res = await tempRepo.findOne({ name: jsonArray[row][column] } as any);
-              value = res;
+              value = await tempRepo.findOne({ name: jsonArray[row][column] } as any);
             } else {
               // 处理多对多关系
               const content: string = jsonArray[row][column];

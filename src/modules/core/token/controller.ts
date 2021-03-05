@@ -31,7 +31,7 @@ export class ObtainOperationTokenDto {
   @Transform(({ value }) => (value || value === 0 ? Number(value) : null))
   readonly expiredInMinutes?: number;
 
-  @ValidateIf((o, value: Date) => value == null || Date.now() < value.getTime())
+  @ValidateIf((o, value: Date) => !value || Date.now() < value.getTime())
   @IsDate()
   @IsOptional()
   readonly expiredAt?: Date;
@@ -98,7 +98,7 @@ export class OperationTokenController {
     const { identifier } = req;
     logger.log(`get token ${r(params)}`);
     const token = await OperationTokenHelper.getTokenByToken(params.token);
-    if (token == null || token.identifier !== identifier) {
+    if (!token || token.identifier !== identifier) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'invalid operation token');
     }
     return token;

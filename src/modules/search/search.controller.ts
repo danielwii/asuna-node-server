@@ -26,7 +26,7 @@ export class SearchController {
     @Query('relations') relationsStr?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
     const repository = DBHelper.repo(model);
-    const select = parseListParam(fields, field => `${model}.${field}`);
+    const select = parseListParam(fields, (field) => `${model}.${field}`);
     const on = parseListParam(onFields);
 
     if (!on) {
@@ -35,15 +35,15 @@ export class SearchController {
 
     const where = parseWhere(whereStr);
     const order = parseOrder(model, sortStr);
-    const allRelations = repository.metadata.relations.map(r => r.propertyName);
+    const allRelations = repository.metadata.relations.map((r) => r.propertyName);
     const relations = profile === Profile.detail ? allRelations : parseListParam(relationsStr);
 
     // 处理关联条件查询
 
     const { normalWhere, relatedFields } = parseNormalWhereAndRelatedFields(where, repository);
 
-    const selectFilter = R.map(field => `${model}.${field} like :${field}`, on).join(' or ');
-    const selectParams = R.mergeAll(R.map(field => ({ [field]: `%${keywords}%` }), on));
+    const selectFilter = R.map((field) => `${model}.${field} like :${field}`, on).join(' or ');
+    const selectParams = R.mergeAll(R.map((field) => ({ [field]: `%${keywords}%` }), on));
     const query = {
       keywords,
       on,
@@ -55,7 +55,7 @@ export class SearchController {
       selectParams,
       relations,
       skip: (page - 1) * size,
-      take: +size,
+      take: Number(size),
     };
 
     // console.log({ query, relatedFields });
@@ -63,7 +63,7 @@ export class SearchController {
     const queryBuilder = repository.createQueryBuilder(model);
 
     // 依次加载对应的关联数据 TODO using DBHelper.wrapProfile
-    relatedFields.forEach(field => {
+    relatedFields.forEach((field) => {
       // console.log('[innerJoinAndSelect]', { field, model, where });
       const elementCondition = where[field] as any;
 
@@ -110,11 +110,8 @@ export class SearchController {
 
     DBHelper.wrapNormalWhere(model, queryBuilder, normalWhere);
 
-    const [items, total] = await queryBuilder
-      .take(query.take)
-      .skip(query.skip)
-      .getManyAndCount();
+    const [items, total] = await queryBuilder.take(query.take).skip(query.skip).getManyAndCount();
 
-    return { query, items, total, page: +page, size: +size };
+    return { query, items, total, page: Number(page), size: Number(size) };
   }
 }

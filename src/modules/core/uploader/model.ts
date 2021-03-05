@@ -22,9 +22,11 @@ export const UploaderTokenServiceName = {
 };
 
 export class UploaderRoot extends AggregateRoot {
+  /*
   constructor() {
     super();
   }
+*/
 
   uploadChunks(token: OperationToken, chunk: ChunkInfo) {
     this.apply(new ChunksUploadEvent(token, chunk));

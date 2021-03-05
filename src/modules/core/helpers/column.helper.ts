@@ -3,9 +3,7 @@ import { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOpt
 import { Global } from '../global';
 
 export class ColumnTypeHelper {
-  static get MONEY(): WithPrecisionColumnType {
-    return 'double precision';
-  }
+  static readonly MONEY: WithPrecisionColumnType = 'double precision';
 
   // usage: @Column({ ...ColumnTypeHelper.money(), nullable: false, default: 0 })
   static money(

@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { dirname, join, resolve } from 'path';
 

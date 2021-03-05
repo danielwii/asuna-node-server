@@ -78,17 +78,17 @@ export class CursoredPageable<T> {
   items: T[];
 }
 
-export type CursorInfo = {
+export interface CursorInfo {
   endCursor: string | number;
   hasNextPage: boolean;
-};
+}
 
-export type PageInfo = {
+export interface PageInfo {
   page: number;
   size: number;
   take: number;
   skip: number;
-};
+}
 
 export const emptyPage = <T>(pageInfo: PageInfo): Pageable<T> => ({ ...pageInfo, items: [], total: 0 });
 

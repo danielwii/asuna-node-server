@@ -6,7 +6,7 @@ export interface JsonMap {
 export interface JsonArray extends Array<AnyJson> {}
 export type Json = JsonMap | JsonArray;
 
-export type EntityMetaInfoOptions = {
+export interface EntityMetaInfoOptions {
   /**
    * ServerSide: 用于外键关联的识别名称
    */
@@ -26,7 +26,7 @@ export type EntityMetaInfoOptions = {
     name: string;
     info: STIMetaInfoOptions;
   };
-};
+}
 
 export interface MetaInfoBaseOptions {
   /**
@@ -183,21 +183,51 @@ export function EntityMetaInfo(options: EntityMetaInfoOptions): Function {
 // Conditions
 // --------------------------------------------------------------
 
-type AndCondition = { $and: Condition };
-type OrCondition = { $or: Condition };
-type LikeCondition = { $like: string };
-type NotLikeCondition = { $notLike: string };
-type AnyCondition = { $any: any[] };
-type InCondition = { $in: any[] };
-type NotInCondition = { $notIn: any[] };
-type BetweenCondition = { $between: [any, any] };
-type EqualCondition = { $eq: any };
-type LessThanCondition = { $lt: any };
-type GreatThanCondition = { $gt: any };
-type RawCondition = { $raw: any };
-type NotNullCondition = { $notNull: true };
-type IsNullCondition = { $isNull: true };
-type NotCondition = { $not: any };
+interface AndCondition {
+  $and: Condition;
+}
+interface OrCondition {
+  $or: Condition;
+}
+interface LikeCondition {
+  $like: string;
+}
+interface NotLikeCondition {
+  $notLike: string;
+}
+interface AnyCondition {
+  $any: any[];
+}
+interface InCondition {
+  $in: any[];
+}
+interface NotInCondition {
+  $notIn: any[];
+}
+interface BetweenCondition {
+  $between: [any, any];
+}
+interface EqualCondition {
+  $eq: any;
+}
+interface LessThanCondition {
+  $lt: any;
+}
+interface GreatThanCondition {
+  $gt: any;
+}
+interface RawCondition {
+  $raw: any;
+}
+interface NotNullCondition {
+  $notNull: true;
+}
+interface IsNullCondition {
+  $isNull: true;
+}
+interface NotCondition {
+  $not: any;
+}
 
 export type Condition = Partial<
   AndCondition &

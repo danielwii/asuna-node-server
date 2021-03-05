@@ -62,7 +62,7 @@ export class SavedFile extends FileInfo {
   }
 }
 
-export type ResolverOpts = {
+export interface ResolverOpts {
   filename: string;
   bucket: string;
   prefix?: string;
@@ -71,7 +71,7 @@ export type ResolverOpts = {
   jpegConfig?: JpegPipeOptions;
   // 用来解析最终地址的转化器，通常是由于域名是配置在外部，所以这里传入一个 wrapper 方法来包装一下
   resolver?: (url: string) => Promise<string>;
-};
+}
 
 export interface IStorageEngine {
   /**
@@ -79,26 +79,24 @@ export interface IStorageEngine {
    * @param file
    * @param opts
    */
-  saveEntity(file: FileInfo, opts: { bucket?: string; prefix?: string; region?: string }): Promise<SavedFile>;
+  saveEntity: (file: FileInfo, opts: { bucket?: string; prefix?: string; region?: string }) => Promise<SavedFile>;
 
-  listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]>;
+  listEntities: (opts: { bucket?: string; prefix?: string }) => Promise<SavedFile[]>;
 
-  removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void>;
+  removeEntities: (opts: { bucket?: string; prefix?: string; filename?: string }) => Promise<void>;
 
   /**
    * 如果是远程仓库，该命令应该先下载文件。然后和本地仓库一样，返回文件信息
    * @param fileInfo
    * @param toPath?   保存文件目录的一个可选项，对本地仓库来说，应该直接略过该参数
    */
-  getEntity(fileInfo: SavedFile, toPath?: string): Promise<string>;
+  getEntity: (fileInfo: SavedFile, toPath?: string) => Promise<string>;
 
   /**
    * 返回相应的 url，在包含 res 时直接通过 res 返回相应的信息
    * TODO need redesign
    */
-  resolveUrl(opts: ResolverOpts): Promise<string>;
-
-  resolveUrl(opts: ResolverOpts, res: Response): Promise<void>;
+  resolveUrl: ((opts: ResolverOpts) => Promise<string>) & ((opts: ResolverOpts, res: Response) => Promise<void>);
 }
 
 export function yearMonthStr(): string {

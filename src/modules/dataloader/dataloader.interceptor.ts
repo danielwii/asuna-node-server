@@ -1,12 +1,12 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
+import * as _ from 'lodash';
 import { LoggerFactory } from '../common/logger';
 import { JwtPayload } from '../core/auth';
 import { DefaultRegisteredLoaders } from './context';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
-import * as _ from 'lodash';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 

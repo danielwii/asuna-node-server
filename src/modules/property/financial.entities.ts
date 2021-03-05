@@ -6,7 +6,10 @@ import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.ent
 import { AbstractTransactionEntity } from './base.entities';
 import { ExchangeObject } from './exchange.entities';
 
-export type ExchangeEventPayload = { key: string; profileId: string };
+export interface ExchangeEventPayload {
+  key: string;
+  profileId: string;
+}
 
 export type FinancialTransactionEventKey = 'adminBalanceChange';
 

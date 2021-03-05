@@ -31,7 +31,7 @@ export function getIgnoreCase(o: object, key: string): any {
 
 const format = (n: string | number): string => {
   // it makes "0X"/"00"/"XX"
-  return (+n / 10).toFixed(1).replace('.', '');
+  return (Number(n) / 10).toFixed(1).replace('.', '');
 };
 
 export function formatTime(nbSeconds, hasHours = true): string {

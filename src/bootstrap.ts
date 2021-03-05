@@ -42,6 +42,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   Object.assign(options, _.merge({ loadDefaultModule: true }, options));
   validateOptions(options);
 
+  // eslint-disable-next-line
   require('events').EventEmitter.defaultMaxListeners = 15;
 
   const logger = LoggerFactory.getLogger('bootstrap');

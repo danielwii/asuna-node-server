@@ -33,8 +33,15 @@ export enum AsunaSocketEvents {
 }
 
 export type AsunaSocketViewsType = number;
-export type AsunaSocketEventsType = { event: string; data: Record<string, unknown> };
-export type AsunaSocketRoomsType = { namespace; sids; rooms };
+export interface AsunaSocketEventsType {
+  event: string;
+  data: Record<string, unknown>;
+}
+export interface AsunaSocketRoomsType {
+  namespace: any;
+  sids: any[];
+  rooms: any[];
+}
 
 @WebSocketGateway({
   namespace: 'admin',

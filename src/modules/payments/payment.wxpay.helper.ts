@@ -11,8 +11,8 @@ import { AsunaErrorCode, AsunaException, r } from '../common';
 import { LoggerFactory } from '../common/logger';
 import { AppConfigObject } from '../config/app.config';
 import { PaymentMethod } from './payment.entities';
-import { PaymentHelper } from './payment.helper';
 import { PaymentOrder } from './payment.order.entities';
+import { PaymentNotifyHelper } from './payment.notify';
 
 const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
 const chance = new Chance();
@@ -55,8 +55,8 @@ export class PaymentWxpayHelper {
           order.status = 'done';
           await order.save();
 
-          _.each(PaymentHelper.notifyHandlers, (handler) => handler(order));
-          PaymentHelper.noticePaymentOrderUser(order);
+          _.each(PaymentNotifyHelper.notifyHandlers, (handler) => handler(order));
+          PaymentNotifyHelper.noticePaymentOrderUser(order);
           return order;
         }
       });
@@ -141,6 +141,10 @@ export class PaymentWxpayHelper {
     return `${data.mweb_url}&redirect_url=${redirectUrl}`;
   }
 
+  /**
+   * FIXME not implemented
+   * @param body
+   */
   public static async validateSign(body: Record<string, string>): Promise<boolean> {
     // const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
     return true; // todo ...

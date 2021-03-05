@@ -8,6 +8,7 @@ import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { SMSVerifyCodeGuard } from '../sms/guards';
 import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
+import { PaymentNotifyHelper } from './payment.notify';
 
 class CreateOrderDTO {
   @IsString()
@@ -49,7 +50,7 @@ export class PaymentController {
     const isWxPay = _.isEmpty(body);
     const data = isWxPay ? await WeChatHelper.parseXmlToJson(req) : body;
     logger.log(`notify ${r(data)}`);
-    await PaymentHelper.handlePaymentNotify(data, isWxPay);
+    await PaymentNotifyHelper.handlePaymentNotify(data, isWxPay);
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)

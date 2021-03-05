@@ -124,26 +124,24 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (R.is(HttpException, processed)) {
       const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
       message = exceptionResponse.message;
-      body = {
-        error: {
-          httpStatus,
-          name: exceptionResponse.error,
-          code: exceptionResponse.code,
-          [key]: message,
-          // raw: processed,
-        } as AsunaException,
+      const error: Partial<AsunaException> = {
+        httpStatus,
+        name: exceptionResponse.error,
+        code: exceptionResponse.code,
+        [key]: message,
+        // raw: processed,
       };
+      body = { error };
     } else if (R.is(Error, processed) && !R.is(AsunaException, processed)) {
       message = processed.message;
-      body = {
-        error: {
-          httpStatus,
-          name: AsunaErrorCode.Unexpected__do_not_use_it.name,
-          code: processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
-          message,
-          // raw: processed,
-        } as AsunaException,
+      const error: Partial<AsunaException> = {
+        httpStatus,
+        name: AsunaErrorCode.Unexpected__do_not_use_it.name,
+        code: processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
+        message,
+        // raw: processed,
       };
+      body = { error };
     } else {
       message = processed.message;
       body = {

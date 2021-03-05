@@ -2,9 +2,8 @@ import { Promise } from 'bluebird';
 import { CacheManager } from '../cache';
 import { AsunaErrorCode, AsunaException, LoggerFactory } from '../common';
 import { r } from '../common/helpers';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { RedisLockProvider, RedisProvider } from '../providers';
-import { WeChatFieldKeys, WeChatServiceConfig, WxApi } from './wx.api';
+import { WxBaseApi } from './wx.api.common';
 
 const logger = LoggerFactory.getLogger('WxHelper');
 
@@ -13,12 +12,6 @@ enum WxKeys {
 }
 
 export class WxHelper {
-  static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_WECHAT, key: 'config' };
-
-  static async getServiceConfig(): Promise<WeChatServiceConfig> {
-    return new WeChatServiceConfig(await KvHelper.getConfigsByEnumKeys(WxHelper.kvDef, WeChatFieldKeys));
-  }
-
   static async getAccessToken(mini?: boolean): Promise<string> {
     const key = mini ? `${WxKeys.accessToken}#mini` : WxKeys.accessToken;
     const redis = RedisProvider.instance.getRedisClient('wx');
@@ -32,7 +25,7 @@ export class WxHelper {
               mini ? 'mini' : ''
             } access token will store in memory and lost when app restarted.`,
           );
-          return (await WxApi.getAccessToken({ mini })).access_token;
+          return (await WxBaseApi.getAccessToken({ mini })).access_token;
         },
         2 * 3600,
       );
@@ -45,7 +38,7 @@ export class WxHelper {
     const { results: token } = await RedisLockProvider.instance.lockProcess(
       key,
       async () => {
-        const result = await WxApi.getAccessToken({ mini });
+        const result = await WxBaseApi.getAccessToken({ mini });
         if (result.access_token) {
           logger.debug(`getAccessToken with key(${key}): ${r(result)}`);
           // 获取 token 的返回值包括过期时间，直接设置为在 redis 中的过期时间

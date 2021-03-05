@@ -5,14 +5,13 @@ import { LoggerFactory } from '../common/logger';
 import { AdminUser } from '../core/auth/auth.entities';
 import { Hermes } from '../core/bus/hermes';
 import { KeyValueType } from '../core/kv/kv.entities';
-import { KVGroupFieldsValue, KvHelper } from "../core/kv/kv.helper";
+import { KVGroupFieldsValue, KvHelper } from '../core/kv/kv.helper';
 import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
 import { CronHelper } from '../helper';
 import { WeChatController } from './wechat.controller';
 import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
-import { WeChatFieldKeys } from './wx.api';
-import { WxHelper } from './wx.helper';
+import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
 
 const logger = LoggerFactory.getLogger('WeChatModule');
 
@@ -32,7 +31,7 @@ export class WeChatModule implements OnModuleInit {
 
   async initKV(): Promise<void> {
     KvHelper.regInitializer<KVGroupFieldsValue>(
-      WxHelper.kvDef,
+      WxConfigApi.kvDef,
       {
         name: '微信配置',
         type: KeyValueType.json,

@@ -96,7 +96,7 @@ export class RedisLockProvider {
   async lockProcess<T>(
     // the string identifier for the resource you want to lock
     operation: string,
-    handler: () => Promise<T | void>,
+    handler: () => Promise<T>,
     options: {
       // the maximum amount of time you want the resource locked in milliseconds,
       // keeping in mind that you can extend the lock up until
@@ -105,7 +105,7 @@ export class RedisLockProvider {
       // waiting for lock released
       waiting?: boolean;
     },
-  ): Promise<{ exists: boolean; results: T | void }> {
+  ): Promise<{ exists: boolean; results: T }> {
     if (!this.redLock) {
       throw new Error(`can not get redLock instance, REDIS_ENABLE: ${this.isEnabled()}`);
     }
@@ -120,10 +120,10 @@ export class RedisLockProvider {
 
       if (options.waiting) {
         const exists = await waitUtil(() => this.checkLock(resource));
-        return { exists: !!exists, results: void 0 };
+        return { exists: !!exists, results: undefined };
       }
 
-      return { exists: true, results: void 0 };
+      return { exists: true, results: undefined };
     }
 
     // eslint-disable-next-line consistent-return
@@ -150,7 +150,7 @@ export class RedisLockProvider {
       },
       (err) => {
         logger.error(`get [${resource}] lock error: ${err} ${r(options)}`);
-        return { exists: false, results: void 0 };
+        return { exists: false, results: undefined };
       },
     );
   }

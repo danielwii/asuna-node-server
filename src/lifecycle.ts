@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/node';
 import * as _ from 'lodash';
 import { Promise } from 'bluebird';
 import * as fp from 'lodash/fp';
+import * as elasticApmNode from 'elastic-apm-node';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper, r } from './modules/common/helpers';
@@ -54,7 +55,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
 
     if (featuresConfig.apmEnabled) {
       logger.log(`[onInit] apm ...`);
-      const apm = require('elastic-apm-node').start({
+      const apm = elasticApmNode.start({
         // Override the service name from package.json
         // Allowed characters: a-z, A-Z, 0-9, -, _, and space
         serviceName: featuresConfig.apmServiceName,

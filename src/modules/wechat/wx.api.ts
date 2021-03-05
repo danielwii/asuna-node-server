@@ -1,25 +1,22 @@
 import { Promise } from 'bluebird';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
-import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
+import fetch from 'node-fetch';
 import ow from 'ow';
 
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
-import { deserializeSafely } from '../common/helpers';
-import { r } from '../common/helpers/utils';
 import { LoggerFactory } from '../common/logger';
 import { WxHelper } from './wx.helper';
 import {
   MiniSubscribeData,
   SubscribeMessageInfo,
   TemplateData,
-  WxAccessToken,
   WxCodeSession,
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
 import { WxUserInfo, WxUserList } from './wx.vo';
+import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 
@@ -78,7 +75,7 @@ type QrLimitScene =
       };
     };
 
-export type TemplateInfo = {
+export interface TemplateInfo {
   // 接收者 openid
   touser: string;
   // 模板ID
@@ -86,7 +83,7 @@ export type TemplateInfo = {
   data: TemplateData;
   // 模板内容字体颜色，不填默认为黑色
   color?: string;
-};
+}
 
 export type MiniAppTemplateInfo = TemplateData & {
   // 跳小程序所需数据，不需跳小程序可不用传该数据
@@ -105,7 +102,7 @@ export type UrlRedirectTemplateInfo = TemplateData & {
   url: string;
 };
 
-export type MiniSubscribeInfo = {
+export interface MiniSubscribeInfo {
   // 接收者（用户）的 openid
   touser: string;
   // 所需下发的订阅模板id
@@ -115,18 +112,18 @@ export type MiniSubscribeInfo = {
   page?: string;
   // 模板内容，格式形如 { "key1": { "value": any }, "key2": { "value": any } }
   data: MiniSubscribeData;
-};
+}
 
-type CreateQRCode = {
+interface CreateQRCode {
   // 扫码进入的小程序页面路径，最大长度 128 字节，不能为空；
   // 对于小游戏，可以只传入 query 部分，来实现传参效果，
   // 如：传入 "?foo=bar"，即可在 wx.getLaunchOptionsSync 接口中的 query 参数获取到 {foo:"bar"}。
   path: string;
   // default: 430. 二维码的宽度，单位 px。最小 280px，最大 1280px
   width?: number;
-};
+}
 
-type GetMiniCode = {
+interface GetMiniCode {
   // 是	扫码进入的小程序页面路径，最大长度 128 字节，不能为空；
   // 对于小游戏，可以只传入 query 部分，来实现传参效果，
   // 如：传入 "?foo=bar"，即可在 wx.getLaunchOptionsSync 接口中的 query 参数获取到 {foo:"bar"}。
@@ -140,32 +137,34 @@ type GetMiniCode = {
   line_color?: Record<'r' | 'g' | 'b', string>;
   // false	否	是否需要透明底色，为 true 时，生成透明底色的小程序码
   is_hyaline?: boolean;
-};
+}
 
 export type TemplateMsgInfo = TemplateInfo | MiniAppTemplateInfo | UrlRedirectTemplateInfo;
 
 export class WxApi {
-  /**
+  /*
+  /!**
    * https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
    * @param opts.mini 是否是小程序
-   */
+   *!/
   static getAccessToken = (opts?: { appId?: string; appSecret?: string; mini?: boolean }): Promise<WxAccessToken> =>
     WxApi.withConfig((config) => {
       const appId = opts?.appId || (opts.mini ? config.miniAppId : config.appId);
       const appSecret = opts?.appSecret || (opts.mini ? config.miniAppSecret : config.appSecret);
       logger.debug(`getAccessToken for app: ${appId}`);
-      return WxApi.wrappedFetch(
+      return WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/token
           ?grant_type=client_credential
           &appid=${appId}
           &secret=${appSecret}`,
       );
     });
+*/
 
   static code2Session = (code: string): Promise<WxCodeSession> => {
     ow(code, ow.string.nonEmpty);
     return WxApi.withMiniConfig((config) =>
-      WxApi.wrappedFetch(
+      WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/sns/jscode2session
         ?appid=${config.miniAppId}
         &secret=${config.miniAppSecret}
@@ -175,9 +174,9 @@ export class WxApi {
     );
   };
 
-  static getUserList = (nextOpenId: string = ''): Promise<WxUserList> =>
+  static getUserList = (nextOpenId = ''): Promise<WxUserList> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(oneLineTrim`
+      WxConfigApi.wrappedFetch(oneLineTrim`
         https://api.weixin.qq.com/cgi-bin/user/get
         ?access_token=${accessToken}
         &next_openid=${nextOpenId}`),
@@ -185,7 +184,7 @@ export class WxApi {
 
   static batchGetUserInfo = (openIds: string[]): Promise<WxUserInfo[]> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(
+      WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=${accessToken}`,
         {
           method: 'post',
@@ -201,7 +200,7 @@ export class WxApi {
    */
   static getUserInfo = (openId: string): Promise<WxUserInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(oneLineTrim`
+      WxConfigApi.wrappedFetch(oneLineTrim`
         https://api.weixin.qq.com/cgi-bin/user/info
         ?access_token=${accessToken}
         &openid=${openId}
@@ -211,13 +210,9 @@ export class WxApi {
   // 服务号发送消息
   static sendTemplateMsg = (opts: TemplateMsgInfo): Promise<WxSendTemplateInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(
+      WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`,
-        {
-          method: 'post',
-          body: JSON.stringify(opts),
-          headers: { 'Content-Type': 'application/json' },
-        },
+        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
       ),
     );
 
@@ -229,24 +224,19 @@ export class WxApi {
   static sendSubscribeMsg = (opts: MiniSubscribeInfo): Promise<SubscribeMessageInfo> =>
     WxApi.withAccessToken(
       (config, { accessToken }) =>
-        WxApi.wrappedFetch(
+        WxConfigApi.wrappedFetch(
           oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
-          {
-            method: 'post',
-            body: JSON.stringify(opts),
-            headers: { 'Content-Type': 'application/json' },
-          },
+          { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
         ),
       true,
     );
 
   static createQrTicket = (opts: QrScene | QrLimitScene): Promise<WxQrTicketInfo> =>
     WxApi.withAccessToken((config, { accessToken }) =>
-      WxApi.wrappedFetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${accessToken}`, {
-        method: 'post',
-        body: JSON.stringify(opts),
-        headers: { 'Content-Type': 'application/json' },
-      }),
+      WxConfigApi.wrappedFetch(
+        oneLineTrim`https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${accessToken}`,
+        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
+      ),
     );
 
   /**
@@ -282,40 +272,11 @@ export class WxApi {
   // call in client directly
   static getQrCodeByTicket = (ticket: string): Promise<any> =>
     WxApi.withAccessToken((config, opts) =>
-      WxApi.wrappedFetch(oneLineTrim`https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`),
+      WxConfigApi.wrappedFetch(oneLineTrim`https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${ticket}`),
     );
 
-  static wrappedFetch(url: RequestInfo, init?: RequestInit): Promise<any> {
-    return fetch(url, init)
-      .then(WxApi.logInterceptor)
-      .catch((reason) => {
-        logger.error(`fetch ${r({ url, init })} reason: ${r(reason)}`);
-        return reason;
-      });
-  }
-
-  static async logInterceptor<T extends Response>(response: T): Promise<Record<string, unknown>> {
-    const { url, status } = response;
-    const json = await response.json();
-    if (json.errcode) {
-      logger.error(`[${status}] call '${url}' error: ${r(json)}`);
-      throw new Error(`[${status}] call '${url}' response: ${r(json)}`);
-    } else {
-      logger.debug(`[${status}] call '${url}': ${r(json)}`);
-    }
-    return json;
-  }
-
-  static async withConfig<T>(call: (config: WeChatServiceConfig) => Promise<T>): Promise<T> {
-    const config = await WxHelper.getServiceConfig();
-    if (!config.enabled) {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, 'wx service config not enabled');
-    }
-    return call(config);
-  }
-
   static async withMiniConfig<T>(call: (config: WeChatServiceConfig) => Promise<T>): Promise<T> {
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     if (!config.miniEnabled) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'wx mini app config not enabled');
     }
@@ -326,40 +287,8 @@ export class WxApi {
     fn: (config: WeChatServiceConfig, opts: { accessToken: string }) => Promise<T>,
     mini?: boolean,
   ): Promise<T> {
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     const accessToken = await WxHelper.getAccessToken(mini);
     return fn(config, { accessToken });
   }
-}
-
-export class WeChatServiceConfig {
-  @IsBoolean() @IsOptional() login?: boolean;
-  @IsBoolean() @IsOptional() saveToAdmin?: boolean;
-
-  @IsBoolean() @IsOptional() enabled?: boolean;
-  @IsString() @IsOptional() token?: string;
-  @IsString() @IsOptional() appId?: string;
-  @IsString() @IsOptional() appSecret?: string;
-
-  @IsBoolean() @IsOptional() miniEnabled?: boolean;
-  @IsString() @IsOptional() miniAppId?: string;
-  @IsString() @IsOptional() miniAppSecret?: string;
-
-  constructor(o: WeChatServiceConfig) {
-    Object.assign(this, deserializeSafely(WeChatServiceConfig, o));
-  }
-}
-
-export enum WeChatFieldKeys {
-  login = 'wechat.login',
-  saveToAdmin = 'wechat.save-to-admin',
-
-  enabled = 'service.enabled',
-  token = 'service.token',
-  appId = 'service.appid',
-  appSecret = 'service.appsecret',
-
-  miniEnabled = 'mini.enabled',
-  miniAppId = 'mini.appid',
-  miniAppSecret = 'mini.appsecret',
 }

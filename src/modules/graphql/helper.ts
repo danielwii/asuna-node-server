@@ -55,32 +55,32 @@ interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
   query: CategoryInputQuery;
 }
 
-type BaseResolveProperty<Entity extends BaseEntity> = {
+interface BaseResolveProperty<Entity extends BaseEntity> {
   cls: ClassType<Entity>;
   instance: Entity;
   key: keyof Entity;
   cache?: boolean | number;
-};
+}
 
-type BaseResolvePropertyWithMapper<
+interface BaseResolvePropertyWithMapper<
   Entity extends BaseEntity,
   RelationEntity extends BaseEntity,
   MixedRelationEntity
-> = {
+> {
   cls: ClassType<Entity>;
   instance: Entity;
   key: keyof Entity;
   cache?: boolean | number;
   mapper: (item: RelationEntity) => MixedRelationEntity | Promise<MixedRelationEntity>;
-};
+}
 
-type ResolvePropertyByTarget<RelationEntity extends BaseEntity> = {
+interface ResolvePropertyByTarget<RelationEntity extends BaseEntity> {
   targetCls: ClassType<RelationEntity>;
-};
+}
 
-type ResolvePropertyByLoader<RelationEntity extends BaseEntity> = {
+interface ResolvePropertyByLoader<RelationEntity extends BaseEntity> {
   loader: DataLoaderFunction<RelationEntity>;
-};
+}
 
 export class GraphqlHelper {
   static resolveOrder<Entity extends BaseEntity>(

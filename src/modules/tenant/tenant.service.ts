@@ -6,7 +6,7 @@ import { AsunaExceptionHelper, AsunaExceptionTypes, LoggerFactory, PrimaryKey, r
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
 import { WeChatUser } from '../wechat/wechat.entities';
-import { WxHelper } from '../wechat/wx.helper';
+import { WxConfigApi } from '../wechat/wx.api.config';
 import { OrgUser, Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
 
@@ -48,7 +48,7 @@ export class TenantService {
     }
 
     // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     if (config.enabled && config.saveToAdmin) {
       const weChatUser = await WeChatUser.findOne({ admin: user });
       if (weChatUser) {

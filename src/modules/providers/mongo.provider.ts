@@ -15,14 +15,14 @@ export class MongoProvider {
         if (!configObject.enable) {
           throw new Error('mongo not enabled');
         }
-        const options = {
+        const options: MongooseModuleOptions = {
           uri,
           connectionFactory: (connection) => {
-            // eslint-disable-next-line global-require,@typescript-eslint/no-var-requires
+            // eslint-disable-next-line
             connection.plugin(require('mongoose-autopopulate'));
             return connection;
           },
-        } as MongooseModuleOptions;
+        };
         logger.log(`init by ${r(options)}`);
         return options;
       },

@@ -3,6 +3,8 @@ import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { AbstractTransactionEntity } from './base.entities';
+import { EntityConstructorObject } from '../base';
+import { deserializeSafely } from '../common';
 
 export const HermesPointChangeEventKeys = { pointsChange: 'user.points.change' };
 
@@ -11,14 +13,23 @@ export const HermesPointChangeEventKeys = { pointsChange: 'user.points.change' }
  */
 @EntityMetaInfo({ name: 'point_exchanges', internal: true })
 @Entity('property__t_point_exchanges')
-export class PointExchange extends InjectMultiUserProfile(AbstractTransactionEntity) {
+export class PointExchange<Body = any> extends InjectMultiUserProfile(AbstractTransactionEntity) {
+  constructor(o: EntityConstructorObject<PointExchange>) {
+    super();
+    Object.assign(this, deserializeSafely(PointExchange, o as any));
+  }
+
+  static of(o?: EntityConstructorObject<Partial<PointExchange>>): PointExchange {
+    return o as PointExchange;
+  }
+
   @MetaInfo({ name: '变化类别', accessible: 'readonly' })
   @Column('varchar', { nullable: false, length: 50, name: 'type' })
   public type: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
-  public body: any;
+  public body: Body;
 
   // --------------------------------------------------------------
   // Relations

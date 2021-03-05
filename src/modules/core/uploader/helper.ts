@@ -1,7 +1,7 @@
 import { plainToClass, Transform } from 'class-transformer';
 import { IsInt, IsString, Min } from 'class-validator';
 import { addMonths } from 'date-fns';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { r, sha1 } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { OperationToken, OperationTokenHelper } from '../token';
@@ -26,9 +26,7 @@ export class ChunksUploadPayload {
   totalChunks: number;
 
   constructor(o: ChunksUploadPayload) {
-    if (o == null) {
-      return;
-    }
+    if (!o) return;
 
     Object.assign(this, plainToClass(ChunksUploadPayload, o, { enableImplicitConversion: true }), {
       finished: o.finished || new Array(o.totalChunks).fill(0),

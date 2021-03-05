@@ -11,7 +11,10 @@ export interface JpegParam {
   progressive?: boolean;
 }
 
-export type JpegPipeOptions = { opts?: JpegParam; param?: string };
+export interface JpegPipeOptions {
+  opts?: JpegParam;
+  param?: string;
+}
 
 /**
  * jpeg 专用的配置信息处理器
@@ -27,7 +30,7 @@ export class JpegPipe implements PipeTransform {
     try {
       if (param.includes('/')) {
         const params = param.split('/')[1].split('_');
-        [jpegParam.quality, jpegParam.progressive] = [+params[0] || 75, !(params[1] === 'baseline')];
+        [jpegParam.quality, jpegParam.progressive] = [Number(params[0]) || 75, !(params[1] === 'baseline')];
         logger.log(r({ value, metatype, param, params, jpegParam }));
         return { opts: jpegParam, param };
       }

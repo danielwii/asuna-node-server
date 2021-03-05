@@ -23,7 +23,6 @@ import { AdminWsHelper } from '../ws';
 import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
-import { WxHelper } from './wx.helper';
 import {
   GetPhoneNumber,
   MiniSubscribeData,
@@ -35,6 +34,7 @@ import {
 } from './wx.interfaces';
 import { WxUserInfo } from './wx.vo';
 import { AppConfigObject } from '../config/app.config';
+import { WxConfigApi } from './wx.api.config';
 
 const logger = LoggerFactory.getLogger('WeChatHelper');
 
@@ -157,7 +157,7 @@ export class WeChatHelper {
   public static noticeKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'wechat.notice' };
 
   public static async checkSignature(opts: { signature: string; timestamp: string; nonce: string }): Promise<boolean> {
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     const validation = [config.token, opts.timestamp, opts.nonce].sort().join('');
     const hashCode = crypto.createHash('sha1');
     const result = hashCode.update(validation, 'utf8').digest('hex');
@@ -181,7 +181,7 @@ export class WeChatHelper {
   }
 
   public static async syncAdminUsers(): Promise<void> {
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
       const BATCH_SIZE = AppConfigObject.load().batchSize;
@@ -214,7 +214,7 @@ export class WeChatHelper {
   public static async handleEvent(
     message: WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage,
   ): Promise<string> {
-    const config = await WxHelper.getServiceConfig();
+    const config = await WxConfigApi.getServiceConfig();
     logger.log(`handle message ${r(message)}`);
 
     if (message.MsgType === 'event' && message.Event === 'subscribe') {

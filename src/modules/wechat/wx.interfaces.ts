@@ -29,14 +29,14 @@ export enum WxSubscribeSceneType {
     }
 }
  */
-export type GetPhoneNumber = {
+export interface GetPhoneNumber {
   // 用户绑定的手机号（国外手机号会有区号）
   phoneNumber: string;
   // 没有区号的手机号
   purePhoneNumber: string;
   // 区号
   countryCode: string;
-};
+}
 
 export interface WxAccessToken {
   access_token: string;
@@ -86,7 +86,7 @@ export interface WxSendTemplateInfo {
   msgid: number;
 }
 
-export type TemplateData = {
+export interface TemplateData {
   first: {
     value: string;
     color: string;
@@ -111,9 +111,9 @@ export type TemplateData = {
     value: string;
     color: string;
   };
-};
+}
 
-export type MiniSubscribeData = {
+export interface MiniSubscribeData {
   phrase1?: {
     value: string;
   };
@@ -141,9 +141,9 @@ export type MiniSubscribeData = {
   date3?: {
     value: string;
   };
-};
+}
 
-export type SubscribeMessageInfo = {
+export interface SubscribeMessageInfo {
   // 错误码   0 是正常
   // 40003 touser字段openid为空或者不正确
   // 40037 订阅模板id为空不正确
@@ -153,4 +153,4 @@ export type SubscribeMessageInfo = {
   errcode: number;
   // 错误信息
   errmsg: string;
-};
+}

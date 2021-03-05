@@ -5,9 +5,8 @@ import { plainToClass, Transform } from 'class-transformer';
 import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import highland from 'highland';
-import * as _ from 'lodash';
-import * as path from 'path';
-import { join } from 'path';
+import _ from 'lodash';
+import { join, dirname } from 'path';
 import { AsunaErrorCode, AsunaException } from '../../common';
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
@@ -136,7 +135,7 @@ export class UploaderService {
     logger.verbose(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
       await Promise.all(chunks.map((chunk) => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
-      (name) => +name.slice(name.lastIndexOf('.') + 1),
+      (name) => Number(name.slice(name.lastIndexOf('.') + 1)),
     );
     const tempDirectory = join(Global.tempPath, 'chunks', payload.fingerprint);
 
@@ -150,7 +149,7 @@ export class UploaderService {
 
     await new Promise((resolve) => {
       writableStream.on('close', () => {
-        const directory = path.dirname(filepaths[0]);
+        const directory = dirname(filepaths[0]);
         logger.log(`merge file done: ${dest}, clean chunks in ${directory} ...`);
         resolve();
         // fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
