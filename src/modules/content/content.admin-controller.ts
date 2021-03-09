@@ -89,12 +89,13 @@ export class ContentAdminController {
   async getDrafts(@Query() query: GetDraftsQuery, @Req() req: AnyAuthRequest): Promise<Draft[]> {
     const { roles, tenant } = req;
     const rolesStr = _.map(roles, fp.get('name'));
-    const drafts = await Draft.find(query);
-    if (!drafts) {
-      throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid operation`);
-    }
+
     const filteredRoles = await AccessControlHelper.filterRoles(rolesStr);
     logger.log(`get drafts ${r({ query, roles, rolesStr, filteredRoles })}`);
+    if (_.isEmpty(filteredRoles)) {
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'role not included in ac');
+    }
+
     const permission = AccessControlHelper.ac.can(filteredRoles).create(query.type);
     const permissionAny = AccessControlHelper.ac.can(filteredRoles).createAny(query.type);
     const permissionOwn = AccessControlHelper.ac.can(filteredRoles).createOwn(query.type);
@@ -105,6 +106,11 @@ export class ContentAdminController {
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
+    }
+
+    const drafts = await Draft.find(query);
+    if (!drafts) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid operation`);
     }
 
     return drafts;
