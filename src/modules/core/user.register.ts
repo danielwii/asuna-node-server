@@ -24,7 +24,7 @@ export class UserRegister {
 
     this.Entity = Entity;
     this.onProfileCreate =
-      onProfileCreate ||
+      onProfileCreate ??
       ((profile) => {
         const entity = _.has(Entity, 'of')
           ? Entity.of({ id: profile.id, profile })
@@ -32,7 +32,7 @@ export class UserRegister {
         logger.debug(`onProfileCreate save ${r({ profile, entity })}`);
         return DBHelper.repo(Entity).save(entity as any);
       });
-    this.onProfileDelete = onProfileDelete || ((profile) => DBHelper.repo(Entity).delete(profile.id));
+    this.onProfileDelete = onProfileDelete ?? ((profile) => DBHelper.repo(Entity).delete(profile.id));
   }
 
   static createUserByProfile(profile: UserProfile): Promise<any> {

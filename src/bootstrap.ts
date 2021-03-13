@@ -85,7 +85,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   logger.log('create app ...');
 
   const { dbType } = Global;
-  if (['mysql56', 'mysql57'].includes(dbType)) {
+  if (['mysql56', 'mysql57', 'mysql8'].includes(dbType)) {
     logger.log('🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA={"charset": "utf8mb4_unicode_ci"}');
     process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
   }
