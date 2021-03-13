@@ -3,7 +3,7 @@ import { Response } from 'express';
 import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
 import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
-import { join } from 'path';
+import { join, extname } from 'path';
 import sharp from 'sharp';
 import { LoggerFactory } from '../../common/logger';
 import { Global } from '../global';
@@ -99,13 +99,14 @@ export class LocalStorage implements IStorageEngine {
       throw new AsunaException(AsunaErrorCode.NotFound);
     }
 
+    const fileExt = extname(filename);
     const type = mime.lookup(filename);
     if (!type) {
       // 无法识别的文件类型，直接返回
       res.contentType('application/octet-stream').sendFile(fullFilePath);
       return;
     }
-    const ext = mime.extension(type);
+    const ext = thumbnailConfig.opts.format ?? mime.extension(type);
     if (!ext) {
       // 无法识别的文件格式，直接返回
       res.contentType('application/octet-stream').sendFile(fullFilePath);
@@ -119,7 +120,7 @@ export class LocalStorage implements IStorageEngine {
       res.type(ext).sendFile(fullFilePath);
     } else if (type.startsWith('image/')) {
       // const ext = _.last(fullFilePath.split('.'));
-      const fullFileDir = fullFilePath.slice(0, -1 - ext.length);
+      const fullFileDir = fullFilePath.slice(0, -fileExt.length);
       let outputFilename = 'compressed';
       if (thumbnailConfig.param) {
         outputFilename += `@${thumbnailConfig.param.replace('/', ':')}`;
@@ -127,10 +128,14 @@ export class LocalStorage implements IStorageEngine {
       if (jpegConfig.param) {
         outputFilename += `@${jpegConfig.param.replace('/', ':')}`;
       }
-      const outputPath = `${fullFileDir}/${outputFilename}.${ext}`;
+      const outputPath = thumbnailConfig.opts.format
+        ? `${fullFileDir}/${outputFilename}`
+        : `${fullFileDir}/${outputFilename}.${ext}`;
+
+      logger.log(`resolve file ${r({ fullFilePath, fullFileDir, outputFilename, fileExt, ext, outputPath })}`);
 
       logger.log(`check file type '${ext}' for '${outputPath}'`);
-      if (!['png', 'jpg', 'jpeg'].includes(ext)) {
+      if (!['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
         if (fs.existsSync(outputPath)) {
           logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
           res.type(ext).sendFile(fullFilePath);
@@ -151,18 +156,21 @@ export class LocalStorage implements IStorageEngine {
       const imageProcess = sharp(fullFilePath);
       if (thumbnailConfig.opts) {
         logger.debug(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
-        imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, {
-          fit: thumbnailConfig.opts.fit,
-        });
+        imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, { fit: thumbnailConfig.opts.fit });
       }
-      if (['jpg', 'jpeg'].includes(ext)) {
+
+      if (ext !== 'webp') {
+        imageProcess.webp();
+      } else if (['jpg', 'jpeg'].includes(ext)) {
         imageProcess.jpeg(jpegConfig.opts);
       }
+
       imageProcess.toFile(outputPath, (err, info) => {
         if (err) {
           logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
           throw new AsunaException(AsunaErrorCode.NotFound, err.message);
         } else {
+          // logger.log(`convert file ${r(info)}`);
           res.type(ext).sendFile(outputPath);
         }
       });

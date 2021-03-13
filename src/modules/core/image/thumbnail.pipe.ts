@@ -11,6 +11,7 @@ export interface ThumbnailParam {
   width?: number;
   height?: number;
   fit?: keyof FitEnum;
+  format?: 'webp';
 }
 
 export interface ThumbnailPipeOptions {
@@ -28,12 +29,14 @@ export class ThumbnailPipe implements PipeTransform {
     }
     try {
       if (param.includes('/')) {
-        const params = param.split('/')[1].split('_');
+        const format = param.split('/')[1].split('.')[1];
+        const params = param.split('/')[1].split('.')[0].split('_');
         thumbnail.fit = ['cover', 'contain', 'fill', 'inside', 'outside'].includes(params[1])
           ? (params[1] as any)
           : null;
+        thumbnail.format = format as any;
         [thumbnail.width, thumbnail.height] = params[0].split('x').map((val) => (val ? _.toNumber(val) : null));
-        logger.log(r({ value, metatype, param, thumbnail }));
+        logger.log(r({ value, metatype, param, params, thumbnail }));
         return { opts: thumbnail, param };
       }
     } catch (error) {
