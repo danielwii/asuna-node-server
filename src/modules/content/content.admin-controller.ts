@@ -120,7 +120,7 @@ export class ContentAdminController {
   async publishDraft(@Param('id') id: string, @Req() req: AnyAuthRequest): Promise<void> {
     const { roles, tenant } = req;
     const rolesStr = _.map(roles, fp.get('name'));
-    const draft = await Draft.findOneOrFail(id);
+    const draft = await Draft.findOneOrFail({ id });
     if (!draft) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid operation`);
     }

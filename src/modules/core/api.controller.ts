@@ -8,6 +8,9 @@ import { AppEnv } from './app.env';
 import { r } from '../common/helpers/utils';
 import { ClientHelper } from '../client/helper';
 
+import { ConfigKeys, configLoader } from "../config";
+import { AsunaErrorCode, AsunaException } from "../common";
+
 import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('ApiController');
@@ -59,6 +62,9 @@ export class ApiController {
 
   @Post('v1/reg-device')
   public async regDevice(@Req() req: RequestInfo) {
+    if (!configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
+      throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'COOKIE_SUPPORT needed.')
+    }
     const device = await ClientHelper.reg(req);
     logger.log(`reg device ${r(device)}`);
   }

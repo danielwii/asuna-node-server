@@ -34,6 +34,7 @@ export const AsunaErrorCode = {
   Duplicate: new NameValue('Duplicate', 409),
   TooManyRequests: new NameValue('Too Many Requests', 429),
   Unprocessable: new NameValue('Unprocessable', 422),
+  FeatureDisabled: new NameValue('FeatureDisabled', 422),
 
   /**
    * use specific errors instead

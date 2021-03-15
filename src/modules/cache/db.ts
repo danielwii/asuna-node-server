@@ -1,7 +1,7 @@
 import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 
-import { fnResolve, parseJSONIfCould, promisify, r } from '../common/helpers';
+import { fnResolve, parseJSONIfCould, promisify, r, TimeUnit } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { RedisProvider } from '../providers';
 import { CacheManager } from './cache';
@@ -118,7 +118,7 @@ export class InMemoryDB {
         // update
         await promisify(redis.client.setex, redis.client)(
           keyStr,
-          options?.expiresInSeconds ?? CacheTTL.LONG_24,
+          options?.expiresInSeconds ?? TimeUnit.MILLIS.toSeconds(CacheTTL.LONG_24),
           _.isString(resolved) ? resolved : JSON.stringify(resolved),
         );
       } else {

@@ -6,7 +6,7 @@ import * as R from 'ramda';
 import { Cryptor } from 'node-buffs';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 
-import { formatTime, r } from '../../common/helpers';
+import { formatTime, r, TimeUnit } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
 import { ConfigKeys, configLoader } from '../../config';
 
@@ -17,6 +17,7 @@ import type { PrimaryKey } from '../../common';
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
 import type { Constructor } from '../../base';
 import type { CreatedUser } from './auth.service';
+import ow from 'ow';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -43,10 +44,21 @@ export class TokenHelper {
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  public static async createToken(user: AuthUser, extra?: { uid?: string }): Promise<CreatedToken> {
+  public static async createSessionToken(clientUser, extra?: { sessionId?: string; uid?: string }) {
+    const expiresIn = TimeUnit.DAYS.toSeconds(1);
+    const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
+    const payload: Omit<Partial<JwtPayload>, 'iat' | 'exp'> = { type: 'SessionToken', ...extra };
+    logger.log(`sign payload ${r(payload)}`);
+    const token = jwt.sign(payload, secretOrKey, { expiresIn });
+    return { expiresIn, accessToken: token };
+  }
+
+  public static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
+    ow(user, 'user', ow.string.nonEmpty);
+
     const type = _.get(user, 'constructor.name');
     logger.log(`createToken >> ${r({ user, extra, type })}`);
-    const expiresIn = 60 * 60 * 24 * 30; // one month
+    const expiresIn = TimeUnit.DAYS.toSeconds(30); // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       id: `${user.id}`,

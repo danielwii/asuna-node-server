@@ -107,6 +107,8 @@ export class AdminInternalModule implements NestModule, OnModuleInit {
     if (configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       consumer.apply(DeviceMiddleware).forRoutes('*');
       consumer.apply(LandingUrlMiddleware).forRoutes('*');
+    } else {
+      logger.warn(`COOKIE_SUPPORT disabled, device and landing middleware will not work.`);
     }
   }
 

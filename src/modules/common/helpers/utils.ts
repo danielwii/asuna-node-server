@@ -183,3 +183,41 @@ export const noNullFilter = <T>(source: Partial<T>) => {
   // logger.log(`[noNullFilter] ${r({ source, noNullSource, predicate })}`);
   return fp.filter<T>(predicate);
 };
+
+export const TimeUnit = {
+  MILLIS: {
+    toMillis: (value: number) => value,
+    toSeconds: (value: number) => _.floor(value / 1000),
+    toMinutes: (value: number) => _.floor(value / (60 * 1000)),
+    toHours: (value: number) => _.floor(value / (60 * 60 * 1000)),
+    toDays: (value: number) => _.floor(value / (60 * 60 * 24 * 1000)),
+  },
+  SECONDS: {
+    toMillis: (value: number) => value * 1000,
+    toSeconds: (value: number) => value,
+    toMinutes: (value: number) => _.floor(value / 60),
+    toHours: (value: number) => _.floor(value / (60 * 60)),
+    toDays: (value: number) => _.floor(value / (60 * 60 * 24)),
+  },
+  MINUTES: {
+    toMillis: (value: number) => value * 1000 * 60,
+    toSeconds: (value: number) => value * 60,
+    toMinutes: (value: number) => value,
+    toHours: (value: number) => _.floor(value / 60),
+    toDays: (value: number) => _.floor(value / (60 * 24)),
+  },
+  HOURS: {
+    toMillis: (value: number) => value * 60 * 60 * 1000,
+    toSeconds: (value: number) => value * 60 * 60,
+    toMinutes: (value: number) => value * 60,
+    toHours: (value: number) => value,
+    toDays: (value: number) => _.floor(value / 24),
+  },
+  DAYS: {
+    toMillis: (value: number) => value * 60 * 60 * 1000 * 24,
+    toSeconds: (value: number) => value * 60 * 60 * 24,
+    toMinutes: (value: number) => value * 60 * 24,
+    toHours: (value: number) => value * 24,
+    toDays: (value: number) => value,
+  },
+};
