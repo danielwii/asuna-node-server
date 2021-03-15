@@ -1,4 +1,5 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import _ from 'lodash';
 import createAdapter, { RedisAdapter } from 'socket.io-redis';
 
 import { r } from '../common/helpers';
@@ -42,8 +43,40 @@ export class RedisIoAdapter extends IoAdapter {
     }
   }
 
+  create(port: number, options: any = {}): any {
+    logger.log(`create ${r({ port, options: _.omit(options, 'server') })}`);
+    return super.create(port, {
+      ...options,
+      handlePreflightRequest: (req, res) => {
+        const headers = {
+          'Access-Control-Allow-Headers': 'Content-Type, authorization, x-token',
+          'Access-Control-Allow-Origin': req.headers.origin,
+          'Access-Control-Allow-Credentials': true,
+          'Access-Control-Max-Age': '1728000',
+          'Content-Length': '0',
+        };
+        res.writeHead(200, headers);
+        res.end();
+      },
+    });
+  }
+
   createIOServer(port: number, options?: any): any {
-    const server = super.createIOServer(port, options);
+    logger.log(`createIOServer ${r({ port, options })}`);
+    const server = super.createIOServer(port, {
+      ...options,
+      handlePreflightRequest: (req, res) => {
+        const headers = {
+          'Access-Control-Allow-Headers': 'Content-Type, authorization, x-token',
+          'Access-Control-Allow-Origin': req.headers.origin,
+          'Access-Control-Allow-Credentials': true,
+          'Access-Control-Max-Age': '1728000',
+          'Content-Length': '0',
+        };
+        res.writeHead(200, headers);
+        res.end();
+      },
+    });
     server.adapter(RedisIoAdapter.redisAdapter);
     return server;
   }

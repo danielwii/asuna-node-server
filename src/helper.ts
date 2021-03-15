@@ -114,7 +114,9 @@ export function resolveTypeormPaths(options?: BootstrapOptions): void {
   const currentSuffix = extname(require.main.filename).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
   const entities = _.uniq([
+    // fixme remove first later
     `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
+    `${resolve(packageDir, '../..')}/**/*entities.${suffix}`,
     `${resolve(packageDir)}/**/*entities.${suffix}`,
     `${resolve(rootDir)}/**/*entities.${currentSuffix}`,
     ...(options?.typeormEntities || []),

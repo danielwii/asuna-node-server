@@ -36,6 +36,7 @@ import './typeorm.fixture';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
+import { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
@@ -104,7 +105,15 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   // setup application
   // --------------------------------------------------------------
 
-  app.enableCors({ credentials: true, origin: true });
+  const corsOptions: CorsOptions | CorsOptionsDelegate<any> = {
+    credentials: true,
+    origin: true,
+    // origin: '*',
+    // allowedHeaders: '*',
+    // methods: '*',
+  };
+  logger.log(`setup cors ${r(corsOptions)}`);
+  app.enableCors(corsOptions);
 
   // see https://expressjs.com/en/guide/behind-proxies.html
   // 设置以后，req.ips 是 ip 数组；如果未经过代理，则为 []. 若不设置，则 req.ips 恒为 []
@@ -144,7 +153,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
         strict-origin-when-cross-origin	于同源的请求，会发送完整的URL作为引用地址；在同等安全级别的情况下，发送文件的源作为引用地址(HTTPS->HTTPS)；在降级的情况下不发送此报头 (HTTPS->HTTP)。
         unsafe-url	无论是同源请求还是非同源请求，都发送完整的 URL（移除参数信息之后）作为引用地址。
          */
-        policy: 'no-referrer-when-downgrade',
+        policy: 'unsafe-url',
       },
     }),
   );
