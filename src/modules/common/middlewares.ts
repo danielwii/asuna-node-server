@@ -26,11 +26,23 @@ export class DeviceMiddleware implements NestMiddleware {
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies = req.signedCookies;
-    const hasDevice = !!cookies?.deviceId;
-    this.logger.debug(`cookies is ${r({ cookies, session: req.session, hasDevice })}`);
-    if (!hasDevice) {
+    const sessionID = req.sessionID;
+    const deviceId = req.session.deviceId ?? cookies?.deviceId;
+    // const hasDevice = !!deviceId;
+    this.logger.log(`cookies is ${r({ cookies, session: req.session, deviceId, sessionID })}`);
+    if (!cookies?.deviceId && req.session.deviceId) {
+      req.virtualDevice = await VirtualDevice.findOne({ id: deviceId });
+      this.logger.log(`reset device id to cookie ${deviceId}`);
+      res.cookie('deviceId', deviceId, {
+        signed: true,
+        httpOnly: true,
+        maxAge: 10 * 365 * 24 * 60 * 60 * 1000,
+        sameSite: 'none',
+        secure: true,
+      });
+    } else if (!cookies?.deviceId) {
       const id = SimpleIdGeneratorHelper.randomId('vd');
-      this.logger.debug(`set device id ${id}`);
+      this.logger.log(`set device id ${id}`);
       res.cookie('deviceId', id, {
         signed: true,
         httpOnly: true,
@@ -40,16 +52,18 @@ export class DeviceMiddleware implements NestMiddleware {
       });
       req.session.deviceId = id;
     }
-    if (hasDevice && !req.session.deviceId) {
+    if (deviceId && !req.session.deviceId) {
       req.session.deviceId = cookies.deviceId;
     }
-    if (!req.virtualSession) {
-      req.virtualSession = await VirtualSession.findOne(req.sessionID);
+    if (!req.virtualSession && sessionID) {
+      this.logger.log(`set virtualSession by id ${sessionID}`);
+      req.virtualSession = await VirtualSession.findOne({ id: sessionID });
     }
-    if (!req.virtualDevice) {
-      req.virtualDevice = await VirtualDevice.findOne(req.session.deviceId);
+    if (!req.virtualDevice && req.session.deviceId) {
+      this.logger.log(`set virtualDevice by id ${req.session.deviceId}`);
+      req.virtualDevice = await VirtualDevice.findOne({ id: req.session.deviceId });
     }
-    res.set('X-Session-ID', req.sessionID);
+    res.set('X-Session-ID', sessionID);
     next();
   }
 }

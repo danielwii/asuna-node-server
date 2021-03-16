@@ -17,12 +17,12 @@ export class ClientHelper {
     let device: VirtualDevice;
     let session: VirtualSession;
     await getManager().transaction(async (manager) => {
-      device = await VirtualDevice.findOne(req.session.deviceId);
+      device = await VirtualDevice.findOne({ id: req.session.deviceId });
       if (!device) {
         device = await manager.save(new VirtualDevice({ id: req.session.deviceId }));
       }
 
-      session = await VirtualSession.findOne(req.sessionID);
+      session = await VirtualSession.findOne({ id: req.sessionID });
       if (!session) {
         session = await manager.save(
           new VirtualSession({ id: req.sessionID, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
@@ -39,6 +39,13 @@ export class ClientHelper {
       throw new Error('get session user by profileId is not implemented');
     }
     return SessionUser.find({ deviceId });
+  }
+
+  public static async getSessionUsersBySession(profileId: string, sessionId: string): Promise<SessionUser[]> {
+    if (profileId) {
+      throw new Error('get session user by profileId is not implemented');
+    }
+    return SessionUser.find({ sessionId });
   }
 
   public static async getSessionUser(

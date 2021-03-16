@@ -11,6 +11,8 @@ import * as JSON5 from 'json5';
 import { Between, FindOperator } from 'typeorm';
 import { inspect } from 'util';
 
+import type { FindConditions } from 'typeorm/find-options/FindConditions';
+
 export const isProductionEnv = process.env.NODE_ENV === 'production';
 export const isTestEnv = process.env.NODE_ENV === 'test';
 
@@ -220,4 +222,11 @@ export const TimeUnit = {
     toHours: (value: number) => value * 24,
     toDays: (value: number) => value,
   },
+};
+
+export const condition = <Entity>(
+  nilProtected: FindConditions<Entity>,
+  nil?: FindConditions<Entity>,
+): FindConditions<Entity> => {
+  return _.assign({}, _.pickBy(nilProtected, _.identity), nil);
 };

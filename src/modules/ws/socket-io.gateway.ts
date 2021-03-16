@@ -67,14 +67,14 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
         if (this.server) {
           const rooms = {
             namespace: this.server.sockets.name,
-            sids: this.server.sockets._ids,
-            rooms: this.server.sockets._rooms,
+            // sids: this.server.sockets._ids,
+            // rooms: this.server.sockets._rooms,
           };
           this.server.volatile.emit('views', { count: this.views, rooms });
           logger.debug(`clients: ${r(rooms)}`);
 
-          const id = _.head(_.keys(this.server.sockets._ids));
-          this.server.to(id).emit('first', 'hello world');
+          // const id = _.head(_.keys(this.server.sockets._ids));
+          // this.server.to(id).emit('first', 'hello world');
         }
       }
     }, 2000);

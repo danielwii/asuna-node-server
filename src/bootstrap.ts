@@ -159,16 +159,30 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   );
   app.use(compression());
 
-  const sessionRedis = RedisProvider.instance.getRedisClient('session');
+  const sessionRedis = RedisProvider.instance.getRedisClient('session', 2);
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({
+      // name 返回客户端的key的名称，默认为sess.sid,也可以自己设置。
+      name: 'sess.id',
       store: sessionRedis.isEnabled
         ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
         : new session.MemoryStore(),
+      // 一个String类型的字符串，作为服务器端生成session的签名。
       secret,
-      resave: false,
-      // cookie: { secure: true },
+      // (是否允许)当客户端并行发送多个请求时，其中一个请求在另一个请求结束时对session进行修改覆盖并保存。
+      // 默认为true。但是(后续版本)有可能默认失效，所以最好手动添加。
+      resave: true,
+      // 设置返回到前端key的属性，默认值为{ path: ‘/', httpOnly: true, secure: false, maxAge: null } 。
+      /*
+        secure - 确保浏览器只通过 HTTPS 发送 cookie。
+        httpOnly - 确保 cookie 只通过 HTTP(S)（而不是客户机 JavaScript）发送，这有助于防御跨站点脚本编制攻击。
+        domain - 表示 cookie 的域；用于和请求 URL 的服务器的域进行比较。如果匹配，那么接下来检查路径属性。
+        path - 表示 cookie 的路径；用于和请求路径进行比较。如果路径和域都匹配，那么在请求中发送 cookie。
+        expires - 用于为持久性 cookie 设置到期日期。
+       */
+      cookie: { path: '/', httpOnly: true, secure: true, /*domain: '*',*/ maxAge: null, sameSite: 'none' },
+      // 初始化session时是否保存到存储。默认为true， 但是(后续版本)有可能默认失效，所以最好手动添加。
       saveUninitialized: true,
       genid: () => SimpleIdGeneratorHelper.randomId('se'),
     }),
