@@ -159,7 +159,7 @@
     "@types/highland": "^2.12.12",
     "@types/jaeger-client": "^3.15.4",
     "@types/jest": "^26.0.20",
-    "@types/jsonwebtoken": "^8.5.0",
+    "@types/jsonwebtoken": "^8.5.1",
     "@types/lodash": "^4.14.168",
     "@types/lru-cache": "^5.1.0",
     "@types/luxon": "^1.26.2",

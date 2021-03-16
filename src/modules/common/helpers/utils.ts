@@ -62,7 +62,7 @@ export function toHHMMSS(num: string): string {
 
 export const safeStringify = (obj, indent = 2) => {
   let cache = [];
-  const retVal = JSON.stringify(
+  const retVal = JSON5.stringify(
     obj,
     (key, value) =>
       typeof value === 'object' && value !== null
@@ -84,7 +84,7 @@ export function r(
     return o;
   }
   const value = transform || stringify ? classToPlain(o) : o;
-  return isProductionEnv || stringify ? safeStringify(value) : inspect(value, { colors: true, depth: depth ?? 5 });
+  return isProductionEnv || stringify ? safeStringify(value, 0) : inspect(value, { colors: true, depth: depth ?? 5 });
 }
 
 /**

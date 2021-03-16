@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
 import * as _ from 'lodash';
-import { Connection, Repository } from 'typeorm';
+import { EntityTarget, getRepository } from 'typeorm';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
@@ -25,11 +25,7 @@ export interface Sort {
  */
 @Injectable()
 export class SortService {
-  private sortRepository: Repository<any>;
-
-  public constructor(@InjectConnection() private readonly connection: Connection, Sort) {
-    this.sortRepository = this.connection.getRepository<any>(Sort);
-  }
+  public constructor(private readonly Sort: EntityTarget<any>) {}
 
   public async findItems(sort: Sort): Promise<any[]> {
     let items = [];
@@ -37,7 +33,7 @@ export class SortService {
     if (sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
       logger.debug(`resolve ${relation} for sorts.`);
-      const withRelation = await this.sortRepository.findOne({
+      const withRelation = await getRepository<any>(this.Sort).findOne({
         where: { id: sort.id },
         relations: [relation],
         cache: true,
