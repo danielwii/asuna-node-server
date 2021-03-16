@@ -54,7 +54,7 @@ export class TokenHelper {
   }
 
   public static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
-    ow(user, 'user', ow.string.nonEmpty);
+    ow(user, 'user', ow.object.nonEmpty);
 
     const type = _.get(user, 'constructor.name');
     logger.log(`createToken >> ${r({ user, extra, type })}`);
