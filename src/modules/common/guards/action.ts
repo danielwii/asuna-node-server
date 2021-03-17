@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
-import * as qs from 'qs';
+import qs from 'qs';
 
 import { InMemoryDB } from '../../cache/db';
 import { JwtAuthRequest } from '../../core/auth/auth.guard';
@@ -17,11 +17,26 @@ export class ActionRateLimitGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
-    const res = context.switchToHttp().getResponse<Response>();
-    const next = context.switchToHttp().getNext();
+    // const res = context.switchToHttp().getResponse<Response>();
+    // const next = context.switchToHttp().getNext();
 
     logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
     await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expires);
+
+    return true;
+  }
+}
+
+@Injectable()
+export class RegDeviceGuard implements CanActivate {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest<JwtAuthRequest>();
+    // const res = context.switchToHttp().getResponse<Response>();
+    // const next = context.switchToHttp().getNext();
+
+    if (!req.scid) {
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'device need to be registered');
+    }
 
     return true;
   }

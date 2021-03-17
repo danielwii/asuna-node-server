@@ -163,8 +163,8 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({
-      // name 返回客户端的key的名称，默认为sess.sid,也可以自己设置。
-      name: 'sess.id',
+      // name 返回客户端的key的名称，默认为asn.seid,也可以自己设置。
+      name: 'asn.seid',
       store: sessionRedis.isEnabled
         ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
         : new session.MemoryStore(),

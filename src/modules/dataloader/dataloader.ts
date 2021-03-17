@@ -81,10 +81,6 @@ export class DataloaderCleaner {
 export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
   public static _loaders;
 
-  public constructor() {
-    logger.log('init ...');
-  }
-
   public static loaders<Loaders = DefaultRegisteredLoaders>(): Loaders {
     return GenericDataLoader._loaders;
   }

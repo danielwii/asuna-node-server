@@ -1,8 +1,5 @@
-import type { VirtualDevice, VirtualSession } from '../client';
-
-export type CommonRequest = { isMobile?: boolean } & { sessionID?: string } & {
+export type CommonRequest = { isMobile?: boolean } & { sessionID?: string; deviceID?: string } & {
   session?: { landingUrl: string; referer: string; origin: string; deviceId: string };
-  signedCookies?: { deviceId?: string };
-  virtualSession?: VirtualSession;
-  virtualDevice?: VirtualDevice;
+  signedCookies?: { 'asn.sdid'?: string };
+  scid?: string;
 };

@@ -10,28 +10,40 @@ import type { RequestInfo } from '../helper';
 const logger = LoggerFactory.getLogger('DeviceHelper');
 
 export class ClientHelper {
-  public static async reg(req: RequestInfo): Promise<VirtualSession> {
-    ow(req.session.deviceId, 'deviceId', ow.string.nonEmpty);
-    ow(req.sessionID, 'sessionID', ow.string.nonEmpty);
+  public static async reg(seid: string, sdid: string, req: RequestInfo): Promise<SessionUser> {
+    ow(seid, 'session id', ow.string.nonEmpty);
+    ow(sdid, 'device id', ow.string.nonEmpty);
 
-    let device: VirtualDevice;
-    let session: VirtualSession;
+    let sessionUser: SessionUser;
     await getManager().transaction(async (manager) => {
-      device = await VirtualDevice.findOne({ id: req.session.deviceId });
+      let device = await VirtualDevice.findOne({ id: sdid });
       if (!device) {
-        device = await manager.save(new VirtualDevice({ id: req.session.deviceId }));
+        device = await manager.save(new VirtualDevice({ id: sdid }));
       }
 
-      session = await VirtualSession.findOne({ id: req.sessionID });
+      let session = await VirtualSession.findOne({ id: seid });
       if (!session) {
-        session = await manager.save(
-          new VirtualSession({ id: req.sessionID, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
+        await manager.save(
+          new VirtualSession({ id: seid, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
         );
-        logger.debug(`registered device ${r({ device, session })}`);
       }
+
+      const exists = await SessionUser.findOne({ sessionId: seid });
+      if (exists) return exists;
+
+      const lastSessionUserByDevice = await SessionUser.findOne({ deviceId: sdid });
+      logger.log(`lastSessionUserByDevice ${r({ seid, lastSessionUserByDevice })}`);
+
+      sessionUser = await manager.save(
+        SessionUser.create({
+          uid: lastSessionUserByDevice?.uid ?? SessionUser.generator.nextId(),
+          deviceId: sdid,
+          sessionId: seid,
+        }),
+      );
     });
 
-    return session;
+    return sessionUser;
   }
 
   public static async getSessionUsersByDevice(profileId: string, deviceId: string): Promise<SessionUser[]> {
@@ -46,6 +58,18 @@ export class ClientHelper {
       throw new Error('get session user by profileId is not implemented');
     }
     return SessionUser.find({ sessionId });
+  }
+
+  public static getClientId(sessionUser: SessionUser): string {
+    return `${sessionUser.uid}.${sessionUser.deviceId}.${sessionUser.sessionId}`;
+  }
+
+  public static parseClientId(scid: string): { suid?: string; sdid?: string; seid?: string } {
+    if (scid) {
+      const [suid, sdid, seid] = scid.split('.');
+      return { suid, sdid, seid };
+    }
+    return {};
   }
 
   public static async getSessionUser(

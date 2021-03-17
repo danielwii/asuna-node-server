@@ -44,7 +44,7 @@ export class TokenHelper {
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  public static async createSessionToken(clientUser, extra?: { sessionId?: string; uid?: string }) {
+  public static async createSessionToken(clientUser, extra?: { scid?: string }) {
     const expiresIn = TimeUnit.DAYS.toSeconds(1);
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<Partial<JwtPayload>, 'iat' | 'exp'> = { type: 'SessionToken', ...extra };

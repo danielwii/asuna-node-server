@@ -2,11 +2,11 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import isMobile from 'ismobilejs';
 
 import { LoggerFactory } from './logger';
-import { r } from './helpers';
+import { r, TimeUnit } from './helpers';
 import { SimpleIdGeneratorHelper } from '../ids';
-import { VirtualDevice, VirtualSession } from '../client';
+import { ClientHelper, SessionUser } from '../client';
 
-import type { Request, Response } from 'express';
+import type { CookieOptions, Request, Response } from 'express';
 import type { CommonRequest } from './interface';
 
 @Injectable()
@@ -26,44 +26,46 @@ export class DeviceMiddleware implements NestMiddleware {
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies = req.signedCookies;
-    const sessionID = req.sessionID;
-    const deviceId = req.session.deviceId ?? cookies?.deviceId;
-    // const hasDevice = !!deviceId;
-    this.logger.log(`cookies is ${r({ cookies, session: req.session, deviceId, sessionID })}`);
-    if (!cookies?.deviceId && req.session.deviceId) {
-      req.virtualDevice = await VirtualDevice.findOne({ id: deviceId });
-      this.logger.log(`reset device id to cookie ${deviceId}`);
-      res.cookie('deviceId', deviceId, {
+    const sessionId = req.sessionID;
+    // const deviceId = req.session.deviceId ?? cookies?.deviceId;
+
+    // SEID (session id) 通过 express-session 来提供
+    // 通过 SEID 查询 SUID (session user id) 是否存在，SUID 应该仅在 regDevice 时创建
+    // 如果 SUID 不存在，查询 cookie 是否被标记（存在 SDID，session device id）
+    // SDID 存在于 cookie 中，SEID 存在于 session 中，仅在 regDevice 后持久化在数据库
+    this.logger.debug(`cookies is ${r({ cookies, session: req.session, sessionId })}`);
+    if (sessionId) {
+      const sessionUser = await SessionUser.findOne({ sessionId });
+      const maxAge = TimeUnit.DAYS.toMillis(365);
+      const cookieOptions: CookieOptions = {
         signed: true,
         httpOnly: true,
-        maxAge: 10 * 365 * 24 * 60 * 60 * 1000,
+        maxAge: maxAge,
         sameSite: 'none',
         secure: true,
-      });
-    } else if (!cookies?.deviceId) {
-      const id = SimpleIdGeneratorHelper.randomId('vd');
-      this.logger.log(`set device id ${id}`);
-      res.cookie('deviceId', id, {
-        signed: true,
-        httpOnly: true,
-        maxAge: 10 * 365 * 24 * 60 * 60 * 1000,
-        sameSite: 'none',
-        secure: true,
-      });
-      req.session.deviceId = id;
+      };
+      if (sessionUser) {
+        // 该设备已经注册，重新押入 deviceId
+        this.logger.log(`prime device id ${sessionUser.deviceId} to cookie`);
+        req.scid = ClientHelper.getClientId(sessionUser);
+        res.cookie('asn.sdid', sessionUser.deviceId, cookieOptions);
+        res.cookie('asn.scid', req.scid, cookieOptions);
+      } else {
+        // 设备还未注册，确保 cookie 中的设备 id
+        if (cookies.deviceId) {
+          req.deviceID = cookies.deviceId
+        } else {
+          const id = SimpleIdGeneratorHelper.randomId('vd');
+          this.logger.log(`set device id ${id}`);
+          req.deviceID = id;
+          res.cookie('asn.sdid', id, cookieOptions);
+        }
+      }
+    } else {
+      this.logger.error(`sessionID not exists, check express-session`);
     }
-    if (deviceId && !req.session.deviceId) {
-      req.session.deviceId = cookies.deviceId;
-    }
-    if (!req.virtualSession && sessionID) {
-      this.logger.log(`set virtualSession by id ${sessionID}`);
-      req.virtualSession = await VirtualSession.findOne({ id: sessionID });
-    }
-    if (!req.virtualDevice && req.session.deviceId) {
-      this.logger.log(`set virtualDevice by id ${req.session.deviceId}`);
-      req.virtualDevice = await VirtualDevice.findOne({ id: req.session.deviceId });
-    }
-    res.set('X-Session-ID', sessionID);
+
+    res.set('X-Session-ID', sessionId);
     next();
   }
 }
