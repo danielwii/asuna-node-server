@@ -74,7 +74,7 @@ export class ApiController {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'device middleware needed.');
     }
     logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID })}`);
-    const sessionUser = await ClientHelper.reg(sessionID, deviceID, req);
+    const sessionUser = await ClientHelper.reg(sessionID, scid ? ClientHelper.parseClientId(scid).sdid : deviceID, req);
     logger.log(`create session user ${r(sessionUser)}`);
   }
 }

@@ -29,7 +29,10 @@ export class ClientHelper {
       }
 
       const exists = await SessionUser.findOne({ sessionId: seid });
-      if (exists) return exists;
+      if (exists) {
+        sessionUser = exists;
+        return;
+      }
 
       const lastSessionUserByDevice = await SessionUser.findOne({ deviceId: sdid });
       logger.log(`lastSessionUserByDevice ${r({ seid, lastSessionUserByDevice })}`);

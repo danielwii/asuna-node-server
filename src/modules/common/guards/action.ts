@@ -62,6 +62,8 @@ class ActionHelper {
     if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
-    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expires || 5 }).catch((reason) => logger.error(reason));
+    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expires || 5, db: 6 }).catch((reason) =>
+      logger.error(reason),
+    );
   }
 }
