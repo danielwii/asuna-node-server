@@ -37,6 +37,9 @@ export class RedisHelper {
   public static async dbsize(redis: RedisClient): Promise<number> {
     return (await promisify(redis.dbsize, redis)()) as any;
   }
+  public static async get(redis: RedisClient, key: string): Promise<string> {
+    return (await promisify(redis.get, redis)(key)) as any;
+  }
   public static async setex(redis: RedisClient, key: string, expires: number, value: string): Promise<number> {
     logger.debug(`setex ${r({ key, expires, value })}`);
     return (await promisify(redis.setex, redis)(key, expires, value)) as any;
