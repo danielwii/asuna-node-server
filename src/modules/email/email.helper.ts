@@ -20,7 +20,6 @@ import { isMailAttachment, MailInfo } from './email.interface';
 import type { Attachment, Options } from 'nodemailer/lib/mailer';
 
 const logger = LoggerFactory.getLogger('EmailHelper');
-const env = process.env.ENV;
 
 // type SendAction = { future: () => Promise<any> };
 
@@ -77,7 +76,7 @@ export class EmailHelper {
       message: { from: config.from || config.username },
       preview: false,
       send: true, // will send emails in development/test env
-      subjectPrefix: env === 'production' ? false : `[${env.toUpperCase()}] `,
+      subjectPrefix: process.env.NODE_ENV === 'production' ? false : `[${_.upperCase(process.env.ENV)}] `,
       transport: this.transporter,
     });
 
