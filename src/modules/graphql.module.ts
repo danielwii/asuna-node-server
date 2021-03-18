@@ -58,7 +58,7 @@ export class GraphqlModule implements OnModuleInit {
           debug: config.debug,
           introspection: config.playground_enable || config.debug,
           tracing: config.debug,
-          resolverValidationOptions: { requireResolversForResolveType: false },
+          resolverValidationOptions: { requireResolversForResolveType: 'warn' },
           persistedQueries: { cache },
           plugins: [
             {
