@@ -59,7 +59,7 @@ export class VirtualSession extends NoPrimaryKeyBaseEntity {
   // @Column({ nullable: true, length: 36, name: 'session_id' })
   // public sessionID: string;
 
-  @Column()
+  @Column({ length: 512 })
   public ua: string;
 
   @Column({ nullable: true, length: 36, name: 'client_ip' })
