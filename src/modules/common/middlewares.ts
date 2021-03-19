@@ -53,10 +53,10 @@ export class DeviceMiddleware implements NestMiddleware {
       } else {
         // 设备还未注册，确保 cookie 中的设备 id
         if (cookies.deviceId) {
-          req.deviceID = cookies.deviceId
+          req.deviceID = cookies.deviceId;
         } else {
           const id = SimpleIdGeneratorHelper.randomId('vd');
-          this.logger.log(`set device id ${id}`);
+          this.logger.log(`set device id ${id} for ua ${req.headers['user-agent']}`);
           req.deviceID = id;
           res.cookie('asn.sdid', id, cookieOptions);
         }
