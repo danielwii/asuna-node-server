@@ -10,6 +10,8 @@ import * as path from 'path';
 import * as JSON5 from 'json5';
 import { Between, FindOperator } from 'typeorm';
 import { inspect } from 'util';
+import isMobile from 'ismobilejs';
+import UaParser from 'ua-parser-js';
 
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
 
@@ -229,4 +231,14 @@ export const condition = <Entity>(
   nil?: FindConditions<Entity>,
 ): FindConditions<Entity> => {
   return _.assign({}, _.pickBy(nilProtected, _.identity), nil);
+};
+
+export const detectUA = (ua: string) => {
+  const parsed = new UaParser(ua);
+  return {
+    isMobile: isMobile(ua).any,
+    isBrowser: isMobile(ua).any || !!parsed.getBrowser().name,
+    parsed: parsed.getResult(),
+    isUnknown: !parsed.getOS().name,
+  };
 };

@@ -1,8 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import isMobile from 'ismobilejs';
 
 import { LoggerFactory } from './logger';
-import { r, TimeUnit } from './helpers';
+import { detectUA, r, TimeUnit } from './helpers';
 import { SimpleIdGeneratorHelper } from '../ids';
 import { ClientHelper, SessionUser } from '../client';
 
@@ -15,7 +14,7 @@ export class IsMobileMiddleware implements NestMiddleware {
 
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
-    req.isMobile = isMobile(userAgent).any;
+    req.isMobile = detectUA(userAgent).isMobile;
     next();
   }
 }
@@ -55,10 +54,13 @@ export class DeviceMiddleware implements NestMiddleware {
         if (cookies.deviceId) {
           req.deviceID = cookies.deviceId;
         } else {
-          const id = SimpleIdGeneratorHelper.randomId('vd');
-          this.logger.log(`set device id ${id} for ua ${req.headers['user-agent']}`);
-          req.deviceID = id;
-          res.cookie('asn.sdid', id, cookieOptions);
+          const parsedUA = detectUA(req.headers['user-agent']);
+          if (parsedUA.isBrowser) {
+            const id = SimpleIdGeneratorHelper.randomId('vd');
+            this.logger.log(`set device id ${id} for device ${r(parsedUA)}`);
+            req.deviceID = id;
+            res.cookie('asn.sdid', id, cookieOptions);
+          }
         }
       }
     } else {
