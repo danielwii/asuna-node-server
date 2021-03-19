@@ -105,7 +105,7 @@ export class InMemoryDB {
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
     const strategy = options?.strategy ?? 'cache-only';
 
-    const redis = RedisProvider.instance.getRedisClient(prefix, options.db);
+    const redis = RedisProvider.instance.getRedisClient(prefix, options?.db);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
