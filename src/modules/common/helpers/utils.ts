@@ -242,3 +242,9 @@ export const detectUA = (ua: string) => {
     isUnknown: !parsed.getOS().name,
   };
 };
+
+export const timeoutPromise = async <T>(promise: () => Promise<T>, timeoutMs: number): Promise<T> =>
+  Promise.race([
+    promise(),
+    new Promise<T>((resolve, reject) => setTimeout(() => reject(`function timeout ${timeoutMs}ms`), timeoutMs)),
+  ]);

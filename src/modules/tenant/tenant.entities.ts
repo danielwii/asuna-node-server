@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
-import { AbstractBaseEntity, AbstractTimeBasedNameEntity, Constructor, Publishable } from '../base';
+import { AbstractBaseEntity, AbstractTimeBasedNameEntity, ConstrainedConstructor, Publishable } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
@@ -24,7 +24,7 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const InjectTenant = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
+export const InjectTenant = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'tenant__id' })

@@ -5,18 +5,18 @@ import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from './db/db.helper';
 
-import type { Constructor } from '../base/abilities';
+import type { ConstrainedConstructor } from '../base/abilities';
 import type { UserProfile } from './auth/user.entities';
 
 const logger = LoggerFactory.getLogger('UserRegister');
 
 export class UserRegister {
-  static Entity: Constructor<any> | any;
+  static Entity: ConstrainedConstructor<any> | any;
   static onProfileCreate: (profile: UserProfile) => Promise<any>;
   static onProfileDelete: (profile: UserProfile) => Promise<any>;
 
   static regCoreUserCreator<User extends BaseEntity>(
-    Entity: Constructor<any> | any,
+    Entity: ConstrainedConstructor<any> | any,
     onProfileCreate?: (profile: UserProfile) => Promise<any>,
     onProfileDelete?: (profile: UserProfile) => Promise<any>,
   ): void {

@@ -35,14 +35,12 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
   public updatedAt?: Date;
 
   @MetaInfo({ accessible: 'hidden' })
-  @Column('varchar', { nullable: true, length: 100, name: 'updated_by' })
+  @Column({ nullable: true, length: 100, name: 'updated_by' })
   public updatedBy?: string;
 
-  /*
   @MetaInfo({ accessible: 'hidden' })
-  @Column('varchar', { nullable: true, length: 100, name: 'created_by' })
+  @Column({ nullable: true, length: 100, name: 'created_by' })
   public createdBy?: string;
-*/
 
   @AfterLoad()
   public afterLoad(): void {

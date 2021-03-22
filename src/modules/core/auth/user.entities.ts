@@ -4,7 +4,7 @@ import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
-import type { Constructor } from '../../base';
+import type { ConstrainedConstructor } from '../../base';
 import type { FinancialTransaction, PointExchange, Wallet } from '../../property';
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';
@@ -44,7 +44,7 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   }
 }
 
-export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
+export const InjectUserProfile = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })
@@ -59,7 +59,7 @@ export const InjectUserProfile = <TBase extends Constructor<BaseEntity>>(Base: T
   return ExtendableEntity;
 };
 
-export const InjectMultiUserProfile = <TBase extends Constructor<BaseEntity>>(Base: TBase) => {
+export const InjectMultiUserProfile = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })

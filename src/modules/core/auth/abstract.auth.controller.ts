@@ -14,13 +14,13 @@ import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base
 import { UserProfile } from './user.entities';
 import { DBHelper } from '../db';
 
-import type { Constructor } from '../../base';
+import type { ConstrainedConstructor } from '../../base';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
 export abstract class AbstractAuthController<U extends AuthUser> {
   public constructor(
-    public readonly UserEntity: Constructor<U> & AuthUserType,
+    public readonly UserEntity: ConstrainedConstructor<U> & AuthUserType,
     public readonly authService: AbstractAuthService<U>,
     public readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;

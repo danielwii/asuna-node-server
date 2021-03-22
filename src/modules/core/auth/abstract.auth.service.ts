@@ -15,7 +15,7 @@ import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-import type { Constructor } from '../../base';
+import type { ConstrainedConstructor } from '../../base';
 import type { CreatedUser } from './auth.service';
 import ow from 'ow';
 
@@ -85,7 +85,7 @@ export class TokenHelper {
 
 export abstract class AbstractAuthService<U extends AuthUser> {
   protected constructor(
-    public readonly AuthUserEntity: Constructor<U> & AuthUserType,
+    public readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,
     public readonly authUserRepository: Repository<U>,
   ) {}
 
