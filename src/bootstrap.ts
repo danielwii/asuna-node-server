@@ -122,6 +122,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
   app.use(requestIp.mw());
   app.use(cookieParser(secret));
+  // http://www.febeacon.com/helmet-docs-zh-CN/routes/install/#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -131,7 +132,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
           'block-all-mixed-content': [],
           'font-src': ["'self'", 'https:', 'data:'],
           'frame-ancestors': ["'self'"],
-          // TODO load all domains' images
+          // load all domains' images
           'img-src': ["'self'", 'data:', '*'],
           'object-src': ["'none'"],
           // TODO maybe more safer, 'unsafe-inline' used to run alipay script
