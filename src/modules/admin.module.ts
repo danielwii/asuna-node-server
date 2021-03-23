@@ -1,5 +1,6 @@
 import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+
 import * as redisStore from 'cache-manager-redis-store';
 
 import { AdminController } from './admin.controller';
