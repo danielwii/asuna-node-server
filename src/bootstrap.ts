@@ -1,19 +1,22 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
+import RedisStoreCreator from 'connect-redis';
+import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
+import session from 'express-session';
 import helmet from 'helmet';
 import * as _ from 'lodash';
 import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import RedisStoreCreator from 'connect-redis';
 import * as requestIp from 'request-ip';
 import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
+import { syncDbWithLockIfPossible, validateOptions, resolveTypeormPaths } from './helper';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
 import {
@@ -26,17 +29,15 @@ import {
 } from './modules/common';
 import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
 import { AsunaContext, Global } from './modules/core';
-import { TracingInterceptor } from './modules/tracing';
+import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
 import { RedisProvider } from './modules/providers';
-import { DefaultModule } from './modules/default.module';
-import { syncDbWithLockIfPossible, validateOptions, resolveTypeormPaths } from './helper';
+import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find
 import './typeorm.fixture';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
-import { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
@@ -55,8 +56,9 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
 
   process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = '1000';
   const dbConfig = await getConnectionOptions();
+  logger.log(`Global is ${r({ ...Global })}`);
   logger.log(
-    `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: ******${_.get(dbConfig, 'password').slice(-4)}`,
+    `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`,
   );
 
   const appSettings = AppConfigObject.load();

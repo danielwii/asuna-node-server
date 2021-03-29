@@ -1,8 +1,9 @@
 import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
+
 import { CacheUtils, CacheWrapper } from '../../cache';
 import {
   AsunaErrorCode,
@@ -14,11 +15,12 @@ import {
   ValidationException,
 } from '../../common';
 import { LoggerFactory } from '../../common/logger';
-import { EnumValueStatic } from '../../enum-values';
 import { auth } from '../../helper';
 import { AdminUser, AdminUserIdentifierHelper } from '../auth';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
+
+import type { EnumValueStatic } from '../../enum-values';
 
 const logger = LoggerFactory.getLogger('KvHelper');
 

@@ -1,19 +1,19 @@
-import { Connection } from 'typeorm';
-import { dirname, extname, resolve } from 'path';
 import _ from 'lodash';
+import { dirname, extname, resolve } from 'path';
+import { Connection } from 'typeorm';
 
 import { renameTables, runCustomMigrations } from './migrations';
-import { configLoader } from './modules/config/loader';
-import { LoggerFactory } from './modules/common/logger/factory';
-import { RedisLockProvider } from './modules/providers/redis-lock.provider';
 import { r } from './modules/common/helpers/utils';
+import { LoggerFactory } from './modules/common/logger/factory';
+import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
+import { RedisLockProvider } from './modules/providers/redis-lock.provider';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
 export function validateOptions(options: BootstrapOptions): void {
-  const config = configLoader.loadConfigs();
+  // const config = configLoader.loadConfigs();
   const redisEnabled = configLoader.loadConfig2('redis', 'enable');
 
   if (options.redisMode === 'redis' && !redisEnabled) {
@@ -80,7 +80,7 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
     }),
   );
 
-  if (Global.dbType !== 'sqlite') {
+  if (['mariadb', 'mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {
     await connection.query('SET FOREIGN_KEY_CHECKS=0');
   }
 
@@ -92,7 +92,7 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
   await runCustomMigrations(options.migrations);
   logger.log(`run custom migrations ... done`);
 
-  if (Global.dbType !== 'sqlite') {
+  if (['mariadb', 'mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {
     await connection.query('SET FOREIGN_KEY_CHECKS=1');
   }
   logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);

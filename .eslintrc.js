@@ -19,5 +19,6 @@ module.exports = {
     '@typescript-eslint/no-parameter-properties': 'off',
     '@typescript-eslint/member-ordering': 'off',
     '@typescript-eslint/explicit-member-accessibility': 'off',
+    '@typescript-eslint/no-invalid-void-type': 'off',
   },
 };

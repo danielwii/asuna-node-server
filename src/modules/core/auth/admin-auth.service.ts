@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
+
 import * as _ from 'lodash';
 import * as shortid from 'shortid';
-import { Connection, getManager } from 'typeorm';
+import { Connection, getManager, In } from 'typeorm';
 
 import { r } from '../../common/helpers';
 import { LoggerFactory } from '../../common/logger';
+import { AppConfigObject } from '../../config/app.config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
-import { AdminUser } from './auth.entities';
-import { RoleRepository } from './auth.repositories';
-import { AppConfigObject } from '../../config/app.config';
+import { AdminUser, Role } from './auth.entities';
 import { AuthUserChannel } from './base.entities';
 
 import type { CreatedUser } from './auth.service';
@@ -19,11 +19,8 @@ const logger = LoggerFactory.getLogger('AdminAuthService');
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
-  private readonly roleRepository: RoleRepository;
-
   public constructor(@InjectConnection() private readonly connection: Connection) {
     super(AdminUser, connection.getRepository<AdminUser>(AdminUser));
-    this.roleRepository = connection.getCustomRepository(RoleRepository);
   }
 
   public async createUser(
@@ -34,7 +31,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     roleNames?: string[],
   ): Promise<CreatedUser<AdminUser>> {
     const { hash, salt } = PasswordHelper.encrypt(password);
-    const roles = _.isEmpty(roleNames) ? null : await this.roleRepository.findByNames(roleNames);
+    const roles = _.isEmpty(roleNames) ? null : await Role.find({ name: In(roleNames) });
 
     let user = await this.getUser({ username, email });
     if (!user) {
@@ -44,6 +41,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     user.password = hash;
     user.salt = salt;
     user.roles = roles;
+    logger.log(`update user with roles ${r({ roleNames, roles })}`);
     return getManager()
       .save(user)
       .then((user) => ({ user }));
@@ -57,18 +55,15 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
   public async initSysAccount(): Promise<void> {
     const email = AppConfigObject.load().sysAdminEmail;
     const password = AppConfigObject.load().sysAdminPassword ?? shortid.generate();
-    const role = await this.roleRepository.findOne({ name: SYS_ROLE });
+    const role = await Role.findOne({ name: SYS_ROLE });
 
     if (!role) {
-      const entity = this.roleRepository.create({ name: SYS_ROLE });
+      const entity = Role.create({ name: SYS_ROLE });
       await getManager().save(entity);
     }
     logger.log(`found sys role: ${!!role}`);
 
-    const sysRole = await this.roleRepository.findOne({
-      where: { name: SYS_ROLE },
-      relations: ['users'],
-    });
+    const sysRole = await Role.findOne({ where: { name: SYS_ROLE }, relations: ['users'] });
     logger.log(`found sys role: ${r(sysRole)}`);
     logger.log(`found users for sys role: ${sysRole.users.length}`);
     if (sysRole.users.length === 0) {

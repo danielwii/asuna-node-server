@@ -1,6 +1,7 @@
-import { ColumnType, WithPrecisionColumnType } from 'typeorm/driver/types/ColumnTypes';
-import { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOptions';
 import { Global } from '../global';
+
+import type { ColumnNumericOptions } from 'typeorm/decorator/options/ColumnNumericOptions';
+import type { ColumnType, WithPrecisionColumnType } from 'typeorm/driver/types/ColumnTypes';
 
 export class ColumnTypeHelper {
   static readonly MONEY: WithPrecisionColumnType = 'double precision';
@@ -26,5 +27,10 @@ export class ColumnTypeHelper {
   static text(type: 'text' | 'mediumtext' | 'longtext' = 'text'): 'text' | 'mediumtext' | 'longtext' {
     const { dbType } = Global;
     return dbType === 'sqlite' ? 'text' : type;
+  }
+
+  static get DATETIME(): ColumnType | any {
+    if (Global.dbType === 'postgres') return 'timestamptz';
+    return 'datetime';
   }
 }

@@ -89,7 +89,7 @@ export class OperationToken extends AbstractBaseEntity {
   usedCount: number;
 
   @MetaInfo({ name: '过期时间' })
-  @Column('datetime', { nullable: true, name: 'expired_at' })
+  @Column(ColumnTypeHelper.DATETIME, { nullable: true, name: 'expired_at' })
   expiredAt: Date;
 
   @MetaInfo({ name: '是否已使用' })

@@ -1,14 +1,17 @@
 import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import _ from 'lodash';
+
+import { ClientHelper } from '../client/helper';
+import { AsunaErrorCode, AsunaException, detectUA } from '../common';
 import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
-import { LoggerFactory } from '../common/logger';
-import { AppEnv } from './app.env';
 import { r } from '../common/helpers/utils';
-import { ClientHelper } from '../client/helper';
+import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
-import { AsunaErrorCode, AsunaException } from '../common';
+import { AppEnv } from './app.env';
+import { TokenHelper } from './auth/abstract.auth.service';
 import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 
 import type { RequestInfo } from '../helper';
@@ -18,18 +21,20 @@ const logger = LoggerFactory.getLogger('ApiController');
 @ApiTags('core')
 @Controller('api')
 export class ApiController {
-  private readonly appContent = AppEnv.instance;
+  private readonly appEnv = AppEnv.instance;
 
   @Get('version')
-  public currentVersion(): string {
-    return `${this.appContent.version}-${this.appContent.upTime.toISOString()}`;
+  public currentVersion(): ApiResponse<{ version: string }> {
+    return { version: `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}` };
+    // return 1;
+    // return `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}`;
   }
 
   @Get('info')
   public info(@Req() req: RequestInfo) {
     return {
-      upTime: this.appContent.upTime.toISOString(),
-      version: this.appContent.version,
+      upTime: this.appEnv.upTime.toISOString(),
+      version: this.appEnv.version,
     };
   }
 
@@ -39,6 +44,8 @@ export class ApiController {
       clientIp: req.clientIp,
       isMobile: req.isMobile,
       headers: req.headers,
+      ua: _.memoize(detectUA)(req.headers['user-agent']),
+      ..._.omit(req.session, 'cookie'),
       address: {
         forwarded: req.header('x-forwarded-for'), // 各阶段ip的CSV, 最左侧的是原始ip
         remoteAddress: req.connection.remoteAddress,
@@ -58,11 +65,11 @@ export class ApiController {
 
   @UseGuards(CsurfGuard)
   @Post('v1/csurf-test')
-  public csurfTest() {}
+  public csurfTest(): ApiResponse {}
 
   @UseGuards(new ActionRateLimitGuard('api/v1/reg-device', 60), new JwtAuthGuard({ anonymousSupport: true }))
   @Post('v1/reg-device')
-  public async regDevice(@Req() req: JwtAuthRequest) {
+  public async regDevice(@Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { identifier, user, payload, scid, sessionID, deviceID } = req;
     if (!configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'COOKIE_SUPPORT needed.');
@@ -77,4 +84,17 @@ export class ApiController {
     const sessionUser = await ClientHelper.reg(sessionID, scid ? ClientHelper.parseClientId(scid).sdid : deviceID, req);
     logger.log(`create session user ${r(sessionUser)}`);
   }
+
+  @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
+  @Post('v1/session-token')
+  public async getToken(@Req() req: JwtAuthRequest): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
+    const { identifier, user, payload, scid } = req;
+    logger.log(`generate session token by ${r({ identifier, user, payload, scid })}`);
+
+    if (scid) {
+      return TokenHelper.createSessionToken(null, { scid });
+    }
+  }
 }
+
+type ApiResponse<Payload extends Record<string, any> = object> = Payload | void;

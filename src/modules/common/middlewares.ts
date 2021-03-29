@@ -1,9 +1,11 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 
-import { LoggerFactory } from './logger';
-import { detectUA, r, TimeUnit } from './helpers';
-import { SimpleIdGeneratorHelper } from '../ids';
+import _ from 'lodash';
+
 import { ClientHelper, SessionUser } from '../client';
+import { SimpleIdGeneratorHelper } from '../ids';
+import { detectUA, r, TimeUnit } from './helpers';
+import { LoggerFactory } from './logger';
 
 import type { CookieOptions, Request, Response } from 'express';
 import type { CommonRequest } from './interface';
@@ -36,13 +38,7 @@ export class DeviceMiddleware implements NestMiddleware {
     if (sessionId) {
       const sessionUser = await SessionUser.findOne({ sessionId });
       const maxAge = TimeUnit.DAYS.toMillis(365);
-      const cookieOptions: CookieOptions = {
-        signed: true,
-        httpOnly: true,
-        maxAge: maxAge,
-        sameSite: 'none',
-        secure: true,
-      };
+      const cookieOptions: CookieOptions = { signed: true, httpOnly: true, maxAge, sameSite: 'none', secure: true };
       if (sessionUser) {
         // 该设备已经注册，重新押入 deviceId
         this.logger.log(`prime device id ${sessionUser.deviceId} to cookie`);
@@ -55,6 +51,7 @@ export class DeviceMiddleware implements NestMiddleware {
           req.deviceID = cookies.deviceId;
         } else {
           const parsedUA = detectUA(req.headers['user-agent']);
+          // this.logger.debug(`parsed ua is ${r(parsedUA)}`);
           if (parsedUA.isBrowser) {
             const id = SimpleIdGeneratorHelper.randomId('vd');
             this.logger.log(`set device id ${id} for device ${r(parsedUA)}`);
@@ -81,7 +78,7 @@ export class LandingUrlMiddleware implements NestMiddleware {
       req.session.landingUrl = req.url;
       req.session.referer = req.headers.referer;
       req.session.origin = req.headers.origin;
-      this.logger.debug(`set landing ${r(req.session)}`);
+      this.logger.debug(`set landing ${r(_.omit(req.session, 'cookie'))}`);
     }
 
     next();
