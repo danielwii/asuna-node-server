@@ -1,23 +1,25 @@
-import { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
-import { NestExpressApplication } from '@nestjs/platform-express';
 import * as Sentry from '@sentry/node';
-import * as _ from 'lodash';
+
 import { Promise } from 'bluebird';
-import * as fp from 'lodash/fp';
 import * as elasticApmNode from 'elastic-apm-node';
+import * as _ from 'lodash';
+import * as fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper, r } from './modules/common/helpers';
 import { LoggerFactory } from './modules/common/logger';
 import { ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
-import { CronHelper } from './modules/helper';
-import { LifecycleRegister } from './register';
-import { RedisLockProvider, RedisProvider } from './modules/providers';
-import { AsunaContext } from './modules/core/context';
-import { Store } from './modules/store/store';
-import { Hermes } from './modules/core/bus';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
+import { Hermes } from './modules/core/bus';
+import { AsunaContext } from './modules/core/context';
+import { CronHelper } from './modules/helper';
+import { RedisLockProvider, RedisProvider } from './modules/providers';
+import { Store } from './modules/store/store';
+import { LifecycleRegister } from './register';
+
+import type { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 
 const logger = LoggerFactory.getLogger('Lifecycle');
 

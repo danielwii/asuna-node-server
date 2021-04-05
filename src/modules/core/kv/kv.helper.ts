@@ -411,7 +411,7 @@ export class KvHelper {
         'field',
       ),
     };
-    logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    // logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
     return result;
   }
 }

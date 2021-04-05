@@ -1,5 +1,4 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -33,9 +32,10 @@ import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
 import { RedisProvider } from './modules/providers';
 import { TracingInterceptor } from './modules/tracing';
-// add condition function in typeorm find
+// add condition function in typeorm find operation
 import './typeorm.fixture';
 
+import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
@@ -254,7 +254,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
 
   await AppLifecycle.beforeBootstrap(app);
   logger.log('bootstrap app ...');
-  return app.listenAsync(port).then(async () => {
+  return app.listen(port).then(async () => {
     await AppLifecycle.onAppStartListening(app);
     logger.log(`===============================================================`);
     logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}`);

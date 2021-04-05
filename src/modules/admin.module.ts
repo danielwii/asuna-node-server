@@ -51,6 +51,7 @@ import { SMSModule } from './sms';
 import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
+import { WebModule } from './web';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
@@ -73,6 +74,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ImportExportModule,
     TenantModule,
     PropertyModule,
+    WebModule,
     SMSModule,
     TracingModule,
     CacheModule.registerAsync({

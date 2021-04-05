@@ -29,6 +29,7 @@ export * from './tenant';
 export * from './sort';
 export * from './health/health.controller';
 export * from './tracing';
+export * from './web';
 export * from './wechat';
 export * from './ws';
 export * from './enum-values';
