@@ -10,6 +10,7 @@ export interface BootstrapOptions {
   viewsDir?: string;
   viewEngine?: string;
   typeormEntities?: string[];
+  typeormSubscriber?: string[];
   /**
    * io     - socket.io
    * redis  - 基于 redis 共享 websocket 信息

@@ -12,7 +12,9 @@
     // Import non-ES modules as default imports.
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    //    "sourceMap": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,

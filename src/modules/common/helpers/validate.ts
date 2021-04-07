@@ -9,10 +9,11 @@ import {
 } from 'class-validator';
 import * as _ from 'lodash';
 
-import { ClassType } from '../decorators';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
 import { LoggerFactory } from '../logger/factory';
 import { r } from './utils';
+
+import type { ClassType } from '../decorators';
 
 const logger = LoggerFactory.getLogger('Validator');
 

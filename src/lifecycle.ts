@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/node';
 
 import { Promise } from 'bluebird';
 import * as elasticApmNode from 'elastic-apm-node';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';

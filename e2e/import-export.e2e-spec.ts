@@ -10,7 +10,7 @@ import { AppLifecycle } from '../src/lifecycle';
 describe('Excel (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
-    resolveTypeormPaths();
+    await resolveTypeormPaths();
     await AppLifecycle.preload();
     const moduleFixture = await Test.createTestingModule({
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],

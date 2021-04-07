@@ -83,7 +83,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   // Setup app
   // --------------------------------------------------------------
 
-  resolveTypeormPaths(options);
+  await resolveTypeormPaths(options);
 
   logger.log('create app ...');
 

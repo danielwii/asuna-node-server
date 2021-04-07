@@ -1,9 +1,11 @@
+import { Promise } from 'bluebird';
+import { glob } from 'glob';
 import _ from 'lodash';
 import { dirname, extname, resolve } from 'path';
 import { Connection } from 'typeorm';
 
 import { renameTables, runCustomMigrations } from './migrations';
-import { r } from './modules/common/helpers/utils';
+import { r, TimeUnit } from './modules/common/helpers/utils';
 import { LoggerFactory } from './modules/common/logger/factory';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
@@ -41,7 +43,7 @@ export async function syncDbWithLockIfPossible(app: NestExpressApplication, opti
     const { exists, results } = await RedisLockProvider.instance.lockProcess(
       'sync-db',
       async () => syncDb(app, options),
-      { ttl: 3 * 60 * 1000, waiting: true },
+      { ttl: TimeUnit.MINUTES.toMillis(3), waiting: true },
     );
     logger.log(`sync results is ${r({ exists, results })}`);
     if (exists) {
@@ -104,7 +106,7 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
  * 根据环境变量调整要拉取的实体
  * @param options
  */
-export function resolveTypeormPaths(options?: BootstrapOptions): void {
+export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<void> {
   const logger = LoggerFactory.getLogger('resolveTypeormPaths');
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);
@@ -113,24 +115,28 @@ export function resolveTypeormPaths(options?: BootstrapOptions): void {
   const suffix = extname(__filename).slice(1);
   const currentSuffix = extname(require.main.filename).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
-  const entities = _.uniq([
-    // fixme remove first later
-    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*entities.${suffix}`,
-    // `${resolve(packageDir, '../..')}/**/*entities.${suffix}`,
-    `${resolve(packageDir)}/**/*entities.${suffix}`,
-    `${resolve(rootDir)}/**/*entities.${currentSuffix}`,
-    ...(options?.typeormEntities || []),
-  ]);
-  const subscribers = _.uniq([
-    `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*subscriber.${suffix}`,
-    `${resolve(packageDir)}/**/*subscriber.${suffix}`,
-    `${resolve(rootDir)}/**/*subscriber.${currentSuffix}`,
-  ]);
+  const pathResolver = (mode: 'entities' | 'subscriber') => [
+    // `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`,
+    // 地址不同时这里认为是用特定的环境配置来拉取 packages 下的相关实体，即 monorepo 模式
+    rootDir !== packageDir
+      ? `${resolve(packageDir, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`
+      : `${resolve(packageDir)}/**/*${mode}.${suffix}`,
+    `${resolve(rootDir)}/**/*${mode}.${currentSuffix}`,
+  ];
+  const entities = _.uniq(_.compact([...pathResolver('entities'), ...(options?.typeormEntities || [])]));
+  const subscribers = _.uniq(_.compact([...pathResolver('subscriber'), ...(options?.typeormSubscriber || [])]));
   logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers, __filename })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
 
+  await Promise.map(entities, promisifyGlob).then((resolved) => logger.debug(`resolved entities ${r(resolved)}`));
+  await Promise.map(subscribers, promisifyGlob).then((resolved) => logger.debug(`resolved subscribers ${r(resolved)}`));
+
   process.env.TYPEORM_ENTITIES = entities.join();
   process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
+}
+
+function promisifyGlob(pattern: string): Promise<string[]> {
+  return new Promise((resolve, reject) => glob(pattern, {}, (err, matches) => (err ? reject(err) : resolve(matches))));
 }
