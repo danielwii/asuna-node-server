@@ -67,7 +67,7 @@ export class ApiController {
   @Post('v1/csurf-test')
   public csurfTest(): ApiResponse {}
 
-  @UseGuards(new ActionRateLimitGuard('api/v1/reg-device', 60), new JwtAuthGuard({ anonymousSupport: true }))
+  @UseGuards(new ActionRateLimitGuard('api/v1/reg-device', 1), new JwtAuthGuard({ anonymousSupport: true }))
   @Post('v1/reg-device')
   public async regDevice(@Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { identifier, user, payload, scid, sessionID, deviceID } = req;
