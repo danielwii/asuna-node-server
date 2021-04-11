@@ -1,10 +1,11 @@
+import * as Sentry from '@sentry/node';
+
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import * as Sentry from '@sentry/node';
-import { Response } from 'express';
-import * as _ from 'lodash';
+
+import _ from 'lodash';
 import * as R from 'ramda';
-import { getRepository, QueryFailedError } from 'typeorm';
+import { getConnection, getRepository, QueryFailedError } from 'typeorm';
 import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
@@ -12,6 +13,8 @@ import { StatsHelper } from '../../stats';
 import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
 import { r } from '../helpers';
 import { LoggerFactory } from '../logger';
+
+import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
@@ -69,6 +72,13 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (exception.code === 'ER_PARSE_ERROR') {
       return new AsunaException(AsunaErrorCode.Unprocessable, 'parse error');
+    }
+    if (exception.code === 'PROTOCOL_CONNECTION_LOST') {
+      (async () => {
+        await getConnection().close();
+        await getConnection().connect();
+      })();
+      return new AsunaException(AsunaErrorCode.Unprocessable, 'connection lost, reconnect...');
     }
 
     logger.error(`unresolved QueryFailedError: ${r(exception)}`);
