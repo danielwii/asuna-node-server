@@ -23,7 +23,7 @@
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
     "doc": "npx @compodoc/compodoc -p tsconfig.json -s",
-    "postinstall": "yarn build"
+    "postinstall!": "yarn build"
   },
   "resolutions": {
     "fsevents": "^2.3.2"
