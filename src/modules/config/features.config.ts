@@ -6,6 +6,7 @@ export enum FeaturesConfigKeys {
   swaggerEnable = 'swagger_enable',
   cronEnable = 'cron_enable',
   errorStats = 'error_stats',
+  webTracingEnabled = 'web_tracing_enabled',
   apmEnabled = 'apm_enabled',
   apmServiceName = 'apm.service_name',
   apmServerUrl = 'apm.server_url',
@@ -28,6 +29,7 @@ export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObj
   public swaggerEnable: boolean;
   public cronEnable: boolean;
   public errorStats: boolean;
+  public webTracingEnabled: boolean;
   public apmEnabled: boolean;
   public apmServiceName: string;
   public apmServerUrl: string;
@@ -46,6 +48,7 @@ export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObj
           swaggerEnable: withP(keys.swaggerEnable, loader),
           cronEnable: withP(keys.cronEnable, loader),
           errorStats: withP(keys.errorStats, loader),
+          webTracingEnabled: withP(keys.webTracingEnabled, loader),
           apmEnabled: withP(keys.apmEnabled, loader),
           apmServiceName: withP(keys.apmServiceName, loader),
           apmServerUrl: withP(keys.apmServerUrl, loader),

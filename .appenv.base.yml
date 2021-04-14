@@ -39,6 +39,9 @@ features:
     service_name: node-server
     secret_token:
     server_url: http://localhost:8200
+  web:
+    tracing:
+      enabled: false
 
 tracing:
   enabled: false

@@ -8,38 +8,45 @@ datasource db {
 }
 
 model app__t_infos {
+  created_at      DateTime          @default(now()) @db.DateTime(6)
+  updated_at      DateTime          @default(now()) @db.DateTime(6)
+  updated_by      String?           @db.VarChar(100)
+  created_by      String?           @db.VarChar(100)
   id              Int               @id @default(autoincrement())
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @default(now())
-  updated_by      String?
-  name            String            @unique
-  description     String?
-  is_published    Int?
-  key             String            @unique
-  mode            String?
+  name            String            @unique @db.VarChar(100)
+  description     String?           @db.Text
+  is_published    Int?              @db.TinyInt
+  key             String            @unique @db.VarChar(50)
+  mode            String?           @db.VarChar(255)
   app__t_releases app__t_releases[]
+
+  @@index([created_at], name: "IDX_a625e68b867d4954cf08e6b828")
+  @@index([updated_at], name: "IDX_f92a6a33ac28787d95df6295e9")
 }
 
 model app__t_releases {
+  created_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_by   String?       @db.VarChar(100)
+  created_by   String?       @db.VarChar(100)
   id           Int           @id @default(autoincrement())
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @default(now())
-  updated_by   String?
-  is_published Int?
-  version_code String
+  is_published Int?          @db.TinyInt
+  version_code String        @db.VarChar(10)
   build_number Int
-  upgrade_mode String?
-  platform     String?
-  description  String?
+  upgrade_mode String?       @db.VarChar(255)
+  platform     String?       @db.VarChar(255)
+  description  String?       @db.Text
   paths        Json
   app_info__id Int?
   app__t_infos app__t_infos? @relation(fields: [app_info__id], references: [id])
 
   @@index([app_info__id], name: "FK_297f3d3b3e0b92a3ad8470bd818")
+  @@index([updated_at], name: "IDX_46fb6d2569291d87a7964c19af")
+  @@index([created_at], name: "IDX_ea85864d7909c703e7cdb6eb80")
 }
 
 model auth__tr_users_roles {
-  user__id      String
+  user__id      String        @db.VarChar(36)
   role__id      Int
   auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id])
   auth__t_users auth__t_users @relation(fields: [user__id], references: [id])
@@ -50,163 +57,188 @@ model auth__tr_users_roles {
 }
 
 model auth__t_api_keys {
+  created_at   DateTime @default(now()) @db.DateTime(6)
+  updated_at   DateTime @default(now()) @db.DateTime(6)
+  updated_by   String?  @db.VarChar(100)
+  created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-  updated_by   String?
-  name         String   @unique
-  description  String?
-  is_published Int?
-  key          String
+  name         String   @unique @db.VarChar(100)
+  description  String?  @db.Text
+  is_published Int?     @db.TinyInt
+  key          String   @db.VarChar(255)
   whitelist    Json?
+
+  @@index([created_at], name: "IDX_1a26dd29cddb6b533386ac2af7")
+  @@index([updated_at], name: "IDX_89786b9eb69c44a8b1478ec424")
 }
 
 model auth__t_roles {
+  created_at           DateTime               @default(now()) @db.DateTime(6)
+  updated_at           DateTime               @default(now()) @db.DateTime(6)
+  updated_by           String?                @db.VarChar(100)
+  created_by           String?                @db.VarChar(100)
   id                   Int                    @id @default(autoincrement())
-  created_at           DateTime               @default(now())
-  updated_at           DateTime               @default(now())
-  updated_by           String?
-  name                 String                 @unique
-  description          String?
+  name                 String                 @unique @db.VarChar(80)
+  description          String?                @db.VarChar(255)
   authorities          Json?
+  data_filter          Json?
   auth__tr_users_roles auth__tr_users_roles[]
+
+  @@index([created_at], name: "IDX_22b4750b85446ae5ddda8fb58e")
+  @@index([updated_at], name: "IDX_756b71a11a50bc357ab1cf79e9")
 }
 
 model auth__t_users {
-  id                   String                 @id
-  created_at           DateTime               @default(now())
-  updated_at           DateTime               @default(now())
-  updated_by           String?
-  username             String                 @unique
-  email                String?                @unique
-  nickname             String?                @unique
-  portrait             String?
-  channel              String?                @default("default")
-  password             String?
-  salt                 String?
-  last_signed_at       DateTime?
-  last_login_at        DateTime?
-  description          String?
-  is_active            Int?
-  is_bound             Int?                   @default(0)
-  tenant__id           String?
-  ss__t_tenants        ss__t_tenants?         @relation(fields: [tenant__id], references: [id])
+  id                   String                 @id @db.VarChar(36)
+  created_at           DateTime               @default(now()) @db.DateTime(6)
+  updated_at           DateTime               @default(now()) @db.DateTime(6)
+  updated_by           String?                @db.VarChar(100)
+  username             String                 @unique @db.VarChar(50)
+  email                String?                @unique @db.VarChar(50)
+  nickname             String?                @unique @db.VarChar(50)
+  portrait             String?                @db.VarChar(255)
+  channel              String?                @default("default") @db.VarChar(255)
+  password             String?                @db.VarChar(255)
+  salt                 String?                @db.VarChar(255)
+  last_signed_at       DateTime?              @db.DateTime(0)
+  last_login_at        DateTime?              @db.DateTime(0)
+  description          String?                @db.Text
+  is_active            Int?                   @db.TinyInt
+  is_bound             Int?                   @default(0) @db.TinyInt
   auth__tr_users_roles auth__tr_users_roles[]
   wx__t_users          wx__t_users?
-
-  @@index([tenant__id], name: "FK_8cfa67a6ea28205d4054ef9f6ad")
-}
-
-model client__t_users {
-  uuid       String   @id
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
 }
 
 model content__t_drafts {
+  created_at DateTime @default(now()) @db.DateTime(6)
+  updated_at DateTime @default(now()) @db.DateTime(6)
+  updated_by String?  @db.VarChar(100)
+  created_by String?  @db.VarChar(100)
   id         Int      @id @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  updated_by String?
   content    Json
-  ref_id     String
-  type       String
+  ref_id     String   @db.VarChar(36)
+  type       String   @db.VarChar(20)
+
+  @@index([created_at], name: "IDX_585015aa5b3babda04237f193e")
+  @@index([updated_at], name: "IDX_98650d2dd375ea29381eabc532")
 }
 
 model content__t_feedback {
+  created_at                  DateTime                      @default(now()) @db.DateTime(6)
+  updated_at                  DateTime                      @default(now()) @db.DateTime(6)
+  updated_by                  String?                       @db.VarChar(100)
+  created_by                  String?                       @db.VarChar(100)
   id                          Int                           @id @default(autoincrement())
-  created_at                  DateTime                      @default(now())
-  updated_at                  DateTime                      @default(now())
-  updated_by                  String?
-  profile__id                 String?
-  name                        String?
-  description                 String?
-  type                        String?
+  profile__id                 String?                       @db.VarChar(36)
+  name                        String?                       @db.VarChar(255)
+  description                 String?                       @db.Text
+  type                        String?                       @db.VarChar(50)
   images                      Json?
-  status                      String
+  status                      String                        @db.VarChar(20)
   user__t_profiles            user__t_profiles?             @relation(fields: [profile__id], references: [id])
   content__t_feedback_replies content__t_feedback_replies[]
 
   @@index([profile__id], name: "FK_f909b9eac784fd3622ae398e6fc")
+  @@index([created_at], name: "IDX_a17f505248cbcf2b42abdd9578")
+  @@index([updated_at], name: "IDX_b809b0fa7a0b09ad014d7134c4")
 }
 
 model content__t_feedback_replies {
+  created_at          DateTime             @default(now()) @db.DateTime(6)
+  updated_at          DateTime             @default(now()) @db.DateTime(6)
+  updated_by          String?              @db.VarChar(100)
+  created_by          String?              @db.VarChar(100)
   id                  Int                  @id @default(autoincrement())
-  created_at          DateTime             @default(now())
-  updated_at          DateTime             @default(now())
-  updated_by          String?
-  ref_id              String
+  ref_id              String               @db.VarChar(36)
   images              Json?
-  description         String
-  sender_type         String
+  description         String               @db.VarChar(1000)
+  sender_type         String               @db.VarChar(1000)
   feedback__id        Int?
   content__t_feedback content__t_feedback? @relation(fields: [feedback__id], references: [id])
 
   @@index([feedback__id], name: "FK_664489527fd4888cfe12591feed")
+  @@index([created_at], name: "IDX_0bc3e3b443ca8bf3a3ffba83eb")
+  @@index([updated_at], name: "IDX_5010543a30396840afa04ad319")
 }
 
 model content__t_notifications {
+  created_at   DateTime @default(now()) @db.DateTime(6)
+  updated_at   DateTime @default(now()) @db.DateTime(6)
+  updated_by   String?  @db.VarChar(100)
+  created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-  updated_by   String?
-  name         String   @unique
-  description  String?
-  is_published Int?
-  type         String
-  usage        String?
+  name         String   @unique @db.VarChar(100)
+  description  String?  @db.Text
+  is_published Int?     @db.TinyInt
+  type         String   @db.VarChar(255)
+  usage        String?  @db.VarChar(255)
+
+  @@index([created_at], name: "IDX_6ec8dc856f5228bb5d6fd7a179")
+  @@index([updated_at], name: "IDX_892503296b6fcaf6d33245289a")
 }
 
 model kv__t_models {
+  created_at   DateTime     @default(now()) @db.DateTime(6)
+  updated_at   DateTime     @default(now()) @db.DateTime(6)
+  updated_by   String?      @db.VarChar(100)
+  created_by   String?      @db.VarChar(100)
   id           Int          @id @default(autoincrement())
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @default(now())
-  updated_by   String?
-  name         String       @unique
-  description  String?
-  is_published Int?
-  format_type  String?
+  name         String       @unique @db.VarChar(100)
+  description  String?      @db.Text
+  is_published Int?         @db.TinyInt
+  format_type  String?      @db.VarChar(255)
   pair__id     Int?         @unique
   kv__t_pairs  kv__t_pairs? @relation(fields: [pair__id], references: [id])
+
+  @@index([updated_at], name: "IDX_57b308a0c3947d7c32d296f1b6")
+  @@index([created_at], name: "IDX_5bde4c94d5f93c71e5c2d7163d")
 }
 
 model kv__t_pairs {
+  created_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_by   String?       @db.VarChar(100)
+  created_by   String?       @db.VarChar(100)
   id           Int           @id @default(autoincrement())
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @default(now())
-  updated_by   String?
-  collection   String
-  key          String
-  name         String?
-  type         String?
-  value        String?
+  collection   String        @db.VarChar(100)
+  key          String        @db.VarChar(100)
+  name         String?       @db.VarChar(255)
+  type         String?       @db.VarChar(255)
+  value        String?       @db.Text
   extra        Json?
   kv__t_models kv__t_models?
+
+  @@index([created_at], name: "IDX_51e67821d6b5e90468c7fef387")
+  @@index([updated_at], name: "IDX_e47de1fa453092410b3d92841e")
 }
 
 model migrations {
   id        Int    @id @default(autoincrement())
-  timestamp Int
-  name      String
+  timestamp BigInt
+  name      String @db.VarChar(255)
 }
 
 model page__t_views {
+  created_at   DateTime @default(now()) @db.DateTime(6)
+  updated_at   DateTime @default(now()) @db.DateTime(6)
+  updated_by   String?  @db.VarChar(100)
+  created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-  updated_by   String?
-  name         String   @unique
-  description  String?
-  is_published Int?
-  path         String
-  main_file    String?
+  name         String   @unique @db.VarChar(100)
+  description  String?  @db.Text
+  is_published Int?     @db.TinyInt
+  path         String   @db.VarChar(50)
+  main_file    String?  @db.VarChar(255)
   files        Json?
   images       Json?
+
+  @@index([updated_at], name: "IDX_1444de8153ca029a71dc77a5d6")
+  @@index([created_at], name: "IDX_4e9aa5aec6ca57cd59acf3c5be")
 }
 
 model payment__tr_order_items {
-  order__id         String
-  item__id          String
+  order__id         String            @db.VarChar(36)
+  item__id          String            @db.VarChar(36)
   payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id])
   payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id])
 
@@ -216,51 +248,51 @@ model payment__tr_order_items {
 }
 
 model payment__t_items {
-  id                      String                    @id
-  created_at              DateTime                  @default(now())
-  updated_at              DateTime                  @default(now())
-  updated_by              String?
-  name                    String                    @unique
-  description             String?
-  is_published            Int?
-  key                     String                    @unique
-  summary                 String?
-  price                   Float?
-  cover                   String?
+  id                      String                    @id @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_by              String?                   @db.VarChar(100)
+  name                    String                    @unique @db.VarChar(100)
+  description             String?                   @db.Text
+  is_published            Int?                      @db.TinyInt
+  key                     String                    @unique @db.VarChar(50)
+  summary                 String?                   @db.Text
+  price                   Decimal?                  @db.Decimal(15, 2)
+  cover                   String?                   @db.VarChar(1000)
   images                  Json?
   payment__tr_order_items payment__tr_order_items[]
 }
 
 model payment__t_methods {
-  id                      String                    @id
-  created_at              DateTime                  @default(now())
-  updated_at              DateTime                  @default(now())
-  updated_by              String?
-  name                    String                    @unique
-  description             String?
-  is_published            Int?
-  display_name            String?
-  endpoint                String?
-  merchant                String?
-  apiKey                  String?
-  private_key             String?
+  id                      String                    @id @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_by              String?                   @db.VarChar(100)
+  name                    String                    @unique @db.VarChar(100)
+  description             String?                   @db.Text
+  is_published            Int?                      @db.TinyInt
+  display_name            String?                   @db.VarChar(255)
+  endpoint                String?                   @db.VarChar(255)
+  merchant                String?                   @db.VarChar(255)
+  apiKey                  String?                   @db.VarChar(255)
+  private_key             String?                   @db.Text
   extra                   Json?
-  sign_tmpl               String?
-  body_tmpl               String?
-  type                    String?                   @default("third")
+  sign_tmpl               String?                   @db.Text
+  body_tmpl               String?                   @db.Text
+  type                    String?                   @default("third") @db.VarChar(255)
   payment__t_transactions payment__t_transactions[]
 }
 
 model payment__t_orders {
-  id                      String                    @id
-  created_at              DateTime                  @default(now())
-  updated_at              DateTime                  @default(now())
-  updated_by              String?
-  profile__id             String?
-  name                    String?
-  amount                  Float
-  status                  String?
-  transaction__id         String?                   @unique
+  id                      String                    @id @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  updated_by              String?                   @db.VarChar(100)
+  profile__id             String?                   @db.VarChar(36)
+  name                    String?                   @db.VarChar(255)
+  amount                  Decimal                   @db.Decimal(15, 2)
+  status                  String?                   @db.VarChar(255)
+  transaction__id         String?                   @unique @db.VarChar(36)
   user__t_profiles        user__t_profiles?         @relation(fields: [profile__id], references: [id])
   payment__t_transactions payment__t_transactions?  @relation(fields: [transaction__id], references: [id])
   payment__tr_order_items payment__tr_order_items[]
@@ -269,17 +301,17 @@ model payment__t_orders {
 }
 
 model payment__t_transactions {
-  id                 String              @id
-  created_at         DateTime            @default(now())
-  updated_at         DateTime            @default(now())
-  updated_by         String?
-  profile__id        String?
-  status             String?
-  sign               String?
+  id                 String              @id @db.VarChar(36)
+  created_at         DateTime            @default(now()) @db.DateTime(6)
+  updated_at         DateTime            @default(now()) @db.DateTime(6)
+  updated_by         String?             @db.VarChar(100)
+  profile__id        String?             @db.VarChar(36)
+  status             String?             @db.VarChar(255)
+  sign               String?             @db.VarChar(255)
   payment_info       Json?
   extra              Json?
   data               Json?
-  method__id         String?
+  method__id         String?             @db.VarChar(36)
   payment__t_methods payment__t_methods? @relation(fields: [method__id], references: [id])
   user__t_profiles   user__t_profiles?   @relation(fields: [profile__id], references: [id])
   payment__t_orders  payment__t_orders?
@@ -289,267 +321,292 @@ model payment__t_transactions {
 }
 
 model property__t_exchange_objects {
+  created_at                         DateTime                             @default(now()) @db.DateTime(6)
+  updated_at                         DateTime                             @default(now()) @db.DateTime(6)
+  updated_by                         String?                              @db.VarChar(100)
+  created_by                         String?                              @db.VarChar(100)
   id                                 Int                                  @id @default(autoincrement())
-  created_at                         DateTime                             @default(now())
-  updated_at                         DateTime                             @default(now())
-  updated_by                         String?
-  name                               String                               @unique
-  description                        String?
-  is_published                       Int?
-  key                                String                               @unique
-  type                               String
-  price                              Float
-  value                              String
-  cover                              String?
-  usage                              String?
+  name                               String                               @unique @db.VarChar(100)
+  description                        String?                              @db.Text
+  is_published                       Int?                                 @db.TinyInt
+  key                                String                               @unique @db.VarChar(50)
+  type                               String                               @db.VarChar(255)
+  price                              Decimal                              @db.Decimal(15, 2)
+  value                              String                               @db.VarChar(255)
+  cover                              String?                              @db.VarChar(1000)
+  usage                              String?                              @db.VarChar(255)
   property__t_financial_transactions property__t_financial_transactions[]
+
+  @@index([updated_at], name: "IDX_857728c978caf383ca64a60068")
+  @@index([created_at], name: "IDX_fdce394ef88931baf178388e5b")
 }
 
 model property__t_financial_transactions {
+  created_at                   DateTime                      @default(now()) @db.DateTime(6)
+  updated_at                   DateTime                      @default(now()) @db.DateTime(6)
+  updated_by                   String?                       @db.VarChar(100)
+  created_by                   String?                       @db.VarChar(100)
   id                           Int                           @id @default(autoincrement())
-  created_at                   DateTime                      @default(now())
-  updated_at                   DateTime                      @default(now())
-  updated_by                   String?
   change                       Int
-  type                         String
+  type                         String                        @db.VarChar(50)
   before                       Int
   after                        Int
-  ref_id                       String?
+  ref_id                       String?                       @db.VarChar(255)
   extra                        Json?
-  remark                       String?
-  profile__id                  String?
+  remark                       String?                       @db.Text
+  profile__id                  String?                       @db.VarChar(36)
   exchange_object__id          Int?
   property__t_exchange_objects property__t_exchange_objects? @relation(fields: [exchange_object__id], references: [id])
   user__t_profiles             user__t_profiles?             @relation(fields: [profile__id], references: [id])
 
   @@index([exchange_object__id], name: "FK_66319aeac147cdacaaa6d3972c1")
   @@index([profile__id], name: "FK_971dbdb2ea844a15d0809c9bd39")
+  @@index([updated_at], name: "IDX_057d44268662ae35a409e05716")
+  @@index([created_at], name: "IDX_caaf5c99071949432a304aa8e3")
 }
 
 model property__t_point_exchanges {
+  created_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_by       String?           @db.VarChar(100)
+  created_by       String?           @db.VarChar(100)
   id               Int               @id @default(autoincrement())
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now())
-  updated_by       String?
   change           Int
-  type             String
+  type             String            @db.VarChar(50)
   before           Int
   after            Int
-  ref_id           String?
+  ref_id           String?           @db.VarChar(255)
   extra            Json?
-  remark           String?
-  profile__id      String?
+  remark           String?           @db.Text
+  profile__id      String?           @db.VarChar(36)
   body             Json?
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
 
   @@index([profile__id], name: "FK_71e71a796ec68bd891e63d37a5f")
+  @@index([created_at], name: "IDX_8439bf0a7c4628f85a0f76540f")
+  @@index([updated_at], name: "IDX_90810898d4811098f6d2bc9db5")
 }
 
 model property__t_wallets {
+  created_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_by       String?           @db.VarChar(100)
+  created_by       String?           @db.VarChar(100)
   id               Int               @id @default(autoincrement())
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now())
-  updated_by       String?
-  profile__id      String?           @unique
+  profile__id      String?           @unique @db.VarChar(36)
   balance          Int
   available        Int
   frozen           Int
   withdrawals      Int
   points           Int
   /// This field's default value can currently not be parsed: `-1`.
-  total_recharge   Int               @default(dbgenerated())
+  total_recharge   Int               @default(-1)
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
+
+  @@index([created_at], name: "IDX_33a258d269927d3d59b4dabf8b")
+  @@index([updated_at], name: "IDX_846797d1cb31afb19251e8c853")
 }
 
 model sys__t_audit_records {
+  created_at     DateTime @default(now()) @db.DateTime(6)
+  updated_at     DateTime @default(now()) @db.DateTime(6)
+  updated_by     String?  @db.VarChar(100)
+  created_by     String?  @db.VarChar(100)
   id             Int      @id @default(autoincrement())
-  created_at     DateTime @default(now())
-  updated_at     DateTime @default(now())
-  updated_by     String?
-  type           String?
-  action         String?
+  type           String?  @db.VarChar(255)
+  action         String?  @db.VarChar(100)
   identification Json?
   from           Json?
   to             Json?
   diff           Json?
+
+  @@index([updated_at], name: "IDX_1f180c9dd2bc784fb41ad41c7a")
+  @@index([created_at], name: "IDX_cc772254fa7dbbb79b73e46cb8")
 }
 
 model sys__t_operation_tokens {
+  created_at    DateTime  @default(now()) @db.DateTime(6)
+  updated_at    DateTime  @default(now()) @db.DateTime(6)
+  updated_by    String?   @db.VarChar(100)
+  created_by    String?   @db.VarChar(100)
   id            Int       @id @default(autoincrement())
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @default(now())
-  updated_by    String?
-  role          String
-  type          String
-  identifier    String
-  key           String?
-  token         String
-  short_id      String
+  role          String    @db.VarChar(50)
+  type          String    @db.VarChar(50)
+  identifier    String    @db.VarChar(255)
+  key           String?   @db.VarChar(255)
+  token         String    @db.VarChar(32)
+  short_id      String    @db.VarChar(9)
   body          Json?
-  service       String
+  service       String    @db.VarChar(50)
   left          Int?
   used_count    Int?      @default(0)
-  expired_at    DateTime?
-  is_used       Int?      @default(0)
-  is_deprecated Int?      @default(0)
-  is_active     Int?      @default(1)
-  is_expired    Int?      @default(0)
+  expired_at    DateTime? @db.DateTime(0)
+  is_used       Int?      @default(0) @db.TinyInt
+  is_deprecated Int?      @default(0) @db.TinyInt
+  is_active     Int?      @default(1) @db.TinyInt
+  is_expired    Int?      @default(0) @db.TinyInt
+
+  @@index([updated_at], name: "IDX_9ae08b76a592a4c4ab812f91b5")
+  @@index([created_at], name: "IDX_efc969a8a30a0f5fd869d1c73f")
 }
 
 model sys__t_tasks {
-  id                 String               @id
-  created_at         DateTime             @default(now())
-  updated_at         DateTime             @default(now())
-  updated_by         String?
-  identifier         String?
-  unique_id          String?
-  service            String?
-  type               String?
-  channel            String?
-  state              String?
+  id                 String               @id @db.VarChar(36)
+  created_at         DateTime             @default(now()) @db.DateTime(6)
+  updated_at         DateTime             @default(now()) @db.DateTime(6)
+  updated_by         String?              @db.VarChar(100)
+  identifier         String?              @db.VarChar(50)
+  unique_id          String?              @db.VarChar(50)
+  service            String?              @db.VarChar(50)
+  type               String?              @db.VarChar(50)
+  channel            String?              @db.VarChar(50)
+  state              String?              @db.VarChar(20)
   body               Json?
   sys__t_task_events sys__t_task_events[]
 }
 
 model sys__t_task_events {
+  created_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_at   DateTime      @default(now()) @db.DateTime(6)
+  updated_by   String?       @db.VarChar(100)
+  created_by   String?       @db.VarChar(100)
   id           Int           @id @default(autoincrement())
-  created_at   DateTime      @default(now())
-  updated_at   DateTime      @default(now())
-  updated_by   String?
-  message      String?
+  message      String?       @db.VarChar(255)
   body         Json?
-  task__id     String?
+  task__id     String?       @db.VarChar(36)
   sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id])
 
   @@index([task__id], name: "FK_b9db76df8c6d282adb47c191808")
+  @@index([updated_at], name: "IDX_553d001ee8575bb606a5ef3057")
+  @@index([created_at], name: "IDX_b5583e5a27f6465be6f909146d")
 }
 
 model user__t_activities {
-  id               String            @id
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now())
-  updated_by       String?
-  profile__id      String?
-  ref_id           String
-  type             String
-  service          String
-  operation        String
+  id               String            @id @db.VarChar(36)
+  created_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_by       String?           @db.VarChar(100)
+  profile__id      String?           @db.VarChar(36)
+  ref_id           String            @db.VarChar(36)
+  type             String            @db.VarChar(20)
+  service          String            @db.VarChar(20)
+  operation        String            @db.VarChar(20)
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
 
   @@index([profile__id], name: "FK_89b4fa3d94c3a2c8464feb0c279")
 }
 
 model user__t_follows {
-  id               String            @id
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now())
-  updated_by       String?
-  type             String?
-  following        String?
-  follower__id     String?
+  id               String            @id @db.VarChar(36)
+  created_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_by       String?           @db.VarChar(100)
+  type             String?           @db.VarChar(50)
+  following        String?           @db.VarChar(50)
+  follower__id     String?           @db.VarChar(36)
   user__t_profiles user__t_profiles? @relation(fields: [follower__id], references: [id])
 
   @@index([follower__id], name: "FK_ab5a56d5c89e147cc87c96b6a7d")
 }
 
 model wx__t_mini_app_users {
-  open_id          String            @id
-  nickname         String?
+  open_id          String            @id @db.VarChar(36)
+  nickname         String?           @db.VarChar(255)
   gender           Int?
-  language         String?
-  mobile           String?
-  city             String?
-  province         String?
-  country          String?
-  avatar           String?
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @default(now())
-  updated_by       String?
-  profile__id      String?           @unique
+  language         String?           @db.VarChar(255)
+  mobile           String?           @db.VarChar(255)
+  city             String?           @db.VarChar(255)
+  province         String?           @db.VarChar(255)
+  country          String?           @db.VarChar(255)
+  avatar           String?           @db.VarChar(255)
+  created_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  updated_by       String?           @db.VarChar(100)
+  profile__id      String?           @unique @db.VarChar(36)
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
 }
 
 model wx__t_users {
-  tenant__id      String?
-  open_id         String         @id
-  nickname        String?
-  head_img        String?
-  remark          String?
+  tenant__id      String?        @db.VarChar(36)
+  open_id         String         @id @db.VarChar(36)
+  nickname        String?        @db.VarChar(255)
+  head_img        String?        @db.VarChar(1000)
+  remark          String?        @db.VarChar(255)
   group_id        Int?
-  union_id        String?
+  union_id        String?        @db.VarChar(255)
   tag_ids         Json?
   sex             Int?
   subscribe       Int?
   subscribe_time  Int?
-  subscribe_scene String?
-  country         String?
-  city            String?
-  province        String?
-  language        String?
+  subscribe_scene String?        @db.VarChar(255)
+  country         String?        @db.VarChar(255)
+  city            String?        @db.VarChar(255)
+  province        String?        @db.VarChar(255)
+  language        String?        @db.VarChar(255)
   qr_scene        Int?
-  qr_scene_str    String?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @default(now())
-  admin__id       String?        @unique
+  qr_scene_str    String?        @db.VarChar(255)
+  created_at      DateTime       @default(now()) @db.DateTime(6)
+  updated_at      DateTime       @default(now()) @db.DateTime(6)
+  admin__id       String?        @unique @db.VarChar(36)
   auth__t_users   auth__t_users? @relation(fields: [admin__id], references: [id])
   ss__t_tenants   ss__t_tenants? @relation(fields: [tenant__id], references: [id])
 
   @@index([tenant__id], name: "FK_84c91d701b8ae841a49bf00352f")
 }
 
-model sys__t_devices {
-  id         Int      @id @default(autoincrement())
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  updated_by String?
-  device_id  String?
-  session_id String?
-  ua         String
-  client_ip  String?
-}
-
 model client__t_session_users {
-  created_at                 DateTime                   @default(now())
-  updated_at                 DateTime                   @default(now())
-  updated_by                 String?
-  profile__id                String?
-  uid                        String
-  device__id                 String?
-  session__id                String                     @id
+  created_at                 DateTime                   @default(now()) @db.DateTime(6)
+  updated_at                 DateTime                   @default(now()) @db.DateTime(6)
+  updated_by                 String?                    @db.VarChar(100)
+  created_by                 String?                    @db.VarChar(100)
+  profile__id                String?                    @db.VarChar(36)
+  uid                        String                     @db.VarChar(36)
+  device__id                 String?                    @db.VarChar(36)
+  session__id                String                     @id @db.VarChar(36)
   client__t_virtual_devices  client__t_virtual_devices? @relation(fields: [device__id], references: [id])
   user__t_profiles           user__t_profiles?          @relation(fields: [profile__id], references: [id])
   client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id])
 
   @@index([profile__id], name: "FK_5d257e4a36e0b569e4fd02e8ae9")
   @@index([device__id], name: "FK_928b741562da4908a8d468afc26")
+  @@index([updated_at], name: "IDX_54ac8410107e9728f051c493ec")
+  @@index([created_at], name: "IDX_bea7340e1acf012907684b3a8a")
 }
 
 model client__t_virtual_devices {
-  created_at                 DateTime                     @default(now())
-  updated_at                 DateTime                     @default(now())
-  updated_by                 String?
-  id                         String                       @id
-  type                       String?
+  created_at                 DateTime                     @default(now()) @db.DateTime(6)
+  updated_at                 DateTime                     @default(now()) @db.DateTime(6)
+  updated_by                 String?                      @db.VarChar(100)
+  created_by                 String?                      @db.VarChar(100)
+  id                         String                       @id @db.VarChar(36)
+  type                       String?                      @db.VarChar(20)
   client__t_session_users    client__t_session_users[]
   client__t_virtual_sessions client__t_virtual_sessions[]
+
+  @@index([updated_at], name: "IDX_176cff1f83eabd5c73640c6231")
+  @@index([created_at], name: "IDX_214d921abf73eca7ef1e6eb59b")
 }
 
 model client__t_virtual_sessions {
-  created_at                DateTime                   @default(now())
-  updated_at                DateTime                   @default(now())
-  updated_by                String?
-  id                        String                     @id
-  ua                        String
-  client_ip                 String?
-  device__id                String?
+  created_at                DateTime                   @default(now()) @db.DateTime(6)
+  updated_at                DateTime                   @default(now()) @db.DateTime(6)
+  updated_by                String?                    @db.VarChar(100)
+  created_by                String?                    @db.VarChar(100)
+  id                        String                     @id @db.VarChar(36)
+  ua                        String                     @db.VarChar(512)
+  client_ip                 String?                    @db.VarChar(36)
+  device__id                String?                    @db.VarChar(36)
   client__t_virtual_devices client__t_virtual_devices? @relation(fields: [device__id], references: [id])
   client__t_session_users   client__t_session_users?
+  web__t_tracing_records    web__t_tracing_records?
 
   @@index([device__id], name: "FK_30e40b42549b0bcb0828ff5d9db")
+  @@index([created_at], name: "IDX_5ded6e94d7d8e4cf7d1f627a97")
+  @@index([updated_at], name: "IDX_79fcb330bf59003a59e09e2894")
 }
 
 model ss__tr_org_users_roles {
-  org_user__id    String
+  org_user__id    String          @db.VarChar(36)
   role__id        Int
   ss__t_org_users ss__t_org_users @relation(fields: [org_user__id], references: [id])
   ss__t_org_roles ss__t_org_roles @relation(fields: [role__id], references: [id])
@@ -560,33 +617,37 @@ model ss__tr_org_users_roles {
 }
 
 model ss__t_org_roles {
-  created_at             DateTime                 @default(now())
-  updated_at             DateTime                 @default(now())
-  updated_by             String?
+  created_at             DateTime                 @default(now()) @db.DateTime(6)
+  updated_at             DateTime                 @default(now()) @db.DateTime(6)
+  updated_by             String?                  @db.VarChar(100)
+  created_by             String?                  @db.VarChar(100)
   id                     Int                      @id @default(autoincrement())
-  name                   String                   @unique
-  description            String?
+  name                   String                   @unique @db.VarChar(80)
+  description            String?                  @db.VarChar(255)
   ss__tr_org_users_roles ss__tr_org_users_roles[]
+
+  @@index([created_at], name: "IDX_af9ce2de264d81547b8edcfb27")
+  @@index([updated_at], name: "IDX_e87d3a9200b11b0ca9e8854f09")
 }
 
 model ss__t_org_users {
-  id                     String                   @id
-  created_at             DateTime                 @default(now())
-  updated_at             DateTime                 @default(now())
-  updated_by             String?
-  username               String                   @unique
-  email                  String?                  @unique
-  nickname               String?                  @unique
-  portrait               String?
-  channel                String?                  @default("default")
-  password               String?
-  salt                   String?
-  last_signed_at         DateTime?
-  last_login_at          DateTime?
-  description            String?
-  is_active              Int?
-  is_bound               Int?                     @default(0)
-  tenant__id             String?
+  id                     String                   @id @db.VarChar(36)
+  created_at             DateTime                 @default(now()) @db.DateTime(6)
+  updated_at             DateTime                 @default(now()) @db.DateTime(6)
+  updated_by             String?                  @db.VarChar(100)
+  username               String                   @unique @db.VarChar(50)
+  email                  String?                  @unique @db.VarChar(50)
+  nickname               String?                  @unique @db.VarChar(50)
+  portrait               String?                  @db.VarChar(255)
+  channel                String?                  @default("default") @db.VarChar(255)
+  password               String?                  @db.VarChar(255)
+  salt                   String?                  @db.VarChar(255)
+  last_signed_at         DateTime?                @db.DateTime(0)
+  last_login_at          DateTime?                @db.DateTime(0)
+  description            String?                  @db.Text
+  is_active              Int?                     @db.TinyInt
+  is_bound               Int?                     @default(0) @db.TinyInt
+  tenant__id             String?                  @db.VarChar(36)
   ss__t_tenants          ss__t_tenants?           @relation(fields: [tenant__id], references: [id])
   ss__tr_org_users_roles ss__tr_org_users_roles[]
 
@@ -594,54 +655,34 @@ model ss__t_org_users {
 }
 
 model ss__t_tenants {
-  id              String            @id
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @default(now())
-  updated_by      String?
-  name            String            @unique
-  description     String?
-  is_published    Int?
-  auth__t_users   auth__t_users[]
+  id              String            @id @db.VarChar(36)
+  created_at      DateTime          @default(now()) @db.DateTime(6)
+  updated_at      DateTime          @default(now()) @db.DateTime(6)
+  updated_by      String?           @db.VarChar(100)
+  name            String            @unique @db.VarChar(100)
+  description     String?           @db.Text
+  is_published    Int?              @db.TinyInt
   ss__t_org_users ss__t_org_users[]
   wx__t_users     wx__t_users[]
 }
 
-model user__profiles {
-  id             String    @id
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @default(now())
-  updated_by     String?
-  username       String    @unique
-  email          String?   @unique
-  nickname       String?   @unique
-  portrait       String?
-  channel        String?   @default("default")
-  password       String?
-  salt           String?
-  last_signed_at DateTime?
-  last_login_at  DateTime?
-  description    String?
-  is_active      Int?
-  is_bound       Int?      @default(0)
-}
-
 model user__t_profiles {
-  id                                 String                               @id
-  created_at                         DateTime                             @default(now())
-  updated_at                         DateTime                             @default(now())
-  updated_by                         String?
-  username                           String                               @unique
-  email                              String?                              @unique
-  nickname                           String?                              @unique
-  portrait                           String?
-  channel                            String?                              @default("default")
-  password                           String?
-  salt                               String?
-  last_signed_at                     DateTime?
-  last_login_at                      DateTime?
-  description                        String?
-  is_active                          Int?
-  is_bound                           Int?                                 @default(0)
+  id                                 String                               @id @db.VarChar(36)
+  created_at                         DateTime                             @default(now()) @db.DateTime(6)
+  updated_at                         DateTime                             @default(now()) @db.DateTime(6)
+  updated_by                         String?                              @db.VarChar(100)
+  username                           String                               @unique @db.VarChar(50)
+  email                              String?                              @unique @db.VarChar(50)
+  nickname                           String?                              @unique @db.VarChar(50)
+  portrait                           String?                              @db.VarChar(255)
+  channel                            String?                              @default("default") @db.VarChar(255)
+  password                           String?                              @db.VarChar(255)
+  salt                               String?                              @db.VarChar(255)
+  last_signed_at                     DateTime?                            @db.DateTime(0)
+  last_login_at                      DateTime?                            @db.DateTime(0)
+  description                        String?                              @db.Text
+  is_active                          Int?                                 @db.TinyInt
+  is_bound                           Int?                                 @default(0) @db.TinyInt
   client__t_session_users            client__t_session_users[]
   content__t_feedback                content__t_feedback[]
   payment__t_orders                  payment__t_orders[]
@@ -652,4 +693,33 @@ model user__t_profiles {
   user__t_activities                 user__t_activities[]
   user__t_follows                    user__t_follows[]
   wx__t_mini_app_users               wx__t_mini_app_users?
+}
+
+model content__t_data_groups {
+  id          String   @id @db.VarChar(36)
+  created_at  DateTime @default(now()) @db.DateTime(6)
+  updated_at  DateTime @default(now()) @db.DateTime(6)
+  updated_by  String?  @db.VarChar(100)
+  name        String   @unique @db.VarChar(100)
+  description String?  @db.Text
+}
+
+model web__t_tracing_records {
+  created_at                 DateTime                   @default(now()) @db.DateTime(6)
+  updated_at                 DateTime                   @default(now()) @db.DateTime(6)
+  updated_by                 String?                    @db.VarChar(100)
+  created_by                 String?                    @db.VarChar(100)
+  referer_url                String?                    @db.VarChar(255)
+  landing_url                String?                    @db.VarChar(255)
+  utm_source                 String?                    @db.VarChar(255)
+  utm_medium                 String?                    @db.VarChar(255)
+  utm_region                 String?                    @db.VarChar(255)
+  utm_area                   String?                    @db.VarChar(255)
+  utm_campaign               String?                    @db.VarChar(255)
+  utm_term                   String?                    @db.VarChar(255)
+  session__id                String                     @id @db.VarChar(36)
+  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id])
+
+  @@index([updated_at], name: "IDX_6042f1e53d26895a6413748497")
+  @@index([created_at], name: "IDX_9699f66084e48645b78b306dae")
 }

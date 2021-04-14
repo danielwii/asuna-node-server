@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 
 import { Promise } from 'bluebird';
-import * as elasticApmNode from 'elastic-apm-node';
+import elasticApmNode from 'elastic-apm-node';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 
