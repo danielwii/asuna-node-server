@@ -7,6 +7,7 @@ import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { Global } from './global';
 import {
+  AliossConfigObject,
   IStorageEngine,
   LocalStorage,
   MinioConfigObject,
@@ -15,6 +16,7 @@ import {
   QiniuStorage,
   StorageMode,
 } from './storage';
+import { AliossStorage } from './storage/storage.alioss.engine';
 import { UploaderConfigObject } from './uploader/config';
 
 const logger = LoggerFactory.getLogger('AsunaContext');
@@ -99,12 +101,19 @@ export class AsunaContext {
     UploaderConfigObject.uploadPath = uploadPath;
     Global.uploadPath = uploadPath;
 
-    const defaultStorage = configLoader.loadConfig(ConfigKeys.DEFAULT_STORAGE);
+    const defaultStorage = configLoader.loadConfig(ConfigKeys.STORAGE_DEFAULT);
     logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
+
+    if (!_.values<string>(StorageMode).includes(defaultStorage)) {
+      throw new Error(`${defaultStorage} engine not support!`);
+    }
+
     if (defaultStorage === StorageMode.QINIU) {
       this.defaultStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr());
     } else if (defaultStorage === StorageMode.MINIO) {
       this.defaultStorageEngine = new MinioStorage(() => MinioConfigObject.load());
+    } else if (defaultStorage === StorageMode.ALIOSS) {
+      this.defaultStorageEngine = new AliossStorage(() => AliossConfigObject.load());
     } else {
       this.defaultStorageEngine = new LocalStorage(Global.uploadPath);
     }

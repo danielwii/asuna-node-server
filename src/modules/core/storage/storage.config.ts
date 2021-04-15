@@ -1,7 +1,9 @@
 import { Expose, plainToClass, Transform } from 'class-transformer';
-import * as _ from 'lodash';
-import { configLoader } from '../../config';
+import _ from 'lodash';
+
+import { withP, withP2 } from '../../common/helpers/utils';
 import { LoggerFactory } from '../../common/logger';
+import { configLoader, YamlConfigKeys } from '../../config';
 
 export const QiniuConfigKeys = {
   QINIU_ENABLE: 'QINIU_ENABLE',
@@ -13,46 +15,48 @@ export const QiniuConfigKeys = {
 };
 
 export class QiniuConfigObject {
-  static logger = LoggerFactory.getLogger('QiniuConfigObject');
+  private static key = YamlConfigKeys.storage;
+  private static prefix = `${QiniuConfigObject.key}_`;
 
-  enable: boolean;
+  private static logger = LoggerFactory.getLogger('QiniuConfigObject');
 
+  public enable: boolean;
   // bucket 应该用 scope 来替换，用来明确概念
-  bucket: string;
-
+  public bucket: string;
   /**
    * 用来和 /uploads/ 后面的路径做匹配
    */
-  path: string;
-
-  domain: string;
-
-  accessKey: string;
+  public path: string;
+  public domain: string;
+  public accessKey: string;
 
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
-  secretKey: string;
+  @Transform((value) => !!value, { toPlainOnly: true })
+  public secretKey: string;
 
   constructor(o: Partial<QiniuConfigObject>) {
     Object.assign(this, plainToClass(QiniuConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
+  public static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    this.logger.log(`load env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
-    return new QiniuConfigObject({
-      enable: configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`),
-      bucket: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_BUCKET_NAME}`),
-      path: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_PATH}`),
-      domain: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_DOMAIN}`),
-      accessKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ACCESS_KEY}`),
-      secretKey: configLoader.loadConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_SECRET_KEY}`),
-    });
+    this.logger.verbose(`try load env: ${QiniuConfigObject.prefix}${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
+    return withP2(
+      (p): any => configLoader.loadConfig2(QiniuConfigObject.key, p),
+      QiniuConfigKeys,
+      (loader, keys) =>
+        new QiniuConfigObject({
+          enable: withP(keys.QINIU_ENABLE, loader),
+          bucket: withP(keys.QINIU_BUCKET_NAME, loader),
+          path: withP(keys.QINIU_PATH, loader),
+          domain: withP(keys.QINIU_DOMAIN, loader),
+          accessKey: withP(keys.QINIU_ACCESS_KEY, loader),
+          secretKey: withP(keys.QINIU_SECRET_KEY, loader),
+        }),
+    );
   }
 
-  static loadOr(
-    prefix: 'videos' | 'images' | 'files' | 'chunks' | string = '',
-  ): QiniuConfigObject | null {
+  static loadOr(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
     this.logger.log(`loadOr env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
@@ -62,15 +66,13 @@ export class QiniuConfigObject {
     if (enable === false) {
       return null;
     }
-    return Object.assign(
-      QiniuConfigObject.load(),
-      _.omitBy(QiniuConfigObject.load(prefix), _.isNull),
-    );
+    return Object.assign(QiniuConfigObject.load(), _.omitBy(QiniuConfigObject.load(prefix), _.isNull));
   }
 }
 
 export const MinioConfigKeys = {
   MINIO_ENABLE: 'MINIO_ENABLE',
+  MINIO_MODE: 'MINIO_MODE',
   MINIO_ENDPOINT: 'MINIO_ENDPOINT',
   MINIO_PORT: 'MINIO_PORT',
   MINIO_USE_SSL: 'MINIO_USE_SSL',
@@ -79,34 +81,85 @@ export const MinioConfigKeys = {
 };
 
 export class MinioConfigObject {
-  static logger = LoggerFactory.getLogger('MinioConfigObject');
+  private static key = YamlConfigKeys.storage;
+  private static prefix = `${MinioConfigObject.key}_`;
 
-  enable: boolean;
+  private static logger = LoggerFactory.getLogger('MinioConfigObject');
 
-  endpoint: string;
-
-  port: number;
-
-  useSSL: boolean;
-
-  accessKey: string;
+  public enable: boolean;
+  public mode: 'alioss-compatibility' | undefined;
+  public endpoint: string;
+  public port: number;
+  public useSSL: boolean;
+  public accessKey: string;
 
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
-  secretKey: string;
+  @Transform((value) => !!value, { toPlainOnly: true })
+  public secretKey: string;
 
   constructor(o: Partial<MinioConfigObject>) {
     Object.assign(this, plainToClass(MinioConfigObject, o, { enableImplicitConversion: true }));
   }
 
-  static load(): MinioConfigObject {
-    return new MinioConfigObject({
-      enable: configLoader.loadBoolConfig(MinioConfigKeys.MINIO_ENABLE, false),
-      endpoint: configLoader.loadConfig(MinioConfigKeys.MINIO_ENDPOINT, 'minio'),
-      port: configLoader.loadNumericConfig(MinioConfigKeys.MINIO_PORT, 9000),
-      useSSL: configLoader.loadBoolConfig(MinioConfigKeys.MINIO_USE_SSL, false),
-      accessKey: configLoader.loadConfig(MinioConfigKeys.MINIO_ACCESS_KEY),
-      secretKey: configLoader.loadConfig(MinioConfigKeys.MINIO_SECRET_KEY),
-    });
+  public static load(): MinioConfigObject {
+    this.logger.verbose(`try load env: ${MinioConfigObject.prefix}${MinioConfigKeys.MINIO_ENABLE}`);
+    return withP2(
+      (p): any => configLoader.loadConfig2(MinioConfigObject.key, p),
+      MinioConfigKeys,
+      (loader, keys) =>
+        new MinioConfigObject({
+          enable: withP(keys.MINIO_ENABLE, loader),
+          mode: withP(keys.MINIO_MODE, loader),
+          endpoint: withP(keys.MINIO_ENDPOINT, loader),
+          port: withP(keys.MINIO_PORT, loader),
+          useSSL: withP(keys.MINIO_USE_SSL, loader),
+          accessKey: withP(keys.MINIO_ACCESS_KEY, loader),
+          secretKey: withP(keys.MINIO_SECRET_KEY, loader),
+        }),
+    );
+  }
+}
+
+export const AliossConfigKeys = {
+  ALIOSS_ENABLE: 'ALIOSS_ENABLE',
+  ALIOSS_ACCESS_KEY: 'ALIOSS_ACCESS_KEY',
+  ALIOSS_SECRET_KEY: 'ALIOSS_SECRET_KEY',
+  ALIOSS_REGION: 'ALIOSS_REGION',
+  ALIOSS_DEFAULT_BUCKET: 'ALIOSS_DEFAULT_BUCKET',
+};
+
+export class AliossConfigObject {
+  private static key = YamlConfigKeys.storage;
+  private static prefix = `${AliossConfigObject.key}_`;
+
+  private static logger = LoggerFactory.getLogger('AliossConfigObject');
+
+  public enable: boolean;
+  public region: string;
+  public defaultBucket: string;
+  public accessKey: string;
+
+  @Expose({ name: 'with-secret-key', toPlainOnly: true })
+  @Transform((value) => !!value, { toPlainOnly: true })
+  public secretKey: string;
+
+  public constructor(o: Partial<AliossConfigObject>) {
+    Object.assign(this, plainToClass(AliossConfigObject, o, { enableImplicitConversion: true }));
+  }
+
+  public static load(): AliossConfigObject {
+    this.logger.verbose(`try load env: ${AliossConfigObject.prefix}${AliossConfigKeys.ALIOSS_ENABLE}`);
+    return withP2(
+      (p): any => configLoader.loadConfig2(AliossConfigObject.key, p),
+      AliossConfigKeys,
+      (loader, keys) =>
+        new AliossConfigObject({
+          enable: withP(keys.ALIOSS_ENABLE, loader),
+          defaultBucket: withP(keys.ALIOSS_DEFAULT_BUCKET, loader),
+          region: withP(keys.ALIOSS_REGION, loader),
+          accessKey: withP(keys.ALIOSS_ACCESS_KEY, loader),
+          secretKey: withP(keys.ALIOSS_SECRET_KEY, loader),
+        }),
+    );
   }
 }

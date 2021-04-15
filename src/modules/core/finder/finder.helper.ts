@@ -57,10 +57,10 @@ export class FinderHelper {
     logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
-      logger.warn(`${name ?? 'default'} not available in upstream ${defaultEndpoint}`);
+      logger.warn(`${name ?? 'default'} not available in upstream endpoint ${defaultEndpoint}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
-        `${name ?? 'default'} not available in upstream ${defaultEndpoint}`,
+        `${name ?? 'default'} not available in upstream endpoint ${defaultEndpoint}`,
       );
     }
 

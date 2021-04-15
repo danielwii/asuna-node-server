@@ -34,6 +34,7 @@ export enum YamlConfigKeys {
   sms = 'sms',
   uploader = 'uploader',
   redis = 'redis',
+  storage = 'storage',
 }
 
 export const ConfigKeys = {
@@ -75,7 +76,7 @@ export const ConfigKeys = {
    */
   CHUNKS_STORAGE: 'CHUNKS_STORAGE',
 
-  DEFAULT_STORAGE: 'DEFAULT_STORAGE',
+  STORAGE_DEFAULT: 'STORAGE_DEFAULT',
 
   // WS_REDIS_HOST: 'WS_REDIS_HOST',
   // WS_REDIS_PORT: 'WS_REDIS_PORT',

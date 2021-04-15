@@ -1,5 +1,4 @@
 import { classToPlain } from 'class-transformer';
-import { Response } from 'express';
 import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
@@ -11,6 +10,8 @@ import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
 import { MinioConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
+
+import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('MinioStorage');
 

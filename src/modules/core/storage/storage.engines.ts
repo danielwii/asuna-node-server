@@ -10,6 +10,7 @@ export enum StorageMode {
   LOCAL = 'local',
   QINIU = 'qiniu',
   MINIO = 'minio',
+  ALIOSS = 'alioss',
 }
 
 export class FileInfo {

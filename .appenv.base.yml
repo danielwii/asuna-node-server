@@ -144,7 +144,7 @@ db: # TODO
   #TYPEORM_CACHE: ioredis/cluster
 
 # --- qiniu storage config ---
-#DEFAULT_STORAGE: qiniu
+#STORAGE_DEFAULT: qiniu
 #QINIU_ACCESS_KEY: **********
 #QINIU_SECRET_KEY: **********
 #QINIU_BUCKET_NAME: test-bucket
@@ -161,12 +161,19 @@ db: # TODO
 # --- local storage config ---
 #IMAGES|VIDEOS|FILES|CHUNKS_STORAGE: local|minio|qiniu
 
-storage: # TODO
-  default_storage: local
+storage:
+  uploader: true
+  default: local
   #IMAGES|[ANY]_STORAGE
   #VIDEOS|[ANY]_STORAGE:
   #FILES|[ANY]_STORAGE:
   #CHUNKS|[ANY]_STORAGE:
+  alioss:
+    enable: false
+    region: oss-cn-beijing
+    access_key:
+    secret_key:
+    default_bucket:
   minio:
     # --- minio storage config ---
     # true or false
