@@ -104,7 +104,7 @@ export class AsunaContext {
     const defaultStorage = configLoader.loadConfig(ConfigKeys.STORAGE_DEFAULT);
     logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
 
-    if (!_.values<string>(StorageMode).includes(defaultStorage)) {
+    if (defaultStorage && !_.values<string>(StorageMode).includes(defaultStorage)) {
       throw new Error(`${defaultStorage} engine not support!`);
     }
 

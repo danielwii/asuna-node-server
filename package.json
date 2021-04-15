@@ -149,7 +149,7 @@
     "@compodoc/compodoc": "^1.1.11",
     "@nestjs/testing": "^7.6.15",
     "@trivago/prettier-plugin-sort-imports": "git+https://github.com/danielwii/prettier-plugin-sort-imports.git#main",
-    "@types/ali-oss": "^6",
+    "@types/ali-oss": "^6.0.8",
     "@types/amqplib": "^0.5.17",
     "@types/bluebird": "^3.5.33",
     "@types/body-parser": "^1.19.0",
