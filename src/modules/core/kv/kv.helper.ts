@@ -287,10 +287,7 @@ export class KvHelper {
     // noUpdate 打开时如果已经存在值不进行更新
     if (exists && noUpdate && exists.value) return exists;
     if (exists && merge) {
-      exists.value = JSON.stringify({
-        ...exists.value,
-        ..._.omit(value as any, 'values'),
-      });
+      exists.value = JSON.stringify({ ...exists.value, ..._.omit(value as any, 'values') });
       logger.debug(`inspect ${r(exists)}`);
       return exists.save();
     }
@@ -306,11 +303,7 @@ export class KvHelper {
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
 
     const entity = await KeyValuePair.findOne(id);
-    const entityTo = KeyValuePair.merge(entity, {
-      name,
-      type,
-      value: stringifyValue as any,
-    });
+    const entityTo = KeyValuePair.merge(entity, { name, type, value: stringifyValue as any });
     return KeyValuePair.save(entityTo);
   }
 
