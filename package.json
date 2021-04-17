@@ -172,7 +172,7 @@
     "@types/jsonwebtoken": "^8.5.1",
     "@types/lodash": "^4.14.168",
     "@types/lru-cache": "^5.1.0",
-    "@types/luxon": "^1.26.3",
+    "@types/luxon": "^1.26.4",
     "@types/mime-types": "^2.1.0",
     "@types/minimatch": "^3.0.4",
     "@types/minio": "^7.0.7",

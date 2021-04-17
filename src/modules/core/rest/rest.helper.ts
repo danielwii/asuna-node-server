@@ -1,8 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
+
 import * as _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 import { BaseEntity, FindOperator, getManager, ObjectLiteral } from 'typeorm';
+
 import { LoggerFactory, PrimaryKey, Profile } from '../../common';
 import { r, validateObject } from '../../common/helpers';
 import { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
@@ -100,10 +102,11 @@ export class RestHelper {
 
   public static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
     const repository = DBHelper.repo(modelNameObject);
+    const columnMetadata = DBHelper.getColumnByPropertyNameAndRepo(repository, column);
     const raw = await repository
       .createQueryBuilder(modelNameObject.model)
-      .select(`DISTINCT ${column}`)
-      // .groupBy(column)
+      .select(columnMetadata.databaseName)
+      .distinct(true)
       .getRawMany();
     const arr = _.flatMap(raw, fp.get(column));
     logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);

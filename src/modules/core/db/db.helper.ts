@@ -372,6 +372,10 @@ export class DBHelper {
     return this.getPropertyNamesByMetadata(repo.metadata);
   }
 
+  public static getColumnByPropertyNameAndRepo<Entity>(repo: Repository<Entity>, propertyName: string): ColumnMetadata {
+    return repo.metadata.columns.find((column) => column.propertyName === propertyName);
+  }
+
   public static getPropertyNamesByMetadata<Entity>(metadata: EntityMetadata): string[] {
     return metadata.columns.map((column) => column.propertyName);
   }
