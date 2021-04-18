@@ -189,7 +189,7 @@ export class WxApi {
         {
           method: 'post',
           body: JSON.stringify({ user_list: _.map(openIds, (openid) => ({ openid, lang: 'zh_CN' })) }),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
         },
       ),
     ).then(({ user_info_list }) => _.map(user_info_list, (json) => new WxUserInfo(json)));
@@ -212,7 +212,7 @@ export class WxApi {
     WxApi.withAccessToken((config, { accessToken }) =>
       WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${accessToken}`,
-        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
+        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json; charset=utf-8' } },
       ),
     );
 
@@ -226,7 +226,7 @@ export class WxApi {
       (config, { accessToken }) =>
         WxConfigApi.wrappedFetch(
           oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
-          { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
+          { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json; charset=utf-8' } },
         ),
       true,
     );
@@ -235,7 +235,7 @@ export class WxApi {
     WxApi.withAccessToken((config, { accessToken }) =>
       WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=${accessToken}`,
-        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json' } },
+        { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json; charset=utf-8' } },
       ),
     );
 
@@ -249,7 +249,7 @@ export class WxApi {
         fetch(oneLineTrim`https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=${accessToken}`, {
           method: 'post',
           body: JSON.stringify(opts),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
         }),
       true,
     ).then((value) => value.buffer());
@@ -264,7 +264,7 @@ export class WxApi {
         fetch(oneLineTrim`https://api.weixin.qq.com/wxa/getwxacode?access_token=${accessToken}`, {
           method: 'post',
           body: JSON.stringify(opts),
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
         }),
       true,
     ).then((value) => value.buffer());

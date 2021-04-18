@@ -44,7 +44,7 @@ describe('Excel (e2e)', () => {
         { username: 'hahahha', password: 'lalala' },
         { username: 'lililil', password: 'puppupu' },
       ])
-      .set('Content-Type', 'application/json')
+      .set('Content-Type', 'application/json; charset=utf-8')
       .expect(200)
       .then((response) => {
         const file = response.files;
@@ -56,7 +56,7 @@ describe('Excel (e2e)', () => {
   it('/GET /api/v1/import-export/model', async () => {
     await supertest(app.getHttpServer())
       .get('/api/v1/import-export/model?name=app__infos')
-      .set('Content-Type', 'application/json')
+      .set('Content-Type', 'application/json; charset=utf-8')
       .expect(200)
       .then((response) => {
         const file = response.files;
