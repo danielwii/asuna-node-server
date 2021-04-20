@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { read, utils, write } from 'xlsx';
+
 import { Promise } from 'bluebird';
+import { read, utils, write } from 'xlsx';
+
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { DBHelper } from '../core/db';
@@ -22,19 +24,12 @@ export class ImportExportService {
     const res = [];
     schemas.forEach((value) => {
       if (
-        value.name !== 'ordinal' &&
-        value.name !== 'logoAlt' &&
-        value.name !== 'videos' &&
-        value.name !== 'coverAlt' &&
-        value.name !== 'studentAlt' &&
-        value.name !== 'isPublished' &&
-        value.name !== 'isFeatured' &&
-        value.name !== 'offers' &&
-        value.config.info !== null &&
-        value.config.info !== undefined &&
+        !['ordinal', 'logoAlt', 'videos', 'coverAlt', 'studentAlt', 'isPublished', 'isFeatured', 'offers'].includes(
+          value.name,
+        ) &&
+        value.config.info &&
         value.config.info.type !== 'Image' &&
-        value.config.info.name !== null &&
-        value.config.info.name !== undefined
+        value.config.info.name
       ) {
         res.push(value);
       }

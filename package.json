@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -75,7 +75,7 @@
     "connect-redis": "^5.1.0",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
-    "cron-parser": "^3.3.0",
+    "cron-parser": "^3.4.0",
     "dataloader": "^2.0.0",
     "date-fns": "^2.21.1",
     "dayjs": "^1.10.4",
