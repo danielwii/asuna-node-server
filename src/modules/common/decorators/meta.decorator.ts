@@ -116,7 +116,7 @@ export interface EditableEnumMetaInfoOptions extends MetaInfoBaseOptions {
 
 export interface JSONMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'SimpleJSON';
-  jsonType: 'string-array' | 'tag-array' | 'textarea-array' | 'rich-array' | 'any';
+  jsonType: 'string-array' | 'kv-array' | 'tag-array' | 'textarea-array' | 'rich-array' | 'any';
 }
 
 export interface StringTmplMetaInfoOptions extends MetaInfoBaseOptions {
