@@ -3,14 +3,15 @@ import * as cronParser from 'cron-parser';
 import dayjs from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
+import { FeaturesConfigObject } from '../config/features.config';
 import { RedisLockProvider } from '../providers/redis-lock.provider';
 import { StatsHelper } from '../stats/stats.helper';
-import { StatsResult } from '../stats/stats.interface';
-import { FeaturesConfigObject } from '../config/features.config';
+
+import type { StatsResult } from '../stats/stats.interface';
 
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
@@ -25,7 +26,7 @@ export class CronHelper {
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
   }
 
-  public static reg<Value extends any>(
+  public static reg<Value>(
     operation: string,
     cronTime: string,
     handler: () => Promise<StatsResult<Value> | any>,

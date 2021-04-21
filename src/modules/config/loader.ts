@@ -14,9 +14,10 @@ export class AbstractConfigLoader<Config> {
     Object.assign(this, deserializeSafely(this.constructor as any, o));
   }
 
-  public fromConfigurator(): Config {
+  public fromConfigurator(localConfigLoader?: ConfigLoader): Config {
     Object.keys(this).forEach((key) => {
-      this[key] = configLoader.loadConfig2(key, undefined, true);
+      this[key] = (localConfigLoader ?? configLoader).loadConfig(key, undefined, true);
+      // logger.log(`load ${r({ key, value: this[key] })}`);
     });
     return this as any;
   }

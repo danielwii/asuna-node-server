@@ -1,5 +1,6 @@
 import { getIgnoreCase } from '../../../common/helpers';
 import { AdminUser } from '../auth.entities';
+
 import type { Request } from 'express';
 import type { AnyAuthRequest, ApiKeyPayload } from '../../../helper/interfaces';
 

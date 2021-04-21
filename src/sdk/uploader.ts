@@ -1,12 +1,13 @@
 import axios, { AxiosResponse } from 'axios';
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as querystring from 'querystring';
-import { r } from '../modules/common/helpers';
+
+import { r } from '../modules/common/helpers/utils';
 import { LoggerFactory } from '../modules/common/logger';
+import { AppConfigObject } from '../modules/config/app.config';
 import { Hermes, InMemoryAsunaQueue } from '../modules/core/bus';
 import { handleAxiosResponseError } from './helper';
-import { AppConfigObject } from '../modules/config/app.config';
 
 const logger = LoggerFactory.getLogger('Uploader');
 
@@ -42,7 +43,7 @@ export class Uploader {
 
   public static async upload(bucket: string, prefix: string, path: string, filename): Promise<AxiosResponse | string> {
     const host = this.appSettings.masterAddress;
-    const endpoint = `${host}/api/v1/uploader/stream`;
+    const endpoint = new URL('/api/v1/uploader/stream', host).href;
 
     const limit = this.appSettings.payloadLimit;
     const stat = await fs.stat(path);

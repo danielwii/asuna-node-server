@@ -1,7 +1,6 @@
+/* eslint-disable */
 import DataLoader from 'dataloader';
-import { GraphQLResolveInfo } from 'graphql';
-import { FieldNode } from 'graphql/language/ast';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
@@ -14,6 +13,8 @@ import { DBHelper } from '../core/db';
 import { RedisProvider } from '../providers';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
+import type { GraphQLResolveInfo } from 'graphql';
+import type { FieldNode } from 'graphql/language/ast';
 import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
 

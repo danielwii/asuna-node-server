@@ -1,11 +1,14 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Request } from 'express';
+
 import { Tags } from 'opentracing';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
 import { LoggerFactory } from '../common/logger';
 import { TracingHelper, WithSpanContext } from './tracing.helper';
+
+import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import type { Request } from 'express';
 
 const logger = LoggerFactory.getLogger('TracingInterceptor');
 
@@ -43,7 +46,7 @@ export class TracingInterceptor implements NestInterceptor {
           span.log({ event: 'success', info });
           // logger.debug(`[trace] log span ${serviceName}`);
         },
-        err => {
+        (err) => {
           span.setTag(Tags.ERROR, true);
           span.log({ event: 'error', 'error.object': err, message: err.message, stack: err.stack, info });
           // logger.debug(`[trace] error span ${serviceName}`);

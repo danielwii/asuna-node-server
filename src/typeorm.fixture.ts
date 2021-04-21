@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { FindOneOptions, FindManyOptions, FindOptionsUtils, JoinOptions, ObjectLiteral } from 'typeorm';
 
-import { r } from './modules/common/helpers';
+import { r } from './modules/common/helpers/utils';
 import { LoggerFactory } from './modules/common/logger';
 
 const logger = LoggerFactory.getLogger('FindOptionsFixture');

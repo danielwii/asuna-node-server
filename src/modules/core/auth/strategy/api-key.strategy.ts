@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Request } from 'express';
-import { Strategy } from 'passport-strategy';
+
 import * as _ from 'lodash';
+import { Strategy } from 'passport-strategy';
+
 import { getIgnoreCase, r } from '../../../common/helpers';
 import { LoggerFactory } from '../../../common/logger';
-import { API_KEY_HEADER, ApiKeyRequest } from './interfaces';
 import { AdminApiKeys } from '../auth.entities';
+import { API_KEY_HEADER, ApiKeyRequest } from './interfaces';
+
+import type { Request } from 'express';
 
 const logger = LoggerFactory.getLogger('ApiKeyStrategy');
 

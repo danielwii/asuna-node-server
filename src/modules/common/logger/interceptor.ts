@@ -1,7 +1,9 @@
 import { GqlExecutionContext } from '@nestjs/graphql';
-import * as _ from 'lodash';
+
+import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
 import { r } from '../helpers/utils';
 import { LoggerFactory } from './factory';
 

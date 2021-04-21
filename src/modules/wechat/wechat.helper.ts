@@ -1,16 +1,17 @@
 import { Promise } from 'bluebird';
 import { classToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
-import { Request } from 'express';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import rawBody from 'raw-body';
 import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
+
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
 import { HandlebarsHelper, r } from '../common/helpers';
 import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
+import { AppConfigObject } from '../config/app.config';
 import { AuthedUserHelper, AuthUserChannel } from '../core/auth';
 import { TokenHelper } from '../core/auth/abstract.auth.service';
 import { AdminUser } from '../core/auth/auth.entities';
@@ -20,10 +21,14 @@ import { PageHelper } from '../core/helpers/page.helper';
 import { AsunaCollections, KvDef } from '../core/kv/kv.helper';
 import { Store } from '../store';
 import { AdminWsHelper } from '../ws';
-import { WXJwtPayload } from './interfaces';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
-import {
+import { WxConfigApi } from './wx.api.config';
+import { WxUserInfo } from './wx.vo';
+
+import type { Request } from 'express';
+import type { WXJwtPayload } from './interfaces';
+import type {
   GetPhoneNumber,
   MiniSubscribeData,
   SubscribeMessageInfo,
@@ -32,9 +37,6 @@ import {
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
-import { WxUserInfo } from './wx.vo';
-import { AppConfigObject } from '../config/app.config';
-import { WxConfigApi } from './wx.api.config';
 
 const logger = LoggerFactory.getLogger('WeChatHelper');
 

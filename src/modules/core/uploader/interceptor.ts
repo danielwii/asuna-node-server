@@ -1,19 +1,21 @@
-import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 // import { FastifyRequest } from 'fastify';
 // import 'fastify-multipart';
 import { Observable } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { switchMap } from 'rxjs/operators';
+
 import { LoggerFactory } from '../../common/logger';
+
+import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 
 const logger = LoggerFactory.getLogger('FastifyFileInterceptor');
 
-export type FastifyUploadedFile = {
+export interface FastifyUploadedFile {
   filename: string;
   path: string;
   mimetype: string;
   encoding: string;
-};
+}
 export type FastifyUploadedFileRequest = /* FastifyRequest & */ any & {
   file: FastifyUploadedFile;
   files: FastifyUploadedFile[];
@@ -23,10 +25,7 @@ export class FastifyFileInterceptor implements NestInterceptor {
   // 该 field 目前没有用户，multipart 中直接可以拿到 field
   constructor(private readonly field: string) {}
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const request: FastifyUploadedFileRequest = context.switchToHttp().getRequest();
     logger.debug(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
 

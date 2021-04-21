@@ -739,7 +739,7 @@ __metadata:
     elastic-apm-node: ^3.14.0
     email-templates: ^8.0.4
     eslint: ^7.24.0
-    eslint-config-alloy: ^3.10.0
+    eslint-config-alloy: ^4.1.0
     eslint-import-resolver-node: ^0.3.4
     eslint-plugin-import: ^2.22.1
     express: ^4.17.1
@@ -794,7 +794,7 @@ __metadata:
     qs: ^6.10.1
     ramda: ^0.27.1
     raw-body: ^2.4.1
-    redis: ^3.1.1
+    redis: ^3.1.2
     redis-dataloader: ^1.0.2
     redlock: ^4.2.0
     reflect-metadata: ^0.1.13
@@ -6781,10 +6781,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-alloy@npm:^3.10.0":
-  version: 3.10.0
-  resolution: "eslint-config-alloy@npm:3.10.0"
-  checksum: aeb367b275c0cbb72ebb1d70ed0ac80244f09f382b0e24644b2b6a788e2cbe74ca11b9b533b8105e00c4f30fa3070d9475c7bd537c58b68db4d88ff2353db61e
+"eslint-config-alloy@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "eslint-config-alloy@npm:4.1.0"
+  checksum: 445bfe5e1b4e308c7cdc52e7804d2cbe9b128e8740fc02eef903cd5ac74766087c9613e025c88043debc47390772999d33b8dedafc309971c2f39a5448d07c2e
   languageName: node
   linkType: hard
 
@@ -13615,15 +13615,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis@npm:^3.0.0, redis@npm:^3.0.2, redis@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "redis@npm:3.1.1"
+"redis@npm:^3.0.0, redis@npm:^3.0.2, redis@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "redis@npm:3.1.2"
   dependencies:
     denque: ^1.5.0
     redis-commands: ^1.7.0
     redis-errors: ^1.2.0
     redis-parser: ^3.0.0
-  checksum: 5b33f9d8dd4eb91001bd292157b9d5e4fa4f23a76f67f63335f0e4688f507b7954c82a40d154068540716f203d40a4452977c5ada348ba980de3330133d9b3c0
+  checksum: af9b5162aa98e3894fab9914e622019ba3e557c6e2285db419354b83fad30e971defb84600191c48985657d2c33d0c0549990fa4efdb9352e81c9727a309f691
   languageName: node
   linkType: hard
 

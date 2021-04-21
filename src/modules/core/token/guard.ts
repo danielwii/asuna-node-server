@@ -1,10 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Request } from 'express';
+
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
 import { AsunaErrorCode, AsunaException, getIgnoreCase } from '../../common';
 import { OperationToken } from './entities';
 import { OperationTokenHelper } from './helper';
+
+import type { Request } from 'express';
 
 export type OperationTokenRequest = Request & { token: OperationToken };
 

@@ -13,7 +13,7 @@ export interface EventStatsInterface {
   result: object;
 }
 
-export interface StatsResult<Value extends any = any> {
+export interface StatsResult<Value = any> {
   value?: Value;
   stats?: object;
 }
