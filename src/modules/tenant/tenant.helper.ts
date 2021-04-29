@@ -6,6 +6,7 @@ import {
 } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Promise } from 'bluebird';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
@@ -14,7 +15,6 @@ import * as fp from 'lodash/fp';
 import { EntityMetadata } from 'typeorm';
 
 import { CacheManager } from '../cache';
-import { deserializeSafely } from '../common/helpers';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { OrgRole, OrgUser, Tenant } from './tenant.entities';

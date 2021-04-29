@@ -1,12 +1,12 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
 import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 
 import { CacheHelper, CleanCacheType } from '../../cache';
-import { validateObjectSync } from '../../common/helpers';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
 import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 

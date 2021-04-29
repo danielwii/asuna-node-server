@@ -1,7 +1,8 @@
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
+
 import { Promise } from 'bluebird';
 
 import { CacheManager } from '../cache';
-import { deserializeSafely } from '../common/helpers';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
 
 export enum DynamicRouterFieldKeys {

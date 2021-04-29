@@ -1,6 +1,7 @@
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
+
 import { Column, Entity } from 'typeorm';
 
-import { deserializeSafely } from '../common';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';

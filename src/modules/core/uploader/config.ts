@@ -1,5 +1,7 @@
+import { AbstractConfigLoader } from '@danielwii/asuna-helper/dist/config';
+
 import { withP, withP2 } from '../../common/helpers';
-import { AbstractConfigLoader, configLoader, YamlConfigKeys } from '../../config';
+import { configLoader, YamlConfigKeys } from '../../config';
 
 export enum UploaderConfigKeys {
   enable = 'enable',

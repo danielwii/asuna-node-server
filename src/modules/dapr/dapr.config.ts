@@ -1,6 +1,6 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { deserializeSafely } from '../common/helpers';
 import { configLoader } from '../config';
 
 export enum DaprConfigKeys {

@@ -1,11 +1,11 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsOptional, IsString } from 'class-validator';
 import * as url from 'url';
 
-import { deserializeSafely } from '../../common';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');

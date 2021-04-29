@@ -3,26 +3,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { resolve } from 'path';
 
-import { deserializeSafely } from '../common/helpers/validate';
-
 const logger = LoggerFactory.getLogger('ConfigLoader');
-
-/**
- * all fields need null as default value to load all keys
- */
-export class AbstractConfigLoader<Config> {
-  public constructor(o?: Omit<Config, 'fromConfigurator'>) {
-    Object.assign(this, deserializeSafely(this.constructor as any, o));
-  }
-
-  public fromConfigurator(localConfigLoader?: ConfigLoader): Config {
-    Object.keys(this).forEach((key) => {
-      this[key] = (localConfigLoader ?? configLoader).loadConfig(key, undefined, true);
-      // logger.log(`load ${r({ key, value: this[key] })}`);
-    });
-    return this as any;
-  }
-}
 
 export enum YamlConfigKeys {
   graphql = 'graphql',

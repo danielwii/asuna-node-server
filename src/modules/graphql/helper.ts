@@ -28,7 +28,8 @@ import {
   TimeConditionInput,
 } from './input';
 
-import type { ClassType, PrimaryKey } from '../common';
+import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
+import type { PrimaryKey } from '../common';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
 

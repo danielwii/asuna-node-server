@@ -4,12 +4,12 @@ import { ApiTags } from '@nestjs/swagger';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import _ from 'lodash';
 
-import { deserializeSafely } from '../../common';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenHelper } from './helper';

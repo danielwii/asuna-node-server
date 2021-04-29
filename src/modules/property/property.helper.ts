@@ -1,10 +1,10 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 
-import { deserializeSafely } from '../common/helpers';
 import { UserProfile } from '../core/auth';
 import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';

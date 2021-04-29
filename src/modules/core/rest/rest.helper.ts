@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -9,7 +10,6 @@ import * as R from 'ramda';
 import { BaseEntity, FindOperator, getManager, ObjectLiteral } from 'typeorm';
 
 import { PrimaryKey, Profile } from '../../common';
-import { validateObject } from '../../common/helpers';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';

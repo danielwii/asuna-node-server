@@ -1,6 +1,7 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
@@ -8,7 +9,6 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import { UpdateResult } from 'typeorm';
 
-import { deserializeSafely } from '../../common';
 import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 

@@ -2,11 +2,9 @@ import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import { plainToClass } from 'class-transformer';
-
-import { ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
-import { validateObjectSync } from '../helpers/validate';
 
 const logger = LoggerFactory.getLogger('CustomValidationPipe');
 
@@ -23,11 +21,12 @@ export class CustomValidationPipe implements PipeTransform<any> {
         return value;
       }
       const object = plainToClass(metatype, value, { enableImplicitConversion: true });
-      const errors = validateObjectSync(object);
-      logger.debug(`transformed ${r({ object, errors })}`);
-      if (errors.length > 0) {
-        throw new ValidationException(metatype.name, errors);
-      }
+      validateObjectSync(object);
+      // const errors = validateObjectSync(object);
+      // logger.debug(`transformed ${r({ object, errors })}`);
+      // if (errors.length > 0) {
+      //   throw new ValidationException(metatype.name, errors);
+      // }
     }
     return value;
   }
