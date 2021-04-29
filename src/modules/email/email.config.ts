@@ -1,9 +1,9 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import _ from 'lodash';
 
-import { withP, withP3 } from '../common/helpers';
 import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum EmailConfigKeys {

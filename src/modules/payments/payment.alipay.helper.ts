@@ -1,12 +1,12 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk/lib/alipay';
 import AlipayFormData from 'alipay-sdk/lib/form';
 import _ from 'lodash';
 
-import { parseJSONIfCould } from '../common';
 import { AppConfigObject } from '../config/app.config';
 import { PaymentMethod } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';

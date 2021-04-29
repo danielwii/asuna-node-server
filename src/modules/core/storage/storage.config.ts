@@ -1,9 +1,9 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import _ from 'lodash';
 
-import { withP, withP2 } from '../../common/helpers/utils';
 import { configLoader, YamlConfigKeys } from '../../config';
 
 export const QiniuConfigKeys = {

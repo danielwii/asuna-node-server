@@ -1,6 +1,7 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import * as crypto from 'crypto';
 import { sub } from 'date-fns';
@@ -10,7 +11,6 @@ import fetch from 'node-fetch';
 import * as qs from 'qs';
 import { IsNull, LessThan } from 'typeorm';
 
-import { parseJSONIfCould } from '../common/helpers';
 import { AppConfigObject } from '../config/app.config';
 import { SMSConfigObject } from '../sms';
 import { PaymentAlipayHelper } from './payment.alipay.helper';

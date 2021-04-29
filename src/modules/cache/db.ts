@@ -1,11 +1,12 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { fnResolve, promisify } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 
-import { parseJSONIfCould, TimeUnit } from '../common/helpers';
+import { TimeUnit } from '../common/helpers';
 import { RedisProvider } from '../providers';
 import { CacheManager } from './cache';
 import { CacheTTL } from './constants';

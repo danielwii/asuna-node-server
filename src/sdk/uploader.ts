@@ -1,3 +1,4 @@
+import { handleAxiosResponseError } from '@danielwii/asuna-helper/dist/axios';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -8,7 +9,6 @@ import * as querystring from 'querystring';
 
 import { AppConfigObject } from '../modules/config/app.config';
 import { Hermes, InMemoryAsunaQueue } from '../modules/core/bus';
-import { handleAxiosResponseError } from './helper';
 
 const logger = LoggerFactory.getLogger('Uploader');
 

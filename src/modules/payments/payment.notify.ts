@@ -1,10 +1,10 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import _ from 'lodash';
 
-import { parseJSONIfCould } from '../common';
 import { SMSConfigObject, SMSHelper } from '../sms';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentOrder } from './payment.order.entities';

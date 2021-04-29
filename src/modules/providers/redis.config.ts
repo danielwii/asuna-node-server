@@ -1,10 +1,10 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as Redis from 'redis';
 
-import { withP, withP2 } from '../common/helpers/utils';
 import { configLoader, YamlConfigKeys } from '../config/loader';
 
 const logger = LoggerFactory.getLogger('RedisConfig');

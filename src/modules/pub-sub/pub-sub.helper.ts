@@ -1,11 +1,11 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { promisify } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 
-import { parseJSONIfCould } from '../common/helpers';
 import { RedisProvider } from '../providers';
 
 const logger = LoggerFactory.getLogger('PubSubHelper');

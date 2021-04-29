@@ -1,27 +1,10 @@
-import axios, { AxiosResponse } from 'axios';
 import { Promise } from 'bluebird';
 import * as fs from 'fs-extra';
-import * as JSON5 from 'json5';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as path from 'path';
 
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-
-export const withP = <P, R>(parameter: P, fn: (p: P) => R) => fn(parameter);
-export const withP2 = <P1, P2, R>(parameter1: P1, parameter2: P2, fn: (p1: P1, p2: P2) => R) =>
-  fn(parameter1, parameter2);
-export const withP3 = <P1, P2, P3, R>(
-  parameter1: P1,
-  parameter2: P2,
-  parameter3: P3,
-  fn: (p1: P1, p2: P2, p3: P3) => R,
-) => fn(parameter1, parameter2, parameter3);
-export const fnWithP2 = <P1, P2, R>(parameter1: P1, parameter2: P2) => (fn: (p1: P1, p2: P2) => R): R =>
-  fn(parameter1, parameter2);
-export const fnWithP3 = <P1, P2, P3, R>(parameter1: P1, parameter2: P2, parameter3: P3) => (
-  fn: (p1: P1, p2: P2, p3: P3) => R,
-): R => fn(parameter1, parameter2, parameter3);
 
 /**
  * https://www.typescriptlang.org/docs/handbook/mixins.html
@@ -33,21 +16,6 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]): void {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
       Object.defineProperty(derivedCtor.prototype, name, Object.getOwnPropertyDescriptor(baseCtor.prototype, name));
     });
-  });
-}
-
-export async function download(url: string, to: string): Promise<AxiosResponse> {
-  fs.ensureDirSync(path.dirname(to));
-  const dir = path.resolve(to);
-  const writer = fs.createWriteStream(dir);
-
-  const response = await axios({ url, method: 'GET', responseType: 'stream', timeout: 60000 });
-
-  response.data.pipe(writer);
-
-  return new Promise((resolve, reject) => {
-    writer.on('finish', resolve);
-    writer.on('error', reject);
   });
 }
 
@@ -85,14 +53,6 @@ export function traverseDir(dir: string): string[] {
  */
 export function numberInterval(min: number, max: number, num: number): number {
   return _.max([_.min([max, num]), min]);
-}
-
-export function parseJSONIfCould(value?: string): any {
-  try {
-    return JSON5.parse(value);
-    // eslint-disable-next-line no-empty
-  } catch {}
-  return value;
 }
 
 export const noNullFilter = <T>(source: Partial<T>) => {
