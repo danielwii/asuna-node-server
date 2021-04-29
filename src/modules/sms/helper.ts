@@ -91,9 +91,9 @@ export class SMSHelper {
   }
 
   public static async sendVerifyCode(req: RequestInfo, phoneNumber: string): Promise<string> {
-    const code = await this.generateVerifyCode(req.sessionID);
-    const id = this.adapter.getTmplId('verify-code');
-    await this.sendSMS(id, phoneNumber, { code });
+    const code = await SMSHelper.generateVerifyCode(req.sessionID);
+    const id = SMSHelper.adapter.getTmplId('verify-code');
+    await SMSHelper.sendSMS(id, phoneNumber, { code });
     return code;
   }
 

@@ -226,11 +226,11 @@ export class WeChatHelper {
       const event = message as WXSubscribeMessage;
 
       if (config.saveToAdmin) {
-        await this.syncAdminUser(event.FromUserName);
+        await WeChatHelper.syncAdminUser(event.FromUserName);
       }
     } else if (message.MsgType === 'event' && message.Event === 'unsubscribe') {
       const event = message as WXSubscribeMessage;
-      await this.syncAdminUser(event.FromUserName);
+      await WeChatHelper.syncAdminUser(event.FromUserName);
     } else if (message.MsgType === 'text') {
       const event = message as WXTextMessage;
     } else if (message.MsgType === 'event' && message.Event === 'SCAN') {

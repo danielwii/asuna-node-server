@@ -181,17 +181,17 @@ export class KvHelper {
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };
-    if (!this.constantMapsPair) {
-      this.constantMapsPair = await this.get(this.constantKvDef, {
+    if (!KvHelper.constantMapsPair) {
+      KvHelper.constantMapsPair = await KvHelper.get(KvHelper.constantKvDef, {
         name: '关键词中文映射表',
         value,
         type: KeyValueType.json,
       });
     }
-    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    this.constantMapsPair.value = { ...this.constantMapsPair.value, ...value };
-    // return this.set(pair);
-    return this.constantMapsPair;
+    // const pair = await KvHelper.get(KvHelper.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    KvHelper.constantMapsPair.value = { ...KvHelper.constantMapsPair.value, ...value };
+    // return KvHelper.set(pair);
+    return KvHelper.constantMapsPair;
   }
 
   /**
@@ -200,27 +200,27 @@ export class KvHelper {
    */
   public static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
     const value = { [enumValue.key]: enumValue.data };
-    if (!this.enumValueConstantMapsPair) {
-      this.enumValueConstantMapsPair = await this.get(this.constantKvDef, {
+    if (!KvHelper.enumValueConstantMapsPair) {
+      KvHelper.enumValueConstantMapsPair = await KvHelper.get(KvHelper.constantKvDef, {
         name: '关键词中文映射表',
         value,
         type: KeyValueType.json,
       });
     }
-    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    this.enumValueConstantMapsPair.value = { ...this.enumValueConstantMapsPair.value, ...value };
-    // return this.set(pair);
-    return this.enumValueConstantMapsPair;
+    // const pair = await KvHelper.get(KvHelper.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    KvHelper.enumValueConstantMapsPair.value = { ...KvHelper.enumValueConstantMapsPair.value, ...value };
+    // return KvHelper.set(pair);
+    return KvHelper.enumValueConstantMapsPair;
   }
 
   public static async syncMergedConstants(): Promise<void> {
-    logger.log(`merge constants ${r(this.constantMapsPair)}`);
-    if (this.constantMapsPair) {
-      await this.set(this.constantMapsPair);
+    logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
+    if (KvHelper.constantMapsPair) {
+      await KvHelper.set(KvHelper.constantMapsPair);
     }
-    logger.log(`merge enum constants ${r(this.enumValueConstantMapsPair)}`);
-    if (this.enumValueConstantMapsPair) {
-      await this.set(this.enumValueConstantMapsPair);
+    logger.log(`merge enum constants ${r(KvHelper.enumValueConstantMapsPair)}`);
+    if (KvHelper.enumValueConstantMapsPair) {
+      await KvHelper.set(KvHelper.enumValueConstantMapsPair);
     }
   }
 
@@ -273,7 +273,7 @@ export class KvHelper {
       extra: opts.extra,
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    const exists = await this.get(entity);
+    const exists = await KvHelper.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOne({ name: opts.name });
       logger.debug(`found kv model ${r({ model, name: opts.name })}`);
@@ -307,7 +307,7 @@ export class KvHelper {
   }
 
   public static async delete(kvDef: KvDef): Promise<void> {
-    const exists = await this.get(kvDef);
+    const exists = await KvHelper.get(kvDef);
     if (exists) {
       await KeyValuePair.delete(kvDef);
     }
@@ -317,10 +317,10 @@ export class KvHelper {
     kvDef: KvDef,
     defaultPair?: { name: string; type: KeyValueType; value: any },
   ): Promise<KeyValuePair> {
-    const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
+    const keyValuePair = (await KvHelper.find(kvDef.collection, kvDef.key))[0];
     if (!keyValuePair && defaultPair) {
-      await this.set({ ...kvDef, ...defaultPair });
-      return (await this.find(kvDef.collection, kvDef.key))[0];
+      await KvHelper.set({ ...kvDef, ...defaultPair });
+      return (await KvHelper.find(kvDef.collection, kvDef.key))[0];
     }
 
     return keyValuePair;
@@ -347,7 +347,7 @@ export class KvHelper {
   }
 
   public static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
-    const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+    const field = await KvHelper.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
     return field?.value ?? _.get(field, 'field.defaultValue');
   }
 

@@ -13,7 +13,7 @@ export class AdminUserIdentifierHelper {
   }
 
   static identify(identifier: string): boolean {
-    return this.resolve(identifier).type === 'admin';
+    return AdminUserIdentifierHelper.resolve(identifier).type === 'admin';
   }
 }
 
@@ -28,7 +28,7 @@ export class UserIdentifierHelper {
   }
 
   static identify(identifier: string): boolean {
-    return this.resolve(identifier).type === 'u';
+    return UserIdentifierHelper.resolve(identifier).type === 'u';
   }
 }
 

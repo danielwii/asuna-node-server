@@ -119,7 +119,7 @@ export class PaymentHelper {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
     }
     // const signTmpl = method?.signTmpl;
-    const context = await this.extraContext(transaction, method, order);
+    const context = await PaymentHelper.extraContext(transaction, method, order);
 
     const signed = Handlebars.compile(method.signTmpl ?? '')(context);
     const md5 = crypto.createHash('md5').update(signed).digest('hex').toUpperCase();
@@ -178,7 +178,7 @@ export class PaymentHelper {
       );
     }
 
-    const { context, signed, md5sign } = await this.sign(transactionId);
+    const { context, signed, md5sign } = await PaymentHelper.sign(transactionId);
     Object.assign(context, { md5sign });
     const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 

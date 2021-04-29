@@ -38,9 +38,9 @@ export class AccessControlHelper {
 
     const entities = DBHelper.loadMetadatas().map<string>((metadata) => _.get(metadata.target, 'entityInfo.name'));
 
-    this.accessControl = new AccessControl();
+    AccessControlHelper.accessControl = new AccessControl();
     // prettier-ignore
-    this.accessControl
+    AccessControlHelper.accessControl
       .grant(ACRole.SYS_ADMIN)
         .create([ACResource.authority, ...entities])
         .read([ACResource.authority, ...entities])
@@ -60,23 +60,23 @@ export class AccessControlHelper {
     logger.log(
       `init ${r({
         // grants: this.accessControl.getGrants(),
-        resources: this.accessControl.getResources(),
-        roles: this.accessControl.getRoles(),
+        resources: AccessControlHelper.accessControl.getResources(),
+        roles: AccessControlHelper.accessControl.getRoles(),
       })}`,
     );
   }
 
   static async filterRoles(roles: string[]): Promise<string[]> {
-    return _.filter(roles, (role) => this.ac.hasRole(role));
+    return _.filter(roles, (role) => AccessControlHelper.ac.hasRole(role));
   }
 
   static setup(fn: (ac: AccessControl) => Access): void {
-    fn(this.ac);
+    fn(AccessControlHelper.ac);
   }
 
   static get ac(): AccessControl {
-    if (!this.accessControl) this.init();
-    return this.accessControl;
+    if (!AccessControlHelper.accessControl) AccessControlHelper.init();
+    return AccessControlHelper.accessControl;
   }
 
   static grantOwn() {}

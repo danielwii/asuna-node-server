@@ -29,7 +29,7 @@ export class PaymentAlipayHelper {
   }
 
   public static async authToken(): Promise<AlipaySdkCommonResult | string> {
-    const sdk = await this.sdk();
+    const sdk = await PaymentAlipayHelper.sdk();
     logger.debug(`alipay sdk is ${r(sdk)}`);
 
     const result = await sdk
@@ -57,7 +57,7 @@ export class PaymentAlipayHelper {
     logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
     // const token = await this.authToken();
 
-    const sdk = await this.sdk();
+    const sdk = await PaymentAlipayHelper.sdk();
 
     const execMethod = isMobile ? 'alipay.trade.wap.pay' : 'alipay.trade.page.pay'; // 统一收单下单并支付页面接口
     // 公共参数 可根据业务需要决定是否传入，当前不用

@@ -37,7 +37,7 @@ export class LoggerConfigObject {
   }
 
   static lv(module: string): string {
-    const configObject = this.load();
+    const configObject = LoggerConfigObject.load();
     if (_.has(configObject.modules, module)) {
       return configObject.modules[module];
     }

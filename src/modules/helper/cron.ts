@@ -36,7 +36,7 @@ export class CronHelper {
       ttl?: number;
     } = {},
   ): CronJob {
-    this.crons[operation] = { cronTime, nextTime: this.nextTime(cronTime) };
+    CronHelper.crons[operation] = { cronTime, nextTime: CronHelper.nextTime(cronTime) };
 
     if (!FeaturesConfigObject.load().cronEnable) {
       logger.warn(`skip ${operation} because cron was not enabled.`);
@@ -45,7 +45,7 @@ export class CronHelper {
 
     const ttl = opts.ttl ?? 10;
     const enabled = RedisLockProvider.instance.isEnabled();
-    logger.debug(`init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled })}`);
+    logger.debug(`init cron ${r({ operation, cronTime, ...CronHelper.nextTime(cronTime), opts, enabled })}`);
     const callPromise = () =>
       enabled
         ? RedisLockProvider.instance
@@ -61,7 +61,7 @@ export class CronHelper {
             if (result) {
               const event = {
                 cronTime,
-                next: this.nextTime(cronTime),
+                next: CronHelper.nextTime(cronTime),
                 ...(_.isObject(result) ? result : { value: result }),
               };
               // logger.debug(`addCronSuccessEvent to ${r({ operation, event })}`);
@@ -75,12 +75,12 @@ export class CronHelper {
             logger.error(`${operation} error found: ${r(reason)}`);
             StatsHelper.addCronFailureEvent(operation, {
               cronTime,
-              next: this.nextTime(cronTime),
+              next: CronHelper.nextTime(cronTime),
               reason,
             }).catch((err) => logger.error(`addCronFailureEvent error: ${r(err)}`));
           })
           .finally(() => {
-            const next = this.nextTime(cronTime);
+            const next = CronHelper.nextTime(cronTime);
             if (dayjs(next.next).diff(new Date(), 'minute') > 1)
               logger.debug(`${operation} done. next: ${r({ cronTime, ...next })}`);
           }),

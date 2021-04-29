@@ -63,7 +63,7 @@ export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
   static async preload(): Promise<any> {
-    return KvHelper.preload(this.kvDef);
+    return KvHelper.preload(TenantHelper.kvDef);
   }
 
   static async getTenantEntities(): Promise<EntityMetadata[]> {
@@ -107,8 +107,8 @@ export class TenantHelper {
           ...entities.map((entity) => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
           ...entities.map((entity) => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
-        // logger.log(`load config by ${r({ kvDef: this.kvDef, keyValues })}`);
-        const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(this.kvDef, keyValues));
+        // logger.log(`load config by ${r({ kvDef: TenantHelper.kvDef, keyValues })}`);
+        const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(TenantHelper.kvDef, keyValues));
 
         // bind 模式下的资源限制默认是 1
         if (tenantConfig.firstModelBind && tenantConfig.firstModelName) {
@@ -158,7 +158,7 @@ export class TenantHelper {
       config,
       recordCounts,
       tenant,
-      roles: this.getTenantRoles(admin?.roles),
+      roles: TenantHelper.getTenantRoles(admin?.roles),
     });
   }
 
@@ -167,12 +167,12 @@ export class TenantHelper {
   }
 
   static async hasTenantRole(roles: OrgRole[]): Promise<boolean> {
-    return !_.isEmpty(await this.getTenantRoles(roles));
+    return !_.isEmpty(await TenantHelper.getTenantRoles(roles));
   }
 
   static async tenantSupport(fullModelName: string, roles: OrgRole[]): Promise<boolean> {
-    const isTenantEntity = await this.isTenantEntity(fullModelName);
-    const hasTenantRoles = await this.hasTenantRole(roles);
+    const isTenantEntity = await TenantHelper.isTenantEntity(fullModelName);
+    const hasTenantRoles = await TenantHelper.hasTenantRole(roles);
     logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
     return isTenantEntity && hasTenantRoles;
   }
@@ -188,7 +188,7 @@ export class TenantHelper {
 
   static async checkPermission(userId: string, fullModelName: string): Promise<void> {
     logger.log(`check permission for ${r({ userId, fullModelName })}`);
-    if (!(await this.isTenantEntity(fullModelName))) {
+    if (!(await TenantHelper.isTenantEntity(fullModelName))) {
       return;
     }
 
@@ -200,14 +200,14 @@ export class TenantHelper {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Unpublished, [`tenant: ${admin.tenant.id}`]);
     }
 
-    const roles = await this.getTenantRoles(admin.roles);
+    const roles = await TenantHelper.getTenantRoles(admin.roles);
     if (_.isEmpty(roles)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'tenant roles needed');
     }
   }
 
   static async checkResourceLimit(userId: string, fullModelName: string): Promise<void> {
-    const info = await this.info(userId);
+    const info = await TenantHelper.info(userId);
     const count = info.recordCounts[fullModelName];
     const limit = _.get(info.config, `limit.${fullModelName}`);
     logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
@@ -222,7 +222,7 @@ export class TenantHelper {
    */
   /*
   static async ensureTenantCreated(userId: PrimaryKey): Promise<Tenant> {
-    const info = await this.info(userId);
+    const info = await TenantHelper.info(userId);
     if (info.tenant) return info.tenant;
 
     if (_.isEmpty(info.roles)) {

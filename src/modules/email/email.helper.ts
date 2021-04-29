@@ -55,7 +55,7 @@ export class EmailHelper {
   private static emailTemplate: EmailTemplate;
 
   public static async init(): Promise<void> {
-    const config = await this.getConfig();
+    const config = await EmailHelper.getConfig();
 
     if (config.enable) {
       logger.log(`init by ${r(config)}`);
@@ -92,7 +92,7 @@ export class EmailHelper {
   public static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
     logger.debug(`send ${r(_.omit(mailInfo, 'content'))}`);
     const { to, cc, bcc, subject, content, attachments } = mailInfo;
-    const { from } = await this.getConfig();
+    const { from } = await EmailHelper.getConfig();
     const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
     let domain = '';
     if (!storageConfigs) logger.warn(`no storage set for image`);

@@ -77,7 +77,7 @@ export class PropertyHelper {
     payload: TopUpPayload,
     @TransactionManager() manager?: EntityManager,
   ): Promise<FinancialTransaction> {
-    const profile = await this.getUserProfileWithWallet(payload.profileId, manager);
+    const profile = await PropertyHelper.getUserProfileWithWallet(payload.profileId, manager);
 
     const [before, after] = [profile.wallet.balance, profile.wallet.balance + payload.amount];
     const financialTransaction = new FinancialTransaction({

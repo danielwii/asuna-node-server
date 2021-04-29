@@ -1,4 +1,5 @@
 // import { PrismaClient } from '@prisma/client';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -29,7 +30,6 @@ import {
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Profile } from '../../common/helpers/normal';
 import { Role } from '../auth/auth.entities';
 import { AsunaContext } from '../context';
@@ -218,7 +218,7 @@ export class DBHelper {
             dbConfig.port ?? 3306
           }/${dbConfig.database}`;
         logger.log(`init db with ${url}`);
-        this._prismaClient = new PrismaClient({
+        DBHelper._prismaClient = new PrismaClient({
           datasources: { db: { url } },
           log: [{ emit: 'event', level: 'query' }],
           errorFormat: 'pretty',
@@ -273,18 +273,18 @@ export class DBHelper {
   }
 
   public static loadMetadatas(): EntityMetadata[] {
-    if (this.metadatas.length === 0) {
+    if (DBHelper.metadatas.length === 0) {
       getConnection().entityMetadatas.forEach((metadata) => {
         if (DBHelper.isValidEntity(metadata)) {
-          this.metadatas.push(metadata);
+          DBHelper.metadatas.push(metadata);
         }
       });
     }
-    return this.metadatas;
+    return DBHelper.metadatas;
   }
 
   public static hasRelation<R extends BaseEntity>(fullModelName: string, relation: ObjectType<R>): boolean {
-    const { metadata, target } = this.repo(fullModelName);
+    const { metadata, target } = DBHelper.repo(fullModelName);
     const relations = metadata.relations.map(fp.get('type'));
     const included = relations.find(
       (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => type.name === relation.name,
@@ -298,7 +298,7 @@ export class DBHelper {
     excludes?: typeof BaseEntity[],
   ): (typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[] {
     const excludeNames = new Set(_.map(excludes, fp.get('name')));
-    return this.loadMetadatas()
+    return DBHelper.loadMetadatas()
       .filter((metadata) => {
         const included = metadata.relations
           .map(fp.get('type'))
@@ -318,7 +318,7 @@ export class DBHelper {
    * @param module 模块名称，不包括 __
    */
   public static getModelNameObject(model: string, module?: string): ModelNameObject {
-    this.loadMetadatas();
+    DBHelper.loadMetadatas();
 
     let parsedModel = model;
     const parsedModule = module || AsunaContext.instance.defaultModulePrefix;
@@ -329,20 +329,20 @@ export class DBHelper {
       !module ||
       module === AsunaContext.instance.defaultModulePrefix
     ) {
-      // const metadata = this.getMetadata(model);
-      // const entityInfo = this.getEntityInfo(metadata);
+      // const metadata = DBHelper.getMetadata(model);
+      // const entityInfo = DBHelper.getEntityInfo(metadata);
       // return { model, dbName: metadata.tableName, entityName: entityInfo.name };
     } else {
       parsedModel = `${module}__${model}`;
     }
 
     logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
-    const metadata = this.getMetadata(parsedModel);
+    const metadata = DBHelper.getMetadata(parsedModel);
     if (!metadata) {
       logger.error(`no metadata found for ${r({ parsedModel, model, parsedModule, module })}`);
       throw new AsunaException(AsunaErrorCode.Unprocessable, `model '${parsedModel}' not resolved`);
     }
-    const entityInfo = this.getEntityInfo(metadata);
+    const entityInfo = DBHelper.getEntityInfo(metadata);
     return {
       model,
       dbName: metadata.tableName,
@@ -352,9 +352,9 @@ export class DBHelper {
   }
 
   public static getMetadata(model: string): EntityMetadata {
-    return this.metadatas.find((metadata) => {
+    return DBHelper.metadatas.find((metadata) => {
       // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
-      return this.getEntityInfo(metadata).name === model;
+      return DBHelper.getEntityInfo(metadata).name === model;
     });
   }
 
@@ -363,7 +363,7 @@ export class DBHelper {
   }
 
   public static getPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.getPropertyNamesByRepo(this.repo(entity));
+    return DBHelper.getPropertyNamesByRepo(DBHelper.repo(entity));
   }
 
   public static filterSelect<Entity>(entity: ObjectType<Entity>, select: (keyof Entity | string)[]): (keyof Entity)[] {
@@ -372,7 +372,7 @@ export class DBHelper {
   }
 
   public static getPropertyNamesByRepo<Entity>(repo: Repository<Entity>): string[] {
-    return this.getPropertyNamesByMetadata(repo.metadata);
+    return DBHelper.getPropertyNamesByMetadata(repo.metadata);
   }
 
   public static getColumnByPropertyNameAndRepo<Entity>(repo: Repository<Entity>, propertyName: string): ColumnMetadata {
@@ -384,20 +384,20 @@ export class DBHelper {
   }
 
   public static getRelationPropertyNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.relations.map((relation) => relation.propertyName);
+    return DBHelper.repo(entity).metadata.relations.map((relation) => relation.propertyName);
   }
 
   public static getColumnNames<Entity>(entity: ObjectType<Entity>): string[] {
-    return this.repo(entity).metadata.columns.map((column) => column.databaseName);
+    return DBHelper.repo(entity).metadata.columns.map((column) => column.databaseName);
   }
 
   public static repo<Entity extends BaseEntity>(
     entity: ObjectType<Entity> | string | ModelNameObject,
   ): Repository<Entity> {
-    this.loadMetadatas();
+    DBHelper.loadMetadatas();
 
     if (_.isString(entity)) {
-      const entityMetadata = this.getMetadata(this.getModelNameObject(entity as string).model);
+      const entityMetadata = DBHelper.getMetadata(DBHelper.getModelNameObject(entity as string).model);
       if (entityMetadata) {
         return getRepository<Entity>(entityMetadata.target);
       }
@@ -418,7 +418,7 @@ export class DBHelper {
 
   public static getPrimaryKeyByModel(modelNameObject: ModelNameObject): string {
     const repository = DBHelper.repo(modelNameObject);
-    return this.getPrimaryKey(repository);
+    return DBHelper.getPrimaryKey(repository);
   }
 
   public static getPrimaryKey(repository): string {
@@ -547,7 +547,7 @@ export class DBHelper {
       manyToOneRelations,
       oneToManyRelations,
       oneToOneRelations,
-    } = this.extractOriginAsunaSchemas(repository, opts);
+    } = DBHelper.extractOriginAsunaSchemas(repository, opts);
 
     return [
       ...columns,
@@ -677,7 +677,7 @@ export class DBHelper {
         condition.value.$or.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
+          const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
 
           // console.log('[wheres-or]', { currentCondition, elementCondition, sqlValue });
 
@@ -691,7 +691,7 @@ export class DBHelper {
         condition.value.$and.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = this.toSqlValue(queryBuilder, currentCondition);
+          const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
 
           // console.log('[wheres-and]', { currentCondition, elementCondition, sqlValue });
 
@@ -704,7 +704,7 @@ export class DBHelper {
       } else {
         const elementCondition = condition.value;
 
-        const sqlValue = this.toSqlValue(queryBuilder, condition);
+        const sqlValue = DBHelper.toSqlValue(queryBuilder, condition);
 
         logger.verbose(`[normalWheres-default] ${r({ condition, elementCondition, sqlValue })}`);
 
