@@ -1,4 +1,5 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import BullQueue from 'bull';
@@ -10,7 +11,6 @@ import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
 
 import { ConfigKeys, configLoader } from '../../config/loader';
-import { RedisConfigObject } from '../../providers/redis.config';
 import { random } from '../helpers/random.helper';
 
 import type { AbstractAuthUser } from '../auth/base.entities';

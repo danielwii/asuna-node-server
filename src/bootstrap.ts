@@ -3,6 +3,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as bodyParser from 'body-parser';
@@ -26,7 +27,6 @@ import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from 
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
-import { RedisProvider } from './modules/providers';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
 import './typeorm.fixture';

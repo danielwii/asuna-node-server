@@ -1,13 +1,14 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import createAdapter, { RedisAdapter } from 'socket.io-redis';
 
 import { ConfigKeys, configLoader } from '../config';
-import { RedisConfigObject, RedisProvider } from '../providers';
 
 const logger = LoggerFactory.getLogger('RedisIoAdapter');
 

@@ -1,10 +1,10 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisClientObject, RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { CacheManager } from '../cache/cache';
-import { RedisClientObject, RedisProvider } from '../providers/redis.provider';
 
 const logger = LoggerFactory.getLogger('Store');
 

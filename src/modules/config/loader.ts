@@ -1,24 +1,10 @@
+import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { resolve } from 'path';
 
 const logger = LoggerFactory.getLogger('ConfigLoader');
-
-export enum YamlConfigKeys {
-  graphql = 'graphql',
-  sentry = 'sentry',
-  features = 'features',
-  app = 'app',
-  tracing = 'tracing',
-  mq = 'mq',
-  email = 'email',
-  live = 'live',
-  sms = 'sms',
-  uploader = 'uploader',
-  redis = 'redis',
-  storage = 'storage',
-}
 
 export const ConfigKeys = {
   ADMIN_SECRET_KEY: 'ADMIN_SECRET_KEY',
@@ -80,6 +66,7 @@ export const configLoader: ConfigLoader = createConfigLoader({
   requiredVariables: [],
   basePath: resolve(__dirname, '../../..'),
 });
+AppEnv.regConfigLoader(configLoader);
 
 logger.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 logger.log(`ENV: ${process.env.ENV}`);

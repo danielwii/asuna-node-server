@@ -1,11 +1,12 @@
-import { AsunaErrorCode, AsunaException } from "@danielwii/asuna-helper/dist/exceptions";
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 
 import { CacheManager } from '../cache';
-import { RedisLockProvider, RedisProvider } from '../providers';
 import { WxBaseApi } from './wx.api.common';
 
 const logger = LoggerFactory.getLogger('WxHelper');

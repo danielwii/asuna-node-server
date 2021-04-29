@@ -9,6 +9,7 @@ import {
 } from '@nestjs/terminus';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import checkDiskSpace from 'check-disk-space';
@@ -16,7 +17,7 @@ import _ from 'lodash';
 import { dirname, resolve } from 'path';
 import { getConnection } from 'typeorm';
 
-import { MQHealthIndicator, MQProvider, RedisHealthIndicator, RedisProvider } from '../providers';
+import { MQHealthIndicator, MQProvider, RedisHealthIndicator } from '../providers';
 
 const logger = LoggerFactory.getLogger('HealthController');
 

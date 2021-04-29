@@ -1,8 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AppLifecycleType, LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 
-import { AppLifecycleType, LifecycleRegister } from '../../../register';
 import { KvController } from './kv.controller';
 import { KvHelper } from './kv.helper';
 import { KeyValueModelResolver, KvQueryResolver } from './kv.resolver';

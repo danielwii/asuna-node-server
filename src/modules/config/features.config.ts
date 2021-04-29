@@ -1,7 +1,8 @@
 import { AbstractConfigLoader } from '@danielwii/asuna-helper/dist/config';
+import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { configLoader, YamlConfigKeys } from './loader';
+import { configLoader } from './loader';
 
 export enum FeaturesConfigKeys {
   auditEnable = 'audit_enable',

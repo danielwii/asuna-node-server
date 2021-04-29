@@ -1,8 +1,9 @@
 import { AbstractConfigLoader } from '@danielwii/asuna-helper/dist/config';
+import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { parseJSONIfCould, withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { configLoader, YamlConfigKeys } from '../config';
+import { configLoader } from '../config';
 
 export enum SMSConfigKeys {
   enable = 'enable',

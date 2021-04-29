@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import DataLoader from 'dataloader';
@@ -11,7 +12,6 @@ import { BaseEntity, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
 import { DBHelper } from '../core/db';
-import { RedisProvider } from '../providers';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 import type { GraphQLResolveInfo } from 'graphql';

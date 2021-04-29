@@ -3,13 +3,13 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import * as path from 'path';
@@ -18,9 +18,10 @@ import { AppModule } from './app';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
-import { RedisProvider } from './providers';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
+
+import type { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 

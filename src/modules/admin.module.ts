@@ -2,6 +2,7 @@ import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } fro
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
 import * as redisStore from 'cache-manager-redis-store';
 
@@ -34,7 +35,6 @@ import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
 import { PropertyModule } from './property';
-import { RedisProvider } from './providers';
 import {
   AdminAppRestController,
   AdminAuthRestController,

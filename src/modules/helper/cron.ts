@@ -1,4 +1,5 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { CronJob, CronJobParameters } from 'cron';
@@ -9,7 +10,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import _ from 'lodash';
 
 import { FeaturesConfigObject } from '../config/features.config';
-import { RedisLockProvider } from '../providers/redis-lock.provider';
 import { StatsHelper } from '../stats/stats.helper';
 
 import type { StatsResult } from '../stats/stats.interface';

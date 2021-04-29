@@ -1,10 +1,10 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { promisify } from '@danielwii/asuna-helper/dist/promise';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { RedisProvider } from '../providers/redis.provider';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';
 

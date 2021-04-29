@@ -1,9 +1,10 @@
+import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToClass, Transform } from 'class-transformer';
 
-import { configLoader, YamlConfigKeys } from '../config/loader';
+import { configLoader } from '../config/loader';
 
 const logger = LoggerFactory.getLogger('MQConfig');
 

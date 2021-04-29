@@ -1,10 +1,11 @@
+import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { withP2, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
 import { plainToClass } from 'class-transformer';
 import _ from 'lodash';
 
-import { configLoader, YamlConfigKeys } from '../config/loader';
+import { configLoader } from '../config/loader';
 
 export enum GraphQLConfigKeys {
   debug = 'debug',

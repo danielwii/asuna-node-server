@@ -1,4 +1,3 @@
-export * from './app.env';
 export * from './context';
 export * from './global';
 export * from './auth';

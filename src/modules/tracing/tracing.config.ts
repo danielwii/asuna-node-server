@@ -1,10 +1,11 @@
+import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { withP } from '@danielwii/asuna-helper/dist/utils';
 
 import { plainToClass } from 'class-transformer';
 import * as _ from 'lodash';
 
-import { configLoader, YamlConfigKeys } from '../config/loader';
+import { configLoader } from '../config/loader';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',

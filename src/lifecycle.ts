@@ -1,6 +1,9 @@
 import * as Sentry from '@sentry/node';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -16,9 +19,7 @@ import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { Hermes } from './modules/core/bus';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
-import { RedisLockProvider, RedisProvider } from './modules/providers';
 import { Store } from './modules/store/store';
-import { LifecycleRegister } from './register';
 
 import type { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
