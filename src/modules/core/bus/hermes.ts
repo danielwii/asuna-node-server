@@ -9,8 +9,8 @@ import { defer, Observable, of, Subject, throwError } from 'rxjs';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import { concatAll, map } from 'rxjs/operators';
 
-import { ConfigKeys, configLoader } from '../../config';
-import { RedisConfigObject } from '../../providers';
+import { ConfigKeys, configLoader } from '../../config/loader';
+import { RedisConfigObject } from '../../providers/redis.config';
 import { random } from '../helpers/random.helper';
 
 import type { AbstractAuthUser } from '../auth/base.entities';
