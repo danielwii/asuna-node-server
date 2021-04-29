@@ -16,7 +16,7 @@ import session from 'express-session';
 import helmet from 'helmet';
 import _ from 'lodash';
 import morgan from 'morgan';
-import * as requestIp from 'request-ip';
+import { mw } from 'request-ip';
 import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
@@ -123,7 +123,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   app.set('trust proxy', true);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-  app.use(requestIp.mw());
+  app.use(mw());
   app.use(cookieParser(secret));
   // http://www.febeacon.com/helmet-docs-zh-CN/routes/install/#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86
   app.use(

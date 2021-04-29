@@ -7,7 +7,7 @@ import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/prov
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import createAdapter, { RedisAdapter } from 'socket.io-redis';
+import { RedisAdapter, createAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
 
