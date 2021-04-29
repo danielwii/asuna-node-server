@@ -1,4 +1,4 @@
-import { configLoader } from '../config';
+import { configLoader } from '../config/loader';
 
 export class CacheTTL {
   public static FLASH = configLoader.loadNumericConfig('CACHE_FLASH_TTL', 60_000); // 1min

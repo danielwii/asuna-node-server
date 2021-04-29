@@ -6,8 +6,8 @@ import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 
-import { TimeUnit } from '../common/helpers';
-import { RedisProvider } from '../providers';
+import { TimeUnit } from '../common/helpers/utils';
+import { RedisProvider } from '../providers/redis.provider';
 import { CacheManager } from './cache';
 import { CacheTTL } from './constants';
 

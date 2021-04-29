@@ -9,13 +9,16 @@ import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
 
-import { CacheUtils, CacheWrapper } from '../../cache';
-import { IdentifierHelper, StaticImplements } from '../../common';
-import { auth } from '../../helper';
-import { AdminUser, AdminUserIdentifierHelper } from '../auth';
+import { CacheUtils } from '../../cache/utils';
+import { CacheWrapper } from '../../cache/wrapper';
+import { StaticImplements } from '../../common/types';
+import { auth } from '../../helper/auth';
+import { AdminUser } from '../auth/auth.entities';
+import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 
+import type { IdentifierHelper } from '../../common/identifier';
 import type { EnumValueStatic } from '../../enum-values';
 
 const logger = LoggerFactory.getLogger('KvHelper');

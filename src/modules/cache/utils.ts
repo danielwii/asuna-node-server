@@ -4,7 +4,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { RedisProvider } from '../providers';
+import { RedisProvider } from '../providers/redis.provider';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';
 

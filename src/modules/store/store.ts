@@ -4,7 +4,7 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { CacheManager } from '../cache/cache';
-import { RedisClientObject, RedisProvider } from '../providers';
+import { RedisClientObject, RedisProvider } from '../providers/redis.provider';
 
 const logger = LoggerFactory.getLogger('Store');
 
