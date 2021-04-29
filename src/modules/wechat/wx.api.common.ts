@@ -1,8 +1,10 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
-import { LoggerFactory } from '../common/logger';
-import { WxAccessToken } from './wx.interfaces';
+
 import { WxConfigApi } from './wx.api.config';
+import { WxAccessToken } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatBaseApi');
 

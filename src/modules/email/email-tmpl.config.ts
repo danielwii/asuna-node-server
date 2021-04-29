@@ -1,6 +1,6 @@
-import { plainToClass } from 'class-transformer';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { LoggerFactory } from '../common/logger';
+import { plainToClass } from 'class-transformer';
 
 export const EmailTmplConfigKeys = {
   templates: 'templates',

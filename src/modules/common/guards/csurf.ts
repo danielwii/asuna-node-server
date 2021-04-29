@@ -1,11 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
-import { LoggerFactory } from '../logger';
-import { JwtAuthRequest } from '../../core/auth';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { CacheKey, InMemoryDB } from '../../cache';
-import { r } from '../helpers';
-import { AsunaErrorCode, AsunaException } from '../exceptions';
 import { random } from '../../core/helpers';
+import { AsunaErrorCode, AsunaException } from '../exceptions';
+
+import type { JwtAuthRequest } from '../../core/auth';
 
 const logger = LoggerFactory.getLogger('CsurfGuard');
 

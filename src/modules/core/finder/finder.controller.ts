@@ -1,11 +1,17 @@
 import { Controller, Get, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Request, Response } from 'express';
-import * as _ from 'lodash';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import * as querystring from 'querystring';
-import { AsunaErrorCode, AsunaException, LoggerFactory, r } from '../../common';
+
+import { AsunaErrorCode, AsunaException } from '../../common';
 import { FinderHelper } from './finder.helper';
+
+import type { Request, Response } from 'express';
 
 const logger = LoggerFactory.getLogger('FinderController');
 
@@ -57,9 +63,7 @@ export class ShortFinderController {
     let encrypt;
     try {
       let encodedQuery;
-      [encodedQuery, encrypt, type] = Buffer.from(q, 'base64')
-        .toString('ascii')
-        .split('.') as any;
+      [encodedQuery, encrypt, type] = Buffer.from(q, 'base64').toString('ascii').split('.') as any;
       query = Buffer.from(encodedQuery, 'base64').toString('ascii');
     } catch (error) {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'decode error');

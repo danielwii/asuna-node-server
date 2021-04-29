@@ -1,12 +1,16 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { IsDefined, IsString } from 'class-validator';
-import { PrimaryKey } from '../common';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { AnyAuthRequest } from '../helper/interfaces';
 import { TaskRecord } from './task.entities';
 import { TaskHelper } from './task.helper';
+
+import type { PrimaryKey } from '../common';
+import type { AnyAuthRequest } from '../helper/interfaces';
 
 const logger = LoggerFactory.getLogger('TaskController');
 

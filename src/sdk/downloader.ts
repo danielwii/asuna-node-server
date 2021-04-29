@@ -1,7 +1,9 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { join } from 'path';
 
-import { download, r } from '../modules/common/helpers/utils';
-import { LoggerFactory } from '../modules/common/logger';
+import { download } from '../modules/common/helpers/utils';
 import { AppConfigObject } from '../modules/config/app.config';
 import { handleAxiosResponseError } from './helper';
 

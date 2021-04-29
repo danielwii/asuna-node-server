@@ -1,7 +1,8 @@
 import { html } from 'common-tags';
 import { Column, Entity } from 'typeorm';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+
 import { AbstractBaseEntity } from '../../base';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
 
 export const TokenRule = {

@@ -1,5 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { bootstrap, LoggerFactory } from '.';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
+import { bootstrap } from '.';
 
 const logger = LoggerFactory.getLogger('ApplicationModule');
 

@@ -1,4 +1,5 @@
 import { Promise } from 'bluebird';
+
 import { AuthMigrations } from './modules/core/auth/auth.migrations';
 
 export const renameTables = [

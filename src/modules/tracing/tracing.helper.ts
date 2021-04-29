@@ -1,7 +1,9 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { initTracer, JaegerTracer, TracingConfig, TracingOptions } from 'jaeger-client';
 import SpanContext from 'opentracing/lib/span_context';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+
 import { TracingConfigObject } from './tracing.config';
 
 const logger = LoggerFactory.getLogger('TracingHelper');

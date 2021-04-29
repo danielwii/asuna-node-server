@@ -1,6 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { NotificationQueryResolver } from './notification.resolver';
-import { LoggerFactory } from '../../common/logger';
 
 const logger = LoggerFactory.getLogger('NotificationModule');
 

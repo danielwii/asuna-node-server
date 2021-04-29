@@ -1,5 +1,7 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Expose, plainToClass, Transform } from 'class-transformer';
-import { LoggerFactory } from '../common/logger';
+
 import { configLoader } from '../config';
 
 const logger = LoggerFactory.getLogger('MongoConfig');
@@ -21,7 +23,7 @@ export class MongoConfigObject {
   username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform(value => !!value, { toPlainOnly: true })
+  @Transform((value) => !!value, { toPlainOnly: true })
   password?: string;
 
   constructor(o: Partial<MongoConfigObject>) {

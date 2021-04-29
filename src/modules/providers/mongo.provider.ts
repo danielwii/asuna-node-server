@@ -1,8 +1,11 @@
-import { DynamicModule } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { MongoConfigObject } from './mongo.config';
+
+import type { DynamicModule } from '@nestjs/common';
 
 const logger = LoggerFactory.getLogger('MongoProvider');
 

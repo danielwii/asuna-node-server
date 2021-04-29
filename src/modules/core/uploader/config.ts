@@ -1,5 +1,5 @@
-import { AbstractConfigLoader, configLoader, YamlConfigKeys } from '../../config';
 import { withP, withP2 } from '../../common/helpers';
+import { AbstractConfigLoader, configLoader, YamlConfigKeys } from '../../config';
 
 export enum UploaderConfigKeys {
   enable = 'enable',

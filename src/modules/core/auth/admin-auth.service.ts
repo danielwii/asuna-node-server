@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
 
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import _ from 'lodash';
 import * as shortid from 'shortid';
 import { Connection, getManager, In } from 'typeorm';
 
-import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../common/logger';
 import { AppConfigObject } from '../../config/app.config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';

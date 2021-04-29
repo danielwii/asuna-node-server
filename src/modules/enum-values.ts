@@ -1,4 +1,5 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
+
 import { StaticImplements } from './common';
 
 export type ValueOf<T> = T[keyof T];

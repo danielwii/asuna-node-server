@@ -1,10 +1,11 @@
 import { plainToClass, Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
-import { Response } from 'express';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as mime from 'mime-types';
-import { JpegPipeOptions } from '../image/jpeg.pipe';
-import { ThumbnailPipeOptions } from '../image/thumbnail.pipe';
+
+import type { Response } from 'express';
+import type { JpegPipeOptions } from '../image/jpeg.pipe';
+import type { ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 
 export enum StorageMode {
   LOCAL = 'local',

@@ -1,6 +1,8 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
+
 import { StaticImplements } from '../common';
-import { EnumValueStatic, ValueOf } from '../enum-values';
+
+import type { EnumValueStatic, ValueOf } from '../enum-values';
 
 @StaticImplements<EnumValueStatic>()
 export class PaymentMethodEnumValue {

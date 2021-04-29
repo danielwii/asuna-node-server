@@ -1,14 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
-import { Response } from 'express';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
 import { UserProfile } from '../core/auth/user.entities';
 import { auth } from '../helper/auth';
 import { Store } from '../store';
 
+import type { Response } from 'express';
 import type { WXJwtPayload } from './interfaces';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxCodeSession } from './wx.interfaces';

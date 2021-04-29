@@ -1,7 +1,8 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Promise } from 'bluebird';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
-import { LoggerFactory } from '../../common/logger';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;

@@ -2,6 +2,9 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
@@ -9,23 +12,16 @@ import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import helmet from 'helmet';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import morgan from 'morgan';
 import * as requestIp from 'request-ip';
 import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
-import { syncDbWithLockIfPossible, validateOptions, resolveTypeormPaths } from './helper';
+import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
-import {
-  AnyExceptionFilter,
-  LoggerConfigObject,
-  LoggerFactory,
-  LoggerHelper,
-  LoggerInterceptor,
-  r,
-} from './modules/common';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerHelper, LoggerInterceptor } from './modules/common';
 import { AppConfigObject, ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';
@@ -48,6 +44,10 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   require('events').EventEmitter.defaultMaxListeners = 15;
 
   const logger = LoggerFactory.getLogger('bootstrap');
+  process.on('unhandledRejection', (reason, p) =>
+    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
+  );
+
   logger.log(`options: ${r(options)}`);
 
   await AppLifecycle.preload();

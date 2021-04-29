@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+
 import { AbstractNameEntity, Publishable } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+
 import type { KeyValuePair } from './kv.entities';
 
 export enum KVModelFormatType {

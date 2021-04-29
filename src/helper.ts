@@ -1,3 +1,6 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Promise } from 'bluebird';
 import { glob } from 'glob';
 import _ from 'lodash';
@@ -5,8 +8,7 @@ import { dirname, extname, resolve } from 'path';
 import { Connection } from 'typeorm';
 
 import { renameTables, runCustomMigrations } from './migrations';
-import { r, TimeUnit } from './modules/common/helpers/utils';
-import { LoggerFactory } from './modules/common/logger/factory';
+import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
 import { RedisLockProvider } from './modules/providers/redis-lock.provider';

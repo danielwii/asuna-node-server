@@ -1,4 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+
 import { OperationToken } from '../token';
 
 export class ChunksUploadEvent {

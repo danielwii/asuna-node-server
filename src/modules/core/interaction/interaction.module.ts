@@ -1,5 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { ActivitiesController } from './activities.controller';
 import { ActivitiesResolver } from './activities.resolver';
 import { InteractionController } from './interaction.controller';

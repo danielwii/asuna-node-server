@@ -1,5 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { ContentAdminController } from './content.admin-controller';
 import { ContentController } from './content.controller';
 import { FeedbackQueryResolver, UserFeedbackResolver } from './feedback.resolver';

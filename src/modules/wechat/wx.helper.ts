@@ -1,7 +1,10 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Promise } from 'bluebird';
+
 import { CacheManager } from '../cache';
-import { AsunaErrorCode, AsunaException, LoggerFactory } from '../common';
-import { r } from '../common/helpers';
+import { AsunaErrorCode, AsunaException } from '../common';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import { WxBaseApi } from './wx.api.common';
 

@@ -1,4 +1,5 @@
-import { LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { SimpleIdGenerator } from '../../ids';
 import { MigrationsHelper } from '../migrations/migrations.helper';
 import { AdminUser } from './auth.entities';

@@ -1,8 +1,9 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { DeleteResult } from 'typeorm';
 
 import { UserProfile } from './auth';
 import { UserFollow } from './interaction/follow.entities';
-import { LoggerFactory } from '../common/logger';
 
 import type { InteractionFollowType } from './interaction/enum-values';
 

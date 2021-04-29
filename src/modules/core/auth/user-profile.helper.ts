@@ -1,5 +1,6 @@
 import ow from 'ow';
 import { UpdateResult } from 'typeorm';
+
 import { PasswordHelper } from './abstract.auth.service';
 import { UserProfile } from './user.entities';
 

@@ -1,13 +1,17 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Promise } from 'bluebird';
-import { LoggerFactory } from '../../common/logger';
+
 import { UserProfile } from '../../core/auth';
-import { GraphqlContext } from '../../dataloader';
 import { Wallet } from '../../property';
 import { GqlWXAuthGuard, WXMiniAppUserInfo } from '../../wechat';
 import { GqlAdminAuthGuard } from '../auth.guard';
 import { GraphqlHelper } from '../helper';
+
+import type { GraphqlContext } from '../../dataloader';
 
 export class UserProfileQueryResolver {
   private logger = LoggerFactory.getLogger('UserProfileQueryResolver');

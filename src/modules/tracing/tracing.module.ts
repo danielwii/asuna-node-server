@@ -1,5 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { TracingHelper } from './tracing.helper';
 
 const logger = LoggerFactory.getLogger('TracingModule');

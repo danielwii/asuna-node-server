@@ -1,5 +1,7 @@
 import { Query, Resolver } from '@nestjs/graphql';
-import { LoggerFactory } from '../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { DBHelper, DBService } from '../core/db';
 
 @Resolver()

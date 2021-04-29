@@ -1,6 +1,9 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { getConnection, getRepository, Repository } from 'typeorm';
-import { Profile, r } from '../../common';
-import { LoggerFactory } from '../../common/logger';
+
+import { Profile } from '../../common';
 import { DBHelper, parseFields } from './db.helper';
 
 const logger = LoggerFactory.getLogger('DBService');

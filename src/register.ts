@@ -1,8 +1,9 @@
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import _ from 'lodash';
 
-import { r } from './modules/common/helpers/utils';
-import { LoggerFactory } from './modules/common/logger/factory';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 
 const logger = LoggerFactory.getLogger('LifecycleRegister');
 

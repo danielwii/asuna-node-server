@@ -1,12 +1,12 @@
 import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import * as redisStore from 'cache-manager-redis-store';
 
 import { AdminController } from './admin.controller';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
-import { r } from './common/helpers';
-import { LoggerFactory } from './common/logger';
 import { ConfigKeys, configLoader } from './config';
 import { ContentModule } from './content';
 import {
@@ -116,13 +116,6 @@ export class AdminInternalModule implements NestModule, OnModuleInit {
   }
 
   public async onModuleInit(): Promise<void> {
-    {
-      const processLogger = LoggerFactory.getLogger('process');
-      process.on('unhandledRejection', (reason, p) =>
-        processLogger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
-      );
-    }
-
     logger.log('init...');
     await this.initKV();
     await this.initConstants();

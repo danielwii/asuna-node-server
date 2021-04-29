@@ -1,19 +1,14 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Promise } from 'bluebird';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { EntityMetadata } from 'typeorm';
 
 import { CacheManager } from '../cache';
-import {
-  AsunaErrorCode,
-  AsunaException,
-  AsunaExceptionHelper,
-  AsunaExceptionTypes,
-  LoggerFactory,
-  PrimaryKey,
-  r,
-} from '../common';
+import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes, PrimaryKey } from '../common';
 import { deserializeSafely } from '../common/helpers';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
@@ -151,7 +146,13 @@ export class TenantHelper {
       : {};
 
     const filtered = _.assign({}, ...entities.map((entity) => ({ [entity.entityInfo.name]: entity.entityInfo })));
-    return Promise.props({ entities: filtered, config, recordCounts, tenant, roles: this.getTenantRoles(admin?.roles) });
+    return Promise.props({
+      entities: filtered,
+      config,
+      recordCounts,
+      tenant,
+      roles: this.getTenantRoles(admin?.roles),
+    });
   }
 
   static async isTenantEntity(fullModelName: string): Promise<boolean> {

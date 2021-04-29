@@ -1,7 +1,9 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
+import _ from 'lodash';
+
 import { withP2, withP3 } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
 import { configLoader, YamlConfigKeys } from '../config/loader';
 
 export enum GraphQLConfigKeys {

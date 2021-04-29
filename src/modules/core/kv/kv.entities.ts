@@ -1,10 +1,10 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
+import { CacheUtils } from '../../cache/utils';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
-import { CacheUtils } from '../../cache/utils';
 
 import type { KeyValueModel } from './kv.isolated.entities';
 

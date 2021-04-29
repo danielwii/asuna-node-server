@@ -1,9 +1,11 @@
-import { RedisClient } from 'redis';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { promisify } from '@danielwii/asuna-helper/dist/promise';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Promise } from 'bluebird';
-import _ from 'lodash';
 import { parse } from 'json5';
-import { LoggerFactory } from '../logger';
-import { promisify, r } from './utils';
+import _ from 'lodash';
+import { RedisClient } from 'redis';
 
 const logger = LoggerFactory.getLogger('RedisHelper');
 

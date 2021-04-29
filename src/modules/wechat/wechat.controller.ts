@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { IsString } from 'class-validator';
 
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
 import { WXAuthGuard } from './wechat.auth';
 import { WXMiniAppUserInfo } from './wechat.entities';
 import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';

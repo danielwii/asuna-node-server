@@ -1,12 +1,16 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
+import _ from 'lodash';
 import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
-import * as _ from 'lodash';
-import { LoggerFactory } from '../common/logger';
-import { JwtPayload } from '../core/auth';
-import { DefaultRegisteredLoaders } from './context';
+
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
+
+import type { JwtPayload } from '../core/auth';
+import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 

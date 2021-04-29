@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { ConfigKeys, configLoader } from '../../config/loader';
 

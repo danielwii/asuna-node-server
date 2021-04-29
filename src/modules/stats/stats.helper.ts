@@ -1,10 +1,13 @@
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import _ from 'lodash';
+
 import { CacheTTL } from '../cache/constants';
 import { InMemoryDB } from '../cache/db';
-import { r } from '../common/helpers/utils';
-import { LoggerFactory } from '../common/logger';
-import { CronStatsInterface } from './stats.interface';
 import { FeaturesConfigObject } from '../config/features.config';
+
+import type { CronStatsInterface } from './stats.interface';
 
 type CronStat = Omit<CronStatsInterface, 'events'>;
 

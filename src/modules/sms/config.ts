@@ -1,5 +1,6 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { parseJSONIfCould, withP, withP2 } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
 import { AbstractConfigLoader, configLoader, YamlConfigKeys } from '../config';
 
 export enum SMSConfigKeys {

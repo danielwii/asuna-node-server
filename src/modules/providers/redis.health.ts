@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { RedisProvider } from './redis.provider';
-import { LoggerFactory } from '../common/logger';
-import { r } from '../common/helpers/utils';
 
 const logger = LoggerFactory.getLogger('RedisHealthIndicator');
 

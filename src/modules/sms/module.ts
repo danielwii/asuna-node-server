@@ -1,7 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { LoggerFactory } from '../common/logger';
-import { SMSHelper } from './helper';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { SMSController } from './controller';
+import { SMSHelper } from './helper';
 
 const logger = LoggerFactory.getLogger('SMSModule');
 

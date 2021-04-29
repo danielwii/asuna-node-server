@@ -1,6 +1,6 @@
-import { getManager } from 'typeorm';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { LoggerFactory } from '../common/logger';
+import { getManager } from 'typeorm';
 
 const logger = LoggerFactory.getLogger('TypeormHelper');
 

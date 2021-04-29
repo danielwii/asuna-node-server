@@ -1,6 +1,8 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
-import { LoggerFactory } from '../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { CronHelper } from '../helper';
 import { PaymentController } from './payment.controller';
 import { PaymentHelper } from './payment.helper';

@@ -1,11 +1,15 @@
 import AliPopCore from '@alicloud/pop-core';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import Chance from 'chance';
-import * as _ from 'lodash';
+import _ from 'lodash';
+
 import { InMemoryDB } from '../cache';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { RequestInfo } from '../helper';
 import { SMSConfigObject } from './config';
+
+import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('SMSHelper');
 

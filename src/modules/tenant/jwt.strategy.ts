@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AsunaErrorCode, AsunaException, r } from '../common';
-import { LoggerFactory } from '../common/logger';
+import { AsunaErrorCode, AsunaException } from '../common';
 import { ConfigKeys, configLoader } from '../config';
 import { TenantAuthService } from './auth.service';
 

@@ -1,6 +1,7 @@
-import * as _ from 'lodash';
-import { CanRegEnumValue, EnumValueStatic, ValueOf } from '../../enum-values';
+import _ from 'lodash';
+
 import { StaticImplements } from '../../common/types';
+import { CanRegEnumValue, EnumValueStatic, ValueOf } from '../../enum-values';
 
 @StaticImplements<EnumValueStatic>()
 export class InteractionFollowEnumValue extends CanRegEnumValue {

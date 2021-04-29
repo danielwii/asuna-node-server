@@ -1,7 +1,8 @@
 import { Controller, Post, Query, Req } from '@nestjs/common';
 
-import { detectUA, r } from '../common';
-import { LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
 import type { AnyAuthRequest } from '../helper';
 

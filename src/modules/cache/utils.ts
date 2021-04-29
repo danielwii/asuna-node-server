@@ -1,6 +1,9 @@
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { promisify } from '@danielwii/asuna-helper/dist/promise';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { LoggerFactory, promisify, r } from '../common';
+import _ from 'lodash';
+
 import { RedisProvider } from '../providers';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';

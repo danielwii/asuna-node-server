@@ -1,5 +1,6 @@
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { DaprConfigObject } from './dapr.config';
 
 const logger = LoggerFactory.getLogger('DaprProvider');

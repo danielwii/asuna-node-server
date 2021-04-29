@@ -1,7 +1,8 @@
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
 import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
 import { ColumnTypeHelper } from '../core/helpers';

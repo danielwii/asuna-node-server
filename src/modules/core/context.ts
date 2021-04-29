@@ -1,9 +1,10 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import { join } from 'path';
 
-import { r } from '../common/helpers/utils';
-import { LoggerFactory } from '../common/logger';
 import { ConfigKeys, configLoader } from '../config';
 import { Global } from './global';
 import {

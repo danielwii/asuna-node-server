@@ -1,8 +1,10 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm';
+
 import { AbstractTimeBasedBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
+
 import type { PaymentItem, PaymentTransaction } from './payment.entities';
 
 @EntityMetaInfo({ name: 'payment__orders', internal: true, displayName: '订单' })

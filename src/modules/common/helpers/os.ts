@@ -1,7 +1,7 @@
-import * as os from 'os';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { LoggerFactory } from '../logger/factory';
-import { r } from './utils';
+import * as os from 'os';
 
 const logger = LoggerFactory.getLogger('OS');
 

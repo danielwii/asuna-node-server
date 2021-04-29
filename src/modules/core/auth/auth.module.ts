@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '../../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
 import { TokenModule } from '../token';

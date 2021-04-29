@@ -1,10 +1,16 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Promise } from 'bluebird';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import * as redis from 'redis';
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { RedisConfigObject } from './redis.config';
+
 import { LifecycleRegister } from '../../register';
+import { RedisConfigObject } from './redis.config';
+
+export function promisify<T extends (...args) => R, R>(fn: T, bind?): (...args: Parameters<T>) => Promise<R> {
+  return Promise.promisify(fn).bind(bind);
+}
 
 const logger = LoggerFactory.getLogger('RedisProvider');
 

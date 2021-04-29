@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { AppQueryResolver } from './app.resolver';
 
 const logger = LoggerFactory.getLogger('AppModule');

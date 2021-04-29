@@ -1,13 +1,16 @@
 import { Body, Delete, Get, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { classToPlain } from 'class-transformer';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
 import { BaseEntity, DeleteResult } from 'typeorm';
 
-import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile, r } from '../common';
-import { LoggerFactory } from '../common/logger';
+import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
 import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
 import {
   ColumnSchema,
@@ -20,8 +23,9 @@ import {
 } from '../core/db';
 import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
-import { AnyAuthRequest } from '../helper';
 import { Tenant, TenantHelper } from '../tenant';
+
+import type { AnyAuthRequest } from '../helper';
 
 // import { AdminUser } from '../../core/auth';
 
@@ -130,7 +134,8 @@ export abstract class RestCrudController {
 
     // TODO 这里的 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
     if (parsedNormalWheres.length > 1) queryBuilder.where(where);
-    else if (parsedNormalWheres.length === 1) DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres[0]);
+    else if (parsedNormalWheres.length === 1)
+      DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres[0]);
 
     if (filterWheres) queryBuilder.andWhere(filterWheres as any);
 

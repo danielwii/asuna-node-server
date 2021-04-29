@@ -1,4 +1,7 @@
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import _ from 'lodash';
 import {
   EntitySubscriberInterface,
   EventSubscriber,
@@ -8,10 +11,8 @@ import {
   UpdateEvent,
 } from 'typeorm';
 
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
-import { AuditService } from './audit.service';
 import { FeaturesConfigObject } from '../config/features.config';
+import { AuditService } from './audit.service';
 
 const logger = LoggerFactory.getLogger('AuditSubscriber');
 

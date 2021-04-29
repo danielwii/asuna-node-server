@@ -1,10 +1,12 @@
 import { Column, Entity } from 'typeorm';
+
+import { deserializeSafely } from '../common';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { AbstractTransactionEntity } from './base.entities';
-import { EntityConstructorObject } from '../base';
-import { deserializeSafely } from '../common';
+
+import type { EntityConstructorObject } from '../base';
 
 export const HermesPointChangeEventKeys = { pointsChange: 'user.points.change' };
 

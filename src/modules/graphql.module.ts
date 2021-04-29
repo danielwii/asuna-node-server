@@ -1,6 +1,10 @@
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
@@ -11,8 +15,6 @@ import * as _ from 'lodash';
 import * as path from 'path';
 
 import { AppModule } from './app';
-import { r } from './common/helpers';
-import { LoggerFactory } from './common/logger';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';

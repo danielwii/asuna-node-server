@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
 import { EntityMetaInfo } from '../../common/decorators';
 import { InjectMultiUserProfile } from '../auth';

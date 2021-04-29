@@ -1,4 +1,5 @@
 import { Column, Entity } from 'typeorm';
+
 import { AbstractNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { ColumnTypeHelper } from '../core/helpers';

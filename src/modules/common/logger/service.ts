@@ -1,9 +1,11 @@
 import { Logger } from '@nestjs/common';
-import { LoggerService, LogLevel } from '@nestjs/common/services/logger.service';
 
-import { r } from '../helpers/utils';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { LoggerConfigObject } from './config';
-import { LoggerFactory } from './factory';
+
+import type { LoggerService, LogLevel } from '@nestjs/common/services/logger.service';
 
 // --------------------------------------------------------------
 //  Numerical         Severity

@@ -1,14 +1,16 @@
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { promisify } from '@danielwii/asuna-helper/dist/promise';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { Promise } from 'bluebird';
+import _ from 'lodash';
 import * as redis from 'redis';
 import RedLock from 'redlock';
-import { Promise } from 'bluebird';
 
-import { promisify, r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+import { LifecycleRegister } from '../../register';
 import { configLoader } from '../config';
 import { RedisConfigKeys } from './redis.config';
 import { RedisProvider } from './redis.provider';
-import { LifecycleRegister } from '../../register';
 
 const logger = LoggerFactory.getLogger('RedisLockProvider');
 

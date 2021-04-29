@@ -1,5 +1,6 @@
 import { StaticImplements } from '../../common/types';
-import { IdentifierHelper, PrimaryKey } from '../../common/identifier';
+
+import type { IdentifierHelper, PrimaryKey } from '../../common/identifier';
 
 @StaticImplements<IdentifierHelper<Partial<{ id: PrimaryKey }>>>()
 export class AdminUserIdentifierHelper {

@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 
-import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { EntityConstructorObject, NoPrimaryKeyBaseEntity } from '../base';
+import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { deserializeSafely } from '../common/helpers';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { SimpleIdGenerator } from '../ids';

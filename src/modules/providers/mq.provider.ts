@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import * as amqp from 'amqplib';
-import * as _ from 'lodash';
 
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import * as amqp from 'amqplib';
+import _ from 'lodash';
+
 import { MQConfigObject } from './mq.config';
 
 const logger = LoggerFactory.getLogger('MQProvider');
@@ -12,9 +14,9 @@ const logger = LoggerFactory.getLogger('MQProvider');
 export class MQProvider {
   private static _instance: MQProvider;
 
-  #connectionFuture?: amqp.Connection;
-  #channel?: amqp.Channel;
-  #isHealthy: boolean;
+  private _connectionFuture?: amqp.Connection;
+  private channel?: amqp.Channel;
+  private isHealthy: boolean;
   // private _retryLimit = 10;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -31,14 +33,14 @@ export class MQProvider {
     await amqp
       .connect(url)
       .then((connection) => {
-        this.#connectionFuture = connection as amqp.Connection;
-        this.#isHealthy = true;
+        this._connectionFuture = connection as amqp.Connection;
+        this.isHealthy = true;
         logger.log('connection established');
       })
       .catch((error) => {
         logger.error(`connect to mq error: ${r(error)}`);
 
-        this.#isHealthy = false;
+        this.isHealthy = false;
         /*
         if (this._retryLimit < 1) {
           // eslint-disable-next-line unicorn/no-process-exit
@@ -49,11 +51,11 @@ export class MQProvider {
         setTimeout(async () => {
           this.createConnection()
             .then((connection) => {
-              this.#connectionFuture = connection as amqp.Connection;
-              this.#isHealthy = true;
+              this._connectionFuture = connection as amqp.Connection;
+              this.isHealthy = true;
             })
             .catch(() => {
-              this.#isHealthy = false;
+              this.isHealthy = false;
               // this._retryLimit -= 1;
               logger.error(`reconnect to mq error, retry in 10s.`);
             });
@@ -62,7 +64,7 @@ export class MQProvider {
       });
 
     // this._retryLimit = 10;
-    return Promise.resolve(this.#connectionFuture);
+    return Promise.resolve(this._connectionFuture);
   }
 
   static get instance(): MQProvider {
@@ -73,17 +75,17 @@ export class MQProvider {
   }
 
   async send(topic, payload): Promise<boolean> {
-    if (!this.#connectionFuture) {
-      this.#connectionFuture = await this.createConnection();
+    if (!this._connectionFuture) {
+      this._connectionFuture = await this.createConnection();
     }
 
-    if (!this.#channel) {
-      this.#channel = await this.#connectionFuture.createChannel();
+    if (!this.channel) {
+      this.channel = await this._connectionFuture.createChannel();
     }
 
-    return this.#channel.assertQueue(topic).then((ok) => {
+    return this.channel.assertQueue(topic).then((ok) => {
       logger.log(`send payload(${r(payload)}) to topic(${topic})`);
-      return this.#channel.sendToQueue(topic, Buffer.from(JSON.stringify(payload)));
+      return this.channel.sendToQueue(topic, Buffer.from(JSON.stringify(payload)));
     });
   }
 
@@ -92,12 +94,12 @@ export class MQProvider {
   }
 
   static get isHealthy(): boolean {
-    return MQProvider._instance.#isHealthy;
+    return MQProvider._instance.isHealthy;
   }
 
   get connectionFuture(): Promise<amqp.Connection> {
-    if (!_.isNil(this.#connectionFuture)) {
-      return Promise.resolve(this.#connectionFuture);
+    if (!_.isNil(this._connectionFuture)) {
+      return Promise.resolve(this._connectionFuture);
     }
 
     return this.createConnection();

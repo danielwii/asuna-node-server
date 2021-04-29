@@ -7,8 +7,10 @@ import {
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Server } from 'ws';
-import { LoggerFactory } from '../common/logger';
 
 const logger = LoggerFactory.getLogger('WSGateway(default)');
 

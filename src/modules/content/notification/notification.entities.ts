@@ -1,12 +1,13 @@
 import { Column, Entity } from 'typeorm';
+
+import { AbstractNameEntity, Publishable } from '../../base';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import {
   NotificationEnumValue,
   NotificationType,
   NotificationUsageEnumValue,
   NotificationUsageType,
 } from './enum-values';
-import { AbstractNameEntity, Publishable } from '../../base';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 
 @EntityMetaInfo({ name: 'content__notifications', displayName: '通知', internal: true })
 @Entity('content__t_notifications')

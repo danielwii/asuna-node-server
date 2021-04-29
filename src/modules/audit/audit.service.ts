@@ -1,6 +1,7 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { diff } from 'jsondiffpatch';
 
-import { LoggerFactory } from '../common/logger';
 import { AuditRecord, AuditType } from './audit.entities';
 
 const logger = LoggerFactory.getLogger('AuditService');

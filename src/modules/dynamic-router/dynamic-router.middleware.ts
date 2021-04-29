@@ -1,9 +1,11 @@
 import { NestMiddleware } from '@nestjs/common';
-import * as _ from 'lodash';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import _ from 'lodash';
 import { resolve } from 'path';
 
-import { r } from '../common/helpers';
-import { LoggerFactory } from '../common/logger';
 import { DynamicRouterHelper } from './dynamic-router.helper';
 
 import type { Request, Response } from 'express';

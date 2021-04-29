@@ -1,10 +1,12 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { r } from '../../common/helpers';
-import { LoggerFactory } from '../../common/logger';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { Hermes } from '../bus';
-import { UploaderService } from './service';
 import { UploaderConfigObject } from './config';
+import { UploaderService } from './service';
 
 const logger = LoggerFactory.getLogger('UploaderModule');
 

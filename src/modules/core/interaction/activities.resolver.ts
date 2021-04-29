@@ -1,9 +1,13 @@
 import { Context, ResolveField, Resolver, Root } from '@nestjs/graphql';
+
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Promise } from 'bluebird';
+
 import { UserProfile } from '../auth';
-import { GraphqlContext } from '../../dataloader';
 import { UserActivity } from './activities.entities';
-import { LoggerFactory } from '../../common/logger';
+
+import type { GraphqlContext } from '../../dataloader';
 
 @Resolver(UserActivity)
 export class ActivitiesResolver {

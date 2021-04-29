@@ -1,5 +1,6 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Entity } from 'typeorm';
+
 import { AbstractTimeBasedNameEntity } from '../base';
 import { EntityMetaInfo } from '../common/decorators';
 

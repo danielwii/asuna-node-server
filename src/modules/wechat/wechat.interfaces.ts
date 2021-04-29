@@ -1,5 +1,4 @@
-import { UserProfile } from '../core/auth/user.entities';
-
+import type { UserProfile } from '../core/auth/user.entities';
 import type { Request } from 'express';
 import type { AnyAuthRequest } from '../helper/interfaces';
 import type { WXJwtPayload } from './interfaces';

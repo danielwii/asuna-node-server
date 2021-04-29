@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+
 import { Exclude, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 export class AdminResetPasswordDto {
   @ApiProperty({ type: 'username' })

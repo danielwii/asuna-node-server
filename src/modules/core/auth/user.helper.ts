@@ -1,8 +1,10 @@
-import * as _ from 'lodash';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
+import _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity, FindOneOptions } from 'typeorm';
+
 import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
-import { LoggerFactory } from '../../common/logger';
 import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';

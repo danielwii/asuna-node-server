@@ -1,4 +1,5 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
+
 import { StaticImplements } from '../common';
 import { CanRegEnumValue, EnumValueStatic, ValueOf } from '../enum-values';
 

@@ -1,8 +1,8 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
 import _ from 'lodash';
-
-import { LoggerFactory } from '../logger';
 
 const logger = LoggerFactory.getLogger('HandlebarsHelper');
 

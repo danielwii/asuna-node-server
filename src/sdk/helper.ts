@@ -1,6 +1,7 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import * as util from 'util';
-import { r } from '../modules/common/helpers';
-import { LoggerFactory } from '../modules/common/logger';
 
 const logger = LoggerFactory.getLogger('Helper');
 

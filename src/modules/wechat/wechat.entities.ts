@@ -1,6 +1,6 @@
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsIn, IsOptional } from 'class-validator';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {
   AfterLoad,
   BaseEntity,
@@ -12,15 +12,17 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { EntityConstructorObject } from '../base/base.entity';
+
 import { EntityMetaInfo, IdentifierHelper, JsonArray, MetaInfo, StaticImplements } from '../common';
 import { deserializeSafely } from '../common/helpers/validate';
 import { AdminUser } from '../core/auth/auth.entities';
-import type { UserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
 import { WxSubscribeSceneType } from './wx.interfaces';
+
+import type { EntityConstructorObject } from '../base/base.entity';
+import type { UserProfile } from '../core/auth/user.entities';
 
 @StaticImplements<IdentifierHelper<Partial<{ openId: string }>>>()
 export class WeChatUserIdentifierHelper {

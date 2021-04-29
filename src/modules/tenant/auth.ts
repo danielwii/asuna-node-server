@@ -1,7 +1,8 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import passport from 'passport';
 
-import { r } from '../common/helpers/utils';
-import { LoggerFactory } from '../common/logger';
 import { wrapErrorInfo } from '../helper/utils';
 import { OrgUser } from './tenant.entities';
 

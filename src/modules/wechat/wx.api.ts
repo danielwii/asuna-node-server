@@ -1,3 +1,5 @@
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
@@ -5,7 +7,7 @@ import fetch from 'node-fetch';
 import ow from 'ow';
 
 import { AsunaErrorCode, AsunaException } from '../common/exceptions';
-import { LoggerFactory } from '../common/logger';
+import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 import { WxHelper } from './wx.helper';
 import {
   MiniSubscribeData,
@@ -16,7 +18,6 @@ import {
   WxSendTemplateInfo,
 } from './wx.interfaces';
 import { WxUserInfo, WxUserList } from './wx.vo';
-import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 
 const logger = LoggerFactory.getLogger('WeChatApi');
 
@@ -226,7 +227,11 @@ export class WxApi {
       (config, { accessToken }) =>
         WxConfigApi.wrappedFetch(
           oneLineTrim`https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=${accessToken}`,
-          { method: 'post', body: JSON.stringify(opts), headers: { 'Content-Type': 'application/json; charset=utf-8' } },
+          {
+            method: 'post',
+            body: JSON.stringify(opts),
+            headers: { 'Content-Type': 'application/json; charset=utf-8' },
+          },
         ),
       true,
     );

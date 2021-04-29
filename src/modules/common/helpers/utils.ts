@@ -1,30 +1,13 @@
 import axios, { AxiosResponse } from 'axios';
 import { Promise } from 'bluebird';
 import { exec } from 'child_process';
-import { classToPlain } from 'class-transformer';
-import { addYears, subYears } from 'date-fns';
 import * as fs from 'fs-extra';
-import isMobile from 'ismobilejs';
 import * as JSON5 from 'json5';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as path from 'path';
-import { Between, FindOperator } from 'typeorm';
-import UaParser from 'ua-parser-js';
-import { inspect } from 'util';
 
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-
-export const isProductionEnv = process.env.NODE_ENV === 'production';
-export const isTestEnv = process.env.NODE_ENV === 'test';
-
-export function AfterDate(date: Date): FindOperator<any> {
-  return Between(date, addYears(date, 100));
-}
-
-export function BeforeDate(date: Date): FindOperator<any> {
-  return Between(subYears(date, 100), date);
-}
 
 export function execAsync(command: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -60,33 +43,6 @@ export function toHHMMSS(num: string): string {
   if (minutes < 10) minutes = `0${minutes}`;
   if (seconds < 10) seconds = `0${seconds}`;
   return `${hours}:${minutes}:${seconds}`;
-}
-
-export const safeStringify = (obj, indent = 2) => {
-  let cache = [];
-  const retVal = JSON5.stringify(
-    obj,
-    (key, value) =>
-      typeof value === 'object' && value !== null
-        ? cache.includes(value)
-          ? undefined // Duplicate reference found, discard key
-          : cache.push(value) && value // Store value in our collection
-        : value,
-    indent,
-  );
-  cache = null;
-  return retVal;
-};
-
-export function r(
-  o: any,
-  { transform, stringify, depth }: { transform?: boolean; stringify?: boolean; depth?: number } = {},
-): string {
-  if (!_.isObjectLike(o)) {
-    return o;
-  }
-  const value = transform || stringify ? classToPlain(o) : o;
-  return isProductionEnv || stringify ? safeStringify(value, 0) : inspect(value, { colors: true, depth: depth ?? 5 });
 }
 
 /**
@@ -168,19 +124,6 @@ export function parseJSONIfCould(value?: string): any {
   return value;
 }
 
-export function promisify<T extends (...args) => R, R>(fn: T, bind?): (...args: Parameters<T>) => Promise<R> {
-  return Promise.promisify(fn).bind(bind);
-}
-
-export function isPromiseAlike<T>(value: any): value is Promise<T> {
-  return !!value.then;
-}
-
-export type FutureResolveType<T> = ((...args) => Promise<T> | T) | T;
-
-export const fnResolve = <T>(fn: FutureResolveType<T>): ((...args) => Promise<T>) => async (...args): Promise<T> =>
-  _.isFunction(fn) ? (isPromiseAlike(fn) ? fn(...args) : Promise.resolve(fn(...args))) : Promise.resolve(fn);
-
 export const noNullFilter = <T>(source: Partial<T>) => {
   const noNullSource = _.omitBy(source, _.isNull);
   const predicate = _.isEmpty(noNullSource) ? _.stubTrue : _.matches(noNullSource);
@@ -233,18 +176,10 @@ export const condition = <Entity>(
   return _.assign({}, _.pickBy(nilProtected, _.identity), nil);
 };
 
-export const detectUA = (ua: string) => {
-  const parsed = new UaParser(ua);
-  return {
-    isMobile: isMobile(ua).any,
-    isBrowser: isMobile(ua).any || !!parsed.getBrowser().name,
-    parsed: parsed.getResult(),
-    isUnknown: !parsed.getOS().name,
-  };
-};
-
 export const timeoutPromise = async <T>(promise: () => Promise<T>, timeoutMs: number): Promise<T> =>
   Promise.race([
     promise(),
-    new Promise<T>((resolve, reject) => setTimeout(() => reject(`function timeout ${timeoutMs}ms`), timeoutMs)),
+    new Promise<T>((resolve, reject) =>
+      setTimeout(() => reject(new Error(`function timeout ${timeoutMs}ms`)), timeoutMs),
+    ),
   ]);

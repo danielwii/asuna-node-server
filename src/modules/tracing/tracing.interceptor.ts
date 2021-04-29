@@ -1,10 +1,11 @@
 import { GqlExecutionContext } from '@nestjs/graphql';
 
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+
 import { Tags } from 'opentracing';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { LoggerFactory } from '../common/logger';
 import { TracingHelper, WithSpanContext } from './tracing.helper';
 
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';

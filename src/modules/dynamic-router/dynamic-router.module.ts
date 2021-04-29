@@ -1,9 +1,10 @@
-import { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { LoggerFactory } from '../common/logger';
-import { KeyValueType, KVListFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
+import { KeyValueType, KvHelper, KVListFieldsValue, KVModelFormatType } from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
 import { DynamicRouterMiddleware } from './dynamic-router.middleware';
+
+import type { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
 
 const logger = LoggerFactory.getLogger('DynamicRouterModule');
 
