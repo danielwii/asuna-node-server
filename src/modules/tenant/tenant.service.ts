@@ -1,3 +1,4 @@
+import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -5,7 +6,6 @@ import { Promise } from 'bluebird';
 import * as _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
 
-import { AsunaExceptionHelper, AsunaExceptionTypes, PrimaryKey } from '../common';
 import { DBHelper } from '../core/db';
 import { RestHelper } from '../core/rest';
 import { WeChatUser } from '../wechat/wechat.entities';
@@ -13,6 +13,7 @@ import { WxConfigApi } from '../wechat/wx.api.config';
 import { OrgUser, Tenant } from './tenant.entities';
 import { TenantHelper } from './tenant.helper';
 
+import type { PrimaryKey } from '../common';
 import type { StatsResult } from '../stats';
 
 const logger = LoggerFactory.getLogger('TenantService');

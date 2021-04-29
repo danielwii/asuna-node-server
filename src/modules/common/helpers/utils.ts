@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
 import { Promise } from 'bluebird';
-import { exec } from 'child_process';
 import * as fs from 'fs-extra';
 import * as JSON5 from 'json5';
 import _ from 'lodash';
@@ -8,15 +7,6 @@ import * as fp from 'lodash/fp';
 import * as path from 'path';
 
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-
-export function execAsync(command: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      if (error) reject(error);
-      else resolve(stdout ?? stderr);
-    });
-  });
-}
 
 export const withP = <P, R>(parameter: P, fn: (p: P) => R) => fn(parameter);
 export const withP2 = <P1, P2, R>(parameter1: P1, parameter2: P2, fn: (p1: P1, p2: P2) => R) =>
@@ -32,18 +22,6 @@ export const fnWithP2 = <P1, P2, R>(parameter1: P1, parameter2: P2) => (fn: (p1:
 export const fnWithP3 = <P1, P2, P3, R>(parameter1: P1, parameter2: P2, parameter3: P3) => (
   fn: (p1: P1, p2: P2, p3: P3) => R,
 ): R => fn(parameter1, parameter2, parameter3);
-
-export function toHHMMSS(num: string): string {
-  const secNum = Number.parseInt(num, 10); // don't forget the second param
-  let hours: number | string = Math.floor(secNum / 3600);
-  let minutes: number | string = Math.floor((secNum - hours * 3600) / 60);
-  let seconds: number | string = secNum - hours * 3600 - minutes * 60;
-
-  if (hours < 10) hours = `0${hours}`;
-  if (minutes < 10) minutes = `0${minutes}`;
-  if (seconds < 10) seconds = `0${seconds}`;
-  return `${hours}:${minutes}:${seconds}`;
-}
 
 /**
  * https://www.typescriptlang.org/docs/handbook/mixins.html
@@ -100,13 +78,6 @@ export function traverseDir(dir: string): string[] {
     }
   });
   return dirs;
-}
-
-export function resolveBasename(dir: string, withExt = false): string {
-  if (!_.isString(dir)) {
-    return dir;
-  }
-  return withExt ? path.basename(dir) : path.basename(dir).replace(/\.[^./]+$/, '');
 }
 
 /**

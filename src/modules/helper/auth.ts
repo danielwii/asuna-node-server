@@ -3,7 +3,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import passport from 'passport';
 
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { AdminUser } from '../core/auth/auth.entities';
 import { AdminUserIdentifierHelper, UserIdentifierHelper } from '../core/auth/identifier';
 import { isApiKeyRequest } from '../core/auth/strategy/interfaces';

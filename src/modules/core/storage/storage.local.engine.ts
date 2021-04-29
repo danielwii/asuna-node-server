@@ -8,7 +8,7 @@ import * as mime from 'mime-types';
 import { extname, join } from 'path';
 import sharp from 'sharp';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';

@@ -7,7 +7,7 @@ import * as crypto from 'crypto';
 import qs from 'qs';
 
 import { InMemoryDB } from '../../cache/db';
-import { AsunaErrorCode, AsunaException } from '../exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 
 import type { JwtAuthRequest } from '../../core/auth/auth.guard';
 import type { PrimaryKey } from '../identifier';

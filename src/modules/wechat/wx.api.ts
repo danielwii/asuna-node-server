@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import ow from 'ow';
 
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 import { WxHelper } from './wx.helper';
 import {

@@ -1,6 +1,12 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import {
+  AsunaErrorCode,
+  AsunaException,
+  AsunaExceptionHelper,
+  AsunaExceptionTypes,
+} from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -9,7 +15,6 @@ import _ from 'lodash';
 import * as otplib from 'otplib';
 import { UpdateResult } from 'typeorm';
 
-import { AsunaErrorCode, AsunaException, AsunaExceptionHelper, AsunaExceptionTypes } from '../../common';
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';

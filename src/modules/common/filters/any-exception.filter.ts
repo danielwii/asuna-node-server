@@ -13,7 +13,7 @@ import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 import { StatsHelper } from '../../stats';
-import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
+import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 
 import type { Response } from 'express';
 

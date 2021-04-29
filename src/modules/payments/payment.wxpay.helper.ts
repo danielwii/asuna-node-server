@@ -1,3 +1,4 @@
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -10,7 +11,6 @@ import * as qs from 'qs';
 import { IsNull } from 'typeorm';
 import * as xml2js from 'xml2js';
 
-import { AsunaErrorCode, AsunaException } from '../common';
 import { AppConfigObject } from '../config/app.config';
 import { PaymentMethod } from './payment.entities';
 import { PaymentNotifyHelper } from './payment.notify';

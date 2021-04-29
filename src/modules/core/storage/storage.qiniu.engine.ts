@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
 import { QiniuConfigObject } from './storage.config';

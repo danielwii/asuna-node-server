@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import _ from 'lodash';
 
-import { AsunaErrorCode, AsunaException, ValidationException } from '../exceptions';
+import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 
 import type { ClassType } from '../decorators';
 

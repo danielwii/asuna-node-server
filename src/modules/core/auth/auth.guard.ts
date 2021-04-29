@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { auth } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 

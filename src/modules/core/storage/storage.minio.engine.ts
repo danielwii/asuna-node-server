@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
 
-import { AsunaErrorCode, AsunaException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';

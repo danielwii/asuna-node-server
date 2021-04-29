@@ -1,4 +1,4 @@
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 
 export function wrapErrorInfo(info: any): any {
   if (info instanceof Error) {

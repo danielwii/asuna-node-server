@@ -1,7 +1,7 @@
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { AlipaySdkCommonResult } from 'alipay-sdk';
 import * as crypto from 'crypto';
 import { sub } from 'date-fns';
 import * as Handlebars from 'handlebars';
@@ -10,7 +10,6 @@ import fetch from 'node-fetch';
 import * as qs from 'qs';
 import { IsNull, LessThan } from 'typeorm';
 
-import { AsunaErrorCode, AsunaException } from '../common';
 import { parseJSONIfCould } from '../common/helpers';
 import { AppConfigObject } from '../config/app.config';
 import { SMSConfigObject } from '../sms';
@@ -19,6 +18,8 @@ import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entiti
 import { PaymentMethodEnumValue } from './payment.enum-values';
 import { PaymentOrder } from './payment.order.entities';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
+
+import type { AlipaySdkCommonResult } from 'alipay-sdk';
 
 const logger = LoggerFactory.getLogger('PaymentHelper');
 

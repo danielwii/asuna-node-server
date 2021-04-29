@@ -29,7 +29,7 @@ import {
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Profile } from '../../common/helpers/normal';
 import { Role } from '../auth/auth.entities';
 import { AsunaContext } from '../context';

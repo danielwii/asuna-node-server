@@ -1,10 +1,10 @@
+import { AsunaErrorCode, AsunaException } from "@danielwii/asuna-helper/dist/exceptions";
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 
 import { CacheManager } from '../cache';
-import { AsunaErrorCode, AsunaException } from '../common';
 import { RedisLockProvider, RedisProvider } from '../providers';
 import { WxBaseApi } from './wx.api.common';
 

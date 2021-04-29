@@ -1,9 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { AsunaErrorCode, AsunaException, getIgnoreCase } from '../../common';
+import { getIgnoreCase } from '../../common';
 import { OperationToken } from './entities';
 import { OperationTokenHelper } from './helper';
 

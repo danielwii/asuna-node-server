@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { ConfigKeys, configLoader } from '../config';
 import { Store } from '../store';
 

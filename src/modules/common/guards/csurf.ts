@@ -5,7 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { CacheKey, InMemoryDB } from '../../cache';
 import { random } from '../../core/helpers';
-import { AsunaErrorCode, AsunaException } from '../exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 
 import type { JwtAuthRequest } from '../../core/auth';
 

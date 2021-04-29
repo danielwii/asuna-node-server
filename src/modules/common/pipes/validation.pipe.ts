@@ -5,7 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { plainToClass } from 'class-transformer';
 
-import { ValidationException } from '../exceptions';
+import { ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 import { validateObjectSync } from '../helpers/validate';
 
 const logger = LoggerFactory.getLogger('CustomValidationPipe');

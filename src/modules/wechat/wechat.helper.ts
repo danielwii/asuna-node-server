@@ -10,7 +10,7 @@ import rawBody from 'raw-body';
 import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
 
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { HandlebarsHelper } from '../common/helpers';
 import { ConfigKeys, configLoader } from '../config';
 import { AppConfigObject } from '../config/app.config';

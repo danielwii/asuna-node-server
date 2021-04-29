@@ -1,10 +1,11 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { AsunaErrorCode, AsunaException, getIgnoreCase } from '../../common';
+import { getIgnoreCase } from '../../common';
 import { auth } from '../../helper';
 import { AdminUser } from './auth.entities';
 import { API_KEY_HEADER } from './strategy';

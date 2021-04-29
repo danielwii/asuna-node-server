@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { AsunaErrorCode, AsunaException } from '../common/exceptions';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { OrgAuthHelper } from './auth';
 import { OrgUser } from './tenant.entities';
 

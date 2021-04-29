@@ -6,7 +6,7 @@ import { classToPlain } from 'class-transformer';
 import _ from 'lodash';
 import { join } from 'path';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '../../common/exceptions';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
 import { AliossConfigObject } from './storage.config';

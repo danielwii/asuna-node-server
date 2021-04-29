@@ -1,6 +1,6 @@
+import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { AsunaExceptionHelper, AsunaExceptionTypes } from '../common';
 import { SMSConfigObject } from './config';
 import { SMSHelper } from './helper';
 
