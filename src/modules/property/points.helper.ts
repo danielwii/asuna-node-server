@@ -1,5 +1,6 @@
 import { AfterDate } from '@danielwii/asuna-helper/dist/db';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -8,7 +9,6 @@ import * as fp from 'lodash/fp';
 import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
-import { Hermes } from '../core/bus';
 import { KvHelper } from '../core/kv';
 import { Wallet } from './financial.entities';
 import { HermesPointChangeEventKeys, PointExchange } from './points.entities';

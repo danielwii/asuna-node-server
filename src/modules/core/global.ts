@@ -1,4 +1,6 @@
-import { ConfigKeys, configLoader } from '../config';
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+
+import { configLoader } from '../config';
 
 export class Global {
   static dbType: 'mariadb' | 'mysql56' | 'mysql57' | 'mysql8' | 'postgres' | 'sqlite' = configLoader.loadConfig(

@@ -1,8 +1,9 @@
 import { AbstractConfigLoader } from '@danielwii/asuna-helper/dist/config';
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { ConfigKeys, configLoader } from './loader';
+import { configLoader } from './loader';
 
 export enum AppConfigKeys {
   sysAdminEmail = 'sys_admin_email',

@@ -1,3 +1,4 @@
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -11,7 +12,7 @@ import * as R from 'ramda';
 import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
 
 import { formatTime, TimeUnit } from '../../common/helpers';
-import { ConfigKeys, configLoader } from '../../config';
+import { configLoader } from '../../config';
 
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';

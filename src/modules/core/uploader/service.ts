@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -13,7 +14,6 @@ import highland from 'highland';
 import _ from 'lodash';
 import { dirname, join } from 'path';
 
-import { Hermes } from '../bus';
 import { AsunaContext } from '../context';
 import { Global } from '../global';
 import { FileInfo } from '../storage';

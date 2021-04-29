@@ -1,13 +1,13 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 
 import { AbstractAuthController } from '../core/auth';
-import { Hermes } from '../core/bus';
 import { OrgJwtAuthGuard } from './auth.guard';
 import { TenantAuthService } from './auth.service';
 import { OrgUser } from './tenant.entities';

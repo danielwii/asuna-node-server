@@ -1,6 +1,7 @@
 import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
@@ -8,7 +9,7 @@ import * as redisStore from 'cache-manager-redis-store';
 
 import { AdminController } from './admin.controller';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
-import { ConfigKeys, configLoader } from './config';
+import { configLoader } from './config';
 import { ContentModule } from './content';
 import {
   CommandController,

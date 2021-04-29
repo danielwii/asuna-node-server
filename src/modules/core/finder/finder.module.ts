@@ -1,8 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { ConfigKeys, configLoader } from '../../config';
+import { configLoader } from '../../config';
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../kv';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderFieldKeys, FinderHelper } from './finder.helper';

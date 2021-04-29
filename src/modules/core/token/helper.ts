@@ -1,5 +1,6 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { random } from '@danielwii/asuna-helper/dist/random';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -9,7 +10,6 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 import { UpdateResult } from 'typeorm';
 
-import { random } from '../helpers';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 
 const logger = LoggerFactory.getLogger('OperationTokenHelper');

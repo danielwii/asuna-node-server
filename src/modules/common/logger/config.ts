@@ -1,7 +1,9 @@
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+
 import { plainToClass } from 'class-transformer';
 import _ from 'lodash';
 
-import { ConfigKeys, configLoader } from '../../config/loader';
+import { configLoader } from '../../config/loader';
 
 // const logger = LoggerFactory.getLogger('LoggerConfig'); dont't use it here
 

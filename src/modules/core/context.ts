@@ -1,3 +1,4 @@
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -5,7 +6,7 @@ import * as fs from 'fs-extra';
 import _ from 'lodash';
 import { join } from 'path';
 
-import { ConfigKeys, configLoader } from '../config';
+import { configLoader } from '../config';
 import { Global } from './global';
 import {
   AliossConfigObject,

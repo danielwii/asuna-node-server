@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/node';
 
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
@@ -13,10 +15,9 @@ import * as fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
-import { ConfigKeys, configLoader, FeaturesConfigObject } from './modules/config';
+import { configLoader, FeaturesConfigObject } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
-import { Hermes } from './modules/core/bus';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
 import { Store } from './modules/store/store';
