@@ -201,14 +201,15 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   );
 
   app.use(responseTime());
-  if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED))
-    app.use(
-      rateLimit({
-        windowMs: 60 * 1e3, // 1 minute(s)
-        max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
-        message: 'Too many requests from this IP, please try again after 1474560 minutes.',
-      }),
-    );
+  if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED)) {
+    const rateOptions: rateLimit.Options = {
+      windowMs: 60 * 1e3, // 1 minute(s)
+      max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
+      message: 'Too many requests from this IP, please try again after 1474560 minutes.',
+    };
+    logger.log(`init rate limit with ${r(rateOptions)}`);
+    app.use(rateLimit(rateOptions));
+  }
   app.use(morgan('combined'));
 
   const limit = appSettings.payloadLimit;
