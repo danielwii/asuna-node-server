@@ -14,7 +14,7 @@ export type AuthInfo<Payload = PayloadType, User = AdminUser | any, Profile = Us
   tenant?: Tenant;
   roles?: Role[];
 }>;
-export type RequestInfo = Request & CommonRequest & ApiKeyRequest & { isOrgUser?: boolean };
+export type RequestInfo = Request & CommonRequest & ApiKeyRequest & { isOrgUser?: boolean; clientIp: string };
 export type AnyAuthRequest<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = RequestInfo &
   AuthInfo<Payload, User, Profile> & { clientIp: string };
 

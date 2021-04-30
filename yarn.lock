@@ -886,7 +886,7 @@ __metadata:
     redis: ^3.1.2
     redlock: ^4.2.0
     reflect-metadata: ^0.1.13
-    rxjs: ^6.6.7
+    rxjs: ^7.0.0
     shortid: ^2.2.16
     typeorm: ^0.2.32
     typescript: ^4.2.4
@@ -945,7 +945,6 @@ __metadata:
     "@types/passport": ^1
     "@types/passport-jwt": ^3.0.5
     "@types/ramda": ^0
-    "@types/request-ip": ^0.0.35
     "@types/response-time": ^2
     "@types/sharp": ^0
     "@types/shortid": ^0.0.29
@@ -1010,7 +1009,6 @@ __metadata:
     ramda: ^0.27.1
     raw-body: ^2.4.1
     redis-dataloader: ^1.0.2
-    request-ip: ^2.1.3
     response-time: ^2.3.2
     rxjs: ^7.0.0
     sharp: ^0.28.1
@@ -2710,15 +2708,6 @@ __metadata:
   dependencies:
     "@types/bluebird": "*"
   checksum: a961aff9ed8999c99e55c76b14ca8795684679f07f06a10220439a1de1192d55d620f7ab64e26fd35da355d8c79a003ba712047855cefdef0f5baf0e117660c3
-  languageName: node
-  linkType: hard
-
-"@types/request-ip@npm:^0.0.35":
-  version: 0.0.35
-  resolution: "@types/request-ip@npm:0.0.35"
-  dependencies:
-    "@types/node": "*"
-  checksum: 04ff98d2842cba8281aeea85e4ad03a110530f9b156a2c8cea544fb3ccff425dbc262943bb46b26186db68293e81c244a606c979cf5c2d28d37819ce14e7753a
   languageName: node
   linkType: hard
 
@@ -9705,13 +9694,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is_js@npm:^0.9.0":
-  version: 0.9.0
-  resolution: "is_js@npm:0.9.0"
-  checksum: 07f24094f8f705aea62138b30c87f8008db7d6b465130c7790cea5bec7b1a22195b9a26869c6b3c416f3226833d523e2d70abf14be6940aa6958fd0476aaa6df
-  languageName: node
-  linkType: hard
-
 "isarray@npm:0.0.1":
   version: 0.0.1
   resolution: "isarray@npm:0.0.1"
@@ -14167,15 +14149,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request-ip@npm:^2.1.3":
-  version: 2.1.3
-  resolution: "request-ip@npm:2.1.3"
-  dependencies:
-    is_js: ^0.9.0
-  checksum: 17676000eea4271e5301cae1169928fa536507f55e0b756d6bf7d7f37b97fd4b07220c18152d96cfb529bfefc0ecf986d2e3fdf3ec8f2943c9e2083c8a33ceac
-  languageName: node
-  linkType: hard
-
 "request-promise-core@npm:1.1.4":
   version: 1.1.4
   resolution: "request-promise-core@npm:1.1.4"
@@ -14436,15 +14409,6 @@ resolve@1.1.7:
   dependencies:
     queue-microtask: ^1.2.2
   checksum: 3d12f0251ad043ed52689523b1e5fa5b7e5395a6ae0d2cbfb880a3009bb297de6d7e96ba4ad5a818e2722b42cea78a5ee6842d6d864736a7ca755ec119ed097c
-  languageName: node
-  linkType: hard
-
-"rxjs@npm:^6.6.7":
-  version: 6.6.7
-  resolution: "rxjs@npm:6.6.7"
-  dependencies:
-    tslib: ^1.9.0
-  checksum: 1146975cbd5388ee5e61450235dc5670931e43cce71813f567977d334acc4d75c6e8d9d293df67e1fb31510b99fc8957943d4a9b550d109e4dc69967a8471543
   languageName: node
   linkType: hard
 

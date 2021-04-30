@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as bodyParser from 'body-parser';
@@ -16,7 +17,6 @@ import session from 'express-session';
 import helmet from 'helmet';
 import _ from 'lodash';
 import morgan from 'morgan';
-import { mw } from 'request-ip';
 import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
@@ -123,7 +123,15 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   app.set('trust proxy', true);
 
   const secret = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
-  app.use(mw());
+  // get client ip and populate to req
+  app.use((req, res, next) => {
+    const ip = getClientIp(req);
+    Object.defineProperty(req, 'clientIp', {
+      get: () => ip,
+      configurable: true,
+    });
+    next();
+  });
   app.use(cookieParser(secret));
   // http://www.febeacon.com/helmet-docs-zh-CN/routes/install/#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86
   app.use(
