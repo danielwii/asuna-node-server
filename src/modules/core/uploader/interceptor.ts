@@ -2,8 +2,7 @@
 // import 'fastify-multipart';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { Observable } from 'rxjs';
-import { fromPromise } from 'rxjs/internal-compatibility';
+import { from, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
@@ -31,7 +30,7 @@ export class FastifyFileInterceptor implements NestInterceptor {
 
     request.files = [];
 
-    return fromPromise(
+    return from(
       new Promise((resolve, reject) => {
         const promises = [];
         /*

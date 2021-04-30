@@ -942,7 +942,7 @@ __metadata:
     "@types/mongoose": ^5
     "@types/morgan": ^1.9.2
     "@types/nodemailer": ^6
-    "@types/passport": ^0
+    "@types/passport": ^1
     "@types/passport-jwt": ^3.0.5
     "@types/ramda": ^0
     "@types/request-ip": ^0.0.35
@@ -1012,7 +1012,7 @@ __metadata:
     redis-dataloader: ^1.0.2
     request-ip: ^2.1.3
     response-time: ^2.3.2
-    rxjs: ^6.6.7
+    rxjs: ^7.0.0
     sharp: ^0.28.1
     shortid: ^2.2.16
     socket.io-redis: ^6.1.0
@@ -2656,21 +2656,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/passport@npm:*":
+"@types/passport@npm:*, @types/passport@npm:^1":
   version: 1.0.6
   resolution: "@types/passport@npm:1.0.6"
   dependencies:
     "@types/express": "*"
   checksum: 6d6a404e3ad0014f4724e0c48f213f3a2df6fc95d68ffabdbe619203e866e475cc0e76776a6833345bb0801dacf3ef1b6d29ef40c9da6ed1ea60a566ffbc4b2d
-  languageName: node
-  linkType: hard
-
-"@types/passport@npm:^0":
-  version: 0.4.7
-  resolution: "@types/passport@npm:0.4.7"
-  dependencies:
-    "@types/express": "*"
-  checksum: 23009d2833528894a822b6ce8cdca185dd6ec4db311ff20eef80c638addaf9799b00a9a3a83abe221c3133c264c3094f6f5d977f73332b414ddce7a47098752c
   languageName: node
   linkType: hard
 
@@ -14454,6 +14445,15 @@ resolve@1.1.7:
   dependencies:
     tslib: ^1.9.0
   checksum: 1146975cbd5388ee5e61450235dc5670931e43cce71813f567977d334acc4d75c6e8d9d293df67e1fb31510b99fc8957943d4a9b550d109e4dc69967a8471543
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "rxjs@npm:7.0.0"
+  dependencies:
+    tslib: ~2.1.0
+  checksum: e0d08420f94474c73a14e57b7a1bcbf7010791817e06e5a16a998a8e151b89bd0b4a4883203cb86906a81b0e052cb99cfe3d96b652de4c744282f4d60a51d73e
   languageName: node
   linkType: hard
 
