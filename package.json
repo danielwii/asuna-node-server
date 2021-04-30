@@ -83,6 +83,7 @@
     "node-buffs": "^0.8.12",
     "nodemailer": "^6.6.0",
     "opentracing": "^0.14.5",
+    "morgan": "^1.10.0",
     "otplib": "^12.0.1",
     "ow": "^0.23.0",
     "passport": "^0.4.1",
