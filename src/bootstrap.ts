@@ -55,7 +55,8 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   await CacheUtils.clearAll();
   // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
-  process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = '1000';
+  process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME || '2000';
+  logger.log(`set slow query time ${process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME}`);
   const dbConfig = await getConnectionOptions();
   logger.log(`Global is ${r({ ...Global })}`);
   logger.log(

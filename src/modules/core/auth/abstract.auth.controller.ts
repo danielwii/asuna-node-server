@@ -127,26 +127,28 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   @HttpCode(HttpStatus.OK)
   async getToken(@Body() signInDto: SignInDto): Promise<CreatedToken> {
     logger.log(`getToken() >> ${signInDto.username}`);
-    const user = await this.authService.getUserWithPassword({ username: signInDto.username });
+    const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
 
-    logger.debug(`get user fron token ${r(user)}`);
-    if (!user?.password) {
+    logger.debug(`get user profile from token ${r(profile)}`);
+    if (!profile?.password) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
-    const verified = PasswordHelper.passwordVerify(signInDto.password, user);
+    const verified = PasswordHelper.passwordVerify(signInDto.password, profile);
 
     if (!verified) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.WrongPassword);
     }
-    Hermes.emit('user.activity.event', 'login', { userId: user.id });
+    Hermes.emit('user.activity.event', 'login', { userId: profile.id });
 
-    const hasProfile = DBHelper.getColumnNames(this.UserEntity).includes('profile');
+    const columnNames = DBHelper.getColumnNames(this.UserEntity);
+    const hasProfile = columnNames.includes('profile') || columnNames.includes('profile__id');
     const authUser = hasProfile
-      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: user.id } })
-      : user;
+      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: profile.id } })
+      : profile;
     // return TokenHelper.createToken(profile, { uid: user.id });
-    return this.authService.createToken(authUser as any, hasProfile ? { uid: `${authUser.id}` } : undefined);
+    logger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
+    return this.authService.createToken(profile, hasProfile ? { uid: `${authUser.id}` } : undefined);
   }
 
   @Get('current')
