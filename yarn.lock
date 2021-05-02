@@ -984,7 +984,7 @@ __metadata:
     glob: ^7.1.6
     graphql: ^15.5.0
     graphql-type-json: ^0.3.2
-    helmet: ^4.5.0
+    helmet: ^4.6.0
     highland: ^2.13.5
     husky: ^6.0.0
     jaeger-client: ^3.18.1
@@ -8589,10 +8589,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"helmet@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "helmet@npm:4.5.0"
-  checksum: e7245be78a024bc4536d9f9f81a02ff856a671f300a3865f625942b73a0f9ef161660cd9c7eb7f380de174fdfb1067af05ca5c4af2682d4ac9c068f5bdb6695f
+"helmet@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "helmet@npm:4.6.0"
+  checksum: 5018633703ac6933b35c581d878f279b3be642c7ce68dcccbaf31be059aefb723a08ed86831df657b82fd2994b4163404b51c76a0dc3ea9cdd67794bf1b0466d
   languageName: node
   linkType: hard
 

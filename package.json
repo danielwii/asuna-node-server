@@ -73,7 +73,7 @@
     "express-session": "^1.17.1",
     "graphql": "^15.5.0",
     "graphql-type-json": "^0.3.2",
-    "helmet": "^4.5.0",
+    "helmet": "^4.6.0",
     "highland": "^2.13.5",
     "jaeger-client": "^3.18.1",
     "jsondiffpatch": "^0.4.1",
