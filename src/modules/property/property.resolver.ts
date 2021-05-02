@@ -34,7 +34,7 @@ export class PropertyQueryResolver {
         pageRequest,
         relationPath: `${PropertyQueryResolver.prototype.user_paged_exchangeRecords.name}.items`,
         info,
-        where: { user: { id: currentUser.uid }, ...(type ? { type } : null), ...(refId ? { refId } : null) },
+        where: { profileId: currentUser.id , ...(type ? { type } : null), ...(refId ? { refId } : null) },
       }),
     );
 
@@ -59,7 +59,7 @@ export class PropertyQueryResolver {
         pageRequest,
         relationPath: `${PropertyQueryResolver.prototype.user_paged_financialTransactions.name}.items`,
         info,
-        where: { user: { id: currentUser.uid }, ...(type ? { type } : null), ...(refId ? { refId } : null) },
+        where: { profileId: currentUser.id , ...(type ? { type } : null), ...(refId ? { refId } : null) },
       }),
     );
 
