@@ -3,7 +3,7 @@ import { ExclusiveConstraintValidator } from '@danielwii/asuna-helper/dist/valid
 import { Type } from 'class-transformer';
 import { IsInt, IsNumber, IsOptional, IsString, Validate, ValidateNested } from 'class-validator';
 
-import { Order, PageRequest } from '../core/helpers';
+import { DEFAULT_PAGE, DEFAULT_SIZE, Order, PageRequest } from '../core/helpers';
 
 export class SorterInput {
   @IsString()
@@ -29,11 +29,19 @@ export class CursoredRequestInput {
 export class PageRequestInput implements PageRequest {
   @IsInt()
   @IsOptional()
-  public page?: number;
+  public pageNumber: number = 1;
 
   @IsInt()
   @IsOptional()
-  public size?: number;
+  public pageIndex?: number = 0;
+
+  @IsInt()
+  @IsOptional()
+  public page?: number = DEFAULT_PAGE;
+
+  @IsInt()
+  @IsOptional()
+  public size?: number = DEFAULT_SIZE;
 
   @IsOptional()
   public orderBy?: SorterInput;

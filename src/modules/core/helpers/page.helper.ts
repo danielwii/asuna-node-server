@@ -14,12 +14,27 @@ export enum Order {
 }
 
 export const DefaultPageRequest: PageRequest = {
+  pageNumber: 1,
+  pageIndex: 0,
+  /**
+   * FIXME deprecated using pageNumber / pageIndex instead
+   * @deprecated
+   */
   page: DEFAULT_PAGE,
   size: DEFAULT_SIZE,
 };
 
 export interface PageRequest {
+  /**
+   * FIXME deprecated using pageNumber / pageIndex instead
+   * @deprecated
+   */
   page?: number;
+  /**
+   * pageIndex + 1
+   */
+  pageNumber?: number;
+  pageIndex?: number;
   size?: number;
   orderBy?: { column?: string; order?: Order };
 }
@@ -66,6 +81,9 @@ export class PageHelper {
 
 export class Pageable<T> {
   total: number;
+  pageNumber: number;
+  pageIndex: number;
+
   page: number;
   size: number;
   items: T[];
@@ -85,6 +103,12 @@ export interface CursorInfo {
 }
 
 export interface PageInfo {
+  pageNumber: number;
+  pageIndex: number;
+  /**
+   * FIXME deprecated using pageNumber / pageIndex instead
+   * @deprecated
+   */
   page: number;
   size: number;
   take: number;
@@ -94,7 +118,8 @@ export interface PageInfo {
 export const emptyPage = <T>(pageInfo: PageInfo): Pageable<T> => ({ ...pageInfo, items: [], total: 0 });
 
 export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInfo => {
-  let { page = DEFAULT_PAGE, size = DEFAULT_SIZE } = pageRequest ?? {};
+  let page = pageRequest.page ?? DEFAULT_PAGE;
+  let size = pageRequest.size ?? DEFAULT_SIZE;
   if (page < 0) {
     page = startsWith0 ? 0 : 1;
   } else if (page === 0 && !startsWith0) {
@@ -105,10 +130,5 @@ export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInf
     size = MAX_PAGE_SIZE;
   }
 
-  return {
-    page,
-    size,
-    take: size,
-    skip: (page - (startsWith0 ? 0 : 1)) * size,
-  };
+  return { pageNumber: 1, pageIndex: 0, page, size, take: size, skip: (page - (startsWith0 ? 0 : 1)) * size };
 };

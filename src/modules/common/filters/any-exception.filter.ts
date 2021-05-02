@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/node';
 import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
+import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -13,7 +14,6 @@ import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 import { StatsHelper } from '../../stats';
-import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 
 import type { Response } from 'express';
 
@@ -181,8 +181,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
       isAsunaException: exception instanceof AsunaException,
     };
     if (![404].includes(httpStatus)) {
-      logger.error(`error: ${r(errorInfo)}`);
-      StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+      if ([401, 403].includes(httpStatus)) {
+        logger.warn(`[unauthorized]: ${r(errorInfo)}`);
+      } else {
+        logger.error(`[ERROR]: ${r(errorInfo)}`);
+        StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+      }
     }
     /*
     if (exception instanceof Error && httpStatus !== 500) {
