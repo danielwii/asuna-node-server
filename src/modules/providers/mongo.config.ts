@@ -23,7 +23,7 @@ export class MongoConfigObject {
   username?: string;
 
   @Expose({ name: 'with-password', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   password?: string;
 
   constructor(o: Partial<MongoConfigObject>) {

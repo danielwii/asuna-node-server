@@ -33,7 +33,7 @@ export class QiniuConfigObject {
   public accessKey: string;
 
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public secretKey: string;
 
   constructor(o: Partial<QiniuConfigObject>) {
@@ -96,7 +96,7 @@ export class MinioConfigObject {
   public accessKey: string;
 
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public secretKey: string;
 
   constructor(o: Partial<MinioConfigObject>) {
@@ -142,7 +142,7 @@ export class AliossConfigObject {
   public accessKey: string;
 
   @Expose({ name: 'with-secret-key', toPlainOnly: true })
-  @Transform((value) => !!value, { toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
   public secretKey: string;
 
   public constructor(o: Partial<AliossConfigObject>) {
