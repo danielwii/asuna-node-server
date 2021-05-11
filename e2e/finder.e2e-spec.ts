@@ -2,8 +2,11 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import * as querystring from 'querystring';
 import supertest from 'supertest';
+
+import { AppLifecycle } from '../src/lifecycle';
 import {
   AdminInternalModule,
   AsunaCollections,
@@ -12,7 +15,6 @@ import {
   KvHelper,
   LoggerHelper,
 } from '../src/modules';
-import { AppLifecycle } from '../src/lifecycle';
 
 describe('FinderModule (e2e)', () => {
   let app: INestApplication;
@@ -23,7 +25,7 @@ describe('FinderModule (e2e)', () => {
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: LoggerHelper.getLoggerService() });
+    app = moduleFixture.createNestApplication(new ExpressAdapter() as any, { logger: LoggerHelper.getLoggerService() });
 
     await app.init();
   });

@@ -2,8 +2,10 @@ import { INestApplication } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import supertest from 'supertest';
 import { getManager } from 'typeorm';
+
 import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
 import { AppLifecycle } from '../src/lifecycle';
 
@@ -16,7 +18,7 @@ describe('Excel (e2e)', () => {
       imports: [TypeOrmModule.forRoot(), AdminInternalModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication(new ExpressAdapter(), { logger: LoggerHelper.getLoggerService() });
+    app = moduleFixture.createNestApplication(new ExpressAdapter() as any, { logger: LoggerHelper.getLoggerService() });
     await app.init();
   });
 

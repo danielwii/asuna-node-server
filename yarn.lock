@@ -941,6 +941,7 @@ __metadata:
     "@types/express-session": ^1
     "@types/highland": ^2
     "@types/jaeger-client": ^3
+    "@types/jest": ^26
     "@types/minio": ^7
     "@types/mongoose": ^5
     "@types/morgan": ^1
@@ -998,7 +999,7 @@ __metadata:
     minio: ^7.0.18
     mongoose: ^5.12.8
     morgan: ^1.10.0
-    node-buffs: ^0.8.13
+    node-buffs: ^0
     nodemailer: ^6.6.0
     nodemon: ^2
     opentracing: ^0.14.5
@@ -2440,6 +2441,16 @@ __metadata:
     opentracing: ~0.14.3
     prom-client: ~11.3.0 || ^12.0.0 || ^13.0.0
   checksum: e6256b1a5634e3d4d783e98893535d69705432fda946662c6836bac21ef99d49624d54a4a59a0c8b7f483fa1a279eae0eaea06c280e95fa12d8f33e717f3d0de
+  languageName: node
+  linkType: hard
+
+"@types/jest@npm:^26":
+  version: 26.0.23
+  resolution: "@types/jest@npm:26.0.23"
+  dependencies:
+    jest-diff: ^26.0.0
+    pretty-format: ^26.0.0
+  checksum: a015676b78bdc51be6f6315acef10d9106ea8064e3e49143bca3c75b834b61285b45c5f5ccfd049a80107f1e2869a9183cdb5be85816c073ea8dd05852fafdc6
   languageName: node
   linkType: hard
 
@@ -6505,10 +6516,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^9.0.1":
-  version: 9.0.1
-  resolution: "dotenv@npm:9.0.1"
-  checksum: d269ad03ed91e8f44a77fbf04ac6f67678b22a7ca2094f3033e1197d5d4756be29ad1ea3951a335149a2363889144a6b171dc91fda88a60114c5dd388a6e17d3
+"dotenv@npm:^9":
+  version: 9.0.2
+  resolution: "dotenv@npm:9.0.2"
+  checksum: 062a31a2fd024a8a7efee4f2d3972d488a1485e0545b97ab3c338f59f17689a2ae84b6e8ddb9ebca2902cc9b4926e7b672a476f5e326c6902648312fc3da54d9
   languageName: node
   linkType: hard
 
@@ -9982,7 +9993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-diff@npm:^26.6.2":
+"jest-diff@npm:^26.0.0, jest-diff@npm:^26.6.2":
   version: 26.6.2
   resolution: "jest-diff@npm:26.6.2"
   dependencies:
@@ -10397,7 +10408,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
+"js-yaml@npm:^4, js-yaml@npm:^4.0.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -12095,15 +12106,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-buffs@npm:^0.8.13":
-  version: 0.8.13
-  resolution: "node-buffs@npm:0.8.13"
+"node-buffs@npm:^0, node-buffs@npm:^0.8.13":
+  version: 0.8.15
+  resolution: "node-buffs@npm:0.8.15"
   dependencies:
-    dotenv: ^9.0.1
-    js-yaml: ^4.1.0
+    dotenv: ^9
+    js-yaml: ^4
   peerDependencies:
     lodash: ">=4.17.0"
-  checksum: 7fd8e260dffe4966e206374d9793fffe75e17f8684e732297f46f9bca583ebd8182e86e2afeb835e21cae931c1f7652dc2b70e5005ae7f45a57c054e92b6b1f7
+  checksum: df0ab14098503b95caf7cb9684d6dd89ca3a83855c3c5202460f885d919e47beb799718aacf4f2a123ab95ec52a8d76fcfbfe099a00ba4977e3f2b1962dc173b
   languageName: node
   linkType: hard
 
