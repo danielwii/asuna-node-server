@@ -1,9 +1,10 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { PrimaryKey } from '../common';
 import { DBCacheCleaner } from '../core/db';
 import { DataloaderCleaner } from '../dataloader/dataloader';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
+
+import type { PrimaryKey } from '../common';
 
 const logger = LoggerFactory.getLogger('CacheHelper');
 

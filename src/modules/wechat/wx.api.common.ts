@@ -4,7 +4,8 @@ import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
 
 import { WxConfigApi } from './wx.api.config';
-import { WxAccessToken } from './wx.interfaces';
+
+import type { WxAccessToken } from './wx.interfaces';
 
 const logger = LoggerFactory.getLogger('WeChatBaseApi');
 

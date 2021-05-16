@@ -11,7 +11,7 @@ import {
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Server, Socket } from 'socket.io';
+import type { Server, Socket } from 'socket.io';
 
 const logger = LoggerFactory.getLogger('SocketIOGateway');
 

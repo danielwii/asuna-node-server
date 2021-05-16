@@ -28,7 +28,7 @@ export class ReqHelper {
     });
   }
 
-  static saveFile(fileStream: NodeJS.ReadableStream, filename: string): Promise<string> {
+  static saveFile(fileStream: pump.Stream, filename: string): Promise<string> {
     const tempfile = `${os.tmpdir()}/${filename}`;
     logger.log(`save file to ${r({ filename, tempfile })}`);
     return new Promise((resolve, reject) => {

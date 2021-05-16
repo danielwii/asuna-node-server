@@ -10,7 +10,7 @@ import {
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
-import { Server } from 'ws';
+import type { Server } from 'ws';
 
 const logger = LoggerFactory.getLogger('WSGateway(default)');
 
