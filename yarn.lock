@@ -960,7 +960,7 @@ __metadata:
     class-validator: ^0.13.1
     common-tags: ^1.8.0
     compression: ^1.7.4
-    connect-redis: ^5.2.0
+    connect-redis: ^6.0.0
     cookie-parser: ^1.4.5
     cron-parser: ^3.5.0
     date-fns: ^2.22.1
@@ -988,14 +988,14 @@ __metadata:
     luxon: ^1.27.0
     minimatch: ^3
     minio: ^7.0.18
-    mongoose: ^5.12.12
+    mongoose: ^5.12.13
     morgan: ^1.10.0
     node-buffs: ^0
     nodemailer: ^6.6.1
     nodemon: ^2
     opentracing: ^0.14.5
     otplib: ^12.0.1
-    ow: ^0.23.0
+    ow: ^0.24.1
     passport: ^0.4.1
     passport-jwt: ^4.0.0
     prettier: ^2
@@ -1016,8 +1016,8 @@ __metadata:
     ts-jest: ^27
     ts-node: ^10
     tslib: ^2
-    typeorm: ^0.2.32
-    typescript: ^4.2.4
+    typeorm: ^0.2.34
+    typescript: ^4.3.2
     xlsx: ^0.17.0
     xml2js: ^0.4.23
   languageName: unknown
@@ -5201,10 +5201,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"connect-redis@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "connect-redis@npm:5.2.0"
-  checksum: 65de57dd62e39f07d4f4f124a1d235e60a6df3429e29a15988c8c44e0f909402455be0209c3dd43937acc1bc3cda79d2f0c3a1c4417935052dc2b5789f5226bf
+"connect-redis@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "connect-redis@npm:6.0.0"
+  checksum: f469e1c9c163598314a0b494518143d0a72b82d55859b962defe9309458109f2a870e3476d545732c529d3eb5b5288744762d80d3823e7217fdc637d826298ea
   languageName: node
   linkType: hard
 
@@ -10564,9 +10564,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:5.12.12, mongoose@npm:^5.12.12":
-  version: 5.12.12
-  resolution: "mongoose@npm:5.12.12"
+"mongoose@npm:5.12.13, mongoose@npm:^5.12.13":
+  version: 5.12.13
+  resolution: "mongoose@npm:5.12.13"
   dependencies:
     "@types/mongodb": ^3.5.27
     bson: ^1.1.4
@@ -10580,7 +10580,7 @@ __metadata:
     safe-buffer: 5.2.1
     sift: 13.5.2
     sliced: 1.0.1
-  checksum: 108f0c2c3e39a4dc19cd08bb15ae4992e750c3ce43e36eb0a40bb4a710e896aad1239dd7f13cdc6794f3cefc6d48677dc649ac24f50287aa2db86a6860ca64c3
+  checksum: f60aa89bf368f4f02c43ac96b7e3f86c92b9ca86e539a2a82492b6883f78c6d9b58f881b564ff13ef8a464bee4b9a787839b5833e3bfeb2033f9d86b8bf73ba5
   languageName: node
   linkType: hard
 
@@ -11368,17 +11368,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ow@npm:^0, ow@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "ow@npm:0.23.0"
+"ow@npm:^0, ow@npm:^0.24.1":
+  version: 0.24.1
+  resolution: "ow@npm:0.24.1"
   dependencies:
     "@sindresorhus/is": ^4.0.0
     callsites: ^3.1.0
     dot-prop: ^6.0.1
     lodash.isequal: ^4.5.0
-    type-fest: ^0.20.2
+    type-fest: ^1.2.0
     vali-date: ^1.0.0
-  checksum: 04df72cbcdeab7e3696b4f061d4c4cc69f07b46cde3f4a099d6661730579ef9054da5dd80d9b09baa368fd975183c4ad39bce5cc014ef599c9aa497ce543eb59
+  checksum: 5528c7d7066f8613f9267e8c2b746fc5e1c0d161c0afe59cfa89584fd9350607a19cf5a93fe5ec569d0f401c39a3270657007410261db69abbf00d1128b99414
   languageName: node
   linkType: hard
 
@@ -14484,6 +14484,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-fest@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "type-fest@npm:1.2.0"
+  checksum: a020ddb653376de0df5db5c07d840ee5787eb1a5982fedff2c6a1a25e689f86fc9946d30457f34776202055aa935778b9d8de33c446e293cc60c0e1ebb6bb972
+  languageName: node
+  linkType: hard
+
 "type-is@npm:^1.6.16, type-is@npm:^1.6.4, type-is@npm:~1.6.17, type-is@npm:~1.6.18":
   version: 1.6.18
   resolution: "type-is@npm:1.6.18"
@@ -14510,9 +14517,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:^0, typeorm@npm:^0.2.32":
-  version: 0.2.32
-  resolution: "typeorm@npm:0.2.32"
+"typeorm@npm:^0, typeorm@npm:^0.2.34":
+  version: 0.2.34
+  resolution: "typeorm@npm:0.2.34"
   dependencies:
     "@sqltools/formatter": ^1.2.2
     app-root-path: ^3.0.0
@@ -14533,27 +14540,27 @@ __metadata:
     zen-observable-ts: ^1.0.0
   bin:
     typeorm: cli.js
-  checksum: f2f40db8d55b8bebaef6d2b8d39667303399086096c79ec625bf35932bdde3312c6f330331d1452eda2bcb578fd97edc9e0a080f437c1fed7952b86a60a9fc0f
+  checksum: 1bf2488a19fcea08d3f53ecf2ae3877837e83814388cab053ab0e18b58d92e81977d8b0eef6afab155a22911f28aba074ecac7a91c672be3b93f935c4d60d81a
   languageName: node
   linkType: hard
 
-typescript@^4.2.4:
-  version: 4.2.4
-  resolution: "typescript@npm:4.2.4"
+"typescript@^4.2.4, typescript@^4.3.2":
+  version: 4.3.2
+  resolution: "typescript@npm:4.3.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: edaede2fa77f56b7fba80ee624a2368ab1216e75b0434d968ccb47ab0a5e2f6d94f848b3b111c1237dd71e988cd376af26370dcdad3b94355c76e759f0dd0a1e
+  checksum: 21e1285402e32fd240f6ad3f97b6fea81b90d2591f412677d01b570a8bd93151d1e08460d58f43689fc758671a5baaebb16fa93d3c8260181612c8e619bd24f7
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.2.4#builtin<compat/typescript>":
-  version: 4.2.4
-  resolution: "typescript@patch:typescript@npm%3A4.2.4#builtin<compat/typescript>::version=4.2.4&hash=a45b0e"
+"typescript@patch:typescript@^4.2.4#builtin<compat/typescript>, typescript@patch:typescript@^4.3.2#builtin<compat/typescript>":
+  version: 4.3.2
+  resolution: "typescript@patch:typescript@npm%3A4.3.2#builtin<compat/typescript>::version=4.3.2&hash=ddfc1b"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 3be44317593182e8ce494c114e7ad9b0bb2553a22f3085cc6da4f0a36912c20850daa9be4c898af2ab6fc8b12f430c1c9e46ac715721867cd38643f2350d3ef9
+  checksum: 68d48dc86dacfeab59a22414ff061c976c46b679a9717a3a710051ea7bab779fd23f4edb856434da8155e8e8646c90b3912e342cc0010dfd15ed321a42cb0578
   languageName: node
   linkType: hard
 

@@ -63,7 +63,7 @@
     "class-validator": "^0.13.1",
     "common-tags": "^1.8.0",
     "compression": "^1.7.4",
-    "connect-redis": "^5.2.0",
+    "connect-redis": "^6.0.0",
     "cookie-parser": "^1.4.5",
     "cron-parser": "^3.5.0",
     "date-fns": "^2.22.1",
@@ -83,13 +83,13 @@
     "lru_map": "^0.4.1",
     "luxon": "^1.27.0",
     "minio": "^7.0.18",
-    "mongoose": "^5.12.12",
+    "mongoose": "^5.12.13",
     "morgan": "^1.10.0",
     "node-buffs": "^0",
     "nodemailer": "^6.6.1",
     "opentracing": "^0.14.5",
     "otplib": "^12.0.1",
-    "ow": "^0.23.0",
+    "ow": "^0.24.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pump": "^3.0.0",
@@ -102,7 +102,7 @@
     "sharp": "^0.28.3",
     "shortid": "^2.2.16",
     "socket.io-redis": "^6.1.1",
-    "typeorm": "^0.2.32",
+    "typeorm": "^0.2.34",
     "xlsx": "^0.17.0",
     "xml2js": "^0.4.23"
   },
@@ -163,7 +163,7 @@
     "ts-jest": "^27",
     "ts-node": "^10",
     "tslib": "^2",
-    "typescript": "^4.2.4"
+    "typescript": "^4.3.2"
   },
   "nodemonConfig": {
     "verbose": true,
