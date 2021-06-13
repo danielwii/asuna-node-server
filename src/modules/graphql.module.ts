@@ -32,10 +32,12 @@ export class GraphqlModule implements OnModuleInit {
     const tracer = TracingHelper.init();
     const tracingConfig = TracingConfigObject.load();
     const config = GraphQLConfigObject.load();
-    const typePaths = _.uniq([
-      path.resolve(__dirname, '../../../*/src/**/*.graphql'),
-      `${path.join(require.main.path, '../src')}/**/*.graphql`,
-    ]);
+    const typePaths = _.uniq(
+      _.compact([
+        require.main.path.includes('asuna-node-server') ? null : path.resolve(__dirname, '../../../*/src/**/*.graphql'),
+        `${path.join(require.main.path, '../src')}/**/*.graphql`,
+      ]),
+    );
     logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
 
     const redis = RedisProvider.instance.getRedisClient('graphql');
