@@ -95,7 +95,7 @@ export class RestHelper {
       ...relationIds,
       updatedBy: user.username,
       ...tenantRelatedFields,
-    });
+    } as any);
     await validateObject(entity);
     /*
      * using getManger().save(entity) will trigger Entity Listener for entities

@@ -21,7 +21,7 @@ export class DefaultModule implements OnModuleInit {
   static forRoot(appModule) {
     return {
       module: DefaultModule,
-      imports: [appModule, GraphqlModule.forRoot(__dirname)],
+      imports: [appModule, GraphqlModule.forRoot()],
     };
   }
 

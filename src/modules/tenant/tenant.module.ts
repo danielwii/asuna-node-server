@@ -95,7 +95,7 @@ export class TenantModule implements OnModuleInit {
             },
             models: {
               name: '模型配置',
-              fields: entities.flatMap((entity) => {
+              fields: _.flatMap(entities, (entity) => {
                 const name = entity.entityInfo.displayName
                   ? `${entity.name} / ${entity.entityInfo.displayName}`
                   : entity.name;
