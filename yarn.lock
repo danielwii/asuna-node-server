@@ -951,6 +951,7 @@ __metadata:
     apollo-server-express: ^2.25.1
     apollo-server-plugin-response-cache: ^0.9.0
     bluebird: ^3.7.2
+    blurhash: ^1.1.3
     cache-manager: ^3.4.4
     cache-manager-redis-store: ^2.0.0
     chance: ^1.1.7
@@ -963,7 +964,7 @@ __metadata:
     cron-parser: ^3.5.0
     date-fns: ^2.22.1
     dayjs: ^1.10.5
-    elastic-apm-node: ^3.15.0
+    elastic-apm-node: ^3
     email-templates: ^8.0.7
     eslint: ^7
     eslint-config-alloy: ^4
@@ -986,7 +987,7 @@ __metadata:
     luxon: ^1.27.0
     minimatch: ^3
     minio: ^7.0.18
-    mongoose: ^5.12.13
+    mongoose: ^5.12.14
     morgan: ^1.10.0
     node-buffs: ^0
     nodemailer: ^6.6.1
@@ -4241,6 +4242,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"blurhash@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "blurhash@npm:1.1.3"
+  checksum: 57735361eb4ab1ca21caa61230014228b8cf5a5ea6ecf038be89908d5d9099eacfc7b6e4aebae0fda22fa3e6936b69e6b85b5bcc50aa434459a896f2bf8de3e3
+  languageName: node
+  linkType: hard
+
 "body-parser@npm:1.19.0, body-parser@npm:^1.18.3":
   version: 1.19.0
   resolution: "body-parser@npm:1.19.0"
@@ -6061,9 +6069,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elastic-apm-http-client@npm:^9.8.0":
-  version: 9.8.0
-  resolution: "elastic-apm-http-client@npm:9.8.0"
+"elastic-apm-http-client@npm:^9.8.1":
+  version: 9.8.1
+  resolution: "elastic-apm-http-client@npm:9.8.1"
   dependencies:
     breadth-filter: ^2.0.0
     container-info: ^1.0.1
@@ -6074,27 +6082,31 @@ __metadata:
     readable-stream: ^3.4.0
     stream-chopper: ^3.0.1
     unicode-byte-truncate: ^1.0.0
-  checksum: dcb4f291a8b5ece9a82bd4b44f97ccbe7fdc231703fefe4a1f3379cebc2da85e44c827d54dc6d04959a786e3a480abe672fa20e9236661a973f7ab767158dbec
+  checksum: d0f210db4c425c6967718d7d02d3918550dd78cca6b7ffdbaa9c650df5833e386406824758d24b080291f92a795390923ed9bb187f84d50d2d487d5b010de76c
   languageName: node
   linkType: hard
 
-"elastic-apm-node@npm:^3.15.0":
-  version: 3.15.0
-  resolution: "elastic-apm-node@npm:3.15.0"
+"elastic-apm-node@npm:^3":
+  version: 3.16.0
+  resolution: "elastic-apm-node@npm:3.16.0"
   dependencies:
     "@elastic/ecs-pino-format": ^1.1.0
     after-all-results: ^2.0.0
+    async-cache: ^1.1.0
     async-value-promise: ^1.1.1
     basic-auth: ^2.0.1
     cookie: ^0.4.0
     core-util-is: ^1.0.2
-    elastic-apm-http-client: ^9.8.0
+    elastic-apm-http-client: ^9.8.1
     end-of-stream: ^1.4.4
+    error-callsites: ^2.0.4
     error-stack-parser: ^2.0.6
     escape-string-regexp: ^4.0.0
     fast-safe-stringify: ^2.0.7
     http-headers: ^3.0.2
     is-native: ^1.0.1
+    load-source-map: ^2.0.0
+    lru-cache: ^6.0.0
     measured-reporting: ^1.51.1
     monitor-event-loop-delay: ^1.0.0
     object-filter-sequence: ^1.0.0
@@ -6108,11 +6120,10 @@ __metadata:
     set-cookie-serde: ^1.0.0
     shallow-clone-shim: ^2.0.0
     sql-summary: ^1.0.1
-    stackman: ^4.0.1
     traceparent: ^1.0.0
     traverse: ^0.6.6
     unicode-byte-truncate: ^1.0.0
-  checksum: dbc3d550c3bbbd0f54052ba69a46751db93ccd7762c80212c29f91dc6194ed911468d01c643b1403c04137ed64cb6de04ded428becd5779726a7a2cabe0740a1
+  checksum: 91b42ad2f98a8896d6e2e3dfadc268c3b87e6ae540f016a00e0db443d7d65d67409058684d0a31d061856dc8c2bc8e6c2e9eb5d7873c45f8813d8992ae02701f
   languageName: node
   linkType: hard
 
@@ -6283,10 +6294,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"error-callsites@npm:^2.0.3":
-  version: 2.0.3
-  resolution: "error-callsites@npm:2.0.3"
-  checksum: aea800b64aa48761ca1051282e8dd011834a56b39e056d20eb92a837638dd06370809621e3ad61ea1118789c5e12c04ef2469b491dcef1658f58e71c52866d74
+"error-callsites@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "error-callsites@npm:2.0.4"
+  checksum: d74fbe6728cc130a5a93d4573c57cb5484288d04978faa2d48e9c5d76a9b71f0d017fbfe2ba1249a3c3fa88c2cbb73e3f0fc15fcb7f11799d4f08a8419ea47e6
   languageName: node
   linkType: hard
 
@@ -8095,18 +8106,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"in-publish@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "in-publish@npm:2.0.1"
-  bin:
-    in-install: in-install.js
-    in-publish: in-publish.js
-    not-in-install: not-in-install.js
-    not-in-publish: not-in-publish.js
-  checksum: 8d2296b25310b5288e7f3921354cdc58f55a1e2c75c261b2ca04faf7fd20f77f221c0885592135bf595e9bf4245a3cf493b85d192f61e295a0ae44eb7c7989db
-  languageName: node
-  linkType: hard
-
 "indent-string@npm:^4.0.0":
   version: 4.0.0
   resolution: "indent-string@npm:4.0.0"
@@ -9757,14 +9756,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"load-source-map@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "load-source-map@npm:1.0.0"
+"load-source-map@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "load-source-map@npm:2.0.0"
   dependencies:
-    in-publish: ^2.0.0
-    semver: ^5.3.0
-    source-map: ^0.5.6
-  checksum: 634f90be2bb436d5cc1a64ecfed720b48560bb2c2b053d79c08a469ec68a1c7c98d02c8c24b331a71b09ca17f8a685543b4e0845361aa0e61cbf36b19bd5d2f9
+    source-map: ^0.7.3
+  checksum: c2d5f61dade5ece715aeb7334bd0b03e3160a08ab6809a45a0fc2e7af37bd802daca67b026ba29cf0821691304751f32f598f29e89bdf25fe8df58576e096e37
   languageName: node
   linkType: hard
 
@@ -10531,9 +10528,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:5.12.13, mongoose@npm:^5.12.13":
-  version: 5.12.13
-  resolution: "mongoose@npm:5.12.13"
+"mongoose@npm:5.12.14, mongoose@npm:^5.12.14":
+  version: 5.12.14
+  resolution: "mongoose@npm:5.12.14"
   dependencies:
     "@types/mongodb": ^3.5.27
     bson: ^1.1.4
@@ -10547,7 +10544,7 @@ __metadata:
     safe-buffer: 5.2.1
     sift: 13.5.2
     sliced: 1.0.1
-  checksum: f60aa89bf368f4f02c43ac96b7e3f86c92b9ca86e539a2a82492b6883f78c6d9b58f881b564ff13ef8a464bee4b9a787839b5833e3bfeb2033f9d86b8bf73ba5
+  checksum: 2960cc8ae262c9f055ef9c037bdd4311c469514f7fe3809360bd0e30c66a5cb8bc47c6183f83eec404cf7291957e140126cb165a8e6a45c6c6099a6bc645085d
   languageName: node
   linkType: hard
 
@@ -12887,7 +12884,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.0.1, semver@npm:^5.3.0, semver@npm:^5.4.1, semver@npm:^5.6.0, semver@npm:^5.7.1":
+"semver@npm:2 || 3 || 4 || 5, semver@npm:^5.0.1, semver@npm:^5.4.1, semver@npm:^5.6.0, semver@npm:^5.7.1":
   version: 5.7.1
   resolution: "semver@npm:5.7.1"
   bin:
@@ -13309,7 +13306,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map@npm:^0.5.0, source-map@npm:^0.5.6":
+"source-map@npm:^0.5.0":
   version: 0.5.7
   resolution: "source-map@npm:0.5.7"
   checksum: 737face96577a2184a42f141607fcc2c9db5620cb8517ae8ab3924476defa138fc26b0bab31e98cbd6f19211ecbf78400b59f801ff7a0f87aa9faa79f7433e10
@@ -13475,19 +13472,6 @@ __metadata:
   version: 1.2.0
   resolution: "stackframe@npm:1.2.0"
   checksum: 71e2868a529123e9ca1cf510192a7de879b8d92b5829c7f58d5576e1500cbedf22b5d9cc86589c547b6842abcf01cea13979ab8301b51e85bdb6267a6f9288f2
-  languageName: node
-  linkType: hard
-
-"stackman@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "stackman@npm:4.0.1"
-  dependencies:
-    after-all-results: ^2.0.0
-    async-cache: ^1.1.0
-    debug: ^4.1.1
-    error-callsites: ^2.0.3
-    load-source-map: ^1.0.0
-  checksum: 4ed5691c1053a8b2b29a7fee37451b6b6cc84cc03a8545447a6dac4d6f938e80db3b3cf6f30000b489de07efd0943928d8ecc4553c465e9ce0089a88d30d2129
   languageName: node
   linkType: hard
 

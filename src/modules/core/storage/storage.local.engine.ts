@@ -110,7 +110,7 @@ export class LocalStorage implements IStorageEngine {
       res.contentType('application/octet-stream').sendFile(fullFilePath);
       return;
     }
-    const ext = thumbnailConfig.opts.format ?? mime.extension(type);
+    const ext = thumbnailConfig.opts?.format ?? mime.extension(type);
     if (!ext) {
       // 无法识别的文件格式，直接返回
       res.contentType('application/octet-stream').sendFile(fullFilePath);
@@ -132,7 +132,7 @@ export class LocalStorage implements IStorageEngine {
       if (jpegConfig.param) {
         outputFilename += `@${jpegConfig.param.replace('/', ':')}`;
       }
-      const outputPath = thumbnailConfig.opts.format
+      const outputPath = thumbnailConfig.opts?.format
         ? `${fullFileDir}/${outputFilename}`
         : `${fullFileDir}/${outputFilename}.${ext}`;
 

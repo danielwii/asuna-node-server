@@ -5,11 +5,17 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { classToPlain } from 'class-transformer';
+import crypto from 'crypto';
+import _ from 'lodash';
 
+import { CacheWrapper } from '../../cache';
+import { TimeUnit } from '../../common';
 import { AsunaContext } from '../context';
 import { FinderHelper } from '../finder';
+import { BlurredHelper } from '../image/blurred.helper';
 import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
+import { LocalStorage } from '../storage';
 
 import type { Response } from 'express';
 
@@ -38,10 +44,11 @@ export class GetUploadsController {
    */
   @Header('Cache-Control', 'max-age=31536000') // expired in 1 year
   @Get(':bucket/*')
-  async getUploads(
+  public async getUploads(
     @Param('bucket') bucket: string,
     @Param('0') filename: string,
     @Query('internal') internal: boolean,
+    // @Query('blurred') blurred: any,
     @Param() param: object,
     @Query() query: object,
     @Query(ThumbnailPipe) thumbnailConfig: ThumbnailPipeOptions,
@@ -49,26 +56,44 @@ export class GetUploadsController {
     @Res() res: Response,
   ): Promise<void> {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
+    const engine = classToPlain(storageEngine);
+    const blurred = _.has(query, 'blurred');
     logger.verbose(
       `get ${r({ bucket, filename })} by ${r({
-        storageEngine: classToPlain(storageEngine),
+        engine,
         thumbnailConfig,
         jpegConfig,
         internal,
         query,
         param,
+        blurred,
       })}`,
     );
-    return storageEngine?.resolveUrl(
-      {
-        filename,
-        bucket,
-        thumbnailConfig,
-        jpegConfig,
-        query,
-        resolver: (path) => FinderHelper.resolveUrl({ type: 'assets', path, internal }),
-      },
-      res,
-    );
+    const resolver = (path: string) => FinderHelper.resolveUrl({ type: 'assets', path, internal });
+    if (blurred) {
+      const hash = crypto.createHash('md5');
+      hash.update('', 'utf8');
+      const key = hash.digest('hex');
+
+      if (storageEngine instanceof LocalStorage) {
+        const filepath = await new Promise<string>((resolve) => {
+          storageEngine?.resolveUrl({ filename, bucket, thumbnailConfig, jpegConfig, query, resolver }, {
+            type: () => ({ sendFile: resolve }),
+          } as any);
+        });
+        const blurhash = await CacheWrapper.do({
+          prefix: 'blurred-',
+          key,
+          expiresInSeconds: TimeUnit.DAYS.toSeconds(7),
+          resolver: () => BlurredHelper.encodeImageToBlurhash(filepath),
+        });
+        logger.verbose(`get blurred image ${r({ bucket, filename })}: ${blurhash}`);
+        res.send(blurhash);
+        return;
+      }
+      res.send('not implemented blurred engine.');
+      return;
+    }
+    return storageEngine?.resolveUrl({ filename, bucket, thumbnailConfig, jpegConfig, query, resolver }, res);
   }
 }
