@@ -1,0 +1,50 @@
+diff --git a/lib/src/utils.js b/lib/src/utils.js
+index d80005c36ab5cdcf5279975abcc4a9f52b1ff8a5..88626a2812efb6ae53a5139197dab249c12d4e6a 100644
+--- a/lib/src/utils.js
++++ b/lib/src/utils.js
+@@ -35,31 +35,35 @@ var isSimilarTextExistInArray = function (list, text) {
+  * @param order import order
+  * @param importOrderSeparation boolean indicating if newline should be inserted after each import order
+  */
+-exports.getSortedNodes = function (nodes, order, importOrderSeparation) {
++var getSortedNodes = function (nodes, order, importOrderSeparation) {
+     var originalNodes = nodes.map(lodash_1.clone);
+-    var newLine = importOrderSeparation && nodes.length > 1 ? newLineNode : null;
++    var sortedTypeNodes = originalNodes.filter(function (node) { return node.importKind === 'type'; });
++    var normalTypeNodes = originalNodes.filter(function (node) { return node.importKind !== 'type'; });
++    var newLine = importOrderSeparation && nodes.length > 1 ? constants_1.newLineNode : null;
+     var sortedNodesByImportOrder = order.reduce(function (res, val) {
+-        var x = originalNodes.filter(function (node) { return node.source.value.match(new RegExp(val)) !== null; });
++        var x = normalTypeNodes.filter(function (node) { return node.source.value.match(new RegExp(val)) !== null; });
+         // remove "found" imports from the list of nodes
+-        lodash_1.pull.apply(void 0, __spreadArrays([originalNodes], x));
++        lodash_1.pull.apply(void 0, __spreadArray([normalTypeNodes], x));
+         if (x.length > 0) {
+             x.sort(function (a, b) { return javascript_natural_sort_1.default(a.source.value, b.source.value); });
+             if (res.length > 0) {
+-                return lodash_1.compact(__spreadArrays(res, [newLine], x));
++                return lodash_1.compact(__spreadArray(__spreadArray(__spreadArray([], res), [newLine]), x));
+             }
+             return x;
+         }
+         return res;
+     }, []);
+-    var sortedNodesNotInImportOrder = originalNodes.filter(function (node) { return !isSimilarTextExistInArray(order, node.source.value); });
++    var sortedNodesNotInImportOrder = normalTypeNodes.filter(function (node) { return !is_similar_text_in_array_1.isSimilarTextExistInArray(order, node.source.value); });
+     sortedNodesNotInImportOrder.sort(function (a, b) {
+         return javascript_natural_sort_1.default(a.source.value, b.source.value);
+     });
+     var shouldAddNewLineInBetween = sortedNodesNotInImportOrder.length > 0 && importOrderSeparation;
+-    var allSortedNodes = lodash_1.compact(__spreadArrays(sortedNodesNotInImportOrder, [
+-        shouldAddNewLineInBetween ? newLineNode : null
+-    ], sortedNodesByImportOrder, [
+-        newLineNode,
++    var allSortedNodes = lodash_1.compact(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], sortedNodesNotInImportOrder), [
++        shouldAddNewLineInBetween ? constants_1.newLineNode : null
++    ]), sortedNodesByImportOrder), [
++        constants_1.newLineNode
++    ]), sortedTypeNodes), [
++        sortedTypeNodes ? constants_1.newLineNode : null,
+     ]));
+     // maintain a copy of the nodes to extract comments from
+     var sortedNodesClone = allSortedNodes.map(lodash_1.clone);

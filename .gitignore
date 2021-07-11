@@ -19,4 +19,6 @@ database.db
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+!.yarn/patches
 .clinic/
+/documentation

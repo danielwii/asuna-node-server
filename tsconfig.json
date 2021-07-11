@@ -24,7 +24,6 @@
     "outDir": "./dist",
     "baseUrl": "src"
   },
-  "files": ["@types/global.d.ts"],
   "include": ["src/**/*.*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts", "./dist"]
 }

@@ -1,5 +1,8 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ConsoleLogger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import type { LogLevel } from '@nestjs/common/services/logger.service';
 import { NestFactory, Reflector } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
@@ -21,9 +24,10 @@ import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
+import type { BootstrapOptions } from './interface';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerHelper, LoggerInterceptor } from './modules/common';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
 import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';
@@ -31,10 +35,6 @@ import { SimpleIdGeneratorHelper } from './modules/ids';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
 import './typeorm.fixture';
-
-import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import type { BootstrapOptions } from './interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
@@ -87,17 +87,21 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
 
   await resolveTypeormPaths(options);
 
-  logger.log('create app ...');
-
-  const { dbType } = Global;
-  if (['mysql56', 'mysql57', 'mysql8'].includes(dbType)) {
-    logger.log('🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA={"charset": "utf8mb4_unicode_ci"}');
-    process.env.TYPEORM_DRIVER_EXTRA = '{"charset": "utf8mb4_unicode_ci"}';
+  const logLevels: LogLevel[] = ['error', 'warn', 'log', 'debug', 'verbose'];
+  if (['mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {
+    const TYPEORM_DRIVER_EXTRA = JSON.stringify({ charset: 'utf8mb4_unicode_ci' });
+    logger.log(`🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA=${TYPEORM_DRIVER_EXTRA}`);
+    process.env.TYPEORM_DRIVER_EXTRA = TYPEORM_DRIVER_EXTRA;
   }
-
+  const appOptions: NestApplicationOptions = {
+    // logger: ['error', 'warn'],
+    logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL'))),
+    bufferLogs: true,
+  };
+  logger.log(`create app ... ${r(appOptions)}`);
   const app = await NestFactory.create<NestExpressApplication>(
     options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule,
-    { logger: LoggerHelper.getLoggerService() },
+    appOptions,
   );
 
   await syncDbWithLockIfPossible(app, options);
@@ -194,7 +198,7 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
         path - 表示 cookie 的路径；用于和请求路径进行比较。如果路径和域都匹配，那么在请求中发送 cookie。
         expires - 用于为持久性 cookie 设置到期日期。
        */
-      cookie: { path: '/', httpOnly: true, secure: true, /*domain: '*',*/ maxAge: null, sameSite: 'none' },
+      cookie: { path: '/', httpOnly: true, secure: true, /* domain: '*', */ maxAge: null, sameSite: 'none' },
       // 初始化session时是否保存到存储。默认为true， 但是(后续版本)有可能默认失效，所以最好手动添加。
       saveUninitialized: true,
       genid: () => SimpleIdGeneratorHelper.randomId('se'),

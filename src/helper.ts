@@ -1,3 +1,5 @@
+import type { NestExpressApplication } from '@nestjs/platform-express';
+
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -8,13 +10,11 @@ import _ from 'lodash';
 import { dirname, extname, resolve } from 'path';
 import { Connection } from 'typeorm';
 
+import type { BootstrapOptions } from './interface';
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
-
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import type { BootstrapOptions } from './interface';
 
 export function validateOptions(options: BootstrapOptions): void {
   // const config = configLoader.loadConfigs();
@@ -113,21 +113,20 @@ export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<v
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);
   logger.log(`main entrance is ${r(require.main.filename)}`);
-  const { packageDir } = global;
   const suffix = extname(__filename).slice(1);
   const currentSuffix = extname(require.main.filename).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
   const pathResolver = (mode: 'entities' | 'subscriber') => [
     // `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`,
     // 地址不同时这里认为是用特定的环境配置来拉取 packages 下的相关实体，即 monorepo 模式
-    rootDir !== packageDir
-      ? `${resolve(packageDir, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`
-      : `${resolve(packageDir)}/**/*${mode}.${suffix}`,
+    rootDir !== __dirname
+      ? `${resolve(__dirname, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`
+      : `${resolve(__dirname)}/**/*${mode}.${suffix}`,
     `${resolve(rootDir)}/**/*${mode}.${currentSuffix}`,
   ];
   const entities = _.uniq(_.compact([...pathResolver('entities'), ...(options?.typeormEntities || [])]));
   const subscribers = _.uniq(_.compact([...pathResolver('subscriber'), ...(options?.typeormSubscriber || [])]));
-  logger.log(`options is ${r({ options, packageDir, rootDir, suffix, entities, subscribers, __filename })}`);
+  logger.log(`options is ${r({ options, __dirname, rootDir, suffix, entities, subscribers, __filename })}`);
 
   logger.log(`resolve typeorm entities: ${r(entities)}`);
   logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
