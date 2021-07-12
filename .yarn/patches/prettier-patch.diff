@@ -1,50 +1,224 @@
-diff --git a/lib/src/utils.js b/lib/src/utils.js
-index d80005c36ab5cdcf5279975abcc4a9f52b1ff8a5..88626a2812efb6ae53a5139197dab249c12d4e6a 100644
---- a/lib/src/utils.js
-+++ b/lib/src/utils.js
-@@ -35,31 +35,35 @@ var isSimilarTextExistInArray = function (list, text) {
-  * @param order import order
-  * @param importOrderSeparation boolean indicating if newline should be inserted after each import order
+diff --git a/lib/src/preprocessor.js b/lib/src/preprocessor.js
+index cedb60f4f8e533af1518b72ef96fd214023decb6..d7daabf3ee20fd8b305becdc42d1fd4dd0409701 100644
+--- a/lib/src/preprocessor.js
++++ b/lib/src/preprocessor.js
+@@ -27,9 +27,7 @@ function preprocessor(code, options) {
+     var interpreter = ast.program.interpreter;
+     traverse_1.default(ast, {
+         ImportDeclaration: function (path) {
+-            var tsModuleParent = path.findParent(function (p) {
+-                return types_1.isTSModuleDeclaration(p);
+-            });
++            var tsModuleParent = path.findParent(function (p) { return types_1.isTSModuleDeclaration(p); });
+             if (!tsModuleParent) {
+                 importNodes.push(path.node);
+             }
+diff --git a/lib/src/utils/get-all-comments-from-nodes.js b/lib/src/utils/get-all-comments-from-nodes.js
+index b56c149a12e379776ab691666309b9107f2bc4d1..d53419db641539a6ca299db198985e9bfdc1a7fe 100644
+--- a/lib/src/utils/get-all-comments-from-nodes.js
++++ b/lib/src/utils/get-all-comments-from-nodes.js
+@@ -8,8 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getAllCommentsFromNodes = void 0;
+ var getAllCommentsFromNodes = function (nodes) {
+     return nodes.reduce(function (acc, node) {
+-        if (Array.isArray(node.leadingComments) &&
+-            node.leadingComments.length > 0) {
++        if (Array.isArray(node.leadingComments) && node.leadingComments.length > 0) {
+             acc = __spreadArray(__spreadArray([], acc), node.leadingComments);
+         }
+         return acc;
+diff --git a/lib/src/utils/get-code-from-ast.js b/lib/src/utils/get-code-from-ast.js
+index 1949624b7c50ac488cd83b28e30d9fbc45e05d2d..a797749796fc3f7f1415d78c2eb23b89841c81f3 100644
+--- a/lib/src/utils/get-code-from-ast.js
++++ b/lib/src/utils/get-code-from-ast.js
+@@ -41,6 +41,7 @@ var getCodeFromAst = function (nodes, originalCode, interpreter) {
+         },
+     });
+     var code = generator_1.default(newAST).code;
+-    return (code.replace(/"PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE";/gi, constants_1.newLineCharacters) + codeWithoutImportsAndInterpreter.trim());
++    return (code.replace(/"PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE";/gi, constants_1.newLineCharacters) +
++        codeWithoutImportsAndInterpreter.trim());
+ };
+ exports.getCodeFromAst = getCodeFromAst;
+diff --git a/lib/src/utils/get-sorted-nodes.js b/lib/src/utils/get-sorted-nodes.js
+index d1337f6f2e999d89e1617577264a0eb891a480de..33e89260227da7a3f7025698d62d5e3fd3673590 100644
+--- a/lib/src/utils/get-sorted-nodes.js
++++ b/lib/src/utils/get-sorted-nodes.js
+@@ -25,11 +25,13 @@ var constants_1 = require("../constants");
   */
--exports.getSortedNodes = function (nodes, order, importOrderSeparation) {
-+var getSortedNodes = function (nodes, order, importOrderSeparation) {
+ var getSortedNodes = function (nodes, order, importOrderSeparation) {
      var originalNodes = nodes.map(lodash_1.clone);
--    var newLine = importOrderSeparation && nodes.length > 1 ? newLineNode : null;
 +    var sortedTypeNodes = originalNodes.filter(function (node) { return node.importKind === 'type'; });
 +    var normalTypeNodes = originalNodes.filter(function (node) { return node.importKind !== 'type'; });
-+    var newLine = importOrderSeparation && nodes.length > 1 ? constants_1.newLineNode : null;
+     var newLine = importOrderSeparation && nodes.length > 1 ? constants_1.newLineNode : null;
      var sortedNodesByImportOrder = order.reduce(function (res, val) {
 -        var x = originalNodes.filter(function (node) { return node.source.value.match(new RegExp(val)) !== null; });
 +        var x = normalTypeNodes.filter(function (node) { return node.source.value.match(new RegExp(val)) !== null; });
          // remove "found" imports from the list of nodes
--        lodash_1.pull.apply(void 0, __spreadArrays([originalNodes], x));
+-        lodash_1.pull.apply(void 0, __spreadArray([originalNodes], x));
 +        lodash_1.pull.apply(void 0, __spreadArray([normalTypeNodes], x));
          if (x.length > 0) {
              x.sort(function (a, b) { return javascript_natural_sort_1.default(a.source.value, b.source.value); });
              if (res.length > 0) {
--                return lodash_1.compact(__spreadArrays(res, [newLine], x));
-+                return lodash_1.compact(__spreadArray(__spreadArray(__spreadArray([], res), [newLine]), x));
-             }
-             return x;
+@@ -39,15 +41,15 @@ var getSortedNodes = function (nodes, order, importOrderSeparation) {
          }
          return res;
      }, []);
--    var sortedNodesNotInImportOrder = originalNodes.filter(function (node) { return !isSimilarTextExistInArray(order, node.source.value); });
+-    var sortedNodesNotInImportOrder = originalNodes.filter(function (node) { return !is_similar_text_in_array_1.isSimilarTextExistInArray(order, node.source.value); });
+-    sortedNodesNotInImportOrder.sort(function (a, b) {
+-        return javascript_natural_sort_1.default(a.source.value, b.source.value);
+-    });
 +    var sortedNodesNotInImportOrder = normalTypeNodes.filter(function (node) { return !is_similar_text_in_array_1.isSimilarTextExistInArray(order, node.source.value); });
-     sortedNodesNotInImportOrder.sort(function (a, b) {
-         return javascript_natural_sort_1.default(a.source.value, b.source.value);
-     });
++    sortedNodesNotInImportOrder.sort(function (a, b) { return javascript_natural_sort_1.default(a.source.value, b.source.value); });
      var shouldAddNewLineInBetween = sortedNodesNotInImportOrder.length > 0 && importOrderSeparation;
--    var allSortedNodes = lodash_1.compact(__spreadArrays(sortedNodesNotInImportOrder, [
--        shouldAddNewLineInBetween ? newLineNode : null
--    ], sortedNodesByImportOrder, [
--        newLineNode,
+-    var allSortedNodes = lodash_1.compact(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], sortedNodesNotInImportOrder), [
 +    var allSortedNodes = lodash_1.compact(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], sortedNodesNotInImportOrder), [
-+        shouldAddNewLineInBetween ? constants_1.newLineNode : null
-+    ]), sortedNodesByImportOrder), [
+         shouldAddNewLineInBetween ? constants_1.newLineNode : null
+     ]), sortedNodesByImportOrder), [
+-        constants_1.newLineNode, // insert a newline after all sorted imports
 +        constants_1.newLineNode
 +    ]), sortedTypeNodes), [
 +        sortedTypeNodes ? constants_1.newLineNode : null,
      ]));
      // maintain a copy of the nodes to extract comments from
      var sortedNodesClone = allSortedNodes.map(lodash_1.clone);
+diff --git a/lib/src/utils.js b/lib/src/utils.js
+deleted file mode 100644
+index d80005c36ab5cdcf5279975abcc4a9f52b1ff8a5..0000000000000000000000000000000000000000
+--- a/lib/src/utils.js
++++ /dev/null
+@@ -1,134 +0,0 @@
+-"use strict";
+-var __spreadArrays = (this && this.__spreadArrays) || function () {
+-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+-            r[k] = a[j];
+-    return r;
+-};
+-var __importDefault = (this && this.__importDefault) || function (mod) {
+-    return (mod && mod.__esModule) ? mod : { "default": mod };
+-};
+-Object.defineProperty(exports, "__esModule", { value: true });
+-exports.getCodeFromAst = exports.removeNodesFromOriginalCode = exports.getSortedNodes = void 0;
+-// we do not have types for javascript-natural-sort
+-//@ts-ignore
+-var javascript_natural_sort_1 = __importDefault(require("javascript-natural-sort"));
+-var generator_1 = __importDefault(require("@babel/generator"));
+-var types_1 = require("@babel/types");
+-var lodash_1 = require("lodash");
+-var PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE = 'PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE';
+-var newLineNode = types_1.expressionStatement(types_1.stringLiteral(PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE));
+-var newLineCharacters = '\n\n';
+-/**
+- * This function checks that specified string exists in the specified list.
+- * @param list
+- * @param text
+- */
+-var isSimilarTextExistInArray = function (list, text) {
+-    return list.some(function (element) { return text.match(new RegExp(element)) !== null; });
+-};
+-/**
+- * This function returns all the nodes which are in the importOrder array.
+- * The plugin considered these import nodes as local import declarations.
+- * @param nodes all import nodes
+- * @param order import order
+- * @param importOrderSeparation boolean indicating if newline should be inserted after each import order
+- */
+-exports.getSortedNodes = function (nodes, order, importOrderSeparation) {
+-    var originalNodes = nodes.map(lodash_1.clone);
+-    var newLine = importOrderSeparation && nodes.length > 1 ? newLineNode : null;
+-    var sortedNodesByImportOrder = order.reduce(function (res, val) {
+-        var x = originalNodes.filter(function (node) { return node.source.value.match(new RegExp(val)) !== null; });
+-        // remove "found" imports from the list of nodes
+-        lodash_1.pull.apply(void 0, __spreadArrays([originalNodes], x));
+-        if (x.length > 0) {
+-            x.sort(function (a, b) { return javascript_natural_sort_1.default(a.source.value, b.source.value); });
+-            if (res.length > 0) {
+-                return lodash_1.compact(__spreadArrays(res, [newLine], x));
+-            }
+-            return x;
+-        }
+-        return res;
+-    }, []);
+-    var sortedNodesNotInImportOrder = originalNodes.filter(function (node) { return !isSimilarTextExistInArray(order, node.source.value); });
+-    sortedNodesNotInImportOrder.sort(function (a, b) {
+-        return javascript_natural_sort_1.default(a.source.value, b.source.value);
+-    });
+-    var shouldAddNewLineInBetween = sortedNodesNotInImportOrder.length > 0 && importOrderSeparation;
+-    var allSortedNodes = lodash_1.compact(__spreadArrays(sortedNodesNotInImportOrder, [
+-        shouldAddNewLineInBetween ? newLineNode : null
+-    ], sortedNodesByImportOrder, [
+-        newLineNode,
+-    ]));
+-    // maintain a copy of the nodes to extract comments from
+-    var sortedNodesClone = allSortedNodes.map(lodash_1.clone);
+-    var firstNodesComments = nodes[0].leadingComments;
+-    // Remove all comments from sorted nodes
+-    allSortedNodes.forEach(types_1.removeComments);
+-    // insert comments other than the first comments
+-    allSortedNodes.forEach(function (node, index) {
+-        if (!lodash_1.isEqual(nodes[0].loc, node.loc)) {
+-            types_1.addComments(node, 'leading', sortedNodesClone[index].leadingComments || []);
+-        }
+-    });
+-    if (firstNodesComments) {
+-        types_1.addComments(allSortedNodes[0], 'leading', firstNodesComments);
+-    }
+-    return allSortedNodes;
+-};
+-/**
+- * Removes imports from original file
+- * @param code the whole file as text
+- * @param nodes to be removed
+- */
+-exports.removeNodesFromOriginalCode = function (code, nodes) {
+-    var text = code;
+-    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+-        var node = nodes_1[_i];
+-        var start = Number(node.start);
+-        var end = Number(node.end);
+-        if (Number.isSafeInteger(start) && Number.isSafeInteger(end)) {
+-            text = text.replace(code.substring(start, end), '');
+-        }
+-    }
+-    return text;
+-};
+-/**
+- * This function generate a code string from the passed nodes.
+- * @param nodes all imports
+- * @param originalCode
+- */
+-exports.getCodeFromAst = function (nodes, originalCode) {
+-    var allCommentsFromImports = getAllCommentsFromNodes(nodes);
+-    var commentAndImportsToRemoveFromCode = __spreadArrays(nodes, allCommentsFromImports);
+-    var codeWithoutImportDeclarations = exports.removeNodesFromOriginalCode(originalCode, commentAndImportsToRemoveFromCode);
+-    var newAST = types_1.file({
+-        type: 'Program',
+-        body: nodes,
+-        directives: [],
+-        sourceType: 'module',
+-        interpreter: null,
+-        sourceFile: '',
+-        leadingComments: [],
+-        innerComments: [],
+-        trailingComments: [],
+-        start: 0,
+-        end: 0,
+-        loc: {
+-            start: { line: 0, column: 0 },
+-            end: { line: 0, column: 0 },
+-        },
+-    });
+-    var code = generator_1.default(newAST).code;
+-    return (code.replace(/"PRETTIER_PLUGIN_SORT_IMPORTS_NEW_LINE";/gi, newLineCharacters) + codeWithoutImportDeclarations.trim());
+-};
+-var getAllCommentsFromNodes = function (nodes) {
+-    return nodes.reduce(function (acc, node) {
+-        if (Array.isArray(node.leadingComments) &&
+-            node.leadingComments.length > 0) {
+-            acc = __spreadArrays(acc, node.leadingComments);
+-        }
+-        return acc;
+-    }, []);
+-};

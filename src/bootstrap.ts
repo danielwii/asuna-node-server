@@ -1,8 +1,5 @@
 import { ClassSerializerInterceptor, ConsoleLogger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
-import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
-import type { LogLevel } from '@nestjs/common/services/logger.service';
 import { NestFactory, Reflector } from '@nestjs/core';
-import type { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
@@ -24,7 +21,6 @@ import responseTime from 'response-time';
 import { getConnectionOptions } from 'typeorm';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
-import type { BootstrapOptions } from './interface';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
@@ -35,6 +31,11 @@ import { SimpleIdGeneratorHelper } from './modules/ids';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
 import './typeorm.fixture';
+
+import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import type { LogLevel } from '@nestjs/common/services/logger.service';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { BootstrapOptions } from './interface';
 
 export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();

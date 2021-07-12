@@ -1843,7 +1843,7 @@ __metadata:
 
 "@trivago/prettier-plugin-sort-imports@patch:@trivago/prettier-plugin-sort-imports@2.0.2#.yarn/patches/prettier-patch.diff::locator=%40danielwii%2Fasuna-node-server%40workspace%3A.":
   version: 2.0.2
-  resolution: "@trivago/prettier-plugin-sort-imports@patch:@trivago/prettier-plugin-sort-imports@npm%3A2.0.2#.yarn/patches/prettier-patch.diff::version=2.0.2&hash=5cfe75&locator=%40danielwii%2Fasuna-node-server%40workspace%3A."
+  resolution: "@trivago/prettier-plugin-sort-imports@patch:@trivago/prettier-plugin-sort-imports@npm%3A2.0.2#.yarn/patches/prettier-patch.diff::version=2.0.2&hash=674b97&locator=%40danielwii%2Fasuna-node-server%40workspace%3A."
   dependencies:
     "@babel/core": 7.13.10
     "@babel/generator": 7.13.9
@@ -1856,7 +1856,7 @@ __metadata:
     prettier: 2.2.1
   peerDependencies:
     prettier: ^2.2.1
-  checksum: 497aac912ec6c1c15be63de4de7a54bdff62499bb45b1af610be51518bac72f77dffc3c60de8c92b90d8360cf3ac2017d25e6eb2af56421fda07a9f621f61654
+  checksum: 3c44f7757ba92f1548b239f3a32d2e9d7525211f88373f9eddb84fd5b61a98dc26f86b5736e0db493c811c594a41f6a97d25582bd445ad164e2e3b6c1a3055b6
   languageName: node
   linkType: hard
 
