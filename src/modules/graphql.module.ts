@@ -57,6 +57,8 @@ export class GraphqlModule implements OnModuleInit {
           // },
           typePaths,
           // autoSchemaFile: 'schema.gql',
+          // autoSchemaFile: true,
+          // sortSchema: true,
           resolvers: { JSON: GraphQLJSON },
           playground: config.playground_enable,
           debug: config.debug,

@@ -1,5 +1,3 @@
-import type { NestExpressApplication } from '@nestjs/platform-express';
-
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -10,11 +8,13 @@ import _ from 'lodash';
 import { dirname, extname, resolve } from 'path';
 import { Connection } from 'typeorm';
 
-import type { BootstrapOptions } from './interface';
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
+
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import type { BootstrapOptions } from './interface';
 
 export function validateOptions(options: BootstrapOptions): void {
   // const config = configLoader.loadConfigs();
