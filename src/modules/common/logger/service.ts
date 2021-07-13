@@ -1,6 +1,5 @@
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { LoggerConfigObject } from './config';
@@ -30,9 +29,9 @@ const levels = {
   silly: 5,
 };
 
-const logger = LoggerFactory.getLogger('LoggerService');
+// const logger = LoggerFactory.getLogger('LoggerService');
 
-export class SimpleLoggerService extends Logger {
+export class SimpleLoggerService extends ConsoleLogger {
   error(message: any, trace?: string, context?: string): any {
     super.error(typeof message === 'object' ? r(message) : message, trace, context);
   }

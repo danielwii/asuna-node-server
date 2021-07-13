@@ -72,8 +72,8 @@ export class GraphqlModule implements OnModuleInit {
                 logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
-            (responseCachePlugin as any)({
-              sessionID: (requestContext) => {
+            responseCachePlugin({
+              sessionId: (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
                 if (sessionID) logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
@@ -94,14 +94,14 @@ export class GraphqlModule implements OnModuleInit {
           extensions: _.compact([
             tracingConfig.enabled
               ? _.memoize(() => {
-                  const openTracingExtension = new (OpenTracingExtension as any)({
+                  const openTracingExtension = OpenTracingExtension({
                     server: tracer,
                     local: tracer,
                     // shouldTraceRequest: info => true,
                     // shouldTraceFieldResolver: (source, args, context, info) => true,
                   });
                   logger.log(`load open tracing extension ...`);
-                  return openTracingExtension;
+                  return openTracingExtension as any;
                 })
               : undefined,
           ]),

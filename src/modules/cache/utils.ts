@@ -8,14 +8,14 @@ import _ from 'lodash';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';
 
-const logger = LoggerFactory.getLogger('CacheUtils');
-
 export class CacheUtils {
-  public static clear(opts: { prefix?: string; key: string | object }): void {
-    logger.debug(`clear cache ${r(opts)}`);
+  private static logger = LoggerFactory.getLogger('CacheUtils');
 
-    CacheWrapper.clear(opts).catch((reason) => logger.error(reason));
-    CacheManager.clear(opts.key).catch((reason) => logger.error(reason));
+  public static clear(opts: { prefix?: string; key: string | object }): void {
+    this.logger.debug(`clear cache ${r(opts)}`);
+
+    CacheWrapper.clear(opts).catch((reason) => this.logger.error(reason));
+    CacheManager.clear(opts.key).catch((reason) => this.logger.error(reason));
   }
 
   public static async clearAll(): Promise<void> {
@@ -24,7 +24,7 @@ export class CacheUtils {
       const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
 
       if (!_.isEmpty(redisKeys)) {
-        logger.log(`clean keys... ${r(redisKeys)}`);
+        this.logger.log(`clean keys... ${r(redisKeys)}`);
         redisKeys.forEach((key) => promisify(redis.client.del, redis.client)(key));
       }
     }

@@ -42,6 +42,8 @@ features:
   web:
     tracing:
       enabled: false
+  payment:
+    enabled: false
 
 tracing:
   enabled: false

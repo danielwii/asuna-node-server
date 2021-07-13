@@ -23,7 +23,7 @@ import { getConnectionOptions } from 'typeorm';
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, SimpleLoggerService } from './modules/common';
 import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';

@@ -14,6 +14,6 @@ const logger = LoggerFactory.getLogger('WSModule');
 export class WSModule implements OnModuleInit {
   onModuleInit(): void {
     logger.log('init...');
-    AdminWsSyncHelper.initCron();
+    // AdminWsSyncHelper.initCron();
   }
 }

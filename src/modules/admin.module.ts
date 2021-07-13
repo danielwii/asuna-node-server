@@ -6,6 +6,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
 import * as redisStore from 'cache-manager-redis-store';
+import _ from 'lodash';
 
 import { AdminController } from './admin.controller';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
@@ -57,12 +58,12 @@ import { WebModule } from './web';
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
 @Module({
-  imports: [
+  imports: _.compact([
     DynamicRouterModule,
     GraphqlQueryModule,
     AuthModule,
     InteractionModule,
-    PaymentModule,
+    configLoader.loadConfig('FEATURES_PAYMENT_ENABLED') ? PaymentModule : null,
     ContentModule,
     EmailModule,
     KvModule,
@@ -84,7 +85,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
         return redisClient.isEnabled ? { store: redisStore, ...redisClient.redisOptions } : {};
       },
     }),
-  ],
+  ]),
   controllers: [
     ApiController,
     AdminController,
