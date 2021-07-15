@@ -1,12 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { auth } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 
@@ -37,7 +37,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (this.opts.anonymousSupport) {
         return undefined;
       }
-      throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'jwt auth failed', info);
+      // this.logger.warn(`auth error, ${r({ err, payload, info })}`);
+      throw err
+        ? new AsunaException(AsunaErrorCode.InvalidToken, 'jwt auth failed', _.isError(err) ? err.message : err)
+        : new AsunaException(
+            AsunaErrorCode.InsufficientPermissions,
+            'jwt auth failed',
+            _.isError(info) ? info.message : info,
+          );
     }
     this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     await auth(req, res, 'client');
