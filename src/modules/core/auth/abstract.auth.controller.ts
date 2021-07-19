@@ -157,7 +157,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
-      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
+      throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user?.username}' not active or exist.`);
     }
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
     /*
@@ -175,7 +175,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
       })
       .catch((reason) => logger.error(reason));
     // logger.debug(`current authed user is ${r(loaded)}`);
-    const result = _.omit(user, 'channel', 'info'); // ...
+    const result = _.omit({ ...user }, 'channel', 'info'); // ...
     const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
     logger.debug(`relations is ${r(relations)}`);
     if (relations.includes('profile')) {
