@@ -59,6 +59,7 @@ export class GraphqlModule implements OnModuleInit {
           // autoSchemaFile: 'schema.gql',
           // autoSchemaFile: true,
           // sortSchema: true,
+          installSubscriptionHandlers: true,
           resolvers: { JSON: GraphQLJSON },
           playground: config.playground_enable,
           debug: config.debug,

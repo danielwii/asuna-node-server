@@ -33,11 +33,8 @@ export class DeviceMiddleware implements NestMiddleware {
     const sessionId = req.sessionID;
     // const deviceId = req.session.deviceId ?? cookies?.deviceId;
 
-    // SEID (session id) 通过 express-session 来提供
-    // 通过 SEID 查询 SUID (session user id) 是否存在，SUID 应该仅在 regDevice 时创建
-    // 如果 SUID 不存在，查询 cookie 是否被标记（存在 SDID，session device id）
-    // SDID 存在于 cookie 中，SEID 存在于 session 中，仅在 regDevice 后持久化在数据库
-    this.logger.debug(`cookies is ${r({ cookies, session: req.session, sessionId })}`);
+    const fp = req.headers['x-vfp-id'];
+
     if (sessionId) {
       const sessionUser = await SessionUser.findOne({ sessionId });
       const maxAge = TimeUnit.DAYS.toMillis(365);
@@ -55,7 +52,13 @@ export class DeviceMiddleware implements NestMiddleware {
         } else {
           const parsedUA = detectUA(req.headers['user-agent']);
           // this.logger.debug(`parsed ua is ${r(parsedUA)}`);
-          if (parsedUA.isBrowser) {
+          if (parsedUA.isBrowser && fp) {
+            // SEID (session id) 通过 express-session 来提供
+            // 通过 SEID 查询 SUID (session user id) 是否存在，SUID 应该仅在 regDevice 时创建
+            // 如果 SUID 不存在，查询 cookie 是否被标记（存在 SDID，session device id）
+            // SDID 存在于 cookie 中，SEID 存在于 session 中，仅在 regDevice 后持久化在数据库
+            this.logger.debug(`cookies is ${r({ cookies, session: req.session, sessionId })}`);
+
             const id = SimpleIdGeneratorHelper.randomId('vd');
             this.logger.log(`set device id ${id} for device ${r(parsedUA)}`);
             req.deviceID = id;
@@ -81,7 +84,7 @@ export class LandingUrlMiddleware implements NestMiddleware {
       req.session.landingUrl = req.url;
       req.session.referer = req.headers.referer;
       req.session.origin = req.headers.origin;
-      this.logger.debug(`set landing ${r(_.omit(req.session, 'cookie'))}`);
+      // this.logger.debug(`set landing ${r(_.omit(req.session, 'cookie'))}`);
     }
 
     next();
