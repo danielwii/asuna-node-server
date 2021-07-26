@@ -40,11 +40,13 @@ export class DeviceMiddleware implements NestMiddleware {
       const maxAge = TimeUnit.DAYS.toMillis(365);
       const cookieOptions: CookieOptions = { signed: true, httpOnly: true, maxAge, sameSite: 'none', secure: true };
       if (sessionUser) {
-        // 该设备已经注册，重新押入 deviceId
-        this.logger.log(`prime device id ${sessionUser.deviceId} to cookie`);
         req.scid = ClientHelper.getClientId(sessionUser);
-        res.cookie('asn.sdid', sessionUser.deviceId, cookieOptions);
-        res.cookie('asn.scid', req.scid, cookieOptions);
+        if (!(cookies['asn.sdid'] && cookies['asn.scid'])) {
+          // 该设备已经注册，重新押入 deviceId
+          this.logger.log(`prime device id ${sessionUser.deviceId} to cookie ${r(cookies)}`);
+          res.cookie('asn.sdid', sessionUser.deviceId, cookieOptions);
+          res.cookie('asn.scid', req.scid, cookieOptions);
+        }
       } else {
         // 设备还未注册，确保 cookie 中的设备 id
         if (cookies.deviceId) {

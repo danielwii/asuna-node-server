@@ -22,6 +22,11 @@ export class TracingInterceptor implements NestInterceptor {
       request = GqlExecutionContext.create(context).getContext().req;
     }
 
+    // ws subscription request
+    if (!request) {
+      return next.handle();
+    }
+
     const info = {
       path: request.url,
       body: request.body,

@@ -43,6 +43,9 @@ export class VirtualDevice extends NoPrimaryKeyBaseEntity {
   @Column({ nullable: true, length: 20 })
   public type?: string;
 
+  @Column({ nullable: true, length: 20 })
+  public fingerprint?: string;
+
   @OneToMany('VirtualSession', (inverse: VirtualSession) => inverse.device)
   public sessions?: VirtualSession[];
 }

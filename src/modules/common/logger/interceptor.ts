@@ -17,6 +17,12 @@ export class LoggerInterceptor implements NestInterceptor {
     if (!req) {
       req = require('@nestjs/graphql').GqlExecutionContext.create(context).getContext().req;
     }
+
+    // ws subscription request
+    if (!req) {
+      return next.handle();
+    }
+
     const info = {
       path: req.url,
       body: req.body,

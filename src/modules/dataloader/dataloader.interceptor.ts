@@ -25,16 +25,19 @@ export class DataLoaderInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     const request = getRequestFromContext(context);
 
-    // If the request already has data loaders,
-    // then do not create them again or the benefits are negated.
-    if (request.dataLoaders) {
-      // this.logger.debug('Data loaders exist', this.constructor.name);
-    } else {
-      if (_.isEmpty(GenericDataLoader.loaders())) {
-        logger.error(`no data loaders for request found, may not initialized at startup.`);
+    // cannot get request if is a graphql subscription by ws
+    if (request) {
+      // If the request already has data loaders,
+      // then do not create them again or the benefits are negated.
+      if (request.dataLoaders) {
+        // this.logger.debug('Data loaders exist', this.constructor.name);
+      } else {
+        if (_.isEmpty(GenericDataLoader.loaders())) {
+          logger.error(`no data loaders for request found, may not initialized at startup.`);
+        }
+        // logger.debug(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
+        request.dataLoaders = new GenericDataLoader().createLoaders();
       }
-      // logger.debug(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
-      request.dataLoaders = new GenericDataLoader().createLoaders();
     }
 
     return next.handle();

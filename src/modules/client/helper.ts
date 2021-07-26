@@ -1,6 +1,7 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import _ from 'lodash';
 import ow from 'ow';
 import { getManager } from 'typeorm';
 
@@ -19,7 +20,8 @@ export class ClientHelper {
     await getManager().transaction(async (manager) => {
       let device = await VirtualDevice.findOne({ id: sdid });
       if (!device) {
-        device = await manager.save(new VirtualDevice({ id: sdid }));
+        const fingerprint = _.toString(req.headers['x-vfp-id']);
+        device = await manager.save(new VirtualDevice({ id: sdid, fingerprint }));
       }
 
       let session = await VirtualSession.findOne({ id: seid });
@@ -45,6 +47,7 @@ export class ClientHelper {
           sessionId: seid,
         }),
       );
+      logger.log(`create session user ${r(sessionUser)}`);
     });
 
     return sessionUser;

@@ -224,7 +224,8 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   app.use(bodyParser.urlencoded({ limit, extended: true }));
 
   app.useGlobalInterceptors(new TracingInterceptor());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  // WARNING will break graphql pubsub
+  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
