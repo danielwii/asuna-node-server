@@ -28,6 +28,6 @@ type APIPagedFeedback implements PagedQuery {
   items: [Feedback]
 }
 
-type Query {
+extend type Query {
   api_paged_feedback(pageRequest: PageRequest): APIPagedFeedback
 }
