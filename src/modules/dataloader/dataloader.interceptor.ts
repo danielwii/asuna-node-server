@@ -6,6 +6,7 @@ import _ from 'lodash';
 import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
 
+import { Tenant } from '../tenant';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
@@ -18,6 +19,7 @@ export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U 
   getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;
+  getTenant: () => Tenant;
 }
 
 @Injectable()

@@ -91,6 +91,7 @@ export class GraphqlModule implements OnModuleInit {
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
             getCurrentUser: () => _.get(context.req, 'user'),
             getTrace: () => _.get(context.req, 'trace'),
+            getTenant: () => _.get(context.req, 'tenant'),
           }),
           extensions: _.compact([
             tracingConfig.enabled

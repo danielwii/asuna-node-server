@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Body, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
@@ -89,12 +89,15 @@ export class ApiController {
 
   @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
   @Post('v1/session-token')
-  public async getToken(@Req() req: JwtAuthRequest): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
+  public async getToken(
+    @Body() body: Record<string, any>,
+    @Req() req: JwtAuthRequest,
+  ): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
     const { identifier, user, payload, scid } = req;
-    logger.log(`generate session token by ${r({ identifier, user, payload, scid })}`);
+    logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
 
     if (scid) {
-      return TokenHelper.createSessionToken(null, { scid });
+      return TokenHelper.createSessionToken(null, { scid, ...body });
     }
   }
 }

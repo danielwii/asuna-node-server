@@ -22,7 +22,7 @@ const logger = LoggerFactory.getLogger('TenantModule');
 
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
- * tenant WIP 可以配置一个待创建的模型入口，用于首次创建
+ * tenant 🚧 可以配置一个待创建的模型入口，用于首次创建
  *          - 目前没有区分后台管理员和用户，通过角色和入口模型的创建作为 tenant 创建的依据
  *            即在此时真正创建 tenant id，来确定用户的角色。
  * tenant 🤔 可以控制不同表可以创建的数量，包含一个默认的数量，同时可以通过自定义覆盖

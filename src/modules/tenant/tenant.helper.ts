@@ -96,11 +96,15 @@ export class TenantHelper {
     return filtered;
   }
 
+  static setup(config: TenantConfig) {
+    return KvHelper.set({ ...this.kvDef, value: _.mapKeys(config, (v, k) => TenantFieldKeys[k] ?? k) });
+  }
+
   static async getConfig(): Promise<TenantConfig> {
     return CacheManager.cacheable(
       'tenant.config',
       async () => {
-        const entities = await DBHelper.getModelsHasRelation(Tenant);
+        const entities = DBHelper.getModelsHasRelation(Tenant);
         const keyValues = _.assign(
           {},
           TenantFieldKeys,
