@@ -21,7 +21,8 @@ import { GraphQLConfigObject } from './graphql/graphql.config';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
-import type { GraphQLServiceContext, ValueOrPromise } from 'apollo-server-types';
+import type { GraphQLServerListener } from 'apollo-server-plugin-base';
+import type { GraphQLServiceContext } from 'apollo-server-types';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
@@ -69,7 +70,7 @@ export class GraphqlModule implements OnModuleInit {
           persistedQueries: { cache },
           plugins: [
             {
-              serverWillStart(service: GraphQLServiceContext): ValueOrPromise<void> {
+              async serverWillStart(service: GraphQLServiceContext): Promise<GraphQLServerListener | void> {
                 logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
