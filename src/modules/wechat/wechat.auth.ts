@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { UserProfile } from '../core/auth/user.entities';
-import { auth } from '../helper/auth';
+import { auth, AuthType } from '../helper/auth';
 import { Store } from '../store';
 
 import type { Response } from 'express';
@@ -27,7 +27,7 @@ export class WXAuthGuard implements CanActivate {
     // const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
-    const result = await auth(req, res, 'client');
+    const result = await auth(req, res, AuthType.client);
 
     if (!result.payload) {
       if (result.err instanceof Error) {

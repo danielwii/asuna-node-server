@@ -112,7 +112,7 @@ export class InMemoryDB {
     const redis = RedisProvider.instance.getRedisClient(prefix, options?.db);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
-      // logger.debug(`redis is not enabled, using inner cache ${r({ key, cacheKey, prefix, options })}.`);
+      // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
       return CacheManager.cacheable(keyStr, resolver, options?.expiresInSeconds);
     }
 
@@ -134,7 +134,7 @@ export class InMemoryDB {
     };
     // redis 存在未过期的值时直接返回
     const value = await Promise.promisify(redis.client.get).bind(redis.client)(keyStr);
-    // logger.debug(`prime to redis -- ${r({ cacheKey, prefix, strategy, value })}`);
+    // logger.debug(`prime to redis -- ${r({ keyStr, prefix, strategy, options, value })}`);
 
     if (value) {
       // when in cache-first mode will populate data to store later and return value in cache at first time

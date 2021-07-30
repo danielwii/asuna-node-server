@@ -12,7 +12,7 @@ import * as R from 'ramda';
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
 import { StaticImplements } from '../../common/types';
-import { auth } from '../../helper/auth';
+import { auth, AuthType } from '../../helper/auth';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValuePair, KeyValueType } from './kv.entities';
@@ -276,7 +276,7 @@ export class KvHelper {
     const exists = await KvHelper.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOne({ name: opts.name });
-      logger.debug(`found kv model ${r({ model, name: opts.name })}`);
+      logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
         model.formatType = formatType;
@@ -372,13 +372,13 @@ export class KvHelper {
 
   public static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
     if (collection.toUpperCase().startsWith(AsunaCollectionPrefix.SYSTEM)) {
-      await auth(req, res, 'admin');
+      await auth(req, res, AuthType.admin);
     }
   }
 
   public static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
     const value = (await KvHelper.get(kvDef))?.value;
-    return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value });
+    return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value, strategy: 'cache-first' });
   }
 
   private static async getGroupFieldsValueByFieldKV(
@@ -389,7 +389,7 @@ export class KvHelper {
       prefix: 'kv',
       key: kvDef,
       resolver: async () => (await KvHelper.get(kvDef))?.value,
-      strategy: 'cache-only',
+      strategy: 'cache-first',
     });
     if (!fields) return;
 

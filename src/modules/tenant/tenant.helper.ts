@@ -96,8 +96,16 @@ export class TenantHelper {
     return filtered;
   }
 
-  static setup(config: TenantConfig) {
-    return KvHelper.set({ ...this.kvDef, value: _.mapKeys(config, (v, k) => TenantFieldKeys[k] ?? k) });
+  /**
+   * 初始化 Tenant 信息，在没有 admin 界面时进行的整体配置。
+   * @param config
+   */
+  static async setup(config: TenantConfig) {
+    const kv = await KvHelper.get(this.kvDef);
+    return KvHelper.set({
+      ...this.kvDef,
+      value: { ...kv.value, values: _.mapKeys(config, (v, k) => TenantFieldKeys[k] ?? k) },
+    });
   }
 
   static async getConfig(): Promise<TenantConfig> {

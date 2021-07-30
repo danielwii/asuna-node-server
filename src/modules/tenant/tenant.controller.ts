@@ -16,7 +16,7 @@ import type { AnyAuthRequest } from '../helper/interfaces';
 
 const logger = LoggerFactory.getLogger('TenantController');
 
-class RegisterTenantDto {
+export class RegisterTenantDto {
   @IsString() name: string;
   @IsString() @IsOptional() description?: string;
 

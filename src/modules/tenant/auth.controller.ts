@@ -1,7 +1,7 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -32,7 +32,9 @@ export class TenantAuthController extends AbstractAuthController<OrgUser> {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
     }
     // const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
-    const loaded = await this.UserEntity.findOne(payload.uid, {
+    const loaded = await this.UserEntity.findOne({
+      // TODO OrgUser 时没有 uid
+      where: { id: payload.uid ?? payload.id },
       // maybe get relations from a register, cause user side relations won't load here.
       // relations: ['profile'],
     });

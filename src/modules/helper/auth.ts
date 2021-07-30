@@ -2,6 +2,7 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import _ from 'lodash';
 import passport from 'passport';
 
 import { AdminUser } from '../core/auth/auth.entities';
@@ -126,10 +127,17 @@ export class AuthHelper {
   }
 }
 
+export enum AuthType {
+  admin = 'admin',
+  client = 'client',
+  org = 'org',
+  all = 'all',
+}
+
 export async function auth<Payload = PayloadType>(
   req: AnyAuthRequest<Payload>,
   res: Response,
-  type: 'admin' | 'client' | 'all' = 'all',
+  type: AuthType = AuthType.all,
 ): Promise<AuthResult<Payload>> {
   logger.debug(
     `auth ${r({
@@ -137,10 +145,11 @@ export async function auth<Payload = PayloadType>(
       isApiKeyRequest: isApiKeyRequest(req),
       isAdminAuthRequest: isAdminAuthRequest(req),
       isWXAuthRequest: isWXAuthRequest(req),
+      isOrgAuthRequest: isOrgAuthRequest(req),
     })}`,
   );
 
-  if (type !== 'client') {
+  if (_.includes([AuthType.admin, AuthType.all], type)) {
     if (isApiKeyRequest(req)) {
       return (await AuthHelper.authAdminApiKey(req, res)) as any;
     }
@@ -148,17 +157,19 @@ export async function auth<Payload = PayloadType>(
     if (isAdminAuthRequest(req)) {
       return (await AuthHelper.authAdmin(req, res)) as any;
     }
+  }
 
+  if (_.includes([AuthType.org, AuthType.all], type)) {
     if (isOrgAuthRequest(req)) {
       return (await OrgAuthHelper.auth(req, res)) as any;
     }
   }
 
-  if (type !== 'admin') {
+  if (_.includes([AuthType.client, AuthType.all], type)) {
     if (isWXAuthRequest(req)) {
       return (await AuthHelper.authWX(req, res)) as any;
     }
-    return (await AuthHelper.authJwt((req as any) as AnyAuthRequest<JwtPayload, AdminUser>, res)) as any;
+    return (await AuthHelper.authJwt(req as any as AnyAuthRequest<JwtPayload, AdminUser>, res)) as any;
   }
 
   throw new AsunaException(AsunaErrorCode.InvalidCredentials);

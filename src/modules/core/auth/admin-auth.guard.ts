@@ -6,7 +6,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { getIgnoreCase } from '../../common';
-import { auth } from '../../helper';
+import { auth, AuthType } from '../../helper';
 import { AdminUser } from './auth.entities';
 import { API_KEY_HEADER } from './strategy';
 
@@ -29,7 +29,7 @@ export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'admin-jwt auth failed');
     }
 
-    await auth(req, res, 'admin');
+    await auth(req, res, AuthType.admin);
     return req.user;
   }
 }

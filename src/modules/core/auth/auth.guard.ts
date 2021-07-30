@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { auth } from '../../helper/auth';
+import { auth, AuthType } from '../../helper/auth';
 import { AdminUser } from './auth.entities';
 
 import type { Response } from 'express';
@@ -30,14 +30,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   // @ts-ignore
-  public async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
+  public async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext, status) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
     const res = context.switchToHttp().getResponse();
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
         return undefined;
       }
-      // this.logger.warn(`auth error, ${r({ err, payload, info })}`);
+      this.logger.warn(`auth error, ${r({ err, payload, info, status })}`);
       throw err
         ? new AsunaException(AsunaErrorCode.InvalidToken, 'jwt auth failed', _.isError(err) ? err.message : err)
         : new AsunaException(
@@ -47,7 +47,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           );
     }
     this.logger.log(`handleRequest ${r({ err, payload, info })}`);
-    await auth(req, res, 'client');
+    await auth(req, res, AuthType.client);
     return req.user;
   }
 }
