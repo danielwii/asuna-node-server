@@ -1099,7 +1099,7 @@ __metadata:
     "@nestjs/platform-socket.io": ^8.0.5
     "@nestjs/platform-ws": ^8.0.5
     "@nestjs/schedule": ^1.0.1
-    "@nestjs/swagger": ^5.0.8
+    "@nestjs/swagger": ^5.0.9
     "@nestjs/terminus": ^7.2.0
     "@nestjs/testing": ^8.0.5
     "@nestjs/typeorm": ^8.0.1
@@ -1170,7 +1170,7 @@ __metadata:
     dayjs: ^1.10.6
     elastic-apm-node: ^3.18.0
     email-templates: ^8.0.7
-    eslint: ^7.31.0
+    eslint: ^7.32.0
     eslint-config-alloy: ^4.2.0
     eslint-import-resolver-node: ^0.3.4
     eslint-plugin-import: ^2.23.4
@@ -1192,7 +1192,7 @@ __metadata:
     luxon: ^2.0.1
     minimatch: ^3.0.4
     minio: ^7.0.18
-    mongoose: ^5.13.4
+    mongoose: ^5.13.5
     morgan: ^1.10.0
     node-buffs: ^0.8.17
     nodemailer: ^6.6.3
@@ -1211,6 +1211,7 @@ __metadata:
     raw-body: ^2.4.1
     redis-dataloader: ^1.0.2
     response-time: ^2.3.2
+    rxjs: ^7.3.0
     sharp: ^0.28.3
     shortid: ^2.2.16
     socket.io-redis: ^6.1.1
@@ -1220,7 +1221,7 @@ __metadata:
     ts-morph: ^11.0.3
     ts-node: ^10.1.0
     tslib: ^2.3.0
-    typeorm: ^0.2.35
+    typeorm: ^0.2.36
     typescript: ^4.3.5
     xlsx: ^0.17.0
     xml2js: ^0.4.23
@@ -2192,16 +2193,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/swagger@npm:^5.0.8":
-  version: 5.0.8
-  resolution: "@nestjs/swagger@npm:5.0.8"
+"@nestjs/swagger@npm:^5.0.9":
+  version: 5.0.9
+  resolution: "@nestjs/swagger@npm:5.0.9"
   dependencies:
     "@nestjs/mapped-types": 1.0.0
     lodash: 4.17.21
     path-to-regexp: 3.2.0
   peerDependencies:
-    "@nestjs/common": ^6.8.0 || ^7.0.0 || ^8.0.0
-    "@nestjs/core": ^6.8.0 || ^7.0.0 || ^8.0.0
+    "@nestjs/common": ^8.0.0
+    "@nestjs/core": ^8.0.0
     fastify-swagger: "*"
     reflect-metadata: ^0.1.12
     swagger-ui-express: "*"
@@ -2210,7 +2211,7 @@ __metadata:
       optional: true
     swagger-ui-express:
       optional: true
-  checksum: 22aa227fde6515562328bafa9ab678abed3e6236fcd75bf61c053828fc427cd54f7e5a2651f0114428d55411beb8a9056571c74fc7141ead3e1e02a00c740596
+  checksum: 2772b46b75d18670205beeb9b4ade6d248e773df55191b254eb628e5380ce9b18d78ce80bfef9bfa8e630d177e015edcd5594a216dde29061a3fedba06938080
   languageName: node
   linkType: hard
 
@@ -3281,13 +3282,6 @@ __metadata:
   version: 16.3.1
   resolution: "@types/node@npm:16.3.1"
   checksum: 2021138afd66a9235f4b64e412dd8a8d1199f3d17303c2868ab062a10214ba76b793bf4f59e14c3bf981623e099843855776390b445d840779cb171c2fcb97a9
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:14.x || 15.x":
-  version: 15.14.2
-  resolution: "@types/node@npm:15.14.2"
-  checksum: 10982df2b5b6aa995e4ce12feca15262ea5127ff2e98f4558945dc7d5dd2b78eb1d727318d5f3b3003ef1b066c7f7e6b3df45a5b7fb0b859231028fba3212c6b
   languageName: node
   linkType: hard
 
@@ -7232,9 +7226,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^7.31.0":
-  version: 7.31.0
-  resolution: "eslint@npm:7.31.0"
+"eslint@npm:^7.32.0":
+  version: 7.32.0
+  resolution: "eslint@npm:7.32.0"
   dependencies:
     "@babel/code-frame": 7.12.11
     "@eslint/eslintrc": ^0.4.3
@@ -7278,7 +7272,7 @@ __metadata:
     v8-compile-cache: ^2.0.3
   bin:
     eslint: bin/eslint.js
-  checksum: 38c000372bfafc3715da2d2b6db2a75d4b3b95ac2c20696d774185aa5b6118065a37d0a1292eaa91292e07f86d53a0993cf9bfb838a7a9b935524a125e21af98
+  checksum: e25f9159d3b6b7e826b190ebb38accf3ec1513e1811bd7df2e8de83313370d266b8b6a571491a9f092d254fc53b2c5cde14dd2196cf046e22970ef037a4c7f3d
   languageName: node
   linkType: hard
 
@@ -11172,12 +11166,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongoose@npm:5.13.4, mongoose@npm:^5.13.4":
-  version: 5.13.4
-  resolution: "mongoose@npm:5.13.4"
+"mongoose@npm:5.13.5, mongoose@npm:^5.13.5":
+  version: 5.13.5
+  resolution: "mongoose@npm:5.13.5"
   dependencies:
     "@types/mongodb": ^3.5.27
-    "@types/node": 14.x || 15.x
     bson: ^1.1.4
     kareem: 2.3.2
     mongodb: 3.6.10
@@ -11190,7 +11183,7 @@ __metadata:
     safe-buffer: 5.2.1
     sift: 13.5.2
     sliced: 1.0.1
-  checksum: 5426f2f2368933b9e54f72bfd2bba7dfb8d74f093718b173a44532fb7b938dc539d3e96c7ce2fe7e73e37c6e40c52ef03faa0421bc835fe51c08c4eec440c507
+  checksum: 8c8b08da0e089f959131eea708232c30ce3164292646686db2a0c7496c669d5e5151342a76b070b47ff2e9b7cccd5b7edfcc0d171c0b2d7729f7bdfdf8567377
   languageName: node
   linkType: hard
 
@@ -15220,9 +15213,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:^0.2.35":
-  version: 0.2.35
-  resolution: "typeorm@npm:0.2.35"
+"typeorm@npm:^0.2.35, typeorm@npm:^0.2.36":
+  version: 0.2.36
+  resolution: "typeorm@npm:0.2.36"
   dependencies:
     "@sqltools/formatter": ^1.2.2
     app-root-path: ^3.0.0
@@ -15239,7 +15232,7 @@ __metadata:
     tslib: ^2.1.0
     xml2js: ^0.4.23
     yargonaut: ^1.1.4
-    yargs: ^16.2.0
+    yargs: ^17.0.1
     zen-observable-ts: ^1.0.0
   peerDependencies:
     "@sap/hana-client": "*"
@@ -15290,7 +15283,7 @@ __metadata:
       optional: true
   bin:
     typeorm: cli.js
-  checksum: 4179789f700616a5f0730ff13c1e0255ecc13336ef6e24e4f695217a2578d24a783b51348e56ccc7e1d583de6dc70e899831341b1cb242db30a504aba7fc3698
+  checksum: cfb508891b7779b7be67b30c11dec97995e376ca739e4a655e272695eb3d340ec289cc336196e705198e8ad58e417ead39f75c75ec4ce2d980ef65931975db2d
   languageName: node
   linkType: hard
 
@@ -16234,7 +16227,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^16.0.0, yargs@npm:^16.0.3, yargs@npm:^16.2.0":
+"yargs@npm:^16.0.0, yargs@npm:^16.0.3":
   version: 16.2.0
   resolution: "yargs@npm:16.2.0"
   dependencies:
@@ -16246,6 +16239,21 @@ __metadata:
     y18n: ^5.0.5
     yargs-parser: ^20.2.2
   checksum: a79ce1f043021cd645de1ffebb6149541d382ba68f4a6b5eca5d2ad65af51893371bbd78e240dc3b6cf0cbb419511ba5bda715dec992e4266e6863ea49f14feb
+  languageName: node
+  linkType: hard
+
+"yargs@npm:^17.0.1":
+  version: 17.0.1
+  resolution: "yargs@npm:17.0.1"
+  dependencies:
+    cliui: ^7.0.2
+    escalade: ^3.1.1
+    get-caller-file: ^2.0.5
+    require-directory: ^2.1.1
+    string-width: ^4.2.0
+    y18n: ^5.0.5
+    yargs-parser: ^20.2.2
+  checksum: a7969b48d2dea129a7d4fcc3f13e88d4f94bacbd24f720b2ce19946fa9facc42cfed89c059d953091241f4e9e9000ed9dbf86e4bb4b6ceb3a26af10ddebdd0b2
   languageName: node
   linkType: hard
 
