@@ -178,5 +178,6 @@
       "src"
     ],
     "delay": 2.5
-  }
+  },
+  "packageManager": "yarn@3.0.0"
 }
