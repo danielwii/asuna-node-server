@@ -4,18 +4,16 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
-import _ from 'lodash';
-
 import { ClientHelper, SessionUser } from '../client';
 import { SimpleIdGeneratorHelper } from '../ids';
 import { TimeUnit } from './helpers';
 
 import type { CookieOptions, Request, Response } from 'express';
-import type { CommonRequest } from './interface';
+import type { CommonRequest, SignedCookies } from './interface';
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
-  private logger = LoggerFactory.getLogger('IsMobileMiddleware');
+  private readonly logger = LoggerFactory.getLogger('IsMobileMiddleware');
 
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
@@ -26,10 +24,10 @@ export class IsMobileMiddleware implements NestMiddleware {
 
 @Injectable()
 export class DeviceMiddleware implements NestMiddleware {
-  private logger = LoggerFactory.getLogger('DeviceMiddleware');
+  private readonly logger = LoggerFactory.getLogger('DeviceMiddleware');
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
-    const cookies = req.signedCookies;
+    const cookies: SignedCookies = req.signedCookies;
     const sessionId = req.sessionID;
     // const deviceId = req.session.deviceId ?? cookies?.deviceId;
 
@@ -49,8 +47,8 @@ export class DeviceMiddleware implements NestMiddleware {
         }
       } else {
         // 设备还未注册，确保 cookie 中的设备 id
-        if (cookies.deviceId) {
-          req.deviceID = cookies.deviceId;
+        if (cookies['asn.sdid']) {
+          req.deviceID = cookies['asn.sdid'];
         } else {
           const parsedUA = detectUA(req.headers['user-agent']);
           // this.logger.debug(`parsed ua is ${r(parsedUA)}`);
@@ -59,10 +57,10 @@ export class DeviceMiddleware implements NestMiddleware {
             // 通过 SEID 查询 SUID (session user id) 是否存在，SUID 应该仅在 regDevice 时创建
             // 如果 SUID 不存在，查询 cookie 是否被标记（存在 SDID，session device id）
             // SDID 存在于 cookie 中，SEID 存在于 session 中，仅在 regDevice 后持久化在数据库
-            this.logger.debug(`cookies is ${r({ cookies, session: req.session, sessionId })}`);
+            this.logger.debug(`cookies is ${r({ cookies, session: req.session, sessionId, fp })}`);
 
             const id = SimpleIdGeneratorHelper.randomId('vd');
-            this.logger.log(`set device id ${id} for device ${r(parsedUA)}`);
+            this.logger.log(`set device id ${id} temporarily for device ${r(parsedUA)}`);
             req.deviceID = id;
             res.cookie('asn.sdid', id, cookieOptions);
           }
@@ -79,7 +77,7 @@ export class DeviceMiddleware implements NestMiddleware {
 
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
-  private logger = LoggerFactory.getLogger('LandingUrlMiddleware');
+  private readonly logger = LoggerFactory.getLogger('LandingUrlMiddleware');
 
   public use(req: Request & CommonRequest, res: Response, next: () => void): any {
     if (!req.session?.landingUrl) {

@@ -1,4 +1,4 @@
-import { AuthUserChannel } from './base.entities';
+import type { AuthUserChannel } from './base.entities';
 
 export type JwtPayload = {
   /**

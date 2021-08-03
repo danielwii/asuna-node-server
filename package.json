@@ -51,7 +51,7 @@
     "ali-oss": "^6.16.0",
     "alipay-sdk": "^3.1.6",
     "amqplib": "^0.8.0",
-    "apollo-opentracing": "^2.1.16",
+    "apollo-opentracing": "^2.1.17",
     "apollo-server-cache-redis": "^1.5.0",
     "apollo-server-express": "^2.25.2",
     "apollo-server-plugin-response-cache": "^0.9.0",
@@ -109,7 +109,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@nestjs/cli": "^8.1.0",
+    "@nestjs/cli": "^8.1.1",
     "@nestjs/testing": "^8.0.5",
     "@trivago/prettier-plugin-sort-imports": "patch:@trivago/prettier-plugin-sort-imports@2.0.2#.yarn/patches/prettier-patch.diff",
     "@types/ali-oss": "^6",
@@ -150,8 +150,8 @@
     "@types/ua-parser-js": "^0",
     "@types/uuid": "^8",
     "@types/xml2js": "^0",
-    "@typescript-eslint/eslint-plugin": "^4.28.5",
-    "@typescript-eslint/parser": "^4.28.5",
+    "@typescript-eslint/eslint-plugin": "^4.29.0",
+    "@typescript-eslint/parser": "^4.29.0",
     "eslint": "^7.32.0",
     "eslint-config-alloy": "^4.2.0",
     "eslint-import-resolver-node": "^0.3.4",
