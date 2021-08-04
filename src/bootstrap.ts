@@ -114,10 +114,20 @@ export async function bootstrap(appModule, options: BootstrapOptions): Promise<N
   // setup application
   // --------------------------------------------------------------
 
+  /*
+  https://github.com/expressjs/cors#configuration-options
+  https://github.com/expressjs/cors#configuring-cors-asynchronously
+    不要盲目反射 Origin 头
+    严格校验 Origin 头，避免出现权限泄露
+    不要配置 Access-Control-Allow-Origin: null
+    HTTPS 网站不要信任 HTTP 域
+    不要信任全部自身子域，减少攻击面
+    不要配置 Origin:* 和 Credentials: true，CORS 规定无法同时使用
+    增加 Vary: Origin 头来区分不同来源的缓存
+   */
   const corsOptions: CorsOptions | CorsOptionsDelegate<any> = {
     credentials: true,
-    origin: true,
-    // origin: '*',
+    origin: true, // reflect from req.header('Origin') TODO dynamic from a function with whitelist
     // allowedHeaders: '*',
     // methods: '*',
   };

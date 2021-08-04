@@ -1,14 +1,17 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { AnyAuthRequest } from '../helper';
 import { OrgAuthHelper } from './auth';
 import { OrgUser } from './tenant.entities';
 
-import type { JwtAuthRequest, JwtPayload } from '../core';
+import type { JwtPayload } from '../core';
+
+export type OrgJwtAuthRequest = AnyAuthRequest<JwtPayload, OrgUser>;
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
@@ -20,7 +23,7 @@ export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
 
   // @ts-ignore
   public async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest<JwtAuthRequest<OrgUser>>();
+    const req = context.switchToHttp().getRequest<OrgJwtAuthRequest>();
     const res = context.switchToHttp().getResponse();
     if (err || !payload) {
       if (this.opts.anonymousSupport) {
