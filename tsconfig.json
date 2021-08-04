@@ -20,9 +20,10 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "incremental": true,
+    "composite": true,
     "allowJs": true,
-    "outDir": "./dist",
-    "baseUrl": "src"
+    "rootDir": "src",
+    "outDir": "./dist"
   },
   "include": ["src/**/*.*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts", "./dist"]
