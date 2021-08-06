@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/node';
+import * as Tracing from '@sentry/tracing';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
@@ -46,7 +47,11 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     if (sentryConfig.enable) {
       const { dsn } = sentryConfig;
       logger.log(`[onInit] sentry ... ${dsn}`);
-      Sentry.init({ dsn, debug: configLoader.loadConfig(ConfigKeys.DEBUG) });
+      Sentry.init({
+        dsn,
+        debug: configLoader.loadConfig(ConfigKeys.DEBUG),
+        integrations: [new Tracing.Integrations.Mysql()],
+      });
 
       // The request handler must be the first middleware on the app
       app.use(Sentry.Handlers.requestHandler());
@@ -79,8 +84,11 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
 
     AccessControlHelper.init();
 
+    process.on('SIGTERM', function onSigterm() {
+      logger.log('Got signal SIGTERM. Graceful shutdown start', new Date().toISOString());
+    });
     process.on('SIGINT', () => {
-      logger.log(`signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`);
+      logger.log(`Got signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`);
       Promise.all(
         _.map(LifecycleRegister.exitProcessors, (processor, resource) => {
           logger.log(`Run exit processor: ${resource}`);

@@ -15,9 +15,14 @@ export class DBCacheCleaner {
   }
 
   public static clear(name: string): void {
-    const triggers = _.flow([fp.filter(({ Entity }) => Entity.name === name), fp.map(fp.get('trigger'))])(
-      this.registers,
-    );
+    const triggers = _.flow([
+      fp.filter(({ Entity, trigger }) => {
+        if (!Entity) logger.error(`no entity found for trigger: ${trigger}.`);
+        return !!Entity;
+      }),
+      fp.filter(({ Entity }) => Entity.name === name),
+      fp.map(fp.get('trigger')),
+    ])(this.registers);
     if (!_.isEmpty(triggers)) {
       logger.debug(`clear ${r(triggers)}`);
       getConnection()

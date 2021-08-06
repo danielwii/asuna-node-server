@@ -1,5 +1,7 @@
-import { ClassSerializerInterceptor, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import * as Sentry from '@sentry/node';
+
+import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
@@ -23,7 +25,7 @@ import { getConnectionOptions } from 'typeorm';
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
 import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, SimpleLoggerService } from './modules/common';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
 import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';
@@ -37,7 +39,13 @@ import type { LogLevel } from '@nestjs/common/services/logger.service';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
-export async function bootstrap(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
+export const bootstrap = (appModule, options: BootstrapOptions) =>
+  run(appModule, options).catch((reason) => {
+    console.error(reason?.message, reason?.stack);
+    Sentry.captureException(reason);
+  });
+
+export async function run(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
   Object.assign(options, _.merge({ loadDefaultModule: true }, options));
   validateOptions(options);
