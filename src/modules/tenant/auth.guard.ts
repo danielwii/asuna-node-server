@@ -15,7 +15,7 @@ export type OrgJwtAuthRequest = AnyAuthRequest<JwtPayload, OrgUser>;
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
-  private logger = LoggerFactory.getLogger('JwtAuthGuard');
+  private logger = LoggerFactory.getLogger('OrgJwtAuthGuard');
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();

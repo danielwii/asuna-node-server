@@ -50,7 +50,11 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       Sentry.init({
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
-        integrations: [new Tracing.Integrations.Mysql()],
+        integrations: [
+          new Tracing.Integrations.Mysql(),
+          // enable HTTP calls tracing
+          new Sentry.Integrations.Http({ tracing: true }),
+        ],
       });
 
       // The request handler must be the first middleware on the app

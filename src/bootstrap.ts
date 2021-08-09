@@ -39,11 +39,16 @@ import type { LogLevel } from '@nestjs/common/services/logger.service';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
-export const bootstrap = (appModule, options: BootstrapOptions) =>
-  run(appModule, options).catch((reason) => {
+export const bootstrap = (appModule, options: BootstrapOptions) => {
+  const logger = LoggerFactory.getLogger('bootstrap');
+  process.on('unhandledRejection', (reason, p) =>
+    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
+  );
+  return run(appModule, options).catch((reason) => {
     console.error(reason?.message, reason?.stack);
     Sentry.captureException(reason);
   });
+};
 
 export async function run(appModule, options: BootstrapOptions): Promise<NestExpressApplication> {
   const startAt = Date.now();
@@ -53,10 +58,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   // eslint-disable-next-line
   require('events').EventEmitter.defaultMaxListeners = 15;
 
-  const logger = LoggerFactory.getLogger('bootstrap');
-  process.on('unhandledRejection', (reason, p) =>
-    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
-  );
+  const logger = LoggerFactory.getLogger('run');
 
   logger.log(`options: ${r(options)}`);
 
