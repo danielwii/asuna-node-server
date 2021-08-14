@@ -2,7 +2,7 @@ import { Column, Entity } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
 import { EntityMetaInfo } from '../../common/decorators';
-import { InjectMultiUserProfile } from '../auth';
+import { InjectMultiUserProfile } from '../auth/user.entities';
 
 @EntityMetaInfo({
   name: 'user__activities',
