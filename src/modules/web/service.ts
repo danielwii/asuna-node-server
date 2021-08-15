@@ -1,15 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Model } from 'mongoose';
+import { LoggerFactory, r } from '@danielwii/asuna-helper';
+
+import { FilterQuery, Model } from 'mongoose';
+import ow from 'ow';
 
 import { PageViewDocument, PageView } from './schema';
+
+const logger = LoggerFactory.getLogger('WebService');
 
 @Injectable()
 export class WebService {
   public constructor(@InjectModel(PageView.name) private readonly pageViewModel: Model<PageViewDocument>) {}
+
   public addPageView(view: PageView): Promise<PageView> {
     const created = new this.pageViewModel(view);
     return created.save();
+  }
+
+  public async loadPageViews(suid: string): Promise<PageView[]> {
+    ow(suid, 'suid', ow.string.nonEmpty);
+    const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
+    logger.log(`loadPageViews ${r({ suid, filter })}`);
+    return this.pageViewModel.find(filter).sort({ at: -1 }).limit(6).exec();
   }
 }
