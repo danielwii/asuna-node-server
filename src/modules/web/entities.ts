@@ -4,9 +4,9 @@ import { NoPrimaryKeyBaseEntity } from '../base';
 import { VirtualSession } from '../client';
 import { EntityMetaInfo, MetaInfo } from '../common';
 
-@EntityMetaInfo({ name: 'web_tracing_records', internal: true })
-@Entity('web__t_tracing_records')
-export class WebTracingRecord extends NoPrimaryKeyBaseEntity {
+@EntityMetaInfo({ name: 'web_page_views', internal: true })
+@Entity('web__t_page_views')
+export class WebPageView extends NoPrimaryKeyBaseEntity {
   // --------------------------------------------------------------
   // Optional
   // --------------------------------------------------------------

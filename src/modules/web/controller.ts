@@ -1,17 +1,27 @@
-import { Controller, Post, Query, Body, Req } from '@nestjs/common';
+import { Body, Controller, Post, Query, Req } from '@nestjs/common';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
-import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
-import type { AnyAuthRequest } from '../helper';
+import { Builder } from 'builder-pattern';
+import _ from 'lodash';
+
+import { PageView } from './schema';
+import { WebService } from './service';
+
+import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('WebController');
 
 @Controller('api/v1/web')
 export class WebController {
+  public constructor(private readonly webService: WebService) {}
+
   @Post('page-view')
-  public async pageView(@Query() query, @Body() body, @Req() req: AnyAuthRequest): Promise<void> {
+  public async pageView(@Query() query, @Body() body, @Req() req: RequestInfo): Promise<void> {
+    // const { user, scid } = req;
+    // logger.log(`pageView ${r({ user, scid })}`);
+
     const tracing: any = {};
     tracing.query = query;
     tracing.body = body;
@@ -27,7 +37,15 @@ export class WebController {
     const ua = req.headers['user-agent'];
     tracing.ua = ua;
     tracing.parsed = detectUA(ua);
+    tracing.isMobile = tracing.parsed.isMobile;
+    tracing.isBrowser = tracing.parsed.isBrowser;
+    tracing.isUnknown = tracing.parsed.isUnknown;
 
-    logger.log(`tracing ${r(tracing)}`);
+    // logger.log(`tracing ${r(tracing)}`);
+    const at = _.isNumber(Number(query.at)) ? new Date(Number(query.at)) : new Date();
+    const view = Builder<PageView>(tracing).href(body.href).title(body.title).at(at).build();
+    // logger.verbose(`page view is ${r(view)}`);
+    await this.webService.addPageView(view);
+    return;
   }
 }

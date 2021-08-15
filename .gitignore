@@ -22,3 +22,5 @@ database.db
 !.yarn/patches
 .clinic/
 /documentation
+tsconfig.tsbuildinfo
+.dcignore
