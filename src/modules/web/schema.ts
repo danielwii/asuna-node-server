@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-import { Document } from 'mongoose';
+import * as mongoose from 'mongoose';
+
+import type { Document } from 'mongoose';
+import type { Lookup } from 'geoip-lite';
 
 export type PageViewDocument = PageView & Document;
 
@@ -32,6 +35,10 @@ export class PageView {
   isBrowser: boolean;
   @Prop()
   isUnknown: boolean;
+  @Prop({ type: mongoose.Schema.Types.Mixed })
+  geo: Lookup;
+  @Prop()
+  address: string;
   @Prop()
   at: Date;
 }

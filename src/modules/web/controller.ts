@@ -1,9 +1,11 @@
 import { Body, Controller, Post, Query, Req } from '@nestjs/common';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
 import { Builder } from 'builder-pattern';
+import geoip from 'geoip-lite';
 import _ from 'lodash';
 
 import { PageView } from './schema';
@@ -26,6 +28,9 @@ export class WebController {
     tracing.query = query;
     tracing.body = body;
     tracing.clientIp = req.clientIp;
+
+    const geo = geoip.lookup(req.clientIp);
+    tracing.geo = geo;
     tracing.session = req.session;
     tracing.landingUrl = req.session.landingUrl;
     tracing.referer = req.session.referer;
@@ -43,8 +48,18 @@ export class WebController {
 
     // logger.log(`tracing ${r(tracing)}`);
     const at = _.isNumber(Number(query.at)) ? new Date(Number(query.at)) : new Date();
-    const view = Builder<PageView>(tracing).href(body.href).title(body.title).at(at).build();
-    // logger.verbose(`page view is ${r(view)}`);
+    const view = Builder(PageView, tracing)
+      .href(body.href)
+      .title(body.title)
+      .address(
+        _.chain(geo ? geo.city + ', ' + geo.country : '')
+          .trim()
+          .trim(',')
+          .trim()
+          .value(),
+      )
+      .at(at)
+      .build();
     await this.webService.addPageView(view);
     return;
   }
