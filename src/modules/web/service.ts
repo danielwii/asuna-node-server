@@ -3,10 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { LoggerFactory, r } from '@danielwii/asuna-helper';
 
+import _ from 'lodash';
 import { FilterQuery, Model } from 'mongoose';
 import ow from 'ow';
 
-import { PageViewDocument, PageView } from './schema';
+import { PageView, PageViewDocument } from './schema';
 
 const logger = LoggerFactory.getLogger('WebService');
 
@@ -24,5 +25,11 @@ export class WebService {
     const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
     logger.log(`loadPageViews ${r({ suid, filter })}`);
     return this.pageViewModel.find(filter).sort({ at: -1 }).limit(6).exec();
+  }
+
+  public async loadEarliestPageView(suid: string): Promise<PageView> {
+    ow(suid, 'suid', ow.string.nonEmpty);
+    const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
+    return this.pageViewModel.find(filter).sort({ at: 1 }).limit(1).exec().then(_.first);
   }
 }
