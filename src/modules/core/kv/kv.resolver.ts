@@ -17,7 +17,7 @@ import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 export class KvQueryResolver {
   private logger = LoggerFactory.getLogger('KvQueryResolver');
 
-  @Query()
+  @Query((returns) => KeyValuePair)
   public async kv(
     @Args('collection') collection: string,
     @Args('key') key: string,
@@ -28,7 +28,7 @@ export class KvQueryResolver {
     return KvHelper.get({ collection, key });
   }
 
-  @Query()
+  @Query((returns) => [KeyValuePair])
   public async kvs(@Args('collection') collection: string, @Context() ctx): Promise<KeyValuePair[]> {
     this.logger.log(`kvs: ${r({ collection })}`);
     await KvHelper.auth(ctx, { collection });
@@ -36,7 +36,7 @@ export class KvQueryResolver {
   }
 
   @UseGuards(GqlAdminAuthGuard)
-  @Query()
+  @Query((returns) => [KeyValueModel])
   public async kv_models(@Context() ctx: GraphqlContext): Promise<KeyValueModel[]> {
     return KeyValueModel.find();
   }
@@ -46,7 +46,7 @@ export class KvQueryResolver {
 export class KeyValueModelResolver {
   private logger = LoggerFactory.getLogger('KeyValueModelResolver');
 
-  @ResolveField()
+  @ResolveField((returns) => KeyValuePair)
   public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {
     const { keyValuePairs: loader } = ctx.getDataLoaders();
     this.logger.debug(`load pair for ${model.id}`);

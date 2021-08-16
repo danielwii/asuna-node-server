@@ -2,6 +2,7 @@ import * as Sentry from '@sentry/node';
 
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
@@ -24,9 +25,26 @@ import { getConnectionOptions } from 'typeorm';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
+import {
+  AppUpgradeMode,
+  Platform,
+  Mode,
+  NotificationEnum,
+  NotificationEnumValue,
+  Order,
+  KVModelFormatType,
+  KeyValueType,
+  ExchangeCurrencyEnum,
+} from './modules';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
 import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
+import {
+  FeedbackSenderEnum,
+  FeedbackSenderEnumValue,
+  FeedbackStatusEnum,
+  FeedbackStatusEnumValue,
+} from './modules/content/enum-values';
 import { AsunaContext, Global } from './modules/core';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
@@ -44,6 +62,28 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   process.on('unhandledRejection', (reason, p) =>
     logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
   );
+
+  // https://docs.nestjs.com/graphql/unions-and-enums#unions
+  registerEnumType(NotificationEnum, {
+    name: 'NotificationEnum',
+    description: JSON.stringify(NotificationEnumValue.data),
+  });
+  registerEnumType(FeedbackStatusEnum, {
+    name: 'FeedbackStatusEnum',
+    description: JSON.stringify(FeedbackStatusEnumValue.data),
+  });
+  registerEnumType(FeedbackSenderEnum, {
+    name: 'FeedbackSenderEnum',
+    description: JSON.stringify(FeedbackSenderEnumValue.data),
+  });
+  registerEnumType(Mode, { name: 'Mode' });
+  registerEnumType(AppUpgradeMode, { name: 'AppUpgradeMode' });
+  registerEnumType(Platform, { name: 'Platform' });
+  registerEnumType(Order, { name: 'Order' });
+  registerEnumType(KVModelFormatType, { name: 'KVModelFormatType' });
+  registerEnumType(KeyValueType, { name: 'KeyValueType' });
+  registerEnumType(ExchangeCurrencyEnum, { name: 'ExchangeCurrencyEnum' });
+
   return run(appModule, options).catch((reason) => {
     console.error(reason?.message, reason?.stack);
     Sentry.captureException(reason);

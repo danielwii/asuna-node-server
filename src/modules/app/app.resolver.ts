@@ -1,4 +1,4 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -8,15 +8,21 @@ import { emptyPage, Pageable, toPage } from '../core/helpers/page.helper';
 import { PageRequestInput } from '../graphql/input';
 import { AppInfo, AppRelease } from './app.entities';
 
+@ObjectType({ implements: () => [Pageable] })
+class AppReleasePageable extends Pageable<AppRelease> {
+  @Field((returns) => [AppRelease])
+  items: AppRelease[];
+}
+
 @Resolver()
 export class AppQueryResolver {
   private logger = LoggerFactory.getLogger('AppQueryResolver');
 
-  @Query()
+  @Query((returns) => AppReleasePageable)
   public async app_releases(
     @Args('key') key: string,
-    @Args({ name: 'pageRequest', type: () => PageRequestInput }) pageRequest,
-  ): Promise<Pageable<AppRelease>> {
+    @Args('pageRequest', { type: () => PageRequestInput }) pageRequest,
+  ): Promise<AppReleasePageable> {
     const pageInfo = toPage(pageRequest);
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     if (!appInfo) return emptyPage(pageInfo);
@@ -31,7 +37,7 @@ export class AppQueryResolver {
     return { ...pageInfo, items, total };
   }
 
-  @Query()
+  @Query((returns) => AppRelease)
   public async app_latestRelease(@Args('key') key: string): Promise<AppRelease> {
     this.logger.log(`app_latestRelease: ${r({ key })}`);
 
@@ -39,7 +45,7 @@ export class AppQueryResolver {
     return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' }, cache: CacheTTL.FLASH });
   }
 
-  @Query()
+  @Query((returns) => AppInfo)
   public async app_info(@Args('key') key: string): Promise<AppInfo> {
     this.logger.log(`app_info: ${r({ key })}`);
 

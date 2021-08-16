@@ -10,7 +10,6 @@ import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import GraphQLJSON from 'graphql-type-json';
 import * as _ from 'lodash';
 import * as path from 'path';
 
@@ -56,12 +55,12 @@ export class GraphqlModule implements OnModuleInit {
           //   path: join(process.cwd(), 'src/graphql.generated.ts'),
           //   outputAs: 'class',
           // },
-          typePaths,
-          // autoSchemaFile: 'schema.gql',
+          // typePaths,
+          autoSchemaFile: 'auto-schema.gql',
           // autoSchemaFile: true,
-          // sortSchema: true,
+          sortSchema: true,
           installSubscriptionHandlers: true,
-          resolvers: { JSON: GraphQLJSON },
+          // resolvers: { JSON: GraphQLJSON },
           playground: config.playground_enable,
           debug: config.debug,
           introspection: config.playground_enable || config.debug,

@@ -37,6 +37,7 @@ import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
 import { PropertyModule } from './property';
+import { MongoConfigObject } from './providers';
 import {
   AdminAppRestController,
   AdminAuthRestController,
@@ -57,6 +58,8 @@ import { WebModule } from './web';
 
 const logger = LoggerFactory.getLogger('AdminInternalModule');
 
+const config = MongoConfigObject.load();
+
 @Module({
   imports: _.compact([
     DynamicRouterModule,
@@ -76,7 +79,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     ImportExportModule,
     TenantModule,
     PropertyModule,
-    WebModule,
+    config.enable ? WebModule : undefined,
     SMSModule,
     TracingModule,
     CacheModule.registerAsync({

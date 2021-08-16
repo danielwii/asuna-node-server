@@ -1,8 +1,17 @@
-import { Query, Resolver } from '@nestjs/graphql';
+import { Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
+import { resolvers as scalars } from 'graphql-scalars';
+
 import { DBHelper, DBService } from '../core/db';
+
+@ObjectType()
+class ModelSchemas {
+  @Field({ nullable: true }) name: string;
+  @Field() internal: boolean;
+  @Field((returns) => scalars.JSONObject) schema: JSON;
+}
 
 @Resolver()
 export class SchemaQueryResolver {
@@ -10,7 +19,7 @@ export class SchemaQueryResolver {
 
   constructor(private readonly dbService: DBService) {}
 
-  @Query()
+  @Query((returns) => ModelSchemas)
   sys_modelSchemas() {
     return this.dbService.repos().map((repository) => {
       const { name, internal } = (repository.metadata.target as any).entityInfo;

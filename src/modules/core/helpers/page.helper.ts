@@ -1,3 +1,5 @@
+import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
+
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
 import { Promise } from 'bluebird';
@@ -79,13 +81,20 @@ export class PageHelper {
   }
 }
 
+@InterfaceType()
 export class Pageable<T> {
+  @Field()
   total: number;
+  @Field()
   pageNumber: number;
+  @Field()
   pageIndex: number;
 
+  @Field()
   page: number;
+  @Field()
   size: number;
+  // @Field()
   items: T[];
 }
 

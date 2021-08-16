@@ -17,13 +17,13 @@ export class UserProfileQueryResolver {
   private logger = LoggerFactory.getLogger('UserProfileQueryResolver');
 
   @UseGuards(new GqlWXAuthGuard())
-  @Query()
+  @Query((returns) => UserProfile)
   public async user_profile(@Context() ctx: GraphqlContext): Promise<UserProfile> {
     return UserProfile.findOne(ctx.getCurrentUser().id);
   }
 
   @UseGuards(new GqlAdminAuthGuard())
-  @Query()
+  @Query((returns) => UserProfile)
   public async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext): Promise<UserProfile> {
     const { profiles: loader } = ctx.getDataLoaders();
     return loader.load(id);
@@ -34,7 +34,7 @@ export class UserProfileQueryResolver {
 export class UserProfileResolver {
   private logger = LoggerFactory.getLogger('UserProfileResolver');
 
-  @ResolveField()
+  @ResolveField((returns) => WXMiniAppUserInfo)
   public async miniAppUserInfo(
     @Root() profile: UserProfile,
     @Context() ctx: GraphqlContext,
@@ -49,7 +49,7 @@ export class UserProfileResolver {
     });
   }
 
-  @ResolveField()
+  @ResolveField((returns) => Wallet)
   public wallet(@Root() profile: UserProfile) {
     return GraphqlHelper.resolveProperty_DO_NOT_USE<UserProfile, Wallet>({
       cls: UserProfile,

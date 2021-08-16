@@ -1,3 +1,5 @@
+import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
+
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
@@ -9,6 +11,7 @@ import type { FinancialTransaction, PointExchange, Wallet } from '../../property
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';
 
+@ObjectType({ implements: () => [AbstractTimeBasedAuthUser] })
 @EntityMetaInfo({ name: 'user__profiles', internal: true })
 @Entity('user__t_profiles')
 export class UserProfile extends AbstractTimeBasedAuthUser {
@@ -45,7 +48,9 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
 }
 
 export const InjectUserProfile = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
+  @InterfaceType()
   class ExtendableEntity extends Base {
+    @Field({ nullable: true })
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })
     profileId?: string;
@@ -60,7 +65,9 @@ export const InjectUserProfile = <TBase extends ConstrainedConstructor<BaseEntit
 };
 
 export const InjectMultiUserProfile = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
+  @InterfaceType()
   class ExtendableEntity extends Base {
+    @Field({ nullable: true })
     @MetaInfo({ accessible: 'hidden' })
     @Column({ nullable: true, length: 36, name: 'profile__id' })
     profileId?: string;

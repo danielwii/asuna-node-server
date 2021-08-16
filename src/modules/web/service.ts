@@ -13,10 +13,10 @@ const logger = LoggerFactory.getLogger('WebService');
 
 @Injectable()
 export class WebService {
-  public constructor(@InjectModel(PageView.name) private readonly pageViewModel: Model<PageViewDocument>) {}
+  public constructor(@InjectModel(PageView.name) private readonly PageViewModel: Model<PageViewDocument>) {}
 
   public addPageView(view: PageView): Promise<PageView> {
-    const created = new this.pageViewModel(view);
+    const created = new this.PageViewModel(view);
     return created.save();
   }
 
@@ -24,12 +24,12 @@ export class WebService {
     ow(suid, 'suid', ow.string.nonEmpty);
     const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
     logger.log(`loadPageViews ${r({ suid, filter })}`);
-    return this.pageViewModel.find(filter).sort({ at: -1 }).limit(6).exec();
+    return this.PageViewModel.find(filter).sort({ at: -1 }).limit(6).exec();
   }
 
   public async loadEarliestPageView(suid: string): Promise<PageView> {
     ow(suid, 'suid', ow.string.nonEmpty);
     const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
-    return this.pageViewModel.find(filter).sort({ at: 1 }).limit(1).exec().then(_.first);
+    return this.PageViewModel.find(filter).sort({ at: 1 }).limit(1).exec().then(_.first);
   }
 }

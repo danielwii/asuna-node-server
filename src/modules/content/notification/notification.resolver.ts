@@ -1,4 +1,4 @@
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, ID, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -21,15 +21,18 @@ export class NotificationQueryResolver extends QueryResolver {
     super(Notification);
   }
 
-  @Query()
-  public async api_notification(@Args('id') id: number, @Context() ctx: GraphqlContext): Promise<MixedNotification> {
+  @Query((returns) => MixedNotification)
+  public async api_notification(
+    @Args('id', { type: () => ID }) id: number,
+    @Context() ctx: GraphqlContext,
+  ): Promise<MixedNotification> {
     this.logger.log(`api_notification: ${r({ id })}`);
     const { notifications: loader } = ctx.getDataLoaders();
     const origin = await loader.load(id);
     return NotificationHelper.loadMixedNotification(origin);
   }
 
-  @Query()
+  @Query((returns) => [MixedNotification])
   public async api_notifications(
     @Args('type') type: NotificationType,
     @Args('usage') usage: string,

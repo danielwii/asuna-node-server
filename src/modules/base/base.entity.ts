@@ -1,3 +1,5 @@
+import { Field, ID, InterfaceType, ObjectType } from '@nestjs/graphql';
+
 import {
   AfterLoad,
   BaseEntity,
@@ -25,11 +27,14 @@ export type EntityConstructorObject<Entity> = Omit<
   keyof typeof BaseEntity | 'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
 >;
 
+@ObjectType()
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
+  @Field()
   @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;
 
+  @Field()
   @Index()
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt?: Date;
@@ -48,22 +53,30 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
   }
 }
 
+@InterfaceType()
 export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
-  @PrimaryGeneratedColumn() public id?: number;
+  @Field((returns) => ID)
+  @PrimaryGeneratedColumn()
+  public id?: number;
 }
 
 /**
  * 生成基于时间的 id，prefix 可以作为一个特殊的前缀用于识别不同的类型
  */
+@InterfaceType()
 export class AbstractTimeBasedBaseEntity extends BaseEntity {
   readonly #idPrefix: string;
   readonly #generator: SimpleIdGenerator;
 
-  @PrimaryColumn('varchar', { length: 36 }) public id?: string;
+  @Field((returns) => ID)
+  @PrimaryColumn('varchar', { length: 36 })
+  public id?: string;
 
+  @Field()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;
 
+  @Field()
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt?: Date;
 
@@ -90,6 +103,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
 
 export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTimeBasedBaseEntity) {}
 
+@InterfaceType({ implements: () => [AbstractBaseEntity] })
 export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {}
 
 export class AbstractUUIDBaseEntity extends BaseEntity {

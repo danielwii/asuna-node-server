@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,8 +17,8 @@
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "yarn clean && yarn tsc",
-    "dev": "node -r ts-node/register src/dev.ts",
-    "dev:watch": "nodemon --exec node -r ts-node/register src/dev.ts",
+    "dev": "node --preserve-symlinks -r ts-node/register src/dev.ts",
+    "dev:watch": "nodemon --exec node --preserve-symlinks -r ts-node/register src/dev.ts",
     "test": "ENV=test jest",
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
@@ -36,7 +36,7 @@
     "@nestjs/core": "^8.0.6",
     "@nestjs/cqrs": "^8.0.0",
     "@nestjs/graphql": "^8.0.2",
-    "@nestjs/mongoose": "^8.0.0",
+    "@nestjs/mongoose": "^8.0.1",
     "@nestjs/passport": "^8.0.1",
     "@nestjs/platform-express": "^8.0.6",
     "@nestjs/platform-socket.io": "^8.0.6",
@@ -76,6 +76,7 @@
     "fs-extra": "^10.0.0",
     "geoip-lite": "^1.4.2",
     "graphql": "^15.5.1",
+    "graphql-scalars": "^1.10.0",
     "graphql-tools": "^8.1.0",
     "graphql-type-json": "^0.3.2",
     "handlebars": "^4.7.7",
@@ -83,6 +84,7 @@
     "highland": "^2.13.5",
     "jaeger-client": "^3.18.1",
     "jsondiffpatch": "^0.4.1",
+    "lodash": "^4.17.21",
     "lru_map": "^0.4.1",
     "luxon": "^2.0.2",
     "minio": "^7.0.18",
@@ -113,7 +115,7 @@
   "devDependencies": {
     "@nestjs/cli": "^8.1.1",
     "@nestjs/testing": "^8.0.6",
-    "@trivago/prettier-plugin-sort-imports": "patch:@trivago/prettier-plugin-sort-imports@2.0.2#.yarn/patches/prettier-patch.diff",
+    "@trivago/prettier-plugin-sort-imports": "git+https://github.com/danielwii/prettier-plugin-sort-imports.git#main",
     "@tsconfig/node14": "^1.0.1",
     "@types/ali-oss": "^6",
     "@types/amqplib": "^0",
@@ -135,6 +137,7 @@
     "@types/highland": "^2",
     "@types/jaeger-client": "^3",
     "@types/jest": "^27",
+    "@types/lodash": "^4",
     "@types/luxon": "^2",
     "@types/mime-types": "^2",
     "@types/minio": "^7",
@@ -185,5 +188,5 @@
     ],
     "delay": 2.5
   },
-  "packageManager": "yarn@3.0.0"
+  "packageManager": "yarn@3.0.1"
 }

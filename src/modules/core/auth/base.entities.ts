@@ -1,8 +1,10 @@
+import { Field, InterfaceType } from '@nestjs/graphql';
+
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
 
-import { MetaInfo } from '../../common/decorators';
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base/base.entity';
+import { MetaInfo } from '../../common/decorators';
 
 import type { UserProfile } from './user.entities';
 
@@ -12,7 +14,9 @@ export enum AuthUserChannel {
   quickpass = 'quickpass',
 }
 
+@InterfaceType({ implements: () => [AbstractTimeBasedBaseEntity] })
 export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
+  @Field()
   @MetaInfo({ name: '用户名' })
   @IsString()
   @Column({ nullable: false, length: 50, unique: true })
@@ -22,12 +26,14 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   // Optional
   // --------------------------------------------------------------
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
   @IsOptional()
   @Column({ nullable: true, length: 50, unique: true })
   email?: string;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '昵称' })
   @IsString()
   @IsOptional()
@@ -35,12 +41,14 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   nickname?: string;
 
   // https://api.adorable.io/avatars/64/{id}.png
+  @Field({ nullable: true })
   @MetaInfo({ name: '头像', type: 'Image' })
   @IsString()
   @IsOptional()
   @Column({ nullable: true, name: 'portrait' })
   portrait?: string;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '渠道', type: 'Enum', enumData: AuthUserChannel })
   @IsString()
   @IsOptional()
@@ -59,14 +67,17 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   @Column({ nullable: true, select: false })
   salt?: string;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '最后获取登录凭证时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_signed_at' })
   lastSignedAt?: Date;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '最后登录时间', accessible: 'readonly' })
   @Column({ nullable: true, name: 'last_login_at' })
   lastLoginAt?: Date;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '描述' })
   @IsString()
   @IsOptional()
@@ -77,10 +88,12 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   // Status
   // --------------------------------------------------------------
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '是否启用？' })
   @Column({ nullable: true, name: 'is_active' })
   isActive?: boolean;
 
+  @Field({ nullable: true })
   @MetaInfo({ name: '是否被绑定', help: 'quickpass 模式时被 reset' })
   @Column({ nullable: true, name: 'is_bound', default: false })
   isBound?: boolean;

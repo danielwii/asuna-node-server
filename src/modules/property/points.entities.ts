@@ -1,3 +1,5 @@
+import { ObjectType } from '@nestjs/graphql';
+
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Column, Entity } from 'typeorm';
@@ -14,6 +16,7 @@ export const HermesPointChangeEventKeys = { pointsChange: 'user.points.change' }
 /**
  * UserPointChangeRecord
  */
+@ObjectType({ implements: () => [AbstractTransactionEntity] })
 @EntityMetaInfo({ name: 'point_exchanges', internal: true })
 @Entity('property__t_point_exchanges')
 export class PointExchange<Body = any> extends InjectMultiUserProfile(AbstractTransactionEntity) {

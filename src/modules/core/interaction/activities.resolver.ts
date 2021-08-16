@@ -13,9 +13,9 @@ import type { GraphqlContext } from '../../dataloader';
 export class ActivitiesResolver {
   private logger = LoggerFactory.getLogger('ActivitiesResolver');
 
-  @ResolveField()
-  public async profile(@Root() activity: UserActivity, @Context() ctx: GraphqlContext): Promise<UserProfile> {
-    const { profiles: loader } = ctx.getDataLoaders();
-    return loader.load(activity.profileId);
-  }
+  // @ResolveField((returns) => UserProfile)
+  // public async profile(@Root() activity: UserActivity, @Context() ctx: GraphqlContext): Promise<UserProfile> {
+  //   const { profiles: loader } = ctx.getDataLoaders();
+  //   return loader.load(activity.profileId);
+  // }
 }

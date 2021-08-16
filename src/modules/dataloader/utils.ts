@@ -3,6 +3,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import type { ExecutionContext } from '@nestjs/common';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { DefaultRegisteredLoaders } from './context';
+import type { Request } from 'express';
 
 export type GraphqlRequest<RegisteredLoaders = DefaultRegisteredLoaders> = Request & {
   id?: string;

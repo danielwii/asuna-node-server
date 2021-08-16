@@ -17,6 +17,10 @@ export class ExchangeCurrencyEnumValue {
   }
 }
 export type ExchangeCurrencyType = ValueOf<typeof ExchangeCurrencyEnumValue.types>;
+export enum ExchangeCurrencyEnum {
+  points,
+  balance,
+}
 
 @StaticImplements<EnumValueStatic>()
 export class ExchangeObjectUsageEnumValue extends CanRegEnumValue {

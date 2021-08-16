@@ -18,6 +18,11 @@ export class FeedbackStatusEnumValue {
   }
 }
 export type FeedbackStatusType = ValueOf<typeof FeedbackStatusEnumValue.types>;
+export enum FeedbackStatusEnum {
+  submitted,
+  replied,
+  resolved,
+}
 
 @StaticImplements<EnumValueStatic>()
 export class FeedbackSenderEnumValue {
@@ -33,3 +38,7 @@ export class FeedbackSenderEnumValue {
   }
 }
 export type FeedbackSenderType = ValueOf<typeof FeedbackSenderEnumValue.types>;
+export enum FeedbackSenderEnum {
+  user,
+  admin,
+}

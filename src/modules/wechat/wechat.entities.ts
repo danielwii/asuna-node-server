@@ -1,3 +1,5 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Exclude, Expose, Transform } from 'class-transformer';
@@ -135,58 +137,70 @@ export class WeChatUser extends InjectTenant(BaseEntity) {
   admin?: AdminUser;
 }
 
+@ObjectType()
 @EntityMetaInfo({ name: 'wx__mini_app_users', internal: true, displayName: '小程序用户' })
 @Entity('wx__t_mini_app_users')
 export class WXMiniAppUserInfo extends BaseEntity {
   @Exclude()
+  @Field()
   @MetaInfo({ name: 'OpenId' })
   @PrimaryColumn({ nullable: false, length: 36, name: 'open_id' })
   openId: string;
 
   // "nickName":"neko",
+  @Field({ nullable: true })
   @MetaInfo({ name: '昵称' })
   @Column({ nullable: true, name: 'nickname' })
   nickname: string;
 
   // "gender":2,
+  @Field({ nullable: true })
   @MetaInfo({ name: '性别' })
   @Column({ nullable: true, name: 'gender' })
   gender: number;
 
   // "language":"zh_TW",
+  @Field({ nullable: true })
   @MetaInfo({ name: '语言' })
   @Column({ nullable: true, name: 'language' })
   language: string;
 
   @Expose({ name: 'with-phone-number', toPlainOnly: true })
   @Transform(({ value }) => !!_.trim(value), { toPlainOnly: true })
+  @Field({ nullable: true })
   @MetaInfo({ name: '手机号' })
   @Column({ nullable: true, name: 'mobile' })
   mobile: string;
 
   // "city":"",
+  @Field({ nullable: true })
   @MetaInfo({ name: '城市' })
   @Column({ nullable: true, name: 'city' })
   city: string;
 
   // "province":"",
+  @Field({ nullable: true })
   @MetaInfo({ name: '省份' })
   @Column({ nullable: true, name: 'province' })
   province: string;
 
   // "country":"Israel",
+  @Field({ nullable: true })
   @MetaInfo({ name: '国家' })
   @Column({ nullable: true, name: 'country' })
   country: string;
 
   // "avatarUrl
+  @Field({ nullable: true })
   @MetaInfo({ name: '头像', type: 'Image' })
   @Column({ nullable: true, name: 'avatar' })
   avatar: string;
 
+  @Field()
   @CreateDateColumn({ name: 'created_at' })
   createdAt?: Date;
 
+  @Field()
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt?: Date;
 
@@ -198,6 +212,7 @@ export class WXMiniAppUserInfo extends BaseEntity {
   // Relations
   // --------------------------------------------------------------
 
+  @Field()
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 36, name: 'profile__id' })
   profileId: string;

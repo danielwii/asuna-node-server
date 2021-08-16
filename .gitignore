@@ -24,3 +24,5 @@ database.db
 /documentation
 tsconfig.tsbuildinfo
 .dcignore
+tsconfig.tsbuildinfo
+.dcignore

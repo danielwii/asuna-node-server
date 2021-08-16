@@ -17,6 +17,11 @@ export class NotificationEnumValue {
   }
 }
 export type NotificationType = ValueOf<typeof NotificationEnumValue.types>;
+export enum NotificationEnum {
+  live_float,
+  live_in,
+  app_in,
+}
 
 @StaticImplements<EnumValueStatic>()
 export class NotificationUsageEnumValue extends CanRegEnumValue {

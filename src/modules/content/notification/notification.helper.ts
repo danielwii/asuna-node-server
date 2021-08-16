@@ -1,3 +1,5 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -7,8 +9,11 @@ import { Notification } from './notification.entities';
 
 const logger = LoggerFactory.getLogger('LiveHelper');
 
-export interface MixedNotification {
+@ObjectType()
+export class MixedNotification {
+  @Field()
   origin: Notification;
+  @Field()
   read: boolean;
 }
 

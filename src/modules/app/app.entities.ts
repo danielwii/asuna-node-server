@@ -1,3 +1,5 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../base';
@@ -21,13 +23,16 @@ export const Mode = {
   STANDALONE: 'STANDALONE',
 };
 
+@ObjectType({ implements: () => [AbstractNameEntity] })
 @EntityMetaInfo({ name: 'app__infos', internal: true })
 @Entity('app__t_infos')
 export class AppInfo extends Publishable(AbstractNameEntity) {
+  @Field()
   @MetaInfo({ name: '唯一识别 Key' })
   @Column({ nullable: false, length: 50, unique: true })
   public key: string;
 
+  @Field((returns) => Mode)
   @MetaInfo({ name: 'Mode', type: 'Enum', enumData: Mode })
   @Column('varchar', { nullable: true, name: 'mode' })
   public mode: keyof typeof Mode;
@@ -36,26 +41,33 @@ export class AppInfo extends Publishable(AbstractNameEntity) {
   public releases: AppRelease[];
 }
 
+@ObjectType({ implements: () => [AbstractBaseEntity] })
 @EntityMetaInfo({ name: 'app__releases', internal: true })
 @Entity('app__t_releases')
 export class AppRelease extends Publishable(AbstractBaseEntity) {
+  @Field()
   @Column({ nullable: false, length: 10, name: 'version_code' })
   public versionCode: string;
 
+  @Field()
   @Column({ nullable: false, name: 'build_number' })
   public buildNumber: number;
 
+  @Field((returns) => AppUpgradeMode)
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: AppUpgradeMode })
   @Column('varchar', { nullable: true, name: 'upgrade_mode' })
   public upgradeMode: keyof typeof AppUpgradeMode;
 
+  @Field((returns) => Platform)
   @MetaInfo({ name: 'Platform', type: 'Enum', enumData: Platform })
   @Column('varchar', { nullable: true, name: 'platform' })
   public platform: keyof typeof Platform;
 
+  @Field()
   @Column('text', { nullable: true })
   public description: string;
 
+  @Field((returns) => [String])
   @MetaInfo({ name: 'File', type: 'File', safeReload: 'json-array' })
   @Column(ColumnTypeHelper.JSON, { nullable: false, name: 'paths' })
   public paths: JsonArray;

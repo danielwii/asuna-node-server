@@ -1,3 +1,5 @@
+import { ArgsType, Field, InputType, Int } from '@nestjs/graphql';
+
 import { ExclusiveConstraintValidator } from '@danielwii/asuna-helper/dist/validate';
 
 import { Type } from 'class-transformer';
@@ -5,11 +7,14 @@ import { IsInt, IsNumber, IsOptional, IsString, Validate, ValidateNested } from 
 
 import { DEFAULT_PAGE, DEFAULT_SIZE, Order, PageRequest } from '../core/helpers';
 
+@InputType()
 export class SorterInput {
+  @Field()
   @IsString()
   @IsOptional()
   public column?: string;
 
+  @Field((returns) => Order)
   @IsOptional()
   public order?: Order;
 }
@@ -26,23 +31,29 @@ export class CursoredRequestInput {
   public after?: string;
 }
 
-export class PageRequestInput implements PageRequest {
+@InputType()
+export class PageRequestInput {
+  @Field((type) => Int)
   @IsInt()
   @IsOptional()
-  public pageNumber: number = 1;
+  public pageNumber = 1;
 
+  @Field((type) => Int)
   @IsInt()
   @IsOptional()
   public pageIndex?: number = 0;
 
+  @Field((type) => Int)
   @IsInt()
   @IsOptional()
   public page?: number = DEFAULT_PAGE;
 
+  @Field((type) => Int)
   @IsInt()
   @IsOptional()
   public size?: number = DEFAULT_SIZE;
 
+  @Field((returns) => SorterInput, { nullable: true })
   @IsOptional()
   public orderBy?: SorterInput;
 }
