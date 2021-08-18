@@ -1,9 +1,18 @@
+import { ObjectType } from '@nestjs/graphql';
+
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
-import { AbstractBaseEntity, AbstractTimeBasedNameEntity, ConstrainedConstructor, Publishable } from '../base';
+import {
+  AbstractBaseEntity,
+  AbstractTimeBasedBaseEntity,
+  AbstractTimeBasedNameEntity,
+  ConstrainedConstructor,
+  Publishable,
+} from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
+@ObjectType({ implements: () => [AbstractTimeBasedNameEntity] })
 @EntityMetaInfo({ name: 'ss__tenants', internal: true })
 @Entity('ss__t_tenants')
 export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
@@ -60,6 +69,7 @@ export class OrgRole extends AbstractBaseEntity {
   public users: OrgUser[];
 }
 
+@ObjectType({ implements: () => [AbstractTimeBasedAuthUser, AbstractTimeBasedBaseEntity] })
 @EntityMetaInfo({ name: 'ss__org_users', internal: true })
 @Entity('ss__t_org_users')
 export class OrgUser extends InjectTenant(AbstractTimeBasedAuthUser) {

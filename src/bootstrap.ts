@@ -14,6 +14,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import * as bodyParser from 'body-parser';
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
+import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
@@ -37,7 +38,7 @@ import {
   ExchangeCurrencyEnum,
 } from './modules';
 import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor } from './modules/common';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
 import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
 import {
   FeedbackSenderEnum,
@@ -59,9 +60,10 @@ import type { BootstrapOptions } from './interface';
 
 export const bootstrap = (appModule, options: BootstrapOptions) => {
   const logger = LoggerFactory.getLogger('bootstrap');
-  process.on('unhandledRejection', (reason, p) =>
-    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`),
-  );
+  process.on('unhandledRejection', (reason, p) => {
+    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
+    Sentry.captureException(reason);
+  });
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
   registerEnumType(NotificationEnum, {
@@ -85,8 +87,12 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   registerEnumType(ExchangeCurrencyEnum, { name: 'ExchangeCurrencyEnum' });
 
   return run(appModule, options).catch((reason) => {
-    console.error(reason?.message, reason?.stack);
+    logger.error(`${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
+    setTimeout(() => {
+      consola.error(`System will exit in 1s because of error: ${reason?.message}`);
+      process.exit(1);
+    }, TimeUnit.SECONDS.toMillis(1));
   });
 };
 

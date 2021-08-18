@@ -1,4 +1,4 @@
-import { ArgsType, Field, InputType, Int } from '@nestjs/graphql';
+import { ArgsType, Field, ID, InputType, Int } from '@nestjs/graphql';
 
 import { ExclusiveConstraintValidator } from '@danielwii/asuna-helper/dist/validate';
 
@@ -69,16 +69,20 @@ export class QueryConditionInput {
   public random?: number;
 }
 
+@InputType()
 export class ExclusiveQueryConditionInput {
+  @Field((returns) => [ID])
   @Validate(ExclusiveConstraintValidator)
   @IsOptional()
   public ids?: string[] | number[];
 
+  @Field()
   @Validate(ExclusiveConstraintValidator)
   @IsNumber()
   @IsOptional()
   public random?: number;
 
+  @Field()
   @Validate(ExclusiveConstraintValidator)
   @IsString()
   @IsOptional()

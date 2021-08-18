@@ -27,7 +27,7 @@ export type EntityConstructorObject<Entity> = Omit<
   keyof typeof BaseEntity | 'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
 >;
 
-@ObjectType()
+@InterfaceType()
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
   @Field()
   @Index()
@@ -101,6 +101,7 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   }
 }
 
+@InterfaceType({ implements: () => [AbstractTimeBasedBaseEntity] })
 export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTimeBasedBaseEntity) {}
 
 @InterfaceType({ implements: () => [AbstractBaseEntity] })
@@ -151,6 +152,7 @@ export class AbstractUUID2BaseEntity extends BaseEntity {
 
 export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2BaseEntity) {}
 
+@InterfaceType({ implements: () => [AbstractBaseEntity] })
 export class AbstractCategoryEntity extends Publishable(NameDescAttachable(AbstractBaseEntity)) {
   @MetaInfo({ name: '是否系统数据？', type: 'Deletable', help: '系统数据无法删除' })
   @Column({ nullable: true, name: 'is_system' })
