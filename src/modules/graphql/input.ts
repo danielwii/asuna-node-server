@@ -43,7 +43,7 @@ export class PageRequestInput {
   @IsOptional()
   public pageIndex?: number = 0;
 
-  @Field((type) => Int)
+  @Field((type) => Int, { deprecationReason: 'use pageIndex or pageNumber instead' })
   @IsInt()
   @IsOptional()
   public page?: number = DEFAULT_PAGE;

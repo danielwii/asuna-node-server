@@ -6,6 +6,8 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
 
+import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
+
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
 export const MAX_PAGE_SIZE = 1000;
@@ -81,6 +83,18 @@ export class PageHelper {
   }
 }
 
+export const PaginatedResponse = <Item>(ItemClass: ClassType<Item>) => {
+  // `isAbstract` decorator option is mandatory to prevent registering in schema
+  @ObjectType({ isAbstract: true, implements: () => [Pageable] })
+  abstract class PaginatedResponseClass extends Pageable<Item> {
+    // here we use the runtime argument
+    @Field((type) => [ItemClass])
+    // and here the generic type
+    items: Item[];
+  }
+  return PaginatedResponseClass as any;
+};
+
 @InterfaceType()
 export class Pageable<T> {
   @Field()
@@ -96,6 +110,9 @@ export class Pageable<T> {
   size: number;
   // @Field()
   items: T[];
+
+  @Field({ nullable: true })
+  hasMore?: boolean;
 }
 
 export class CursoredPageable<T> {
@@ -141,3 +158,8 @@ export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInf
 
   return { pageNumber: 1, pageIndex: 0, page, size, take: size, skip: (page - (startsWith0 ? 0 : 1)) * size };
 };
+
+export const extractPageRequest = <Entity = any>(pageRequest: PageRequest, primaryKey = 'id') => ({
+  pageInfo: toPage(pageRequest),
+  order: pageRequest.orderBy ? { [pageRequest.orderBy.column]: pageRequest.orderBy.order } : { [primaryKey]: 'DESC' },
+});
