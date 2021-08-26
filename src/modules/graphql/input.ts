@@ -21,18 +21,22 @@ export class SorterInput {
 
 export const toOrder = (sorter: SorterInput) => (sorter?.column ? { [sorter.column]: sorter.order ?? Order.ASC } : {});
 
-export class CursoredRequestInput {
-  @IsInt()
-  @IsOptional()
-  public first?: number;
-
-  @IsString()
-  @IsOptional()
-  public after?: string;
+export interface CursoredRequest {
+  first: number;
+  after?: string | number;
 }
 
 @InputType()
-export class PageRequestInput {
+export class CursoredRequestInput implements CursoredRequest {
+  @Field((type) => Int, { description: '拉取数量', nullable: true, defaultValue: 10 })
+  public first: number;
+
+  @Field((type) => ID, { description: '最后的游标', nullable: true })
+  public after?: string | number;
+}
+
+@InputType()
+export class PageRequestInput implements PageRequest {
   @Field((type) => Int)
   @IsInt()
   @IsOptional()

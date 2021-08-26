@@ -1,10 +1,13 @@
-import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
+import { Field, ID, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 
+import { deserializeSafely } from '@danielwii/asuna-helper';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
+
+import { CursoredRequest } from '../../graphql';
 
 import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
 
@@ -95,37 +98,59 @@ export const PaginatedResponse = <Item>(ItemClass: ClassType<Item>) => {
   return PaginatedResponseClass as any;
 };
 
+export const CursoredResponse = <Item>(ItemClass: ClassType<Item>) => {
+  // `isAbstract` decorator option is mandatory to prevent registering in schema
+  @ObjectType({ isAbstract: true, implements: () => [CursoredPageable] })
+  abstract class CursoredResponseClass extends CursoredPageable<Item> {
+    // here we use the runtime argument
+    @Field((type) => [ItemClass])
+    // and here the generic type
+    items: Item[];
+  }
+  return CursoredResponseClass as any;
+};
+
 @InterfaceType()
 export class Pageable<T> {
-  @Field()
-  total: number;
-  @Field()
-  pageNumber: number;
-  @Field()
-  pageIndex: number;
+  @Field((returns) => Int) total: number;
+  @Field((returns) => Int) pageNumber: number;
+  @Field((returns) => Int) pageIndex: number;
 
-  @Field()
-  page: number;
-  @Field()
-  size: number;
+  @Field((returns) => Int) page: number;
+  @Field((returns) => Int) size: number;
+
   // @Field()
   items: T[];
 
-  @Field({ nullable: true })
-  hasMore?: boolean;
+  // @Field({ nullable: true })
+  // hasMore?: boolean;
 }
 
-export class CursoredPageable<T> {
-  first: number;
-  after: string;
-  total: number;
-  cursorInfo: CursorInfo;
-  items: T[];
-}
+@ObjectType()
+export class CursorInfo {
+  @Field((returns) => ID, { nullable: true })
+  endCursor?: string | number;
 
-export interface CursorInfo {
-  endCursor: string | number;
+  @Field()
   hasNextPage: boolean;
+
+  public static of(o?: CursorInfo): CursorInfo {
+    return deserializeSafely(CursorInfo, o as any);
+  }
+}
+
+@InterfaceType()
+export class CursoredPageable<T> implements CursoredRequest {
+  @Field((returns) => Int, { description: '拉取数量', deprecationReason: 'will remove later' })
+  first: number;
+
+  @Field((returns) => ID, { description: '最后的游标', deprecationReason: 'will remove later', nullable: true })
+  after?: string | number;
+
+  @Field((returns) => Int) total: number;
+  @Field((returns) => CursorInfo) cursorInfo: CursorInfo;
+
+  items: T[];
 }
 
 export interface PageInfo {
@@ -162,4 +187,9 @@ export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInf
 export const extractPageRequest = <Entity = any>(pageRequest: PageRequest, primaryKey = 'id') => ({
   pageInfo: toPage(pageRequest),
   order: pageRequest.orderBy ? { [pageRequest.orderBy.column]: pageRequest.orderBy.order } : { [primaryKey]: 'DESC' },
+});
+
+export const extractCursoredRequest = (cursoredRequest: CursoredRequest): CursoredRequest => ({
+  first: cursoredRequest?.first ?? 10,
+  after: cursoredRequest?.after,
 });
