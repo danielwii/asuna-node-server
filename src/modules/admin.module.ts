@@ -36,6 +36,7 @@ import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
+import { PrismaModule } from './prisma';
 import { PropertyModule } from './property';
 import {
   AdminAppRestController,
@@ -85,6 +86,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
         return redisClient.isEnabled ? { store: redisStore, ...redisClient.redisOptions } : {};
       },
     }),
+    PrismaModule,
   ]),
   controllers: [
     ApiController,
@@ -104,7 +106,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     TaskController,
     UploaderController,
   ],
-  exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule],
+  exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
 export class AdminInternalModule implements NestModule, OnModuleInit {
   public configure(consumer: MiddlewareConsumer): any {

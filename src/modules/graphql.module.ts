@@ -64,7 +64,7 @@ export class GraphqlModule implements OnModuleInit {
           playground: config.playground_enable,
           debug: config.debug,
           introspection: config.playground_enable || config.debug,
-          tracing: config.debug,
+          // tracing: config.debug,
           resolverValidationOptions: { requireResolversForResolveType: 'warn' },
           persistedQueries: { cache },
           plugins: [
@@ -81,11 +81,13 @@ export class GraphqlModule implements OnModuleInit {
               },
             }),
           ],
+          /*
           cacheControl: {
             // defaultMaxAge: 5,
             stripFormattedExtensions: false,
             calculateHttpHeaders: true,
           },
+          */
           context: (context): GraphqlContext => ({
             ...context,
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
@@ -93,6 +95,7 @@ export class GraphqlModule implements OnModuleInit {
             getTrace: () => _.get(context.req, 'trace'),
             getTenant: () => _.get(context.req, 'tenant'),
           }),
+          /*
           extensions: _.compact([
             tracingConfig.enabled
               ? _.memoize(() => {
@@ -107,6 +110,7 @@ export class GraphqlModule implements OnModuleInit {
                 })
               : undefined,
           ]),
+          */
           formatResponse: (response) => {
             if (response.errors) {
               logger.error(`response: ${r(response.errors)}`);

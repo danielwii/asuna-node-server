@@ -86,6 +86,9 @@ export class SessionUser extends InjectMultiUserProfile(NoPrimaryKeyBaseEntity) 
   //   super('imu');
   // }
 
+  @Column({ nullable: true, length: 100, name: 'filter' })
+  filter?: string;
+
   // @MetaInfo({ accessible: 'hidden' })
   // @Column({ nullable: true, name: 'timeline_id' })
   // public timelineId?: string;

@@ -21,6 +21,7 @@ import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
+import { PrismaService } from './modules/prisma/service';
 import { Store } from './modules/store/store';
 
 import type { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
@@ -103,6 +104,10 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         return process.exit(0);
       });
     });
+
+    const prismaService: PrismaService = app.get(PrismaService);
+    await prismaService.enableShutdownHooks(app);
+
     logger.log(`[onInit] done`);
   }
 

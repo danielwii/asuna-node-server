@@ -23,33 +23,33 @@ const logger = LoggerFactory.getLogger('HealthController');
 
 @Controller('health')
 export class HealthController {
-  private mq = new MQHealthIndicator();
-  private redis = new RedisHealthIndicator();
-  private path = resolve(dirname(require.main.filename), '../..');
+  // private mq = new MQHealthIndicator();
+  // private redis = new RedisHealthIndicator();
+  // private path = resolve(dirname(require.main.filename), '../..');
 
   // eslint-disable-next-line max-params
   public constructor(
     private health: HealthCheckService,
-    private dns: HttpHealthIndicator,
-    private typeorm: TypeOrmHealthIndicator,
-    private memory: MemoryHealthIndicator,
-    private disk: DiskHealthIndicator,
+    // private http: HttpHealthIndicator,
+    // private memory: MemoryHealthIndicator,
+    // private typeorm: TypeOrmHealthIndicator,
+    // private disk: DiskHealthIndicator,
   ) {}
 
   @Get()
   @HealthCheck()
   public async healthCheck() {
-    const diskSpace = await checkDiskSpace(this.path);
-    logger.debug(`check disk path ${r({ path: this.path, diskSpace })}`);
+    // const diskSpace = await checkDiskSpace(this.path);
+    // logger.debug(`check disk path ${r({ path: this.path, diskSpace })}`);
     return this.health.check(
       _.compact([
-        async () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
-        async () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() }),
-        async () => this.memory.checkHeap('memory_heap', 1024 * 1024 * 1024),
-        async () => this.memory.checkRSS('memory_rss', 3072 * 1024 * 1024),
-        async () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: this.path }),
-        MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
-        RedisProvider.instance.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
+        // () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
+        // () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() }),
+        // () => this.memory.checkHeap('memory_heap', 1024 * 1024 * 1024),
+        // () => this.memory.checkRSS('memory_rss', 3072 * 1024 * 1024),
+        // () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: this.path }),
+        // MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
+        // RedisProvider.instance.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
       ]),
     );
   }

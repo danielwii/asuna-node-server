@@ -32,4 +32,10 @@ export class WebService {
     const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
     return this.PageViewModel.find(filter).sort({ at: 1 }).limit(1).exec().then(_.first);
   }
+
+  public async loadLatestPageView(suid: string): Promise<PageView> {
+    ow(suid, 'suid', ow.string.nonEmpty);
+    const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
+    return this.PageViewModel.find(filter).sort({ at: -1 }).limit(1).exec().then(_.first);
+  }
 }
