@@ -26,7 +26,7 @@ export const InjectProject = <TBase extends ConstrainedConstructor<BaseEntity>>(
   class ExtendableEntity extends Base {
     @Field({ nullable: true })
     @MetaInfo({ accessible: 'hidden' })
-    @Column({ nullable: true, length: 36, name: 'project__id' })
+    @Column({ nullable: true, length: 20, name: 'project__id' })
     projectId?: string;
 
     @MetaInfo({ name: '账户' })

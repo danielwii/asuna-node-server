@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity, EntityConstructorObject, IdGenerators, NoPrimaryKeyBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
@@ -93,10 +93,10 @@ export class LeadUser extends InjectProject(InjectTenant(InjectUserProfile(Abstr
   @Column({ nullable: true, length: 100, name: 'filter' })
   public filter?: string;
 
-  @Field({ nullable: true })
+  @Field()
   @MetaInfo({ accessible: 'hidden' })
-  @Column({ nullable: true, length: 36, name: 'visitor__id' })
-  public visitorId?: string;
+  @Column({ length: 36, name: 'visitor__id' })
+  public visitorId: string;
 }
 
 @EntityMetaInfo({ name: 'client__t_session_users', internal: true })
