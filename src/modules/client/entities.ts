@@ -1,11 +1,15 @@
+import { Field, ObjectType } from '@nestjs/graphql';
+
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 
-import { EntityConstructorObject, NoPrimaryKeyBaseEntity } from '../base';
+import { AbstractTimeBasedBaseEntity, EntityConstructorObject, IdGenerators, NoPrimaryKeyBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
-import { InjectMultiUserProfile } from '../core/auth/user.entities';
+import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.entities';
 import { SimpleIdGenerator } from '../ids';
+import { InjectProject } from '../project/entities';
+import { InjectTenant } from '../tenant/tenant.entities';
 
 /*
 @EntityMetaInfo({ name: 'client__users', internal: true })
@@ -78,6 +82,23 @@ export class VirtualSession extends NoPrimaryKeyBaseEntity {
   public device?: VirtualDevice;
 }
 
+@ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })
+@EntityMetaInfo({ name: 'lead_users' })
+@Entity('client__t_lead_users')
+export class LeadUser extends InjectProject(InjectTenant(InjectUserProfile(AbstractTimeBasedBaseEntity))) {
+  public constructor() {
+    super('lu');
+  }
+
+  @Column({ nullable: true, length: 100, name: 'filter' })
+  public filter?: string;
+
+  @Field({ nullable: true })
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 36, name: 'visitor__id' })
+  public visitorId?: string;
+}
+
 @EntityMetaInfo({ name: 'client__t_session_users', internal: true })
 @Entity('client__t_session_users')
 export class SessionUser extends InjectMultiUserProfile(NoPrimaryKeyBaseEntity) {
@@ -85,9 +106,6 @@ export class SessionUser extends InjectMultiUserProfile(NoPrimaryKeyBaseEntity) 
   // public constructor() {
   //   super('imu');
   // }
-
-  @Column({ nullable: true, length: 100, name: 'filter' })
-  filter?: string;
 
   // @MetaInfo({ accessible: 'hidden' })
   // @Column({ nullable: true, name: 'timeline_id' })

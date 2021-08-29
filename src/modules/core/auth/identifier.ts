@@ -1,4 +1,4 @@
-import { StaticImplements } from '../../common/types';
+import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 
 import type { IdentifierHelper, PrimaryKey } from '../../common/identifier';
 

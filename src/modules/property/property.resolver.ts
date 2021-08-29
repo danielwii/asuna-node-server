@@ -4,7 +4,6 @@ import { Args, Context, Field, Info, ObjectType, Query, Resolver } from '@nestjs
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { AppRelease } from '../app';
 import { Pageable } from '../core/helpers';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, SorterInput, toOrder } from '../graphql';
 import { ExchangeObject } from './exchange.entities';

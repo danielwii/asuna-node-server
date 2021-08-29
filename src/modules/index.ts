@@ -15,6 +15,8 @@ export * from './graphql';
 export * from './helper';
 export * from './ids';
 export * from './payments';
+export * from './project/entities';
+export * from './project/helper';
 export * from './property';
 export * from './providers';
 export * from './core/auth/auth.module';

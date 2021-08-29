@@ -1,6 +1,7 @@
+import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
+
 import _ from 'lodash';
 
-import { StaticImplements } from '../../common/types';
 import { CanRegEnumValue, EnumValueStatic, ValueOf } from '../../enum-values';
 
 @StaticImplements<EnumValueStatic>()

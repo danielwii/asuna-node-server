@@ -9,6 +9,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
 
 import { AdminController } from './admin.controller';
+import { ClientModule } from './client';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { configLoader } from './config';
 import { ContentModule } from './content';
@@ -87,6 +88,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
       },
     }),
     PrismaModule,
+    ClientModule,
   ]),
   controllers: [
     ApiController,

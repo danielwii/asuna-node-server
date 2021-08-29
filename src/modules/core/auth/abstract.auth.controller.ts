@@ -22,7 +22,7 @@ import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
 
-import type { ConstrainedConstructor } from '../../base';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 

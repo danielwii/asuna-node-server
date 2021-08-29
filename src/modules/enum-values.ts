@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { StaticImplements } from './common';
+import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 
 export type ValueOf<T> = T[keyof T];
 

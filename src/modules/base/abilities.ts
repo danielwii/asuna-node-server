@@ -4,8 +4,7 @@ import { BaseEntity, Column } from 'typeorm';
 
 import { MetaInfo } from '../common/decorators';
 
-export type Constructor = new (...args: any[]) => {};
-export type ConstrainedConstructor<T = {}> = new (...args: any[]) => T;
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 export const Publishable = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   @InterfaceType()

@@ -19,7 +19,7 @@ import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-import type { ConstrainedConstructor } from '../../base';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 import type { CreatedUser } from './auth.service';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');

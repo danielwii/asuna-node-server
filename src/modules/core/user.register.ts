@@ -6,7 +6,7 @@ import { BaseEntity } from 'typeorm';
 
 import { DBHelper } from './db/db.helper';
 
-import type { ConstrainedConstructor } from '../base/abilities';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 import type { UserProfile } from './auth/user.entities';
 
 const logger = LoggerFactory.getLogger('UserRegister');
