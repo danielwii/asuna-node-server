@@ -304,7 +304,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   if (options.staticAssets) {
     logger.log(`set static assets path to ${options.staticAssets}`);
-    app.useStaticAssets(options.staticAssets);
+    app.useStaticAssets(options.staticAssets, { maxAge: TimeUnit.MINUTES.toMillis(10) });
   }
 
   if (options.viewsDir) {
