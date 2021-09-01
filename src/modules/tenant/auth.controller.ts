@@ -1,14 +1,15 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { CreateTenantStaffDTO } from '@danielwii/asuna-shared';
 
 import { Promise } from 'bluebird';
 
 import { AbstractAuthController } from '../core/auth';
-import { OrgJwtAuthGuard } from './auth.guard';
+import { OrgJwtAuthGuard, TenantRoleName, TenantRolesGuard } from './auth.guard';
 import { TenantAuthService } from './auth.service';
 import { OrgUser } from './tenant.entities';
 
@@ -19,13 +20,20 @@ const logger = LoggerFactory.getLogger('AuthController');
 
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {
-  constructor(public readonly authService: TenantAuthService) {
+  public constructor(public readonly authService: TenantAuthService) {
     super(OrgUser, authService);
+  }
+
+  @Post('staff')
+  @UseGuards(OrgJwtAuthGuard, new TenantRolesGuard([TenantRoleName.admin]))
+  public async createStaff(@Body() body: CreateTenantStaffDTO, @Req() req: OrgJwtAuthRequest) {
+    const { tenant } = req;
+    return this.authService.createStaff(tenant.id, body);
   }
 
   @Get('current')
   @UseGuards(OrgJwtAuthGuard)
-  async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
+  public async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {

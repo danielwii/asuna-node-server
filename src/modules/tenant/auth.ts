@@ -1,6 +1,7 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { Promise } from 'bluebird';
 import passport from 'passport';
 
 import { wrapErrorInfo } from '../helper/utils';
@@ -17,7 +18,7 @@ const logger = LoggerFactory.getLogger('AuthHelper');
 export class OrgAuthHelper {
   public static async populate(req: OrgJwtAuthRequest, payload: JwtPayload): Promise<void> {
     // TODO user not include tenant and roles, only admin-user has currently
-    const user = await OrgUser.findOne(payload.id, { relations: ['tenant'] });
+    const user = await OrgUser.findOne(payload.id, { relations: ['tenant', 'roles'] });
     logger.debug(`jwt user ${r(user)}`);
     // req.identifier = UserIdentifierHelper.stringify(payload);
     req.isOrgUser = true;
@@ -25,7 +26,7 @@ export class OrgAuthHelper {
     // req.profile = user.profile;
     req.user = user;
     req.tenant = user.tenant;
-    // req.roles = user.roles;
+    req.roles = user.roles;
   }
 
   public static auth(req: OrgJwtAuthRequest, res: Response): Promise<AuthResult<JwtPayload>> {

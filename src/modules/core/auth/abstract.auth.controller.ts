@@ -39,7 +39,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   @HttpCode(200)
   @Post('reset-password')
   @UseGuards(JwtAuthGuard)
-  async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
+  public async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
     const { payload } = req;
     logger.log(`reset password: ${r({ dto, payload })}`);
 
@@ -52,7 +52,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   @HttpCode(200)
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
-  async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<void> {
+  public async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
@@ -76,7 +76,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   }
 
   @Post('quick-pass')
-  async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
+  public async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
     const chance = new Chance();
     const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
     const password = chance.string({ length: 6, pool: '0123456789' });
@@ -102,7 +102,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   }
 
   @Post('sign-up')
-  async signUp(@Body() body) {
+  public async signUp(@Body() body) {
     logger.log(`sign-up: ${r(body)}`);
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
 
@@ -125,7 +125,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  async getToken(@Body() signInDto: SignInDto): Promise<CreatedToken> {
+  public async getToken(@Body() signInDto: SignInDto): Promise<CreatedToken> {
     logger.log(`getToken() >> ${signInDto.username}`);
     const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
 
@@ -153,7 +153,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
 
   @Get('current')
   @UseGuards(JwtAuthGuard)
-  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
+  public async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
@@ -191,7 +191,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
 
   @Get('authorized')
   @UseGuards(JwtAuthGuard)
-  async authorized(): Promise<void> {
+  public async authorized(): Promise<void> {
     logger.log('Authorized route...');
   }
 }

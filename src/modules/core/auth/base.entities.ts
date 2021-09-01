@@ -1,4 +1,5 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
+import { Exclude } from 'class-transformer';
 
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
@@ -55,15 +56,17 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   @Column('varchar', { nullable: true, name: 'channel', default: AuthUserChannel.default })
   channel: AuthUserChannel;
 
-  @MetaInfo({ ignore: true })
   @IsString()
   @IsOptional()
+  @Exclude({ toPlainOnly: true })
+  @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
   password?: string;
 
-  @MetaInfo({ ignore: true })
   @IsString()
   @IsOptional()
+  @Exclude({ toPlainOnly: true })
+  @MetaInfo({ ignore: true })
   @Column({ nullable: true, select: false })
   salt?: string;
 

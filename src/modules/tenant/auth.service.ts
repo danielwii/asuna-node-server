@@ -4,18 +4,31 @@ import { InjectConnection } from '@nestjs/typeorm';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import Chance from 'chance';
 import _ from 'lodash';
+import ow from 'ow';
 import { Connection, In } from 'typeorm';
 
 import { AbstractAuthService, AuthUserChannel, CreatedUser, PasswordHelper } from '../core/auth';
+import { TenantRoleName } from './auth.guard';
 import { OrgRole, OrgUser } from './tenant.entities';
 
-const logger = LoggerFactory.getLogger('OrgUserAuthService');
+import type { CreateStaffVO } from '@danielwii/asuna-shared';
+
+const logger = LoggerFactory.getLogger('TenantAuthService');
+
+const chance = new Chance();
 
 @Injectable()
 export class TenantAuthService extends AbstractAuthService<OrgUser> {
   public constructor(@InjectConnection() private readonly connection: Connection) {
     super(OrgUser, connection.getRepository<OrgUser>(OrgUser));
+
+    _.values(TenantRoleName).forEach((name) =>
+      OrgRole.findOne({ where: { name } }).then((exists) => {
+        if (!exists) return OrgRole.create({ name }).save();
+      }),
+    );
   }
 
   public async createUser(
@@ -23,8 +36,10 @@ export class TenantAuthService extends AbstractAuthService<OrgUser> {
     email: string,
     password: string,
     channel?: AuthUserChannel,
-    roleNames?: string[],
+    // roleNames?: string[],
   ): Promise<CreatedUser<OrgUser>> {
+    const roleNames = [TenantRoleName.admin];
+    logger.log(`createUser ${r({ username, email, channel, roleNames })}`);
     const { hash, salt } = PasswordHelper.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await OrgRole.find({ name: In(roleNames) });
 
@@ -38,5 +53,37 @@ export class TenantAuthService extends AbstractAuthService<OrgUser> {
       .create({ email, username, isActive: true, password: hash, salt, roles })
       .save()
       .then((user) => ({ user }));
+  }
+
+  /**
+   * 根据 tenant id 创建组织下的用户，并且随机生成一个密码
+   * @param tenantId
+   * @param username
+   * @param email
+   * @param nickname
+   * @param password 不传输一个初始化密码的时候会自动生成一个 16 位的密码
+   */
+  public async createStaff(
+    tenantId: string,
+    { nickname, username, email, password }: { username: string; email: string; nickname?: string; password?: string },
+  ): Promise<CreateStaffVO<OrgUser>> {
+    ow(tenantId, 'tenantId', ow.string.nonEmpty);
+    ow(username, 'username', ow.string.nonEmpty);
+    ow(email, 'email', ow.string.nonEmpty);
+
+    logger.log(`createStaff ${r({ tenantId, username, email, nickname, password })}`);
+    const staff = await this.getUser({ username, email });
+    if (staff) {
+      logger.log(`found staff ${r(staff)}`);
+      return { staff };
+    }
+
+    const generatedPassword = password ?? chance.string({ length: 16 });
+    const { hash, salt } = PasswordHelper.encrypt(generatedPassword);
+    const role = await OrgRole.findOne({ where: { name: TenantRoleName.staff } });
+    return this.authUserRepository
+      .create({ tenantId, email, username, isActive: true, password: hash, salt, roles: [role] })
+      .save()
+      .then((staff) => ({ staff, password: generatedPassword }));
   }
 }

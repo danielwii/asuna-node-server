@@ -54,7 +54,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
             value,
           })),
         );
-      return new AsunaException(AsunaErrorCode.Unprocessable, `${key} not found.`);
+      return new AsunaException(AsunaErrorCode.Duplicate, `${value} already exists.`);
     }
 
     // 未找到默认值

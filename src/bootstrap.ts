@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 
-import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -291,7 +291,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   app.useGlobalInterceptors(new TracingInterceptor());
   // WARNING will break graphql pubsub
-  // app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));

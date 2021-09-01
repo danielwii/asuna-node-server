@@ -1,4 +1,4 @@
-import { ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 
@@ -44,13 +44,16 @@ export const InjectTenant = <TBase extends ConstrainedConstructor<BaseEntity>>(B
   return ExtendableEntity;
 };
 
+@ObjectType({ implements: () => [AbstractBaseEntity] })
 @EntityMetaInfo({ name: 'ss__org_roles', internal: true })
 @Entity('ss__t_org_roles')
 export class OrgRole extends AbstractBaseEntity {
+  @Field()
   @MetaInfo({ name: '名称' })
   @Column({ nullable: false, length: 80, unique: true })
   public name: string;
 
+  @Field()
   @MetaInfo({ name: '描述' })
   @Column({ nullable: true })
   public description: string;
@@ -80,6 +83,7 @@ export class OrgUser extends InjectTenant(AbstractTimeBasedAuthUser) {
   public tenant: Tenant;
 */
 
+  @Field((returns) => [OrgRole])
   @MetaInfo({ name: '角色' })
   @ManyToMany('OrgRole', (inverse: OrgRole) => inverse.users, { primary: true })
   @JoinTable({

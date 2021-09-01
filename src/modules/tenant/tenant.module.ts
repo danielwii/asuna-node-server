@@ -12,8 +12,9 @@ import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '.
 import { CronHelper } from '../helper';
 import { TenantAuthController } from './auth.controller';
 import { TenantAuthService } from './auth.service';
+import { TenantController } from './controller';
 import { OrgJwtStrategy } from './jwt.strategy';
-import { TenantAdminController, TenantController } from './tenant.controller';
+import { TenantAdminController } from './mgmt.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';

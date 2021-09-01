@@ -1,3 +1,4 @@
+import type { OrgRole } from '../tenant';
 import type { Request } from 'express';
 import type { CommonRequest } from '../common';
 import type { AdminUser, JwtPayload, Role, UserProfile } from '../core/auth';
@@ -12,7 +13,7 @@ export type AuthInfo<Payload = PayloadType, User = AdminUser | any, Profile = Us
   profile?: Profile;
   identifier?: string;
   tenant?: Tenant;
-  roles?: Role[];
+  roles?: Role[] | OrgRole[];
 }>;
 export type RequestInfo = Request & CommonRequest & ApiKeyRequest & { isOrgUser?: boolean; clientIp: string };
 export type AnyAuthRequest<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = RequestInfo &
