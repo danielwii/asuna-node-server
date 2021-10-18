@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { promisify } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';

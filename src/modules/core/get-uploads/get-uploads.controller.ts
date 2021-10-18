@@ -1,7 +1,7 @@
 import { Controller, Get, Header, Param, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { classToPlain } from 'class-transformer';

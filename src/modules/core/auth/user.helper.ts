@@ -1,10 +1,10 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 import ow from 'ow';
 import { BaseEntity, FindOneOptions } from 'typeorm';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';

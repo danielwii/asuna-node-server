@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { configLoader } from '../config';

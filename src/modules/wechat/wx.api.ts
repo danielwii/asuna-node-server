@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
@@ -6,7 +7,6 @@ import * as _ from 'lodash';
 import fetch from 'node-fetch';
 import ow from 'ow';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 import { WxHelper } from './wx.helper';
 import {
@@ -257,7 +257,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json; charset=utf-8' },
         }),
       true,
-    ).then((value) => value.buffer());
+    ).then((value: any) => value.buffer());
 
   /**
    * https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.get.html#HTTPS%20%E8%B0%83%E7%94%A8
@@ -272,7 +272,7 @@ export class WxApi {
           headers: { 'Content-Type': 'application/json; charset=utf-8' },
         }),
       true,
-    ).then((value) => value.buffer());
+    ).then((value: any) => value.buffer());
 
   // call in client directly
   static getQrCodeByTicket = (ticket: string): Promise<any> =>

@@ -6,7 +6,7 @@ import { AbstractBaseEntity, AbstractTimeBasedBaseEntity, AbstractTimeBasedNameE
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 
 @ObjectType({ implements: () => [AbstractTimeBasedNameEntity] })
 @EntityMetaInfo({ name: 'ss__tenants', internal: true })

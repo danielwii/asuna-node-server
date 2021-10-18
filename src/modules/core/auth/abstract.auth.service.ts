@@ -1,5 +1,5 @@
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { oneLine } from 'common-tags';
@@ -19,7 +19,7 @@ import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';
 import type { FindConditions } from 'typeorm/find-options/FindConditions';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { CreatedUser } from './auth.service';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');

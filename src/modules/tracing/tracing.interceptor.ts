@@ -1,6 +1,6 @@
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Tags } from 'opentracing';
 import { Observable } from 'rxjs';

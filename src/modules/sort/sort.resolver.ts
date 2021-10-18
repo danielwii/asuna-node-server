@@ -1,6 +1,6 @@
 import { Args, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import * as util from 'util';
 

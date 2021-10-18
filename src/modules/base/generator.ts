@@ -1,8 +1,8 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { SimpleIdGenerator } from '../ids';
 
 const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');

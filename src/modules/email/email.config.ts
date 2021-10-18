@@ -1,5 +1,5 @@
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToClass, Transform } from 'class-transformer';

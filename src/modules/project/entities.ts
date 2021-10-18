@@ -7,7 +7,7 @@ import { NoPrimaryKeyBaseEntity } from '../base/base.entity';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
 import { InjectTenant } from '../tenant/tenant.entities';
 
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 
 @ObjectType({ implements: () => [NoPrimaryKeyBaseEntity] })
 @EntityMetaInfo({ name: 'im_projects' })

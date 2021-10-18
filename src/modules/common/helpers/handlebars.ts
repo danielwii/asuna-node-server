@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';

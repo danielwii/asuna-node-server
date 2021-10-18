@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsBoolean, IsDefined, IsOptional, IsString, isURL } from 'class-validator';

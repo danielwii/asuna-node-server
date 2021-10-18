@@ -7,7 +7,7 @@ import {
   AsunaExceptionHelper,
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { AccessControl } from 'accesscontrol';

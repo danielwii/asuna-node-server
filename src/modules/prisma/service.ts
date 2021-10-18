@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {

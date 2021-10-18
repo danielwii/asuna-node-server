@@ -1,7 +1,7 @@
 import { Field, ID, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 
-import { deserializeSafely } from '@danielwii/asuna-helper';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';

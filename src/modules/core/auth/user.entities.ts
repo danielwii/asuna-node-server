@@ -6,7 +6,7 @@ import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { FinancialTransaction, PointExchange, Wallet } from '../../property';
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';

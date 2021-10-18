@@ -1,6 +1,6 @@
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { MongoConfigObject } from './mongo.config';
@@ -10,8 +10,8 @@ import type { DynamicModule } from '@nestjs/common';
 const logger = LoggerFactory.getLogger('MongoProvider');
 
 export class MongoProvider {
-  static forRootAsync(): DynamicModule {
-    return MongooseModule.forRootAsync({
+  public static forRootAsync = (): DynamicModule =>
+    MongooseModule.forRootAsync({
       useFactory: () => {
         const configObject = MongoConfigObject.load();
         const uri = `mongodb://${configObject.username}:${configObject.password}@${configObject.host}:${configObject.port}/${configObject.db}?authSource=admin`;
@@ -31,5 +31,4 @@ export class MongoProvider {
         return options;
       },
     });
-  }
 }

@@ -1,5 +1,5 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import axios from 'axios';
@@ -109,7 +109,7 @@ export class PaymentWxpayHelper {
   ): Promise<Record<string, unknown>> {
     logger.log(`create order ${r({ method, goods, openid })}`);
     const xmlData = await this.createXmlData(method, goods, tradeType, { openid });
-    const response = await axios.post('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
+    const response = await axios.post<any>('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
     logger.debug(`response is ${r(data)}`);
@@ -132,7 +132,7 @@ export class PaymentWxpayHelper {
   ): Promise<string> {
     logger.log(`create payment order ${r({ method, goods, redirectUrl })}`);
     const xmlData = await this.createXmlData(method, goods);
-    const response = await axios.post(method.endpoint, xmlData);
+    const response = await axios.post<any>(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
     logger.debug(`response is ${r(data)}`);

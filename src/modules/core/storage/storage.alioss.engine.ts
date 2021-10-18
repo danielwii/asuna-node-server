@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import OSS from 'ali-oss';
@@ -6,7 +7,6 @@ import { classToPlain } from 'class-transformer';
 import _ from 'lodash';
 import { join } from 'path';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
 import { AliossConfigObject } from './storage.config';

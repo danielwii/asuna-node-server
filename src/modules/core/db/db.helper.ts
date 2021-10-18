@@ -1,6 +1,6 @@
 // import { PrismaClient } from '@prisma/client';
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -541,13 +541,8 @@ export class DBHelper {
   }
 
   public static extractAsunaSchemas(repository, opts: { module?: string; prefix?: string } = {}): ColumnSchema[] {
-    const {
-      columns,
-      manyToManyRelations,
-      manyToOneRelations,
-      oneToManyRelations,
-      oneToOneRelations,
-    } = DBHelper.extractOriginAsunaSchemas(repository, opts);
+    const { columns, manyToManyRelations, manyToOneRelations, oneToManyRelations, oneToOneRelations } =
+      DBHelper.extractOriginAsunaSchemas(repository, opts);
 
     return [
       ...columns,

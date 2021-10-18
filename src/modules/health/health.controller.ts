@@ -8,9 +8,7 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
-import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import checkDiskSpace from 'check-disk-space';
 import _ from 'lodash';
@@ -28,13 +26,11 @@ export class HealthController {
   // private path = resolve(dirname(require.main.filename), '../..');
 
   // eslint-disable-next-line max-params
-  public constructor(
-    private health: HealthCheckService,
-    // private http: HttpHealthIndicator,
-    // private memory: MemoryHealthIndicator,
-    // private typeorm: TypeOrmHealthIndicator,
-    // private disk: DiskHealthIndicator,
-  ) {}
+  public constructor(private health: HealthCheckService) // private http: HttpHealthIndicator,
+  // private memory: MemoryHealthIndicator,
+  // private typeorm: TypeOrmHealthIndicator,
+  // private disk: DiskHealthIndicator,
+  {}
 
   @Get()
   @HealthCheck()

@@ -1,5 +1,5 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -70,7 +70,7 @@ interface BaseResolveProperty<Entity extends BaseEntity> {
 interface BaseResolvePropertyWithMapper<
   Entity extends BaseEntity,
   RelationEntity extends BaseEntity,
-  MixedRelationEntity
+  MixedRelationEntity,
 > {
   cls: ClassType<Entity>;
   instance: Entity;
@@ -103,7 +103,7 @@ export class GraphqlHelper {
   static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders,
-    MixedEntity = any
+    MixedEntity = any,
   >({
     cls,
     query,
@@ -125,7 +125,7 @@ export class GraphqlHelper {
     pageRequest: PageRequest;
     mapper?: (item: Entity) => Promise<MixedEntity>;
   }): Promise<PageInfo & { items: any[]; total: number }> {
-    const entityRepo = (cls as any) as Repository<Entity>;
+    const entityRepo = cls as any as Repository<Entity>;
     const pageInfo = toPage(pageRequest);
     logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, relationPath, loader })}`);
     const items = await this.handleDefaultQueryRequest({
@@ -146,7 +146,7 @@ export class GraphqlHelper {
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders,
-    MixedEntity
+    MixedEntity,
   >(opts: {
     cls: ClassType<Entity>;
     categoryCls?: ClassType<AbstractCategoryEntity>;
@@ -161,7 +161,7 @@ export class GraphqlHelper {
   }): Promise<MixedEntity[]>;
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
-    DataLoaders extends DefaultRegisteredLoaders
+    DataLoaders extends DefaultRegisteredLoaders,
   >(opts: {
     cls: ClassType<Entity>;
     categoryCls?: ClassType<AbstractCategoryEntity>;
@@ -176,7 +176,7 @@ export class GraphqlHelper {
   static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders,
-    MixedEntity
+    MixedEntity,
   >({
     cls,
     query,
@@ -200,7 +200,7 @@ export class GraphqlHelper {
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<Entity[] | MixedEntity[]> {
-    const entityRepo = (cls as any) as Repository<Entity>;
+    const entityRepo = cls as any as Repository<Entity>;
     const dataloader = ctx && loader ? loader(ctx.getDataLoaders()) : undefined;
     if (query.ids && query.ids.length > 0) {
       const items = await (dataloader ? dataloader.load(query.ids) : entityRepo.findByIds(query.ids));
@@ -314,7 +314,7 @@ export class GraphqlHelper {
         throw new AsunaException(AsunaErrorCode.Unprocessable, `category class not defined for ${cls.name}`);
       }
 
-      const categoryClsRepoAlike = (categoryCls as any) as Repository<AbstractCategoryEntity>;
+      const categoryClsRepoAlike = categoryCls as any as Repository<AbstractCategoryEntity>;
       const category = await categoryClsRepoAlike.findOne({ name: query.category, isPublished: true });
 
       logger.debug(`category is ${r(category)}`);
@@ -354,7 +354,7 @@ export class GraphqlHelper {
     }
 
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-    const result = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+    const result = (await (opts.cls as any as typeof BaseEntity).findOne(opts.instance[primaryKey], {
       // loadRelationIds: { relations: [opts.key as string] },
       loadRelationIds: true,
       cache: opts.cache,
@@ -367,7 +367,7 @@ export class GraphqlHelper {
       return _opts.loader.load(id);
     }
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
-    const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+    const targetRepo = _opts.targetCls as any as Repository<RelationEntity>;
     return targetRepo.findOne(id);
   }
 
@@ -392,7 +392,7 @@ export class GraphqlHelper {
   static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
-    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
+    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity },
   >(
     opts: BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
@@ -400,7 +400,7 @@ export class GraphqlHelper {
   static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
-    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity }
+    MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity },
   >(
     opts: (BaseResolveProperty<Entity> | BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>) &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
@@ -417,7 +417,7 @@ export class GraphqlHelper {
     if (_.isNil(ids)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
       logger.debug(`no ids for ${opts.key} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`);
-      const result: any = (await ((opts.cls as any) as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+      const result: any = (await (opts.cls as any as typeof BaseEntity).findOne(opts.instance[primaryKey], {
         loadRelationIds: { relations: [opts.key as string] },
         cache: opts.cache,
       })) as Entity;
@@ -428,12 +428,12 @@ export class GraphqlHelper {
 
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
-      return _opts.loader.load((ids as any) as any[]).then((items) => mapItems(items, mapper));
+      return _opts.loader.load(ids as any as any[]).then((items) => mapItems(items, mapper));
     }
 
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
     logger.warn(`no loader found for ${_opts.targetCls.name}... may cause performance issue`);
-    const targetRepo = (_opts.targetCls as any) as Repository<RelationEntity>;
+    const targetRepo = _opts.targetCls as any as Repository<RelationEntity>;
     return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }
 
@@ -489,7 +489,7 @@ export class GraphqlHelper {
   }) {
     if (!origin) return;
 
-    const targetRepo = (targetCls as any) as Repository<RelationEntity>;
+    const targetRepo = targetCls as any as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
     const take = query?.latest ?? count;
     const order: { [P in keyof RelationEntity]?: 'ASC' | 'DESC' | 1 | -1 } = query?.orderBy
@@ -512,7 +512,7 @@ export class GraphqlHelper {
     cursoredRequest: CursoredRequestInput;
     where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
   }): Promise<CursoredPageable<Entity>> {
-    const entityRepo = (cls as any) as Repository<Entity>;
+    const entityRepo = cls as any as Repository<Entity>;
     const countOptions = where || {};
     const total = await entityRepo.count(countOptions as FindConditions<Entity>);
     // const offsetOptions = await F.when(

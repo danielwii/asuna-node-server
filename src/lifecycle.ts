@@ -3,7 +3,7 @@ import * as Tracing from '@sentry/tracing';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';

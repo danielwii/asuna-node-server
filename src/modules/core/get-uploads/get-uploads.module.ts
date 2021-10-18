@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { FinderModule } from '../finder';
 import { GetUploadsController } from './get-uploads.controller';

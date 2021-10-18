@@ -1,4 +1,4 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { DBCacheCleaner } from '../core/db';
 import { DataloaderCleaner } from '../dataloader/dataloader';

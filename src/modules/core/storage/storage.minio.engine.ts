@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { classToPlain } from 'class-transformer';
@@ -6,7 +7,6 @@ import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';

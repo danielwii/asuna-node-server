@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { LoggerFactory, r } from '@danielwii/asuna-helper';
+import { LoggerFactory, r } from '@danielwii/asuna-helper/dist';
 
 import _ from 'lodash';
 import { FilterQuery, Model } from 'mongoose';

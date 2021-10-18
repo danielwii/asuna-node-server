@@ -1,6 +1,6 @@
 import AliPopCore from '@alicloud/pop-core';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import Chance from 'chance';

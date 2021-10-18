@@ -8,7 +8,7 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { Server } from 'ws';
 

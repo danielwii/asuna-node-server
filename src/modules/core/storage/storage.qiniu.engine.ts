@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger';
+import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { classToPlain } from 'class-transformer';
@@ -6,7 +7,6 @@ import * as _ from 'lodash';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
 
-import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
 import { QiniuConfigObject } from './storage.config';
