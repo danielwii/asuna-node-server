@@ -13,15 +13,15 @@ model app__t_infos {
   updated_by      String?           @db.VarChar(100)
   created_by      String?           @db.VarChar(100)
   id              Int               @id @default(autoincrement())
-  name            String            @unique @db.VarChar(100)
+  name            String            @unique(map: "IDX_6504a93a497fe965317a52a43c") @db.VarChar(100)
   description     String?           @db.Text
   is_published    Int?              @db.TinyInt
-  key             String            @unique @db.VarChar(50)
+  key             String            @unique(map: "IDX_7ffa5d9d63763013e0db35f68b") @db.VarChar(50)
   mode            String?           @db.VarChar(255)
   app__t_releases app__t_releases[]
 
-  @@index([created_at], name: "IDX_a625e68b867d4954cf08e6b828")
-  @@index([updated_at], name: "IDX_f92a6a33ac28787d95df6295e9")
+  @@index([created_at], map: "IDX_a625e68b867d4954cf08e6b828")
+  @@index([updated_at], map: "IDX_f92a6a33ac28787d95df6295e9")
 }
 
 model app__t_releases {
@@ -38,22 +38,22 @@ model app__t_releases {
   description  String?       @db.Text
   paths        Json
   app_info__id Int?
-  app__t_infos app__t_infos? @relation(fields: [app_info__id], references: [id])
+  app__t_infos app__t_infos? @relation(fields: [app_info__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_297f3d3b3e0b92a3ad8470bd818")
 
-  @@index([app_info__id], name: "FK_297f3d3b3e0b92a3ad8470bd818")
-  @@index([updated_at], name: "IDX_46fb6d2569291d87a7964c19af")
-  @@index([created_at], name: "IDX_ea85864d7909c703e7cdb6eb80")
+  @@index([app_info__id], map: "FK_297f3d3b3e0b92a3ad8470bd818")
+  @@index([updated_at], map: "IDX_46fb6d2569291d87a7964c19af")
+  @@index([created_at], map: "IDX_ea85864d7909c703e7cdb6eb80")
 }
 
 model auth__tr_users_roles {
   user__id      String        @db.VarChar(36)
   role__id      Int
-  auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id])
-  auth__t_users auth__t_users @relation(fields: [user__id], references: [id])
+  auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_3c04c4b2407cda34444ccb47d92")
+  auth__t_users auth__t_users @relation(fields: [user__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_8977e1e734c29dccaf68a6beded")
 
   @@id([user__id, role__id])
-  @@index([role__id], name: "IDX_3c04c4b2407cda34444ccb47d9")
-  @@index([user__id], name: "IDX_8977e1e734c29dccaf68a6bede")
+  @@index([role__id], map: "IDX_3c04c4b2407cda34444ccb47d9")
+  @@index([user__id], map: "IDX_8977e1e734c29dccaf68a6bede")
 }
 
 model auth__t_api_keys {
@@ -62,14 +62,14 @@ model auth__t_api_keys {
   updated_by   String?  @db.VarChar(100)
   created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  name         String   @unique @db.VarChar(100)
+  name         String   @unique(map: "IDX_673c6e2ec5de5c84c31e20406a") @db.VarChar(100)
   description  String?  @db.Text
   is_published Int?     @db.TinyInt
   key          String   @db.VarChar(255)
   whitelist    Json?
 
-  @@index([created_at], name: "IDX_1a26dd29cddb6b533386ac2af7")
-  @@index([updated_at], name: "IDX_89786b9eb69c44a8b1478ec424")
+  @@index([created_at], map: "IDX_1a26dd29cddb6b533386ac2af7")
+  @@index([updated_at], map: "IDX_89786b9eb69c44a8b1478ec424")
 }
 
 model auth__t_roles {
@@ -78,14 +78,14 @@ model auth__t_roles {
   updated_by           String?                @db.VarChar(100)
   created_by           String?                @db.VarChar(100)
   id                   Int                    @id @default(autoincrement())
-  name                 String                 @unique @db.VarChar(80)
+  name                 String                 @unique(map: "IDX_9e0d0d08f85548995247de00fc") @db.VarChar(80)
   description          String?                @db.VarChar(255)
   authorities          Json?
   data_filter          Json?
   auth__tr_users_roles auth__tr_users_roles[]
 
-  @@index([created_at], name: "IDX_22b4750b85446ae5ddda8fb58e")
-  @@index([updated_at], name: "IDX_756b71a11a50bc357ab1cf79e9")
+  @@index([created_at], map: "IDX_22b4750b85446ae5ddda8fb58e")
+  @@index([updated_at], map: "IDX_756b71a11a50bc357ab1cf79e9")
 }
 
 model auth__t_users {
@@ -93,9 +93,9 @@ model auth__t_users {
   created_at           DateTime               @default(now()) @db.DateTime(6)
   updated_at           DateTime               @default(now()) @db.DateTime(6)
   updated_by           String?                @db.VarChar(100)
-  username             String                 @unique @db.VarChar(50)
-  email                String?                @unique @db.VarChar(50)
-  nickname             String?                @unique @db.VarChar(50)
+  username             String                 @unique(map: "IDX_a03085fbb019b9b2c1beff10d5") @db.VarChar(50)
+  email                String?                @unique(map: "IDX_a1157cadd35c869b45de19ca47") @db.VarChar(50)
+  nickname             String?                @unique(map: "IDX_17a37b460d8c8de9a3d4519a71") @db.VarChar(50)
   portrait             String?                @db.VarChar(255)
   channel              String?                @default("default") @db.VarChar(255)
   password             String?                @db.VarChar(255)
@@ -119,8 +119,8 @@ model content__t_drafts {
   ref_id     String   @db.VarChar(36)
   type       String   @db.VarChar(20)
 
-  @@index([created_at], name: "IDX_585015aa5b3babda04237f193e")
-  @@index([updated_at], name: "IDX_98650d2dd375ea29381eabc532")
+  @@index([created_at], map: "IDX_585015aa5b3babda04237f193e")
+  @@index([updated_at], map: "IDX_98650d2dd375ea29381eabc532")
 }
 
 model content__t_feedback {
@@ -135,12 +135,12 @@ model content__t_feedback {
   type                        String?                       @db.VarChar(50)
   images                      Json?
   status                      String                        @db.VarChar(20)
-  user__t_profiles            user__t_profiles?             @relation(fields: [profile__id], references: [id])
+  user__t_profiles            user__t_profiles?             @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f909b9eac784fd3622ae398e6fc")
   content__t_feedback_replies content__t_feedback_replies[]
 
-  @@index([profile__id], name: "FK_f909b9eac784fd3622ae398e6fc")
-  @@index([created_at], name: "IDX_a17f505248cbcf2b42abdd9578")
-  @@index([updated_at], name: "IDX_b809b0fa7a0b09ad014d7134c4")
+  @@index([profile__id], map: "FK_f909b9eac784fd3622ae398e6fc")
+  @@index([created_at], map: "IDX_a17f505248cbcf2b42abdd9578")
+  @@index([updated_at], map: "IDX_b809b0fa7a0b09ad014d7134c4")
 }
 
 model content__t_feedback_replies {
@@ -154,11 +154,11 @@ model content__t_feedback_replies {
   description         String               @db.VarChar(1000)
   sender_type         String               @db.VarChar(1000)
   feedback__id        Int?
-  content__t_feedback content__t_feedback? @relation(fields: [feedback__id], references: [id])
+  content__t_feedback content__t_feedback? @relation(fields: [feedback__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_664489527fd4888cfe12591feed")
 
-  @@index([feedback__id], name: "FK_664489527fd4888cfe12591feed")
-  @@index([created_at], name: "IDX_0bc3e3b443ca8bf3a3ffba83eb")
-  @@index([updated_at], name: "IDX_5010543a30396840afa04ad319")
+  @@index([feedback__id], map: "FK_664489527fd4888cfe12591feed")
+  @@index([created_at], map: "IDX_0bc3e3b443ca8bf3a3ffba83eb")
+  @@index([updated_at], map: "IDX_5010543a30396840afa04ad319")
 }
 
 model content__t_notifications {
@@ -167,14 +167,14 @@ model content__t_notifications {
   updated_by   String?  @db.VarChar(100)
   created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  name         String   @unique @db.VarChar(100)
+  name         String   @unique(map: "IDX_a82c19659253716a85844e318d") @db.VarChar(100)
   description  String?  @db.Text
   is_published Int?     @db.TinyInt
   type         String   @db.VarChar(255)
   usage        String?  @db.VarChar(255)
 
-  @@index([created_at], name: "IDX_6ec8dc856f5228bb5d6fd7a179")
-  @@index([updated_at], name: "IDX_892503296b6fcaf6d33245289a")
+  @@index([created_at], map: "IDX_6ec8dc856f5228bb5d6fd7a179")
+  @@index([updated_at], map: "IDX_892503296b6fcaf6d33245289a")
 }
 
 model kv__t_models {
@@ -183,15 +183,15 @@ model kv__t_models {
   updated_by   String?      @db.VarChar(100)
   created_by   String?      @db.VarChar(100)
   id           Int          @id @default(autoincrement())
-  name         String       @unique @db.VarChar(100)
+  name         String       @unique(map: "IDX_3a35080b44fce728d9b2ab85c4") @db.VarChar(100)
   description  String?      @db.Text
   is_published Int?         @db.TinyInt
   format_type  String?      @db.VarChar(255)
-  pair__id     Int?         @unique
-  kv__t_pairs  kv__t_pairs? @relation(fields: [pair__id], references: [id])
+  pair__id     Int?         @unique(map: "REL_1ead35b3b9780e8dc55ede673c")
+  kv__t_pairs  kv__t_pairs? @relation(fields: [pair__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_1ead35b3b9780e8dc55ede673ce")
 
-  @@index([updated_at], name: "IDX_57b308a0c3947d7c32d296f1b6")
-  @@index([created_at], name: "IDX_5bde4c94d5f93c71e5c2d7163d")
+  @@index([updated_at], map: "IDX_57b308a0c3947d7c32d296f1b6")
+  @@index([created_at], map: "IDX_5bde4c94d5f93c71e5c2d7163d")
 }
 
 model kv__t_pairs {
@@ -208,8 +208,8 @@ model kv__t_pairs {
   extra        Json?
   kv__t_models kv__t_models?
 
-  @@index([created_at], name: "IDX_51e67821d6b5e90468c7fef387")
-  @@index([updated_at], name: "IDX_e47de1fa453092410b3d92841e")
+  @@index([created_at], map: "IDX_51e67821d6b5e90468c7fef387")
+  @@index([updated_at], map: "IDX_e47de1fa453092410b3d92841e")
 }
 
 model migrations {
@@ -224,7 +224,7 @@ model page__t_views {
   updated_by   String?  @db.VarChar(100)
   created_by   String?  @db.VarChar(100)
   id           Int      @id @default(autoincrement())
-  name         String   @unique @db.VarChar(100)
+  name         String   @unique(map: "IDX_9a71d9ec304e7f5312cae64007") @db.VarChar(100)
   description  String?  @db.Text
   is_published Int?     @db.TinyInt
   path         String   @db.VarChar(50)
@@ -232,19 +232,19 @@ model page__t_views {
   files        Json?
   images       Json?
 
-  @@index([updated_at], name: "IDX_1444de8153ca029a71dc77a5d6")
-  @@index([created_at], name: "IDX_4e9aa5aec6ca57cd59acf3c5be")
+  @@index([updated_at], map: "IDX_1444de8153ca029a71dc77a5d6")
+  @@index([created_at], map: "IDX_4e9aa5aec6ca57cd59acf3c5be")
 }
 
 model payment__tr_order_items {
   order__id         String            @db.VarChar(36)
   item__id          String            @db.VarChar(36)
-  payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id])
-  payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id])
+  payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_46c05f9d98ca4e16836ab89fae0")
+  payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_aaaffec287d62170d792eef4e9f")
 
   @@id([order__id, item__id])
-  @@index([item__id], name: "IDX_46c05f9d98ca4e16836ab89fae")
-  @@index([order__id], name: "IDX_aaaffec287d62170d792eef4e9")
+  @@index([item__id], map: "IDX_46c05f9d98ca4e16836ab89fae")
+  @@index([order__id], map: "IDX_aaaffec287d62170d792eef4e9")
 }
 
 model payment__t_items {
@@ -252,10 +252,10 @@ model payment__t_items {
   created_at              DateTime                  @default(now()) @db.DateTime(6)
   updated_at              DateTime                  @default(now()) @db.DateTime(6)
   updated_by              String?                   @db.VarChar(100)
-  name                    String                    @unique @db.VarChar(100)
+  name                    String                    @unique(map: "IDX_86fc4ee85f594a0152186c525c") @db.VarChar(100)
   description             String?                   @db.Text
   is_published            Int?                      @db.TinyInt
-  key                     String                    @unique @db.VarChar(50)
+  key                     String                    @unique(map: "IDX_d5fccf27631cc84dee81c9dfb8") @db.VarChar(50)
   summary                 String?                   @db.Text
   price                   Decimal?                  @db.Decimal(15, 2)
   cover                   String?                   @db.VarChar(1000)
@@ -268,7 +268,7 @@ model payment__t_methods {
   created_at              DateTime                  @default(now()) @db.DateTime(6)
   updated_at              DateTime                  @default(now()) @db.DateTime(6)
   updated_by              String?                   @db.VarChar(100)
-  name                    String                    @unique @db.VarChar(100)
+  name                    String                    @unique(map: "IDX_690477c4a389c5259f11d7e35f") @db.VarChar(100)
   description             String?                   @db.Text
   is_published            Int?                      @db.TinyInt
   display_name            String?                   @db.VarChar(255)
@@ -292,12 +292,12 @@ model payment__t_orders {
   name                    String?                   @db.VarChar(255)
   amount                  Decimal                   @db.Decimal(15, 2)
   status                  String?                   @db.VarChar(255)
-  transaction__id         String?                   @unique @db.VarChar(36)
-  user__t_profiles        user__t_profiles?         @relation(fields: [profile__id], references: [id])
-  payment__t_transactions payment__t_transactions?  @relation(fields: [transaction__id], references: [id])
+  transaction__id         String?                   @unique(map: "REL_de81f74f6be8648264ada4c5c3") @db.VarChar(36)
+  user__t_profiles        user__t_profiles?         @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_8f41cad8ace463ec57036efaecc")
+  payment__t_transactions payment__t_transactions?  @relation(fields: [transaction__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_de81f74f6be8648264ada4c5c3a")
   payment__tr_order_items payment__tr_order_items[]
 
-  @@index([profile__id], name: "FK_8f41cad8ace463ec57036efaecc")
+  @@index([profile__id], map: "FK_8f41cad8ace463ec57036efaecc")
 }
 
 model payment__t_transactions {
@@ -312,12 +312,12 @@ model payment__t_transactions {
   extra              Json?
   data               Json?
   method__id         String?             @db.VarChar(36)
-  payment__t_methods payment__t_methods? @relation(fields: [method__id], references: [id])
-  user__t_profiles   user__t_profiles?   @relation(fields: [profile__id], references: [id])
+  payment__t_methods payment__t_methods? @relation(fields: [method__id], references: [id], onUpdate: NoAction, map: "FK_e15010b86bdf88783447bc62057")
+  user__t_profiles   user__t_profiles?   @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_efddbdc437038a75d15ef0ae750")
   payment__t_orders  payment__t_orders?
 
-  @@index([method__id], name: "FK_e15010b86bdf88783447bc62057")
-  @@index([profile__id], name: "FK_efddbdc437038a75d15ef0ae750")
+  @@index([method__id], map: "FK_e15010b86bdf88783447bc62057")
+  @@index([profile__id], map: "FK_efddbdc437038a75d15ef0ae750")
 }
 
 model property__t_exchange_objects {
@@ -326,10 +326,10 @@ model property__t_exchange_objects {
   updated_by                         String?                              @db.VarChar(100)
   created_by                         String?                              @db.VarChar(100)
   id                                 Int                                  @id @default(autoincrement())
-  name                               String                               @unique @db.VarChar(100)
+  name                               String                               @unique(map: "IDX_798af19ccff99a7c587436da70") @db.VarChar(100)
   description                        String?                              @db.Text
   is_published                       Int?                                 @db.TinyInt
-  key                                String                               @unique @db.VarChar(50)
+  key                                String                               @unique(map: "IDX_7c55d69fabe9befb42cd7f20c4") @db.VarChar(50)
   type                               String                               @db.VarChar(255)
   price                              Decimal                              @db.Decimal(15, 2)
   value                              String                               @db.VarChar(255)
@@ -337,8 +337,8 @@ model property__t_exchange_objects {
   usage                              String?                              @db.VarChar(255)
   property__t_financial_transactions property__t_financial_transactions[]
 
-  @@index([updated_at], name: "IDX_857728c978caf383ca64a60068")
-  @@index([created_at], name: "IDX_fdce394ef88931baf178388e5b")
+  @@index([updated_at], map: "IDX_857728c978caf383ca64a60068")
+  @@index([created_at], map: "IDX_fdce394ef88931baf178388e5b")
 }
 
 model property__t_financial_transactions {
@@ -356,13 +356,13 @@ model property__t_financial_transactions {
   remark                       String?                       @db.Text
   profile__id                  String?                       @db.VarChar(36)
   exchange_object__id          Int?
-  property__t_exchange_objects property__t_exchange_objects? @relation(fields: [exchange_object__id], references: [id])
-  user__t_profiles             user__t_profiles?             @relation(fields: [profile__id], references: [id])
+  property__t_exchange_objects property__t_exchange_objects? @relation(fields: [exchange_object__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_66319aeac147cdacaaa6d3972c1")
+  user__t_profiles             user__t_profiles?             @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_971dbdb2ea844a15d0809c9bd39")
 
-  @@index([exchange_object__id], name: "FK_66319aeac147cdacaaa6d3972c1")
-  @@index([profile__id], name: "FK_971dbdb2ea844a15d0809c9bd39")
-  @@index([updated_at], name: "IDX_057d44268662ae35a409e05716")
-  @@index([created_at], name: "IDX_caaf5c99071949432a304aa8e3")
+  @@index([exchange_object__id], map: "FK_66319aeac147cdacaaa6d3972c1")
+  @@index([profile__id], map: "FK_971dbdb2ea844a15d0809c9bd39")
+  @@index([updated_at], map: "IDX_057d44268662ae35a409e05716")
+  @@index([created_at], map: "IDX_caaf5c99071949432a304aa8e3")
 }
 
 model property__t_point_exchanges {
@@ -380,11 +380,11 @@ model property__t_point_exchanges {
   remark           String?           @db.Text
   profile__id      String?           @db.VarChar(36)
   body             Json?
-  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_71e71a796ec68bd891e63d37a5f")
 
-  @@index([profile__id], name: "FK_71e71a796ec68bd891e63d37a5f")
-  @@index([created_at], name: "IDX_8439bf0a7c4628f85a0f76540f")
-  @@index([updated_at], name: "IDX_90810898d4811098f6d2bc9db5")
+  @@index([profile__id], map: "FK_71e71a796ec68bd891e63d37a5f")
+  @@index([created_at], map: "IDX_8439bf0a7c4628f85a0f76540f")
+  @@index([updated_at], map: "IDX_90810898d4811098f6d2bc9db5")
 }
 
 model property__t_wallets {
@@ -393,7 +393,7 @@ model property__t_wallets {
   updated_by       String?           @db.VarChar(100)
   created_by       String?           @db.VarChar(100)
   id               Int               @id @default(autoincrement())
-  profile__id      String?           @unique @db.VarChar(36)
+  profile__id      String?           @unique(map: "REL_3f767823aceb4828d3b19d3fdb") @db.VarChar(36)
   balance          Int
   available        Int
   frozen           Int
@@ -401,10 +401,10 @@ model property__t_wallets {
   points           Int
   /// This field's default value can currently not be parsed: `-1`.
   total_recharge   Int               @default(-1)
-  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3f767823aceb4828d3b19d3fdb0")
 
-  @@index([created_at], name: "IDX_33a258d269927d3d59b4dabf8b")
-  @@index([updated_at], name: "IDX_846797d1cb31afb19251e8c853")
+  @@index([created_at], map: "IDX_33a258d269927d3d59b4dabf8b")
+  @@index([updated_at], map: "IDX_846797d1cb31afb19251e8c853")
 }
 
 model sys__t_audit_records {
@@ -420,8 +420,8 @@ model sys__t_audit_records {
   to             Json?
   diff           Json?
 
-  @@index([updated_at], name: "IDX_1f180c9dd2bc784fb41ad41c7a")
-  @@index([created_at], name: "IDX_cc772254fa7dbbb79b73e46cb8")
+  @@index([updated_at], map: "IDX_1f180c9dd2bc784fb41ad41c7a")
+  @@index([created_at], map: "IDX_cc772254fa7dbbb79b73e46cb8")
 }
 
 model sys__t_operation_tokens {
@@ -446,8 +446,8 @@ model sys__t_operation_tokens {
   is_active     Int?      @default(1) @db.TinyInt
   is_expired    Int?      @default(0) @db.TinyInt
 
-  @@index([updated_at], name: "IDX_9ae08b76a592a4c4ab812f91b5")
-  @@index([created_at], name: "IDX_efc969a8a30a0f5fd869d1c73f")
+  @@index([updated_at], map: "IDX_9ae08b76a592a4c4ab812f91b5")
+  @@index([created_at], map: "IDX_efc969a8a30a0f5fd869d1c73f")
 }
 
 model sys__t_tasks {
@@ -474,11 +474,11 @@ model sys__t_task_events {
   message      String?       @db.VarChar(255)
   body         Json?
   task__id     String?       @db.VarChar(36)
-  sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id])
+  sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b9db76df8c6d282adb47c191808")
 
-  @@index([task__id], name: "FK_b9db76df8c6d282adb47c191808")
-  @@index([updated_at], name: "IDX_553d001ee8575bb606a5ef3057")
-  @@index([created_at], name: "IDX_b5583e5a27f6465be6f909146d")
+  @@index([task__id], map: "FK_b9db76df8c6d282adb47c191808")
+  @@index([updated_at], map: "IDX_553d001ee8575bb606a5ef3057")
+  @@index([created_at], map: "IDX_b5583e5a27f6465be6f909146d")
 }
 
 model user__t_activities {
@@ -491,9 +491,9 @@ model user__t_activities {
   type             String            @db.VarChar(20)
   service          String            @db.VarChar(20)
   operation        String            @db.VarChar(20)
-  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_89b4fa3d94c3a2c8464feb0c279")
 
-  @@index([profile__id], name: "FK_89b4fa3d94c3a2c8464feb0c279")
+  @@index([profile__id], map: "FK_89b4fa3d94c3a2c8464feb0c279")
 }
 
 model user__t_follows {
@@ -504,9 +504,9 @@ model user__t_follows {
   type             String?           @db.VarChar(50)
   following        String?           @db.VarChar(50)
   follower__id     String?           @db.VarChar(36)
-  user__t_profiles user__t_profiles? @relation(fields: [follower__id], references: [id])
+  user__t_profiles user__t_profiles? @relation(fields: [follower__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ab5a56d5c89e147cc87c96b6a7d")
 
-  @@index([follower__id], name: "FK_ab5a56d5c89e147cc87c96b6a7d")
+  @@index([follower__id], map: "FK_ab5a56d5c89e147cc87c96b6a7d")
 }
 
 model wx__t_mini_app_users {
@@ -522,8 +522,8 @@ model wx__t_mini_app_users {
   created_at       DateTime          @default(now()) @db.DateTime(6)
   updated_at       DateTime          @default(now()) @db.DateTime(6)
   updated_by       String?           @db.VarChar(100)
-  profile__id      String?           @unique @db.VarChar(36)
-  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id])
+  profile__id      String?           @unique(map: "REL_f5d7d26210feb0a32e85bd5b7a") @db.VarChar(36)
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f5d7d26210feb0a32e85bd5b7a9")
 }
 
 model wx__t_users {
@@ -547,11 +547,11 @@ model wx__t_users {
   qr_scene_str    String?        @db.VarChar(255)
   created_at      DateTime       @default(now()) @db.DateTime(6)
   updated_at      DateTime       @default(now()) @db.DateTime(6)
-  admin__id       String?        @unique @db.VarChar(36)
-  auth__t_users   auth__t_users? @relation(fields: [admin__id], references: [id])
-  ss__t_tenants   ss__t_tenants? @relation(fields: [tenant__id], references: [id])
+  admin__id       String?        @unique(map: "REL_d391be1d5c66b164a90c708f56") @db.VarChar(36)
+  auth__t_users   auth__t_users? @relation(fields: [admin__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_d391be1d5c66b164a90c708f569")
+  ss__t_tenants   ss__t_tenants? @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_84c91d701b8ae841a49bf00352f")
 
-  @@index([tenant__id], name: "FK_84c91d701b8ae841a49bf00352f")
+  @@index([tenant__id], map: "FK_84c91d701b8ae841a49bf00352f")
 }
 
 model client__t_session_users {
@@ -563,14 +563,14 @@ model client__t_session_users {
   uid                        String                     @db.VarChar(36)
   device__id                 String?                    @db.VarChar(36)
   session__id                String                     @id @db.VarChar(36)
-  client__t_virtual_devices  client__t_virtual_devices? @relation(fields: [device__id], references: [id])
-  user__t_profiles           user__t_profiles?          @relation(fields: [profile__id], references: [id])
-  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id])
+  client__t_virtual_devices  client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_928b741562da4908a8d468afc26")
+  user__t_profiles           user__t_profiles?          @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_5d257e4a36e0b569e4fd02e8ae9")
+  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_e73a635c89b018fbb192c8ab3ac")
 
-  @@index([profile__id], name: "FK_5d257e4a36e0b569e4fd02e8ae9")
-  @@index([device__id], name: "FK_928b741562da4908a8d468afc26")
-  @@index([updated_at], name: "IDX_54ac8410107e9728f051c493ec")
-  @@index([created_at], name: "IDX_bea7340e1acf012907684b3a8a")
+  @@index([profile__id], map: "FK_5d257e4a36e0b569e4fd02e8ae9")
+  @@index([device__id], map: "FK_928b741562da4908a8d468afc26")
+  @@index([updated_at], map: "IDX_54ac8410107e9728f051c493ec")
+  @@index([created_at], map: "IDX_bea7340e1acf012907684b3a8a")
 }
 
 model client__t_virtual_devices {
@@ -583,8 +583,8 @@ model client__t_virtual_devices {
   client__t_session_users    client__t_session_users[]
   client__t_virtual_sessions client__t_virtual_sessions[]
 
-  @@index([updated_at], name: "IDX_176cff1f83eabd5c73640c6231")
-  @@index([created_at], name: "IDX_214d921abf73eca7ef1e6eb59b")
+  @@index([updated_at], map: "IDX_176cff1f83eabd5c73640c6231")
+  @@index([created_at], map: "IDX_214d921abf73eca7ef1e6eb59b")
 }
 
 model client__t_virtual_sessions {
@@ -596,24 +596,24 @@ model client__t_virtual_sessions {
   ua                        String                     @db.VarChar(512)
   client_ip                 String?                    @db.VarChar(36)
   device__id                String?                    @db.VarChar(36)
-  client__t_virtual_devices client__t_virtual_devices? @relation(fields: [device__id], references: [id])
+  client__t_virtual_devices client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_30e40b42549b0bcb0828ff5d9db")
   client__t_session_users   client__t_session_users?
   web__t_tracing_records    web__t_tracing_records?
 
-  @@index([device__id], name: "FK_30e40b42549b0bcb0828ff5d9db")
-  @@index([created_at], name: "IDX_5ded6e94d7d8e4cf7d1f627a97")
-  @@index([updated_at], name: "IDX_79fcb330bf59003a59e09e2894")
+  @@index([device__id], map: "FK_30e40b42549b0bcb0828ff5d9db")
+  @@index([created_at], map: "IDX_5ded6e94d7d8e4cf7d1f627a97")
+  @@index([updated_at], map: "IDX_79fcb330bf59003a59e09e2894")
 }
 
 model ss__tr_org_users_roles {
   org_user__id    String          @db.VarChar(36)
   role__id        Int
-  ss__t_org_users ss__t_org_users @relation(fields: [org_user__id], references: [id])
-  ss__t_org_roles ss__t_org_roles @relation(fields: [role__id], references: [id])
+  ss__t_org_users ss__t_org_users @relation(fields: [org_user__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_c35a4655e4a9fb2d52d4ed70837")
+  ss__t_org_roles ss__t_org_roles @relation(fields: [role__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_5f95985274505aa362fac9e512d")
 
   @@id([org_user__id, role__id])
-  @@index([role__id], name: "IDX_5f95985274505aa362fac9e512")
-  @@index([org_user__id], name: "IDX_c35a4655e4a9fb2d52d4ed7083")
+  @@index([role__id], map: "IDX_5f95985274505aa362fac9e512")
+  @@index([org_user__id], map: "IDX_c35a4655e4a9fb2d52d4ed7083")
 }
 
 model ss__t_org_roles {
@@ -622,12 +622,12 @@ model ss__t_org_roles {
   updated_by             String?                  @db.VarChar(100)
   created_by             String?                  @db.VarChar(100)
   id                     Int                      @id @default(autoincrement())
-  name                   String                   @unique @db.VarChar(80)
+  name                   String                   @unique(map: "IDX_e3a5a7a0060e3d978181ef6bcf") @db.VarChar(80)
   description            String?                  @db.VarChar(255)
   ss__tr_org_users_roles ss__tr_org_users_roles[]
 
-  @@index([created_at], name: "IDX_af9ce2de264d81547b8edcfb27")
-  @@index([updated_at], name: "IDX_e87d3a9200b11b0ca9e8854f09")
+  @@index([created_at], map: "IDX_af9ce2de264d81547b8edcfb27")
+  @@index([updated_at], map: "IDX_e87d3a9200b11b0ca9e8854f09")
 }
 
 model ss__t_org_users {
@@ -635,9 +635,9 @@ model ss__t_org_users {
   created_at             DateTime                 @default(now()) @db.DateTime(6)
   updated_at             DateTime                 @default(now()) @db.DateTime(6)
   updated_by             String?                  @db.VarChar(100)
-  username               String                   @unique @db.VarChar(50)
-  email                  String?                  @unique @db.VarChar(50)
-  nickname               String?                  @unique @db.VarChar(50)
+  username               String                   @unique(map: "IDX_5e064e6d098ac87d72bba218df") @db.VarChar(50)
+  email                  String?                  @unique(map: "IDX_0a87c311c30ba94653f8b3b0d7") @db.VarChar(50)
+  nickname               String?                  @unique(map: "IDX_ee123b93f0979b1a14e5c2dd53") @db.VarChar(50)
   portrait               String?                  @db.VarChar(255)
   channel                String?                  @default("default") @db.VarChar(255)
   password               String?                  @db.VarChar(255)
@@ -648,10 +648,10 @@ model ss__t_org_users {
   is_active              Int?                     @db.TinyInt
   is_bound               Int?                     @default(0) @db.TinyInt
   tenant__id             String?                  @db.VarChar(36)
-  ss__t_tenants          ss__t_tenants?           @relation(fields: [tenant__id], references: [id])
+  ss__t_tenants          ss__t_tenants?           @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_81914fa6804dd1f103a589e6f74")
   ss__tr_org_users_roles ss__tr_org_users_roles[]
 
-  @@index([tenant__id], name: "FK_81914fa6804dd1f103a589e6f74")
+  @@index([tenant__id], map: "FK_81914fa6804dd1f103a589e6f74")
 }
 
 model ss__t_tenants {
@@ -659,7 +659,7 @@ model ss__t_tenants {
   created_at      DateTime          @default(now()) @db.DateTime(6)
   updated_at      DateTime          @default(now()) @db.DateTime(6)
   updated_by      String?           @db.VarChar(100)
-  name            String            @unique @db.VarChar(100)
+  name            String            @unique(map: "IDX_4a16e97ca6791b1a894e1a8eb5") @db.VarChar(100)
   description     String?           @db.Text
   is_published    Int?              @db.TinyInt
   ss__t_org_users ss__t_org_users[]
@@ -671,9 +671,9 @@ model user__t_profiles {
   created_at                         DateTime                             @default(now()) @db.DateTime(6)
   updated_at                         DateTime                             @default(now()) @db.DateTime(6)
   updated_by                         String?                              @db.VarChar(100)
-  username                           String                               @unique @db.VarChar(50)
-  email                              String?                              @unique @db.VarChar(50)
-  nickname                           String?                              @unique @db.VarChar(50)
+  username                           String                               @unique(map: "IDX_07c9a8edb162691058276a7a6e") @db.VarChar(50)
+  email                              String?                              @unique(map: "IDX_50658e037cadb3f55fa15b920c") @db.VarChar(50)
+  nickname                           String?                              @unique(map: "IDX_dd073653a780fe30b46c93a0e5") @db.VarChar(50)
   portrait                           String?                              @db.VarChar(255)
   channel                            String?                              @default("default") @db.VarChar(255)
   password                           String?                              @db.VarChar(255)
@@ -700,7 +700,7 @@ model content__t_data_groups {
   created_at  DateTime @default(now()) @db.DateTime(6)
   updated_at  DateTime @default(now()) @db.DateTime(6)
   updated_by  String?  @db.VarChar(100)
-  name        String   @unique @db.VarChar(100)
+  name        String   @unique(map: "IDX_9e9a4ee14ef761a52ae4f38ee8") @db.VarChar(100)
   description String?  @db.Text
 }
 
@@ -718,8 +718,8 @@ model web__t_tracing_records {
   utm_campaign               String?                    @db.VarChar(255)
   utm_term                   String?                    @db.VarChar(255)
   session__id                String                     @id @db.VarChar(36)
-  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id])
+  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_85b490c3556ceeafd084c29b814")
 
-  @@index([updated_at], name: "IDX_6042f1e53d26895a6413748497")
-  @@index([created_at], name: "IDX_9699f66084e48645b78b306dae")
+  @@index([updated_at], map: "IDX_6042f1e53d26895a6413748497")
+  @@index([created_at], map: "IDX_9699f66084e48645b78b306dae")
 }
