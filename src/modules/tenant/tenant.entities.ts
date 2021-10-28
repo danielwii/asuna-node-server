@@ -1,6 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
@@ -28,7 +28,6 @@ export class Tenant extends Publishable(AbstractTimeBasedNameEntity) {
   users: OrgUser[];
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InjectTenant = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   class ExtendableEntity extends Base {
     @MetaInfo({ accessible: 'hidden' })
@@ -93,3 +92,37 @@ export class OrgUser extends InjectTenant(AbstractTimeBasedAuthUser) {
   })
   public roles: OrgRole[];
 }
+
+export const InjectOrgUser = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
+  @InterfaceType()
+  class ExtendableEntity extends Base {
+    @Field({ nullable: true })
+    @MetaInfo({ accessible: 'hidden' })
+    @Column({ nullable: true, length: 36, name: 'org_user__id' })
+    orgUserId?: string;
+
+    @MetaInfo({ name: '管理' })
+    @OneToOne('OrgUser')
+    @JoinColumn({ name: 'org_user__id' })
+    orgUser?: OrgUser;
+  }
+
+  return ExtendableEntity;
+};
+
+export const InjectMultiOrgUser = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
+  @InterfaceType()
+  class ExtendableEntity extends Base {
+    @Field({ nullable: true })
+    @MetaInfo({ accessible: 'hidden' })
+    @Column({ nullable: true, length: 36, name: 'org_user__id' })
+    orgUserId?: string;
+
+    @MetaInfo({ name: '管理' })
+    @ManyToOne('OrgUser')
+    @JoinColumn({ name: 'org_user__id' })
+    orgUser?: OrgUser;
+  }
+
+  return ExtendableEntity;
+};

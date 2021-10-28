@@ -48,18 +48,12 @@ export class WebController {
 
     // logger.log(`tracing ${r(tracing)}`);
     const at = _.isNumber(Number(query.at)) ? new Date(Number(query.at)) : new Date();
-    const view = Builder(PageView, tracing)
-      .href(body.href)
-      .title(body.title)
-      .address(
-        _.chain(geo ? geo.city + ', ' + geo.country : '')
-          .trim()
-          .trim(',')
-          .trim()
-          .value(),
-      )
-      .at(at)
-      .build();
+    const address = _.chain(geo ? geo.city + ', ' + geo.country : '')
+      .trim()
+      .trim(',')
+      .trim()
+      .value();
+    const view = Builder(PageView, tracing).href(body.href).title(body.title).address(address).at(at).build();
     await this.webService.addPageView(view);
     return;
   }

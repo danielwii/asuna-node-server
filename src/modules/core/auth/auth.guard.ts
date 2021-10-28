@@ -46,7 +46,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             _.isError(info) ? info.message : info,
           );
     }
-    this.logger.log(`handleRequest ${r({ err, payload, info })}`);
+    // this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     await auth(req, res, AuthType.client);
     return req.user;
   }

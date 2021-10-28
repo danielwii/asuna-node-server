@@ -1,9 +1,0 @@
-type Tenant implements BaseGenericEntity {
-  id: String!
-  createdAt: Date!
-  updatedAt: Date!
-}
-
-type MgmtTenantInfo {
-  config: Any
-}

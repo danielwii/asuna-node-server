@@ -9,7 +9,7 @@ import { EntityManager, getManager } from 'typeorm';
 
 import { CursoredRequest } from '../../graphql';
 
-import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
+import type { ClassType } from '@danielwii/asuna-helper';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
