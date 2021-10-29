@@ -638,7 +638,7 @@ __metadata:
   dependencies:
     "@alicloud/pop-core": ^1.7.10
     "@danielwii/asuna-helper": ^0.0.9
-    "@danielwii/asuna-shared": ^0.0.3
+    "@danielwii/asuna-shared": ^0.0.4
     "@nestjs/cli": ^8.1.4
     "@nestjs/common": ^8.1.2
     "@nestjs/core": ^8.1.2
@@ -706,7 +706,7 @@ __metadata:
     ali-oss: ^6.16.0
     alipay-sdk: ^3.1.7
     amqplib: ^0.8.0
-    apollo-opentracing: ^2.1.60
+    apollo-opentracing: ^2.1.62
     apollo-server-cache-redis: ^3.2.0
     apollo-server-express: ^3.4.0
     apollo-server-plugin-response-cache: ^3.3.0
@@ -736,7 +736,7 @@ __metadata:
     fs-extra: ^10.0.0
     geoip-lite: ^1.4.2
     glob: ^7.2.0
-    graphql: ^15.7.0
+    graphql: ^16.0.0
     graphql-scalars: ^1.12.0
     graphql-tools: ^8.2.0
     graphql-type-json: ^0.3.2
@@ -790,15 +790,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@danielwii/asuna-shared@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@danielwii/asuna-shared@npm:0.0.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-shared%2F0.0.3%2F3793234c127ff6cc7ec823f4faee3c6f5e1d96e8a0ea26f684e5031f5848ac94"
+"@danielwii/asuna-shared@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@danielwii/asuna-shared@npm:0.0.4::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-shared%2F0.0.4%2Fa4d911a535403301d9c391e7bd26b33023df38a5ed850a4661a6974ed24278f1"
   dependencies:
     class-transformer: ^0.4.0
     class-validator: ^0.13.1
     lodash: ^4.17.21
     yup: ^0.32.11
-  checksum: 698eba205332cf323dfdb80572508a23907ed7afa0f1eb5221301e3097dc0d3861ff79772d725bac7819a672da570d6237b22b96b4546b4739e1881536b893e1
+  checksum: 1f51e2594b5e8149f8f3285c9c7effc7827ab024ba7e0cb471b0cdbb4247935228d13aa116f27f2778123cbd479da38115adf9999fb6a1d407d1a1a2943df1eb
   languageName: node
   linkType: hard
 
@@ -3511,9 +3511,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"apollo-opentracing@npm:^2.1.60":
-  version: 2.1.60
-  resolution: "apollo-opentracing@npm:2.1.60"
+"apollo-opentracing@npm:^2.1.62":
+  version: 2.1.62
+  resolution: "apollo-opentracing@npm:2.1.62"
   dependencies:
     apollo-server-plugin-base: ^0.13.0
     apollo-server-types: ^0.9.0
@@ -3522,7 +3522,7 @@ __metadata:
     apollo-server-env: "*"
     graphql: ">=0.10.x"
     opentracing: "*"
-  checksum: 2f3a7ec6d3fcd5a4988805d7ae9185e5f0ae9e3530e343b5c2e742bad22c4816d0d7f872573eb38ffbdede37834f17ea0cfbcc7628a3a74aee676b6eeb5772f2
+  checksum: 46dd2f1f11f68d9ccc8f490055cd304cc8d1076a1d119f60aa9e9bd13b1042d0e3541527d01b8fadba9c3e93a5673629450e7852572da10365e1880be56d5886
   languageName: node
   linkType: hard
 
@@ -7511,10 +7511,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:^15.7.0":
-  version: 15.7.0
-  resolution: "graphql@npm:15.7.0"
-  checksum: e95027a63fc68444aa6079793c5f6902e9691dc0fff87ce7d5bf57a104cb100bc5763739e0d25ea08fbe5dedbb009479ebf11de1ebd3c8a0737605129bdaa2c2
+"graphql@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "graphql@npm:16.0.0"
+  checksum: 6b7c09cbafdcafde7bf69e84fb35abc5641bd923cd3b4894f12bbb6ee412478a959906937a63c8ad7cf37b3e5b980c26001f89be90ac9bcf4cefade3a4efd21f
   languageName: node
   linkType: hard
 
