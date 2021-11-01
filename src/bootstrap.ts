@@ -86,6 +86,10 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   registerEnumType(KeyValueType, { name: 'KeyValueType' });
   registerEnumType(ExchangeCurrencyEnum, { name: 'ExchangeCurrencyEnum' });
 
+  if (configLoader.loadBoolConfig('DEBUG')) {
+    logger.debug(`Configs is ${r(configLoader.loadConfigs())}`);
+  }
+
   return run(appModule, options).catch((reason) => {
     logger.error(`${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
