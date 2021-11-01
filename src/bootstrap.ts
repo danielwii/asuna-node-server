@@ -11,11 +11,11 @@ import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/prov
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import * as bodyParser from 'body-parser';
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
+import express from 'express';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import helmet from 'helmet';
@@ -28,14 +28,14 @@ import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from '
 import { AppLifecycle } from './lifecycle';
 import {
   AppUpgradeMode,
-  Platform,
+  ExchangeCurrencyEnum,
+  KeyValueType,
+  KVModelFormatType,
   Mode,
   NotificationEnum,
   NotificationEnumValue,
   Order,
-  KVModelFormatType,
-  KeyValueType,
-  ExchangeCurrencyEnum,
+  Platform,
 } from './modules';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
@@ -198,10 +198,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   // get client ip and populate to req
   app.use((req, res, next) => {
     const ip = getClientIp(req);
-    Object.defineProperty(req, 'clientIp', {
-      get: () => ip,
-      configurable: true,
-    });
+    Object.defineProperty(req, 'clientIp', { get: () => ip, configurable: true });
     next();
   });
   app.use(cookieParser(secret));
@@ -286,8 +283,8 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const limit = appSettings.payloadLimit;
   logger.log(`set json payload limit to ${limit}`);
-  app.use(bodyParser.json({ limit }));
-  app.use(bodyParser.urlencoded({ limit, extended: true }));
+  app.use(express.json({ limit }));
+  app.use(express.urlencoded({ limit, extended: true }));
 
   app.useGlobalInterceptors(new TracingInterceptor());
   // WARNING will break graphql pubsub
@@ -340,7 +337,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   return app.listen(port).then(async () => {
     await AppLifecycle.onAppStartListening(app);
     logger.log(`===============================================================`);
-    logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}`);
+    logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}. ${await app.getUrl()}`);
     logger.log(`===============================================================`);
     return app;
   });
