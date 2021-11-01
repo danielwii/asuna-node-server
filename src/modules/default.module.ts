@@ -8,6 +8,7 @@ import _ from 'lodash';
 
 import { AdminInternalModule } from './admin.module';
 import { configLoader } from './config/loader';
+import { DebugController } from './debug.controller';
 import { GraphqlModule } from './graphql.module';
 import { HealthController } from './health/health.controller';
 import { MongoProvider } from './providers';
@@ -24,18 +25,18 @@ const logger = LoggerFactory.getLogger('<DefaultModule>');
     TerminusModule,
   ]),
   providers: [],
-  controllers: [HealthController],
+  controllers: _.compact([HealthController, configLoader.loadBoolConfig('DEBUG') ? DebugController : undefined]),
   exports: [],
 })
 export class DefaultModule implements OnModuleInit {
-  static forRoot(appModule) {
+  public static forRoot(appModule) {
     return {
       module: DefaultModule,
       imports: [appModule, GraphqlModule.forRoot()],
     };
   }
 
-  async onModuleInit(): Promise<void> {
+  public async onModuleInit(): Promise<void> {
     logger.log('init ...');
   }
 }

@@ -593,15 +593,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@danielwii/asuna-helper@npm:^0.0.9":
-  version: 0.0.9
-  resolution: "@danielwii/asuna-helper@npm:0.0.9::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.9%2F10119d317de32e1cdbff01d4ec8628ddb19658e2533ef9780ca356644a02d0a9"
+"@danielwii/asuna-helper@npm:^0.0.10":
+  version: 0.0.10
+  resolution: "@danielwii/asuna-helper@npm:0.0.10::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.10%2F28fa277d8d751256e6397f2813994638ac258b695a900471c591a9a346747de6"
   dependencies:
     "@nestjs/common": ^8.1.2
     "@nestjs/platform-express": ^8.1.2
     axios: ^0.24.0
     bluebird: ^3.7.2
-    bull: ^3.29.3
+    bull: ^4.1.0
     class-transformer: ^0.4.0
     class-validator: ^0.13.1
     classnames: ^2.3.1
@@ -621,14 +621,14 @@ __metadata:
     rxjs: ^7.4.0
     shortid: ^2.2.16
     typeorm: ^0.2.38
-    ua-parser-js: ^0.7.30
+    ua-parser-js: ^0.7.31
   peerDependencies:
     "@nestjs/common": ^8.1.1
     "@nestjs/core": ^8.1.1
     "@nestjs/platform-express": ^8.1.1
     redis: ^3.1.2
     typeorm: ^0.2.38
-  checksum: 8d28e727c4c2cf55f441c51c58a890a6752bb2d0dc0f8865b8a2fbcd6f9fdd121d60fd51df4d02d238862f7d15298b799ee942590c0bae7a06e7beb01825cddc
+  checksum: 124982286976e5b86b9f5a5da939077ee0603d0715069478698a84fd02a13a3e0a307838aca57fa0783cb155793cadd8ff87708744d9d853de9227c2d87e0e0b
   languageName: node
   linkType: hard
 
@@ -637,7 +637,7 @@ __metadata:
   resolution: "@danielwii/asuna-node-server@workspace:."
   dependencies:
     "@alicloud/pop-core": ^1.7.10
-    "@danielwii/asuna-helper": ^0.0.9
+    "@danielwii/asuna-helper": ^0.0.10
     "@danielwii/asuna-shared": ^0.0.4
     "@nestjs/cli": ^8.1.4
     "@nestjs/common": ^8.1.2
@@ -744,7 +744,7 @@ __metadata:
     helmet: ^4.6.0
     highland: ^2.13.5
     husky: ^7.0.4
-    jaeger-client: ^3.18.1
+    jaeger-client: ^3.19.0
     jest: ^27.3.1
     jsondiffpatch: ^0.4.1
     lodash: ^4.17.21
@@ -780,7 +780,7 @@ __metadata:
     sqlite3: ^5.0.2
     supertest: ^6.1.6
     ts-jest: ^27.0.7
-    ts-morph: ^12.0.0
+    ts-morph: ^12.1.0
     ts-node: ^10.4.0
     tslib: ^2.3.1
     typeorm: ^0.2.38
@@ -1958,15 +1958,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ts-morph/common@npm:~0.11.0":
-  version: 0.11.0
-  resolution: "@ts-morph/common@npm:0.11.0"
+"@ts-morph/common@npm:~0.11.1":
+  version: 0.11.1
+  resolution: "@ts-morph/common@npm:0.11.1"
   dependencies:
     fast-glob: ^3.2.7
     minimatch: ^3.0.4
     mkdirp: ^1.0.4
     path-browserify: ^1.0.1
-  checksum: beaa444c6a30cb3d886644464590bf39e84c3d5bec21cb0ff909643f590f2166ac81c81466b506a6015dd5f573dd91611e3b724f91b5ec2e08a20a92feaf2680
+  checksum: 2853215cfdfb9b65f96ceef91b15a73ab6591fd27d072801884ea5acc1a8f0becd5ac214d5f3d840f5d650b7654585a9b9df86fc4287872e7be1c6f566381bfd
   languageName: node
   linkType: hard
 
@@ -4421,9 +4421,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:^3.29.3":
-  version: 3.29.3
-  resolution: "bull@npm:3.29.3"
+"bull@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "bull@npm:4.1.0"
   dependencies:
     cron-parser: ^2.13.0
     debuglog: ^1.0.0
@@ -4435,7 +4435,7 @@ __metadata:
     semver: ^7.3.2
     util.promisify: ^1.0.1
     uuid: ^8.3.0
-  checksum: 794cc507cd8502caa1d8bfebbbd5ffcb5fd7df0324b29287b81f4aab90491bcf380b9790c2fda6b6320e96058b220edb1c2995fcd038bcc384ada2eed5c7762b
+  checksum: 8fc696346dc56d273e3fae0e3ca8f1d541098422d81e91bdd6a696aa43f7a785f0c7bc5a8f03d8dfd0a131b65de170d0c3fcd0cb38939703eb0712149b1d1173
   languageName: node
   linkType: hard
 
@@ -8666,16 +8666,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jaeger-client@npm:^3.18.1":
-  version: 3.18.1
-  resolution: "jaeger-client@npm:3.18.1"
+"jaeger-client@npm:^3.19.0":
+  version: 3.19.0
+  resolution: "jaeger-client@npm:3.19.0"
   dependencies:
     node-int64: ^0.4.0
     opentracing: ^0.14.4
     thriftrw: ^3.5.0
-    uuid: ^3.2.1
-    xorshift: ^0.2.0
-  checksum: d8d0fa2449e5a85f73b95518570bc9661cdc646850e714b83e1943de5b05db4f8ed02f730c75afbfd1edd9a961b67a42bf08d13d45a04158b4830cb4e60fcb6d
+    uuid: ^8.3.2
+    xorshift: ^1.1.1
+  checksum: fcdc0523b70299c0db1c07e6c209fa170cef75aa3ad00e6241c906423ba07dc6112a60e1b96de59c2a8eb9d335bf0a0c2a23cc13595ef24aededca2fdff65837
   languageName: node
   linkType: hard
 
@@ -14254,13 +14254,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-morph@npm:^12.0.0":
-  version: 12.0.0
-  resolution: "ts-morph@npm:12.0.0"
+"ts-morph@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "ts-morph@npm:12.1.0"
   dependencies:
-    "@ts-morph/common": ~0.11.0
+    "@ts-morph/common": ~0.11.1
     code-block-writer: ^10.1.1
-  checksum: c033708c76448625380daa3b8c2eeea1306300fa4367804029635f0d911a3723e4315a6e0824e6dfb256df0b99aac0ea0478cb3f14ed6fae2339d43ec882a427
+  checksum: b0998f2678386b6e451f84effa0626d5c2ee61883d0f8bb2cd474372616c2a497e95ae8322e67becd06bef2a2bc247dbff339d4a6ffd693cf0fbbaa887c1f8cd
   languageName: node
   linkType: hard
 
@@ -14599,7 +14599,7 @@ typescript@^4.4.4:
   languageName: node
   linkType: hard
 
-"ua-parser-js@npm:^0.7.30":
+"ua-parser-js@npm:^0.7.31":
   version: 0.7.31
   resolution: "ua-parser-js@npm:0.7.31"
   checksum: e2f8324a83d1715601576af85b2b6c03890699aaa7272950fc77ea925c70c5e4f75060ae147dc92124e49f7f0e3d6dd2b0a91e7f40d267e92df8894be967ba8b
@@ -14876,7 +14876,7 @@ typescript@^4.4.4:
   languageName: node
   linkType: hard
 
-"uuid@npm:^3.2.1, uuid@npm:^3.3.2":
+"uuid@npm:^3.3.2":
   version: 3.4.0
   resolution: "uuid@npm:3.4.0"
   bin:
@@ -15422,10 +15422,10 @@ typescript@^4.4.4:
   languageName: node
   linkType: hard
 
-"xorshift@npm:^0.2.0":
-  version: 0.2.1
-  resolution: "xorshift@npm:0.2.1"
-  checksum: 37e21340cdcef2982ce94d940ddccffc3fe2fc6ca28ef38763671d973ae72b7f03df2d81d6aec337db55b479e0ededf23f2456b60d495d3993754f3ac04c4f9d
+"xorshift@npm:^1.1.1":
+  version: 1.2.0
+  resolution: "xorshift@npm:1.2.0"
+  checksum: bb5575707d20a806e71fa3e80bc3dc083a4bcf3c82965bd27b797a355cf87583273fe7676cfc9c7ffaa4c17d5a171903462045e2154e51fe1f07b90a4dc6b9d2
   languageName: node
   linkType: hard
 
