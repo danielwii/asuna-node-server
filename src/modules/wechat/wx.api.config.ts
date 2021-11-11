@@ -70,7 +70,7 @@ export class WxConfigApi {
 
   static async logInterceptor<T extends Response>(response: T): Promise<Record<string, unknown>> {
     const { url, status } = response;
-    const json = await response.json();
+    const json: any = await response.json();
     if (json.errcode) {
       logger.error(`[${status}] call '${url}' error: ${r(json)}`);
       throw new Error(`[${status}] call '${url}' response: ${r(json)}`);
