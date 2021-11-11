@@ -53,7 +53,7 @@ export class GqlAuthGuard implements CanActivate {
    * @param opts.anonymousSupport default false
    */
   public constructor(
-    private readonly opts: { anonymousSupport?: boolean; type: AuthType } = {
+    private readonly opts: { anonymousSupport?: boolean; type?: AuthType } = {
       anonymousSupport: false,
       type: AuthType.all,
     },
