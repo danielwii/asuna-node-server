@@ -25,7 +25,7 @@ export class PropertyModule implements OnModuleInit {
 
     {
       const where = { totalRecharge: -1 };
-      const total = await Wallet.count(where);
+      const total = await Wallet.count({ where });
       logger.log(`${total} wallets waiting for init...`);
       if (total) {
         const size = AppConfigObject.load().batchSize;
@@ -34,7 +34,7 @@ export class PropertyModule implements OnModuleInit {
           const wallets = await Wallet.find({ where, take: size /* , skip: size * (page - 1) */ });
           return getManager().transaction(async (entityManager) => {
             await Promise.all(
-              wallets.map(async (wallet) => {
+              wallets.map(async (wallet: Wallet) => {
                 const transactions = await entityManager.find(FinancialTransaction, {
                   profileId: wallet.profileId,
                   type: 'adminBalanceChange',

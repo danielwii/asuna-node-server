@@ -309,7 +309,7 @@ export class KvHelper {
   public static async delete(kvDef: KvDef): Promise<void> {
     const exists = await KvHelper.get(kvDef);
     if (exists) {
-      await KeyValuePair.delete(kvDef);
+      await KeyValuePair.delete({ ...kvDef });
     }
   }
 

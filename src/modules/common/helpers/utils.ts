@@ -104,7 +104,7 @@ export const condition = <Entity>(
   nilProtected: FindConditions<Entity>,
   nil?: FindConditions<Entity>,
 ): FindConditions<Entity> => {
-  return _.assign({}, _.pickBy(nilProtected, _.identity), nil);
+  return _.assign({}, _.pickBy(nilProtected as object, _.identity), nil);
 };
 
 export const timeoutPromise = async <T>(promise: () => Promise<T>, timeoutMs: number): Promise<T> =>
