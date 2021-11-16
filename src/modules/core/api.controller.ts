@@ -50,6 +50,7 @@ export class ApiController {
       ua: _.memoize(detectUA)(req.headers['user-agent']),
       ..._.omit(req.session, 'cookie'),
       address: {
+        originalForwarded: req.header('x-original-forwarded-for'),
         forwarded: req.header('x-forwarded-for'), // 各阶段ip的CSV, 最左侧的是原始ip
         remoteAddress: req.connection.remoteAddress,
         remoteFamily: req.connection.remoteFamily,

@@ -6,10 +6,12 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Pageable } from '../core/helpers';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, SorterInput, toOrder } from '../graphql';
+import { ExchangeCurrencyEnum } from './enum-values';
 import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction } from './financial.entities';
 import { PointExchange } from './points.entities';
 
+import type { GraphQLResolveInfo } from 'graphql';
 import type { JwtPayload } from '../core/auth';
 import type { ExchangeCurrencyType } from './enum-values';
 
@@ -35,7 +37,7 @@ export class PropertyQueryResolver {
     @Args('type') type: string,
     @Args('refId') refId: string,
     @Args('pageRequest') pageRequest: PageRequestInput,
-    @Info() info,
+    @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<PointExchangePageable> {
     const currentUser = getCurrentUser() as JwtPayload;
@@ -60,7 +62,7 @@ export class PropertyQueryResolver {
     @Args('type') type: string,
     @Args('refId') refId: string,
     @Args('pageRequest') pageRequest: PageRequestInput,
-    @Info() info,
+    @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<FinancialTransactionPageable> {
     const currentUser = getCurrentUser() as JwtPayload;
@@ -81,10 +83,10 @@ export class PropertyQueryResolver {
 
   @Query((returns) => [ExchangeObject])
   public async api_exchangeObjects(
-    @Args('type') type: ExchangeCurrencyType,
-    @Args('usage') usage: string,
-    @Args('orderBy') orderBy: SorterInput,
-    @Info() info,
+    @Args('type', { type: () => ExchangeCurrencyEnum, nullable: true }) type: ExchangeCurrencyType,
+    @Args('usage', { nullable: true }) usage: string,
+    @Args('orderBy', { nullable: true }) orderBy: SorterInput,
+    @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<ExchangeObject[]> {
     this.logger.log(`api_exchangeObjects: ${r({ type, usage, orderBy })}`);

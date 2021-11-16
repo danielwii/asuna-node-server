@@ -2,7 +2,7 @@ import { Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { resolvers as scalars } from 'graphql-scalars';
+import { resolver as scalars } from 'graphql-scalars';
 
 import { DBHelper, DBService } from '../core/db';
 

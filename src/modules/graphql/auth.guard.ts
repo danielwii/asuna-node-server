@@ -78,6 +78,10 @@ export class GqlAuthGuard implements CanActivate {
     logger.verbose(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     const result = await auth(req, res, this.opts.type);
 
+    if (this.opts.anonymousSupport) {
+      return true;
+    }
+
     if (!result.payload) {
       if (result.err instanceof Error) {
         throw result.err;

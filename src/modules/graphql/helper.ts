@@ -88,7 +88,7 @@ interface ResolvePropertyByLoader<RelationEntity extends BaseEntity> {
 }
 
 export class GraphqlHelper {
-  static resolveOrder<Entity extends BaseEntity>(
+  public static resolveOrder<Entity extends BaseEntity>(
     cls: ClassType<Entity>,
     pageRequest: PageRequest,
   ): {
@@ -100,7 +100,7 @@ export class GraphqlHelper {
       : { ...(includeOrdinal ? { ordinal: 'DESC' } : {}), createdAt: 'DESC' };
   }
 
-  static async handlePagedDefaultQueryRequest<
+  public static async handlePagedDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders = DefaultRegisteredLoaders,
     MixedEntity = any,
@@ -143,7 +143,7 @@ export class GraphqlHelper {
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
-  static async handleDefaultQueryRequest<
+  public static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders,
     MixedEntity,
@@ -159,7 +159,7 @@ export class GraphqlHelper {
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
     mapper?: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<MixedEntity[]>;
-  static async handleDefaultQueryRequest<
+  public static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders,
   >(opts: {
@@ -173,7 +173,7 @@ export class GraphqlHelper {
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
   }): Promise<Entity[]>;
-  static async handleDefaultQueryRequest<
+  public static async handleDefaultQueryRequest<
     Entity extends BaseEntity,
     DataLoaders extends DefaultRegisteredLoaders,
     MixedEntity,
@@ -277,17 +277,17 @@ export class GraphqlHelper {
    * @param timeCondition
    * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
    */
-  static async genericFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  static async genericFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & ResolveCategoryOptionsType<Entity>,
   ): Promise<FindManyOptions<Entity>>;
 
   // eslint-disable-next-line no-dupe-class-members
-  static async genericFindOptions<Entity extends BaseEntity>(
+  public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>,
   ): Promise<FindManyOptions<Entity>> {
     const {
@@ -343,7 +343,7 @@ export class GraphqlHelper {
     return options;
   }
 
-  static async resolveProperty_DO_NOT_USE<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+  public static async resolveProperty_DO_NOT_USE<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity> {
@@ -385,11 +385,11 @@ export class GraphqlHelper {
 
    static adsLoader = new DataLoader(AdCategoryResolver.adsLoaderFn);
    */
-  static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
+  public static async resolveProperties<Entity extends BaseEntity, RelationEntity extends BaseEntity>(
     opts: BaseResolveProperty<Entity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<RelationEntity[]>;
-  static async resolveProperties<
+  public static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
     MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity },
@@ -397,7 +397,7 @@ export class GraphqlHelper {
     opts: BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity> &
       (ResolvePropertyByLoader<RelationEntity> | ResolvePropertyByTarget<RelationEntity>),
   ): Promise<MixedRelationEntity[]>;
-  static async resolveProperties<
+  public static async resolveProperties<
     Entity extends BaseEntity,
     RelationEntity extends BaseEntity,
     MixedRelationEntity extends { origin: RelationEntity } = { origin: RelationEntity },
@@ -437,7 +437,7 @@ export class GraphqlHelper {
     return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }
 
-  static pagedResult<Entity>({
+  public static pagedResult<Entity>({
     pageRequest,
     items,
     total,
@@ -446,7 +446,7 @@ export class GraphqlHelper {
     items: Entity[];
     total: number;
   }): Promise<PageInfo & { items: Entity[]; total: number }>;
-  static pagedResult<Entity, MixedEntity>({
+  public static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
     total,
@@ -457,7 +457,7 @@ export class GraphqlHelper {
     total: number;
     mapper: (item: Entity) => MixedEntity | Promise<MixedEntity>;
   }): Promise<PageInfo & { items: MixedEntity[]; total: number }>;
-  static pagedResult<Entity, MixedEntity>({
+  public static pagedResult<Entity, MixedEntity>({
     pageRequest,
     items,
     total,
@@ -471,7 +471,7 @@ export class GraphqlHelper {
     return Promise.props({ ...toPage(pageRequest), items: mapItems(items, mapper), total });
   }
 
-  static async resolveMixedRelation<Entity extends BaseEntity, RelationEntity extends BaseEntity>({
+  public static async resolveMixedRelation<Entity extends BaseEntity, RelationEntity extends BaseEntity>({
     origin,
     query,
     // loader,
@@ -503,7 +503,7 @@ export class GraphqlHelper {
     return { count, items };
   }
 
-  static async handleCursoredQueryRequest<Entity extends BaseEntity>({
+  public static async handleCursoredQueryRequest<Entity extends BaseEntity>({
     cls,
     cursoredRequest,
     where,

@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { resolvers as scalars } from 'graphql-scalars';
+import { resolver as scalars } from 'graphql-scalars';
 import _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 

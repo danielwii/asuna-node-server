@@ -75,18 +75,18 @@ export class QueryConditionInput {
 
 @InputType()
 export class ExclusiveQueryConditionInput {
-  @Field((returns) => [ID])
+  @Field((returns) => [ID], { nullable: true })
   @Validate(ExclusiveConstraintValidator)
   @IsOptional()
   public ids?: string[] | number[];
 
-  @Field()
+  @Field((returns) => Int, { nullable: true })
   @Validate(ExclusiveConstraintValidator)
   @IsNumber()
   @IsOptional()
   public random?: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Validate(ExclusiveConstraintValidator)
   @IsString()
   @IsOptional()

@@ -1,6 +1,6 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 
-import { resolvers as scalars } from 'graphql-scalars';
+import { resolver as scalars } from 'graphql-scalars';
 import { Column } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base/base.entity';

@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType, ObjectType } from '@nestjs/graphql';
+import { Field, ID, InterfaceType } from "@nestjs/graphql";
 
 import {
   AfterLoad,
@@ -9,13 +9,13 @@ import {
   Index,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 
-import { MetaInfo } from '../common/decorators';
-import { fixTZ } from '../core/helpers/entity.helper';
-import { SimpleIdGenerator } from '../ids';
-import { NameDescAttachable, Publishable } from './abilities';
+import { MetaInfo } from "../common/decorators";
+import { fixTZ } from "../core/helpers/entity.helper";
+import { SimpleIdGenerator } from "../ids";
+import { NameDescAttachable, Publishable } from "./abilities";
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityObject<Entity> = Omit<
@@ -27,7 +27,7 @@ export type EntityConstructorObject<Entity> = Omit<
   keyof typeof BaseEntity | 'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator'
 >;
 
-@InterfaceType()
+@InterfaceType({ isAbstract: true })
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
   @Field()
   @Index()
@@ -53,9 +53,9 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
   }
 }
 
-@InterfaceType()
+@InterfaceType({ implements: () => [NoPrimaryKeyBaseEntity] })
 export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
-  @Field((returns) => ID)
+  @Field()
   @PrimaryGeneratedColumn()
   public id?: number;
 }
@@ -107,15 +107,20 @@ export class AbstractTimeBasedNameEntity extends NameDescAttachable(AbstractTime
 @InterfaceType({ implements: () => [AbstractBaseEntity] })
 export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {}
 
+@InterfaceType()
 export class AbstractUUIDBaseEntity extends BaseEntity {
+  @Field()
   @PrimaryGeneratedColumn('uuid') public uuid!: string;
 
+  @Field({ nullable: true })
   @CreateDateColumn({ name: 'created_at' })
   public createdAt: Date;
 
+  @Field({ nullable: true })
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt: Date;
 
+  @Field({ nullable: true })
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   public updatedBy: string;
@@ -126,6 +131,7 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
   }
 }
 
+@InterfaceType({ implements: () => [AbstractUUIDBaseEntity] })
 export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseEntity) {}
 
 /**

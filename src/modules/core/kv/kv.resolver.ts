@@ -17,7 +17,7 @@ import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 export class KvQueryResolver {
   private logger = LoggerFactory.getLogger('KvQueryResolver');
 
-  @Query((returns) => KeyValuePair)
+  @Query((returns) => KeyValuePair, { nullable: true })
   public async kv(
     @Args('collection') collection: string,
     @Args('key') key: string,
