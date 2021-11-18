@@ -2,7 +2,7 @@ import { Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { resolver as scalars } from 'graphql-scalars';
+import * as scalars from 'graphql-scalars';
 
 import { DBHelper, DBService } from '../core/db';
 
@@ -10,7 +10,7 @@ import { DBHelper, DBService } from '../core/db';
 class ModelSchemas {
   @Field({ nullable: true }) name: string;
   @Field() internal: boolean;
-  @Field((returns) => scalars.JSONObject) schema: JSON;
+  @Field((returns) => scalars.GraphQLJSONObject) schema: JSON;
 }
 
 @Resolver()

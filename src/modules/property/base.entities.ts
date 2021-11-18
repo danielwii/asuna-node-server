@@ -1,6 +1,6 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 
-import { resolver as scalars } from 'graphql-scalars';
+import * as scalars from 'graphql-scalars';
 import { Column } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base/base.entity';
@@ -30,7 +30,7 @@ export class AbstractTransactionEntity extends AbstractBaseEntity {
   @Column({ nullable: true, name: 'ref_id' })
   public refId?: string;
 
-  @Field((returns) => scalars.JSONObject, { nullable: true })
+  @Field((returns) => scalars.GraphQLJSONObject, { nullable: true })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'extra' })
   public extra?: JsonMap;
 

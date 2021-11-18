@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 import { html } from 'common-tags';
-import { resolver as scalars } from 'graphql-scalars';
+import * as scalars from 'graphql-scalars';
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
@@ -49,7 +49,7 @@ export class PaymentMethod extends Publishable(AbstractTimeBasedNameEntity) {
   @Column(ColumnTypeHelper.text(), { nullable: true, name: 'private_key' })
   public privateKey: string;
 
-  @Field((returns) => scalars.JSONObject)
+  @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({
     name: '附加信息',
     type: 'JSON',
@@ -143,7 +143,7 @@ export class PaymentItem extends Publishable(AbstractTimeBasedNameEntity) {
   @Column({ nullable: true, length: 1000 })
   public cover: string;
 
-  @Field((returns) => scalars.JSON)
+  @Field((returns) => scalars.GraphQLJSON)
   @MetaInfo({ name: '图片', type: 'Images' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public images: JsonArray;
@@ -171,17 +171,17 @@ export class PaymentTransaction extends InjectMultiUserProfile(AbstractTimeBased
   @Column({ nullable: true })
   public sign: string;
 
-  @Field((returns) => scalars.JSONObject)
+  @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({ name: '支付相关信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'payment_info' })
   public paymentInfo: Record<string, unknown>;
 
-  @Field((returns) => scalars.JSONObject)
+  @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({ name: '附加信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public extra: Record<string, unknown>;
 
-  @Field((returns) => scalars.JSONObject)
+  @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({ name: '返回信息' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public data: Record<string, unknown>;

@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { resolver as scalars } from 'graphql-scalars';
+import * as scalars from 'graphql-scalars';
 import _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 
@@ -47,12 +47,12 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column('varchar', { nullable: true })
   public type?: KeyValueType;
 
-  @Field((returns) => String, { nullable: true })
+  @Field((returns) => scalars.GraphQLJSON, { nullable: true })
   @MetaInfo({ name: 'Value' })
   @Column('text', { nullable: true })
   public value?: any;
 
-  @Field((returns) => scalars.JSONObject)
+  @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public extra?: JsonMap;
