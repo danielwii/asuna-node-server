@@ -1,6 +1,6 @@
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../../config/loader';
@@ -15,7 +15,7 @@ export class LoggerConfigObject {
   readonly modules?: { [key: string]: LogLevel };
 
   constructor(o: LoggerConfigObject) {
-    Object.assign(this, plainToClass(LoggerConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(LoggerConfigObject, o, { enableImplicitConversion: true }));
   }
 
   static load(): LoggerConfigObject {

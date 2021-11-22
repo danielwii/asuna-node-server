@@ -1,7 +1,7 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { plainToClass, Transform } from 'class-transformer';
+import { plainToInstance, Transform } from 'class-transformer';
 import { IsInt, IsString, Min } from 'class-validator';
 import { addMonths } from 'date-fns';
 import _ from 'lodash';
@@ -31,7 +31,7 @@ export class ChunksUploadPayload {
   constructor(o: ChunksUploadPayload) {
     if (!o) return;
 
-    Object.assign(this, plainToClass(ChunksUploadPayload, o, { enableImplicitConversion: true }), {
+    Object.assign(this, plainToInstance(ChunksUploadPayload, o, { enableImplicitConversion: true }), {
       finished: o.finished || new Array(o.totalChunks).fill(0),
     });
   }

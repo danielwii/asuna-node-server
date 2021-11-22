@@ -2,7 +2,7 @@ import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP } from '@danielwii/asuna-helper/dist/utils';
 
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import * as _ from 'lodash';
 
 import { configLoader } from '../config/loader';
@@ -23,7 +23,7 @@ export class TracingConfigObject {
   public endpoint: string;
 
   public constructor(o: Partial<TracingConfigObject>) {
-    Object.assign(this, plainToClass(TracingConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(TracingConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load = (): TracingConfigObject =>

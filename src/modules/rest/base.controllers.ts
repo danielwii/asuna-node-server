@@ -4,7 +4,7 @@ import { ApiParam } from '@nestjs/swagger';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
@@ -145,7 +145,7 @@ export abstract class RestCrudController {
 
     logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
 
-    return { query, items: classToPlain(items) as any[], total, page: Number(page), size: Number(size) };
+    return { query, items: instanceToPlain(items) as any[], total, page: Number(page), size: Number(size) };
   }
 
   @UseGuards(JwtAdminAuthGuard)

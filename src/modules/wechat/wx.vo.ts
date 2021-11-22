@@ -1,4 +1,5 @@
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
+
 import { WeChatUser } from './wechat.entities';
 
 import type { WxSubscribeSceneType } from './wx.interfaces';
@@ -56,7 +57,7 @@ export class WxUserInfo {
   unionid?: string;
 
   constructor(o: WxUserInfo) {
-    Object.assign(this, plainToClass(WxUserInfo, o));
+    Object.assign(this, plainToInstance(WxUserInfo, o));
   }
 
   toWeChatUser(): WeChatUser {

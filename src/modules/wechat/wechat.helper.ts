@@ -5,7 +5,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
@@ -314,7 +314,7 @@ export class WeChatHelper {
     }
     const { openid: openId } = userInfo;
     if (await WeChatUser.findOne(openId)) {
-      const weChatUser = classToPlain(userInfo.toWeChatUser());
+      const weChatUser = instanceToPlain(userInfo.toWeChatUser());
       const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
       logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
       await WeChatUser.update(openId, updatedTo);

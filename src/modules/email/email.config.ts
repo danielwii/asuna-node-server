@@ -2,7 +2,7 @@ import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
-import { Expose, plainToClass, Transform } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
@@ -36,7 +36,7 @@ export class EmailConfigObject {
   public password: string;
 
   public constructor(o: Partial<EmailConfigObject>) {
-    Object.assign(this, plainToClass(EmailConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(EmailConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load = (): EmailConfigObject =>

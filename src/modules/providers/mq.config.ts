@@ -2,7 +2,7 @@ import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { Expose, plainToClass, Transform } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config/loader';
 
@@ -33,7 +33,7 @@ export class MQConfigObject {
   public password?: string;
 
   public constructor(o: Partial<MQConfigObject>) {
-    Object.assign(this, plainToClass(MQConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(MQConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load(mqPrefix = ''): MQConfigObject {

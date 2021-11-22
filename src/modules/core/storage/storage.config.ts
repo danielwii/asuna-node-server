@@ -2,7 +2,7 @@ import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { Expose, plainToClass, Transform } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../../config';
@@ -37,7 +37,7 @@ export class QiniuConfigObject {
   public secretKey: string;
 
   constructor(o: Partial<QiniuConfigObject>) {
-    Object.assign(this, plainToClass(QiniuConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(QiniuConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
@@ -100,7 +100,7 @@ export class MinioConfigObject {
   public secretKey: string;
 
   constructor(o: Partial<MinioConfigObject>) {
-    Object.assign(this, plainToClass(MinioConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(MinioConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load(): MinioConfigObject {
@@ -146,7 +146,7 @@ export class AliossConfigObject {
   public secretKey: string;
 
   public constructor(o: Partial<AliossConfigObject>) {
-    Object.assign(this, plainToClass(AliossConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(AliossConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load(): AliossConfigObject {

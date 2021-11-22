@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import crypto from 'crypto';
 import _ from 'lodash';
 
@@ -56,7 +56,7 @@ export class GetUploadsController {
     @Res() res: Response,
   ): Promise<void> {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
-    const engine = classToPlain(storageEngine);
+    const engine = instanceToPlain(storageEngine);
     const blurred = _.has(query, 'blurred');
     logger.verbose(
       `get ${r({ bucket, filename })} by ${r({

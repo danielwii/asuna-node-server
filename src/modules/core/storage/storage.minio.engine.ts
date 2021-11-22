@@ -2,7 +2,7 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import * as minio from 'minio';
 import { join } from 'path';
@@ -29,12 +29,12 @@ export class MinioStorage implements IStorageEngine {
     if (this.configObject.enable !== true) {
       throw new Error(
         `minio must enable when using minio storage engine: ${r({
-          configs: classToPlain(this.configObject),
+          configs: instanceToPlain(this.configObject),
           opts,
         })}`,
       );
     }
-    logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject), opts })}`);
+    logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject), opts })}`);
   }
 
   public get client(): minio.Client {

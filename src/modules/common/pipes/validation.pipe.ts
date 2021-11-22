@@ -4,7 +4,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 const logger = LoggerFactory.getLogger('CustomValidationPipe');
 
@@ -20,7 +20,7 @@ export class CustomValidationPipe implements PipeTransform<any> {
         logger.debug(`return value directly ${r(this.toValidate(metatype))}`);
         return value;
       }
-      const object = plainToClass(metatype, value, { enableImplicitConversion: true });
+      const object = plainToInstance(metatype, value, { enableImplicitConversion: true });
       validateObjectSync(object);
       // const errors = validateObjectSync(object);
       // logger.debug(`transformed ${r({ object, errors })}`);

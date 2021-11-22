@@ -3,7 +3,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import OSS from 'ali-oss';
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import { join } from 'path';
 
@@ -28,10 +28,10 @@ export class AliossStorage implements IStorageEngine {
 
     if (this.configObject.enable !== true) {
       throw new Error(
-        `alioss must enable when using alioss storage engine: ${r({ configs: classToPlain(this.configObject) })}`,
+        `alioss must enable when using alioss storage engine: ${r({ configs: instanceToPlain(this.configObject) })}`,
       );
     }
-    AliossStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject) })}`);
+    AliossStorage.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
   }
 
   public get client(): OSS {

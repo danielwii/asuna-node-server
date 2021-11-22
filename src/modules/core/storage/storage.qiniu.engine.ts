@@ -2,7 +2,7 @@ import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { classToPlain } from 'class-transformer';
+import { instanceToPlain } from 'class-transformer';
 import * as _ from 'lodash';
 import { join } from 'path';
 import * as qiniu from 'qiniu';
@@ -26,10 +26,10 @@ export class QiniuStorage implements IStorageEngine {
 
     if (this.configObject.enable !== true) {
       throw new Error(
-        `qiniu must enable when using qiniu storage engine: ${r({ configs: classToPlain(this.configObject) })}`,
+        `qiniu must enable when using qiniu storage engine: ${r({ configs: instanceToPlain(this.configObject) })}`,
       );
     }
-    QiniuStorage.logger.log(`[constructor] init ${r({ configs: classToPlain(this.configObject) })}`);
+    QiniuStorage.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
   }
 
   public saveEntity(

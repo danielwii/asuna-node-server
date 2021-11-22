@@ -1,4 +1,4 @@
-import { plainToClass, Transform } from 'class-transformer';
+import { plainToInstance, Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
 import * as mime from 'mime-types';
@@ -36,7 +36,7 @@ export class FileInfo {
       return;
     }
 
-    Object.assign(this, plainToClass(FileInfo, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(FileInfo, o, { enableImplicitConversion: true }));
     this.mimetype = o.mimetype || mime.lookup(o.filename) || 'application/octet-stream';
     this.extension = o.extension || mime.extension(this.mimetype) || 'bin';
   }
@@ -60,7 +60,7 @@ export class SavedFile extends FileInfo {
 
   constructor(o: SavedFile) {
     super(o);
-    Object.assign(this, plainToClass(SavedFile, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(SavedFile, o, { enableImplicitConversion: true }));
   }
 }
 

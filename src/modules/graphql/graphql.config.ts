@@ -2,7 +2,7 @@ import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP2, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
@@ -22,7 +22,7 @@ export class GraphQLConfigObject {
   playground_enable: boolean;
 
   public constructor(o: Partial<GraphQLConfigObject>) {
-    Object.assign(this, plainToClass(GraphQLConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(GraphQLConfigObject, o, { enableImplicitConversion: true }));
   }
 
   public static load = (): GraphQLConfigObject =>

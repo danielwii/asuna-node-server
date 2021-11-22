@@ -7,7 +7,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
-import { plainToClass, Transform } from 'class-transformer';
+import { plainToInstance, Transform } from 'class-transformer';
 import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import highland from 'highland';
@@ -41,7 +41,7 @@ export class ChunkFileInfo {
   readonly chunk: number;
 
   constructor(o: ChunkFileInfo) {
-    Object.assign(this, plainToClass(ChunkFileInfo, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(ChunkFileInfo, o, { enableImplicitConversion: true }));
   }
 }
 
@@ -60,7 +60,7 @@ export class RemoteFileInfo extends FileInfo {
 
   constructor(o: RemoteFileInfo) {
     super(o);
-    Object.assign(this, plainToClass(RemoteFileInfo, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(RemoteFileInfo, o, { enableImplicitConversion: true }));
   }
 }
 

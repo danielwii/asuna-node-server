@@ -1,6 +1,6 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { Expose, plainToClass, Transform } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config';
 
@@ -27,7 +27,7 @@ export class MongoConfigObject {
   password?: string;
 
   constructor(o: Partial<MongoConfigObject>) {
-    Object.assign(this, plainToClass(MongoConfigObject, o, { enableImplicitConversion: true }));
+    Object.assign(this, plainToInstance(MongoConfigObject, o, { enableImplicitConversion: true }));
   }
 
   static load(): MongoConfigObject {
