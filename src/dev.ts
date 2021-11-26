@@ -1,15 +1,13 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { Module, OnModuleInit } from '@nestjs/common';
 
-import { bootstrap } from '.';
+require('fix-esm').register();
 
-@Module({
-  imports: [],
-  controllers: [],
-})
+@Module({})
 export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {
     // AdminApiKeys.create({ name: 'test-only', key: 'test-key', isPublished: true }).save();
   }
 }
 
-bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
+require('.').bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
