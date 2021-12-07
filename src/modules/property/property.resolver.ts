@@ -34,13 +34,13 @@ export class PropertyQueryResolver {
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => PointExchangePageable)
   public async user_paged_exchangeRecords(
-    @Args('type') type: string,
+    @Args('type', { nullable: true }) type: string,
     @Args('refId') refId: string,
     @Args('pageRequest') pageRequest: PageRequestInput,
     @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<PointExchangePageable> {
-    const currentUser = getCurrentUser() as JwtPayload;
+    const currentUser = getCurrentUser();
     this.logger.log(`user_paged_exchangeRecords: ${r({ type, refId, pageRequest })}`);
     const [items, total] = await PointExchange.findAndCount(
       await GraphqlHelper.genericFindOptions<PointExchange>({
@@ -65,7 +65,7 @@ export class PropertyQueryResolver {
     @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<FinancialTransactionPageable> {
-    const currentUser = getCurrentUser() as JwtPayload;
+    const currentUser = getCurrentUser();
     this.logger.log(`user_paged_financialTransactions: ${r({ type, refId, pageRequest })}`);
     const [items, total] = await FinancialTransaction.findAndCount(
       await GraphqlHelper.genericFindOptions<FinancialTransaction>({

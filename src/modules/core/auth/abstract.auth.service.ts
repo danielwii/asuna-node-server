@@ -1,3 +1,4 @@
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -141,12 +142,14 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     isActive?: boolean,
     options?: FindOneOptions<U>,
   ): Promise<U> {
-    const condition: FindConditions<U> = {
-      ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
-      ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
-      ...R.ifElse(R.identity, R.always({ isActive }), R.always({}))(!_.isNil(isActive)),
-    };
+    const condition: FindConditions<any> = _.pickBy(
+      { email: identifier.email, username: identifier.username, isActive },
+      (v) => !_.isUndefined(v),
+    );
     logger.debug(`get user by condition ${r(condition)}`);
+    if (!(condition.email ?? condition.username)) {
+      throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
+    }
     return this.authUserRepository.findOne(condition, options);
   }
 
