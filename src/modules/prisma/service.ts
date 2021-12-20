@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
@@ -24,7 +24,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     this.logger.log('connect to db...');
     await this.$connect();
 
-    this.$on('query' as any, (e: Prisma.QueryEvent) => {
+    this.$on('query' as any, (e: any) => {
       if (e.duration > 1000) {
         this.logger.debug('Timestamp: ' + e.timestamp);
         this.logger.debug('Query: ' + e.query);

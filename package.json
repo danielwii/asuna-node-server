@@ -26,7 +26,7 @@
     "postinstall!": "yarn build"
   },
   "resolutions": {
-    "node-pre-gyp": "https://github.com/mapbox/node-pre-gyp/archive/refs/tags/v1.0.7.tar.gz",
+    "node-pre-gyp": "https://github.com/mapbox/node-pre-gyp/archive/refs/tags/v1.0.8.tar.gz",
     "fsevents": "^2"
   },
   "dependencies": {
