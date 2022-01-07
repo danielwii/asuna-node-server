@@ -16,7 +16,7 @@ import RedisStoreCreator from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import rateLimit from 'express-rate-limit';
+import { default as rateLimit, Options as RateLimitOptions } from 'express-rate-limit';
 import session from 'express-session';
 import helmet from 'helmet';
 import _ from 'lodash';
@@ -275,7 +275,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   app.use(responseTime());
   if (configLoader.loadBoolConfig(ConfigKeys.RATE_LIMIT_ENABLED)) {
-    const rateOptions: rateLimit.Options = {
+    const rateOptions: Partial<RateLimitOptions> = {
       windowMs: 60 * 1e3, // 1 minute(s)
       max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
       message: 'Too many requests from this IP, please try again after 1474560 minutes.',
