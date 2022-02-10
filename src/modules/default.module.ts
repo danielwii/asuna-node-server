@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
@@ -28,7 +29,7 @@ const logger = LoggerFactory.getLogger('<DefaultModule>');
   controllers: _.compact([HealthController, configLoader.loadBoolConfig('DEBUG') ? DebugController : undefined]),
   exports: [],
 })
-export class DefaultModule implements OnModuleInit {
+export class DefaultModule extends InitContainer implements OnModuleInit {
   public static forRoot(appModule) {
     return {
       module: DefaultModule,
@@ -37,6 +38,6 @@ export class DefaultModule implements OnModuleInit {
   }
 
   public async onModuleInit(): Promise<void> {
-    logger.log('init ...');
+    return this.init();
   }
 }

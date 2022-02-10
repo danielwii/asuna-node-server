@@ -45,7 +45,7 @@ export class HealthController {
         // () => this.memory.checkRSS('memory_rss', 3072 * 1024 * 1024),
         // () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: this.path }),
         // MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
-        // RedisProvider.instance.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
+        // RedisProvider.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
       ]),
     );
   }

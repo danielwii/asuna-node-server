@@ -33,7 +33,7 @@ export class RedisIoAdapter extends IoAdapter {
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
       logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
-      const pubClient = RedisProvider.instance.getRedisClient('ws', db).client;
+      const pubClient = RedisProvider.getRedisClient('ws', db).client;
       const subClient = pubClient.duplicate();
       RedisIoAdapter.redisAdapter = createAdapter(
         { pubClient, subClient },

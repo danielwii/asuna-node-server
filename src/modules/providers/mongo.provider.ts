@@ -14,12 +14,11 @@ export class MongoProvider {
     MongooseModule.forRootAsync({
       useFactory: () => {
         const configObject = MongoConfigObject.load();
-        const uri = `mongodb://${configObject.username}:${configObject.password}@${configObject.host}:${configObject.port}/${configObject.db}?authSource=admin`;
         if (!configObject.enable) {
           throw new Error('mongo not enabled');
         }
         const options: MongooseModuleOptions = {
-          uri,
+          uri: `mongodb://${configObject.username}:${configObject.password}@${configObject.host}:${configObject.port}/${configObject.db}?authSource=admin`,
           connectionFactory: (connection, name) => {
             logger.log(`connect to ${name}...`);
             // eslint-disable-next-line

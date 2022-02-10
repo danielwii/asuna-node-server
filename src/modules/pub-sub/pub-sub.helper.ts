@@ -1,9 +1,9 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { promisify } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
+import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 
@@ -15,16 +15,16 @@ export enum PubSubChannels {
 
 export class PubSubHelper {
   static async publish(channel: string, payload: string | object) {
-    const redis = RedisProvider.instance.getRedisClient('pub_sub_publisher');
+    const redis = RedisProvider.getRedisClient('pub_sub_publisher');
     if (!redis.isEnabled) return Promise.resolve();
 
     logger.log(`publish ... ${r({ channel, payload })}`);
     const value = _.isObject(payload) ? JSON.stringify(payload) : payload;
-    return promisify(redis.client.publish, redis.client)(channel, value);
+    return redis.client.publish(channel, value);
   }
 
   static subscribe<T>(...channels: string[]): Subject<T> {
-    const redis = RedisProvider.instance.getRedisClient('pub_sub_subscriber');
+    const redis = RedisProvider.getRedisClient('pub_sub_subscriber');
     const subscription = new Subject<T>();
     if (redis.isEnabled) {
       logger.log(`subscribe ... ${channels}`);

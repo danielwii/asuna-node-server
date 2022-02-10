@@ -98,7 +98,7 @@ export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
 }
 
 export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
-  const redis = RedisProvider.instance.getRedisClient('dataloader');
+  const redis = RedisProvider.getRedisClient('dataloader');
   if (redis.isEnabled) {
     logger.log(`init redis dataloader for ${segment} ... ${r(redis.redisOptions)}`);
     const redisLoader = new (createRedisDataloader({ redis: redis.client }))(

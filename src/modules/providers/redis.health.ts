@@ -10,8 +10,8 @@ const logger = LoggerFactory.getLogger('RedisHealthIndicator');
 @Injectable()
 export class RedisHealthIndicator extends HealthIndicator {
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
-    const redisClientObject = RedisProvider.instance.getRedisClient();
-    const isHealthy = redisClientObject.isHealthy;
+    const redisClientObject = RedisProvider.getRedisClient();
+    const isHealthy = redisClientObject.client.isOpen;
 
     const status = this.getStatus(key, isHealthy, {
       message: !isHealthy ? 'redis is unhealthy' : undefined,

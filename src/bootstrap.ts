@@ -64,6 +64,16 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
     Sentry.captureException(reason);
   });
+  process.on('uncaughtException', (reason, e) => {
+    logger.error(`Uncaught Exception at: ${r({ e, reason })}`);
+    Sentry.captureException(reason);
+  });
+  process.on('beforeExit', (reason) => {
+    logger.error(`App will exit cause: ${r(reason)}`);
+  });
+  process.on('exit', (reason) => {
+    reason ? logger.error(`App exit cause: ${r(reason)}`) : logger.log(`App exit cause: ${r(reason)}`);
+  });
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
   registerEnumType(NotificationEnum, {
@@ -91,10 +101,10 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   }
 
   return run(appModule, options).catch((reason) => {
-    logger.error(`${reason?.message} ${r(reason?.stack)}`);
+    logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
     setTimeout(() => {
-      consola.error(`System will exit in 1s because of error: ${reason?.message}`);
+      consola.error(`[bootstrap] System will exit in 1s because of error: ${reason?.message}`);
       process.exit(1);
     }, TimeUnit.SECONDS.toMillis(1));
   });
@@ -110,7 +120,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const logger = LoggerFactory.getLogger('run');
 
-  logger.log(`options: ${r(options)}`);
+  logger.log(`options: ${r({ appModule, options })}`);
 
   await AppLifecycle.preload();
   await CacheUtils.clearAll();
@@ -244,7 +254,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   );
   app.use(compression());
 
-  const sessionRedis = RedisProvider.instance.getRedisClient('session', 2);
+  const sessionRedis = RedisProvider.getRedisClient('session', 2, true);
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({

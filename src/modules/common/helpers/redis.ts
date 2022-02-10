@@ -1,15 +1,13 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { promisify } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 import { parse } from 'json5';
 import _ from 'lodash';
-import { createClient } from 'redis';
+
+import type { RedisClientType } from 'redis';
 
 const logger = LoggerFactory.getLogger('RedisHelper');
-
-type RedisClient = ReturnType<typeof createClient>;
 
 export class RedisHelper {
   /**
@@ -17,7 +15,7 @@ export class RedisHelper {
    * @param redis
    * @param patterns
    */
-  public static async getKeysByPattern(redis: RedisClient, patterns: string[]): Promise<string[]> {
+  public static async getKeysByPattern(redis: RedisClientType, patterns: string[]): Promise<string[]> {
     if (_.isEmpty(patterns)) return [];
     const mappedKeys = await Promise.map(patterns, (pattern) => RedisHelper.keys(redis, pattern));
     const keys = _.flow(_.flatten, _.uniq)(mappedKeys);
@@ -25,7 +23,7 @@ export class RedisHelper {
     return keys as any;
   }
 
-  public static async getMultiKeys<R>(redis: RedisClient, keys: string[]): Promise<Record<string, R>> {
+  public static async getMultiKeys<R>(redis: RedisClientType, keys: string[]): Promise<Record<string, R>> {
     if (_.isEmpty(keys)) return {};
     const values = await RedisHelper.mget(redis, keys);
     const zipped = _.zipObject(keys, values.map(parse as any));
@@ -33,7 +31,7 @@ export class RedisHelper {
     return zipped as any;
   }
 
-  public static async getRandomKeys(redis: RedisClient, count = 10): Promise<string[]> {
+  public static async getRandomKeys(redis: RedisClientType, count = 10): Promise<string[]> {
     const total = await RedisHelper.dbsize(redis);
     // if (count > total) {
     //   return RedisHelper.keys(redis, '*');
@@ -47,14 +45,14 @@ export class RedisHelper {
 
   // --- basic command wrapper
 
-  public static async randomkey(redis: RedisClient): Promise<string> {
-    return (await promisify(redis.randomkey, redis)()) as any;
+  public static async randomkey(redis: RedisClientType): Promise<string> {
+    return redis.randomKey();
   }
-  public static async dbsize(redis: RedisClient): Promise<number> {
-    return (await promisify(redis.dbsize, redis)()) as any;
+  public static async dbsize(redis: RedisClientType): Promise<number> {
+    return redis.dbSize();
   }
   public static async scan(
-    redis: RedisClient,
+    redis: RedisClientType,
     cursor?: number,
     pattern?: string,
     count?: number,
@@ -73,22 +71,23 @@ export class RedisHelper {
     //   });
     // });
   }
-  public static async keys(redis: RedisClient, pattern: string): Promise<string[]> {
-    return (await promisify(redis.keys, redis)(pattern)) as any;
+  public static async keys(redis: RedisClientType, pattern: string): Promise<string[]> {
+    return redis.keys(pattern);
   }
-  public static async get(redis: RedisClient, key: string): Promise<string> {
-    return (await promisify(redis.get, redis)(key)) as any;
+  public static async get(redis: RedisClientType, key: string): Promise<string> {
+    return redis.get(key);
   }
-  public static async mget(redis: RedisClient, keys: string[]): Promise<string[]> {
-    return (await promisify(redis.mget as any, redis)(keys)) as any;
+  public static async mget(redis: RedisClientType, keys: string[]): Promise<string[]> {
+    return redis.mGet(keys);
   }
-  public static async setex(redis: RedisClient, key: string, expires: number, value: string): Promise<number> {
+  public static async setex(redis: RedisClientType, key: string, expires: number, value: string): Promise<string> {
     logger.debug(`setex ${r({ key, expires, value })}`);
-    return (await promisify(redis.setex, redis)(key, expires, value)) as any;
+    return redis.setEx(key, expires, value);
   }
-  public static async del(redis: RedisClient, keys: string[]): Promise<void> {
+  public static async del(redis: RedisClientType, keys: string[]): Promise<void> {
     logger.debug(`del ${r(keys)}`);
     // await Promise.all(_.map(keys, (key) => promisify(redis.del, redis)(key)));
-    if (!_.isEmpty(keys)) redis.sendCommand(['del', ...keys]);
+    if (!_.isEmpty(keys)) await redis.del(keys);
+    // redis.sendCommand(['del', ...keys]);
   }
 }

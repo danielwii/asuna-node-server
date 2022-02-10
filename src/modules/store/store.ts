@@ -1,7 +1,6 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisClientObject, RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
-import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { CacheManager } from '../cache/cache';
@@ -18,7 +17,7 @@ export class Store {
   public constructor(prefix: string) {
     this.prefix = `store_${prefix}`;
 
-    this.redis = RedisProvider.instance.getRedisClient(this.prefix);
+    this.redis = RedisProvider.getRedisClient(this.prefix);
     this.redisMode = this.redis.isEnabled;
     logger.log(`init with ${this.prefix} redis: ${this.redisMode}`);
   }
@@ -30,11 +29,7 @@ export class Store {
   public setItem = async <T>(key: any, value: T, expiresInSeconds: number = Number.MAX_SAFE_INTEGER): Promise<void> => {
     const itemKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     if (this.redisMode) {
-      await Promise.promisify(this.redis.client.setex).bind(this.redis.client)(
-        itemKey,
-        expiresInSeconds,
-        _.isString(value) ? value : JSON.stringify(value),
-      );
+      await this.redis.client.setEx(itemKey, expiresInSeconds, _.isString(value) ? value : JSON.stringify(value));
     } else {
       await CacheManager.clear(itemKey);
       await CacheManager.cacheable(itemKey, async () => value, expiresInSeconds);
@@ -44,7 +39,7 @@ export class Store {
   public getItem = async <T>(key: any, opts?: { json?: boolean }): Promise<T> => {
     const itemKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     if (this.redisMode) {
-      const result = await Promise.promisify(this.redis.client.get).bind(this.redis.client)(itemKey);
+      const result = await this.redis.client.get(itemKey);
       return opts?.json ? JSON.parse(result) : result;
     }
     return CacheManager.get(itemKey);

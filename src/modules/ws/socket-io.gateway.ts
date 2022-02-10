@@ -54,7 +54,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   @WebSocketServer()
   private readonly server?: Server;
   private readonly timestamp = Date.now();
-  // private readonly redis = RedisProvider.instance.getRedisClient('ws');
+  // private readonly redis = RedisProvider.getRedisClient('ws');
 
   private views = 0;
   private history = 0;

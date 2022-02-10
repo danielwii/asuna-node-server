@@ -1,5 +1,4 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { promisify } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -19,13 +18,13 @@ export class CacheUtils {
   }
 
   public static async clearAll(): Promise<void> {
-    const redis = RedisProvider.instance.getRedisClient('cache_utils');
+    const redis = RedisProvider.getRedisClient('cache_utils');
     if (redis.isEnabled) {
-      const redisKeys = (await promisify(redis.client.keys, redis.client)('kv#*')) as string[];
+      const redisKeys = await redis.client.keys('kv#*');
 
       if (!_.isEmpty(redisKeys)) {
         this.logger.log(`clean keys... ${r(redisKeys)}`);
-        redisKeys.forEach((key) => promisify(redis.client.del, redis.client)(key));
+        redisKeys.forEach((key) => redis.client.del(key));
       }
     }
   }

@@ -34,7 +34,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     logger.log(`[preload] ...`);
     await HandlebarsHelper.init();
     await AsunaContext.init();
-    await RedisProvider.init();
+    // await RedisProvider.init();
     await RedisLockProvider.init();
     await Store.init();
     await Hermes.initialize();
@@ -122,7 +122,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   public static async onAppStartListening(app: NestExpressApplication): Promise<void> {
     logger.log(`[onAppStartListening] ...`);
 
-    logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.instance.clients, fp.omit('client')))}`);
+    logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.clients, fp.omit('client')))}`);
     logger.debug(`inspect crons: ${r(CronHelper.crons)}`);
     logger.debug(
       `inspect id generators: ${r({ byPrefix: IdGenerators.handlers, byEntity: IdGenerators.handlersByEntity })}`,

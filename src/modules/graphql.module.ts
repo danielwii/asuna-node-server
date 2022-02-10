@@ -1,3 +1,4 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -40,7 +41,7 @@ export class GraphqlModule implements OnModuleInit {
     );
     logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
 
-    const redis = RedisProvider.instance.getRedisClient('graphql');
+    const redis = RedisProvider.getRedisClient('graphql');
     const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
     logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
@@ -50,7 +51,8 @@ export class GraphqlModule implements OnModuleInit {
         ...modules,
         KvModule,
         AppModule,
-        GraphQLModule.forRoot({
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+          driver: ApolloDriver,
           // definitions: {
           //   path: join(process.cwd(), 'src/graphql.generated.ts'),
           //   outputAs: 'class',

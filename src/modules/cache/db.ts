@@ -1,5 +1,5 @@
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { fnResolve, promisify } from '@danielwii/asuna-helper/dist/promise';
+import { fnResolve } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
@@ -32,7 +32,7 @@ export class InMemoryDB {
     const keyStr = isPrefixObject(key) ? InMemoryDB.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
-    const redis = RedisProvider.instance.getRedisClient(prefix);
+    const redis = RedisProvider.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
@@ -48,14 +48,14 @@ export class InMemoryDB {
       const value = await fnResolve(resolver)();
       if (value) {
         // update
-        await promisify(redis.client.lpush, redis.client)(
+        await redis.client.lPush(
           keyStr,
           // options?.expiresInSeconds,
           _.isString(value) ? value : JSON.stringify(value),
         );
       } else {
         // remove null just in case
-        await promisify(redis.client.ltrim, redis.client)(keyStr, 0, options?.length ?? 99);
+        await redis.client.lTrim(keyStr, 0, options?.length ?? 99);
       }
       return value;
     };
@@ -63,28 +63,28 @@ export class InMemoryDB {
     return primeToRedis();
   }
 
-  public static async list<Key extends string | CacheKey, Value>(key: Key): Promise<Value[]> {
+  public static async list<Key extends string | CacheKey>(key: Key): Promise<string[]> {
     const keyStr = isPrefixObject(key) ? InMemoryDB.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
-    const redis = RedisProvider.instance.getRedisClient(prefix);
+    const redis = RedisProvider.getRedisClient(prefix);
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix })}.`);
       return CacheManager.get(keyStr);
     }
-    return Promise.promisify(redis.client.lrange).bind(redis.client)(keyStr, 0, -1);
+    return redis.client.lRange(keyStr, 0, -1);
   }
 
   public static async get<Key extends string | CacheKey>(key: Key) {
     const keyStr = isPrefixObject(key) ? InMemoryDB.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
-    const redis = RedisProvider.instance.getRedisClient(prefix);
+    const redis = RedisProvider.getRedisClient(prefix);
     if (!redis.isEnabled) {
       return CacheManager.get(keyStr);
     }
-    const value = await Promise.promisify(redis.client.get).bind(redis.client)(keyStr);
+    const value = await redis.client.get(keyStr);
     return parseJSONIfCould(value);
   }
 
@@ -109,31 +109,32 @@ export class InMemoryDB {
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
     const strategy = options?.strategy ?? 'cache-only';
 
-    const redis = RedisProvider.instance.getRedisClient(prefix, options?.db);
+    const redis = RedisProvider.getRedisClient(prefix, options?.db);
+    // logger.log(`redis is ${r(redis)}`);
     // redis 未启用时使用 CacheManager
-    if (!redis.isEnabled) {
+    if (!redis.isOpen) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
       return CacheManager.cacheable(keyStr, resolver, options?.expiresInSeconds);
     }
 
     const primeToRedis = async (saved?): Promise<Value> => {
       const resolved = await fnResolve(resolver)(saved);
-      logger.verbose(`prime to redis by ${r({ cacheKey: keyStr, prefix, strategy, saved /* , resolved */ })}`);
+      logger.verbose(`prime to redis: ${r({ cacheKey: keyStr, prefix, strategy, saved /* , resolved */ })}`);
       if (resolved) {
         // update
-        await promisify(redis.client.setex, redis.client)(
+        await redis.client.setEx(
           keyStr,
           options?.expiresInSeconds ?? TimeUnit.MILLIS.toSeconds(CacheTTL.LONG_24),
           _.isString(resolved) ? resolved : JSON.stringify(resolved),
         );
       } else {
         // remove null just in case
-        await promisify(redis.client.del, redis.client)(keyStr);
+        await redis.client.del(keyStr);
       }
       return resolved;
     };
     // redis 存在未过期的值时直接返回
-    const value = await Promise.promisify(redis.client.get).bind(redis.client)(keyStr);
+    const value = await redis.client.get(keyStr);
     // logger.debug(`prime to redis -- ${r({ keyStr, prefix, strategy, options, value })}`);
 
     if (value) {
@@ -148,14 +149,14 @@ export class InMemoryDB {
     return primeToRedis();
   }
 
-  public static async clear(cacheKey: CacheKey): Promise<void> {
+  public static async clear(cacheKey: CacheKey): Promise<number | void> {
     const { key, prefix } = cacheKey;
     const keyStr = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
     logger.debug(`remove ${keyStr}`);
-    const redis = RedisProvider.instance.getRedisClient(prefix);
+    const redis = RedisProvider.getRedisClient(prefix);
     if (!redis.isEnabled) {
       return CacheManager.clear(keyStr);
     }
-    return Promise.promisify(redis.client.del).bind(redis.client)(keyStr);
+    return redis.client.del(keyStr);
   }
 }

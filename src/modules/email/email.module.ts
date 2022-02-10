@@ -1,5 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -11,18 +12,20 @@ import { EmailHelper } from './email.helper';
 const logger = LoggerFactory.getLogger('EmailModule');
 
 @Module({})
-export class EmailModule implements OnModuleInit {
+export class EmailModule extends InitContainer implements OnModuleInit {
   public async onModuleInit(): Promise<void> {
-    logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
+    return this.init(async () => {
+      logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
 
-    await this.initKV();
-    await EmailHelper.init();
-    /* test-only
+      await this.initKV();
+      await EmailHelper.init();
+      /* test-only
     interval(300).subscribe((value) => {
       console.log('internal', value);
       EmailHelper.sender.next(value);
     });
 */
+    });
   }
 
   public async initKV(): Promise<void> {
