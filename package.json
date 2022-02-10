@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.8.18",
+  "version": "0.8.19",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.10",
-    "@danielwii/asuna-helper": "^0.0.17",
+    "@danielwii/asuna-helper": "^0.0.19",
     "@danielwii/asuna-shared": "^0.0.5",
     "@nestjs/apollo": "^10.0.0",
     "@nestjs/common": "^8.2.6",
@@ -105,7 +105,7 @@
     "passport-jwt": "^4.0.0",
     "pump": "^3.0.0",
     "qiniu": "^7.4.0",
-    "ramda": "^0.27.2",
+    "ramda": "^0.28.0",
     "raw-body": "^2.4.2",
     "redis": "^4.0.3",
     "redis-dataloader": "^1.0.2",
