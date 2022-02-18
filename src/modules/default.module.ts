@@ -37,7 +37,5 @@ export class DefaultModule extends InitContainer implements OnModuleInit {
     };
   }
 
-  public async onModuleInit(): Promise<void> {
-    return this.init();
-  }
+  public onModuleInit = async (): Promise<void> => this.init();
 }

@@ -3,6 +3,7 @@ import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -27,7 +28,7 @@ import type { GraphQLServiceContext } from 'apollo-server-types';
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
 @Module({})
-export class GraphqlModule implements OnModuleInit {
+export class GraphqlModule extends InitContainer implements OnModuleInit {
   public static forRoot(modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
@@ -126,7 +127,5 @@ export class GraphqlModule implements OnModuleInit {
     };
   }
 
-  public onModuleInit(): void {
-    logger.log('init...');
-  }
+  public onModuleInit = () => super.init();
 }

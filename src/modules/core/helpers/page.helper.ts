@@ -13,7 +13,7 @@ import type { ClassType } from '@danielwii/asuna-helper';
 
 export const DEFAULT_PAGE = 1;
 export const DEFAULT_SIZE = 10;
-export const MAX_PAGE_SIZE = 1000;
+export const MAX_PAGE_SIZE = 100;
 
 export enum Order {
   ASC = 'ASC',

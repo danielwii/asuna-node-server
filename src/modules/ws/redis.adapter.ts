@@ -3,8 +3,9 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+// import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import Redis from 'ioredis';
 
 import _ from 'lodash';
 import { RedisAdapter, createAdapter } from 'socket.io-redis';
@@ -33,7 +34,9 @@ export class RedisIoAdapter extends IoAdapter {
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
       logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
-      const pubClient = RedisProvider.getRedisClient('ws', db).client;
+      const redis = new Redis(configObject.getOptions(db));
+      const pubClient = redis;
+      // const pubClient = RedisProvider.getRedisClient('ws', db, true).client;
       const subClient = pubClient.duplicate();
       RedisIoAdapter.redisAdapter = createAdapter(
         { pubClient, subClient },

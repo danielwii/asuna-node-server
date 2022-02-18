@@ -1,9 +1,10 @@
 /* eslint-disable */
+import { RedisConfigObject } from '@danielwii/asuna-helper';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import DataLoader from 'dataloader';
+import Redis from 'ioredis';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
@@ -98,10 +99,11 @@ export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
 }
 
 export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
-  const redis = RedisProvider.getRedisClient('dataloader');
-  if (redis.isEnabled) {
-    logger.log(`init redis dataloader for ${segment} ... ${r(redis.redisOptions)}`);
-    const redisLoader = new (createRedisDataloader({ redis: redis.client }))(
+  const redisConfig = RedisConfigObject.loadOr('ws');
+  // const redis = RedisProvider.getRedisClient('dataloader');
+  if (redisConfig.enable) {
+    logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig)}`);
+    const redisLoader = new (createRedisDataloader({ redis: new Redis(redisConfig.getOptions()) }))(
       `dataloader-${segment}`,
       // create a regular dataloader. This should always be set with caching disabled.
       new DataLoader(

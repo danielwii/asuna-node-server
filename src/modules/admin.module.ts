@@ -2,6 +2,7 @@ import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } fro
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
@@ -110,7 +111,7 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
   ],
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
-export class AdminInternalModule implements NestModule, OnModuleInit {
+export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');
     if (configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
@@ -121,11 +122,11 @@ export class AdminInternalModule implements NestModule, OnModuleInit {
     }
   }
 
-  public async onModuleInit(): Promise<void> {
-    logger.log('init...');
-    await this.initKV();
-    await this.initConstants();
-  }
+  public onModuleInit = async (): Promise<void> =>
+    super.init(async () => {
+      await this.initKV();
+      await this.initConstants();
+    });
 
   public async initKV(): Promise<void> {
     KvHelper.regInitializer<KVFieldsValue>(
