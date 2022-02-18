@@ -89,7 +89,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
 
     AccessControlHelper.init();
 
-    process.on('SIGTERM', function onSigterm() {
+    process.on('SIGTERM', () => {
       logger.log('Got signal SIGTERM. Graceful shutdown start', new Date().toISOString());
     });
     process.on('SIGINT', () => {
