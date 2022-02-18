@@ -16,7 +16,10 @@
   ],
   "scripts": {
     "clean": "rm -rf ./dist",
-    "build": "yarn clean && yarn tsc",
+    "build": "yarn clean && nest build",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
     "dev": "node --preserve-symlinks -r ts-node/register src/dev.ts",
     "dev:watch": "nodemon --exec node --preserve-symlinks -r ts-node/register src/dev.ts",
     "test": "ENV=test jest",
