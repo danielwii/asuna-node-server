@@ -5,7 +5,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import * as shortid from 'shortid';
+import { nanoid } from 'nanoid';
 import { Connection, getManager, In } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
@@ -55,7 +55,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
    */
   public async initSysAccount(): Promise<void> {
     const email = AppConfigObject.load().sysAdminEmail;
-    const password = AppConfigObject.load().sysAdminPassword ?? shortid.generate();
+    const password = AppConfigObject.load().sysAdminPassword ?? nanoid();
     const role = await Role.findOne({ name: SYS_ROLE });
 
     if (!role) {

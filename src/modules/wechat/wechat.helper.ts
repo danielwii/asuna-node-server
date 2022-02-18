@@ -9,8 +9,8 @@ import { instanceToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { nanoid } from 'nanoid';
 import rawBody from 'raw-body';
-import * as shortid from 'shortid';
 import * as xml2js from 'xml2js';
 
 import { HandlebarsHelper } from '../common/helpers';
@@ -387,7 +387,7 @@ export class WeChatHelper {
   public static async code2Session(code: string): Promise<string> {
     const codeSession = await WxApi.code2Session(code);
     logger.log(`code2session ${r({ code, codeSession })}`);
-    const key = shortid.generate();
+    const key = nanoid();
     await Store.Global.setItem(key, codeSession);
     if (codeSession.errcode) {
       throw new AsunaException(
