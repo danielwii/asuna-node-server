@@ -657,12 +657,12 @@ __metadata:
     "@alicloud/pop-core": ^1.7.10
     "@danielwii/asuna-helper": ^0.0.21
     "@danielwii/asuna-shared": ^0.0.5
-    "@nestjs/apollo": ^10.0.3
+    "@nestjs/apollo": ^10.0.4
     "@nestjs/cli": ^8.2.1
     "@nestjs/common": ^8.3.1
     "@nestjs/core": ^8.3.1
     "@nestjs/cqrs": ^8.0.2
-    "@nestjs/graphql": ^10.0.3
+    "@nestjs/graphql": ^10.0.4
     "@nestjs/mongoose": ^9.0.2
     "@nestjs/passport": ^8.2.1
     "@nestjs/platform-express": ^8.3.1
@@ -1236,9 +1236,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/apollo@npm:^10.0.3":
-  version: 10.0.3
-  resolution: "@nestjs/apollo@npm:10.0.3"
+"@nestjs/apollo@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "@nestjs/apollo@npm:10.0.4"
   dependencies:
     iterall: 1.3.0
     lodash.omit: 4.5.0
@@ -1259,7 +1259,7 @@ __metadata:
       optional: true
     apollo-server-fastify:
       optional: true
-  checksum: 6d333a072f7bfb0f3d4fef9a532fa7a4283358a4a927ad26404f5b8b8b35de7da56f344347599a2fd42db0065a53ba5746714bb0921b48c386d1d530a2f67b79
+  checksum: 0f55374eff4c40420d380fa1c4517f72cb628eb07ae4434369d99d0bb200980a0f3ed410aad6cfccbdc05b292fdd7e504ff9659a1099aa8d7f5a8abc54a7cc39
   languageName: node
   linkType: hard
 
@@ -1363,9 +1363,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/graphql@npm:^10.0.3":
-  version: 10.0.3
-  resolution: "@nestjs/graphql@npm:10.0.3"
+"@nestjs/graphql@npm:^10.0.4":
+  version: 10.0.4
+  resolution: "@nestjs/graphql@npm:10.0.4"
   dependencies:
     "@graphql-tools/merge": 8.2.2
     "@graphql-tools/schema": 8.3.1
@@ -1393,7 +1393,7 @@ __metadata:
       optional: true
     ts-morph:
       optional: true
-  checksum: d60ac140db94c5295214f8ff401e74604d4735eb2c799605b78cc4e417f4757c48096ddfad73686ab0b8048482e0c6fff325d6754a3126318c7b73ee70b65ead
+  checksum: 879cf17508de5ec2719c5b65f8df71293fa12bb88a234c082f3f8aadfe3843a76c70c9fa1c30a918291191d6c9f4de6b7ceac041cff993def7dc9f69d20de3e7
   languageName: node
   linkType: hard
 
@@ -10959,16 +10959,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.1.30":
-  version: 3.2.0
-  resolution: "nanoid@npm:3.2.0"
-  bin:
-    nanoid: bin/nanoid.cjs
-  checksum: 3d1d5a69fea84e538057cf64106e713931c4ef32af344068ecff153ff91252f39b0f2b472e09b0dfff43ac3cf520c92938d90e6455121fe93976e23660f4fccc
-  languageName: node
-  linkType: hard
-
-"nanoid@npm:^3.3.1":
+"nanoid@npm:^3.1.30, nanoid@npm:^3.3.1":
   version: 3.3.1
   resolution: "nanoid@npm:3.3.1"
   bin:
