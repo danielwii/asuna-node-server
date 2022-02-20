@@ -3,21 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model app__t_infos {
-  created_at      DateTime          @default(now()) @db.DateTime(6)
-  updated_at      DateTime          @default(now()) @db.DateTime(6)
+  created_at      DateTime          @default(now()) @db.Timestamp(6)
+  updated_at      DateTime          @default(now()) @db.Timestamp(6)
   updated_by      String?           @db.VarChar(100)
   created_by      String?           @db.VarChar(100)
-  id              Int               @id @default(autoincrement())
-  name            String            @unique(map: "IDX_6504a93a497fe965317a52a43c") @db.VarChar(100)
-  description     String?           @db.Text
-  is_published    Int?              @db.TinyInt
-  key             String            @unique(map: "IDX_7ffa5d9d63763013e0db35f68b") @db.VarChar(50)
-  mode            String?           @db.VarChar(255)
+  id              Int               @id(map: "PK_ea720ddf2e57c9b9b225cab85ed") @default(autoincrement())
+  name            String            @unique(map: "UQ_6504a93a497fe965317a52a43cf") @db.VarChar(100)
+  description     String?
+  is_published    Boolean?
+  key             String            @unique(map: "UQ_7ffa5d9d63763013e0db35f68b8") @db.VarChar(50)
+  mode            String?           @db.VarChar
   app__t_releases app__t_releases[]
 
   @@index([created_at], map: "IDX_a625e68b867d4954cf08e6b828")
@@ -25,47 +25,35 @@ model app__t_infos {
 }
 
 model app__t_releases {
-  created_at   DateTime      @default(now()) @db.DateTime(6)
-  updated_at   DateTime      @default(now()) @db.DateTime(6)
+  created_at   DateTime      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_by   String?       @db.VarChar(100)
   created_by   String?       @db.VarChar(100)
-  id           Int           @id @default(autoincrement())
-  is_published Int?          @db.TinyInt
+  id           Int           @id(map: "PK_50eeab535f662ed6b244fa7465e") @default(autoincrement())
+  is_published Boolean?
   version_code String        @db.VarChar(10)
   build_number Int
-  upgrade_mode String?       @db.VarChar(255)
-  platform     String?       @db.VarChar(255)
-  description  String?       @db.Text
+  upgrade_mode String?       @db.VarChar
+  platform     String?       @db.VarChar
+  description  String?
   paths        Json
   app_info__id Int?
   app__t_infos app__t_infos? @relation(fields: [app_info__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_297f3d3b3e0b92a3ad8470bd818")
 
-  @@index([app_info__id], map: "FK_297f3d3b3e0b92a3ad8470bd818")
   @@index([updated_at], map: "IDX_46fb6d2569291d87a7964c19af")
   @@index([created_at], map: "IDX_ea85864d7909c703e7cdb6eb80")
 }
 
-model auth__tr_users_roles {
-  user__id      String        @db.VarChar(36)
-  role__id      Int
-  auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_3c04c4b2407cda34444ccb47d92")
-  auth__t_users auth__t_users @relation(fields: [user__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_8977e1e734c29dccaf68a6beded")
-
-  @@id([user__id, role__id])
-  @@index([role__id], map: "IDX_3c04c4b2407cda34444ccb47d9")
-  @@index([user__id], map: "IDX_8977e1e734c29dccaf68a6bede")
-}
-
 model auth__t_api_keys {
-  created_at   DateTime @default(now()) @db.DateTime(6)
-  updated_at   DateTime @default(now()) @db.DateTime(6)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
   updated_by   String?  @db.VarChar(100)
   created_by   String?  @db.VarChar(100)
-  id           Int      @id @default(autoincrement())
-  name         String   @unique(map: "IDX_673c6e2ec5de5c84c31e20406a") @db.VarChar(100)
-  description  String?  @db.Text
-  is_published Int?     @db.TinyInt
-  key          String   @db.VarChar(255)
+  id           Int      @id(map: "PK_3ce2a3342962718a288a7d5b948") @default(autoincrement())
+  name         String   @unique(map: "UQ_673c6e2ec5de5c84c31e20406ab") @db.VarChar(100)
+  description  String?
+  is_published Boolean?
+  key          String   @db.VarChar
   whitelist    Json?
 
   @@index([created_at], map: "IDX_1a26dd29cddb6b533386ac2af7")
@@ -73,13 +61,13 @@ model auth__t_api_keys {
 }
 
 model auth__t_roles {
-  created_at           DateTime               @default(now()) @db.DateTime(6)
-  updated_at           DateTime               @default(now()) @db.DateTime(6)
+  created_at           DateTime               @default(now()) @db.Timestamp(6)
+  updated_at           DateTime               @default(now()) @db.Timestamp(6)
   updated_by           String?                @db.VarChar(100)
   created_by           String?                @db.VarChar(100)
-  id                   Int                    @id @default(autoincrement())
-  name                 String                 @unique(map: "IDX_9e0d0d08f85548995247de00fc") @db.VarChar(80)
-  description          String?                @db.VarChar(255)
+  id                   Int                    @id(map: "PK_3185d1edec38664e1d06d9d62a9") @default(autoincrement())
+  name                 String                 @unique(map: "UQ_9e0d0d08f85548995247de00fce") @db.VarChar(80)
+  description          String?                @db.VarChar
   authorities          Json?
   data_filter          Json?
   auth__tr_users_roles auth__tr_users_roles[]
@@ -89,32 +77,115 @@ model auth__t_roles {
 }
 
 model auth__t_users {
-  id                   String                 @id @db.VarChar(36)
-  created_at           DateTime               @default(now()) @db.DateTime(6)
-  updated_at           DateTime               @default(now()) @db.DateTime(6)
+  id                   String                 @id(map: "PK_931b192b0398248c2249e96e651") @db.VarChar(36)
+  created_at           DateTime               @default(now()) @db.Timestamp(6)
+  updated_at           DateTime               @default(now()) @db.Timestamp(6)
   updated_by           String?                @db.VarChar(100)
-  username             String                 @unique(map: "IDX_a03085fbb019b9b2c1beff10d5") @db.VarChar(50)
-  email                String?                @unique(map: "IDX_a1157cadd35c869b45de19ca47") @db.VarChar(50)
-  nickname             String?                @unique(map: "IDX_17a37b460d8c8de9a3d4519a71") @db.VarChar(50)
-  portrait             String?                @db.VarChar(255)
-  channel              String?                @default("default") @db.VarChar(255)
-  password             String?                @db.VarChar(255)
-  salt                 String?                @db.VarChar(255)
-  last_signed_at       DateTime?              @db.DateTime(0)
-  last_login_at        DateTime?              @db.DateTime(0)
-  description          String?                @db.Text
-  is_active            Int?                   @db.TinyInt
-  is_bound             Int?                   @default(0) @db.TinyInt
+  username             String                 @unique(map: "UQ_a03085fbb019b9b2c1beff10d5e") @db.VarChar(50)
+  email                String?                @unique(map: "UQ_a1157cadd35c869b45de19ca478") @db.VarChar(50)
+  nickname             String?                @unique(map: "UQ_17a37b460d8c8de9a3d4519a71e") @db.VarChar(50)
+  portrait             String?                @db.VarChar
+  channel              String?                @default("default") @db.VarChar
+  password             String?                @db.VarChar
+  salt                 String?                @db.VarChar
+  last_signed_at       DateTime?              @db.Timestamp(6)
+  last_login_at        DateTime?              @db.Timestamp(6)
+  description          String?
+  is_active            Boolean?
+  is_bound             Boolean?               @default(false)
   auth__tr_users_roles auth__tr_users_roles[]
   wx__t_users          wx__t_users?
 }
 
+model auth__tr_users_roles {
+  user__id      String        @db.VarChar(36)
+  role__id      Int
+  auth__t_roles auth__t_roles @relation(fields: [role__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3c04c4b2407cda34444ccb47d92")
+  auth__t_users auth__t_users @relation(fields: [user__id], references: [id], onDelete: Cascade, map: "FK_8977e1e734c29dccaf68a6beded")
+
+  @@id([user__id, role__id], map: "PK_490b8149421731cdc08ba2624f3")
+  @@index([role__id], map: "IDX_3c04c4b2407cda34444ccb47d9")
+  @@index([user__id], map: "IDX_8977e1e734c29dccaf68a6bede")
+}
+
+model client__t_lead_users {
+  id               String            @id(map: "PK_fbc783aea74164d231f9d208ef4") @db.VarChar(36)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_by       String?           @db.VarChar(100)
+  profile__id      String?           @unique(map: "REL_b13670ed9fe0e732d36b24cecd") @db.VarChar(36)
+  tenant__id       String?           @db.VarChar(36)
+  project__id      String?           @unique(map: "REL_1fccf53f4c5fe9458c81686a6d") @db.VarChar(20)
+  filter           String?           @db.VarChar(100)
+  visitor__id      String            @db.VarChar(36)
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_b13670ed9fe0e732d36b24cecdd")
+  im__t_projects   im__t_projects?   @relation(fields: [project__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_1fccf53f4c5fe9458c81686a6df")
+  ss__t_tenants    ss__t_tenants?    @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_ce5ce786b488ea57c12e87c44b3")
+}
+
+model client__t_session_users {
+  created_at                 DateTime                   @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime                   @default(now()) @db.Timestamp(6)
+  updated_by                 String?                    @db.VarChar(100)
+  created_by                 String?                    @db.VarChar(100)
+  profile__id                String?                    @db.VarChar(36)
+  uid                        String                     @db.VarChar(36)
+  device__id                 String?                    @db.VarChar(36)
+  session__id                String                     @id(map: "PK_e73a635c89b018fbb192c8ab3ac") @db.VarChar(36)
+  client__t_virtual_devices  client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_928b741562da4908a8d468afc26")
+  user__t_profiles           user__t_profiles?          @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_5d257e4a36e0b569e4fd02e8ae9")
+  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_e73a635c89b018fbb192c8ab3ac")
+
+  @@index([updated_at], map: "IDX_54ac8410107e9728f051c493ec")
+  @@index([created_at], map: "IDX_bea7340e1acf012907684b3a8a")
+}
+
+model client__t_virtual_devices {
+  created_at                 DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime                     @default(now()) @db.Timestamp(6)
+  updated_by                 String?                      @db.VarChar(100)
+  created_by                 String?                      @db.VarChar(100)
+  id                         String                       @id(map: "PK_d82fa92861157ebab6dd313db21") @db.VarChar(36)
+  type                       String?                      @db.VarChar(20)
+  fingerprint                String?                      @db.VarChar(50)
+  client__t_session_users    client__t_session_users[]
+  client__t_virtual_sessions client__t_virtual_sessions[]
+
+  @@index([updated_at], map: "IDX_176cff1f83eabd5c73640c6231")
+  @@index([created_at], map: "IDX_214d921abf73eca7ef1e6eb59b")
+}
+
+model client__t_virtual_sessions {
+  created_at                DateTime                   @default(now()) @db.Timestamp(6)
+  updated_at                DateTime                   @default(now()) @db.Timestamp(6)
+  updated_by                String?                    @db.VarChar(100)
+  created_by                String?                    @db.VarChar(100)
+  id                        String                     @id(map: "PK_e0d90bd579d3fea3ac960b661f3") @db.VarChar(36)
+  ua                        String                     @db.VarChar(512)
+  client_ip                 String?                    @db.VarChar(36)
+  device__id                String?                    @db.VarChar(36)
+  client__t_virtual_devices client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_30e40b42549b0bcb0828ff5d9db")
+  client__t_session_users   client__t_session_users?
+
+  @@index([created_at], map: "IDX_5ded6e94d7d8e4cf7d1f627a97")
+  @@index([updated_at], map: "IDX_79fcb330bf59003a59e09e2894")
+}
+
+model content__t_data_groups {
+  id          String   @id(map: "PK_f2d5b716a93df3b86f2fed02c52") @db.VarChar(36)
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_by  String?  @db.VarChar(100)
+  name        String   @unique(map: "UQ_9e9a4ee14ef761a52ae4f38ee84") @db.VarChar(100)
+  description String?
+}
+
 model content__t_drafts {
-  created_at DateTime @default(now()) @db.DateTime(6)
-  updated_at DateTime @default(now()) @db.DateTime(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
   updated_by String?  @db.VarChar(100)
   created_by String?  @db.VarChar(100)
-  id         Int      @id @default(autoincrement())
+  id         Int      @id(map: "PK_b77b786b8a68ab38316d44988b7") @default(autoincrement())
   content    Json
   ref_id     String   @db.VarChar(36)
   type       String   @db.VarChar(20)
@@ -124,31 +195,30 @@ model content__t_drafts {
 }
 
 model content__t_feedback {
-  created_at                  DateTime                      @default(now()) @db.DateTime(6)
-  updated_at                  DateTime                      @default(now()) @db.DateTime(6)
+  created_at                  DateTime                      @default(now()) @db.Timestamp(6)
+  updated_at                  DateTime                      @default(now()) @db.Timestamp(6)
   updated_by                  String?                       @db.VarChar(100)
   created_by                  String?                       @db.VarChar(100)
-  id                          Int                           @id @default(autoincrement())
+  id                          Int                           @id(map: "PK_c72a8364a29d5b496e06b2e4d78") @default(autoincrement())
   profile__id                 String?                       @db.VarChar(36)
-  name                        String?                       @db.VarChar(255)
-  description                 String?                       @db.Text
+  name                        String?                       @db.VarChar
+  description                 String?
   type                        String?                       @db.VarChar(50)
   images                      Json?
   status                      String                        @db.VarChar(20)
   user__t_profiles            user__t_profiles?             @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f909b9eac784fd3622ae398e6fc")
   content__t_feedback_replies content__t_feedback_replies[]
 
-  @@index([profile__id], map: "FK_f909b9eac784fd3622ae398e6fc")
   @@index([created_at], map: "IDX_a17f505248cbcf2b42abdd9578")
   @@index([updated_at], map: "IDX_b809b0fa7a0b09ad014d7134c4")
 }
 
 model content__t_feedback_replies {
-  created_at          DateTime             @default(now()) @db.DateTime(6)
-  updated_at          DateTime             @default(now()) @db.DateTime(6)
+  created_at          DateTime             @default(now()) @db.Timestamp(6)
+  updated_at          DateTime             @default(now()) @db.Timestamp(6)
   updated_by          String?              @db.VarChar(100)
   created_by          String?              @db.VarChar(100)
-  id                  Int                  @id @default(autoincrement())
+  id                  Int                  @id(map: "PK_7bb0cbf1e132672764691255596") @default(autoincrement())
   ref_id              String               @db.VarChar(36)
   images              Json?
   description         String               @db.VarChar(1000)
@@ -156,37 +226,51 @@ model content__t_feedback_replies {
   feedback__id        Int?
   content__t_feedback content__t_feedback? @relation(fields: [feedback__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_664489527fd4888cfe12591feed")
 
-  @@index([feedback__id], map: "FK_664489527fd4888cfe12591feed")
   @@index([created_at], map: "IDX_0bc3e3b443ca8bf3a3ffba83eb")
   @@index([updated_at], map: "IDX_5010543a30396840afa04ad319")
 }
 
 model content__t_notifications {
-  created_at   DateTime @default(now()) @db.DateTime(6)
-  updated_at   DateTime @default(now()) @db.DateTime(6)
+  created_at   DateTime @default(now()) @db.Timestamp(6)
+  updated_at   DateTime @default(now()) @db.Timestamp(6)
   updated_by   String?  @db.VarChar(100)
   created_by   String?  @db.VarChar(100)
-  id           Int      @id @default(autoincrement())
-  name         String   @unique(map: "IDX_a82c19659253716a85844e318d") @db.VarChar(100)
-  description  String?  @db.Text
-  is_published Int?     @db.TinyInt
-  type         String   @db.VarChar(255)
-  usage        String?  @db.VarChar(255)
+  id           Int      @id(map: "PK_6f6a5ee7d5786113aa433736f57") @default(autoincrement())
+  name         String   @unique(map: "UQ_a82c19659253716a85844e318d3") @db.VarChar(100)
+  description  String?
+  is_published Boolean?
+  type         String   @db.VarChar
+  usage        String?  @db.VarChar
 
   @@index([created_at], map: "IDX_6ec8dc856f5228bb5d6fd7a179")
   @@index([updated_at], map: "IDX_892503296b6fcaf6d33245289a")
 }
 
+model im__t_projects {
+  created_at           DateTime              @default(now()) @db.Timestamp(6)
+  updated_at           DateTime              @default(now()) @db.Timestamp(6)
+  updated_by           String?               @db.VarChar(100)
+  created_by           String?               @db.VarChar(100)
+  tenant__id           String?               @db.VarChar(36)
+  is_published         Boolean?
+  id                   String                @id(map: "PK_b1ceb3599da0e89c3ad9a1f2fc5") @db.VarChar(20)
+  ss__t_tenants        ss__t_tenants?        @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_cb3b7c64f5f4355cecd24d134ac")
+  client__t_lead_users client__t_lead_users?
+
+  @@index([created_at], map: "IDX_0f6179e2ce393c5805c4a3fef1")
+  @@index([updated_at], map: "IDX_f9cc8db230243f9d5b4deca0aa")
+}
+
 model kv__t_models {
-  created_at   DateTime     @default(now()) @db.DateTime(6)
-  updated_at   DateTime     @default(now()) @db.DateTime(6)
+  created_at   DateTime     @default(now()) @db.Timestamp(6)
+  updated_at   DateTime     @default(now()) @db.Timestamp(6)
   updated_by   String?      @db.VarChar(100)
   created_by   String?      @db.VarChar(100)
-  id           Int          @id @default(autoincrement())
-  name         String       @unique(map: "IDX_3a35080b44fce728d9b2ab85c4") @db.VarChar(100)
-  description  String?      @db.Text
-  is_published Int?         @db.TinyInt
-  format_type  String?      @db.VarChar(255)
+  id           Int          @id(map: "PK_0742c423ade5e03b1a630938f58") @default(autoincrement())
+  name         String       @unique(map: "UQ_3a35080b44fce728d9b2ab85c45") @db.VarChar(100)
+  description  String?
+  is_published Boolean?
+  format_type  String?      @db.VarChar
   pair__id     Int?         @unique(map: "REL_1ead35b3b9780e8dc55ede673c")
   kv__t_pairs  kv__t_pairs? @relation(fields: [pair__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_1ead35b3b9780e8dc55ede673ce")
 
@@ -195,16 +279,16 @@ model kv__t_models {
 }
 
 model kv__t_pairs {
-  created_at   DateTime      @default(now()) @db.DateTime(6)
-  updated_at   DateTime      @default(now()) @db.DateTime(6)
+  created_at   DateTime      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime      @default(now()) @db.Timestamp(6)
   updated_by   String?       @db.VarChar(100)
   created_by   String?       @db.VarChar(100)
-  id           Int           @id @default(autoincrement())
+  id           Int           @id(map: "PK_b205e20f0c0846664b0a214b84a") @default(autoincrement())
   collection   String        @db.VarChar(100)
   key          String        @db.VarChar(100)
   name         String?       @db.VarChar(255)
-  type         String?       @db.VarChar(255)
-  value        String?       @db.Text
+  type         String?       @db.VarChar
+  value        String?
   extra        Json?
   kv__t_models kv__t_models?
 
@@ -213,50 +297,21 @@ model kv__t_pairs {
 }
 
 model migrations {
-  id        Int    @id @default(autoincrement())
+  id        Int    @id(map: "PK_8c82d7f526340ab734260ea46be") @default(autoincrement())
   timestamp BigInt
-  name      String @db.VarChar(255)
-}
-
-model page__t_views {
-  created_at   DateTime @default(now()) @db.DateTime(6)
-  updated_at   DateTime @default(now()) @db.DateTime(6)
-  updated_by   String?  @db.VarChar(100)
-  created_by   String?  @db.VarChar(100)
-  id           Int      @id @default(autoincrement())
-  name         String   @unique(map: "IDX_9a71d9ec304e7f5312cae64007") @db.VarChar(100)
-  description  String?  @db.Text
-  is_published Int?     @db.TinyInt
-  path         String   @db.VarChar(50)
-  main_file    String?  @db.VarChar(255)
-  files        Json?
-  images       Json?
-
-  @@index([updated_at], map: "IDX_1444de8153ca029a71dc77a5d6")
-  @@index([created_at], map: "IDX_4e9aa5aec6ca57cd59acf3c5be")
-}
-
-model payment__tr_order_items {
-  order__id         String            @db.VarChar(36)
-  item__id          String            @db.VarChar(36)
-  payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_46c05f9d98ca4e16836ab89fae0")
-  payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_aaaffec287d62170d792eef4e9f")
-
-  @@id([order__id, item__id])
-  @@index([item__id], map: "IDX_46c05f9d98ca4e16836ab89fae")
-  @@index([order__id], map: "IDX_aaaffec287d62170d792eef4e9")
+  name      String @db.VarChar
 }
 
 model payment__t_items {
-  id                      String                    @id @db.VarChar(36)
-  created_at              DateTime                  @default(now()) @db.DateTime(6)
-  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  id                      String                    @id(map: "PK_19d8524590791155124f3926a20") @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamp(6)
   updated_by              String?                   @db.VarChar(100)
-  name                    String                    @unique(map: "IDX_86fc4ee85f594a0152186c525c") @db.VarChar(100)
-  description             String?                   @db.Text
-  is_published            Int?                      @db.TinyInt
-  key                     String                    @unique(map: "IDX_d5fccf27631cc84dee81c9dfb8") @db.VarChar(50)
-  summary                 String?                   @db.Text
+  name                    String                    @unique(map: "UQ_86fc4ee85f594a0152186c525c8") @db.VarChar(100)
+  description             String?
+  is_published            Boolean?
+  key                     String                    @unique(map: "UQ_d5fccf27631cc84dee81c9dfb84") @db.VarChar(50)
+  summary                 String?
   price                   Decimal?                  @db.Decimal(15, 2)
   cover                   String?                   @db.VarChar(1000)
   images                  Json?
@@ -264,50 +319,48 @@ model payment__t_items {
 }
 
 model payment__t_methods {
-  id                      String                    @id @db.VarChar(36)
-  created_at              DateTime                  @default(now()) @db.DateTime(6)
-  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  id                      String                    @id(map: "PK_e2f696991cfaa8dd37c081cd0eb") @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamp(6)
   updated_by              String?                   @db.VarChar(100)
-  name                    String                    @unique(map: "IDX_690477c4a389c5259f11d7e35f") @db.VarChar(100)
-  description             String?                   @db.Text
-  is_published            Int?                      @db.TinyInt
-  display_name            String?                   @db.VarChar(255)
-  endpoint                String?                   @db.VarChar(255)
-  merchant                String?                   @db.VarChar(255)
-  apiKey                  String?                   @db.VarChar(255)
-  private_key             String?                   @db.Text
+  name                    String                    @unique(map: "UQ_690477c4a389c5259f11d7e35fc") @db.VarChar(100)
+  description             String?
+  is_published            Boolean?
+  display_name            String?                   @db.VarChar
+  endpoint                String?                   @db.VarChar
+  merchant                String?                   @db.VarChar
+  apiKey                  String?                   @db.VarChar
+  private_key             String?
   extra                   Json?
-  sign_tmpl               String?                   @db.Text
-  body_tmpl               String?                   @db.Text
-  type                    String?                   @default("third") @db.VarChar(255)
+  sign_tmpl               String?
+  body_tmpl               String?
+  type                    String?                   @default("third") @db.VarChar
   payment__t_transactions payment__t_transactions[]
 }
 
 model payment__t_orders {
-  id                      String                    @id @db.VarChar(36)
-  created_at              DateTime                  @default(now()) @db.DateTime(6)
-  updated_at              DateTime                  @default(now()) @db.DateTime(6)
+  id                      String                    @id(map: "PK_8329cc6a4fc2ca6732f4b616d87") @db.VarChar(36)
+  created_at              DateTime                  @default(now()) @db.Timestamp(6)
+  updated_at              DateTime                  @default(now()) @db.Timestamp(6)
   updated_by              String?                   @db.VarChar(100)
   profile__id             String?                   @db.VarChar(36)
-  name                    String?                   @db.VarChar(255)
+  name                    String?                   @db.VarChar
   amount                  Decimal                   @db.Decimal(15, 2)
-  status                  String?                   @db.VarChar(255)
+  status                  String?                   @db.VarChar
   transaction__id         String?                   @unique(map: "REL_de81f74f6be8648264ada4c5c3") @db.VarChar(36)
   user__t_profiles        user__t_profiles?         @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_8f41cad8ace463ec57036efaecc")
   payment__t_transactions payment__t_transactions?  @relation(fields: [transaction__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_de81f74f6be8648264ada4c5c3a")
   payment__tr_order_items payment__tr_order_items[]
-
-  @@index([profile__id], map: "FK_8f41cad8ace463ec57036efaecc")
 }
 
 model payment__t_transactions {
-  id                 String              @id @db.VarChar(36)
-  created_at         DateTime            @default(now()) @db.DateTime(6)
-  updated_at         DateTime            @default(now()) @db.DateTime(6)
+  id                 String              @id(map: "PK_6c70545a6920ebf89baac52f127") @db.VarChar(36)
+  created_at         DateTime            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime            @default(now()) @db.Timestamp(6)
   updated_by         String?             @db.VarChar(100)
   profile__id        String?             @db.VarChar(36)
-  status             String?             @db.VarChar(255)
-  sign               String?             @db.VarChar(255)
+  status             String?             @db.VarChar
+  sign               String?             @db.VarChar
   payment_info       Json?
   extra              Json?
   data               Json?
@@ -315,26 +368,34 @@ model payment__t_transactions {
   payment__t_methods payment__t_methods? @relation(fields: [method__id], references: [id], onUpdate: NoAction, map: "FK_e15010b86bdf88783447bc62057")
   user__t_profiles   user__t_profiles?   @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_efddbdc437038a75d15ef0ae750")
   payment__t_orders  payment__t_orders?
+}
 
-  @@index([method__id], map: "FK_e15010b86bdf88783447bc62057")
-  @@index([profile__id], map: "FK_efddbdc437038a75d15ef0ae750")
+model payment__tr_order_items {
+  order__id         String            @db.VarChar(36)
+  item__id          String            @db.VarChar(36)
+  payment__t_items  payment__t_items  @relation(fields: [item__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_46c05f9d98ca4e16836ab89fae0")
+  payment__t_orders payment__t_orders @relation(fields: [order__id], references: [id], onDelete: Cascade, map: "FK_aaaffec287d62170d792eef4e9f")
+
+  @@id([order__id, item__id], map: "PK_b133a973aa288899cfda8cf679a")
+  @@index([item__id], map: "IDX_46c05f9d98ca4e16836ab89fae")
+  @@index([order__id], map: "IDX_aaaffec287d62170d792eef4e9")
 }
 
 model property__t_exchange_objects {
-  created_at                         DateTime                             @default(now()) @db.DateTime(6)
-  updated_at                         DateTime                             @default(now()) @db.DateTime(6)
+  created_at                         DateTime                             @default(now()) @db.Timestamp(6)
+  updated_at                         DateTime                             @default(now()) @db.Timestamp(6)
   updated_by                         String?                              @db.VarChar(100)
   created_by                         String?                              @db.VarChar(100)
-  id                                 Int                                  @id @default(autoincrement())
-  name                               String                               @unique(map: "IDX_798af19ccff99a7c587436da70") @db.VarChar(100)
-  description                        String?                              @db.Text
-  is_published                       Int?                                 @db.TinyInt
-  key                                String                               @unique(map: "IDX_7c55d69fabe9befb42cd7f20c4") @db.VarChar(50)
-  type                               String                               @db.VarChar(255)
+  id                                 Int                                  @id(map: "PK_cf08c81b58e62da82a19ec10139") @default(autoincrement())
+  name                               String                               @unique(map: "UQ_798af19ccff99a7c587436da704") @db.VarChar(100)
+  description                        String?
+  is_published                       Boolean?
+  key                                String                               @unique(map: "UQ_7c55d69fabe9befb42cd7f20c42") @db.VarChar(50)
+  type                               String                               @db.VarChar
   price                              Decimal                              @db.Decimal(15, 2)
-  value                              String                               @db.VarChar(255)
+  value                              String                               @db.VarChar
   cover                              String?                              @db.VarChar(1000)
-  usage                              String?                              @db.VarChar(255)
+  usage                              String?                              @db.VarChar
   property__t_financial_transactions property__t_financial_transactions[]
 
   @@index([updated_at], map: "IDX_857728c978caf383ca64a60068")
@@ -342,64 +403,60 @@ model property__t_exchange_objects {
 }
 
 model property__t_financial_transactions {
-  created_at                   DateTime                      @default(now()) @db.DateTime(6)
-  updated_at                   DateTime                      @default(now()) @db.DateTime(6)
+  created_at                   DateTime                      @default(now()) @db.Timestamp(6)
+  updated_at                   DateTime                      @default(now()) @db.Timestamp(6)
   updated_by                   String?                       @db.VarChar(100)
   created_by                   String?                       @db.VarChar(100)
-  id                           Int                           @id @default(autoincrement())
+  id                           Int                           @id(map: "PK_3cbeaeed177ba0cf4c6a3270f37") @default(autoincrement())
   change                       Int
   type                         String                        @db.VarChar(50)
   before                       Int
   after                        Int
-  ref_id                       String?                       @db.VarChar(255)
+  ref_id                       String?                       @db.VarChar
   extra                        Json?
-  remark                       String?                       @db.Text
+  remark                       String?
   profile__id                  String?                       @db.VarChar(36)
   exchange_object__id          Int?
   property__t_exchange_objects property__t_exchange_objects? @relation(fields: [exchange_object__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_66319aeac147cdacaaa6d3972c1")
   user__t_profiles             user__t_profiles?             @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_971dbdb2ea844a15d0809c9bd39")
 
-  @@index([exchange_object__id], map: "FK_66319aeac147cdacaaa6d3972c1")
-  @@index([profile__id], map: "FK_971dbdb2ea844a15d0809c9bd39")
   @@index([updated_at], map: "IDX_057d44268662ae35a409e05716")
   @@index([created_at], map: "IDX_caaf5c99071949432a304aa8e3")
 }
 
 model property__t_point_exchanges {
-  created_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
   updated_by       String?           @db.VarChar(100)
   created_by       String?           @db.VarChar(100)
-  id               Int               @id @default(autoincrement())
+  id               Int               @id(map: "PK_3026b57a6bd4ba2c39dd18d0fdc") @default(autoincrement())
   change           Int
   type             String            @db.VarChar(50)
   before           Int
   after            Int
-  ref_id           String?           @db.VarChar(255)
+  ref_id           String?           @db.VarChar
   extra            Json?
-  remark           String?           @db.Text
+  remark           String?
   profile__id      String?           @db.VarChar(36)
   body             Json?
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_71e71a796ec68bd891e63d37a5f")
 
-  @@index([profile__id], map: "FK_71e71a796ec68bd891e63d37a5f")
   @@index([created_at], map: "IDX_8439bf0a7c4628f85a0f76540f")
   @@index([updated_at], map: "IDX_90810898d4811098f6d2bc9db5")
 }
 
 model property__t_wallets {
-  created_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
   updated_by       String?           @db.VarChar(100)
   created_by       String?           @db.VarChar(100)
-  id               Int               @id @default(autoincrement())
+  id               Int               @id(map: "PK_c550525b4d3ffd9a63b4ebde1f5") @default(autoincrement())
   profile__id      String?           @unique(map: "REL_3f767823aceb4828d3b19d3fdb") @db.VarChar(36)
   balance          Int
   available        Int
   frozen           Int
   withdrawals      Int
   points           Int
-  /// This field's default value can currently not be parsed: `-1`.
   total_recharge   Int               @default(-1)
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3f767823aceb4828d3b19d3fdb0")
 
@@ -407,13 +464,74 @@ model property__t_wallets {
   @@index([updated_at], map: "IDX_846797d1cb31afb19251e8c853")
 }
 
+model ss__t_org_roles {
+  created_at             DateTime                 @default(now()) @db.Timestamp(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamp(6)
+  updated_by             String?                  @db.VarChar(100)
+  created_by             String?                  @db.VarChar(100)
+  id                     Int                      @id(map: "PK_773119e8d98d0a5ba2b49ab966e") @default(autoincrement())
+  name                   String                   @unique(map: "UQ_e3a5a7a0060e3d978181ef6bcff") @db.VarChar(80)
+  description            String?                  @db.VarChar
+  ss__tr_org_users_roles ss__tr_org_users_roles[]
+
+  @@index([created_at], map: "IDX_af9ce2de264d81547b8edcfb27")
+  @@index([updated_at], map: "IDX_e87d3a9200b11b0ca9e8854f09")
+}
+
+model ss__t_org_users {
+  id                     String                   @id(map: "PK_062a7b7a8c687bbb7f08bebf0bc") @db.VarChar(36)
+  created_at             DateTime                 @default(now()) @db.Timestamp(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamp(6)
+  updated_by             String?                  @db.VarChar(100)
+  username               String                   @unique(map: "UQ_5e064e6d098ac87d72bba218df8") @db.VarChar(50)
+  email                  String?                  @unique(map: "UQ_0a87c311c30ba94653f8b3b0d74") @db.VarChar(50)
+  nickname               String?                  @unique(map: "UQ_ee123b93f0979b1a14e5c2dd537") @db.VarChar(50)
+  portrait               String?                  @db.VarChar
+  channel                String?                  @default("default") @db.VarChar
+  password               String?                  @db.VarChar
+  salt                   String?                  @db.VarChar
+  last_signed_at         DateTime?                @db.Timestamp(6)
+  last_login_at          DateTime?                @db.Timestamp(6)
+  description            String?
+  is_active              Boolean?
+  is_bound               Boolean?                 @default(false)
+  tenant__id             String?                  @db.VarChar(36)
+  ss__t_tenants          ss__t_tenants?           @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_81914fa6804dd1f103a589e6f74")
+  ss__tr_org_users_roles ss__tr_org_users_roles[]
+}
+
+model ss__t_tenants {
+  id                   String                 @id(map: "PK_915e18bce31a217660f3a07a2de") @db.VarChar(36)
+  created_at           DateTime               @default(now()) @db.Timestamp(6)
+  updated_at           DateTime               @default(now()) @db.Timestamp(6)
+  updated_by           String?                @db.VarChar(100)
+  name                 String                 @unique(map: "UQ_4a16e97ca6791b1a894e1a8eb5a") @db.VarChar(100)
+  description          String?
+  is_published         Boolean?
+  client__t_lead_users client__t_lead_users[]
+  im__t_projects       im__t_projects[]
+  ss__t_org_users      ss__t_org_users[]
+  wx__t_users          wx__t_users[]
+}
+
+model ss__tr_org_users_roles {
+  org_user__id    String          @db.VarChar(36)
+  role__id        Int
+  ss__t_org_users ss__t_org_users @relation(fields: [org_user__id], references: [id], onDelete: Cascade, map: "FK_c35a4655e4a9fb2d52d4ed70837")
+  ss__t_org_roles ss__t_org_roles @relation(fields: [role__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_5f95985274505aa362fac9e512d")
+
+  @@id([org_user__id, role__id], map: "PK_3f14351dc036cc542a660e8d760")
+  @@index([role__id], map: "IDX_5f95985274505aa362fac9e512")
+  @@index([org_user__id], map: "IDX_c35a4655e4a9fb2d52d4ed7083")
+}
+
 model sys__t_audit_records {
-  created_at     DateTime @default(now()) @db.DateTime(6)
-  updated_at     DateTime @default(now()) @db.DateTime(6)
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  updated_at     DateTime @default(now()) @db.Timestamp(6)
   updated_by     String?  @db.VarChar(100)
   created_by     String?  @db.VarChar(100)
-  id             Int      @id @default(autoincrement())
-  type           String?  @db.VarChar(255)
+  id             Int      @id(map: "PK_f4166e8667477a0817ef072e84b") @default(autoincrement())
+  type           String?  @db.VarChar
   action         String?  @db.VarChar(100)
   identification Json?
   from           Json?
@@ -425,35 +543,50 @@ model sys__t_audit_records {
 }
 
 model sys__t_operation_tokens {
-  created_at    DateTime  @default(now()) @db.DateTime(6)
-  updated_at    DateTime  @default(now()) @db.DateTime(6)
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+  updated_at    DateTime  @default(now()) @db.Timestamp(6)
   updated_by    String?   @db.VarChar(100)
   created_by    String?   @db.VarChar(100)
-  id            Int       @id @default(autoincrement())
+  id            Int       @id(map: "PK_e536b6aaf4dc46d3d5396f3dcf9") @default(autoincrement())
   role          String    @db.VarChar(50)
   type          String    @db.VarChar(50)
-  identifier    String    @db.VarChar(255)
-  key           String?   @db.VarChar(255)
+  identifier    String    @db.VarChar
+  key           String?   @db.VarChar
   token         String    @db.VarChar(32)
   short_id      String    @db.VarChar(9)
   body          Json?
   service       String    @db.VarChar(50)
   left          Int?
   used_count    Int?      @default(0)
-  expired_at    DateTime? @db.DateTime(0)
-  is_used       Int?      @default(0) @db.TinyInt
-  is_deprecated Int?      @default(0) @db.TinyInt
-  is_active     Int?      @default(1) @db.TinyInt
-  is_expired    Int?      @default(0) @db.TinyInt
+  expired_at    DateTime? @db.Timestamptz(6)
+  is_used       Boolean?  @default(false)
+  is_deprecated Boolean?  @default(false)
+  is_active     Boolean?  @default(true)
+  is_expired    Boolean?  @default(false)
 
   @@index([updated_at], map: "IDX_9ae08b76a592a4c4ab812f91b5")
   @@index([created_at], map: "IDX_efc969a8a30a0f5fd869d1c73f")
 }
 
+model sys__t_task_events {
+  created_at   DateTime      @default(now()) @db.Timestamp(6)
+  updated_at   DateTime      @default(now()) @db.Timestamp(6)
+  updated_by   String?       @db.VarChar(100)
+  created_by   String?       @db.VarChar(100)
+  id           Int           @id(map: "PK_02769666a57427cabf7da046910") @default(autoincrement())
+  message      String?       @db.VarChar
+  body         Json?
+  task__id     String?       @db.VarChar(36)
+  sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b9db76df8c6d282adb47c191808")
+
+  @@index([updated_at], map: "IDX_553d001ee8575bb606a5ef3057")
+  @@index([created_at], map: "IDX_b5583e5a27f6465be6f909146d")
+}
+
 model sys__t_tasks {
-  id                 String               @id @db.VarChar(36)
-  created_at         DateTime             @default(now()) @db.DateTime(6)
-  updated_at         DateTime             @default(now()) @db.DateTime(6)
+  id                 String               @id(map: "PK_1457e28eb848e67a2136a5bb75a") @db.VarChar(36)
+  created_at         DateTime             @default(now()) @db.Timestamp(6)
+  updated_at         DateTime             @default(now()) @db.Timestamp(6)
   updated_by         String?              @db.VarChar(100)
   identifier         String?              @db.VarChar(50)
   unique_id          String?              @db.VarChar(50)
@@ -465,26 +598,22 @@ model sys__t_tasks {
   sys__t_task_events sys__t_task_events[]
 }
 
-model sys__t_task_events {
-  created_at   DateTime      @default(now()) @db.DateTime(6)
-  updated_at   DateTime      @default(now()) @db.DateTime(6)
-  updated_by   String?       @db.VarChar(100)
-  created_by   String?       @db.VarChar(100)
-  id           Int           @id @default(autoincrement())
-  message      String?       @db.VarChar(255)
-  body         Json?
-  task__id     String?       @db.VarChar(36)
-  sys__t_tasks sys__t_tasks? @relation(fields: [task__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b9db76df8c6d282adb47c191808")
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model typeorm_metadata {
+  type     String  @db.VarChar
+  database String? @db.VarChar
+  schema   String? @db.VarChar
+  table    String? @db.VarChar
+  name     String? @db.VarChar
+  value    String?
 
-  @@index([task__id], map: "FK_b9db76df8c6d282adb47c191808")
-  @@index([updated_at], map: "IDX_553d001ee8575bb606a5ef3057")
-  @@index([created_at], map: "IDX_b5583e5a27f6465be6f909146d")
+  @@ignore
 }
 
 model user__t_activities {
-  id               String            @id @db.VarChar(36)
-  created_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  id               String            @id(map: "PK_1748a0d377f799e25dee8ea5387") @db.VarChar(36)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
   updated_by       String?           @db.VarChar(100)
   profile__id      String?           @db.VarChar(36)
   ref_id           String            @db.VarChar(36)
@@ -492,197 +621,37 @@ model user__t_activities {
   service          String            @db.VarChar(20)
   operation        String            @db.VarChar(20)
   user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_89b4fa3d94c3a2c8464feb0c279")
-
-  @@index([profile__id], map: "FK_89b4fa3d94c3a2c8464feb0c279")
 }
 
 model user__t_follows {
-  id               String            @id @db.VarChar(36)
-  created_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_at       DateTime          @default(now()) @db.DateTime(6)
+  id               String            @id(map: "PK_e07416773e05cd12b02869a7baf") @db.VarChar(36)
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
   updated_by       String?           @db.VarChar(100)
   type             String?           @db.VarChar(50)
   following        String?           @db.VarChar(50)
   follower__id     String?           @db.VarChar(36)
   user__t_profiles user__t_profiles? @relation(fields: [follower__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ab5a56d5c89e147cc87c96b6a7d")
-
-  @@index([follower__id], map: "FK_ab5a56d5c89e147cc87c96b6a7d")
-}
-
-model wx__t_mini_app_users {
-  open_id          String            @id @db.VarChar(36)
-  nickname         String?           @db.VarChar(255)
-  gender           Int?
-  language         String?           @db.VarChar(255)
-  mobile           String?           @db.VarChar(255)
-  city             String?           @db.VarChar(255)
-  province         String?           @db.VarChar(255)
-  country          String?           @db.VarChar(255)
-  avatar           String?           @db.VarChar(255)
-  created_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_at       DateTime          @default(now()) @db.DateTime(6)
-  updated_by       String?           @db.VarChar(100)
-  profile__id      String?           @unique(map: "REL_f5d7d26210feb0a32e85bd5b7a") @db.VarChar(36)
-  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f5d7d26210feb0a32e85bd5b7a9")
-}
-
-model wx__t_users {
-  tenant__id      String?        @db.VarChar(36)
-  open_id         String         @id @db.VarChar(36)
-  nickname        String?        @db.VarChar(255)
-  head_img        String?        @db.VarChar(1000)
-  remark          String?        @db.VarChar(255)
-  group_id        Int?
-  union_id        String?        @db.VarChar(255)
-  tag_ids         Json?
-  sex             Int?
-  subscribe       Int?
-  subscribe_time  Int?
-  subscribe_scene String?        @db.VarChar(255)
-  country         String?        @db.VarChar(255)
-  city            String?        @db.VarChar(255)
-  province        String?        @db.VarChar(255)
-  language        String?        @db.VarChar(255)
-  qr_scene        Int?
-  qr_scene_str    String?        @db.VarChar(255)
-  created_at      DateTime       @default(now()) @db.DateTime(6)
-  updated_at      DateTime       @default(now()) @db.DateTime(6)
-  admin__id       String?        @unique(map: "REL_d391be1d5c66b164a90c708f56") @db.VarChar(36)
-  auth__t_users   auth__t_users? @relation(fields: [admin__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_d391be1d5c66b164a90c708f569")
-  ss__t_tenants   ss__t_tenants? @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_84c91d701b8ae841a49bf00352f")
-
-  @@index([tenant__id], map: "FK_84c91d701b8ae841a49bf00352f")
-}
-
-model client__t_session_users {
-  created_at                 DateTime                   @default(now()) @db.DateTime(6)
-  updated_at                 DateTime                   @default(now()) @db.DateTime(6)
-  updated_by                 String?                    @db.VarChar(100)
-  created_by                 String?                    @db.VarChar(100)
-  profile__id                String?                    @db.VarChar(36)
-  uid                        String                     @db.VarChar(36)
-  device__id                 String?                    @db.VarChar(36)
-  session__id                String                     @id @db.VarChar(36)
-  client__t_virtual_devices  client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_928b741562da4908a8d468afc26")
-  user__t_profiles           user__t_profiles?          @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_5d257e4a36e0b569e4fd02e8ae9")
-  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_e73a635c89b018fbb192c8ab3ac")
-
-  @@index([profile__id], map: "FK_5d257e4a36e0b569e4fd02e8ae9")
-  @@index([device__id], map: "FK_928b741562da4908a8d468afc26")
-  @@index([updated_at], map: "IDX_54ac8410107e9728f051c493ec")
-  @@index([created_at], map: "IDX_bea7340e1acf012907684b3a8a")
-}
-
-model client__t_virtual_devices {
-  created_at                 DateTime                     @default(now()) @db.DateTime(6)
-  updated_at                 DateTime                     @default(now()) @db.DateTime(6)
-  updated_by                 String?                      @db.VarChar(100)
-  created_by                 String?                      @db.VarChar(100)
-  id                         String                       @id @db.VarChar(36)
-  type                       String?                      @db.VarChar(20)
-  client__t_session_users    client__t_session_users[]
-  client__t_virtual_sessions client__t_virtual_sessions[]
-
-  @@index([updated_at], map: "IDX_176cff1f83eabd5c73640c6231")
-  @@index([created_at], map: "IDX_214d921abf73eca7ef1e6eb59b")
-}
-
-model client__t_virtual_sessions {
-  created_at                DateTime                   @default(now()) @db.DateTime(6)
-  updated_at                DateTime                   @default(now()) @db.DateTime(6)
-  updated_by                String?                    @db.VarChar(100)
-  created_by                String?                    @db.VarChar(100)
-  id                        String                     @id @db.VarChar(36)
-  ua                        String                     @db.VarChar(512)
-  client_ip                 String?                    @db.VarChar(36)
-  device__id                String?                    @db.VarChar(36)
-  client__t_virtual_devices client__t_virtual_devices? @relation(fields: [device__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_30e40b42549b0bcb0828ff5d9db")
-  client__t_session_users   client__t_session_users?
-  web__t_tracing_records    web__t_tracing_records?
-
-  @@index([device__id], map: "FK_30e40b42549b0bcb0828ff5d9db")
-  @@index([created_at], map: "IDX_5ded6e94d7d8e4cf7d1f627a97")
-  @@index([updated_at], map: "IDX_79fcb330bf59003a59e09e2894")
-}
-
-model ss__tr_org_users_roles {
-  org_user__id    String          @db.VarChar(36)
-  role__id        Int
-  ss__t_org_users ss__t_org_users @relation(fields: [org_user__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_c35a4655e4a9fb2d52d4ed70837")
-  ss__t_org_roles ss__t_org_roles @relation(fields: [role__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_5f95985274505aa362fac9e512d")
-
-  @@id([org_user__id, role__id])
-  @@index([role__id], map: "IDX_5f95985274505aa362fac9e512")
-  @@index([org_user__id], map: "IDX_c35a4655e4a9fb2d52d4ed7083")
-}
-
-model ss__t_org_roles {
-  created_at             DateTime                 @default(now()) @db.DateTime(6)
-  updated_at             DateTime                 @default(now()) @db.DateTime(6)
-  updated_by             String?                  @db.VarChar(100)
-  created_by             String?                  @db.VarChar(100)
-  id                     Int                      @id @default(autoincrement())
-  name                   String                   @unique(map: "IDX_e3a5a7a0060e3d978181ef6bcf") @db.VarChar(80)
-  description            String?                  @db.VarChar(255)
-  ss__tr_org_users_roles ss__tr_org_users_roles[]
-
-  @@index([created_at], map: "IDX_af9ce2de264d81547b8edcfb27")
-  @@index([updated_at], map: "IDX_e87d3a9200b11b0ca9e8854f09")
-}
-
-model ss__t_org_users {
-  id                     String                   @id @db.VarChar(36)
-  created_at             DateTime                 @default(now()) @db.DateTime(6)
-  updated_at             DateTime                 @default(now()) @db.DateTime(6)
-  updated_by             String?                  @db.VarChar(100)
-  username               String                   @unique(map: "IDX_5e064e6d098ac87d72bba218df") @db.VarChar(50)
-  email                  String?                  @unique(map: "IDX_0a87c311c30ba94653f8b3b0d7") @db.VarChar(50)
-  nickname               String?                  @unique(map: "IDX_ee123b93f0979b1a14e5c2dd53") @db.VarChar(50)
-  portrait               String?                  @db.VarChar(255)
-  channel                String?                  @default("default") @db.VarChar(255)
-  password               String?                  @db.VarChar(255)
-  salt                   String?                  @db.VarChar(255)
-  last_signed_at         DateTime?                @db.DateTime(0)
-  last_login_at          DateTime?                @db.DateTime(0)
-  description            String?                  @db.Text
-  is_active              Int?                     @db.TinyInt
-  is_bound               Int?                     @default(0) @db.TinyInt
-  tenant__id             String?                  @db.VarChar(36)
-  ss__t_tenants          ss__t_tenants?           @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_81914fa6804dd1f103a589e6f74")
-  ss__tr_org_users_roles ss__tr_org_users_roles[]
-
-  @@index([tenant__id], map: "FK_81914fa6804dd1f103a589e6f74")
-}
-
-model ss__t_tenants {
-  id              String            @id @db.VarChar(36)
-  created_at      DateTime          @default(now()) @db.DateTime(6)
-  updated_at      DateTime          @default(now()) @db.DateTime(6)
-  updated_by      String?           @db.VarChar(100)
-  name            String            @unique(map: "IDX_4a16e97ca6791b1a894e1a8eb5") @db.VarChar(100)
-  description     String?           @db.Text
-  is_published    Int?              @db.TinyInt
-  ss__t_org_users ss__t_org_users[]
-  wx__t_users     wx__t_users[]
 }
 
 model user__t_profiles {
-  id                                 String                               @id @db.VarChar(36)
-  created_at                         DateTime                             @default(now()) @db.DateTime(6)
-  updated_at                         DateTime                             @default(now()) @db.DateTime(6)
+  id                                 String                               @id(map: "PK_69cd2586d671cd28c47e50c1da0") @db.VarChar(36)
+  created_at                         DateTime                             @default(now()) @db.Timestamp(6)
+  updated_at                         DateTime                             @default(now()) @db.Timestamp(6)
   updated_by                         String?                              @db.VarChar(100)
-  username                           String                               @unique(map: "IDX_07c9a8edb162691058276a7a6e") @db.VarChar(50)
-  email                              String?                              @unique(map: "IDX_50658e037cadb3f55fa15b920c") @db.VarChar(50)
-  nickname                           String?                              @unique(map: "IDX_dd073653a780fe30b46c93a0e5") @db.VarChar(50)
-  portrait                           String?                              @db.VarChar(255)
-  channel                            String?                              @default("default") @db.VarChar(255)
-  password                           String?                              @db.VarChar(255)
-  salt                               String?                              @db.VarChar(255)
-  last_signed_at                     DateTime?                            @db.DateTime(0)
-  last_login_at                      DateTime?                            @db.DateTime(0)
-  description                        String?                              @db.Text
-  is_active                          Int?                                 @db.TinyInt
-  is_bound                           Int?                                 @default(0) @db.TinyInt
+  username                           String                               @unique(map: "UQ_07c9a8edb162691058276a7a6e6") @db.VarChar(50)
+  email                              String?                              @unique(map: "UQ_50658e037cadb3f55fa15b920c7") @db.VarChar(50)
+  nickname                           String?                              @unique(map: "UQ_dd073653a780fe30b46c93a0e5a") @db.VarChar(50)
+  portrait                           String?                              @db.VarChar
+  channel                            String?                              @default("default") @db.VarChar
+  password                           String?                              @db.VarChar
+  salt                               String?                              @db.VarChar
+  last_signed_at                     DateTime?                            @db.Timestamp(6)
+  last_login_at                      DateTime?                            @db.Timestamp(6)
+  description                        String?
+  is_active                          Boolean?
+  is_bound                           Boolean?                             @default(false)
+  client__t_lead_users               client__t_lead_users?
   client__t_session_users            client__t_session_users[]
   content__t_feedback                content__t_feedback[]
   payment__t_orders                  payment__t_orders[]
@@ -695,31 +664,45 @@ model user__t_profiles {
   wx__t_mini_app_users               wx__t_mini_app_users?
 }
 
-model content__t_data_groups {
-  id          String   @id @db.VarChar(36)
-  created_at  DateTime @default(now()) @db.DateTime(6)
-  updated_at  DateTime @default(now()) @db.DateTime(6)
-  updated_by  String?  @db.VarChar(100)
-  name        String   @unique(map: "IDX_9e9a4ee14ef761a52ae4f38ee8") @db.VarChar(100)
-  description String?  @db.Text
+model wx__t_mini_app_users {
+  open_id          String            @id(map: "PK_ce32b36e13f857bc94d37784446") @db.VarChar(36)
+  nickname         String?           @db.VarChar
+  gender           Int?
+  language         String?           @db.VarChar
+  mobile           String?           @db.VarChar
+  city             String?           @db.VarChar
+  province         String?           @db.VarChar
+  country          String?           @db.VarChar
+  avatar           String?           @db.VarChar
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_by       String?           @db.VarChar(100)
+  profile__id      String?           @unique(map: "REL_f5d7d26210feb0a32e85bd5b7a") @db.VarChar(36)
+  user__t_profiles user__t_profiles? @relation(fields: [profile__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f5d7d26210feb0a32e85bd5b7a9")
 }
 
-model web__t_tracing_records {
-  created_at                 DateTime                   @default(now()) @db.DateTime(6)
-  updated_at                 DateTime                   @default(now()) @db.DateTime(6)
-  updated_by                 String?                    @db.VarChar(100)
-  created_by                 String?                    @db.VarChar(100)
-  referer_url                String?                    @db.VarChar(255)
-  landing_url                String?                    @db.VarChar(255)
-  utm_source                 String?                    @db.VarChar(255)
-  utm_medium                 String?                    @db.VarChar(255)
-  utm_region                 String?                    @db.VarChar(255)
-  utm_area                   String?                    @db.VarChar(255)
-  utm_campaign               String?                    @db.VarChar(255)
-  utm_term                   String?                    @db.VarChar(255)
-  session__id                String                     @id @db.VarChar(36)
-  client__t_virtual_sessions client__t_virtual_sessions @relation(fields: [session__id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_85b490c3556ceeafd084c29b814")
-
-  @@index([updated_at], map: "IDX_6042f1e53d26895a6413748497")
-  @@index([created_at], map: "IDX_9699f66084e48645b78b306dae")
+model wx__t_users {
+  tenant__id      String?        @db.VarChar(36)
+  open_id         String         @id(map: "PK_2ae2b02a2d293eedcb8f11a9bb2") @db.VarChar(36)
+  nickname        String?        @db.VarChar
+  head_img        String?        @db.VarChar(1000)
+  remark          String?        @db.VarChar
+  group_id        Int?
+  union_id        String?        @db.VarChar
+  tag_ids         Json?
+  sex             Int?
+  subscribe       Int?
+  subscribe_time  Int?
+  subscribe_scene String?        @db.VarChar
+  country         String?        @db.VarChar
+  city            String?        @db.VarChar
+  province        String?        @db.VarChar
+  language        String?        @db.VarChar
+  qr_scene        Int?
+  qr_scene_str    String?        @db.VarChar
+  created_at      DateTime       @default(now()) @db.Timestamp(6)
+  updated_at      DateTime       @default(now()) @db.Timestamp(6)
+  admin__id       String?        @unique(map: "REL_d391be1d5c66b164a90c708f56") @db.VarChar(36)
+  auth__t_users   auth__t_users? @relation(fields: [admin__id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_d391be1d5c66b164a90c708f569")
+  ss__t_tenants   ss__t_tenants? @relation(fields: [tenant__id], references: [id], onUpdate: NoAction, map: "FK_84c91d701b8ae841a49bf00352f")
 }
