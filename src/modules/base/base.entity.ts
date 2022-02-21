@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType } from "@nestjs/graphql";
+import { Field, ID, InterfaceType, GraphQLISODateTime } from "@nestjs/graphql";
 
 import {
   AfterLoad,
@@ -29,12 +29,12 @@ export type EntityConstructorObject<Entity> = Omit<
 
 @InterfaceType({ isAbstract: true })
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;
 
-  @Field()
+  @Field({ nullable: true })
   @Index()
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt?: Date;
@@ -113,10 +113,12 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') public uuid!: string;
 
   @Field({ nullable: true })
+  @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt: Date;
 
   @Field({ nullable: true })
+  @Index()
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt: Date;
 
@@ -140,6 +142,8 @@ export class AbstractUUIDNameEntity extends NameDescAttachable(AbstractUUIDBaseE
 export class AbstractUUID2BaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid') public id!: string;
 
+  @Field({ nullable: true })
+  @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt: Date;
 

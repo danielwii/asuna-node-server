@@ -1,17 +1,17 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { GraphQLModule } from '@nestjs/graphql';
+import { CustomScalar, GraphQLModule, Scalar } from '@nestjs/graphql';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import OpenTracingExtension from 'apollo-opentracing';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
+import { Kind, ValueNode } from 'graphql';
 import * as _ from 'lodash';
 import * as path from 'path';
 
@@ -27,7 +27,32 @@ import type { GraphQLServiceContext } from 'apollo-server-types';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
-@Module({})
+@Scalar('Date', (type) => Date)
+export class DateScalar implements CustomScalar<number, Date> {
+  description = 'Date custom scalar type';
+
+  parseValue(value: number): Date {
+    return new Date(value); // value from the client
+  }
+
+  serialize(value: Date): number {
+    if (_.isString(value)) {
+      // FIXME fix BaseEntity @CreateDateColumn({ name: 'created_at' }) format issue
+      return value as any;
+    } else {
+      return value.getTime(); // value sent to the client
+    }
+  }
+
+  parseLiteral(ast: ValueNode): Date {
+    if (ast.kind === Kind.INT) {
+      return new Date(ast.value);
+    }
+    return null;
+  }
+}
+
+@Module({ providers: [DateScalar] })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
   public static forRoot(modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
