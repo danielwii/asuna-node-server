@@ -4,7 +4,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { PrismaService } from './service';
 
-const logger = LoggerFactory.getLogger('WebModule');
+const logger = LoggerFactory.getLogger('PrismaModule');
 
 @Module({
   providers: [PrismaService],
