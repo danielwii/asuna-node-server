@@ -27,7 +27,7 @@ import type { GraphQLServiceContext } from 'apollo-server-types';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
 
-@Scalar('Date', (type) => Date)
+@Scalar('DateTime', (type) => Date)
 export class DateScalar implements CustomScalar<number, Date> {
   description = 'Date custom scalar type';
 

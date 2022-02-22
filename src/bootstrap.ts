@@ -62,10 +62,12 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   const logger = LoggerFactory.getLogger('bootstrap');
   process.on('unhandledRejection', (reason, p) => {
     logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
+    consola.error(r(reason));
     Sentry.captureException(reason);
   });
   process.on('uncaughtException', (reason, e) => {
     logger.error(`Uncaught Exception at: ${r({ e, reason })}`);
+    consola.error(r(reason));
     Sentry.captureException(reason);
   });
   process.on('beforeExit', (reason) => {
