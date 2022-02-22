@@ -5,7 +5,7 @@ import { CustomScalar, GraphQLModule, Scalar } from '@nestjs/graphql';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { RedisCache } from 'apollo-server-cache-redis';
@@ -22,6 +22,7 @@ import { GraphQLConfigObject } from './graphql/graphql.config';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
+import type { RedisOptions } from 'ioredis';
 import type { GraphQLServerListener } from 'apollo-server-plugin-base';
 import type { GraphQLServiceContext } from 'apollo-server-types';
 
@@ -67,8 +68,10 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
     );
     logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
 
-    const redis = RedisProvider.getRedisClient('graphql');
-    const cache = redis.isEnabled ? new RedisCache(redis.redisOptions as any) : new InMemoryLRUCache();
+    const redisConfig = RedisConfigObject.load('graphql');
+    const cache = redisConfig.enable
+      ? new RedisCache(redisConfig.getOptions() as RedisOptions)
+      : new InMemoryLRUCache();
     logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
     return {

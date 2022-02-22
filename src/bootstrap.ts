@@ -71,10 +71,10 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     Sentry.captureException(reason);
   });
   process.on('beforeExit', (reason) => {
-    logger.error(`App will exit cause: ${r(reason)}`);
+    logger[reason ? 'error' : 'log'](`App will exit cause: ${r(reason)}`);
   });
   process.on('exit', (reason) => {
-    reason ? logger.error(`App exit cause: ${r(reason)}`) : logger.log(`App exit cause: ${r(reason)}`);
+    logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
   });
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
@@ -171,11 +171,9 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL'))),
     bufferLogs: true,
   };
-  logger.log(`create app ... ${r(appOptions)}`);
-  const app = await NestFactory.create<NestExpressApplication>(
-    options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule,
-    appOptions,
-  );
+  const module = options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule;
+  logger.log(`create app ... ${r({ module, appOptions })}`);
+  const app = await NestFactory.create<NestExpressApplication>(module, appOptions);
 
   await syncDbWithLockIfPossible(app, options);
   await AppLifecycle.onInit(app);

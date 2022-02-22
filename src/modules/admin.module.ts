@@ -4,7 +4,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
@@ -84,8 +85,9 @@ const logger = LoggerFactory.getLogger('AdminInternalModule');
     TracingModule,
     CacheModule.registerAsync({
       useFactory: () => {
-        const redisClient = RedisProvider.getRedisClient('cache_manager');
-        return redisClient.isEnabled ? { store: redisStore, ...redisClient.redisOptions } : {};
+        const redisConfig = RedisConfigObject.load('graphql');
+        logger.log(`init cache module with redis: ${r(redisConfig)}`);
+        return redisConfig.enable ? { store: redisStore, ...redisConfig.getOptions() } : {};
       },
     }),
     PrismaModule,
