@@ -103,7 +103,11 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   // const redis = RedisProvider.getRedisClient('dataloader');
   if (redisConfig.enable) {
     logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig)}`);
-    const redisLoader = new (createRedisDataloader({ redis: new Redis(redisConfig.getOptions()) }))(
+    const redis = new Redis(redisConfig.getOptions());
+    redis.on('error', (reason) => {
+      logger.error(`ioredis connection error ${r(reason)}`);
+    });
+    const redisLoader = new (createRedisDataloader({ redis }))(
       `dataloader-${segment}`,
       // create a regular dataloader. This should always be set with caching disabled.
       new DataLoader(
