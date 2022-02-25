@@ -26,7 +26,7 @@
     "test:cov": "ENV=test jest --coverage --no-cache",
     "check:circular": "npx madge --circular --extensions ts ./",
     "doc": "yarn dlx compodoc -p tsconfig.json -s",
-    "postinstall!": "yarn build"
+    "prepack": "yarn build"
   },
   "resolutions": {
     "node-pre-gyp": "https://github.com/mapbox/node-pre-gyp/archive/refs/tags/v1.0.8.tar.gz",
