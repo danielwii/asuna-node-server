@@ -1,3 +1,14 @@
 .history
 temp
+node_modules
+.yarn/cache
+.idea
+.git
+.vscode
+**/*/coverage
+**/*/dist
+**/*/declaration
+Dockerfile
+
 uploads
+e2e

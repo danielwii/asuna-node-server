@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { RedisConfigObject } from '@danielwii/asuna-helper';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import DataLoader from 'dataloader';

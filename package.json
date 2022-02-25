@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.10",
-    "@danielwii/asuna-helper": "^0.0.21",
+    "@danielwii/asuna-helper": "^0.0.22",
     "@danielwii/asuna-shared": "^0.0.5",
     "@nestjs/apollo": "^10.0.5",
     "@nestjs/common": "^8.3.1",
@@ -52,7 +52,7 @@
     "@nestjs/typeorm": "^8.0.3",
     "@nestjs/websockets": "^8.3.1",
     "@prisma/client": "3.10.0",
-    "@sentry/node": "^6.17.9",
+    "@sentry/node": "^6.18.0",
     "accesscontrol": "^2.2.1",
     "ali-oss": "^6.17.1",
     "alipay-sdk": "^3.2.0",
@@ -173,7 +173,7 @@
     "glob": "^7.2.0",
     "husky": "^7.0.4",
     "jest": "^27.5.1",
-    "minimatch": "^5.0.0",
+    "minimatch": "^5.0.1",
     "mysql2": "^2.3.3",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
@@ -193,5 +193,5 @@
     ],
     "delay": 2.5
   },
-  "packageManager": "yarn@3.1.1"
+  "packageManager": "yarn@3.2.0"
 }
