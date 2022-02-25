@@ -10,7 +10,10 @@ import { WSGateway } from './ws.gateway';
 const logger = LoggerFactory.getLogger('WSModule');
 
 @Module({
-  providers: [SocketIOGateway, WSGateway],
+  providers: [
+    SocketIOGateway,
+    // WSGateway
+  ],
 })
 export class WSModule extends InitContainer implements OnModuleInit {
   onModuleInit = () =>

@@ -10,11 +10,19 @@ import {
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
+import { configLoader } from '../config';
+
 import type { Server } from 'ws';
 
 const logger = LoggerFactory.getLogger('WSGateway(default)');
 
-@WebSocketGateway(3002, {
+export const WSConfigKeys = {
+  WS_PORT: 'WS_PORT',
+};
+
+const port = configLoader.loadNumericConfig(WSConfigKeys.WS_PORT, 3002);
+
+@WebSocketGateway(port, {
   path: '/',
   // pingInterval: 30000, // default 25e3
   // pingTimeout: 4000, // default 5e3
@@ -43,7 +51,7 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
   }
 
   public afterInit(server: any): any {
-    logger.log(`init...`);
+    logger.log(`init... listening on :${port}`);
   }
 
   handleConnection(client: any, ...args: any[]): any {

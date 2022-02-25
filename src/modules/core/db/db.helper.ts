@@ -23,6 +23,7 @@ import {
   Not,
   ObjectType,
   QueryBuilder,
+  ObjectLiteral,
   Raw,
   Repository,
   SelectQueryBuilder,
@@ -69,17 +70,22 @@ export interface ModelNameObject {
  * @param {string} value
  * @returns {any}
  */
-export function parseWhere(value: string): string[] | FindOperator<any>[] | null {
+export function parseWhere(value: string): ObjectLiteral {
   if (value) {
     try {
       const parsed = JSON.parse(value);
+      /*
       const result = R.ifElse(
         _.isArray,
         (v) => _.map(v, R.map(parseCondition)),
         (v) => R.map(parseCondition)(v),
       )(parsed);
-      logger.debug(`condition is ${r({ parsed, result })}`);
-      return result;
+*/
+      const condition = _.isArray(parsed)
+        ? _.map(parsed, (v) => _.map(v, parseCondition))
+        : _.map(parsed, parseCondition);
+      logger.debug(`condition is ${r({ parsed, condition })}`);
+      return condition as any;
     } catch (reason) {
       logger.warn(`parse where error ${r({ reason, value })}`);
     }
@@ -118,12 +124,14 @@ export function parseNormalWhereAndRelatedFields(
   return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
-function parseCondition(value: Condition): string | Condition | FindOperator<any> {
+function parseCondition(value: Condition): ObjectLiteral {
   if (_.has(value, '$and')) {
-    return { $and: R.map(parseCondition)(value.$and as any) as any };
+    return { $and: _.map(value.$and, parseCondition) as Condition };
+    // return { $and: R.map(parseCondition)(value.$and as any) as any };
   }
   if (_.has(value, '$or')) {
-    return { $or: R.map(parseCondition)(value.$or as any) as any };
+    return { $or: _.map(value.$or, parseCondition) as Condition };
+    // return { $or: R.map(parseCondition)(value.$or as any) as any };
   }
 
   if (_.has(value, '$like')) return Like(value.$like);
@@ -573,7 +581,7 @@ export class DBHelper {
     profile: Profile,
     relationsStr: string | string[],
     parsedFields: ParsedFields,
-    where: string[] | FindOperator<any>[] | null,
+    where: ObjectLiteral,
   ): void {
     if (profile === Profile.ids) {
       const relations = relationsStr ? parseListParam(relationsStr) : [];

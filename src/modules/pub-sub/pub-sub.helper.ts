@@ -29,6 +29,7 @@ export class PubSubHelper {
     if (redis.isEnabled) {
       logger.log(`subscribe ... ${channels}`);
       const subscriber = redis.client;
+      /*
       subscriber.subscribe(channels, (err, reply) => {
         logger.debug(`sub ${r({ channels, reply })}`);
         // if (err) {
@@ -37,6 +38,7 @@ export class PubSubHelper {
         //   resolve(parseJSONIfCould(reply));
         // }
       });
+*/
       subscriber.on('message', (channel, message) => {
         subscription.next(parseJSONIfCould(message));
       });

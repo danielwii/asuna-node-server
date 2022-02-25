@@ -292,10 +292,13 @@ export class KvHelper {
     }
 
     logger.debug(`set ${r(entity)}`);
-    return KeyValuePair.save({
-      ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
+    return KeyValuePair.create({
+      // ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
+      ...(!!exists ? { id: exists.id } : {}),
       ...entity,
-    }).finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
+    })
+      .save()
+      .finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
   }
 
   public static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {

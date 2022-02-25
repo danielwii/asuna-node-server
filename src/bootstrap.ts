@@ -69,6 +69,7 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     logger.error(`Uncaught Exception at: ${r({ e, reason })}`);
     consola.error(r(reason));
     Sentry.captureException(reason);
+    process.exit(1);
   });
   process.on('beforeExit', (reason) => {
     logger[reason ? 'error' : 'log'](`App will exit cause: ${r(reason)}`);

@@ -4,7 +4,6 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
-import * as R from 'ramda';
 
 import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { Notification } from './notification.entities';
@@ -46,8 +45,10 @@ export class NotificationQueryResolver extends QueryResolver {
       loader: (loaders) => loaders.notifications,
       query: {},
       where: {
-        ...R.ifElse(R.identity, R.always({ usage }), R.always({}))(!!usage),
-        ...R.ifElse(R.identity, R.always({ type }), R.always({}))(!!type),
+        // ...R.ifElse(R.identity, R.always({ usage }), R.always({}))(!!usage),
+        ...(!!usage ? { usage } : {}),
+        // ...R.ifElse(R.identity, R.always({ type }), R.always({}))(!!type),
+        ...(!!type ? { type } : {}),
       },
       mapper: NotificationHelper.loadMixedNotification,
     });

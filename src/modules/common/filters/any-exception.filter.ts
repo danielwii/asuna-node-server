@@ -19,18 +19,19 @@ import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('AnyExceptionFilter');
 
-type QueryFailedErrorType = QueryFailedError & {
-  message: string;
-  code: string;
-  errno: number;
-  sqlMessage: string;
-  sqlState: string;
-  index: number;
-  sql: string;
-  name: string;
-  query: string;
-  parameters: string[];
-};
+type QueryFailedErrorType = QueryFailedError &
+  Partial<{
+    message: string;
+    code: string;
+    errno: number;
+    sqlMessage: string;
+    sqlState: string;
+    index: number;
+    sql: string;
+    name: string;
+    query: string;
+    parameters: string[];
+  }>;
 
 export class AnyExceptionFilter implements ExceptionFilter {
   static handleSqlExceptions(exception: QueryFailedErrorType): ValidationException | QueryFailedErrorType {
@@ -149,6 +150,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
         httpStatus,
         name: processed.name || AsunaErrorCode.Unexpected__do_not_use_it.name,
         code: `W${
+          // @ts-ignore TODO
           processed.code || processed.status || processed.httpStatus || AsunaErrorCode.Unexpected__do_not_use_it.value
         }`,
         message,

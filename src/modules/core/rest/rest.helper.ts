@@ -7,7 +7,7 @@ import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
-import { BaseEntity, FindOperator, getManager, ObjectLiteral } from 'typeorm';
+import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
 
 import { PrimaryKey, Profile } from '../../common';
 import { TenantHelper } from '../../tenant/tenant.helper';
@@ -119,7 +119,7 @@ export class RestHelper {
 
   public static async groupCounts(
     modelNameObject: ModelNameObject,
-    where: string[] | FindOperator<any>[] | null,
+    where: ObjectLiteral,
     column: string,
   ): Promise<{ [id: string]: { [name: string]: number } }> {
     const repository = DBHelper.repo(modelNameObject);

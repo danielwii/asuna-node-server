@@ -9,8 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
-import * as R from 'ramda';
-import { FindOneOptions, Repository, UpdateResult } from 'typeorm';
+import { FindOneOptions, ObjectLiteral, Repository, UpdateResult } from 'typeorm';
 
 import { formatTime, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
@@ -154,14 +153,16 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
-    return this.authUserRepository.findOne(
-      {
-        ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
-        ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
+    return this.authUserRepository.findOne({
+      where: {
+        // ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
+        ...(!!identifier.email ? { email: identifier.email } : {}),
+        // ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
+        ...(!!identifier.username ? { username: identifier.username } : {}),
         isActive,
-      },
-      { select: ['id', 'username', 'email', 'channel', 'password', 'salt'] },
-    );
+      } as ObjectLiteral,
+      select: ['id', 'username', 'email', 'channel', 'password', 'salt'],
+    });
   }
 
   public updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<UpdateResult> {
