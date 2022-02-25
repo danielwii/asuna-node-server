@@ -32,6 +32,7 @@ import {
   KeyValueType,
   KVModelFormatType,
   Mode,
+  MongoConfigObject,
   NotificationEnum,
   NotificationEnumValue,
   Order,
@@ -135,6 +136,13 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   logger.log(`Global is ${r({ ...Global })}`);
   logger.log(
     `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`,
+  );
+
+  const mongoConfig = MongoConfigObject.load();
+  logger.log(
+    `mongoConfig: ${r(_.omit(mongoConfig, 'password'))} withPassword: *$****${_.get(mongoConfig, 'password').slice(
+      -4,
+    )}`,
   );
 
   const appSettings = AppConfigObject.load();
@@ -255,7 +263,8 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   );
   app.use(compression());
 
-  const sessionRedis = RedisProvider.getRedisClient('session', 2, true);
+  const sessionRedisDB = configLoader.loadNumericConfig('SESSION_REDIS_DB', 2);
+  const sessionRedis = RedisProvider.getRedisClient('session', sessionRedisDB, true);
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({

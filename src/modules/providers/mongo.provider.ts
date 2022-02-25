@@ -18,7 +18,11 @@ export class MongoProvider {
           throw new Error('mongo not enabled');
         }
         const options: MongooseModuleOptions = {
-          uri: `mongodb://${configObject.username}:${configObject.password}@${configObject.host}:${configObject.port}/${configObject.db}?authSource=admin`,
+          uri: `mongodb+srv://${configObject.host}`,
+          user: configObject.username,
+          pass: configObject.password,
+          dbName: configObject.db,
+          authSource: 'admin',
           connectionFactory: (connection, name) => {
             logger.log(`connect to ${name}...`);
             // eslint-disable-next-line

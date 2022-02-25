@@ -104,7 +104,7 @@ export class TenantHelper {
     const kv = await KvHelper.get(this.kvDef);
     return KvHelper.set({
       ...this.kvDef,
-      value: { ...kv.value, values: _.mapKeys(config, (v, k) => TenantFieldKeys[k] ?? k) },
+      value: { ...kv?.value, values: _.mapKeys(config, (v, k) => TenantFieldKeys[k] ?? k) },
     });
   }
 

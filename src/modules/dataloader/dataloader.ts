@@ -12,6 +12,7 @@ import createRedisDataloader from 'redis-dataloader';
 import { BaseEntity, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
+import { configLoader } from '../config';
 import { DBHelper } from '../core/db';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
@@ -99,10 +100,11 @@ export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
 }
 
 export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
-  const redisConfig = RedisConfigObject.loadOr('ws');
+  const redisConfig = RedisConfigObject.loadOr('dataloader');
+  const enableRedisDataLoader = configLoader.loadBoolConfig('DATALOADER_REDIS_CACHE', true);
   // const redis = RedisProvider.getRedisClient('dataloader');
-  if (redisConfig.enable) {
-    logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig)}`);
+  if (redisConfig.enable && enableRedisDataLoader) {
+    logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig.host)}`);
     const redis = new Redis(redisConfig.getOptions());
     redis.on('error', (reason) => {
       logger.error(`ioredis connection error ${r(reason)}`);
