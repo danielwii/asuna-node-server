@@ -140,7 +140,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const mongoConfig = MongoConfigObject.load();
   logger.log(
-    `mongoConfig: ${r(_.omit(mongoConfig, 'password'))} withPassword: *$****${_.get(mongoConfig, 'password').slice(
+    `mongoConfig: ${r(_.omit(mongoConfig, 'password'))} withPassword: *$****${_.get(mongoConfig, 'password')?.slice(
       -4,
     )}`,
   );
