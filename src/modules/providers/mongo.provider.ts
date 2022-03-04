@@ -18,7 +18,7 @@ export class MongoProvider {
           throw new Error('mongo not enabled');
         }
         const options: MongooseModuleOptions = {
-          uri: `mongodb+srv://${configObject.host}`,
+          uri: configObject.srv ? `mongodb+srv://${configObject.host}` : `mongodb://${configObject.host}`,
           user: configObject.username,
           pass: configObject.password,
           dbName: configObject.db,

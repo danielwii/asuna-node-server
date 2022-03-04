@@ -8,6 +8,7 @@ const logger = LoggerFactory.getLogger('MongoConfig');
 
 export const MongoConfigKeys = {
   MONGO_ENABLE: 'MONGO_ENABLE',
+  MONGO_SRV: 'MONGO_SRV',
   MONGO_HOST: 'MONGO_HOST',
   MONGO_PORT: 'MONGO_PORT',
   MONGO_USERNAME: 'MONGO_USERNAME',
@@ -16,6 +17,7 @@ export const MongoConfigKeys = {
 };
 
 export class MongoConfigObject {
+  srv?: boolean;
   host?: string;
   port?: number;
   db?: string;
@@ -33,6 +35,7 @@ export class MongoConfigObject {
   static load(): MongoConfigObject {
     logger.verbose(`try load env: ${MongoConfigKeys.MONGO_ENABLE}`);
     return new MongoConfigObject({
+      srv: configLoader.loadBoolConfig(MongoConfigKeys.MONGO_SRV, false),
       enable: configLoader.loadBoolConfig(MongoConfigKeys.MONGO_ENABLE, false),
       host: configLoader.loadConfig(MongoConfigKeys.MONGO_HOST, 'localhost'),
       port: configLoader.loadNumericConfig(MongoConfigKeys.MONGO_PORT, 27017),

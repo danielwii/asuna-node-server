@@ -12,6 +12,7 @@ import { PageView } from './schema';
 import { WebService } from './service';
 
 import type { RequestInfo } from '../helper';
+import type { PageViewDTO } from '@asuna-stack/asuna-sdk';
 
 const logger = LoggerFactory.getLogger('WebController');
 
@@ -20,7 +21,7 @@ export class WebController {
   public constructor(private readonly webService: WebService) {}
 
   @Post('page-view')
-  public async pageView(@Query() query, @Body() body, @Req() req: RequestInfo): Promise<void> {
+  public async pageView(@Query() query, @Body() body: PageViewDTO, @Req() req: RequestInfo): Promise<void> {
     // const { user, scid } = req;
     // logger.log(`pageView ${r({ user, scid })}`);
 
@@ -53,7 +54,13 @@ export class WebController {
       .trim(',')
       .trim()
       .value();
-    const view = Builder(PageView, tracing).href(body.href).title(body.title).address(address).at(at).build();
+    const view = Builder(PageView, tracing)
+      .href(body.href)
+      .title(body.title)
+      .projectId(body.projectId)
+      .address(address)
+      .at(at)
+      .build();
     await this.webService.addPageView(view);
     return;
   }

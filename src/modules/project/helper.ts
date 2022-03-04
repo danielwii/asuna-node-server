@@ -18,7 +18,7 @@ export class ProjectHelper {
     }
 
     //
-    const id = chance.string({ length: 12, symbols: false });
+    const id = chance.string({ length: 18, symbols: false });
     const created = await Project.create({ id, tenantId: tenant.id }).save();
     logger.log(`created default project ${r(created)}`);
     return created;

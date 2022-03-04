@@ -17,6 +17,7 @@ import { configLoader } from '../config';
 import { TokenHelper } from './auth/abstract.auth.service';
 import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 
+import type { RegDeviceDTO } from '@asuna-stack/asuna-sdk';
 import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('ApiController');
@@ -73,7 +74,7 @@ export class ApiController {
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), new ActionRateLimitGuard('api/v1/reg-device', 1))
   @Post('v1/reg-device')
-  public async regDevice(@Req() req: JwtAuthRequest): Promise<ApiResponse> {
+  public async regDevice(@Req() req: JwtAuthRequest, @Body() body: RegDeviceDTO): Promise<ApiResponse> {
     const { identifier, user, payload, scid, sessionID, deviceID } = req;
     if (!configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'COOKIE_SUPPORT needed.');
@@ -84,7 +85,8 @@ export class ApiController {
     if (!scid && !deviceID) {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'device middleware needed.');
     }
-    logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID })}`);
+    logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID, body })}`);
+    // TODO project-id
     await ClientHelper.reg(sessionID, scid ? ClientHelper.parseClientId(scid).sdid : deviceID, req);
   }
 
