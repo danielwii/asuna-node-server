@@ -8,7 +8,6 @@ import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
 import dayjs from 'dayjs';
 import _ from 'lodash';
-import { UpdateResult } from 'typeorm';
 
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 
@@ -171,8 +170,8 @@ export class OperationTokenHelper {
     });
   }
 
-  static async deprecateToken({ key, role, identifier, service }: DeprecateTokenParams): Promise<UpdateResult> {
-    return OperationToken.update({ key, role, identifier, service }, { isDeprecated: true });
+  static async deprecateToken({ key, role, identifier, service }: DeprecateTokenParams): Promise<void> {
+    await OperationToken.update({ key, role, identifier, service }, { isDeprecated: true });
   }
 
   static async getTokenByToken(tokenOrShortId: string): Promise<OperationToken | undefined> | null {

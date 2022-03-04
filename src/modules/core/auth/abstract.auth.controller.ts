@@ -1,4 +1,6 @@
-import { Body, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
+
+import { Body, Get, HttpCode, HttpStatus, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import {
   AsunaErrorCode,
@@ -13,15 +15,15 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { Promise } from 'bluebird';
 import Chance from 'chance';
 import _ from 'lodash';
-import { DeepPartial, UpdateResult } from 'typeorm';
 
 import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
-import { ResetAccountDto, ResetPasswordDto, SignInDto } from './auth.dto';
+import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDTO } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
 
+import type { DeepPartial } from 'typeorm';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
@@ -39,20 +41,21 @@ export abstract class AbstractAuthController<U extends AuthUser> {
   @HttpCode(200)
   @Post('reset-password')
   @UseGuards(JwtAuthGuard)
-  public async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<UpdateResult> {
+  public async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload } = req;
     logger.log(`reset password: ${r({ dto, payload })}`);
 
     const { hash, salt } = PasswordHelper.encrypt(dto.password);
-    return this.authService
+    await this.authService
       .updatePassword(payload.id, hash, salt)
       .then((result) => this.handlers.onResetPassword?.(result, dto));
+    return ApiResponse.success();
   }
 
   @HttpCode(200)
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
-  public async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<void> {
+  public async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
@@ -73,6 +76,22 @@ export abstract class AbstractAuthController<U extends AuthUser> {
     if (_.has(userEntity, 'username') && dto.username) _.set(userEntity, 'username', profile.username);
     if (_.has(userEntity, 'email') && dto.email) _.set(userEntity, 'email', profile.email);
     await userEntity.save();
+    return ApiResponse.success();
+  }
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  public async updateNickname(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
+    const { payload, user } = req;
+    logger.log(`update profile: ${r({ dto, payload, user })}`);
+
+    if (user.isBound) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
+    }
+
+    const profile = await UserProfile.findOne(payload.uid);
+    profile.nickname = dto.nickname;
+    await profile.save();
   }
 
   @Post('quick-pass')

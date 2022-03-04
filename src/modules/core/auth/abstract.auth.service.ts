@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
-import { FindOneOptions, ObjectLiteral, Repository, UpdateResult } from 'typeorm';
+import { FindOneOptions, ObjectLiteral, Repository } from 'typeorm';
 
 import { formatTime, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
@@ -165,8 +165,9 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     });
   }
 
-  public updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<UpdateResult> {
-    return this.authUserRepository.update(uid, { password, salt } as any);
+  public async updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<void> {
+    logger.log(`update password ${r({ uid, password, salt })}`);
+    await this.authUserRepository.update(uid, { password, salt } as any);
     // return UserProfile.update(uid, { password, salt });
   }
 

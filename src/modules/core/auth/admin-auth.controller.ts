@@ -1,3 +1,5 @@
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
+
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -13,7 +15,6 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 import * as otplib from 'otplib';
-import { UpdateResult } from 'typeorm';
 
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
@@ -66,7 +67,7 @@ export class AdminAuthController extends RestCrudController {
   // FIXME type ResetPasswordDto not recognise email
   @HttpCode(200)
   @Post('reset-password')
-  public async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<UpdateResult> {
+  public async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<ApiResponse> {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
     const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
     logger.log(`reset password: ${r({ resetPasswordDto, data })}`);
@@ -77,7 +78,8 @@ export class AdminAuthController extends RestCrudController {
     }
 
     const { hash, salt } = PasswordHelper.encrypt(resetPasswordDto.password);
-    return this.adminAuthService.updatePassword(user.id, hash, salt);
+    await this.adminAuthService.updatePassword(user.id, hash, salt);
+    return ApiResponse.success();
   }
 
   @Post('token')

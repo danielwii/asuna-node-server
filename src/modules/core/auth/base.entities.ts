@@ -1,6 +1,6 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
-import { Exclude } from 'class-transformer';
 
+import { Exclude } from 'class-transformer';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
 
@@ -109,6 +109,7 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
 /**
  * @deprecated {@see AbstractTimeBasedAuthUser}
  */
+/*
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()
@@ -148,9 +149,10 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @Column({ nullable: true, name: 'is_active' })
   isActive?: boolean;
 }
+*/
 
-export type AuthUser = AbstractTimeBasedAuthUser | AbstractAuthUser;
-export type AuthUserType = typeof AbstractTimeBasedAuthUser | typeof AbstractAuthUser;
+export type AuthUser = AbstractTimeBasedAuthUser /*| AbstractAuthUser*/;
+export type AuthUserType = typeof AbstractTimeBasedAuthUser /*| typeof AbstractAuthUser*/;
 export type WithProfileUser = typeof AbstractTimeBasedBaseEntity & Partial<{ profileId: string; profile: UserProfile }>;
 export type WithProfileUserInstance = AbstractTimeBasedBaseEntity &
   Partial<{ profileId: string; profile: UserProfile }>;

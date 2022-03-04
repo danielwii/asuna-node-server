@@ -2,6 +2,7 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { Promise } from 'bluebird';
 import _ from 'lodash';
 import passport from 'passport';
 

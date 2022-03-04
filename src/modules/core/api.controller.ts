@@ -1,4 +1,6 @@
-import { Controller, Get, Post, Req, Body, UseGuards } from '@nestjs/common';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
+
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
@@ -29,7 +31,7 @@ export class ApiController {
 
   @Get('version')
   public currentVersion(): ApiResponse<{ version: string }> {
-    return { version: `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}` };
+    return ApiResponse.success({ version: `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}` });
     // return 1;
     // return `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}`;
   }
@@ -70,7 +72,9 @@ export class ApiController {
 
   @UseGuards(CsurfGuard)
   @Post('v1/csurf-test')
-  public csurfTest(): ApiResponse {}
+  public csurfTest(): ApiResponse {
+    return ApiResponse.success();
+  }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), new ActionRateLimitGuard('api/v1/reg-device', 1))
   @Post('v1/reg-device')
@@ -88,6 +92,7 @@ export class ApiController {
     logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID, body })}`);
     // TODO project-id
     await ClientHelper.reg(sessionID, scid ? ClientHelper.parseClientId(scid).sdid : deviceID, req);
+    return ApiResponse.success();
   }
 
   @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
@@ -95,7 +100,7 @@ export class ApiController {
   public async getToken(
     @Body() body: Record<string, any>,
     @Req() req: JwtAuthRequest,
-  ): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
+  ): Promise<{ expiresIn: number; accessToken: string }> {
     const { identifier, user, payload, scid } = req;
     logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
 
@@ -103,6 +108,18 @@ export class ApiController {
       return TokenHelper.createSessionToken(null, { scid, ...body });
     }
   }
-}
+  @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
+  @Post('v2/session-token')
+  public async getTokenV2(
+    @Body() body: Record<string, any>,
+    @Req() req: JwtAuthRequest,
+  ): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
+    const { identifier, user, payload, scid } = req;
+    logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
 
-type ApiResponse<Payload extends Record<string, any> = object> = Payload | void;
+    if (scid) {
+      return ApiResponse.success(await TokenHelper.createSessionToken(null, { scid, ...body }));
+    }
+    return ApiResponse.failure({ message: 'no scid found' });
+  }
+}
