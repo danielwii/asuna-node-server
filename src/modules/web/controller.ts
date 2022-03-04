@@ -12,7 +12,7 @@ import { PageView } from './schema';
 import { WebService } from './service';
 
 import type { RequestInfo } from '../helper';
-import type { PageViewDTO } from '@asuna-stack/asuna-sdk';
+import type { PageViewDTO } from '@danielwii/asuna-shared/dist/dto';
 
 const logger = LoggerFactory.getLogger('WebController');
 

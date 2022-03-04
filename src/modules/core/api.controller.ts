@@ -1,5 +1,3 @@
-import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
-
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -9,6 +7,7 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import _ from 'lodash';
 
@@ -19,7 +18,7 @@ import { configLoader } from '../config';
 import { TokenHelper } from './auth/abstract.auth.service';
 import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 
-import type { RegDeviceDTO } from '@asuna-stack/asuna-sdk';
+import type { RegDeviceDTO } from '@danielwii/asuna-shared/dist/dto';
 import type { RequestInfo } from '../helper';
 
 const logger = LoggerFactory.getLogger('ApiController');
