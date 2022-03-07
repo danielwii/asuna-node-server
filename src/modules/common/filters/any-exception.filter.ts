@@ -6,6 +6,7 @@ import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import _ from 'lodash';
 import * as R from 'ramda';
@@ -204,6 +205,11 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
 
     // logger.error(`send ${r(body)} status: ${httpStatus}`);
-    res.status(httpStatus).send(body);
+    const response = ApiResponse.failure({
+      code: body.error.code,
+      error: body.error,
+      message: body.error.message,
+    });
+    res.status(httpStatus).send(response);
   }
 }
