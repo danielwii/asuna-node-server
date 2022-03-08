@@ -8,6 +8,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import _ from 'lodash';
 
 import { AdminInternalModule } from './admin.module';
+import { AppController } from './app.controller';
 import { configLoader } from './config/loader';
 import { DebugController } from './debug.controller';
 import { GraphqlModule } from './graphql.module';
@@ -26,7 +27,11 @@ const logger = LoggerFactory.getLogger('<DefaultModule>');
     TerminusModule,
   ]),
   providers: [],
-  controllers: _.compact([HealthController, configLoader.loadBoolConfig('DEBUG') ? DebugController : undefined]),
+  controllers: _.compact([
+    AppController,
+    HealthController,
+    configLoader.loadBoolConfig('DEBUG') ? DebugController : undefined,
+  ]),
   exports: [],
 })
 export class DefaultModule extends InitContainer implements OnModuleInit {

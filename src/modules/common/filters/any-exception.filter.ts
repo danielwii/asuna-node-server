@@ -206,6 +206,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     // logger.error(`send ${r(body)} status: ${httpStatus}`);
     const response = ApiResponse.failure({
+      status: body.error.httpStatus,
       code: body.error.code,
       error: body.error,
       message: body.error.message,
