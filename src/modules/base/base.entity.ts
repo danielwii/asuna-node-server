@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType, GraphQLISODateTime } from "@nestjs/graphql";
+import { Field, ID, InterfaceType, Int } from "@nestjs/graphql";
 
 import {
   AfterLoad,
@@ -55,7 +55,7 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
 
 @InterfaceType({ implements: () => [NoPrimaryKeyBaseEntity] })
 export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
-  @Field()
+  @Field(returns => Int)
   @PrimaryGeneratedColumn()
   public id?: number;
 }
