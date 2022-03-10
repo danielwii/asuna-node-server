@@ -53,6 +53,7 @@
     "@nestjs/websockets": "^8.4.0",
     "@prisma/client": "3.10.0",
     "@sentry/node": "^6.18.2",
+    "@sentry/tracing": "^6.18.2",
     "accesscontrol": "^2.2.1",
     "ali-oss": "^6.17.1",
     "alipay-sdk": "^3.2.0",
