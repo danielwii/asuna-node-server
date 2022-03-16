@@ -7,8 +7,7 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { EntityManager, getManager } from 'typeorm';
 
-import { CursoredRequest } from '../../graphql';
-
+import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
 
 export const DEFAULT_PAGE = 1;

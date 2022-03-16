@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,6 +8,8 @@ import supertest from 'supertest';
 import { AppLifecycle } from '../src/lifecycle';
 import { AdminAuthService, AdminInternalModule, LoggerHelper, TokenHelper } from '../src/modules';
 import { TaskEvent, TaskRecord } from '../src/modules/task';
+
+import type { INestApplication } from '@nestjs/common';
 
 describe('AppRestController (e2e)', () => {
   let app: INestApplication;

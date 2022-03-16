@@ -1,4 +1,3 @@
-import { INestApplication } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +7,8 @@ import { getManager } from 'typeorm';
 
 import { AdminInternalModule, AppInfo, LoggerHelper, resolveTypeormPaths } from '../src';
 import { AppLifecycle } from '../src/lifecycle';
+
+import type { INestApplication } from '@nestjs/common';
 
 describe('Excel (e2e)', () => {
   let app: INestApplication;
