@@ -16,7 +16,7 @@ const logger = LoggerFactory.getLogger('ActionGuard');
 
 @Injectable()
 export class ActionRateLimitGuard implements CanActivate {
-  public constructor(private readonly key: string, private readonly expires = 5) {}
+  public constructor(private readonly key: string, private readonly expiresInSeconds = 5) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
@@ -24,7 +24,7 @@ export class ActionRateLimitGuard implements CanActivate {
     // const next = context.switchToHttp().getNext();
 
     logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
-    await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expires);
+    await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expiresInSeconds);
 
     return true;
   }
@@ -51,7 +51,7 @@ class ActionHelper {
     req: JwtAuthRequest,
     actionJson: object,
     userId: PrimaryKey,
-    expires: number,
+    expiresInSeconds: number,
   ): Promise<void> {
     const md5 = crypto.createHash('md5');
     const actionStr = qs.stringify(
@@ -60,12 +60,12 @@ class ActionHelper {
     );
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
     const calcKey = { prefix: 'action', key };
-    const exists = await InMemoryDB.get(calcKey);
+    const exists = await InMemoryDB.get(calcKey, 6);
     logger.log(`action ${r({ exists, actionStr, calcKey })}`);
     if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
-    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expires || 5, db: 6 }).catch((reason) =>
+    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expiresInSeconds || 5, db: 6 }).catch((reason) =>
       logger.error(reason),
     );
   }

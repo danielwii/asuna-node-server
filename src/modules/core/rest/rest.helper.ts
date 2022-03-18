@@ -112,7 +112,7 @@ export class RestHelper {
       .select(columnMetadata.databaseName)
       .distinct(true)
       .getRawMany();
-    const arr = _.flatMap(raw, fp.get(column));
+    const arr = _.compact(_.flatMap(raw, fp.get(column)));
     logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
     return arr;
   }
@@ -126,10 +126,10 @@ export class RestHelper {
     const [[relation, value]] = _.toPairs(where);
     const field = `${relation}__id`;
     const queryBuilder = repository.createQueryBuilder();
-    const whereSql = DBHelper.toSqlValue(queryBuilder, { field, value });
+    // const whereSql = DBHelper.toSqlValue(queryBuilder, { field, value });
     const raw = await queryBuilder
       .select(`${column}, ${field}, COUNT(${column}) as count`)
-      .where(whereSql)
+      .where({ [field]: value })
       .groupBy(`${column}, ${field}`)
       .getRawMany();
 
@@ -141,7 +141,7 @@ export class RestHelper {
       fp.mapValues((v) => _.assign({}, ...v)), // merge values
       // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
     )(raw);
-    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ whereSql, stats })}`);
+    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats })}`);
     return stats;
   }
 }

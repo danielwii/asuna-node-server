@@ -8,7 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
-import { BaseEntity, DeleteResult } from 'typeorm';
+import { BaseEntity, DeleteResult, FindOperator } from 'typeorm';
 
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
 import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
@@ -135,7 +135,7 @@ export abstract class RestCrudController {
     // TODO 这里的 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
     if (parsedNormalWheres.length > 1) queryBuilder.where(where);
     else if (parsedNormalWheres.length === 1)
-      DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres[0]);
+      DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres);
 
     if (filterWheres) queryBuilder.andWhere(filterWheres as any);
 

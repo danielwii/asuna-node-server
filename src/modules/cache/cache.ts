@@ -10,8 +10,8 @@ import { CacheTTL } from './constants';
 const logger = LoggerFactory.getLogger('CacheManager');
 
 export class CacheManager {
-  public static cache = new LRU<string, any>({ max: 500, maxAge: CacheTTL.LONG_1 });
-  public static shortCache = new LRU<string, any>({ max: 50, maxAge: CacheTTL.SHORT });
+  public static cache = new LRU<string, any>({ max: 500, ttl: CacheTTL.LONG_1 });
+  public static shortCache = new LRU<string, any>({ max: 50, ttl: CacheTTL.SHORT });
 
   /**
    * 缓存工具，将 resolver 的结果按 ttl: [seconds] 保存在内存中，默认过期为 60 min
@@ -26,14 +26,14 @@ export class CacheManager {
     if (cacheValue) return cacheValue;
 
     const value = await fnResolve(resolver)();
-    this.cache.set(cacheKey, value, seconds ? seconds * 1000 : undefined);
+    this.cache.set(cacheKey, value, { ttl: seconds ? seconds * 1000 : undefined });
     logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 
   public static set(key: any, value, ttl?: number): void {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
-    this.cache.set(cacheKey, value, ttl ? ttl * 1000 : undefined);
+    this.cache.set(cacheKey, value, { ttl: ttl ? ttl * 1000 : undefined });
   }
 
   public static get<T = any>(key: any): T {
@@ -42,12 +42,12 @@ export class CacheManager {
   }
 
   public static clearAll(): void {
-    this.cache.reset();
+    this.cache.clear();
   }
 
-  public static async clear(key: any): Promise<void> {
+  public static async clear(key: any): Promise<boolean> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
-    return this.cache.del(cacheKey);
+    return this.cache.delete(cacheKey);
   }
 }
 

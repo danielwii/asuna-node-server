@@ -29,8 +29,8 @@ export class Notification extends Publishable(AbstractNameEntity) {
 
   @Field((type) => String, { nullable: true })
   @MetaInfo({ name: '通知发出类型', type: 'EditableEnum', enumData: NotificationUsageEnumValue.data })
-  @Column('varchar', { nullable: true })
-  public usage: NotificationUsageType;
+  @Column('varchar', { name: 'usage_type', nullable: true })
+  public usage?: NotificationUsageType;
 
   // --------------------------------------------------------------
   // Status

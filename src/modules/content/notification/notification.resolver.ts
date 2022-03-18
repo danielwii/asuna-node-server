@@ -34,7 +34,7 @@ export class NotificationQueryResolver extends QueryResolver {
   @Query((returns) => [MixedNotification])
   public async api_notifications(
     @Args('type') type: NotificationType,
-    @Args('usage') usage: string,
+    @Args('usage', { nullable: true }) usage: string,
     @Context() ctx: GraphqlContext,
   ): Promise<MixedNotification[]> {
     this.logger.log(`api_notifications: ${r({ type, usage })}`);

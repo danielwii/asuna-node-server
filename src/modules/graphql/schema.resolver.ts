@@ -1,6 +1,7 @@
 import { Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as scalars from 'graphql-scalars';
 
@@ -10,7 +11,7 @@ import { DBHelper, DBService } from '../core/db';
 class ModelSchemas {
   @Field({ nullable: true }) name: string;
   @Field() internal: boolean;
-  @Field((returns) => scalars.GraphQLJSONObject) schema: JSON;
+  @Field((returns) => scalars.GraphQLJSON) schema: any[];
 }
 
 @Resolver()
@@ -19,11 +20,13 @@ export class SchemaQueryResolver {
 
   constructor(private readonly dbService: DBService) {}
 
-  @Query((returns) => ModelSchemas)
-  sys_modelSchemas() {
+  @Query((returns) => [ModelSchemas])
+  sys_modelSchemas(): ModelSchemas[] {
     return this.dbService.repos().map((repository) => {
       const { name, internal } = (repository.metadata.target as any).entityInfo;
-      return { name, internal, schema: DBHelper.extractAsunaSchemas(repository) };
+      const schema = DBHelper.extractAsunaSchemas(repository);
+      this.logger.log(`sys_modelSchemas ${r({ name, internal, schema: !!schema })}`);
+      return { name, internal, schema };
     });
   }
 }

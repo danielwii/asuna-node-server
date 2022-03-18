@@ -27,9 +27,11 @@ import {
   Raw,
   Repository,
   SelectQueryBuilder,
+  FindOptionsUtils,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
+import { WhereClauseCondition } from 'typeorm/query-builder/WhereClause';
 
 import { Profile } from '../../common/helpers/normal';
 import { Role } from '../auth/auth.entities';
@@ -65,27 +67,31 @@ export interface ModelNameObject {
   entityName: string;
 }
 
+export type ParsedWhere = Record<string, ParsedCondition> | Record<string, ParsedCondition>[];
+
 /**
  * https://github.com/typeorm/typeorm/issues/1101
  * @param {string} value
  * @returns {any}
  */
-export function parseWhere(value: string): ObjectLiteral {
+export function parseWhere(value: string): ParsedWhere {
   if (value) {
     try {
       const parsed = JSON.parse(value);
+
       /*
-      const result = R.ifElse(
+      const condition = R.ifElse(
         _.isArray,
         (v) => _.map(v, R.map(parseCondition)),
         (v) => R.map(parseCondition)(v),
       )(parsed);
 */
+
       const condition = _.isArray(parsed)
-        ? _.map(parsed, (v) => _.map(v, parseCondition))
-        : _.map(parsed, parseCondition);
+        ? _.map(parsed, (v) => _.mapValues(v, parseCondition))
+        : _.mapValues(parsed, parseCondition);
       logger.debug(`condition is ${r({ parsed, condition })}`);
-      return condition as any;
+      return condition;
     } catch (reason) {
       logger.warn(`parse where error ${r({ reason, value })}`);
     }
@@ -93,16 +99,24 @@ export function parseWhere(value: string): ObjectLiteral {
   return null;
 }
 
-export const parseNormalWheres = (where, repository): any | any[] =>
-  R.ifElse(
+export const parseNormalWheres = (where: ParsedWhere, repository: Repository<any>) => {
+  if (_.isArray(where)) {
+    return _.map(where, (condition) => parseNormalWhereAndRelatedFields([condition], repository).normalWhere);
+  } else {
+    return parseNormalWhereAndRelatedFields(where, repository).normalWhere;
+  }
+  /*
+  return R.ifElse(
     _.isArray,
     (v) => _.map(v, (str) => parseNormalWhereAndRelatedFields(str, repository).normalWhere),
     (v) => [parseNormalWhereAndRelatedFields(v, repository).normalWhere],
   )(where);
+*/
+};
 
 export function parseNormalWhereAndRelatedFields(
-  where,
-  repository,
+  where: ParsedWhere,
+  repository: Repository<any>,
 ): { allRelations: any[]; normalWhere: any[]; relatedFields: string[]; relatedWhere: { [key: string]: string[] } } {
   const allRelations = repository.metadata.relations.map((relation) => relation.propertyName);
   logger.debug(`all relations is ${r(allRelations)}`);
@@ -124,20 +138,27 @@ export function parseNormalWhereAndRelatedFields(
   return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
-function parseCondition(value: Condition): ObjectLiteral {
+export type ParsedCondition =
+  | FindOperator<any>
+  | string
+  | boolean
+  | { $and: ParsedCondition[] }
+  | { $or: ParsedCondition[] };
+
+function parseCondition(value: Condition): ParsedCondition {
   if (_.has(value, '$and')) {
-    return { $and: _.map(value.$and, parseCondition) as Condition };
+    return { $and: _.map(value.$and, parseCondition) };
     // return { $and: R.map(parseCondition)(value.$and as any) as any };
   }
   if (_.has(value, '$or')) {
-    return { $or: _.map(value.$or, parseCondition) as Condition };
+    return { $or: _.map(value.$or, parseCondition) };
     // return { $or: R.map(parseCondition)(value.$or as any) as any };
   }
 
   if (_.has(value, '$like')) return Like(value.$like);
   if (_.has(value, '$notLike')) return Not(Like(value.$notLike));
   if (_.has(value, '$any')) return Any(value.$any);
-  if (_.has(value, '$in')) return In(_.isArray(value.$in) ? value.$in : [value.$in]);
+  if (_.has(value, '$in')) return In(_.flow(_.uniq, _.compact)(_.isArray(value.$in) ? value.$in : [value.$in]));
   if (_.has(value, '$notIn')) return Not(In(value.$notIn));
   if (_.has(value, '$between')) return Between(value.$between[0], value.$between[1]);
   if (_.has(value, '$eq')) return Equal(value.$eq);
@@ -149,7 +170,8 @@ function parseCondition(value: Condition): ObjectLiteral {
   if (_.has(value, '$not')) return Not(value.$not);
   if (_.isBoolean(value) || _.isString(value)) return value;
   logger.warn(`no handler found for '${r(value)}'`);
-  return value;
+  // FIXME should throw exception
+  return value as any;
 }
 
 export function parseOrder(model: string, value: string): { [name: string]: string } {
@@ -581,7 +603,7 @@ export class DBHelper {
     profile: Profile,
     relationsStr: string | string[],
     parsedFields: ParsedFields,
-    where: ObjectLiteral,
+    where: ParsedWhere,
   ): void {
     if (profile === Profile.ids) {
       const relations = relationsStr ? parseListParam(relationsStr) : [];
@@ -671,7 +693,7 @@ export class DBHelper {
     }
   }
 
-  public static wrapNormalWhere(model: string, queryBuilder, wheres): void {
+  public static wrapNormalWhere(model: string, queryBuilder: SelectQueryBuilder<any>, wheres): void {
     // logger.log(`handle wheres ${r(wheres)}`);
     wheres.forEach((condition) => {
       logger.verbose(`handle condition ${r(condition)}`);
@@ -680,41 +702,50 @@ export class DBHelper {
         condition.value.$or.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
+          // const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
 
           // console.log('[wheres-or]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
-            queryBuilder.orWhere(`${model}.${sqlValue}`);
+            queryBuilder.orWhere({ [condition.field]: elementCondition });
+            // queryBuilder.orWhere(`${model}.${sqlValue}`);
           } else {
-            queryBuilder.orWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
+            queryBuilder.orWhere(`${model}.${condition.field} = :${condition.field}`, {
+              [condition.field]: condition.value,
+            });
           }
         });
       } else if (condition.value?.$and) {
         condition.value.$and.forEach((elementCondition) => {
           const currentCondition = { field: condition.field, value: elementCondition };
 
-          const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
+          // const sqlValue = DBHelper.toSqlValue(queryBuilder, currentCondition);
 
           // console.log('[wheres-and]', { currentCondition, elementCondition, sqlValue });
 
           if (_.isObject(currentCondition)) {
-            queryBuilder.andWhere(`${model}.${sqlValue}`);
+            queryBuilder.andWhere({ [condition.field]: elementCondition });
+            // queryBuilder.andWhere(`${model}.${sqlValue}`);
           } else {
-            queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
+            queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, {
+              [condition.field]: condition.value,
+            });
           }
         });
       } else {
         const elementCondition = condition.value;
 
-        const sqlValue = DBHelper.toSqlValue(queryBuilder, condition);
+        // const sqlValue = DBHelper.toSqlValue(queryBuilder, condition);
 
-        logger.verbose(`[normalWheres-default] ${r({ condition, elementCondition, sqlValue })}`);
+        logger.verbose(`[normalWheres-default] ${r({ condition, elementCondition })}`);
 
         if (_.isObject(elementCondition)) {
-          queryBuilder.andWhere(`${model}.${sqlValue}`);
+          queryBuilder.andWhere({ [condition.field]: elementCondition });
+          // queryBuilder.andWhere(`${model}.${sqlValue}`);
         } else {
-          queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
+          queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, {
+            [condition.field]: condition.value,
+          });
         }
       }
     });
@@ -738,6 +769,7 @@ export class DBHelper {
     }
   }
 
+  /*
   public static toSqlValue(
     queryBuilder: any,
     condition: { field: string; value: string | FindOperator<any> },
@@ -795,6 +827,7 @@ export class DBHelper {
     // queryBuilder.andWhere(`${model}.${condition.field} = :${condition.field}`, sqlValue);
     return { [condition.field]: condition.value };
   }
+*/
 
   static loadDataFilter(roles: Role[], entityName: string) {
     const dataFilters = _.merge({}, ..._.map(roles, (role) => role.dataFilter));

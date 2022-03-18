@@ -20,7 +20,7 @@ export class CacheWrapper {
     return InMemoryDB.save({ prefix, key }, resolver, { expiresInSeconds, strategy });
   }
 
-  public static async clear(opts: { prefix?: string; key: any }): Promise<number | void> {
+  public static async clear(opts: { prefix?: string; key: any }): Promise<number | boolean> {
     return InMemoryDB.clear(opts);
   }
 }

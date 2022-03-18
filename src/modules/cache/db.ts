@@ -76,11 +76,11 @@ export class InMemoryDB {
     return redis.client.lRange(keyStr, 0, -1);
   }
 
-  public static async get<Key extends string | CacheKey>(key: Key) {
+  public static async get<Key extends string | CacheKey>(key: Key, db = 0) {
     const keyStr = isPrefixObject(key) ? InMemoryDB.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
 
-    const redis = RedisProvider.getRedisClient(prefix);
+    const redis = RedisProvider.getRedisClient(prefix, db);
     if (!redis.isEnabled) {
       return CacheManager.get(keyStr);
     }
@@ -149,7 +149,7 @@ export class InMemoryDB {
     return primeToRedis();
   }
 
-  public static async clear(cacheKey: CacheKey): Promise<number | void> {
+  public static async clear(cacheKey: CacheKey): Promise<number | boolean> {
     const { key, prefix } = cacheKey;
     const keyStr = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
     logger.debug(`remove ${keyStr}`);

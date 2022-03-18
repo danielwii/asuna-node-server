@@ -38,10 +38,10 @@ export const NameDescAttachable = <TBase extends ConstrainedConstructor<BaseEnti
     @Column({ nullable: false, length: 100, unique: true, name: 'name' })
     public name: string;
 
-    @Field()
+    @Field({ nullable: true })
     @MetaInfo({ name: '描述' })
     @Column('text', { nullable: true, name: 'description' })
-    public description: string;
+    public description?: string;
   }
   return ExtendableEntity;
 };

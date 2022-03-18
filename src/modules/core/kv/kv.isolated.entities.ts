@@ -17,7 +17,7 @@ export enum KVModelFormatType {
 @EntityMetaInfo({ name: 'kv__models', internal: true })
 @Entity('kv__t_models')
 export class KeyValueModel extends Publishable(AbstractNameEntity) {
-  @Field((returns) => KVModelFormatType)
+  @Field((returns) => KVModelFormatType, { nullable: true })
   @MetaInfo({ name: 'FormatType', type: 'Enum', enumData: KVModelFormatType })
   @Column('varchar', { nullable: true, name: 'format_type' })
   public formatType?: KVModelFormatType;
