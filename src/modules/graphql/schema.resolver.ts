@@ -10,7 +10,7 @@ import { DBHelper, DBService } from '../core/db';
 @ObjectType()
 class ModelSchemas {
   @Field({ nullable: true }) name: string;
-  @Field() internal: boolean;
+  @Field({ nullable: true }) internal: boolean;
   @Field((returns) => scalars.GraphQLJSON) schema: any[];
 }
 

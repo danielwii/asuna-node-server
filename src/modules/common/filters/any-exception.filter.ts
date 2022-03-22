@@ -150,7 +150,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const error: Partial<AsunaException> = {
         httpStatus,
         name: processed.name || AsunaErrorCode.Unexpected__do_not_use_it.name,
-        code: `${processed.code || AsunaErrorCode.Unexpected__do_not_use_it.value}`,
+        code: `${(processed as any).code || AsunaErrorCode.Unexpected__do_not_use_it.value}`,
         message,
         // raw: processed,
       };

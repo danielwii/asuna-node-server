@@ -1,5 +1,3 @@
-import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
-
 import { Body, Get, HttpCode, HttpStatus, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import {
@@ -11,6 +9,7 @@ import {
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import { Promise } from 'bluebird';
 import Chance from 'chance';
@@ -35,6 +34,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
     public readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
       onSignUp?: <Result>(result: Result, body) => Promise<void>;
+      onCurrent?: (user: U) => Promise<U & Record<any, any>>;
     } = {},
   ) {}
 
@@ -205,7 +205,7 @@ export abstract class AbstractAuthController<U extends AuthUser> {
       // logger.debug(`current profile is ${r({ profile, desensitized })}`);
       _.set(result, 'profile', desensitized);
     }
-    return result;
+    return this.handlers.onCurrent ? await this.handlers.onCurrent(result) : result;
   }
 
   @Get('authorized')
