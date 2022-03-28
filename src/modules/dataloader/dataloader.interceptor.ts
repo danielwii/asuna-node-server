@@ -12,10 +12,11 @@ import { getRequestFromContext } from './utils';
 
 import type { JwtPayload } from '../core/auth';
 import type { DefaultRegisteredLoaders } from './context';
+import type { WithProfileUser } from '../core/auth';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = JwtPayload> {
+export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> {
   getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;

@@ -153,6 +153,6 @@ export abstract class AbstractAuthUser extends AbstractBaseEntity {
 
 export type AuthUser = AbstractTimeBasedAuthUser /*| AbstractAuthUser*/;
 export type AuthUserType = typeof AbstractTimeBasedAuthUser /*| typeof AbstractAuthUser*/;
-export type WithProfileUser = typeof AbstractTimeBasedBaseEntity & Partial<{ profileId: string; profile: UserProfile }>;
+export type WithProfileUser = AbstractTimeBasedBaseEntity & Partial<{ profileId: string; profile: UserProfile }>;
 export type WithProfileUserInstance = AbstractTimeBasedBaseEntity &
   Partial<{ profileId: string; profile: UserProfile }>;
