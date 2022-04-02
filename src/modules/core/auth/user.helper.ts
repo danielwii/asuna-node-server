@@ -32,7 +32,7 @@ export class AuthedUserHelper {
     { email, username }: { username?: string; email?: string },
     options?: FindOneOptions<UserProfile>,
   ): Promise<UserProfile> {
-    if (!email && !email) {
+    if (!email && !username) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
 

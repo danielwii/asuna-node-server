@@ -146,7 +146,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       (v) => !_.isUndefined(v),
     );
     logger.debug(`get user by condition ${r(condition)}`);
-    if (!(condition.email ?? condition.username)) {
+    if (!condition.email && !condition.username) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
     return this.authUserRepository.findOne(condition, options);

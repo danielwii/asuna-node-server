@@ -23,14 +23,14 @@ import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base
 import { UserProfile } from './user.entities';
 
 import type { DeepPartial } from 'typeorm';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
 
-export abstract class AbstractAuthController<U extends AuthUser> {
+export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
   public constructor(
     public readonly UserEntity: ConstrainedConstructor<U> & AuthUserType,
-    public readonly authService: AbstractAuthService<U>,
+    public readonly authService: AbstractAuthService<AuthUser>,
     public readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
       onSignUp?: <Result>(result: Result, body) => Promise<void>;
