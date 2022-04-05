@@ -8,7 +8,6 @@ import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
-import * as R from 'ramda';
 
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
@@ -275,7 +274,7 @@ export class KvHelper {
     };
     const exists = await KvHelper.get(entity);
     if (exists && opts.name) {
-      const model = await KeyValueModel.findOne({ name: opts.name });
+      const model = await KeyValueModel.findOneBy({ name: opts.name });
       logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
@@ -294,7 +293,7 @@ export class KvHelper {
     logger.debug(`set ${r(entity)}`);
     return KeyValuePair.create({
       // ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
-      ...(!!exists ? { id: exists.id } : {}),
+      ...(exists ? { id: exists.id } : {}),
       ...entity,
     })
       .save()
@@ -304,7 +303,7 @@ export class KvHelper {
   public static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
 
-    const entity = await KeyValuePair.findOne(id);
+    const entity = await KeyValuePair.findOneBy({ id });
     const entityTo = KeyValuePair.merge(entity, { name, type, value: stringifyValue as any });
     return KeyValuePair.save(entityTo);
   }
@@ -330,7 +329,7 @@ export class KvHelper {
   }
 
   public static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
-    return KeyValuePair.find({
+    return KeyValuePair.findBy({
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
       ...(key ? { key } : {}),
     }).then(
@@ -363,7 +362,7 @@ export class KvHelper {
     if (kvDef.collection.startsWith('system.')) {
       if (AdminUserIdentifierHelper.identify(identifier)) {
         const resolved = AdminUserIdentifierHelper.resolve(identifier);
-        const admin = await AdminUser.findOne(resolved.id);
+        const admin = await AdminUser.findOneBy({ id: resolved.id as string });
         if (!admin?.isActive) {
           throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'admin is not active.');
         }

@@ -15,7 +15,7 @@ const logger = LoggerFactory.getLogger('PaymentAlipayHelper');
 
 export class PaymentAlipayHelper {
   public static async sdk(): Promise<AlipaySdk> {
-    const method = await PaymentMethod.findOne({ type: PaymentMethodEnumValue.types.alipay, isPublished: true });
+    const method = await PaymentMethod.findOneBy({ type: PaymentMethodEnumValue.types.alipay, isPublished: true });
     if (!method) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `no alipay method exists`);
     }

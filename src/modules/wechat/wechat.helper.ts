@@ -270,8 +270,8 @@ export class WeChatHelper {
 
   public static async handleAdminLogin(message: WXSubscribedQrSceneMessage): Promise<void> {
     const [type, sid] = message.EventKey.split(':');
-    const user = await WeChatUser.findOne({ openId: message.FromUserName });
-    const admin = await AdminUser.findOne({ email: `${message.FromUserName}@wx.openid` });
+    const user = await WeChatUser.findOneBy({ openId: message.FromUserName });
+    const admin = await AdminUser.findOneBy({ email: `${message.FromUserName}@wx.openid` });
     logger.log(`handle type ${type} with sid ${sid} ... ${r({ user, admin })}`);
     if (admin) {
       if (admin.isActive) {
@@ -313,12 +313,12 @@ export class WeChatHelper {
       return undefined;
     }
     const { openid: openId } = userInfo;
-    if (await WeChatUser.findOne(openId)) {
+    if (await WeChatUser.findOneBy({ openId })) {
       const weChatUser = instanceToPlain(userInfo.toWeChatUser());
       const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
       logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
       await WeChatUser.update(openId, updatedTo);
-      return WeChatUser.findOne(openId);
+      return WeChatUser.findOneBy({ openId });
     }
     return WeChatUser.save(userInfo.toWeChatUser());
   }
@@ -379,7 +379,7 @@ export class WeChatHelper {
     const key = await this.getSessionKey(payload);
     const decoded = await this.decryptData<GetPhoneNumber>(key, body.encryptedData, body.iv);
     // logger.debug(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
-    const userInfo = await WXMiniAppUserInfo.findOne({ profile: { id: user.id } });
+    const userInfo = await WXMiniAppUserInfo.findOneBy({ profileId: user.id });
     userInfo.mobile = decoded.phoneNumber;
     await userInfo.save();
   }
@@ -396,7 +396,7 @@ export class WeChatHelper {
       );
     }
 
-    const user = await UserProfile.findOne({ username: codeSession.openid });
+    const user = await UserProfile.findOneBy({ username: codeSession.openid });
     if (!user) {
       await AuthedUserHelper.createProfile(
         UserProfile.create({

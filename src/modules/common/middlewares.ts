@@ -34,7 +34,7 @@ export class DeviceMiddleware implements NestMiddleware {
     const fp = req.headers['x-vfp-id'];
 
     if (sessionId) {
-      const sessionUser = await SessionUser.findOne({ sessionId });
+      const sessionUser = await SessionUser.findOneBy({ sessionId });
       const maxAge = TimeUnit.DAYS.toMillis(365);
       const cookieOptions: CookieOptions = { signed: true, httpOnly: true, maxAge, sameSite: 'none', secure: true };
       if (sessionUser) {

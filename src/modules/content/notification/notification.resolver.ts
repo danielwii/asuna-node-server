@@ -46,9 +46,9 @@ export class NotificationQueryResolver extends QueryResolver {
       query: {},
       where: {
         // ...R.ifElse(R.identity, R.always({ usage }), R.always({}))(!!usage),
-        ...(!!usage ? { usage } : {}),
+        ...(usage ? { usage } : {}),
         // ...R.ifElse(R.identity, R.always({ type }), R.always({}))(!!type),
-        ...(!!type ? { type } : {}),
+        ...((type ? { type } : {}) as any),
       },
       mapper: NotificationHelper.loadMixedNotification,
     });

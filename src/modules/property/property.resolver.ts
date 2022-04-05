@@ -95,7 +95,7 @@ export class PropertyQueryResolver {
         cls: ExchangeObject,
         relationPath: `${PropertyQueryResolver.prototype.api_exchangeObjects.name}.items`,
         info,
-        where: { ...(usage ? { usage } : {}) },
+        where: { ...(usage ? { usage } : {}) } as any,
         order: toOrder(orderBy),
       }),
     );

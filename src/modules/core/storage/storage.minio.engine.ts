@@ -4,6 +4,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
+import _ from 'lodash';
 import * as minio from 'minio';
 import { join } from 'path';
 
@@ -16,6 +17,33 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('MinioStorage');
+
+const awsS3Endpoint = {
+  'us-east-1': 's3.amazonaws.com',
+  'us-east-2': 's3-us-east-2.amazonaws.com',
+  'us-west-1': 's3-us-west-1.amazonaws.com',
+  'us-west-2': 's3-us-west-2.amazonaws.com',
+  'ca-central-1': 's3.ca-central-1.amazonaws.com',
+  'eu-west-1': 's3-eu-west-1.amazonaws.com',
+  'eu-west-2': 's3-eu-west-2.amazonaws.com',
+  'sa-east-1': 's3-sa-east-1.amazonaws.com',
+  'eu-central-1': 's3-eu-central-1.amazonaws.com',
+  'ap-south-1': 's3-ap-south-1.amazonaws.com',
+  'ap-southeast-1': 's3-ap-southeast-1.amazonaws.com',
+  'ap-southeast-2': 's3-ap-southeast-2.amazonaws.com',
+  'ap-northeast-1': 's3-ap-northeast-1.amazonaws.com',
+  'cn-north-1': 's3.cn-north-1.amazonaws.com.cn',
+  'ap-east-1': 's3.ap-east-1.amazonaws.com',
+  // Add new endpoints here.
+};
+
+function isS3Endpoint(endpoint: string): boolean {
+  return !!_.find(_.values(awsS3Endpoint), (each) => endpoint.endsWith(each));
+}
+
+function getS3Region(endpoint: string): string {
+  return isS3Endpoint(endpoint) ? _.findKey(awsS3Endpoint, (value, key) => endpoint.endsWith(value)) : null;
+}
 
 export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;
@@ -37,10 +65,15 @@ export class MinioStorage implements IStorageEngine {
     logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject), opts })}`);
   }
 
+  public get region(): string {
+    return isS3Endpoint(this.configObject.endpoint) ? getS3Region(this.configObject.endpoint) : null;
+  }
+
   public get client(): minio.Client {
     return new minio.Client({
       endPoint: this.configObject.endpoint,
       port: this.configObject.port,
+      region: this.region,
       useSSL: this.configObject.useSSL,
       accessKey: this.configObject.accessKey,
       secretKey: this.configObject.secretKey,
@@ -67,34 +100,44 @@ export class MinioStorage implements IStorageEngine {
     file: FileInfo,
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
-    const bucket = opts.bucket || this.defaultBucket;
-    const prefix = opts.prefix || yearMonthStr();
-    const region = opts.region || 'local';
-    const items: minio.BucketItemFromList[] = await this.client.listBuckets();
-    logger.log(`found buckets: ${r(items)} current is ${bucket}`);
-    if (!items?.find((item) => item.name === bucket)) {
-      logger.log(`create bucket [${bucket}] for region [${region}]`);
-      await this.client.makeBucket(bucket, region);
-    }
+    logger.log(`save entity ${r({ file, opts, config: this.configObject })}`);
+    const bucket = opts.bucket ?? this.defaultBucket;
+    const prefix = opts.prefix ?? yearMonthStr();
+    const region = opts.region ?? this.region ?? 'local';
 
-    if (!bucket.startsWith('private-')) {
-      logger.log(`bucket [${bucket}] is not private, set anonymous access policy`);
-      await this.client.setBucketPolicy(
-        bucket,
-        JSON.stringify({
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Action: ['s3:GetObject'],
-              Effect: 'Allow',
-              Principal: {
-                AWS: ['*'],
+    const isS3 = isS3Endpoint(this.configObject.endpoint);
+    // logger.log(`is s3 endpoint ${r({ endpoints: _.values(awsS3Endpoint), isS3, endpoint: this.configObject.endpoint})}`);
+
+    if (!isS3) {
+      const items: minio.BucketItemFromList[] = await this.client.listBuckets();
+      logger.log(`found buckets: ${r(items)} current is ${bucket}`);
+      if (!items?.find((item) => item.name === bucket)) {
+        logger.log(`create bucket [${bucket}] for region [${region}]`);
+        await this.client.makeBucket(bucket, region);
+      }
+      if (!bucket.startsWith('private-')) {
+        logger.log(`bucket [${bucket}] is not private, set anonymous access policy`);
+        await this.client.setBucketPolicy(
+          bucket,
+          JSON.stringify({
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: '*',
+                Action: ['s3:GetObject'],
+                Resource: [`arn:aws:s3:::${bucket}/*`],
+                /*
+                Condition: {
+                  StringEquals: {
+                    's3:ExistingObjectTag/public': 'yes',
+                  },
+                }, */
               },
-              Resource: ['arn:aws:s3:::*'],
-            },
-          ],
-        }),
-      );
+            ],
+          }),
+        );
+      }
     }
 
     // remove head and tail chars '/' in prefix
@@ -105,7 +148,7 @@ export class MinioStorage implements IStorageEngine {
     logger.log(`put ${r({ file, filenameWithPrefix, resolvedPrefix, bucket })}`);
     const eTag = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, { 'Content-Type': file.mimetype });
 
-    logger.log(`[saveEntity] [${eTag}] ...`);
+    logger.log(`[saveEntity] [${r(eTag)}] ...`);
     (async () => {
       try {
         logger.log(`remove local file ${file.path}`);
@@ -131,7 +174,7 @@ export class MinioStorage implements IStorageEngine {
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
       filename,
-      fullpath: join(this.config.resourcePath, bucket, resolvedPrefix, filename),
+      fullpath: join(isS3 ? '' : this.config.resourcePath, bucket, resolvedPrefix, filename),
     });
   }
 

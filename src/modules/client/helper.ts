@@ -18,26 +18,26 @@ export class ClientHelper {
 
     let sessionUser: SessionUser;
     await getManager().transaction(async (manager) => {
-      let device = await VirtualDevice.findOne({ id: sdid });
+      let device = await VirtualDevice.findOneBy({ id: sdid });
       if (!device) {
         const fingerprint = _.toString(req.headers['x-vfp-id']);
         device = await manager.save(new VirtualDevice({ id: sdid, fingerprint }));
       }
 
-      let session = await VirtualSession.findOne({ id: seid });
+      let session = await VirtualSession.findOneBy({ id: seid });
       if (!session) {
         await manager.save(
           new VirtualSession({ id: seid, ua: req.headers['user-agent'], clientIp: req.clientIp, device }),
         );
       }
 
-      const exists = await SessionUser.findOne({ sessionId: seid });
+      const exists = await SessionUser.findOneBy({ sessionId: seid });
       if (exists) {
         sessionUser = exists;
         return;
       }
 
-      const lastSessionUserByDevice = await SessionUser.findOne({ deviceId: sdid });
+      const lastSessionUserByDevice = await SessionUser.findOneBy({ deviceId: sdid });
       logger.log(`lastSessionUserByDevice ${r({ seid, lastSessionUserByDevice })}`);
 
       sessionUser = await manager.save(
@@ -57,14 +57,14 @@ export class ClientHelper {
     if (profileId) {
       throw new Error('get session user by profileId is not implemented');
     }
-    return SessionUser.find({ deviceId });
+    return SessionUser.findBy({ deviceId });
   }
 
   public static async getSessionUsersBySession(profileId: string, sessionId: string): Promise<SessionUser[]> {
     if (profileId) {
       throw new Error('get session user by profileId is not implemented');
     }
-    return SessionUser.find({ sessionId });
+    return SessionUser.findBy({ sessionId });
   }
 
   public static getClientId(sessionUser: SessionUser): string {
@@ -88,11 +88,11 @@ export class ClientHelper {
       throw new Error('get session user by profileId is not implemented');
     }
     ow(virtualSession?.id, 'virtualSession.id', ow.string.nonEmpty);
-    const exists = await SessionUser.findOne({ sessionId: virtualSession.id });
+    const exists = await SessionUser.findOneBy({ sessionId: virtualSession.id });
     if (exists) return exists;
 
     if (!doNotCreate) {
-      const lastSessionUserByDevice = await SessionUser.findOne({ deviceId: virtualSession.deviceId });
+      const lastSessionUserByDevice = await SessionUser.findOneBy({ deviceId: virtualSession.deviceId });
       logger.log(`lastSessionUserByDevice ${r({ virtualSession, lastSessionUserByDevice })}`);
 
       return SessionUser.create({

@@ -76,4 +76,9 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   @ManyToOne('AppInfo', (inverse: AppInfo) => inverse.releases, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'app_info__id' })
   public appInfo: AppInfo;
+
+  @Field({ nullable: true })
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, name: 'app_info__id' })
+  public appInfoId?: number;
 }

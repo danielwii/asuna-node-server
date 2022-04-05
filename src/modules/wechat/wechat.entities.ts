@@ -47,7 +47,7 @@ export class WeChatUserIdentifierHelper {
 @EntityMetaInfo({ name: 'wx__users', internal: true })
 @Entity('wx__t_users')
 export class WeChatUser extends InjectTenant(BaseEntity) {
-  constructor(o: EntityConstructorObject<WeChatUser>) {
+  constructor(o?: EntityConstructorObject<WeChatUser>) {
     super();
     Object.assign(this, deserializeSafely(WeChatUser, o));
   }

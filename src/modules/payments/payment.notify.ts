@@ -68,7 +68,7 @@ export class PaymentNotifyHelper {
 
       // const params = parseJSONIfCould(body.passback_params);
       logger.log(`find order ${body.out_trade_no}`);
-      const order = await PaymentOrder.findOneOrFail(body.out_trade_no, { relations: ['transaction'] });
+      const order = await PaymentOrder.findOneOrFail({ where: { id: body.out_trade_no }, relations: ['transaction'] });
       logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
@@ -122,7 +122,10 @@ export class PaymentNotifyHelper {
 
       const params = parseJSONIfCould(body.passback_params);
       logger.log(`find order ${params.orderId ?? body.subject}`);
-      const order = await PaymentOrder.findOneOrFail(params.orderId ?? body.subject, { relations: ['transaction'] });
+      const order = await PaymentOrder.findOneOrFail({
+        where: { id: params.orderId ?? body.subject },
+        relations: ['transaction'],
+      });
       logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {

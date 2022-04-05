@@ -8,7 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import ow from 'ow';
 import * as R from 'ramda';
-import { BaseEntity, DeleteResult, FindOperator } from 'typeorm';
+import { BaseEntity, DeleteResult } from 'typeorm';
 
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
 import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
@@ -231,7 +231,7 @@ export abstract class RestCrudController {
     })(R.pick(_.keys(relationKeys))(updateTo));
     logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
-    const entity = await repository.findOneOrFail(id, { where: whereOptions });
+    const entity = await repository.findOneOrFail({ where: { id, ...whereOptions } as any });
 
     const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username } as any);
     logger.log(`patch ${r({ entityTo })}`);

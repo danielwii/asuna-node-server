@@ -25,7 +25,7 @@ export const HermesExchangeEventKeys = {
 @EntityMetaInfo({ name: 'wallets', internal: true })
 @Entity('property__t_wallets')
 export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
-  public constructor(o: EntityConstructorObject<Wallet>) {
+  public constructor(o?: EntityConstructorObject<Wallet>) {
     super();
     Object.assign(this, deserializeSafely(Wallet, o));
   }
@@ -75,7 +75,7 @@ export class Wallet extends InjectUserProfile(AbstractBaseEntity) {
 @EntityMetaInfo({ name: 'financial_transactions', internal: true })
 @Entity('property__t_financial_transactions')
 export class FinancialTransaction extends InjectMultiUserProfile(AbstractTransactionEntity) {
-  public constructor(o: EntityConstructorObject<FinancialTransaction>) {
+  public constructor(o?: EntityConstructorObject<FinancialTransaction>) {
     super();
     Object.assign(this, deserializeSafely(FinancialTransaction, o));
   }

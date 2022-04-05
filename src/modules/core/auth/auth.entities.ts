@@ -47,7 +47,7 @@ export class AdminUser extends AbstractTimeBasedAuthUser /* InjectTenant(Abstrac
   }
 
   @MetaInfo({ name: '角色' })
-  @ManyToMany('Role', (inverse: Role) => inverse.users, { primary: true })
+  @ManyToMany('Role', (inverse: Role) => inverse.users)
   @JoinTable({
     name: 'auth__tr_users_roles',
     joinColumn: { name: 'user__id' },

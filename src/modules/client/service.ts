@@ -41,7 +41,7 @@ export class ClientService {
     return LeadUser.create({ visitorId, tenantId, projectId, profileId: sessionUser.profileId }).save();
   }
 
-  public async listLeadUsers(projectId: string) {
-    return LeadUser.findAndCount({ where: { isLead: true } });
+  public async listLeadUsers() {
+    return LeadUser.findAndCount();
   }
 }

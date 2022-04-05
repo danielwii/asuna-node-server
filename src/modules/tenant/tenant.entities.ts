@@ -84,7 +84,7 @@ export class OrgUser extends InjectTenant(AbstractTimeBasedAuthUser) {
 
   @Field((returns) => [OrgRole])
   @MetaInfo({ name: '角色' })
-  @ManyToMany('OrgRole', (inverse: OrgRole) => inverse.users, { primary: true })
+  @ManyToMany('OrgRole', (inverse: OrgRole) => inverse.users)
   @JoinTable({
     name: 'ss__tr_org_users_roles',
     joinColumn: { name: 'org_user__id' },

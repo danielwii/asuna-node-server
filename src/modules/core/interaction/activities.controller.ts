@@ -31,7 +31,7 @@ export class ActivitiesController {
     const { user } = req;
     logger.log(`save activity ${r(body)}`);
 
-    const exists = await UserActivity.findOne({ ...body, profile: user });
+    const exists = await UserActivity.findOneBy({ ...body, profile: user });
     if (exists) return exists;
 
     return UserActivity.create({ ...body, profile: user }).save();
@@ -40,7 +40,7 @@ export class ActivitiesController {
   @Get()
   async latestActivities(@Query() query: Partial<CreateActivityDto>): Promise<UserActivity[]> {
     logger.log(`list latest activities ${r(query)}`);
-    const count = await UserActivity.count({ ...query });
+    const count = await UserActivity.countBy({ ...query });
     return UserActivity.find({ ...query, ...PageHelper.latestSkip(count, 10) });
   }
 }

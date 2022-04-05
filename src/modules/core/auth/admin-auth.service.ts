@@ -32,7 +32,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     roleNames?: string[],
   ): Promise<CreatedUser<AdminUser>> {
     const { hash, salt } = PasswordHelper.encrypt(password);
-    const roles = _.isEmpty(roleNames) ? null : await Role.find({ name: In(roleNames) });
+    const roles = _.isEmpty(roleNames) ? null : await Role.findBy({ name: In(roleNames) });
 
     let user = await this.getUser({ username, email });
     if (!user) {
@@ -56,7 +56,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
   public async initSysAccount(): Promise<void> {
     const email = AppConfigObject.load().sysAdminEmail;
     const password = AppConfigObject.load().sysAdminPassword ?? nanoid();
-    const role = await Role.findOne({ name: SYS_ROLE });
+    const role = await Role.findOneBy({ name: SYS_ROLE });
 
     if (!role) {
       const entity = Role.create({ name: SYS_ROLE });

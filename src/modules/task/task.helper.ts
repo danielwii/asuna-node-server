@@ -4,8 +4,6 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { MQProvider } from '../providers';
 import { TaskRecord } from './task.entities';
 
-import type { PrimaryKey } from '../common';
-
 const logger = LoggerFactory.getLogger('TaskHelper');
 
 export enum TaskState {
@@ -35,8 +33,8 @@ export class TaskHelper {
     return record.save();
   }
 
-  public static async invoke(id: PrimaryKey): Promise<void> {
-    const task = await TaskRecord.findOne(id);
+  public static async invoke(id: string): Promise<void> {
+    const task = await TaskRecord.findOneBy({ id });
     logger.log(`invoke ${r(task)}`);
     await this.mq
       .send(task.channel, task.body)
@@ -44,6 +42,6 @@ export class TaskHelper {
   }
 
   public static search(type: string, service: string, identifier: string): Promise<TaskRecord> {
-    return TaskRecord.findOne({ type, service, identifier });
+    return TaskRecord.findOneBy({ type, service, identifier });
   }
 }

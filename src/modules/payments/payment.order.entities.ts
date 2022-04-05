@@ -6,6 +6,7 @@ import { AbstractTimeBasedBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
+// eslint-disable-next-line import/no-cycle
 import { PaymentItem, PaymentTransaction } from './payment.entities';
 
 @ObjectType()
@@ -44,7 +45,7 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
 
   @Field((returns) => [PaymentItem])
   @MetaInfo({ name: '订单内容' })
-  @ManyToMany('PaymentItem', (inverse: PaymentItem) => inverse.orders, { primary: true })
+  @ManyToMany('PaymentItem', (inverse: PaymentItem) => inverse.orders)
   @JoinTable({
     name: 'payment__tr_order_items',
     joinColumn: { name: 'order__id' },

@@ -35,7 +35,7 @@ export class PropertyModule implements OnModuleInit {
           return getManager().transaction(async (entityManager) => {
             await Promise.all(
               wallets.map(async (wallet: Wallet) => {
-                const transactions = await entityManager.find(FinancialTransaction, {
+                const transactions = await entityManager.findBy(FinancialTransaction, {
                   profileId: wallet.profileId,
                   type: 'adminBalanceChange',
                 });

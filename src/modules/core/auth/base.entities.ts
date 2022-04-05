@@ -106,10 +106,8 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
   // --------------------------------------------------------------
 }
 
-/**
- * @deprecated {@see AbstractTimeBasedAuthUser}
- */
 /*
+ * @deprecated {@see AbstractTimeBasedAuthUser}
 export abstract class AbstractAuthUser extends AbstractBaseEntity {
   @MetaInfo({ name: '邮箱' })
   @IsEmail()

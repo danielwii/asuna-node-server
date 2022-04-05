@@ -7,12 +7,12 @@ import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import {
   BaseEntity,
-  FindConditions,
   FindManyOptions,
+  FindOptionsWhere,
+  FindOptionsOrder,
   JoinOptions,
   LessThan,
   MoreThan,
-  ObjectLiteral,
   Repository,
 } from 'typeorm';
 
@@ -40,7 +40,7 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   pageRequest?: PageRequest;
   select?: (keyof Entity)[] | string[];
   info?: GraphQLResolveInfo;
-  where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+  where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
   join?: JoinOptions;
   relationPath?: string;
   selectionPath?: string;
@@ -49,9 +49,7 @@ interface ResolveFindOptionsType<Entity extends BaseEntity> {
   cache?: boolean | number | { id: any; milliseconds: number };
   // skip?: number;
   // take?: number;
-  order?: {
-    [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
-  };
+  order?: FindOptionsOrder<Entity>;
 }
 
 interface ResolveCategoryOptionsType<Entity extends BaseEntity> {
@@ -91,9 +89,7 @@ export class GraphqlHelper {
   public static resolveOrder<Entity extends BaseEntity>(
     cls: ClassType<Entity>,
     pageRequest: PageRequest,
-  ): {
-    [P in keyof Entity]?: 'ASC' | 'DESC' | 1 | -1;
-  } {
+  ): FindOptionsOrder<Entity> {
     const includeOrdinal = DBHelper.getPropertyNames(cls).includes('ordinal');
     return pageRequest?.orderBy
       ? ({ [pageRequest.orderBy.column]: pageRequest.orderBy.order } as any)
@@ -117,7 +113,7 @@ export class GraphqlHelper {
   }: {
     cls: ClassType<Entity>;
     query: ExclusiveQueryConditionInput;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
     relationPath?: string;
     info?: GraphQLResolveInfo;
     ctx?: GraphqlContext<DataLoaders>;
@@ -153,7 +149,7 @@ export class GraphqlHelper {
     query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
@@ -168,7 +164,7 @@ export class GraphqlHelper {
     query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
@@ -194,7 +190,7 @@ export class GraphqlHelper {
     query: ExclusiveQueryConditionInput;
     relationPath?: string;
     info?: GraphQLResolveInfo;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
     ctx?: GraphqlContext<DataLoaders>;
     pageInfo?: PageInfo;
     loader?: (loaders: DataLoaders) => DataLoaderFunction<Entity>;
@@ -214,7 +210,7 @@ export class GraphqlHelper {
 
     if (query.random > 0) {
       logger.debug(`parse where ${r({ publishable, cls, where })}`);
-      const count = await entityRepo.count({ where });
+      const count = await entityRepo.countBy(where);
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
       logger.debug(`ready for random ${r({ count, skip })}`);
       const opts = await this.genericFindOptions<Entity>({
@@ -278,15 +274,10 @@ export class GraphqlHelper {
    * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
    */
   public static async genericFindOptions<Entity extends BaseEntity>(
-    opts: ResolveFindOptionsType<Entity>,
+    opts:
+      | ResolveFindOptionsType<Entity>
+      | (ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>),
   ): Promise<FindManyOptions<Entity>>;
-
-  // eslint-disable-next-line no-dupe-class-members
-  public static async genericFindOptions<Entity extends BaseEntity>(
-    opts: ResolveFindOptionsType<Entity> & ResolveCategoryOptionsType<Entity>,
-  ): Promise<FindManyOptions<Entity>>;
-
-  // eslint-disable-next-line no-dupe-class-members
   public static async genericFindOptions<Entity extends BaseEntity>(
     opts: ResolveFindOptionsType<Entity> & Partial<ResolveCategoryOptionsType<Entity>>,
   ): Promise<FindManyOptions<Entity>> {
@@ -315,7 +306,7 @@ export class GraphqlHelper {
       }
 
       const categoryClsRepoAlike = categoryCls as any as Repository<AbstractCategoryEntity>;
-      const category = await categoryClsRepoAlike.findOne({ name: query.category, isPublished: true });
+      const category = await categoryClsRepoAlike.findOneBy({ name: query.category, isPublished: true });
 
       logger.debug(`category is ${r(category)}`);
       // if (category != null) {}
@@ -354,7 +345,8 @@ export class GraphqlHelper {
     }
 
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-    const result = (await (opts.cls as any as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+    const result = (await (opts.cls as any as typeof BaseEntity).findOne({
+      where: { [primaryKey]: opts.instance[primaryKey] },
       // loadRelationIds: { relations: [opts.key as string] },
       loadRelationIds: true,
       cache: opts.cache,
@@ -417,7 +409,8 @@ export class GraphqlHelper {
     if (_.isNil(ids)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
       logger.debug(`no ids for ${opts.key} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`);
-      const result: any = (await (opts.cls as any as typeof BaseEntity).findOne(opts.instance[primaryKey], {
+      const result: any = (await (opts.cls as any as typeof BaseEntity).findOne({
+        where: { [primaryKey]: opts.instance[primaryKey] },
         loadRelationIds: { relations: [opts.key as string] },
         cache: opts.cache,
       })) as Entity;
@@ -483,7 +476,7 @@ export class GraphqlHelper {
     // loader: DataLoaderFunction<Entity>;
     query: RelationQueryConditionInput;
     targetCls: ClassType<RelationEntity>;
-    where: FindConditions<RelationEntity>;
+    where: FindOptionsWhere<RelationEntity>;
     // cls: Job;
     // key: string;
   }) {
@@ -492,7 +485,7 @@ export class GraphqlHelper {
     const targetRepo = targetCls as any as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });
     const take = query?.latest ?? count;
-    const order: { [P in keyof RelationEntity]?: 'ASC' | 'DESC' | 1 | -1 } = query?.orderBy
+    const order: FindOptionsOrder<RelationEntity> = query?.orderBy
       ? ({ [query.orderBy.column]: query.orderBy.order } as any)
       : { createdAt: 'DESC' };
     // const skip = PageHelper.latestSkip(count, limit);
@@ -510,11 +503,11 @@ export class GraphqlHelper {
   }: {
     cls: ClassType<Entity>;
     cursoredRequest: CursoredRequestInput;
-    where?: FindConditions<Entity>[] | FindConditions<Entity> | ObjectLiteral | string;
+    where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
   }): Promise<CursoredPageable<Entity>> {
     const entityRepo = cls as any as Repository<Entity>;
     const countOptions = where || {};
-    const total = await entityRepo.count(countOptions as FindConditions<Entity>);
+    const total = await entityRepo.countBy(countOptions as FindOptionsWhere<Entity>);
     // const offsetOptions = await F.when(
     //   cursoredRequest.after,
     //   () => this.genericFindOptions({ cls, pageRequest: { size: first } }),
@@ -525,7 +518,7 @@ export class GraphqlHelper {
     const hasNextPage = first < total;
     const findOptions = await this.genericFindOptions({
       cls,
-      where: { ...(cursoredRequest.after ? { id: MoreThan(cursoredRequest.after) } : {}) },
+      where: { ...(cursoredRequest.after ? { id: MoreThan(cursoredRequest.after) } : {}) } as any,
       pageRequest: { size: first },
     });
     const items = await entityRepo.find(findOptions);

@@ -1,12 +1,11 @@
 import { AfterDate } from '@danielwii/asuna-helper/dist/db';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { EntityManager, Transaction, TransactionManager } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
 import { KvHelper } from '../core/kv';
@@ -30,12 +29,14 @@ export interface VipVideoExchangeBody {
 
 export class PointsHelper {
   public static async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
-    const exists = await PointExchange.findOne(PointExchange.of({ type: 'vipVideoExchange', profileId, refId: uuid }));
+    const exists = await PointExchange.findOneBy(
+      PointExchange.of({ type: 'vipVideoExchange', profileId, refId: uuid }) as any,
+    );
     logger.log(`pointExchange ${r(exists)}`);
     if (exists) return exists;
 
     const cost = await KvHelper.getValueByGroupFieldKV(PropertyHelper.kvDef, 'vipVideoExchange');
-    const current = await UserProfile.findOne(profileId, { relations: ['wallet'] });
+    const current = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
     if (!current.wallet) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `not enough points: 0`);
     }
@@ -65,7 +66,7 @@ export class PointsHelper {
   }
 
   public static async checkExchange(type: string, profileId: string, body: any): Promise<PointExchange> {
-    return PointExchange.findOne(PointExchange.of({ type, profileId, body: JSON.stringify(body) }));
+    return PointExchange.findOneBy(PointExchange.of({ type, profileId, body: JSON.stringify(body) }) as any);
   }
 
   public static async getPointsByType(
@@ -73,29 +74,27 @@ export class PointsHelper {
     profileId: string,
     after?: Date,
   ): Promise<{ total: number; items: PointExchange[] }> {
-    const items = await PointExchange.find({ profileId, type, ...(after ? { createdAt: AfterDate(after) } : null) });
+    const items = await PointExchange.findBy({ profileId, type, ...(after ? { createdAt: AfterDate(after) } : null) });
     return { total: _.sum(_.map(items, fp.get('change'))), items };
   }
 
-  @Transaction()
   public static async savePoints(
     change: number,
     type: string,
     profileId: string,
     remark: string,
-    @TransactionManager() manager?: EntityManager,
   ): Promise<PointExchange> {
     logger.log(`savePoints ${r({ change, type, profileId, remark })}`);
-    const profile = await UserProfile.findOneOrFail(profileId, { relations: ['wallet'] });
+    const profile = await UserProfile.findOneOrFail({ where: { id: profileId }, relations: ['wallet'] });
     if (!profile.wallet) {
-      profile.wallet = await manager.save<Wallet>(
+      profile.wallet = await Wallet.save(
         new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0, totalRecharge: 0 }),
       );
     }
     const [before, after] = [profile.wallet.points, profile.wallet.points + change];
-    const pointExchange = PointExchange.create({ change, type, remark, before, after, profile });
-    const exchange = await manager.save(pointExchange);
-    await manager.update(Wallet, profile.wallet.id, { points: pointExchange.after });
+    const pointExchange = PointExchange.of({ change, type, remark, before, after, profile });
+    const exchange = await pointExchange.save();
+    await Wallet.update(profile.wallet.id, { points: pointExchange.after });
 
     logger.log(`profileId: ${profileId} points changed '${type}' ${change}, succeed.`);
     return exchange;

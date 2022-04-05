@@ -20,7 +20,7 @@ export const HermesPointChangeEventKeys = { pointsChange: 'user.points.change' }
 @EntityMetaInfo({ name: 'point_exchanges', internal: true })
 @Entity('property__t_point_exchanges')
 export class PointExchange<Body = any> extends InjectMultiUserProfile(AbstractTransactionEntity) {
-  constructor(o: EntityConstructorObject<PointExchange>) {
+  constructor(o?: EntityConstructorObject<PointExchange>) {
     super();
     Object.assign(this, deserializeSafely(PointExchange, o as any));
   }

@@ -41,7 +41,8 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('beforeUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    const entity = await getRepository(event.entity.constructor.name).findOne(event.entity.id, {
+    const entity = await getRepository(event.entity.constructor.name).findOne({
+      where: { id: event.entity.id },
       loadRelationIds: true,
     });
     if (entity) {

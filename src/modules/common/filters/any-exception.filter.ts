@@ -11,7 +11,6 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 import _ from 'lodash';
 import * as R from 'ramda';
 import { getConnection, getRepository, QueryFailedError } from 'typeorm';
-import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 import { StatsHelper } from '../../stats';
@@ -88,6 +87,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     return exception;
   }
 
+  // eslint-disable-next-line complexity
   catch(exception: any, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
@@ -96,8 +96,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
-    } else if (R.is(EntityColumnNotFound, exception)) {
-      processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
+      // } else if (R.is(EntityColumnNotFound, exception)) {
+      //   processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
     } else if (R.is(EntityNotFoundError, exception)) {
       processed.status = HttpStatus.NOT_FOUND;
     } else if (exception.name === 'ArgumentError') {

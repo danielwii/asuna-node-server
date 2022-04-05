@@ -24,7 +24,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') 
     if (_.isNil(key)) {
       self.fail('ApiKey is required', 401);
     } else {
-      const exists = await AdminApiKeys.findOne({ key, isPublished: true });
+      const exists = await AdminApiKeys.findOneBy({ key, isPublished: true });
       logger.verbose(`found api key: ${r(exists)}`);
       if (exists) {
         req.isApiKeyRequest = true;

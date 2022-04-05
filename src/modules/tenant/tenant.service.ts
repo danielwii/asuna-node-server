@@ -34,7 +34,7 @@ export class TenantService {
       // throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
-    const user = await OrgUser.findOne(userId, { relations: ['tenant'] });
+    const user = await OrgUser.findOne({ where: { id: userId as string }, relations: ['tenant'] });
     if (user.tenant) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ElementExists, ['tenant', user.tenant.name]);
     }
@@ -54,7 +54,7 @@ export class TenantService {
     // TODO 为该 admin 绑定的微信用户也绑定相应的租户信息
     const config = await WxConfigApi.getServiceConfig();
     if (config.enabled && config.saveToAdmin) {
-      const weChatUser = await WeChatUser.findOne({ admin: user });
+      const weChatUser = await WeChatUser.findOneBy({ admin: user as any });
       if (weChatUser) {
         weChatUser.tenant = user.tenant;
         await weChatUser.save();

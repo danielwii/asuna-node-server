@@ -9,6 +9,7 @@ import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth';
 import { ColumnTypeHelper } from '../core/helpers';
 import { PaymentMethodEnumValue, PaymentMethodType } from './payment.enum-values';
+// eslint-disable-next-line import/no-cycle
 import { PaymentOrder } from './payment.order.entities';
 
 /**

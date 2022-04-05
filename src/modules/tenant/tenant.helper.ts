@@ -136,7 +136,7 @@ export class TenantHelper {
   static async info(userId: PrimaryKey): Promise<TenantInfo> {
     const { config, admin } = await Promise.props({
       config: TenantHelper.getConfig(),
-      admin: OrgUser.findOne(userId, { relations: ['roles', 'tenant'] }),
+      admin: OrgUser.findOne({ where: { id: userId as string }, relations: ['roles', 'tenant'] }),
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
@@ -204,7 +204,7 @@ export class TenantHelper {
       return;
     }
 
-    const admin = await OrgUser.findOne(userId, { relations: ['roles', 'tenant'] });
+    const admin = await OrgUser.findOne({ where: { id: userId as string }, relations: ['roles', 'tenant'] });
     if (!admin.tenant) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.TenantNeeded, []);
     }

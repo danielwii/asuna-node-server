@@ -86,7 +86,7 @@ export class WeChatModule implements OnModuleInit {
       logger.log(`subscribe event: ${r(event)}`);
       if (WXEventMessageHelper.isWXSubscribedQrSceneMessage(event.payload)) {
         const message = event.payload as WXSubscribedQrSceneMessage;
-        const admin = await AdminUser.findOne({ email: `${message.FromUserName}@wx.openid` });
+        const admin = await AdminUser.findOneBy({ email: `${message.FromUserName}@wx.openid` });
         if (admin) {
           //
         }

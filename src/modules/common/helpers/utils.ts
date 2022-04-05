@@ -4,8 +4,6 @@ import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as path from 'path';
 
-import type { FindConditions } from 'typeorm/find-options/FindConditions';
-
 /**
  * https://www.typescriptlang.org/docs/handbook/mixins.html
  * @param derivedCtor
@@ -100,10 +98,7 @@ export const TimeUnit = {
   },
 };
 
-export const condition = <Entity>(
-  nilProtected: FindConditions<Entity>,
-  nil?: FindConditions<Entity>,
-): FindConditions<Entity> => {
+export const condition = <Entity>(nilProtected, nil?) => {
   return _.assign({}, _.pickBy(nilProtected as object, _.identity), nil);
 };
 

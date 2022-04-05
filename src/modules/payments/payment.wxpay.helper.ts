@@ -66,7 +66,10 @@ export class PaymentWxpayHelper {
   }
 
   public static async query(id: string): Promise<any> {
-    const order = await PaymentOrder.findOneOrFail(id, { relations: ['transaction', 'transaction.method'] });
+    const order = await PaymentOrder.findOneOrFail({
+      where: { id },
+      relations: ['transaction', 'transaction.method'],
+    });
     const method = order.transaction.method;
     logger.log(`query order ${r({ id, order })}`);
     const queryObject = {

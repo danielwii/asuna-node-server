@@ -10,16 +10,16 @@ import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
 import { FindOneOptions, ObjectLiteral, Repository } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 import { formatTime, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';
-import type { FindConditions } from 'typeorm/find-options/FindConditions';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { CreatedUser } from './auth.service';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
@@ -122,7 +122,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   public async updateLastLoginDate(uid: PrimaryKey): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
-    const authUser = await this.authUserRepository.findOne(uid);
+    const authUser = await this.authUserRepository.findOneBy({ id: uid as any });
     if (authUser) {
       const currentDate = new Date();
       const calendarDays = differenceInCalendarDays(authUser.lastLoginAt, currentDate);
@@ -139,28 +139,28 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   public async getUser(
     identifier: { email?: string; username?: string },
     isActive?: boolean,
-    options?: FindOneOptions<U>,
+    options?: Exclude<FindOneOptions<U>, 'where'>,
   ): Promise<U> {
-    const condition: FindConditions<any> = _.pickBy(
+    const where = _.pickBy(
       { email: identifier.email, username: identifier.username, isActive },
       (v) => !_.isUndefined(v),
-    );
-    logger.debug(`get user by condition ${r(condition)}`);
-    if (!condition.email && !condition.username) {
+    ) as FindOptionsWhere<U>;
+    logger.debug(`get user by where ${r(where)}`);
+    if (!(where.email ?? where.username)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
-    return this.authUserRepository.findOne(condition, options);
+    return this.authUserRepository.findOne({ where, ...options });
   }
 
   public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.authUserRepository.findOne({
       where: {
         // ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
-        ...(!!identifier.email ? { email: identifier.email } : {}),
+        ...(identifier.email ? { email: identifier.email } : {}),
         // ...R.ifElse(R.identity, R.always({ username: identifier.username }), R.always({}))(!!identifier.username),
-        ...(!!identifier.username ? { username: identifier.username } : {}),
+        ...(identifier.username ? { username: identifier.username } : {}),
         isActive,
-      } as ObjectLiteral,
+      } as any,
       select: ['id', 'username', 'email', 'channel', 'password', 'salt'],
     });
   }
@@ -172,7 +172,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   public async updateAccount(uid: PrimaryKey, { username, email }: { username: string; email?: string }): Promise<U> {
-    const authUser = await this.AuthUserEntity.findOneOrFail<AuthUser>(uid);
+    const authUser = await this.AuthUserEntity.findOneByOrFail<AuthUser>({ id: uid as any });
     if (username) authUser.username = username;
     if (email) authUser.email = email;
     // FIXME authUser.isBound = true;

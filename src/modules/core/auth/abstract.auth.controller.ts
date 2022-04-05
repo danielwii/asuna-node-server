@@ -72,7 +72,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     // profile.isBound = true;
     // await profile.save();
 
-    const userEntity = await this.UserEntity.findOne(payload.uid);
+    const userEntity = await this.UserEntity.findOneById(payload.uid);
     if (_.has(userEntity, 'username') && dto.username) _.set(userEntity, 'username', profile.username);
     if (_.has(userEntity, 'email') && dto.email) _.set(userEntity, 'email', profile.email);
     await userEntity.save();
@@ -89,7 +89,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
-    const profile = await UserProfile.findOne(payload.uid);
+    const profile = await UserProfile.findOneBy({ id: payload.uid });
     profile.nickname = dto.nickname;
     await profile.save();
   }
@@ -137,7 +137,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
           await this.handlers.onSignUp(result, body);
         }
         const relations = _.intersection(DBHelper.getColumnNames(this.UserEntity), ['profile']);
-        return this.UserEntity.findOne(result.user.id, { relations });
+        return this.UserEntity.findOne({ where: { id: result.user.id } as any, relations });
         // return _.get(user, 'profile');
       });
   }
@@ -163,7 +163,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     const columnNames = DBHelper.getColumnNames(this.UserEntity);
     const hasProfile = columnNames.includes('profile') || columnNames.includes('profile__id');
     const authUser = hasProfile
-      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: profile.id } })
+      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: profile.id } as any })
       : profile;
     // return TokenHelper.createToken(profile, { uid: user.id });
     logger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
@@ -199,7 +199,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     logger.debug(`relations is ${r(relations)}`);
     if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
-      const profile = await UserProfile.findOne(profileId, { relations: ['wallet'] });
+      const profile = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
       // const desensitized = _.omit(profile, 'salt', 'password', 'info');
       const { salt, password, ...desensitized } = profile;
       // logger.debug(`current profile is ${r({ profile, desensitized })}`);

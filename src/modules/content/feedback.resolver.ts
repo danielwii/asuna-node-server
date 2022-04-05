@@ -48,7 +48,7 @@ export class FeedbackQueryResolver extends QueryResolver {
         pageRequest,
         info,
         ...selects,
-        where: { profileId: user.id },
+        where: { profileId: user.id } as any,
       }),
     );
 

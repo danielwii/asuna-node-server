@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType, Int } from "@nestjs/graphql";
+import { Field, ID, InterfaceType, Int } from '@nestjs/graphql';
 
 import {
   AfterLoad,
@@ -9,13 +9,13 @@ import {
   Index,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
+  UpdateDateColumn,
+} from 'typeorm';
 
-import { MetaInfo } from "../common/decorators";
-import { fixTZ } from "../core/helpers/entity.helper";
-import { SimpleIdGenerator } from "../ids";
-import { NameDescAttachable, Publishable } from "./abilities";
+import { MetaInfo } from '../common/decorators';
+import { fixTZ } from '../core/helpers/entity.helper';
+import { SimpleIdGenerator } from '../ids';
+import { NameDescAttachable, Publishable } from './abilities';
 
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityObject<Entity> = Omit<
@@ -55,7 +55,7 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
 
 @InterfaceType({ implements: () => [NoPrimaryKeyBaseEntity] })
 export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
-  @Field(returns => Int)
+  @Field((returns) => Int)
   @PrimaryGeneratedColumn()
   public id?: number;
 }
@@ -110,7 +110,8 @@ export class AbstractNameEntity extends NameDescAttachable(AbstractBaseEntity) {
 @InterfaceType()
 export class AbstractUUIDBaseEntity extends BaseEntity {
   @Field()
-  @PrimaryGeneratedColumn('uuid') public uuid!: string;
+  @PrimaryGeneratedColumn('uuid')
+  public uuid!: string;
 
   @Field({ nullable: true })
   @Index()

@@ -44,16 +44,16 @@ export class PaymentHelper {
   }: {
     itemId: string;
     callback: string;
-    methodId: number;
+    methodId: string;
     paymentInfo: Record<string, unknown>;
     extra?: Record<string, unknown>;
     profileId: string;
   }): Promise<PaymentOrder> {
     logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo, extra })}`);
     // create order first
-    const item = await PaymentItem.findOneOrFail(itemId);
+    const item = await PaymentItem.findOneByOrFail({ id: itemId });
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
-    const method = await PaymentMethod.findOneOrFail(methodId);
+    const method = await PaymentMethod.findOneByOrFail({ id: methodId });
     // logger.log(`created order ${r({ item, method, order })}`);
 
     // create transaction
@@ -71,8 +71,11 @@ export class PaymentHelper {
   }
 
   public static async validateSign(orderId: string, body): Promise<boolean> {
-    const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
-    const transaction = await PaymentTransaction.findOneOrFail(order.transaction.id, { relations: ['method'] });
+    const order = await PaymentOrder.findOneOrFail({ where: { id: orderId }, relations: ['transaction'] });
+    const transaction = await PaymentTransaction.findOneOrFail({
+      where: { id: order.transaction.id },
+      relations: ['method'],
+    });
     const { method, sign } = transaction;
 
     const remoteSignPath = _.get(method.extra, 'remoteSign');
@@ -113,7 +116,10 @@ export class PaymentHelper {
   public static async sign(
     transactionId: string,
   ): Promise<{ context: PaymentContext; signed: string; md5sign: string }> {
-    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
+    const transaction = await PaymentTransaction.findOneOrFail({
+      where: { id: transactionId },
+      relations: ['method', 'order'],
+    });
     const { method, order } = transaction;
     if (!method) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `method not found for transaction: ${transactionId}`);
@@ -141,7 +147,10 @@ export class PaymentHelper {
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
     logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid, isMobile })}`);
-    const transaction = await PaymentTransaction.findOneOrFail(transactionId, { relations: ['method', 'order'] });
+    const transaction = await PaymentTransaction.findOneOrFail({
+      where: { id: transactionId },
+      relations: ['method', 'order'],
+    });
     const { method, order } = transaction;
     // const bodyTmpl = method?.bodyTmpl;
     if (!method) {
@@ -208,14 +217,14 @@ export class PaymentHelper {
   }
 
   public static async updateOrder(orderId: string, data: any): Promise<PaymentOrder> {
-    const order = await PaymentOrder.findOneOrFail(orderId, { relations: ['transaction'] });
+    const order = await PaymentOrder.findOneOrFail({ where: { id: orderId }, relations: ['transaction'] });
     order.transaction.data = data;
     return order.save();
   }
 
   public static async cleanExpiredPayments(): Promise<void> {
     const oneDayAgo = sub(new Date(), { days: 1 });
-    const transactions = await PaymentTransaction.count({ createdAt: LessThan(oneDayAgo), status: IsNull() });
+    const transactions = await PaymentTransaction.countBy({ createdAt: LessThan(oneDayAgo), status: IsNull() });
     logger.debug(`remove expired transactions: ${transactions}`);
     if (transactions) {
       await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });

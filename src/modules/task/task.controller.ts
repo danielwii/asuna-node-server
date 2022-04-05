@@ -56,7 +56,7 @@ export class TaskController {
 
   @UseGuards(new JwtAdminAuthGuard())
   @Post(':id/invoke')
-  public async invoke(@Param('id') id: PrimaryKey, @Req() req: AnyAuthRequest): Promise<void> {
+  public async invoke(@Param('id') id: string, @Req() req: AnyAuthRequest): Promise<void> {
     const { identifier } = req;
     logger.log(`invoke task ${id} by ${identifier}`);
     return TaskHelper.invoke(id);

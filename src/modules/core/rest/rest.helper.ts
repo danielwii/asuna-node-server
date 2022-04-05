@@ -69,7 +69,7 @@ export class RestHelper {
         const firsModel = DBHelper.getModelNameObject(config.firstModelName);
         const primaryKey = DBHelper.getPrimaryKeyByModel(firsModel);
         // 唯一标志使这里只应该拿到 0-1 个绑定实体
-        const entity = await DBHelper.repo(firsModel).findOne({ where: { tenant } });
+        const entity = await DBHelper.repo(firsModel).findOne({ where: { tenant } as any });
         if (relationSchema) {
           _.assign(tenantRelatedFields, { [relationSchema.name]: { [primaryKey]: entity[primaryKey] } });
         }

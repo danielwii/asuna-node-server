@@ -58,9 +58,9 @@ export class AuthHelper {
         if (err || info) {
           logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
         } else {
-          const admin = await AdminUser.findOne(payload.id, { relations: ['roles' /* , 'tenant' */] });
+          const admin = await AdminUser.findOne({ where: { id: payload.id }, relations: ['roles' /* , 'tenant' */] });
           req.identifier = AdminUserIdentifierHelper.stringify(payload);
-          req.profile = await UserProfile.findOne(payload.id);
+          req.profile = await UserProfile.findOneBy({ id: payload.id });
           req.user = admin;
           req.payload = payload;
           // req.tenant = admin?.tenant;
@@ -86,7 +86,7 @@ export class AuthHelper {
             logger.log(`wx-jwt load user by ${r(codeSession)}`);
             if (codeSession?.openid) {
               req.payload = payload;
-              const profile = await UserProfile.findOne({ username: codeSession.openid });
+              const profile = await UserProfile.findOneBy({ username: codeSession.openid });
               if (!profile) {
                 const error = new AsunaException(AsunaErrorCode.InvalidCredentials, 'no user found in session');
                 return resolve({ err: error, payload: undefined, info });

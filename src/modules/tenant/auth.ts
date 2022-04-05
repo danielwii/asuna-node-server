@@ -18,7 +18,7 @@ const logger = LoggerFactory.getLogger('AuthHelper');
 export class OrgAuthHelper {
   public static async populate(req: OrgJwtAuthRequest, payload: JwtPayload): Promise<void> {
     // TODO user not include tenant and roles, only admin-user has currently
-    const user = await OrgUser.findOne(payload.id, { relations: ['tenant', 'roles'] });
+    const user = await OrgUser.findOne({ where: { id: payload.id }, relations: ['tenant', 'roles'] });
     logger.debug(`jwt user ${r(user)}`);
     // req.identifier = UserIdentifierHelper.stringify(payload);
     req.isOrgUser = true;

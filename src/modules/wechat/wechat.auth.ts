@@ -64,7 +64,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
     const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
     logger.log(`wx-jwt load user by ${r(codeSession)}`);
     if (codeSession?.openid) {
-      const user = await UserProfile.findOne({ username: codeSession.openid });
+      const user = await UserProfile.findOneBy({ username: codeSession.openid });
       logger.debug(`wx-jwt found user by ${r(user)}`);
       return user;
     }

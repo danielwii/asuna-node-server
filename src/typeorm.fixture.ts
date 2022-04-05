@@ -6,13 +6,13 @@ import { FindManyOptions, FindOneOptions, FindOptionsUtils, JoinOptions, ObjectL
 
 const logger = LoggerFactory.getLogger('FindOptionsFixture');
 
-const oldApplyOptionsToQueryBuilder = FindOptionsUtils.applyOptionsToQueryBuilder;
+const oldApplyOptionsToQueryBuilder = FindOptionsUtils.applyOptionsToTreeQueryBuilder;
 
 export type FindOptionsFixture<T> = (FindOneOptions<T> | FindManyOptions<T>) & {
   join?: JoinOptions & { options?: { [key: string]: { condition?: string; parameters?: ObjectLiteral } } };
 };
 
-FindOptionsUtils.applyOptionsToQueryBuilder = <T>(qb, options: FindOptionsFixture<T>) => {
+FindOptionsUtils.applyOptionsToTreeQueryBuilder = <T>(qb, options: FindOptionsFixture<T>) => {
   const join = options?.join;
 
   if (join) {

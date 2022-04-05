@@ -41,7 +41,7 @@ export class TenantAuthService extends AbstractAuthService<OrgUser> {
     const roleNames = [TenantRoleName.admin];
     logger.log(`createUser ${r({ username, email, channel, roleNames })}`);
     const { hash, salt } = PasswordHelper.encrypt(password);
-    const roles = _.isEmpty(roleNames) ? null : await OrgRole.find({ name: In(roleNames) });
+    const roles = _.isEmpty(roleNames) ? null : await OrgRole.findBy({ name: In(roleNames) });
 
     const user = await this.getUser({ username, email });
     if (user) {

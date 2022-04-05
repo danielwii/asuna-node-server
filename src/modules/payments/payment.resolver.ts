@@ -29,7 +29,7 @@ export class PaymentQueryResolver extends QueryResolver {
   @Query((returns) => [PaymentMethod])
   public async api_payment_methods(@Context() ctx: GraphqlContext): Promise<PaymentMethod[]> {
     this.logger.log(`api_payment_methods ...`);
-    return PaymentMethod.find({ isPublished: true });
+    return PaymentMethod.findBy({ isPublished: true });
   }
 
   @Query((returns) => PaymentOrder)

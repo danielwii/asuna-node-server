@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('UserHelper');
 
 export class UserHelper {
   static async follow(follower: UserProfile, type: InteractionFollowType, following: string): Promise<UserFollow> {
-    const [items, count] = await UserFollow.findAndCount({ type, follower, following });
+    const [items, count] = await UserFollow.findAndCountBy({ type, follower: follower as any, following });
     if (count === 0) {
       return UserFollow.create({ type, follower, following }).save();
     }
@@ -22,6 +22,6 @@ export class UserHelper {
   }
 
   static async unfollow(follower: UserProfile, type: InteractionFollowType, following: string): Promise<DeleteResult> {
-    return UserFollow.delete({ type, follower, following });
+    return UserFollow.delete({ type, follower: follower as any, following });
   }
 }

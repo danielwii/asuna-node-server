@@ -69,7 +69,7 @@ export class WeChatController {
   async userInfo(@Req() req: WXAuthRequest): Promise<WXMiniAppUserInfo> {
     const { payload, user, identifier } = req;
     logger.log(`get user-info ${r({ payload, user, identifier })}`);
-    return WXMiniAppUserInfo.findOne({ profile: { id: user.id } }, { relations: ['profile'] });
+    return WXMiniAppUserInfo.findOne({ where: { profileId: user.id }, relations: ['profile'] });
   }
 
   @UseGuards(WXAuthGuard)

@@ -29,7 +29,7 @@ export class AppQueryResolver {
 
     const [items, total] = await AppRelease.findAndCount({
       ...pageInfo,
-      where: { appInfo },
+      where: { appInfo } as any,
       order: pageRequest?.orderBy ? { [pageRequest.orderBy.column]: pageRequest.orderBy.order } : { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });
@@ -42,7 +42,11 @@ export class AppQueryResolver {
     this.logger.log(`app_latestRelease: ${r({ key })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
-    return AppRelease.findOne({ where: { appInfo }, order: { id: 'DESC' }, cache: CacheTTL.FLASH });
+    return AppRelease.findOne({
+      where: { appInfo } as any,
+      order: { id: 'DESC' },
+      cache: CacheTTL.FLASH,
+    });
   }
 
   @Query((returns) => AppInfo)

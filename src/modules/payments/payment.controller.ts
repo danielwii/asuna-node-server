@@ -20,7 +20,7 @@ class CreateOrderDTO {
   @IsString()
   public callback: string;
   @IsDefined()
-  public methodId: number;
+  public methodId: string;
   @IsDefined()
   public paymentInfo: Record<'mobile' | string, unknown>;
   @IsOptional()

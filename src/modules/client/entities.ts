@@ -36,7 +36,7 @@ export abstract class AbstractClientUserFavorite extends AbstractBaseEntity {
 @EntityMetaInfo({ name: 'client__virtual_devices', internal: true })
 @Entity('client__t_virtual_devices')
 export class VirtualDevice extends NoPrimaryKeyBaseEntity {
-  constructor(o: EntityConstructorObject<VirtualDevice>) {
+  constructor(o?: EntityConstructorObject<VirtualDevice>) {
     super();
     Object.assign(this, deserializeSafely(VirtualDevice, o as any));
   }
@@ -57,7 +57,7 @@ export class VirtualDevice extends NoPrimaryKeyBaseEntity {
 @EntityMetaInfo({ name: 'client__virtual_sessions', internal: true })
 @Entity('client__t_virtual_sessions')
 export class VirtualSession extends NoPrimaryKeyBaseEntity {
-  constructor(o: EntityConstructorObject<VirtualSession>) {
+  constructor(o?: EntityConstructorObject<VirtualSession>) {
     super();
     Object.assign(this, deserializeSafely(VirtualSession, o as any));
   }

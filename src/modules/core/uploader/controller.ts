@@ -35,8 +35,10 @@ const logger = LoggerFactory.getLogger('UploaderController');
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
-      const filename = `${uuid.v4()}.${file.mimetype.split('/').slice(-1)}__${file.originalname.toLowerCase()}`;
-      logger.debug(`set filename ${filename}`);
+      const extension = file.mimetype.split('/').slice(-1).join('');
+      const name = basename(file.originalname, `.${extension}`).replace('.', '_').replace(' ', '_');
+      const filename = `${uuid.v4()}.${name.toLowerCase()}.${extension}`;
+      logger.debug(`set filename ${r({ filename, extension })}`);
       cb(undefined, filename);
     },
   }),
@@ -290,9 +292,7 @@ export class UploaderController {
         // return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
       } else {
         // bucket = bucket || 'files';
-        logger.log(oneLineTrim`
-          unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.
-        `);
+        // logger.log(oneLineTrim`unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.`);
         return storageEngine.saveEntity(file, { bucket, prefix });
       }
       return storageEngine.saveEntity(file, { bucket, prefix });
