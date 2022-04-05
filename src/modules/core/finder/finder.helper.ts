@@ -1,3 +1,4 @@
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -6,6 +7,7 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 import { IsOptional, IsString } from 'class-validator';
 import * as url from 'url';
 
+import { configLoader } from '../../config';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
 const logger = LoggerFactory.getLogger('FinderHelper');
@@ -58,7 +60,9 @@ export class FinderHelper {
     }
 
     const config = await this.getConfig();
-    const defaultEndpoint = internal ? config.internalEndpoint : config.endpoint;
+    const defaultEndpoint = internal
+      ? config.internalEndpoint ?? configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT)
+      : config.endpoint ?? configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
     logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {

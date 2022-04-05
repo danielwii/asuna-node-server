@@ -170,11 +170,11 @@ export class MinioStorage implements IStorageEngine {
       prefix: resolvedPrefix,
       path: filenameWithPrefix,
       bucket,
-      region,
+      // region,
       mimetype: file.mimetype,
       mode: StorageMode.MINIO,
       filename,
-      fullpath: join(isS3 ? '' : this.config.resourcePath, bucket, resolvedPrefix, filename),
+      fullpath: join(this.config.resourcePath, bucket, resolvedPrefix, filename),
     });
   }
 

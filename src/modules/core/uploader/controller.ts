@@ -12,6 +12,7 @@ import { isEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
+import * as mime from 'mime-types';
 import * as multer from 'multer';
 import * as os from 'os';
 import ow from 'ow';
@@ -35,10 +36,12 @@ const logger = LoggerFactory.getLogger('UploaderController');
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
-      const extension = file.mimetype.split('/').slice(-1).join('');
+      const mimetype = file.mimetype.split('/').slice(-1).join('');
+      const lookup = mime.lookup(file.originalname);
+      const extension = mime.extension(lookup || 'bin');
       const name = basename(file.originalname, `.${extension}`).replace('.', '_').replace(' ', '_');
       const filename = `${uuid.v4()}.${name.toLowerCase()}.${extension}`;
-      logger.debug(`set filename ${r({ filename, extension })}`);
+      logger.debug(`set filename ${r({ filename, extension, mimetype, originalname: file.originalname, lookup })}`);
       cb(undefined, filename);
     },
   }),
