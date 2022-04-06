@@ -130,7 +130,7 @@ export class OperationTokenHelper {
 
     logger.log(`create token with type options ${r(typeOptions)}`);
 
-    return OperationToken.create({
+    const operationToken = OperationToken.create<OperationToken>({
       key,
       type,
       identifier,
@@ -139,12 +139,13 @@ export class OperationTokenHelper {
       role,
       body: payload,
       service,
-      ...typeOptions,
       isUsed: false,
       isActive: true,
       isExpired: false,
       isDeprecated: false,
-    }).save();
+      ...typeOptions,
+    });
+    return operationToken.save();
   }
 
   /**
