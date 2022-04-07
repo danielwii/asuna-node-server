@@ -9,10 +9,10 @@ import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
-import { FindOneOptions, ObjectLiteral, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
-import { formatTime, TimeUnit } from '../../common/helpers';
+import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
@@ -146,7 +146,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       (v) => !_.isUndefined(v),
     ) as FindOptionsWhere<U>;
     logger.debug(`get user by where ${r(where)}`);
-    if (!(where.email ?? where.username)) {
+    if (isBlank(where.email) && isBlank(where.username)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
     return this.authUserRepository.findOne({ where, ...options });
