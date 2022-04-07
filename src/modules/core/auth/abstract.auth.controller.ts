@@ -15,6 +15,7 @@ import { Promise } from 'bluebird';
 import Chance from 'chance';
 import _ from 'lodash';
 
+import { isNotBlank } from '../../common';
 import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDTO } from './auth.dto';
@@ -133,6 +134,9 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       .createUser(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
       .then(async (result) => {
         logger.log(`created user ${r(result)}`);
+        if (isNotBlank(body.nickname)) {
+          await UserProfile.update(result.profile.id, { nickname: body.nickname });
+        }
         if (this.handlers.onSignUp) {
           await this.handlers.onSignUp(result, body);
         }

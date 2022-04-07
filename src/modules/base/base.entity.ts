@@ -29,7 +29,7 @@ export type EntityConstructorObject<Entity> = Omit<
 
 @InterfaceType({ isAbstract: true })
 export class NoPrimaryKeyBaseEntity extends BaseEntity {
-  @Field({ nullable: true })
+  @Field()
   @Index()
   @CreateDateColumn({ name: 'created_at' })
   public createdAt?: Date;

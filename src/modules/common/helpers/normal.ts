@@ -46,3 +46,7 @@ export function isBlank(value): boolean {
     ? !!_.trim(value)
     : _.isEmpty(value);
 }
+
+export function isNotBlank(value): boolean {
+  return !isBlank(value);
+}

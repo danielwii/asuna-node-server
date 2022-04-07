@@ -55,6 +55,7 @@ export const InjectUserProfile = <TBase extends ConstrainedConstructor<BaseEntit
     @Column({ nullable: true, length: 36, name: 'profile__id' })
     profileId?: string;
 
+    @Field((returns) => UserProfile, { nullable: true })
     @MetaInfo({ name: '账户' })
     @OneToOne('UserProfile')
     @JoinColumn({ name: 'profile__id' })
