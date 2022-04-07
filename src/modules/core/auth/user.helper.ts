@@ -56,7 +56,7 @@ export class AuthedUserHelper {
 
   static async getProfileByUserId(userId: string): Promise<UserProfile> {
     const user: any = await UserRegister.Entity.findOneByOrFail({ id: userId });
-    return UserProfile.findOne(user.profileId);
+    return UserProfile.findOneById(user.profileId);
   }
 
   static getUserByProfileId<User = any>(profileId: string, relations?: string[]): Promise<User> {

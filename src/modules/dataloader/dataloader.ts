@@ -9,7 +9,7 @@ import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
-import { BaseEntity, In, ObjectType } from 'typeorm';
+import { BaseEntity, FindOptionsWhere, In, ObjectType } from 'typeorm';
 
 import { CacheTTL } from '../cache/constants';
 import { configLoader } from '../config';
@@ -52,11 +52,12 @@ export function loader<Entity extends BaseEntity>(
     cachedDataLoader(entity.name, (ids) => {
       // logger.debug(`cachedDataLoader load ${entity.name}: ${ids}`);
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
+      logger.verbose(`${entity} primaryKey is ${primaryKey}`);
       const options = {
         where: {
-          id: In(ids),
+          [primaryKey]: In(ids),
           ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined),
-        } as any,
+        } as FindOptionsWhere<any>,
         loadRelationIds: opts.loadRelationIds,
       };
       return entity.find(options).then(resolveIds(ids, primaryKey));

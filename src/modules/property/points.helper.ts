@@ -1,4 +1,3 @@
-import { AfterDate } from '@danielwii/asuna-helper/dist/db';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
@@ -6,6 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
+import { MoreThan } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
 import { KvHelper } from '../core/kv';
@@ -74,7 +74,7 @@ export class PointsHelper {
     profileId: string,
     after?: Date,
   ): Promise<{ total: number; items: PointExchange[] }> {
-    const items = await PointExchange.findBy({ profileId, type, ...(after ? { createdAt: AfterDate(after) } : null) });
+    const items = await PointExchange.findBy({ profileId, type, ...(after ? { createdAt: MoreThan(after) } : null) });
     return { total: _.sum(_.map(items, fp.get('change'))), items };
   }
 
@@ -93,7 +93,7 @@ export class PointsHelper {
     }
     const [before, after] = [profile.wallet.points, profile.wallet.points + change];
     const pointExchange = PointExchange.of({ change, type, remark, before, after, profile });
-    const exchange = await pointExchange.save();
+    const exchange = await PointExchange.save(pointExchange);
     await Wallet.update(profile.wallet.id, { points: pointExchange.after });
 
     logger.log(`profileId: ${profileId} points changed '${type}' ${change}, succeed.`);

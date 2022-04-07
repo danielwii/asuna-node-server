@@ -176,6 +176,7 @@ export class AsunaContext {
 
     logger.log(
       `initStorageEngine ${r({
+        default: this.defaultStorageEngine,
         videos: this.videosStorageEngine,
         chunks: this.chunksStorageEngine,
         local: this.localStorageEngine,
