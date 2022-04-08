@@ -4,46 +4,20 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
-import _ from 'lodash';
+import * as mime from 'mime-types';
 import * as minio from 'minio';
 import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
+import { getS3Region, isS3Endpoint } from './helper';
 import { MinioConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('MinioStorage');
-
-const awsS3Endpoint = {
-  'us-east-1': 's3.amazonaws.com',
-  'us-east-2': 's3-us-east-2.amazonaws.com',
-  'us-west-1': 's3-us-west-1.amazonaws.com',
-  'us-west-2': 's3-us-west-2.amazonaws.com',
-  'ca-central-1': 's3.ca-central-1.amazonaws.com',
-  'eu-west-1': 's3-eu-west-1.amazonaws.com',
-  'eu-west-2': 's3-eu-west-2.amazonaws.com',
-  'sa-east-1': 's3-sa-east-1.amazonaws.com',
-  'eu-central-1': 's3-eu-central-1.amazonaws.com',
-  'ap-south-1': 's3-ap-south-1.amazonaws.com',
-  'ap-southeast-1': 's3-ap-southeast-1.amazonaws.com',
-  'ap-southeast-2': 's3-ap-southeast-2.amazonaws.com',
-  'ap-northeast-1': 's3-ap-northeast-1.amazonaws.com',
-  'cn-north-1': 's3.cn-north-1.amazonaws.com.cn',
-  'ap-east-1': 's3.ap-east-1.amazonaws.com',
-  // Add new endpoints here.
-};
-
-function isS3Endpoint(endpoint: string): boolean {
-  return !!_.find(_.values(awsS3Endpoint), (each) => endpoint.endsWith(each));
-}
-
-function getS3Region(endpoint: string): string {
-  return isS3Endpoint(endpoint) ? _.findKey(awsS3Endpoint, (value, key) => endpoint.endsWith(value)) : null;
-}
 
 export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;
@@ -101,11 +75,11 @@ export class MinioStorage implements IStorageEngine {
     opts: { bucket?: string; prefix?: string; region?: string } = {},
   ): Promise<SavedFile> {
     logger.log(`save entity ${r({ file, opts, config: this.configObject })}`);
+    const isS3 = isS3Endpoint(this.configObject.endpoint);
     const bucket = opts.bucket ?? this.defaultBucket;
     const prefix = opts.prefix ?? yearMonthStr();
     const region = opts.region ?? this.region ?? 'local';
 
-    const isS3 = isS3Endpoint(this.configObject.endpoint);
     // logger.log(`is s3 endpoint ${r({ endpoints: _.values(awsS3Endpoint), isS3, endpoint: this.configObject.endpoint})}`);
 
     if (!isS3) {
@@ -146,7 +120,8 @@ export class MinioStorage implements IStorageEngine {
     const filenameWithPrefix = join(resolvedPrefix, filename);
 
     logger.log(`put ${r({ file, filenameWithPrefix, resolvedPrefix, bucket })}`);
-    const eTag = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, { 'Content-Type': file.mimetype });
+    const mimetype = mime.lookup(file.filename) || file.mimetype;
+    const eTag = await this.client.fPutObject(bucket, filenameWithPrefix, file.path, { 'Content-Type': mimetype });
 
     logger.log(`[saveEntity] [${r(eTag)}] ...`);
     (async () => {
@@ -171,7 +146,7 @@ export class MinioStorage implements IStorageEngine {
       path: filenameWithPrefix,
       bucket,
       // region,
-      mimetype: file.mimetype,
+      mimetype,
       mode: StorageMode.MINIO,
       filename,
       fullpath: join(this.config.resourcePath, bucket, resolvedPrefix, filename),
