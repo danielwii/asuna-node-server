@@ -14,6 +14,7 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 import { Promise } from 'bluebird';
 import Chance from 'chance';
 import _ from 'lodash';
+import { BaseEntity } from 'typeorm';
 
 import { isNotBlank } from '../../common';
 import { DBHelper } from '../db';
@@ -23,6 +24,7 @@ import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
 
+import type { CreatedUser } from './auth.service';
 import type { DeepPartial } from 'typeorm';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
@@ -30,11 +32,11 @@ const logger = LoggerFactory.getLogger('AbstractAuthController');
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
   public constructor(
-    public readonly UserEntity: ConstrainedConstructor<U> & AuthUserType,
+    public readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
     public readonly authService: AbstractAuthService<AuthUser>,
     public readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
-      onSignUp?: <Result>(result: Result, body) => Promise<void>;
+      onSignUp?: (result: CreatedUser<U>, body) => Promise<void>;
       onCurrent?: (user: U) => Promise<U & Record<any, any>>;
     } = {},
   ) {}
@@ -106,7 +108,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       .createUser(username, undefined, password, AuthUserChannel.quickpass)
       .then(async (result) => {
         if (this.handlers.onSignUp) {
-          await this.handlers.onSignUp(result, body);
+          await this.handlers.onSignUp(result as any, body);
         }
         return result;
       });
@@ -138,7 +140,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
           await UserProfile.update(result.profile.id, { nickname: body.nickname });
         }
         if (this.handlers.onSignUp) {
-          await this.handlers.onSignUp(result, body);
+          await this.handlers.onSignUp(result as any, body);
         }
         const relations = _.intersection(DBHelper.getColumnNames(this.UserEntity), ['profile']);
         return this.UserEntity.findOne({ where: { id: result.user.id } as any, relations });
@@ -167,7 +169,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     const columnNames = DBHelper.getColumnNames(this.UserEntity);
     const hasProfile = columnNames.includes('profile') || columnNames.includes('profile__id');
     const authUser = hasProfile
-      ? await this.UserEntity.findOneOrFail<AuthUser>({ where: { profileId: profile.id } as any })
+      ? await this.UserEntity.findOneOrFail({ where: { profileId: profile.id } as any })
       : profile;
     // return TokenHelper.createToken(profile, { uid: user.id });
     logger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
