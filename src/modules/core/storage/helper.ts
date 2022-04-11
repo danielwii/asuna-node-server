@@ -19,10 +19,10 @@ const awsS3Endpoint = {
   // Add new endpoints here.
 };
 
-export function isS3Endpoint(endpoint: string): boolean {
-  return !!_.find(_.values(awsS3Endpoint), (each) => endpoint.endsWith(each));
+export function isS3Endpoint(endpoint?: string): boolean {
+  return !!_.find(_.values(awsS3Endpoint), (each) => endpoint?.endsWith(each));
 }
 
-export function getS3Region(endpoint: string): string {
-  return isS3Endpoint(endpoint) ? _.findKey(awsS3Endpoint, (value, key) => endpoint.endsWith(value)) : null;
+export function getS3Region(endpoint?: string): string {
+  return isS3Endpoint(endpoint) ? _.findKey(awsS3Endpoint, (value, key) => endpoint?.endsWith(value)) : null;
 }
