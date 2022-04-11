@@ -80,10 +80,13 @@ export class MinioStorage implements IStorageEngine {
     const prefix = opts.prefix ?? yearMonthStr();
     const region = opts.region ?? this.region ?? 'local';
 
-    // logger.log(`is s3 endpoint ${r({ endpoints: _.values(awsS3Endpoint), isS3, endpoint: this.configObject.endpoint})}`);
+    logger.log(`info ${r({ isS3, bucket, prefix, region })}`);
 
     if (!isS3) {
-      const items: minio.BucketItemFromList[] = await this.client.listBuckets();
+      const items: minio.BucketItemFromList[] = await this.client.listBuckets().catch((reason) => {
+        logger.error(`list buckets error ${r(reason)}`);
+        throw reason;
+      });
       logger.log(`found buckets: ${r(items)} current is ${bucket}`);
       if (!items?.find((item) => item.name === bucket)) {
         logger.log(`create bucket [${bucket}] for region [${region}]`);
