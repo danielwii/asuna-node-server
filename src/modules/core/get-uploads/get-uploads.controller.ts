@@ -162,6 +162,7 @@ class ImageProxy {
 @Controller('i')
 export class GetImageController {
   private readonly apiEndpoint = configLoader.loadConfig('MASTER_ADDRESS');
+  private readonly thumborEndpoint = configLoader.loadConfig('THUMBOR_ENDPOINT', 'http://localhost:8888');
 
   @Header('Cache-Control', 'max-age=31536000') // expired in 1 year
   @Get(':bucket/*')
@@ -177,7 +178,7 @@ export class GetImageController {
         ? parsed.image.startsWith('http')
           ? parsed.image
           : `/${parsed.image}`
-        : `http://localhost:8888/${bucket}/${parsedUrl}`;
+        : `${this.thumborEndpoint}/${bucket}/${parsedUrl}`;
     logger.verbose(
       `get ${r({ bucket, filename: url })} by ${r({
         bucket,
