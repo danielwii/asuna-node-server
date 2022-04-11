@@ -48,7 +48,7 @@ export class MinioStorage implements IStorageEngine {
       endPoint: this.configObject.endpoint,
       port: this.configObject.port,
       region: this.region,
-      useSSL: this.configObject.useSSL,
+      useSSL: !!this.configObject.useSSL,
       accessKey: this.configObject.accessKey,
       secretKey: this.configObject.secretKey,
     });

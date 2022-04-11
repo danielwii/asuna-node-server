@@ -221,7 +221,7 @@ export class UploaderController {
     logger.log(`upload files ${r({ bucket, prefix, files })}`);
     const results = await this.saveFiles(bucket, prefix, local, files).catch((error) => {
       logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
-      console.error(error);
+      console.error({ type: typeof error, error });
       // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Upload, null, error);
     });
