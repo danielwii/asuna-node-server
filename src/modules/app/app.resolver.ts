@@ -40,12 +40,15 @@ export class AppQueryResolver {
   }
 
   @Query((returns) => AppRelease, { nullable: true })
-  public async app_latestRelease(@Args('key') key: string): Promise<AppRelease> {
-    this.logger.log(`app_latestRelease: ${r({ key })}`);
+  public async app_latestRelease(
+    @Args('key') key: string,
+    @Args('platform', { nullable: true }) platform: string,
+  ): Promise<AppRelease> {
+    this.logger.log(`app_latestRelease: ${r({ key, platform })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     return AppRelease.findOne({
-      where: { appInfoId: appInfo?.id } as FindOptionsWhere<AppRelease>,
+      where: { appInfoId: appInfo?.id, platform } as FindOptionsWhere<AppRelease>,
       order: { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });
