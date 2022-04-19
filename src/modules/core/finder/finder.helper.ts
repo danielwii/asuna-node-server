@@ -24,8 +24,8 @@ export enum FinderFieldKeys {
 }
 
 export class FinderAssetsSettings {
-  @IsString() @IsOptional() public endpoint?: string;
-  @IsString() @IsOptional() public internalEndpoint?: string;
+  // @IsString() @IsOptional() public endpoint?: string;
+  // @IsString() @IsOptional() public internalEndpoint?: string;
 
   @IsOptional() public hostExchanges?: string;
 }
@@ -61,8 +61,8 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal
-      ? config.internalEndpoint ?? configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT)
-      : config.endpoint ?? configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
+      ? /*config.internalEndpoint ??*/ configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT)
+      : /*config.endpoint ??*/ configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
@@ -89,7 +89,7 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
-      return url.resolve(`${config.endpoint ?? ''}/`, path);
+      return new URL(path, `${defaultEndpoint ?? ''}/`).toString();
     }
     // TODO add other handlers later
     logger.warn('only type assets is available');

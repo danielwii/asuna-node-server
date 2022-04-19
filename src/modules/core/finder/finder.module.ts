@@ -23,8 +23,8 @@ export class FinderModule implements OnModuleInit {
   }
 
   async initKV(): Promise<void> {
-    const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
-    const internalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
+    // const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
+    // const internalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
 
     KvHelper.regInitializer<KVGroupFieldsValue>(
       FinderHelper.kvDef,
@@ -33,6 +33,7 @@ export class FinderModule implements OnModuleInit {
         type: KeyValueType.json,
         value: {
           form: {
+            /*
             default: {
               name: '公网资源',
               fields: [
@@ -47,7 +48,7 @@ export class FinderModule implements OnModuleInit {
                   field: { name: FinderFieldKeys.internalEndpoint, type: 'string', defaultValue: internalEndpoint },
                 },
               ],
-            },
+            },*/
             exchanges: {
               name: '地址转换',
               fields: [{ name: 'json', field: { name: FinderFieldKeys.hostExchanges, type: 'text' } }],

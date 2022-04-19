@@ -13,6 +13,7 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import { Promise } from 'bluebird';
 import Chance from 'chance';
+import { registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
 import { BaseEntity } from 'typeorm';
 
@@ -21,14 +22,22 @@ import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDTO } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
-import { AuthUser, AuthUserChannel, AuthUserType, WithProfileUser } from './base.entities';
+import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
 
-import type { CreatedUser } from './auth.service';
 import type { DeepPartial } from 'typeorm';
+import type { CreatedUser } from './auth.service';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 const logger = LoggerFactory.getLogger('AbstractAuthController');
+
+export const UsernameValidationSchema: ValidationSchema = {
+  name: 'usernameValidationSchema',
+  properties: {
+    username: [{ type: 'isAlphanumeric' }],
+  },
+};
+registerSchema(UsernameValidationSchema);
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
   public constructor(
@@ -126,6 +135,11 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @Post('sign-up')
   public async signUp(@Body() body) {
     logger.log(`sign-up: ${r(body)}`);
+    const errors = await validate('usernameValidationSchema', { username: body.username });
+    if (errors.length) {
+      logger.warn(`validate body error ${r(errors)}`);
+      throw new AsunaException(AsunaErrorCode.Unprocessable, '用户名格式不正确，只能包含英文和数字');
+    }
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
 
     if (found) {

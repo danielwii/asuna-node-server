@@ -4,7 +4,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { ClientService } from './service';
 
-const logger = LoggerFactory.getLogger('WebModule');
+const logger = LoggerFactory.getLogger('ClientModule');
 
 @Module({
   providers: [ClientService],

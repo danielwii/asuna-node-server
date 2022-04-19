@@ -108,7 +108,7 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
     setTimeout(() => {
-      consola.error(`[bootstrap] System will exit in 1s because of error: ${reason?.message}`);
+      consola.error(`[bootstrap] System will exit in 1s because of error: ${reason?.message} ${r(reason?.stack)}`);
       process.exit(1);
     }, TimeUnit.SECONDS.toMillis(1));
   });

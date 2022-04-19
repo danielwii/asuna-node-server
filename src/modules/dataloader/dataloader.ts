@@ -261,6 +261,42 @@ export function resolveRelationsFromInfo(
   }
 }
 
+export function resolveFieldsFromInfo(info: GraphQLResolveInfo, path: string): string[] {
+  if (!info || !path) return [];
+
+  try {
+    const locations = path.split('.');
+    const fieldNode = info.fieldNodes.find((node) => node.name.value === locations[0]);
+    if (_.isNil(fieldNode)) return [];
+
+    let selectionNode; // like items node
+    _.times(locations.length - 1).forEach((index) => {
+      (selectionNode || fieldNode).selectionSet.selections.find((node) => {
+        if (node.kind === 'FragmentSpread') {
+          selectionNode = info.fragments[node.name.value].selectionSet.selections.find(
+            (fragmentNode: any) => fragmentNode.name.value === locations[index + 1],
+          );
+          return;
+        }
+        if (node.name.value === locations[index + 1]) {
+          selectionNode = node;
+          return;
+        }
+      });
+    });
+    const fields = _.uniq<string>(
+      (selectionNode || fieldNode).selectionSet.selections
+        // .filter((node) => node.selectionSet)
+        .map((node) => node.name.value),
+    );
+    logger.debug(`resolved relations ${r({ path, locations, fields })}`);
+    return fields;
+  } catch (error) {
+    logger.warn(`resolveRelationsFromInfo ${r(error)}`);
+    return [];
+  }
+}
+
 // TODO cannot resolve fragments
 export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): string[] | null {
   if (!info || !path) return null;
