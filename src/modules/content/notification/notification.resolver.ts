@@ -6,6 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { Promise } from 'bluebird';
 
 import { GraphqlHelper, QueryResolver } from '../../graphql';
+import { NotificationEnum } from './enum-values';
 import { Notification } from './notification.entities';
 import { MixedNotification, NotificationHelper } from './notification.helper';
 
@@ -33,7 +34,7 @@ export class NotificationQueryResolver extends QueryResolver {
 
   @Query((returns) => [MixedNotification])
   public async api_notifications(
-    @Args('type') type: NotificationType,
+    @Args('type', { type: () => NotificationEnum, nullable: true }) type: NotificationType,
     @Args('usage', { nullable: true }) usage: string,
     @Context() ctx: GraphqlContext,
   ): Promise<MixedNotification[]> {

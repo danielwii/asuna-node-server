@@ -4,8 +4,8 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { IsOptional, IsString } from 'class-validator';
-import * as url from 'url';
+import { IsOptional } from 'class-validator';
+import { URL } from 'url';
 
 import { configLoader } from '../../config';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
@@ -61,8 +61,8 @@ export class FinderHelper {
 
     const config = await this.getConfig();
     const defaultEndpoint = internal
-      ? /*config.internalEndpoint ??*/ configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT)
-      : /*config.endpoint ??*/ configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
+      ? /* config.internalEndpoint ?? */ configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT)
+      : /* config.endpoint ?? */ configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
 
     if (!defaultEndpoint) {
@@ -81,7 +81,7 @@ export class FinderHelper {
         const exchange = exchanges.find((x) => new RegExp(x.regex).test(path));
         if (exchange) {
           logger.verbose(`check exchange ${r({ exchange, path })}`);
-          return url.resolve(`${exchange.endpoint ?? ''}/`, path);
+          return new URL(path, `${exchange.endpoint ?? ''}/`).toString();
         }
       } catch (e) {
         logger.error(`handle exchange error: ${e}`);
