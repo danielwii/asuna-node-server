@@ -38,13 +38,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         return undefined;
       }
       this.logger.warn(`auth error, ${r({ err, payload, info, status })}`);
-      throw err
-        ? new AsunaException(AsunaErrorCode.InvalidToken, 'jwt auth failed', _.isError(err) ? err.message : err)
-        : new AsunaException(
-            AsunaErrorCode.InsufficientPermissions,
-            'jwt auth failed',
-            _.isError(info) ? info.message : info,
-          );
+      throw new AsunaException(
+        AsunaErrorCode.InvalidAuthToken,
+        'jwt auth failed',
+        _.isError(err ?? info) ? (err ?? info).message : err ?? info,
+      );
     }
     // this.logger.log(`handleRequest ${r({ err, payload, info })}`);
     await auth(req, res, AuthType.client);
@@ -70,7 +68,7 @@ export class AnyAuthGuard implements CanActivate {
       if (result.err instanceof Error) {
         throw result.err;
       } else {
-        throw new AsunaException(AsunaErrorCode.InsufficientPermissions, result.err || result.info);
+        throw new AsunaException(AsunaErrorCode.InvalidAuthToken, result.err || result.info);
       }
     }
 

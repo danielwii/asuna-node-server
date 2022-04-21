@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.10",
-    "@danielwii/asuna-helper": "^0.0.25",
+    "@danielwii/asuna-helper": "^0.0.26",
     "@danielwii/asuna-shared": "^0.0.8",
     "@nestjs/apollo": "^10.0.9",
     "@nestjs/common": "^8.4.4",
