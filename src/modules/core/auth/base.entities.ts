@@ -98,8 +98,8 @@ export class AbstractTimeBasedAuthUser extends AbstractTimeBasedBaseEntity {
 
   @Field({ nullable: true })
   @MetaInfo({ name: '是否被绑定', help: 'quickpass 模式时被 reset' })
-  @Column({ nullable: true, name: 'is_bound', default: false })
-  isBound?: boolean;
+  @Column({ nullable: true, name: 'is_banned', default: false })
+  isBanned?: boolean;
 
   // --------------------------------------------------------------
   // Relations

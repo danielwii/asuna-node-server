@@ -71,7 +71,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
-    if (user.isBound) {
+    if (user.isBanned) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
@@ -97,7 +97,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     const { payload, user } = req;
     logger.log(`update profile: ${r({ dto, payload, user })}`);
 
-    if (user.isBound) {
+    if (user.isBanned) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
     }
 
