@@ -36,7 +36,7 @@ export class PointsHelper {
     if (exists) return exists;
 
     const cost = await KvHelper.getValueByGroupFieldKV(PropertyHelper.kvDef, 'vipVideoExchange');
-    const current = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
+    const current = await UserProfile.findOne({ where: { id: profileId } as any, relations: ['wallet'] });
     if (!current.wallet) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `not enough points: 0`);
     }
@@ -85,7 +85,7 @@ export class PointsHelper {
     remark: string,
   ): Promise<PointExchange> {
     logger.log(`savePoints ${r({ change, type, profileId, remark })}`);
-    const profile = await UserProfile.findOneOrFail({ where: { id: profileId }, relations: ['wallet'] });
+    const profile = await UserProfile.findOneOrFail({ where: { id: profileId } as any, relations: ['wallet'] });
     if (!profile.wallet) {
       profile.wallet = await Wallet.save(
         new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0, totalRecharge: 0 }),

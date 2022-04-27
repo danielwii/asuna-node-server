@@ -30,7 +30,7 @@ export class AuthedUserHelper {
       return UserProfile.findOneByOrFail({ id: `u${id}` });
     }
     ow(id, 'id', ow.string.nonEmpty);
-    return UserProfile.findOneOrFail({ where: { id } as FindOptionsWhere<UserProfile>, ...options });
+    return UserProfile.findOneOrFail({ where: { id } as any, ...options });
   }
 
   static getProfile(
@@ -41,7 +41,7 @@ export class AuthedUserHelper {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
 
-    return UserProfile.findOneOrFail({ where: { username, email } as FindOptionsWhere<UserProfile>, ...options });
+    return UserProfile.findOneOrFail({ where: { username, email } as any, ...options });
   }
 
   static async getUserById<User>(id: string | number, options?: Exclude<FindOneOptions<User>, 'where'>): Promise<User> {
