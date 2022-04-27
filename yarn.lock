@@ -613,13 +613,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@danielwii/asuna-helper@npm:^0.0.26":
-  version: 0.0.26
-  resolution: "@danielwii/asuna-helper@npm:0.0.26::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.26%2F5d5a0cae614b8231f816a96089b163e4e10fb251d16c31e3d24fa11eaefde4c5"
+"@danielwii/asuna-helper@npm:^0.0.27":
+  version: 0.0.27
+  resolution: "@danielwii/asuna-helper@npm:0.0.27::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.27%2F80a969f838ac8964e9c628bf47472dc4c9afd7b99469ff0ee05bc23ac8afce36"
   dependencies:
     "@nestjs/common": ^8.4.4
     "@nestjs/platform-express": ^8.4.4
-    axios: ^0.26.1
+    axios: ^0.27.2
     bluebird: ^3.7.2
     bull: ^4.8.2
     class-transformer: ^0.5.1
@@ -652,7 +652,7 @@ __metadata:
     next: ">=12"
     redis: ">=4"
     typeorm: ">=0"
-  checksum: 75b7ca42db6fc910bb1968e7391a24db0b4acb597e181a42701e519796545528da5fc339004fb5b2db0f895cf39955609a36aa577a654b807f43c915b873ef48
+  checksum: 26afde7d23729f04505981aaa3fa3002512c3c549a46dfd5a8d9f34ebeda166f9fa93d0634a75fd0cc5dd174bfa39740ce0b64144b3b39acb5444cee6dea46e6
   languageName: node
   linkType: hard
 
@@ -662,7 +662,7 @@ __metadata:
   dependencies:
     "@alicloud/pop-core": ^1.7.10
     "@babel/parser": ^7.17.9
-    "@danielwii/asuna-helper": ^0.0.26
+    "@danielwii/asuna-helper": ^0.0.27
     "@danielwii/asuna-shared": ^0.0.8
     "@nestjs/apollo": ^10.0.9
     "@nestjs/cli": ^8.2.5
@@ -4338,12 +4338,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:0.26.1, axios@npm:^0.26.1":
+"axios@npm:0.26.1":
   version: 0.26.1
   resolution: "axios@npm:0.26.1"
   dependencies:
     follow-redirects: ^1.14.8
   checksum: d9eb58ff4bc0b36a04783fc9ff760e9245c829a5a1052ee7ca6013410d427036b1d10d04e7380c02f3508c5eaf3485b1ae67bd2adbfec3683704745c8d7a6e1a
+  languageName: node
+  linkType: hard
+
+"axios@npm:^0.27.2":
+  version: 0.27.2
+  resolution: "axios@npm:0.27.2"
+  dependencies:
+    follow-redirects: ^1.14.9
+    form-data: ^4.0.0
+  checksum: 38cb7540465fe8c4102850c4368053c21683af85c5fdf0ea619f9628abbcb59415d1e22ebc8a6390d2bbc9b58a9806c874f139767389c862ec9b772235f06854
   languageName: node
   linkType: hard
 
@@ -7435,13 +7445,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.8":
-  version: 1.14.8
-  resolution: "follow-redirects@npm:1.14.8"
+"follow-redirects@npm:^1.14.8, follow-redirects@npm:^1.14.9":
+  version: 1.14.9
+  resolution: "follow-redirects@npm:1.14.9"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 40c67899c2e3149a27e8b6498a338ff27f39fe138fde8d7f0756cb44b073ba0bfec3d52af28f20c5bdd67263d564d0d8d7b5efefd431de95c18c42f7b4aef457
+  checksum: f5982e0eb481818642492d3ca35a86989c98af1128b8e1a62911a3410621bc15d2b079e8170b35b19d3bdee770b73ed431a257ed86195af773771145baa57845
   languageName: node
   linkType: hard
 
