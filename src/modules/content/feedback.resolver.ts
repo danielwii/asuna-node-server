@@ -33,7 +33,7 @@ export class FeedbackQueryResolver extends QueryResolver {
   @Query((returns) => FeedbackPageable)
   @named
   async api_paged_feedback(
-    @Args('pageRequest') pageRequest: PageRequestInput,
+    @Args('pageRequest', { nullable: true }) pageRequest: PageRequestInput,
     @Context() ctx: GraphqlContext,
     @Info() info: GraphQLResolveInfo,
     funcName?: string,

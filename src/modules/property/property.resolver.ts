@@ -11,9 +11,8 @@ import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction } from './financial.entities';
 import { PointExchange } from './points.entities';
 
-import type { GraphQLResolveInfo } from 'graphql';
-import type { JwtPayload } from '../core/auth';
 import type { ExchangeCurrencyType } from './enum-values';
+import type { GraphQLResolveInfo } from 'graphql';
 
 @ObjectType({ implements: () => [Pageable] })
 class PointExchangePageable extends Pageable<PointExchange> {
@@ -36,7 +35,7 @@ export class PropertyQueryResolver {
   public async user_paged_exchangeRecords(
     @Args('type', { nullable: true }) type: string,
     @Args('refId') refId: string,
-    @Args('pageRequest') pageRequest: PageRequestInput,
+    @Args('pageRequest', { nullable: true }) pageRequest: PageRequestInput,
     @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<PointExchangePageable> {
@@ -61,7 +60,7 @@ export class PropertyQueryResolver {
   public async user_paged_financialTransactions(
     @Args('type') type: string,
     @Args('refId') refId: string,
-    @Args('pageRequest') pageRequest: PageRequestInput,
+    @Args('pageRequest', { nullable: true }) pageRequest: PageRequestInput,
     @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<FinancialTransactionPageable> {

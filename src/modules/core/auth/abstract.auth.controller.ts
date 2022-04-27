@@ -94,7 +94,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  public async updateNickname(@Body() dto: UpdateProfileDto, @Req() req: JwtAuthRequest): Promise<void> {
+  public async updateProfile(@Body() dto: UpdateProfileDto, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     logger.log(`update profile: ${r({ dto, payload, user })}`);
 
@@ -103,7 +103,8 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     }
 
     const profile = await UserProfile.findOneBy({ id: payload.uid });
-    profile.nickname = dto.nickname;
+    dto.nickname && (profile.nickname = dto.nickname);
+    dto.position && (profile.position = dto.position);
     await profile.save();
   }
 

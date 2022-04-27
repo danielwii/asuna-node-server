@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { Exclude, Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import _ from 'lodash';
 
 export class AdminResetPasswordDto {
@@ -36,9 +36,9 @@ export class UpdateProfileDto {
   @MinLength(1)
   readonly nickname?: string;
 
-  @IsString()
+  @IsObject()
   @IsOptional()
-  readonly lbs?: string[];
+  readonly position?: JSON;
 }
 
 export class ResetAccountDto {

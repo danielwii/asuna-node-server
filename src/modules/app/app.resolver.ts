@@ -23,7 +23,7 @@ export class AppQueryResolver {
   @Query((returns) => AppReleasePageable)
   public async app_releases(
     @Args('key') key: string,
-    @Args('pageRequest', { type: () => PageRequestInput }) pageRequest,
+    @Args('pageRequest', { type: () => PageRequestInput, nullable: true }) pageRequest,
   ): Promise<AppReleasePageable> {
     const pageInfo = toPage(pageRequest);
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });

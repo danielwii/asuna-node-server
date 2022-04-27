@@ -10,18 +10,18 @@ import { Tenant } from '../tenant';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
-import type { JwtPayload } from '../core/auth';
-import type { DefaultRegisteredLoaders } from './context';
+import type { RequestInfo } from '../helper';
 import type { WithProfileUser } from '../core/auth';
+import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
 
-export interface GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> {
+export type GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> = { req: RequestInfo } & {
   getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
   getTrace: () => SpanContext;
   getTenant: () => Tenant;
-}
+};
 
 @Injectable()
 export class DataLoaderInterceptor implements NestInterceptor {

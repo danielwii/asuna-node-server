@@ -1,9 +1,10 @@
 import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
 import { IsOptional } from 'class-validator';
+import * as scalars from 'graphql-scalars';
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
-import { EntityMetaInfo, JsonArray, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
@@ -21,11 +22,11 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
     super('u');
   }
 
-  @Field((returns) => [String], { nullable: true })
+  @Field((returns) => scalars.GraphQLJSONObject, { nullable: true })
   @MetaInfo({ name: 'lbs' })
   @IsOptional()
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  position?: JsonArray;
+  position?: Record<string, any>;
 
   @OneToOne('WXMiniAppUserInfo', (inverse: WXMiniAppUserInfo) => inverse.profile)
   miniAppUserInfo: WXMiniAppUserInfo;

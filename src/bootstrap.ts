@@ -177,7 +177,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   }
   const appOptions: NestApplicationOptions = {
     // logger: ['error', 'warn'],
-    logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL'))),
+    logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL')) + 1),
     bufferLogs: true,
   };
   const module = options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule;
