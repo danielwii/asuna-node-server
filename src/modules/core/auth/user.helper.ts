@@ -8,6 +8,7 @@ import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 
+import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import type { FindOneOptions } from 'typeorm';
 
 const logger = LoggerFactory.getLogger('AuthedUserHelper');
@@ -29,7 +30,7 @@ export class AuthedUserHelper {
       return UserProfile.findOneByOrFail({ id: `u${id}` });
     }
     ow(id, 'id', ow.string.nonEmpty);
-    return UserProfile.findOneOrFail({ where: { id }, ...options });
+    return UserProfile.findOneOrFail({ where: { id } as FindOptionsWhere<UserProfile>, ...options });
   }
 
   static getProfile(
@@ -40,7 +41,7 @@ export class AuthedUserHelper {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
 
-    return UserProfile.findOneOrFail({ where: { username, email }, ...options });
+    return UserProfile.findOneOrFail({ where: { username, email } as FindOptionsWhere<UserProfile>, ...options });
   }
 
   static async getUserById<User>(id: string | number, options?: Exclude<FindOneOptions<User>, 'where'>): Promise<User> {

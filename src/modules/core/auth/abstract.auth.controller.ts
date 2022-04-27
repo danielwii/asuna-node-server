@@ -16,11 +16,12 @@ import Chance from 'chance';
 import { registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
 import { BaseEntity } from 'typeorm';
+import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 import { isNotBlank } from '../../common';
 import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
-import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDTO } from './auth.dto';
+import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { UserProfile } from './user.entities';
@@ -93,7 +94,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  public async updateNickname(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
+  public async updateNickname(@Body() dto: UpdateProfileDto, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     logger.log(`update profile: ${r({ dto, payload, user })}`);
 
@@ -219,7 +220,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     logger.debug(`relations is ${r(relations)}`);
     if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
-      const profile = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
+      const profile = await UserProfile.findOne({
+        where: { id: profileId } as FindOptionsWhere<UserProfile>,
+        relations: ['wallet'],
+      });
       // const desensitized = _.omit(profile, 'salt', 'password', 'info');
       const { salt, password, ...desensitized } = profile;
       // logger.debug(`current profile is ${r({ profile, desensitized })}`);

@@ -29,11 +29,16 @@ export class ResetPasswordDto {
   readonly password: string;
 }
 
-export class UpdateProfileDTO {
+export class UpdateProfileDto {
   @ApiProperty({ minLength: 1 })
   @IsString()
+  @IsOptional()
   @MinLength(1)
-  readonly nickname: string;
+  readonly nickname?: string;
+
+  @IsString()
+  @IsOptional()
+  readonly lbs?: string[];
 }
 
 export class ResetAccountDto {

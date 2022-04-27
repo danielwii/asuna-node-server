@@ -1,8 +1,10 @@
 import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
+import { IsOptional } from 'class-validator';
 import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, JsonArray, MetaInfo } from '../../common/decorators';
+import { ColumnTypeHelper } from '../helpers';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
@@ -18,6 +20,12 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   constructor() {
     super('u');
   }
+
+  @Field((returns) => [String], { nullable: true })
+  @MetaInfo({ name: 'lbs' })
+  @IsOptional()
+  @Column(ColumnTypeHelper.JSON, { nullable: true })
+  position?: JsonArray;
 
   @OneToOne('WXMiniAppUserInfo', (inverse: WXMiniAppUserInfo) => inverse.profile)
   miniAppUserInfo: WXMiniAppUserInfo;

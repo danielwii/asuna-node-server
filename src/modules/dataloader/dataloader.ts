@@ -26,7 +26,7 @@ const logger = LoggerFactory.getLogger('DataLoader');
 const cacheMap = new Map();
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
-  load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
+  load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[] | null>);
 }
 
 function resolveIds(ids: PrimaryKey[], primaryKey: PrimaryKey) {
