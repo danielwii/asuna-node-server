@@ -59,7 +59,7 @@ export class PropertyHelper {
   public static kvDef = { collection: 'app.settings', key: 'exchange-points' };
 
   public static async getUserProfileWithWallet(profileId: string, manager?: EntityManager): Promise<UserProfile> {
-    const profile = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
+    const profile = await UserProfile.findOne({ where: { id: profileId } as any, relations: ['wallet'] });
     if (!profile?.wallet) {
       profile.wallet = await manager.save<Wallet>(
         new Wallet({ profile, balance: 0, available: 0, frozen: 0, withdrawals: 0, points: 0, totalRecharge: 0 }),
