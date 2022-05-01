@@ -65,8 +65,8 @@ export class ApiController {
 
   @UseGuards(new ActionRateLimitGuard('api/v1/csurf-token', 1))
   @Post('v1/csurf-token')
-  public csurfToken(): string {
-    return CsurfHelper.generate();
+  public csurfToken(): ApiResponse<string> {
+    return ApiResponse.success(CsurfHelper.generate());
   }
 
   @UseGuards(CsurfGuard)
