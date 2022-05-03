@@ -109,7 +109,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   // const redis = RedisProvider.getRedisClient('dataloader');
   if (redisConfig.enable && enableRedisDataLoader) {
     logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig.host)}`);
-    const redis = new Redis(redisConfig.getOptions());
+    const redis = new Redis(redisConfig.getIoOptions());
     redis.on('error', (reason) => {
       logger.error(`ioredis connection error ${r(reason)}`);
     });

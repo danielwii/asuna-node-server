@@ -11,7 +11,7 @@ import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
 
 export const DEFAULT_PAGE = 1;
-export const DEFAULT_SIZE = 10;
+export const DEFAULT_SIZE = 20;
 export const MAX_PAGE_SIZE = 1000;
 
 export enum Order {

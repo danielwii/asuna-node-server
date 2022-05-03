@@ -34,7 +34,7 @@ export class RedisIoAdapter extends IoAdapter {
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
       logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
-      const redis = new Redis(configObject.getOptions(db));
+      const redis = new Redis(configObject.getIoOptions(db));
       redis.on('error', (reason) => {
         logger.error(`ioredis connection error ${r(reason)}`);
       });

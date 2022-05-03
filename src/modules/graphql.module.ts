@@ -69,9 +69,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
     logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
 
     const redisConfig = RedisConfigObject.load('graphql');
-    const cache = redisConfig.enable
-      ? new RedisCache(redisConfig.getOptions() as RedisOptions)
-      : new InMemoryLRUCache();
+    const cache = redisConfig.enable ? new RedisCache(redisConfig.getIoOptions()) : new InMemoryLRUCache();
     logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
     return {
