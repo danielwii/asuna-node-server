@@ -10,7 +10,7 @@ import { EntityManager, getManager } from 'typeorm';
 import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
 
-export const DEFAULT_PAGE = 1;
+export const DEFAULT_PAGE = 0;
 export const DEFAULT_SIZE = 20;
 export const MAX_PAGE_SIZE = 1000;
 
@@ -20,27 +20,12 @@ export enum Order {
 }
 
 export const DefaultPageRequest: PageRequest = {
-  pageNumber: 1,
-  pageIndex: 0,
-  /**
-   * FIXME deprecated using pageNumber / pageIndex instead
-   * @deprecated
-   */
   page: DEFAULT_PAGE,
   size: DEFAULT_SIZE,
 };
 
 export interface PageRequest {
-  /**
-   * FIXME deprecated using pageNumber / pageIndex instead
-   * @deprecated
-   */
   page?: number;
-  /**
-   * pageIndex + 1
-   */
-  pageNumber?: number;
-  pageIndex?: number;
   size?: number;
   orderBy?: { column?: string; order?: Order };
 }
@@ -167,29 +152,18 @@ export interface PageInfo {
 
 export const emptyPage = <T>(pageInfo: PageInfo): Pageable<T> => ({ ...pageInfo, items: [], total: 0 });
 
-export const toPage = (pageRequest: PageRequest, startsWith0?: boolean): PageInfo => {
+export const toPage = (pageRequest: PageRequest): PageInfo => {
   let page = pageRequest.page ?? DEFAULT_PAGE;
   let size = pageRequest.size ?? DEFAULT_SIZE;
-  let pageIndex, pageNumber;
-  if (page < 0) {
-    page = startsWith0 ? 0 : 1;
-    pageIndex = 0;
-    pageNumber = 1;
-  } else if (page === 0 && !startsWith0) {
-    page = 1;
-    pageIndex = 0;
-    pageNumber = 1;
-  } else {
-    pageIndex = startsWith0 ? page : page - 1;
-    pageNumber = pageIndex + 1;
-  }
+  const pageIndex = page;
+  const pageNumber = pageIndex + 1;
 
   if (size > MAX_PAGE_SIZE) {
     logger.warn(`max page size is ${MAX_PAGE_SIZE}, change size: ${size}`);
     size = MAX_PAGE_SIZE;
   }
 
-  return { pageNumber, pageIndex, page, size, take: size, skip: (page - (startsWith0 ? 0 : 1)) * size };
+  return { pageNumber, pageIndex, page, size, take: size, skip: page * size };
 };
 
 export const extractPageRequest = <Entity = any>(pageRequest: PageRequest, primaryKey = 'id') => ({

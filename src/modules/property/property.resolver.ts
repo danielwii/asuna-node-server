@@ -4,7 +4,7 @@ import { Args, Context, Field, Info, ObjectType, Query, Resolver } from '@nestjs
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Pageable } from '../core/helpers';
+import { Pageable, toPage } from '../core/helpers';
 import { GqlAuthGuard, GraphqlHelper, PageRequestInput, SorterInput, toOrder } from '../graphql';
 import { ExchangeCurrencyEnum } from './enum-values';
 import { ExchangeObject } from './exchange.entities';
@@ -44,7 +44,7 @@ export class PropertyQueryResolver {
     const [items, total] = await PointExchange.findAndCount(
       await GraphqlHelper.genericFindOptions<PointExchange>({
         cls: PointExchange,
-        pageRequest,
+        pageRequest: toPage(pageRequest),
         relationPath: `${PropertyQueryResolver.prototype.user_paged_exchangeRecords.name}.items`,
         info,
         where: { profileId: currentUser.id, ...(type ? { type } : null), ...(refId ? { refId } : null) },
@@ -52,7 +52,7 @@ export class PropertyQueryResolver {
     );
 
     this.logger.verbose(`user_paged_exchangeRecords ${r({ total, pageRequest })}`);
-    return GraphqlHelper.pagedResult({ pageRequest, items, total });
+    return GraphqlHelper.pagedResult({ pageRequest: toPage(pageRequest), items, total });
   }
 
   @UseGuards(new GqlAuthGuard())
@@ -69,7 +69,7 @@ export class PropertyQueryResolver {
     const [items, total] = await FinancialTransaction.findAndCount(
       await GraphqlHelper.genericFindOptions<FinancialTransaction>({
         cls: FinancialTransaction,
-        pageRequest,
+        pageRequest: toPage(pageRequest),
         relationPath: `${PropertyQueryResolver.prototype.user_paged_financialTransactions.name}.items`,
         info,
         where: { profileId: currentUser.id, ...(type ? { type } : null), ...(refId ? { refId } : null) },
@@ -77,7 +77,7 @@ export class PropertyQueryResolver {
     );
 
     this.logger.verbose(`user_paged_financialTransactions ${r({ total, pageRequest })}`);
-    return GraphqlHelper.pagedResult({ pageRequest, items, total });
+    return GraphqlHelper.pagedResult({ pageRequest: toPage(pageRequest), items, total });
   }
 
   @Query((returns) => [ExchangeObject])

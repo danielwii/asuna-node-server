@@ -13,7 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     super({
       log: [
         { emit: 'event', level: 'query' },
-        // 'query',
+        'query',
         'info',
         `warn`,
         `error`,

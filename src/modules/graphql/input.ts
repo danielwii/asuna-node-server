@@ -37,6 +37,7 @@ export class CursoredRequestInput implements CursoredRequest {
 
 @InputType()
 export class PageRequestInput implements PageRequest {
+  /*
   @Field((type) => Int)
   @IsInt()
   @IsOptional()
@@ -45,7 +46,7 @@ export class PageRequestInput implements PageRequest {
   @Field((type) => Int)
   @IsInt()
   @IsOptional()
-  public pageIndex?: number = 0;
+  public pageIndex?: number = 0;*/
 
   @Field((type) => Int, { deprecationReason: 'use pageIndex or pageNumber instead' })
   @IsInt()
