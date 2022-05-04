@@ -48,7 +48,11 @@ export class AppQueryResolver {
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     return AppRelease.findOne({
-      where: { appInfoId: appInfo?.id, platform } as FindOptionsWhere<AppRelease>,
+      where: {
+        appInfoId: appInfo?.id,
+        platform: platform?.toUpperCase(),
+        isPublished: true,
+      } as FindOptionsWhere<AppRelease>,
       order: { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });
