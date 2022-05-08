@@ -64,6 +64,8 @@ export interface MetaInfoBaseOptions {
 
 export interface NormalMetaInfoOptions extends MetaInfoBaseOptions {
   type?:
+    | 'Audio'
+    | 'Audios'
     | 'Video'
     | 'Videos'
     | 'Authorities'
