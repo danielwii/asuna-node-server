@@ -21,11 +21,11 @@ export class SchemaQueryResolver {
   constructor(private readonly dbService: DBService) {}
 
   @Query((returns) => [ModelSchemas])
-  sys_modelSchemas(): ModelSchemas[] {
+  sys_model_schemas(): ModelSchemas[] {
     return this.dbService.repos().map((repository) => {
       const { name, internal } = (repository.metadata.target as any).entityInfo;
       const schema = DBHelper.extractAsunaSchemas(repository);
-      this.logger.log(`sys_modelSchemas ${r({ name, internal, schema: !!schema })}`);
+      this.logger.log(`sys_model_schemas ${r({ name, internal, schema: !!schema })}`);
       return { name, internal, schema };
     });
   }

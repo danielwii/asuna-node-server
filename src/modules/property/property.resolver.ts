@@ -32,7 +32,7 @@ export class PropertyQueryResolver {
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => PointExchangePageable)
-  public async user_paged_exchangeRecords(
+  public async user_paged_exchange_records(
     @Args('type', { nullable: true }) type: string,
     @Args('refId') refId: string,
     @Args('pageRequest', { nullable: true }) pageRequest: PageRequestInput,
@@ -40,24 +40,24 @@ export class PropertyQueryResolver {
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<PointExchangePageable> {
     const currentUser = getCurrentUser();
-    this.logger.log(`user_paged_exchangeRecords: ${r({ type, refId, pageRequest })}`);
+    this.logger.log(`user_paged_exchange_records: ${r({ type, refId, pageRequest })}`);
     const [items, total] = await PointExchange.findAndCount(
       await GraphqlHelper.genericFindOptions<PointExchange>({
         cls: PointExchange,
         pageRequest: toPage(pageRequest),
-        relationPath: `${PropertyQueryResolver.prototype.user_paged_exchangeRecords.name}.items`,
+        relationPath: `${PropertyQueryResolver.prototype.user_paged_exchange_records.name}.items`,
         info,
         where: { profileId: currentUser.id, ...(type ? { type } : null), ...(refId ? { refId } : null) },
       }),
     );
 
-    this.logger.verbose(`user_paged_exchangeRecords ${r({ total, pageRequest })}`);
+    this.logger.verbose(`user_paged_exchange_records ${r({ total, pageRequest })}`);
     return GraphqlHelper.pagedResult({ pageRequest: toPage(pageRequest), items, total });
   }
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => FinancialTransactionPageable)
-  public async user_paged_financialTransactions(
+  public async user_paged_financial_transactions(
     @Args('type') type: string,
     @Args('refId') refId: string,
     @Args('pageRequest', { nullable: true }) pageRequest: PageRequestInput,
@@ -65,41 +65,41 @@ export class PropertyQueryResolver {
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<FinancialTransactionPageable> {
     const currentUser = getCurrentUser();
-    this.logger.log(`user_paged_financialTransactions: ${r({ type, refId, pageRequest })}`);
+    this.logger.log(`user_paged_financial_transactions: ${r({ type, refId, pageRequest })}`);
     const [items, total] = await FinancialTransaction.findAndCount(
       await GraphqlHelper.genericFindOptions<FinancialTransaction>({
         cls: FinancialTransaction,
         pageRequest: toPage(pageRequest),
-        relationPath: `${PropertyQueryResolver.prototype.user_paged_financialTransactions.name}.items`,
+        relationPath: `${PropertyQueryResolver.prototype.user_paged_financial_transactions.name}.items`,
         info,
         where: { profileId: currentUser.id, ...(type ? { type } : null), ...(refId ? { refId } : null) },
       }),
     );
 
-    this.logger.verbose(`user_paged_financialTransactions ${r({ total, pageRequest })}`);
+    this.logger.verbose(`user_paged_financial_transactions ${r({ total, pageRequest })}`);
     return GraphqlHelper.pagedResult({ pageRequest: toPage(pageRequest), items, total });
   }
 
   @Query((returns) => [ExchangeObject])
-  public async api_exchangeObjects(
+  public async api_exchange_objects(
     @Args('type', { type: () => ExchangeCurrencyEnum, nullable: true }) type: ExchangeCurrencyType,
     @Args('usage', { nullable: true }) usage: string,
     @Args('orderBy', { nullable: true }) orderBy: SorterInput,
     @Info() info: GraphQLResolveInfo,
     @Context('getCurrentUser') getCurrentUser,
   ): Promise<ExchangeObject[]> {
-    this.logger.log(`api_exchangeObjects: ${r({ type, usage, orderBy })}`);
+    this.logger.log(`api_exchange_objects: ${r({ type, usage, orderBy })}`);
     const [items, total] = await ExchangeObject.findAndCount(
       await GraphqlHelper.genericFindOptions<ExchangeObject>({
         cls: ExchangeObject,
-        relationPath: `${PropertyQueryResolver.prototype.api_exchangeObjects.name}.items`,
+        relationPath: `${PropertyQueryResolver.prototype.api_exchange_objects.name}.items`,
         info,
         where: { ...(usage ? { usage } : {}) } as any,
         order: toOrder(orderBy),
       }),
     );
 
-    this.logger.debug(`api_exchangeObjects ${r({ total })}`);
+    this.logger.debug(`api_exchange_objects ${r({ total })}`);
     return items;
   }
 }
