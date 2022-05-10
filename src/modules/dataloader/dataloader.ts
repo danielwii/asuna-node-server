@@ -46,7 +46,7 @@ function build<Entity extends BaseEntity>(dataloader: DataLoader<PrimaryKey, Ent
 
 export function loader<Entity extends BaseEntity>(
   entity: typeof BaseEntity,
-  opts: { isPublished?: boolean; loadRelationIds?: boolean } = {},
+  opts: { isPublished?: boolean; isDeleted?: boolean; loadRelationIds?: boolean } = {},
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
     cachedDataLoader(entity.name, (ids) => {
@@ -57,6 +57,7 @@ export function loader<Entity extends BaseEntity>(
         where: {
           [primaryKey]: In(ids),
           ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined),
+          ...(_.has(opts, 'isDeleted') ? { isDeleted: opts.isDeleted } : undefined),
         } as FindOptionsWhere<any>,
         loadRelationIds: opts.loadRelationIds,
       };

@@ -4,7 +4,7 @@ import { BaseEntity, Column } from 'typeorm';
 
 import { MetaInfo } from '../common/decorators';
 
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 
 export const Publishable = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   @InterfaceType()
@@ -13,6 +13,17 @@ export const Publishable = <TBase extends ConstrainedConstructor<BaseEntity>>(Ba
     @MetaInfo({ name: '是否发布？' })
     @Column({ nullable: true, name: 'is_published' })
     public isPublished: boolean;
+  }
+
+  return ExtendableEntity;
+};
+
+export const SoftDelete = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
+  @InterfaceType()
+  class ExtendableEntity extends Base {
+    @MetaInfo({ name: '软删除？' })
+    @Column({ name: 'is_deleted', default: false })
+    public isDeleted: boolean;
   }
 
   return ExtendableEntity;
