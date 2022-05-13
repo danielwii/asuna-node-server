@@ -11,7 +11,6 @@ const logger = LoggerFactory.getLogger('CacheManager');
 
 export class CacheManager {
   public static cache = new LRU<string, any>({ max: 500, ttl: CacheTTL.LONG_1 });
-  public static shortCache = new LRU<string, any>({ max: 50, ttl: CacheTTL.SHORT });
 
   /**
    * 缓存工具，将 resolver 的结果按 ttl: [seconds] 保存在内存中，默认过期为 60 min
@@ -21,13 +20,14 @@ export class CacheManager {
    */
   public static async cacheable<T>(key: any, resolver: FutureResolveType<T>, seconds?: number): Promise<T> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
+    const remainingTTL = this.cache.getRemainingTTL(cacheKey);
     const cacheValue = this.cache.get(cacheKey);
-    // logger.debug(`cacheable ${r({ key, cacheKey, cacheValue })}`);
+    logger.verbose(`get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`) })}`);
     if (cacheValue) return cacheValue;
 
     const value = await fnResolve(resolver)();
     this.cache.set(cacheKey, value, { ttl: seconds ? seconds * 1000 : undefined });
-    logger.verbose(`cacheable set ${r({ cacheKey, value, seconds })}`);
+    logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 
@@ -49,16 +49,4 @@ export class CacheManager {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.delete(cacheKey);
   }
-}
-
-// TODO not implemented
-export function Cacheable(options: { type?: 'default' | 'short'; key: string }) {
-  return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
-    let { cache } = CacheManager;
-    if (options.type === 'short') {
-      cache = CacheManager.shortCache;
-    }
-
-    console.log({ options, target, propertyKey });
-  };
 }

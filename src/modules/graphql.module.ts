@@ -10,8 +10,17 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
+import { ApolloServerPluginCacheControl } from 'apollo-server-core';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { Kind, ValueNode } from 'graphql';
+import {
+  DirectiveLocation,
+  GraphQLBoolean,
+  GraphQLDirective,
+  GraphQLEnumType,
+  GraphQLInt,
+  Kind,
+  ValueNode,
+} from 'graphql';
 import * as _ from 'lodash';
 import * as path from 'path';
 
@@ -22,8 +31,6 @@ import { GraphQLConfigObject } from './graphql/graphql.config';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
-import type { RedisOptions } from 'ioredis';
-import type { GraphQLServerListener } from 'apollo-server-plugin-base';
 import type { GraphQLServiceContext } from 'apollo-server-types';
 
 const logger = LoggerFactory.getLogger('GraphqlModule');
@@ -91,14 +98,43 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           installSubscriptionHandlers: true,
           // resolvers: { JSON: GraphQLJSON },
           playground: config.playground_enable,
+          // playground: false,
           debug: config.debug,
           introspection: config.playground_enable || config.debug,
           // tracing: config.debug,
           resolverValidationOptions: { requireResolversForResolveType: 'warn' },
+          cache,
           persistedQueries: { cache },
-          plugins: [
+          // TODO https://github.com/nestjs/graphql/pull/2139
+          buildSchemaOptions: {
+            directives: [
+              new GraphQLDirective({
+                name: 'cacheControl',
+                locations: [
+                  DirectiveLocation.FIELD_DEFINITION,
+                  DirectiveLocation.OBJECT,
+                  DirectiveLocation.INTERFACE,
+                  DirectiveLocation.UNION,
+                ],
+                args: {
+                  maxAge: { type: GraphQLInt },
+                  scope: {
+                    type: new GraphQLEnumType({
+                      name: 'CacheControlScope',
+                      values: {
+                        PUBLIC: {},
+                        PRIVATE: {},
+                      },
+                    }),
+                  },
+                  inheritMaxAge: { type: GraphQLBoolean },
+                },
+              }),
+            ],
+          },
+          plugins: _.compact([
             {
-              async serverWillStart(service: GraphQLServiceContext): Promise<GraphQLServerListener | void> {
+              async serverWillStart(service: GraphQLServiceContext) {
                 logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
@@ -109,7 +145,10 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
                 return sessionID;
               },
             }),
-          ],
+            // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
+            ApolloServerPluginCacheControl({ defaultMaxAge: 5 * 1000, calculateHttpHeaders: false }),
+            config.debug ? require('apollo-tracing').plugin() : null,
+          ]),
           /*
           cacheControl: {
             // defaultMaxAge: 5,

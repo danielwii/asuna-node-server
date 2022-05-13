@@ -113,6 +113,7 @@ export class InMemoryDB {
     // redis 未启用时使用 CacheManager
     if (!redis.isOpen) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
+      // redis 未开启时直接返回缓存
       return CacheManager.cacheable(keyStr, resolver, options?.expiresInSeconds);
     }
 
