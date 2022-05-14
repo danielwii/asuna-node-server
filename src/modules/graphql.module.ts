@@ -146,7 +146,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
               },
             }),
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
-            ApolloServerPluginCacheControl({ defaultMaxAge: 5 * 1000, calculateHttpHeaders: false }),
+            ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
             config.debug ? require('apollo-tracing').plugin() : null,
           ]),
           /*
