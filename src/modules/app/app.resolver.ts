@@ -39,12 +39,31 @@ export class AppQueryResolver {
     return { ...pageInfo, items, total };
   }
 
-  @Query((returns) => AppRelease, { nullable: true })
+  @Query((returns) => AppRelease, { nullable: true, deprecationReason: 'using app_latest_release instead' })
   public async app_latestRelease(
     @Args('key') key: string,
     @Args('platform', { nullable: true }) platform: string,
   ): Promise<AppRelease> {
     this.logger.log(`app_latestRelease: ${r({ key, platform })}`);
+
+    const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
+    return AppRelease.findOne({
+      where: {
+        appInfoId: appInfo?.id,
+        platform: platform?.toUpperCase(),
+        isPublished: true,
+      } as FindOptionsWhere<AppRelease>,
+      order: { id: 'DESC' },
+      cache: CacheTTL.FLASH,
+    });
+  }
+
+  @Query((returns) => AppRelease, { nullable: true })
+  public async app_latest_release(
+    @Args('key') key: string,
+    @Args('platform', { nullable: true }) platform: string,
+  ): Promise<AppRelease> {
+    this.logger.log(`app_latest_release: ${r({ key, platform })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
     return AppRelease.findOne({
