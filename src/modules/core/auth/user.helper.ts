@@ -8,7 +8,6 @@ import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 
-import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import type { FindOneOptions } from 'typeorm';
 
 const logger = LoggerFactory.getLogger('AuthedUserHelper');
@@ -52,7 +51,10 @@ export class AuthedUserHelper {
     ow(id, 'id', ow.string.nonEmpty);
     logger.log(`get user by id ${id}`);
     const entity = await UserRegister.Entity.findOneById(id);
-    const fixedId = _.isNumber(entity.id) ? Number(id.slice(1)) : id;
+    if (!entity) {
+      throw new AsunaException(AsunaErrorCode.InvalidAuthToken, `no user found`);
+    }
+    const fixedId = _.isNumber(entity?.id) ? Number(id.slice(1)) : id;
     return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options });
   }
 

@@ -64,18 +64,20 @@ export class FinderHelper {
     const config = await this.getConfig();
     const defaultAssetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     const defaultCNAssetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT + '_CN', defaultAssetsEndpoint);
-    const defaultEndpoint = internal
+    const endpoint = internal
       ? /* config.internalEndpoint ?? */ configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT)
       : /* config.endpoint ?? */ isCN
       ? defaultCNAssetsEndpoint
       : defaultAssetsEndpoint;
-    logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint, defaultCNAssetsEndpoint })}`);
+    logger.verbose(
+      `get endpoint ${r({ type, internal, config, endpoint, defaultAssetsEndpoint, defaultCNAssetsEndpoint })}`,
+    );
 
-    if (!defaultEndpoint) {
-      logger.warn(`${name ?? 'default'} not available in upstream endpoint ${defaultEndpoint}`);
+    if (!endpoint) {
+      logger.warn(`${name ?? 'default'} not available in upstream endpoint ${endpoint}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
-        `${name ?? 'default'} not available in upstream endpoint ${defaultEndpoint}`,
+        `${name ?? 'default'} not available in upstream endpoint ${endpoint}`,
       );
     }
 
@@ -95,7 +97,7 @@ export class FinderHelper {
     }
 
     if (type === 'assets') {
-      return new URL(path, `${defaultEndpoint ?? ''}/`).toString();
+      return new URL(path, `${endpoint ?? ''}/`).toString();
     }
     // TODO add other handlers later
     logger.warn('only type assets is available');
