@@ -65,7 +65,8 @@ export class MinioStorage implements IStorageEngine {
     logger.verbose(
       `resolveUrl ${r({ bucket: bucket ?? this.defaultBucket, prefix: prefix ?? '', filename, pathname, url })}`,
     );
-    return res.redirect(url);
+    res.redirect(url);
+    return url;
     // resolver(join(bucket || this.defaultBucket, prefix || '', filename)).then(url => res.redirect(url));
     // return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
   }

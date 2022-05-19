@@ -42,6 +42,7 @@ export class FinderHelper {
     name,
     path,
     internal,
+    isCN,
   }: {
     type: /**
      * 直接附件查询，默认模式
@@ -54,16 +55,21 @@ export class FinderHelper {
     name?: string; // default is default
     path: string;
     internal?: boolean;
+    isCN?: boolean;
   }): Promise<string> {
     if (!(type && path)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, JSON.stringify({ type, name, path }));
     }
 
     const config = await this.getConfig();
+    const defaultAssetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
+    const defaultCNAssetsEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT + '_CN', defaultAssetsEndpoint);
     const defaultEndpoint = internal
       ? /* config.internalEndpoint ?? */ configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT)
-      : /* config.endpoint ?? */ configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
-    logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint })}`);
+      : /* config.endpoint ?? */ isCN
+      ? defaultCNAssetsEndpoint
+      : defaultAssetsEndpoint;
+    logger.verbose(`get endpoint ${r({ type, internal, config, defaultEndpoint, defaultCNAssetsEndpoint })}`);
 
     if (!defaultEndpoint) {
       logger.warn(`${name ?? 'default'} not available in upstream endpoint ${defaultEndpoint}`);

@@ -1,4 +1,4 @@
-import { Controller, Get, Header, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, Header, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
@@ -6,6 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import crypto from 'crypto';
+import geoip from 'geoip-lite';
 import _ from 'lodash';
 import path from 'path';
 
@@ -19,6 +20,7 @@ import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 import { LocalStorage } from '../storage';
 
+import type { RequestInfo } from '../../helper';
 import type { Response } from 'express';
 
 const logger = LoggerFactory.getLogger('GetUploadsController');
@@ -213,6 +215,7 @@ export class GetUploadsController {
    * @param query
    * @param thumbnailConfig
    * @param jpegConfig
+   * @param req
    * @param res
    */
   @Header('Cache-Control', 'max-age=31536000') // expired in 1 year
@@ -226,11 +229,14 @@ export class GetUploadsController {
     @Query() query: object,
     @Query(ThumbnailPipe) thumbnailConfig: ThumbnailPipeOptions,
     @Query(JpegPipe) jpegConfig: JpegPipeOptions,
+    @Req() req: RequestInfo,
     @Res() res: Response,
   ): Promise<void> {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
     const engine = instanceToPlain(storageEngine);
     const blurred = _.has(query, 'blurred');
+    const lookup = geoip.lookup(req.clientIp);
+    const usingCN = lookup == null || lookup?.country === 'CN';
     logger.verbose(
       `get ${r({ bucket, filename })} by ${r({
         engine,
@@ -240,9 +246,11 @@ export class GetUploadsController {
         query,
         param,
         blurred,
+        lookup,
+        usingCN,
       })}`,
     );
-    const resolver = (path: string) => FinderHelper.resolveUrl({ type: 'assets', path, internal });
+    const resolver = (path: string) => FinderHelper.resolveUrl({ type: 'assets', path, internal, isCN: usingCN });
     if (blurred) {
       const hash = crypto.createHash('md5');
       hash.update('', 'utf8');
