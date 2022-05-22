@@ -61,11 +61,11 @@ class ActionHelper {
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
     const calcKey = { prefix: 'action', key };
     const exists = await InMemoryDB.get(calcKey, 6);
-    logger.log(`action ${r({ exists, actionStr, calcKey })}`);
+    logger.log(`get action ${r({ exists, calcKey })}`);
     if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
-    InMemoryDB.save(calcKey, actionStr, { expiresInSeconds: expiresInSeconds || 5, db: 6 }).catch((reason) =>
+    InMemoryDB.save(calcKey, true, { expiresInSeconds: expiresInSeconds || 5, db: 6 }).catch((reason) =>
       logger.error(reason),
     );
   }
