@@ -19,7 +19,7 @@ export class WxHelper {
     const redis = RedisProvider.getRedisClient('wx');
     // redis 未启用时将 token 保存到内存中，2h 后过期
     if (!redis.isEnabled) {
-      return CacheManager.cacheable(
+      return CacheManager.default.cacheable(
         key,
         async () => {
           logger.warn(

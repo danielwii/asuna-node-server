@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -11,6 +10,7 @@ import { LRUMap } from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
 import { BaseEntity, FindOptionsWhere, In, ObjectType } from 'typeorm';
 
+import { CacheManager } from '../cache';
 import { CacheTTL } from '../cache/constants';
 import { configLoader } from '../config';
 import { DBHelper } from '../core/db';
@@ -22,8 +22,6 @@ import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoader');
-
-const cacheMap = new Map();
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
@@ -70,19 +68,21 @@ export class DataloaderCleaner {
   public static redisLoaders: Record<string, any> = {};
 
   public static reg(segment: string, loader) {
-    // logger.log(`reg redis cleaner ${segment}`);
+    logger.log(`reg redis cleaner ${segment}`);
     DataloaderCleaner.redisLoaders[segment] = loader;
   }
 
   public static clear(segment: string, id: PrimaryKey): void {
     const key = `${segment}:${id}`;
     logger.log(`remove loader cache ... ${r(key)}`);
-    cacheMap.delete(key);
     if (DataloaderCleaner.redisLoaders[segment]) {
       const redisLoader = DataloaderCleaner.redisLoaders[segment];
       redisLoader.clear(id);
       redisLoader.clearLocal(id);
       redisLoader.clearAllLocal(id);
+    } else {
+      const cache = new CacheManager('dataloader');
+      cache.clear({ prefix: 'dataloader', key });
     }
   }
 }
@@ -122,7 +122,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           logger.debug(`redis dataloader load ${segment}: ${ids}`);
           return fn(ids);
         },
-        { batchScheduleFn: (callback) => setTimeout(callback, 10), cache: false },
+        { batchScheduleFn: (callback) => setTimeout(callback, 20), cache: false },
       ),
       {
         // caching here is a local in memory cache. Caching is always done to redis.
@@ -139,71 +139,42 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
     return redisLoader;
   }
 
+  const cache = new CacheManager('dataloader');
   return new DataLoader(
     (ids) => {
       logger.debug(`dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     {
-      batchScheduleFn: (callback) => setTimeout(callback, 10),
+      batchScheduleFn: (callback) => setTimeout(callback, 20),
       cacheMap: {
         get: (id: string) => {
-          // const cachedObject = await client.get({ segment, id });
-          // logger.log(`get (${segment}:${id}) ${r(cachedObject)}`);
-          // logger.debug(`get (${segment}:${id})`);
-          // return cachedObject;
-          const now = Date.now();
           const key = `${segment}:${id}`;
-          const { value, expires } = cacheMap.get(key) || ({} as any);
-          logger.verbose(
-            `get (${key}) ${r({
-              exists: !!value,
-              expires: new Date(expires),
-              now: new Date(now),
-              left: expires - now,
-              isExpired: expires < now,
-            })}`,
-          );
-          if (!value) {
-            return null;
-          }
-          const isExpired = expires < now;
-          if (isExpired) {
-            // logger.debug(`remove (${segment}:${id})`);
-            cacheMap.delete(key);
-            return null;
-          }
-          logger.debug(`dataloader loaded cached ${key}`);
+          const ttl = cache.getRemainingTTL({ prefix: 'dataloader', key });
+          const value = cache.get({ prefix: 'dataloader', key });
+          logger.verbose(`get (${key}) ${r({ exists: !!value, ttl: parseInt(String(ttl / 1000)) })}`);
           return value;
         },
         set: async (id: string, value) => {
           const key = `${segment}:${id}`;
           const promised = await value;
           if (promised) {
-            logger.debug(`dataloader set ${key}`);
-            const now = Date.now();
-            // logger.log(`has (${segment}:${id})[${cacheMap.size}]${cacheMap.has(key)}`);
-            // if (!cacheMap.has(key)) {
-            //   cacheMap.set(key, { value, expires: now + 1 * 60 * 1000 });
-            //   // console.log({ size: cacheMap.size });
-            // }
-            cacheMap.set(key, { value: promised, expires: now + CacheTTL.SHORT });
+            logger.verbose(`dataloader set ${key}`);
+            const result = cache.set({ prefix: 'dataloader', key }, promised, CacheTTL.FLASH / 1000);
+            logger.debug(`set (${key}) size ${result.size}/${result.max}/${result.maxSize}`);
           }
         },
         delete: (id: string) => {
-          // logger.log(`delete (${segment}:${id})`);
           const key = `${segment}:${id}`;
-          cacheMap.delete(key);
+          cache.clear({ prefix: 'dataloader', key });
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch((reason) =>
             logger.error(reason),
           );
-          // return client.drop({ segment, id });
         },
         clear: () => {
           logger.log(`clear (${segment})`);
-          cacheMap.clear();
+          cache.clearAll();
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch((reason) => logger.error(reason));
-          // return logger.warn('not implemented.');
         },
       },
     },
@@ -216,7 +187,7 @@ export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<Prim
       logger.debug(`per-request dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
-    { batchScheduleFn: (callback) => setTimeout(callback, 10), cacheMap: new LRUMap(100) },
+    { batchScheduleFn: (callback) => setTimeout(callback, 20), cacheMap: new LRUMap(100) },
   );
 }
 

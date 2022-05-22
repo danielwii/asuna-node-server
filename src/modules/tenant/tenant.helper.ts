@@ -109,7 +109,7 @@ export class TenantHelper {
   }
 
   static async getConfig(): Promise<TenantConfig> {
-    return CacheManager.cacheable(
+    return CacheManager.default.cacheable(
       'tenant.config',
       async () => {
         const entities = DBHelper.getModelsHasRelation(Tenant);

@@ -3,14 +3,29 @@ import { fnResolve, FutureResolveType } from '@danielwii/asuna-helper/dist/promi
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 
 import { CacheTTL } from './constants';
 
 const logger = LoggerFactory.getLogger('CacheManager');
 
+const caches = new Map<string, LRUCache<string, any>>();
 export class CacheManager {
-  public static cache = new LRU<string, any>({ max: 500, ttl: CacheTTL.LONG_1 });
+  public static default = new CacheManager('default');
+
+  private readonly cache: LRUCache<string, any>;
+
+  public constructor(name: string, options?: LRUCache.Options<string, any>) {
+    if (caches.has(name)) {
+      this.cache = caches.get(name);
+      logger.log(`create cache: ${name}`);
+    } else {
+      const cache = new LRUCache<string, any>(options ?? { max: 500, ttl: CacheTTL.LONG_1 });
+      this.cache = cache;
+      caches.set(name, cache);
+      logger.log(`get preset cache: ${name}`);
+    }
+  }
 
   /**
    * 缓存工具，将 resolver 的结果按 ttl: [seconds] 保存在内存中，默认过期为 60 min
@@ -18,7 +33,7 @@ export class CacheManager {
    * @param resolver
    * @param seconds
    */
-  public static async cacheable<T>(key: any, resolver: FutureResolveType<T>, seconds?: number): Promise<T> {
+  public async cacheable<V>(key: any, resolver: FutureResolveType<V>, seconds?: number): Promise<V> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const remainingTTL = this.cache.getRemainingTTL(cacheKey);
     const cacheValue = this.cache.get(cacheKey);
@@ -31,21 +46,26 @@ export class CacheManager {
     return value;
   }
 
-  public static set(key: any, value, ttl?: number): void {
+  public set(key: any, value, ttl?: number): LRUCache<string, any> {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
-    this.cache.set(cacheKey, value, { ttl: ttl ? ttl * 1000 : undefined });
+    return this.cache.set(cacheKey, value, { ttl: ttl ? ttl * 1000 : undefined });
   }
 
-  public static get<T = any>(key: any): T {
+  public get<T = any>(key: any): T {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.get(cacheKey);
   }
 
-  public static clearAll(): void {
-    this.cache.clear();
+  public getRemainingTTL(key: any): number {
+    const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
+    return this.cache.getRemainingTTL(cacheKey);
   }
 
-  public static async clear(key: any): Promise<boolean> {
+  public clearAll(): void {
+    return this.cache.clear();
+  }
+
+  public clear(key: any): boolean {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     return this.cache.delete(cacheKey);
   }

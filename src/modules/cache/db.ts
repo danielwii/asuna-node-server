@@ -36,10 +36,12 @@ export class InMemoryDB {
     if (!redis.isEnabled) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
       const value = await fnResolve(resolver)();
-      CacheManager.cacheable(keyStr, async () => {
-        const saved = ((await CacheManager.get(keyStr)) as Array<Value>) ?? [];
-        return [...saved, value];
-      }).catch((reason) => logger.error(reason));
+      CacheManager.default
+        .cacheable(keyStr, async () => {
+          const saved = ((await CacheManager.default.get(keyStr)) as Array<Value>) ?? [];
+          return [...saved, value];
+        })
+        .catch((reason) => logger.error(reason));
       return value;
     }
 
@@ -70,7 +72,7 @@ export class InMemoryDB {
     // redis 未启用时使用 CacheManager
     if (!redis.isEnabled) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix })}.`);
-      return CacheManager.get(keyStr);
+      return CacheManager.default.get(keyStr);
     }
     return redis.client.lRange(keyStr, 0, -1);
   }
@@ -81,7 +83,7 @@ export class InMemoryDB {
 
     const redis = RedisProvider.getRedisClient(prefix, db);
     if (!redis.isEnabled) {
-      return CacheManager.get(keyStr);
+      return CacheManager.default.get(keyStr);
     }
     const value = await redis.client.get(keyStr);
     return parseJSONIfCould(value);
@@ -114,7 +116,7 @@ export class InMemoryDB {
     if (!redis.isOpen) {
       // logger.debug(`redis is not enabled, using inner cache ${r({ key, keyStr, prefix, options })}.`);
       // redis 未开启时直接返回缓存
-      return CacheManager.cacheable(keyStr, resolver, options?.expiresInSeconds);
+      return CacheManager.default.cacheable(keyStr, resolver, options?.expiresInSeconds);
     }
 
     const primeToRedis = async (saved?): Promise<Value> => {
@@ -155,7 +157,7 @@ export class InMemoryDB {
     logger.debug(`remove ${keyStr}`);
     const redis = RedisProvider.getRedisClient(prefix);
     if (!redis.isEnabled) {
-      return CacheManager.clear(keyStr);
+      return CacheManager.default.clear(keyStr);
     }
     return redis.client.del(keyStr);
   }

@@ -14,7 +14,7 @@ export class CacheUtils {
     this.logger.debug(`clear cache ${r(opts)}`);
 
     CacheWrapper.clear(opts).catch((reason) => this.logger.error(reason));
-    CacheManager.clear(opts.key).catch((reason) => this.logger.error(reason));
+    CacheManager.default.clear(opts.key);
   }
 
   public static async clearAll(): Promise<void> {

@@ -31,8 +31,8 @@ export class Store {
     if (this.redisMode) {
       await this.redis.client.setEx(itemKey, expiresInSeconds, _.isString(value) ? value : JSON.stringify(value));
     } else {
-      await CacheManager.clear(itemKey);
-      await CacheManager.cacheable(itemKey, async () => value, expiresInSeconds);
+      CacheManager.default.clear(itemKey);
+      await CacheManager.default.cacheable(itemKey, async () => value, expiresInSeconds);
     }
   };
 
@@ -42,6 +42,6 @@ export class Store {
       const result = await this.redis.client.get(itemKey);
       return opts?.json ? JSON.parse(result) : result;
     }
-    return CacheManager.get(itemKey);
+    return CacheManager.default.get(itemKey);
   };
 }

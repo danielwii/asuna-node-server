@@ -23,7 +23,7 @@ export class DynamicRouterHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_DYNAMIC_ROUTER, key: 'text' };
 
   static async getConfig(): Promise<DynamicRouterConfig> {
-    return CacheManager.cacheable(
+    return CacheManager.default.cacheable(
       this.kvDef,
       async () => new DynamicRouterConfig({ textRouter: (await KvHelper.get(this.kvDef))?.value?.values }),
       120,

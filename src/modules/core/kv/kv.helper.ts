@@ -395,7 +395,8 @@ export class KvHelper {
     });
     if (!fields) return;
 
-    const result = {
+    // logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    return {
       value: _.get(fields.values, fieldKey),
       field: _.get(
         _.chain(fields.form)
@@ -405,7 +406,5 @@ export class KvHelper {
         'field',
       ),
     };
-    // logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
-    return result;
   }
 }
