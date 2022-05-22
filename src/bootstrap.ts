@@ -10,6 +10,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
@@ -171,7 +172,9 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const logLevels: LogLevel[] = ['error', 'warn', 'log', 'debug', 'verbose'];
   if (['mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {
-    const TYPEORM_DRIVER_EXTRA = JSON.stringify({ charset: 'utf8mb4_unicode_ci' });
+    const extra = parseJSONIfCould(process.env.TYPEORM_DRIVER_EXTRA) ?? {};
+    extra.charset = 'utf8mb4_unicode_ci';
+    const TYPEORM_DRIVER_EXTRA = JSON.stringify(extra);
     logger.log(`🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA=${TYPEORM_DRIVER_EXTRA}`);
     process.env.TYPEORM_DRIVER_EXTRA = TYPEORM_DRIVER_EXTRA;
   }
