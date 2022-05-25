@@ -49,6 +49,7 @@ import {
   FeedbackStatusEnumValue,
 } from './modules/content/enum-values';
 import { AsunaContext, Global } from './modules/core';
+import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
 import { TracingInterceptor } from './modules/tracing';
@@ -93,6 +94,7 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     name: 'FeedbackSenderEnum',
     description: JSON.stringify(FeedbackSenderEnumValue.data),
   });
+  registerEnumType(UserRelationType, { name: 'UserRelationType' });
   registerEnumType(Mode, { name: 'Mode' });
   registerEnumType(AppUpgradeMode, { name: 'AppUpgradeMode' });
   registerEnumType(Platform, { name: 'Platform' });

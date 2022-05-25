@@ -87,7 +87,7 @@ export const CursoredResponse = <Item>(ItemClass: ClassType<Item>) => {
   @ObjectType({ isAbstract: true, implements: () => [CursoredPageable] })
   abstract class CursoredResponseClass extends CursoredPageable<Item> {
     // here we use the runtime argument
-    @Field((type) => [ItemClass])
+    @Field((type) => [ItemClass], { nullable: 'items' })
     // and here the generic type
     items: Item[];
   }
@@ -124,13 +124,7 @@ export class CursorInfo {
 }
 
 @InterfaceType()
-export class CursoredPageable<T> implements CursoredRequest {
-  @Field((returns) => Int, { description: '拉取数量', deprecationReason: 'will remove later' })
-  first: number;
-
-  @Field((returns) => ID, { description: '最后的游标', deprecationReason: 'will remove later', nullable: true })
-  after?: string | number;
-
+export class CursoredPageable<T> {
   @Field((returns) => Int) total: number;
   @Field((returns) => CursorInfo) cursorInfo: CursorInfo;
 

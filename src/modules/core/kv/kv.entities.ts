@@ -6,7 +6,7 @@ import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
 import { CacheUtils } from '../../cache/utils';
-import { EntityMetaInfo, JsonMap, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
 
 import type { KeyValueModel } from './kv.isolated.entities';
@@ -55,7 +55,7 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Field((returns) => scalars.GraphQLJSONObject)
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
-  public extra?: JsonMap;
+  public extra?: Record<string, any>;
 
   @OneToOne('KeyValueModel', (inverse: KeyValueModel) => inverse.pair)
   public model: KeyValueModel;

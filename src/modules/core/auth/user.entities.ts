@@ -6,6 +6,7 @@ import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMa
 
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
+import { UserRelation } from '../interaction/friends.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
@@ -33,6 +34,9 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
 
   @OneToMany('UserFollow', (inverse: UserFollow) => inverse.follower)
   follows: UserFollow[];
+
+  @OneToMany('UserRelation', (inverse: UserRelation) => inverse.user)
+  relations: UserRelation[];
 
   @OneToMany('PointExchange', (inverse: PointExchange) => inverse.profile)
   exchangeRecords: PointExchange[];

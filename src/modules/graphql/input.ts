@@ -1,4 +1,4 @@
-import { ArgsType, Field, ID, InputType, Int } from '@nestjs/graphql';
+import { Field, ID, InputType, Int } from '@nestjs/graphql';
 
 import { ExclusiveConstraintValidator } from '@danielwii/asuna-helper/dist/validate';
 
@@ -29,9 +29,12 @@ export interface CursoredRequest {
 @InputType()
 export class CursoredRequestInput implements CursoredRequest {
   @Field((type) => Int, { description: '拉取数量', nullable: true, defaultValue: 10 })
+  @IsInt()
+  @IsOptional()
   public first: number;
 
   @Field((type) => ID, { description: '最后的游标', nullable: true })
+  @IsOptional()
   public after?: string | number;
 }
 

@@ -8,8 +8,8 @@ import * as fp from 'lodash/fp';
 import {
   BaseEntity,
   FindManyOptions,
-  FindOptionsWhere,
   FindOptionsOrder,
+  FindOptionsWhere,
   JoinOptions,
   LessThan,
   MoreThan,
@@ -498,38 +498,45 @@ export class GraphqlHelper {
 
   public static async handleCursoredQueryRequest<Entity extends BaseEntity>({
     cls,
-    cursoredRequest,
+    request,
     where,
+    relations,
   }: {
     cls: ClassType<Entity>;
-    cursoredRequest: CursoredRequestInput;
+    request: CursoredRequestInput;
     where?: FindOptionsWhere<Entity>[] | FindOptionsWhere<Entity>;
+    relations?: boolean | { relations?: string[]; disableMixedMap?: boolean };
   }): Promise<CursoredPageable<Entity>> {
     const entityRepo = cls as any as Repository<Entity>;
     const countOptions = where || {};
     const total = await entityRepo.countBy(countOptions as FindOptionsWhere<Entity>);
-    // const offsetOptions = await F.when(
-    //   cursoredRequest.after,
-    //   () => this.genericFindOptions({ cls, pageRequest: { size: first } }),
-    //   {},
-    // );
-    // const offset = await entityRepo.find(offsetOptions);
-    const first = cursoredRequest.first > 0 && cursoredRequest.first <= 20 ? cursoredRequest.first : 10;
-    const hasNextPage = first < total;
+    const first = request.first > 0 && request.first <= 20 ? request.first : 10;
     const findOptions = await this.genericFindOptions({
       cls,
-      where: { ...(cursoredRequest.after ? { id: MoreThan(cursoredRequest.after) } : {}) } as any,
+      where: { ...where, ...(request.after ? { id: LessThan(request.after) } : {}) } as any,
       pageRequest: { size: first },
+      relations,
     });
     const items = await entityRepo.find(findOptions);
-    logger.debug(`handleCursoredQueryRequest ${r({ countOptions, total, findOptions, first, cursoredRequest })}`);
-    return {
-      items,
-      total,
-      first,
-      after: cursoredRequest.after,
-      cursorInfo: { hasNextPage, endCursor: _.get(_.last(items), 'id') },
-    };
+    // 同样就认为存在更多，如果刚好不存在，就返回之前的 endCursor 也就是 after
+    const hasNextPage = first === items.length;
+    const latest = _.last(items);
+    const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? request.after };
+    logger.debug(
+      `handleCursoredQueryRequest ${r({ countOptions, total, findOptions, first, request, latest, cursorInfo })}`,
+    );
+    return { items, total, cursorInfo };
+  }
+
+  public static async handleCursoredRequest<Item>({ countCaller, itemsCaller, request }) {
+    const total: number = await countCaller();
+    const items: Item[] = (await itemsCaller()) ?? [];
+    const first = request.first > 0 && request.first <= 20 ? request.first : 10;
+    const hasNextPage = first === items.length;
+    const latest = _.last(items);
+    const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? request.after };
+    logger.debug(`handleCursoredRequest ${r({ total, first, request, latest, cursorInfo })}`);
+    return { items, total, cursorInfo };
   }
 }
 

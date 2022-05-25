@@ -5,12 +5,13 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { ActivitiesController } from './activities.controller';
 import { ActivitiesResolver } from './activities.resolver';
 import { InteractionController } from './interaction.controller';
+import { UserRelationQueryResolver, UserRelationResolver } from './resolver';
 
 const logger = LoggerFactory.getLogger('InteractionModule');
 
 @Module({
   imports: [],
-  providers: [ActivitiesResolver],
+  providers: [ActivitiesResolver, UserRelationQueryResolver, UserRelationResolver],
   exports: [],
   controllers: [ActivitiesController, InteractionController],
 })

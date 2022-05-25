@@ -64,10 +64,10 @@ export class PaymentQueryResolver extends QueryResolver {
   // @UseGuards(new GqlAdminAuthGuard())
   @Query((returns) => CursoredVisitorResponse)
   public async admin_paged_payment_orders(
-    @Args('cursoredRequest', { type: () => CursoredRequestInput }) cursoredRequest: CursoredRequestInput,
+    @Args('request', { type: () => CursoredRequestInput }) request: CursoredRequestInput,
   ): Promise<CursoredPageable<PaymentOrder>> {
-    this.logger.log(`admin_paged_payment_orders ${r(cursoredRequest)}`);
-    return GraphqlHelper.handleCursoredQueryRequest({ cls: PaymentOrder, cursoredRequest });
+    this.logger.log(`admin_paged_payment_orders ${r(request)}`);
+    return GraphqlHelper.handleCursoredQueryRequest({ cls: PaymentOrder, request });
   }
 }
 

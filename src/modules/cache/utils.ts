@@ -18,6 +18,7 @@ export class CacheUtils {
   }
 
   public static async clearAll(): Promise<void> {
+    CacheManager.default.clearAll();
     const redis = RedisProvider.getRedisClient('cache_utils');
     if (redis.isEnabled) {
       const redisKeys = await redis.client.keys('kv#*');
