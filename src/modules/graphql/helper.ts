@@ -340,8 +340,11 @@ export class GraphqlHelper {
   ): Promise<RelationEntity> {
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
-      logger.error(`no relation ${opts.key} exists in ${opts.cls.name}. list: ${relations}`);
-      throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
+      logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
+      throw new AsunaException(
+        AsunaErrorCode.Unprocessable,
+        `unresolved relation ${String(opts.key)} for ${opts.cls.name}`,
+      );
     }
 
     const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
@@ -400,21 +403,28 @@ export class GraphqlHelper {
     const { mapper } = opts as BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>;
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
-      logger.error(`no relation ${opts.key} exists in ${opts.cls.name}. list: ${relations}`);
-      throw new AsunaException(AsunaErrorCode.Unprocessable, `unresolved relation ${opts.key} for ${opts.cls.name}`);
+      logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
+      throw new AsunaException(
+        AsunaErrorCode.Unprocessable,
+        `unresolved relation ${String(opts.key)} for ${opts.cls.name}`,
+      );
     }
 
     // logger.debug(`resolve properties by ${r(opts)}`);
     let ids = opts.instance[opts.key];
     if (_.isNil(ids)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      logger.debug(`no ids for ${opts.key} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`);
+      logger.debug(
+        `no ids for ${String(opts.key)} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`,
+      );
       const result: any = (await (opts.cls as any as typeof BaseEntity).findOne({
         where: { [primaryKey]: opts.instance[primaryKey] },
         loadRelationIds: { relations: [opts.key as string] },
         cache: opts.cache,
       })) as Entity;
-      logger.debug(`load ${result[opts.key].length} ${opts.key} for ${opts.cls.name} ${opts.instance[primaryKey]}`);
+      logger.debug(
+        `load ${result[opts.key].length} ${String(opts.key)} for ${opts.cls.name} ${opts.instance[primaryKey]}`,
+      );
       ids = result[opts.key];
     }
     if (_.isEmpty(ids)) return [];

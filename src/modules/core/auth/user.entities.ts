@@ -35,7 +35,7 @@ export class UserProfile extends AbstractTimeBasedAuthUser {
   @OneToMany('UserFollow', (inverse: UserFollow) => inverse.follower)
   follows: UserFollow[];
 
-  @OneToMany('UserRelation', (inverse: UserRelation) => inverse.user)
+  @OneToMany('UserRelation', (inverse: UserRelation) => inverse.profile)
   relations: UserRelation[];
 
   @OneToMany('PointExchange', (inverse: PointExchange) => inverse.profile)
