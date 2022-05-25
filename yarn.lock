@@ -684,9 +684,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@danielwii/asuna-helper@npm:^0.0.31":
-  version: 0.0.31
-  resolution: "@danielwii/asuna-helper@npm:0.0.31::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.31%2F09cb30f4b49d11ebe313eb11923fff09e1b9861a7b5d060b3a7b89d2a3caac66"
+"@danielwii/asuna-helper@npm:^0.0.32":
+  version: 0.0.32
+  resolution: "@danielwii/asuna-helper@npm:0.0.32::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40danielwii%2Fasuna-helper%2F0.0.32%2Fe2753de9e2d23e69baded5f58c933ef1c401a689e4324e80a1e7c31997e43f09"
   dependencies:
     "@nestjs/common": ^8.4.5
     "@nestjs/platform-express": ^8.4.5
@@ -709,7 +709,7 @@ __metadata:
     node-buffs: ^0.8.20
     ow: ^0.28.1
     query-string: ^7.1.1
-    react-use: ^17.3.2
+    react-use: ^17.4.0
     redis: ^4.1.0
     redlock: ^5.0.0-beta.2
     reflect-metadata: ^0.1.13
@@ -723,7 +723,7 @@ __metadata:
     next: ">=12"
     redis: ">=4"
     typeorm: ">=0"
-  checksum: 98e7d4829ca72b5d02c2ddf1a454f3979feafe90eb41c4fc9a52c662d8f94f1a979e469e0c14d3cd6f68bdbc83c99e836d06678b91099e4b12de06fcab03c27c
+  checksum: 20a6d18056d3d837fae99f89946273d89e87131a889c051222e433e4b8f95cbbfe79d9982266e1d4bd4699b0723f5a21bb432888f821b5d04dc65a3aae0f821f
   languageName: node
   linkType: hard
 
@@ -733,7 +733,7 @@ __metadata:
   dependencies:
     "@alicloud/pop-core": ^1.7.11
     "@babel/parser": ^7.18.3
-    "@danielwii/asuna-helper": ^0.0.31
+    "@danielwii/asuna-helper": ^0.0.32
     "@danielwii/asuna-shared": ^0.0.8
     "@nestjs/apollo": ^10.0.12
     "@nestjs/cli": ^8.2.6
@@ -13030,9 +13030,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-use@npm:^17.3.2":
-  version: 17.3.2
-  resolution: "react-use@npm:17.3.2"
+"react-use@npm:^17.4.0":
+  version: 17.4.0
+  resolution: "react-use@npm:17.4.0"
   dependencies:
     "@types/js-cookie": ^2.2.6
     "@xobotyi/scrollbar-width": ^1.9.5
@@ -13049,9 +13049,9 @@ __metadata:
     ts-easing: ^0.2.0
     tslib: ^2.1.0
   peerDependencies:
-    react: ^16.8.0  || ^17.0.0
-    react-dom: ^16.8.0  || ^17.0.0
-  checksum: 7379460f51b78c5375f8e039f59305c55efb75205d49a18d579154fcccfddf98fa9460a734e7d4cf3b1be8f1c15ec86feeab0d846fbaaa1fea425da83aaf117c
+    react: ^16.8.0  || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0  || ^17.0.0 || ^18.0.0
+  checksum: 0889da919b49a186de375ec15d2778b954ae981c523acd17dd496e4a4da7b6190efe7993491e1b85fdd6de3e745d08a4eaba4caa35408d570b5f1de550f35d11
   languageName: node
   linkType: hard
 
