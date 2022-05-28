@@ -6,12 +6,13 @@ import { ContentAdminController } from './content.admin-controller';
 import { ContentController } from './content.controller';
 import { FeedbackQueryResolver, UserFeedbackResolver } from './feedback.resolver';
 import { NotificationModule } from './notification';
+import { ContentQueryResolver } from './resolver';
 
 const logger = LoggerFactory.getLogger('ContentModule');
 
 @Module({
   imports: [NotificationModule],
-  providers: [FeedbackQueryResolver, UserFeedbackResolver],
+  providers: [FeedbackQueryResolver, UserFeedbackResolver, ContentQueryResolver],
   exports: [],
   controllers: [ContentAdminController, ContentController],
 })

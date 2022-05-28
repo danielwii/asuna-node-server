@@ -32,6 +32,7 @@ import {
   ExchangeCurrencyEnum,
   KeyValueType,
   KVModelFormatType,
+  MediaType,
   Mode,
   MongoConfigObject,
   NotificationEnum,
@@ -94,6 +95,7 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     name: 'FeedbackSenderEnum',
     description: JSON.stringify(FeedbackSenderEnumValue.data),
   });
+  registerEnumType(MediaType, { name: 'MediaType' });
   registerEnumType(UserRelationType, { name: 'UserRelationType' });
   registerEnumType(Mode, { name: 'Mode' });
   registerEnumType(AppUpgradeMode, { name: 'AppUpgradeMode' });

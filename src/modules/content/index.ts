@@ -4,3 +4,4 @@ export * from './content.module';
 export * from './data-group.entities';
 export * from './draft.entities';
 export * from './feedback.entities';
+export * from './media.entities';

@@ -13,7 +13,7 @@ import { getRequestFromContext } from './utils';
 import type { ResolveInfoCacheControl } from 'apollo-server-types';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { RequestInfo } from '../helper';
-import type { WithProfileUser } from '../core/auth';
+import type { JwtPayload, WithProfileUser } from '../core/auth';
 import type { DefaultRegisteredLoaders } from './context';
 
 const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
@@ -22,6 +22,7 @@ export type GraphQLResolveCacheInfo = GraphQLResolveInfo & { cacheControl: Resol
 export type GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> = { req: RequestInfo } & {
   getDataLoaders: () => RegisteredLoaders;
   getCurrentUser: () => U | undefined;
+  getPayload: () => JwtPayload;
   getTrace: () => SpanContext;
   getTenant: () => Tenant;
 };

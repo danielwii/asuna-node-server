@@ -160,6 +160,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
             ...context,
             getDataLoaders: () => _.get(context.req, 'dataLoaders'),
             getCurrentUser: () => _.get(context.req, 'user'),
+            getPayload: () => _.get(context.req, 'payload'),
             getTrace: () => _.get(context.req, 'trace'),
             getTenant: () => _.get(context.req, 'tenant'),
           }),
