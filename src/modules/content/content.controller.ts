@@ -25,6 +25,7 @@ class CreateFeedbackDto {
 class UpsertMediaBody {
   @IsEnum(MediaType) type: string;
   @IsArray() @IsOptional() media?: JsonArray;
+  @IsString() @IsOptional() useFor?: string;
 }
 
 const logger = LoggerFactory.getLogger('ContentController');
@@ -68,6 +69,7 @@ export class ContentController {
       profileId: payload.id,
       type: MediaType[body.type],
       content: body.media ?? [],
+      useFor: body.useFor ?? 'gallery',
     } as ContentMedia).save();
   }
 
@@ -84,6 +86,7 @@ export class ContentController {
     }
     media.type = MediaType[body.type];
     media.content = body.media;
+    media.useFor = body.useFor ?? 'gallery';
     return media.save();
   }
 

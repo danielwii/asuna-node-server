@@ -1,6 +1,6 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 
-import { BaseEntity, Column } from 'typeorm';
+import { BaseEntity, Column, DeleteDateColumn } from 'typeorm';
 
 import { MetaInfo } from '../common/decorators';
 
@@ -24,6 +24,10 @@ export const SoftDelete = <TBase extends ConstrainedConstructor<BaseEntity>>(Bas
     @MetaInfo({ name: '软删除？' })
     @Column({ name: 'is_deleted', default: false })
     public isDeleted: boolean;
+
+    @MetaInfo({ name: '删除时间' })
+    @DeleteDateColumn({ name: 'deleted_at' })
+    public deletedAt?: Date;
   }
 
   return ExtendableEntity;

@@ -26,9 +26,9 @@ export class ContentMedia extends SoftDelete(InjectMultiUserProfile(AbstractTime
   @Column(ColumnTypeHelper.JSON, { default: [] })
   content: any;
 
-  /*
-  @Column({ nullable: false, length: 36, name: 'ref_id' })
-  refId: string;*/
+  @Field({ nullable: true })
+  @Column({ nullable: true, name: 'use_for' })
+  useFor?: string;
 
   @Field((returns) => MediaType)
   @Column('enum', { nullable: false, enum: MediaType })
