@@ -1,18 +1,23 @@
+import { Injectable } from '@nestjs/common';
+
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 import { Profile } from '../../common';
 import { DBHelper, parseFields } from './db.helper';
 
 const logger = LoggerFactory.getLogger('DBService');
 
+@Injectable()
 export class DBService {
+  constructor(private readonly dataSource: DataSource) {}
+
   repos(): Repository<any>[] {
-    return getConnection()
-      .entityMetadatas.filter((metadata) => DBHelper.isValidEntity(metadata))
-      .map((metadata) => getRepository<any>(metadata.target));
+    return this.dataSource.entityMetadatas
+      .filter((metadata) => DBHelper.isValidEntity(metadata))
+      .map((metadata) => this.dataSource.getRepository<any>(metadata.target));
   }
 
   get(opts: {

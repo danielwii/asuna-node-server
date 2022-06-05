@@ -7,7 +7,14 @@ import { resolve } from 'path';
 const logger = LoggerFactory.getLogger('ConfigLoader');
 
 export const configLoader: ConfigLoader = createConfigLoader({
-  requiredVariables: [],
+  requiredVariables: [
+    'TYPEORM_TYPE',
+    'TYPEORM_HOST',
+    'TYPEORM_PORT',
+    'TYPEORM_DATABASE',
+    'TYPEORM_USERNAME',
+    'TYPEORM_PASSWORD',
+  ],
   basePath: resolve(__dirname, '../../..'),
 });
 AppEnv.regConfigLoader(configLoader);

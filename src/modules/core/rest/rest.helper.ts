@@ -7,9 +7,10 @@ import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import * as R from 'ramda';
-import { BaseEntity, getManager, ObjectLiteral } from 'typeorm';
+import { BaseEntity, ObjectLiteral } from 'typeorm';
 
 import { PrimaryKey, Profile } from '../../common';
+import { AppDataSource } from '../../datasource';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
@@ -101,7 +102,7 @@ export class RestHelper {
      * using getManger().save(entity) will trigger Entity Listener for entities
      * but repo.save and getManger().save(target, object) will not
      */
-    return getManager().save(entity as any);
+    return AppDataSource.dataSource.manager.save(entity as any);
   }
 
   public static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {

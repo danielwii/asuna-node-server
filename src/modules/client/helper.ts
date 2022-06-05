@@ -3,8 +3,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import ow from 'ow';
-import { getManager } from 'typeorm';
 
+import { AppDataSource } from '../datasource';
 import { SessionUser, VirtualDevice, VirtualSession } from './entities';
 
 import type { RequestInfo } from '../helper';
@@ -17,7 +17,7 @@ export class ClientHelper {
     ow(sdid, 'device id', ow.string.nonEmpty);
 
     let sessionUser: SessionUser;
-    await getManager().transaction(async (manager) => {
+    await AppDataSource.dataSource.transaction(async (manager) => {
       let device = await VirtualDevice.findOneBy({ id: sdid });
       if (!device) {
         const fingerprint = _.toString(req.headers['x-vfp-id']);

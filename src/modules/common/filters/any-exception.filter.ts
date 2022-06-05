@@ -10,9 +10,10 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import _ from 'lodash';
 import * as R from 'ramda';
-import { getConnection, getRepository, QueryFailedError } from 'typeorm';
+import { QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
+import { AppDataSource } from '../../datasource';
 import { StatsHelper } from '../../stats';
 
 import type { Response } from 'express';
@@ -39,7 +40,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (exception.code === 'ER_DUP_ENTRY') {
       const [, value, key] = exception.sqlMessage.match(/Duplicate entry '(.*)' for key '(.+)'/);
       const [, model] = exception.sql.match(/`(\w+)`.+/);
-      const { metadata } = getRepository(model);
+      const { metadata } = AppDataSource.dataSource.getRepository(model);
       if (!metadata) {
         logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
         return new AsunaException(AsunaErrorCode.Unprocessable, 'dup entry error');
@@ -77,8 +78,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
     if (exception.code === 'PROTOCOL_CONNECTION_LOST') {
       (async () => {
-        await getConnection().close();
-        await getConnection().connect();
+        await AppDataSource.dataSource.destroy();
+        await AppDataSource.dataSource.initialize();
       })();
       return new AsunaException(AsunaErrorCode.Unprocessable, 'connection lost, reconnect...');
     }

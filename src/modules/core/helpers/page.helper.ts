@@ -5,7 +5,9 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';
-import { EntityManager, getManager } from 'typeorm';
+import { EntityManager } from 'typeorm';
+
+import { AppDataSource } from '../../datasource';
 
 import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
@@ -58,7 +60,7 @@ export class PageHelper {
   ): Promise<T[]> {
     const totalPages = Math.ceil(total / (size ?? 100));
     return Promise.mapSeries(_.range(totalPages), (page) =>
-      getManager().transaction((entityManager) => handler(page + 1, totalPages, entityManager)),
+      AppDataSource.dataSource.transaction((entityManager) => handler(page + 1, totalPages, entityManager)),
     );
   }
 

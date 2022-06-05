@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
 
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
-import { Connection, getManager, In } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
@@ -20,8 +19,8 @@ const logger = LoggerFactory.getLogger('AdminAuthService');
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
-  public constructor(@InjectConnection() private readonly connection: Connection) {
-    super(AdminUser, connection.getRepository<AdminUser>(AdminUser));
+  public constructor(private readonly dataSource: DataSource) {
+    super(AdminUser, dataSource.getRepository<AdminUser>(AdminUser));
   }
 
   public async createUser(
@@ -43,9 +42,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     user.salt = salt;
     user.roles = roles;
     logger.log(`update user with roles ${r({ roleNames, roles })}`);
-    return getManager()
-      .save(user)
-      .then((user) => ({ user }));
+    return this.dataSource.manager.save(user).then((user) => ({ user }));
   }
 
   /**
@@ -60,7 +57,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
 
     if (!role) {
       const entity = Role.create({ name: SYS_ROLE });
-      await getManager().save(entity);
+      await this.dataSource.manager.save(entity);
     }
     logger.log(`found sys role: ${!!role}`);
 

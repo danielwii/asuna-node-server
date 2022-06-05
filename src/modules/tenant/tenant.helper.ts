@@ -112,7 +112,7 @@ export class TenantHelper {
     return CacheManager.default.cacheable(
       'tenant.config',
       async () => {
-        const entities = DBHelper.getModelsHasRelation(Tenant);
+        const entities = await DBHelper.getModelsHasRelation(Tenant);
         const keyValues = _.assign(
           {},
           TenantFieldKeys,

@@ -3,9 +3,10 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
-import { EntityManager, getManager } from 'typeorm';
+import { EntityManager } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
+import { AppDataSource } from '../datasource';
 import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 
@@ -69,7 +70,7 @@ export class PropertyHelper {
   }
 
   public static async topUp(payload: TopUpPayload): Promise<FinancialTransaction> {
-    return getManager().transaction(async (manager) => {
+    return AppDataSource.dataSource.transaction(async (manager) => {
       const profile = await PropertyHelper.getUserProfileWithWallet(payload.profileId, manager);
 
       const [before, after] = [profile.wallet.balance, profile.wallet.balance + payload.amount];
@@ -95,7 +96,7 @@ export class PropertyHelper {
   }
 
   public static async exchange(payload: ExchangePayload): Promise<FinancialTransaction> {
-    return getManager().transaction(async (manager) => {
+    return AppDataSource.dataSource.transaction(async (manager) => {
       const profile = await this.getUserProfileWithWallet(payload.profileId, manager);
       const exchangeObject = await ExchangeObject.findOneBy({ key: payload.key });
 

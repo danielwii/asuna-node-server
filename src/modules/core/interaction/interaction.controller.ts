@@ -9,8 +9,8 @@ import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
-import { getManager } from 'typeorm';
 
+import { AppDataSource } from '../../datasource';
 import { JwtAuthGuard, JwtAuthRequest, JwtAuthRequestExtractor } from '../auth';
 import { UserHelper } from '../user.helper';
 import { UserRelation, UserRelationType } from './friends.entities';
@@ -85,7 +85,7 @@ export class InteractionController {
       throw new AsunaException(AsunaErrorCode.Unprocessable, '无效的申请');
     }
 
-    await getManager().transaction(async (entityManager) => {
+    await AppDataSource.dataSource.transaction(async (entityManager) => {
       relation.type = UserRelationType.accepted;
       await entityManager.save(relation);
       // 需要增加一个双向 id

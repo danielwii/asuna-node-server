@@ -186,7 +186,7 @@ export class TenantService {
 
         // eslint-disable-next-line no-param-reassign
         entity.tenant = tenant;
-        await (entity as any).save(); // getManager().save(entity);
+        await (entity as any).save();
       } else {
         // logger.error(`tenant column found but firstModelName not detected.`);
       }

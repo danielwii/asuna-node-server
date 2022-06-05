@@ -3,7 +3,9 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
-import { BaseEntity, getConnection } from 'typeorm';
+import { BaseEntity } from 'typeorm';
+
+import { AppDataSource } from '../../datasource';
 
 const logger = LoggerFactory.getLogger('DBCacheCleaner');
 
@@ -25,9 +27,7 @@ export class DBCacheCleaner {
     ])(this.registers);
     if (!_.isEmpty(triggers)) {
       logger.debug(`clear ${r(triggers)}`);
-      getConnection()
-        .queryResultCache?.remove(triggers)
-        .catch((reason) => logger.error(reason));
+      AppDataSource.dataSource.queryResultCache?.remove(triggers).catch((reason) => logger.error(reason));
     }
   }
 }

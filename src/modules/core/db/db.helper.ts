@@ -13,8 +13,6 @@ import {
   EntityMetadata,
   Equal,
   FindOperator,
-  getConnection,
-  getRepository,
   In,
   IsNull,
   LessThan,
@@ -23,17 +21,15 @@ import {
   Not,
   ObjectType,
   QueryBuilder,
-  ObjectLiteral,
   Raw,
   Repository,
   SelectQueryBuilder,
-  FindOptionsUtils,
 } from 'typeorm';
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import { WhereClauseCondition } from 'typeorm/query-builder/WhereClause';
 
 import { Profile } from '../../common/helpers/normal';
+import { AppDataSource } from '../../datasource';
 import { Role } from '../auth/auth.entities';
 import { AsunaContext } from '../context';
 
@@ -304,7 +300,7 @@ export class DBHelper {
 
   public static loadMetadatas(): EntityMetadata[] {
     if (DBHelper.metadatas.length === 0) {
-      getConnection().entityMetadatas.forEach((metadata) => {
+      AppDataSource.dataSource.entityMetadatas.forEach((metadata) => {
         if (DBHelper.isValidEntity(metadata)) {
           DBHelper.metadatas.push(metadata);
         }
@@ -323,10 +319,10 @@ export class DBHelper {
     return !_.isEmpty(included);
   }
 
-  public static getModelsHasRelation<E extends BaseEntity>(
+  public static async getModelsHasRelation<E extends BaseEntity>(
     entity: ObjectType<E>,
     excludes?: typeof BaseEntity[],
-  ): (typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[] {
+  ): Promise<(typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[]> {
     const excludeNames = new Set(_.map(excludes, fp.get('name')));
     return DBHelper.loadMetadatas()
       .filter((metadata) => {
@@ -429,13 +425,13 @@ export class DBHelper {
     if (_.isString(entity)) {
       const entityMetadata = DBHelper.getMetadata(DBHelper.getModelNameObject(entity as string).model);
       if (entityMetadata) {
-        return getRepository<Entity>(entityMetadata.target);
+        return AppDataSource.dataSource.getRepository<Entity>(entityMetadata.target);
       }
       throw new ErrorException('Repository', `no valid repository for '${entity}' founded...`);
     } else if ((entity as ModelNameObject).model) {
-      return getRepository<Entity>((entity as ModelNameObject).dbName);
+      return AppDataSource.dataSource.getRepository<Entity>((entity as ModelNameObject).dbName);
     } else {
-      return getRepository<Entity>(entity as ObjectType<Entity>);
+      return AppDataSource.dataSource.getRepository<Entity>(entity as ObjectType<Entity>);
     }
   }
 
@@ -636,16 +632,13 @@ export class DBHelper {
 
           if (_.isObjectLike(innerValue) && innerValue.toSql) {
             innerValue = elementCondition._value.toSql(
-              getConnection(),
+              AppDataSource.dataSource,
               `${relatedModel}.id`,
               elementCondition._value._value,
             );
             logger.log(`create innerValue for '${relatedModel}.id' by ${r(elementCondition._value._value)}`);
           } else {
-            // const v1 = elementCondition.toSql(getConnection(), `${relatedModel}.id`, innerValue);
-            // const v2 = elementCondition.toSql(getConnection(), `${relatedModel}.id`, [innerValue]);
-            // logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}' - ${r({ v1, v2 })}`);
-            innerValue = elementCondition.toSql(getConnection(), `${relatedModel}.${relatedField}`, [
+            innerValue = elementCondition.toSql(AppDataSource.dataSource, `${relatedModel}.${relatedField}`, [
               `'${innerValue}'`,
             ]);
             logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}'`);

@@ -5,10 +5,10 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 import * as R from 'ramda';
-import { getConnection } from 'typeorm';
 
 import { Profile } from '../common';
 import { DBHelper, parseListParam, parseNormalWhereAndRelatedFields, parseOrder, parseWhere } from '../core/db';
+import { AppDataSource } from '../datasource';
 
 const logger = LoggerFactory.getLogger('SearchController');
 
@@ -74,9 +74,13 @@ export class SearchController {
         let innerValue = elementCondition._value;
 
         if (_.isObjectLike(innerValue) && innerValue.toSql) {
-          innerValue = elementCondition._value.toSql(getConnection(), `${field}.id`, elementCondition._value._value);
+          innerValue = elementCondition._value.toSql(
+            AppDataSource.dataSource,
+            `${field}.id`,
+            elementCondition._value._value,
+          );
         } else {
-          innerValue = elementCondition.toSql(getConnection(), `${field}.id`, innerValue);
+          innerValue = elementCondition.toSql(AppDataSource.dataSource, `${field}.id`, innerValue);
         }
 
         if (elementCondition._type === 'not') {

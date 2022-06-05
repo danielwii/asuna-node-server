@@ -10,11 +10,11 @@ import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
 import { FindOneOptions, Repository } from 'typeorm';
-import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 
+import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';

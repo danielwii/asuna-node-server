@@ -23,7 +23,6 @@ import helmet from 'helmet';
 import _ from 'lodash';
 import morgan from 'morgan';
 import responseTime from 'response-time';
-import { getConnectionOptions } from 'typeorm';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
@@ -137,11 +136,9 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME || '2000';
   logger.log(`set slow query time ${process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME}`);
-  const dbConfig = await getConnectionOptions();
+  // const dbConfig = await getConnectionOptions();
   logger.log(`Global is ${r({ ...Global })}`);
-  logger.log(
-    `dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`,
-  );
+  // logger.log(`dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`);
 
   const mongoConfig = MongoConfigObject.load();
   logger.log(
@@ -188,7 +185,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     bufferLogs: true,
   };
   const module = options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule;
-  logger.log(`create app ... ${r({ module, appOptions })}`);
+  logger.log(`create app ... ${r({ module, appOptions, options })}`);
   const app = await NestFactory.create<NestExpressApplication>(module, appOptions);
 
   await syncDbWithLockIfPossible(app, options);

@@ -18,12 +18,12 @@ export class CacheManager {
   public constructor(name: string, options?: LRUCache.Options<string, any>) {
     if (caches.has(name)) {
       this.cache = caches.get(name);
-      logger.log(`create cache: ${name}`);
+      // logger.log(`get preset cache: ${name}`);
     } else {
+      logger.log(`create cache: ${name}`);
       const cache = new LRUCache<string, any>(options ?? { max: 500, ttl: CacheTTL.LONG_1 });
       this.cache = cache;
       caches.set(name, cache);
-      logger.log(`get preset cache: ${name}`);
     }
   }
 

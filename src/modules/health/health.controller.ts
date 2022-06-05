@@ -13,7 +13,6 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import checkDiskSpace from 'check-disk-space';
 import _ from 'lodash';
 import { dirname, resolve } from 'path';
-import { getConnection } from 'typeorm';
 
 import { MQHealthIndicator, MQProvider, RedisHealthIndicator } from '../providers';
 
@@ -40,7 +39,6 @@ export class HealthController {
     return this.health.check(
       _.compact([
         // () => this.dns.pingCheck('dns', 'https://1.1.1.1'),
-        // () => this.typeorm.pingCheck('database', { timeout: 1000, connection: getConnection() }),
         // () => this.memory.checkHeap('memory_heap', 1024 * 1024 * 1024),
         // () => this.memory.checkRSS('memory_rss', 3072 * 1024 * 1024),
         // () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: this.path }),
