@@ -188,6 +188,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   logger.log(`create app ... ${r({ module, appOptions, options })}`);
   const app = await NestFactory.create<NestExpressApplication>(module, appOptions);
 
+  logger.log(`sync db ...`);
   await syncDbWithLockIfPossible(app, options);
   await AppLifecycle.onInit(app);
 

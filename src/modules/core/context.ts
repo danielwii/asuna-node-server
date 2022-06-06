@@ -2,6 +2,7 @@ import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import { join } from 'path';
@@ -44,16 +45,17 @@ export class AsunaContext {
   // public tempPath: string;
 
   public defaultStorageEngine: IStorageEngine;
-  /**
+  /*
+  /!**
    * @see AsunaContext.defaultStorageEngine
    * @deprecated
-   */
+   *!/
   public videosStorageEngine: IStorageEngine;
-  /**
+  /!**
    * @see AsunaContext.defaultStorageEngine
    * @deprecated
-   */
-  public filesStorageEngine: IStorageEngine;
+   *!/
+  public filesStorageEngine: IStorageEngine;*/
 
   public chunksStorageEngine: IStorageEngine;
   public localStorageEngine: IStorageEngine;
@@ -139,6 +141,7 @@ export class AsunaContext {
     }
 */
 
+    /*
     const videoStorage = configLoader.loadConfig(ConfigKeys.VIDEOS_STORAGE);
     if (videoStorage === StorageMode.QINIU) {
       this.videosStorageEngine = new QiniuStorage(() => QiniuConfigObject.loadOr('videos'));
@@ -159,7 +162,7 @@ export class AsunaContext {
       });
     } else {
       this.filesStorageEngine = new LocalStorage(Global.uploadPath, 'files');
-    }
+    }*/
 
     this.localStorageEngine = new LocalStorage(Global.uploadPath, 'local');
 
@@ -176,11 +179,11 @@ export class AsunaContext {
 
     logger.log(
       `initStorageEngine ${r({
-        default: this.defaultStorageEngine,
-        videos: this.videosStorageEngine,
+        default: instanceToPlain(this.defaultStorageEngine),
+        // videos: this.videosStorageEngine,
         chunks: this.chunksStorageEngine,
         local: this.localStorageEngine,
-        files: this.filesStorageEngine,
+        // files: this.filesStorageEngine,
       })}`,
     );
   }

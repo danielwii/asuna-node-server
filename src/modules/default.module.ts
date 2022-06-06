@@ -34,13 +34,14 @@ const logger = LoggerFactory.getLogger('<DefaultModule>');
           })}`,
         );
         const options: TypeOrmModuleOptions = {
-          logging: process.env.TYPEORM_LOGGING as any,
+          logging: configLoader.loadConfig('TYPEORM_LOGGING', 'all'),
+          loggerLevel: configLoader.loadConfig('TYPEORM_LOGGER_LEVEL', 'debug'),
           // url: process.env.DATABASE_URL ?? process.env.TYPEORM_URL,
           debug: true,
           trace: true,
           type: configLoader.loadConfig('TYPEORM_TYPE'),
           synchronize: configLoader.loadBoolConfig('TYPEORM_SYNCHRONIZE', false),
-          database: configLoader.loadConfig('TYPEORM_DATABASE'),
+          database: configLoader.loadConfig('TYPEORM_DATABASE') as any,
           host: configLoader.loadConfig('TYPEORM_HOST'),
           port: configLoader.loadConfig('TYPEORM_PORT'),
           username: configLoader.loadConfig('TYPEORM_USERNAME'),
@@ -55,7 +56,7 @@ const logger = LoggerFactory.getLogger('<DefaultModule>');
             // connection timeout
             // connectionTimeoutMillis: 1000,
           },
-        } as any;
+        };
         logger.log(`init datasource by ${r(_.omit(options, 'password'))}`);
         return options;
       },

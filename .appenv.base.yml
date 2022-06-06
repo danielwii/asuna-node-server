@@ -115,23 +115,23 @@ redis:
   #PREFIX_REDIS_DB:
 
 # --- mysql ---
-db: # TODO
-  # default: mysql57 ; mysql56 | mysql57 | postgres
-  DB_TYPE:
-  TYPEORM_SYNCHRONIZE: false
-  #TYPEORM_DEBUG: true
-  # error | true
-  TYPEORM_LOGGING: error
-  # https://github.com/typeorm/typeorm/blob/master/docs/logging.md
-  # advanced-console | simple-console | file | debug
-  TYPEORM_LOGGER: advanced-console
-
-  TYPEORM_CONNECTION: mysql
-  TYPEORM_HOST:
-  #TYPEORM_PORT:
-  TYPEORM_DATABASE: db_name
-  TYPEORM_USERNAME:
-  TYPEORM_PASSWORD:
+#db: # TODO
+#  # default: mysql57 ; mysql56 | mysql57 | postgres
+#  DB_TYPE:
+#  TYPEORM_SYNCHRONIZE: false
+#  #TYPEORM_DEBUG: true
+#  # error | true
+#  TYPEORM_LOGGING: error
+#  # https://github.com/typeorm/typeorm/blob/master/docs/logging.md
+#  # advanced-console | simple-console | file | debug
+#  TYPEORM_LOGGER: advanced-console
+#
+#  TYPEORM_CONNECTION: mysql
+#  TYPEORM_HOST:
+#  #TYPEORM_PORT:
+#  TYPEORM_DATABASE: db_name
+#  TYPEORM_USERNAME:
+#  TYPEORM_PASSWORD:
 
   # --- db-cache ---
   #TYPEORM_CACHE_ALWAYS_ENABLED: true
