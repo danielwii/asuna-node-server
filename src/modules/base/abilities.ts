@@ -23,7 +23,7 @@ export const SoftDelete = <TBase extends ConstrainedConstructor<BaseEntity>>(Bas
   class ExtendableEntity extends Base {
     @MetaInfo({ name: '软删除？' })
     @Column({ name: 'is_deleted', default: false })
-    public isDeleted: boolean;
+    public isDeleted?: boolean;
 
     @MetaInfo({ name: '删除时间' })
     @DeleteDateColumn({ name: 'deleted_at' })
