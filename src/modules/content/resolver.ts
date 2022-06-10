@@ -28,7 +28,7 @@ export class ContentQueryResolver {
     const { id } = ctx.getPayload();
     this.logger.log(`${funcName}: ${r({ id })}`);
 
-    return ContentMedia.find({ where: { profileId: id, isDeleted: false }, order: { createdAt: 'desc' } });
+    return ContentMedia.find({ where: { profileId: id }, order: { createdAt: 'desc' } });
   }
 
   @UseGuards(new GqlAuthGuard())
@@ -43,6 +43,6 @@ export class ContentQueryResolver {
     const { id } = ctx.getPayload();
     this.logger.log(`${funcName}: ${r({ id })}`);
 
-    return ContentMedia.findOneBy({ profileId: id, isDeleted: false, useFor });
+    return ContentMedia.findOneBy({ profileId: id, useFor });
   }
 }

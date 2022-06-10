@@ -80,7 +80,7 @@ export class ContentController {
 
     const { payload } = req;
     logger.log(`edit media ${r({ payload, id, body })}`);
-    const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id, isDeleted: false });
+    const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id });
     if (!media) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, '找不到对应的资源');
     }
@@ -97,7 +97,7 @@ export class ContentController {
 
     const { payload } = req;
     logger.log(`delete media ${r({ payload, id })}`);
-    const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id, isDeleted: false });
+    const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id });
     // if (!media) {
     //   throw new AsunaException(AsunaErrorCode.Unprocessable, '找不到对应的资源');
     // }

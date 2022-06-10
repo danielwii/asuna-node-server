@@ -21,10 +21,6 @@ export const Publishable = <TBase extends ConstrainedConstructor<BaseEntity>>(Ba
 export const SoftDelete = <TBase extends ConstrainedConstructor<BaseEntity>>(Base: TBase) => {
   @InterfaceType()
   class ExtendableEntity extends Base {
-    @MetaInfo({ name: '软删除？' })
-    @Column({ name: 'is_deleted', default: false })
-    public isDeleted?: boolean;
-
     @MetaInfo({ name: '删除时间' })
     @DeleteDateColumn({ name: 'deleted_at' })
     public deletedAt?: Date;
