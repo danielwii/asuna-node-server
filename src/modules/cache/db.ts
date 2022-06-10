@@ -108,7 +108,7 @@ export class InMemoryDB {
   ): Promise<Value> {
     const keyStr = isPrefixObject(key) ? InMemoryDB.calcKey(key) : (key as string);
     const prefix = isPrefixObject(key) ? key.prefix : 'cache-db';
-    const strategy = options?.strategy ?? 'cache-only';
+    const strategy = options?.strategy ?? 'cache-first';
 
     const redis = RedisProvider.getRedisClient(prefix, options?.db);
     // logger.log(`redis is ${r(redis)}`);
