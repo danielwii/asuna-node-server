@@ -1,5 +1,6 @@
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import ow from 'ow';
@@ -49,13 +50,16 @@ export class AuthedUserHelper {
       return UserRegister.Entity.findOneOrFail({ where: { id }, ...options });
     }
     ow(id, 'id', ow.string.nonEmpty);
-    logger.log(`get user by id ${id}`);
-    const entity = await UserRegister.Entity.findOneById(id);
+    logger.log(`get user by id '${id}' ${r(options)}`);
+    const entity = await UserRegister.Entity.findOne({ where: { id }, ...options });
     if (!entity) {
       throw new AsunaException(AsunaErrorCode.InvalidAuthToken, `no user found`);
     }
+    return entity;
+    /*
     const fixedId = _.isNumber(entity?.id) ? Number(id.slice(1)) : id;
-    return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options });
+    logger.log(`get user by fixed id '${fixedId}' ${r(options)}`);
+    return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options });*/
   }
 
   static async getProfileByUserId(userId: string): Promise<UserProfile> {

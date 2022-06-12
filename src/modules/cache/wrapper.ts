@@ -3,7 +3,7 @@ import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { CacheScope } from 'apollo-server-types';
 import { Promise } from 'bluebird';
 
-import { InMemoryDB } from './db';
+import { CacheKey, InMemoryDB } from './db';
 
 import type { GraphqlContext, GraphQLResolveCacheInfo } from '../dataloader/dataloader.interceptor';
 
@@ -11,7 +11,7 @@ const logger = LoggerFactory.getLogger('CacheWrapper');
 
 interface CacheWrapperDoOptions<V> {
   prefix?: string;
-  key: any;
+  key: string | CacheKey;
   resolver: () => Promise<V>;
   expiresInSeconds?: number;
   strategy?: 'cache-only' | 'cache-first';
@@ -37,7 +37,7 @@ export class CacheWrapper {
     const scope = hint.scope === CacheScope.Private ? ctx.getPayload().id : CacheScope.Public;
     return CacheWrapper.do({
       prefix: 'resolver:cache',
-      key: { ...key, scope },
+      key: { key, prefix: scope },
       resolver,
       expiresInSeconds: hint.maxAge,
     });

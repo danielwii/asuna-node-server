@@ -329,6 +329,23 @@ export class KvHelper {
   }
 
   public static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
+    return CacheWrapper.do({
+      prefix: 'kv:cache',
+      key: { prefix: collection, key },
+      resolver: async () =>
+        KeyValuePair.findBy({
+          collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
+          ...(key ? { key } : {}),
+        }).then(
+          fp.map((item) => {
+            // eslint-disable-next-line no-param-reassign
+            [, item.value] = recognizeTypeValue(item.type, item.value);
+            return item;
+          }),
+        ),
+      expiresInSeconds: 60,
+    });
+    /*
     return KeyValuePair.findBy({
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
       ...(key ? { key } : {}),
@@ -338,7 +355,7 @@ export class KvHelper {
         [, item.value] = recognizeTypeValue(item.type, item.value);
         return item;
       }),
-    );
+    );*/
   }
 
   public static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
@@ -392,6 +409,7 @@ export class KvHelper {
       key: kvDef,
       resolver: async () => (await KvHelper.get(kvDef))?.value,
       strategy: 'cache-first',
+      expiresInSeconds: 60,
     });
     if (!fields) return;
 
