@@ -9,18 +9,18 @@ import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import ow from 'ow';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
+import { named } from '../../helper/annotations';
 
-import type { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
 import type { PrimaryKey } from '../../common';
 import type { CreatedUser } from './auth.service';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 
 const logger = LoggerFactory.getLogger('AbstractAuthService');
 
@@ -121,11 +121,16 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return TokenHelper.createToken(authUser, extra);
   }
 
-  public async updateLastLoginDate(uid: PrimaryKey): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
+  @named
+  public async updateLastLoginDate(
+    uid: PrimaryKey,
+    funcName?: string,
+  ): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
     const authUser = await this.authUserRepository.findOneBy({ id: uid as any });
     if (authUser) {
       const currentDate = new Date();
-      const calendarDays = differenceInCalendarDays(authUser.lastLoginAt, currentDate);
+      const calendarDays = differenceInCalendarDays(currentDate, authUser.lastLoginAt);
+      logger.debug(`<${funcName}> ${r({ lastLoginAt: authUser.lastLoginAt, currentDate, diff: calendarDays })}`);
       if (authUser.lastLoginAt && calendarDays < 1) {
         return { sameDay: true, lastLoginAt: authUser.lastLoginAt };
       }
