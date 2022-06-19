@@ -1,12 +1,11 @@
 import * as Sentry from '@sentry/node';
 
-import { ClassSerializerInterceptor, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -52,6 +51,7 @@ import { AsunaContext, Global } from './modules/core';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
+import { resolveModule } from './modules/logger/resolver';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
 import './typeorm.fixture';
@@ -62,7 +62,7 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
 export const bootstrap = (appModule, options: BootstrapOptions) => {
-  const logger = LoggerFactory.getLogger('bootstrap');
+  const logger = new Logger(resolveModule(__filename, 'bootstrap'));
   process.on('unhandledRejection', (reason, p) => {
     logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
     consola.error(r(reason));
@@ -126,7 +126,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   // eslint-disable-next-line
   require('events').EventEmitter.defaultMaxListeners = 15;
 
-  const logger = LoggerFactory.getLogger('run');
+  const logger = new Logger(resolveModule(__filename, 'run'));
 
   logger.log(`options: ${r({ appModule, options })}`);
 
@@ -181,7 +181,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   }
   const appOptions: NestApplicationOptions = {
     // logger: ['error', 'warn'],
-    logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL')) + 1),
+    logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL')) + 1) || ['error', 'warn'],
     bufferLogs: true,
   };
   const module = options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule;

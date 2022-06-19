@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 
+import { Logger } from '@nestjs/common';
+
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
@@ -21,13 +22,14 @@ import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
+import { resolveModule } from './modules/logger/resolver';
 import { PrismaService } from './modules/prisma/service';
 import { Store } from './modules/store/store';
 
 import type { BeforeApplicationShutdown, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 
-const logger = LoggerFactory.getLogger('Lifecycle');
+const logger = new Logger(resolveModule(__filename));
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   public static async preload(): Promise<void> {
