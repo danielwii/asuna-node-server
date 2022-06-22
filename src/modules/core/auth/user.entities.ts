@@ -2,10 +2,22 @@ import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
 import { IsOptional } from 'class-validator';
 import * as scalars from 'graphql-scalars';
-import { AfterRemove, BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import {
+  AfterRemove,
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 
+import { NoPrimaryKeyBaseEntity } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
+// eslint-disable-next-line import/no-cycle
 import { UserRelation } from '../interaction/friends.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
@@ -70,7 +82,7 @@ export const InjectUserProfile = <TBase extends ConstrainedConstructor<BaseEntit
 
     @Field((returns) => UserProfile, { nullable: true })
     @MetaInfo({ name: '账户' })
-    @OneToOne('UserProfile')
+    @OneToOne('UserProfile', { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'profile__id' })
     profile?: UserProfile;
   }
@@ -94,3 +106,19 @@ export const InjectMultiUserProfile = <TBase extends ConstrainedConstructor<Base
 
   return ExtendableEntity;
 };
+
+@EntityMetaInfo({ name: 'user__profiles', internal: true })
+@Entity('user__t_apple_profiles')
+export class AppleUserProfile extends InjectUserProfile(NoPrimaryKeyBaseEntity) {
+  @PrimaryColumn({ length: 44 })
+  id!: string;
+
+  @Column({ nullable: true })
+  email?: string;
+
+  @Column({ name: 'is_email_verified' })
+  isEmailVerified!: boolean;
+
+  @Column({ name: 'is_private_email' })
+  isPrivateEmail!: boolean;
+}

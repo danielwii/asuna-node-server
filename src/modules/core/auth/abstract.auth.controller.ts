@@ -7,23 +7,26 @@ import {
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
+import appleSignIn from 'apple-signin-auth';
 import { Promise } from 'bluebird';
 import Chance from 'chance';
-import { registerSchema, validate, ValidationSchema } from 'class-validator';
+import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
 import { BaseEntity } from 'typeorm';
 
-import { isNotBlank } from '../../common';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { isNotBlank, TimeUnit } from '../../common';
+import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
+import { AppleConfigObject } from './apple.config';
 import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDto } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
-import { UserProfile } from './user.entities';
+import { AppleUserProfile, UserProfile } from './user.entities';
 
 import type { DeepPartial } from 'typeorm';
 import type { CreatedUser } from './auth.service';
@@ -31,6 +34,7 @@ import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 const logger = new Logger(resolveModule(__filename, 'AbstractAuthController'));
 
+const chance = new Chance();
 export const UsernameValidationSchema: ValidationSchema = {
   name: 'usernameValidationSchema',
   properties: {
@@ -39,7 +43,20 @@ export const UsernameValidationSchema: ValidationSchema = {
 };
 registerSchema(UsernameValidationSchema);
 
+class SignInWithAppleDTO {
+  @IsString() code: string;
+  @IsString() @IsOptional() profileId?: string;
+  @IsOptional() givenName: string;
+  @IsOptional() familyName: string;
+  // @IsOptional() useBundleId: boolean;
+  @IsOptional() email: string;
+  // @IsOptional() identityToken: any;
+  // @IsOptional() state: any;
+}
+
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
+  private readonly appleConfig = AppleConfigObject.load();
+
   public constructor(
     public readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
     public readonly authService: AbstractAuthService<AuthUser>,
@@ -107,9 +124,105 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     await profile.save();
   }
 
+  @Post('sign-in-with-apple')
+  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
+  @named
+  async signInWithApple(@Body() dto: SignInWithAppleDTO, @Req() req: JwtAuthRequest, funcName?: string) {
+    const { payload } = req;
+    logger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
+    if (!this.appleConfig.enable) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `apple sign in is disabled.`);
+    }
+
+    if (dto.profileId && dto.profileId !== payload.id) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, `profileId not match`);
+    }
+    const clientID = this.appleConfig.clientID;
+    const clientSecret = appleSignIn.getClientSecret({
+      clientID, // Apple Client ID
+      teamID: this.appleConfig.teamID, // Apple Developer Team ID.
+      privateKey: this.appleConfig.privateKey, // private key associated with your client ID. -- Or provide a `privateKeyPath` property instead.
+      keyIdentifier: this.appleConfig.keyIdentifier, // identifier of the private key.
+      // OPTIONAL
+      expAfter: TimeUnit.DAYS.toSeconds(30), // Unix time in seconds after which to expire the clientSecret JWT. Default is now+5 minutes.
+    });
+    logger.debug(`#${funcName} ${r({ clientSecret })}`);
+    const token = await appleSignIn.getAuthorizationToken(dto.code, {
+      clientID, // Apple Client ID
+      redirectUri: this.appleConfig.redirectUri, // use the same value which you passed to authorisation URL.
+      clientSecret,
+    });
+    logger.debug(`#${funcName} ${r({ token })}`);
+    const verified = await appleSignIn.verifyIdToken(token.id_token, {
+      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+      audience: clientID, // client id - can also be an array
+      // nonce: 'NONCE', // nonce // Check this note if coming from React Native AS RN automatically SHA256-hashes the nonce https://github.com/invertase/react-native-apple-authentication#nonce
+      // If you want to handle expiration on your own, or if you want the expired tokens decoded
+      ignoreExpiration: true, // default is false
+    });
+    logger.debug(`#${funcName} ${r({ verified })}`);
+    let exists = await AppleUserProfile.findOne({ where: { id: verified.sub }, relations: ['profile'] });
+    if (!exists) {
+      // const profile = await UserProfile.findOneBy({ id: dto.profileId });
+      exists = await AppleUserProfile.save({
+        id: verified.sub,
+        email: verified.email,
+        isEmailVerified: _.isString(verified.email_verified)
+          ? verified.email_verified === 'true'
+          : verified.email_verified,
+        isPrivateEmail: _.isString(verified.is_private_email)
+          ? verified.is_private_email === 'true'
+          : verified.is_private_email,
+        profile: await UserProfile.findOneBy({ id: dto.profileId }),
+      });
+      logger.debug(`#${funcName} ${r({ appleProfile: exists })}`);
+    }
+    logger.debug(`#${funcName} ${r({ exists })}`);
+
+    if (!exists.profileId && dto.profileId) {
+      // 未绑定profileId时直接绑定即可
+      exists.profileId = dto.profileId;
+      await exists.save();
+      return;
+    } else if (!exists.profileId) {
+      // 不存在profileId时创建一个并绑定
+      const username = chance.string({ length: 12, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
+      logger.debug(`#${funcName} ${r({ username })}`);
+      const signed = await this.authService.createUser(username, null, null, AuthUserChannel.apple);
+      logger.debug(`#${funcName} ${r({ signed })}`);
+      const profile = await this.authService.getUserWithPassword({ username });
+      logger.debug(`#${funcName} ${r({ profile })}`);
+      exists.profileId = profile.id;
+      await exists.save();
+      return await this.authService.createToken(profile, { uid: `${signed.user.id}` });
+    } else {
+      // 存在profile时直接创建一个token返回
+      return await this.authService.createToken(exists.profile);
+    }
+  }
+
+  /*
+  @Get('apple/refresh')
+  @named
+  async appleRefreshToken(@Query() query, funcName?: string) {
+    logger.log(`#${funcName} ${r(query)}`);
+    return await appleSignIn.verifyIdToken(query.id_token, {
+      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+      audience: 'io.github.danielwii.robin-board', // client id - can also be an array
+      // nonce: 'NONCE', // nonce // Check this note if coming from React Native AS RN automatically SHA256-hashes the nonce https://github.com/invertase/react-native-apple-authentication#nonce
+      // If you want to handle expiration on your own, or if you want the expired tokens decoded
+      ignoreExpiration: true, // default is false
+    });
+  }
+
+  @Get('apple-callback')
+  @named
+  async appleCallback(@Query() query, funcName?: string) {
+    logger.log(`#${funcName} ${r(query)}`);
+  } */
+
   @Post('quick-pass')
   public async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
-    const chance = new Chance();
     const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
     const password = chance.string({ length: 6, pool: '0123456789' });
 
@@ -229,6 +342,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       // logger.debug(`current profile is ${r({ profile, desensitized })}`);
       _.set(result, 'profile', desensitized);
     }
+    result.profile.isBindApple = await AppleUserProfile.findOneBy({ profileId: payload.id }).then((o) => !!o);
     return this.handlers.onCurrent ? await this.handlers.onCurrent(result) : result;
   }
 

@@ -45,15 +45,15 @@ export class LoggerInterceptor implements NestInterceptor {
     };
 
     const TAG = `${context.getClass().name}.${context.getHandler().name}`;
-    logger.debug(`${TAG} call...`);
+    logger.debug(`#${TAG} call...`);
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () => logger.debug(`${TAG} spent ${Date.now() - now}ms`),
+        () => logger.debug(`#${TAG} spent ${Date.now() - now}ms`),
         (e) => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {
-            logger.warn(`${TAG} ${r(info)}`);
+            logger.warn(`#${TAG} ${r(info)}`);
           }
         },
       ),

@@ -3,11 +3,12 @@ import { InjectDataSource } from '@nestjs/typeorm';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import ow from 'ow';
 import { DataSource } from 'typeorm';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AuthUserChannel } from './base.entities';
 import { UserProfile } from './user.entities';
@@ -65,28 +66,41 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     password: string,
     channel?: AuthUserChannel,
   ): Promise<CreatedUser<U>> {
-    const { hash, salt } = PasswordHelper.encrypt(password);
+    ow(!!(username || email), 'username or email must exists', ow.boolean.true);
+    if (channel === AuthUserChannel.apple) {
+      ow(username, 'username', ow.string.nonEmpty);
+      const entity = this.authUserRepository.create({ username, isActive: true, channel });
+      logger.debug(`create user ${r(entity)}`);
+      return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
+        logger.debug(`created ${r({ profile, user })}`);
+        Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
+        return { profile, user };
+      });
+    } else {
+      ow(password, 'password', ow.string.nonEmpty);
+      const { hash, salt } = PasswordHelper.encrypt(password);
 
-    const found = await this.getUser({ email, username });
-    if (found) {
-      logger.log(`found user ${r(found)}`);
-      throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
+      const found = await this.getUser({ email, username });
+      if (found) {
+        logger.log(`found user ${r(found)}`);
+        throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
+      }
+
+      const entity = this.authUserRepository.create({
+        email: email || undefined,
+        username: username || undefined,
+        isActive: true,
+        password: hash,
+        salt,
+        channel,
+      });
+      logger.debug(`create user ${r(entity)}`);
+      return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
+        logger.debug(`created ${r({ profile, user })}`);
+        Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
+        return { profile, user };
+      });
     }
-
-    const entity = this.authUserRepository.create({
-      email: email || undefined,
-      username: username || undefined,
-      isActive: true,
-      password: hash,
-      salt,
-      channel,
-    });
-    logger.debug(`create user ${r(entity)}`);
-    return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
-      logger.debug(`created ${r({ profile, user })}`);
-      Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
-      return { profile, user };
-    });
   }
 
   /*

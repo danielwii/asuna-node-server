@@ -18,7 +18,7 @@ import { StatsHelper } from '../../stats';
 
 import type { Response } from 'express';
 
-const logger = new Logger(resolveModule(__filename, 'AnyExceptionFilter'));
+const logger = new Logger(resolveModule(__filename));
 
 type QueryFailedErrorType = QueryFailedError &
   Partial<{

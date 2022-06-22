@@ -6,6 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity, EntityConstructorObject } from '../../base/base.entity';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+// eslint-disable-next-line import/no-cycle
 import { InjectMultiUserProfile, UserProfile } from '../auth/user.entities';
 
 export enum UserRelationType {

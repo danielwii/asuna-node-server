@@ -4,7 +4,7 @@ import { Exclude } from 'class-transformer';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
 
-import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../../base/base.entity';
+import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
 import { MetaInfo } from '../../common/decorators';
 
 import type { UserProfile } from './user.entities';
@@ -13,6 +13,7 @@ export enum AuthUserChannel {
   default = 'default',
   wechat = 'wechat',
   quickpass = 'quickpass',
+  apple = 'apple',
 }
 
 @InterfaceType({ implements: () => [AbstractTimeBasedBaseEntity] })
