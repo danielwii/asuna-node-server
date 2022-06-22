@@ -191,6 +191,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       const signed = await this.authService.createUser(username, null, null, AuthUserChannel.apple);
       logger.debug(`#${funcName} ${r({ signed })}`);
       const profile = await this.authService.getUserWithPassword({ username });
+      if (dto.givenName && !profile.nickname) {
+        profile.nickname = `${dto.givenName} ${dto.familyName ?? ''}`.trim();
+        await profile.save();
+      }
       logger.debug(`#${funcName} ${r({ profile })}`);
       exists.profileId = profile.id;
       await exists.save();
