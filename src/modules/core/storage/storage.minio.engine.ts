@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -10,7 +11,7 @@ import * as minio from 'minio';
 import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { configLoader } from '../../config/loader';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
 import { getS3Region, isS3Endpoint } from './helper';
@@ -19,7 +20,8 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 
 import type { Response } from 'express';
 
-const logger = new Logger(resolveModule(__filename, 'MinioStorage'));
+const logger = new Logger(resolveModule(__filename));
+const styleSuffix = configLoader.loadConfig('STYLE_SUFFIX', '');
 
 export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;
@@ -64,10 +66,18 @@ export class MinioStorage implements IStorageEngine {
     const { filename, bucket, prefix, resolver } = opts;
     const pathname = join(bucket ?? this.defaultBucket, prefix ?? '', filename);
     const url = await resolver(pathname);
+    const isImage = mime.lookup(pathname) ? (mime.lookup(pathname) as string).startsWith('image/') : false;
     logger.verbose(
-      `resolveUrl ${r({ bucket: bucket ?? this.defaultBucket, prefix: prefix ?? '', filename, pathname, url })}`,
+      `resolveUrl ${r({
+        bucket: bucket ?? this.defaultBucket,
+        prefix: prefix ?? '',
+        filename,
+        pathname,
+        url,
+        isImage,
+      })}`,
     );
-    res.redirect(url);
+    res.redirect(url + (isImage ? styleSuffix : ''));
     return url;
     // resolver(join(bucket || this.defaultBucket, prefix || '', filename)).then(url => res.redirect(url));
     // return resolver(join(bucket || this.defaultBucket, prefix || '', filename));
