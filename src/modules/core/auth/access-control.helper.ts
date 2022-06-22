@@ -1,9 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Access, AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from '../db';
 
 export enum ACRole {
@@ -26,7 +28,7 @@ export enum ACResource {
 export type ACResources = ACResourceType[];
 export type ACResourceType = keyof typeof ACResource;
 
-const logger = LoggerFactory.getLogger('AccessControlHelper');
+const logger = new Logger(resolveModule(__filename, 'AccessControlHelper'));
 
 export class AccessControlHelper {
   private static accessControl: AccessControl;

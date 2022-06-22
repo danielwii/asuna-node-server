@@ -1,13 +1,14 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
 
 import { DeleteResult } from 'typeorm';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UserProfile } from './auth';
 import { UserFollow } from './interaction/follow.entities';
 
 import type { InteractionFollowType } from './interaction/enum-values';
 
-const logger = LoggerFactory.getLogger('UserHelper');
+const logger = new Logger(resolveModule(__filename, 'UserHelper'));
 
 export class UserHelper {
   static async follow(follower: UserProfile, type: InteractionFollowType, following: string): Promise<UserFollow> {

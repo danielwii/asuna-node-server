@@ -1,7 +1,7 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -19,7 +19,7 @@ import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
-const logger = LoggerFactory.getLogger('TenantModule');
+const logger = new Logger(resolveModule(__filename, 'TenantModule'));
 
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表

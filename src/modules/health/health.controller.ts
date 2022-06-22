@@ -1,22 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import {
-  DiskHealthIndicator,
-  HealthCheck,
-  HealthCheckService,
-  HttpHealthIndicator,
-  MemoryHealthIndicator,
-  TypeOrmHealthIndicator,
-} from '@nestjs/terminus';
+import { Controller, Get, Logger } from '@nestjs/common';
+import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import checkDiskSpace from 'check-disk-space';
 import _ from 'lodash';
-import { dirname, resolve } from 'path';
 
-import { MQHealthIndicator, MQProvider, RedisHealthIndicator } from '../providers';
-
-const logger = LoggerFactory.getLogger('HealthController');
+const logger = new Logger(resolveModule(__filename, 'HealthController'));
 
 @Controller('health')
 export class HealthController {
@@ -25,8 +14,9 @@ export class HealthController {
   // private path = resolve(dirname(require.main.filename), '../..');
 
   // eslint-disable-next-line max-params
-  public constructor(private health: HealthCheckService) // private http: HttpHealthIndicator,
-  // private memory: MemoryHealthIndicator,
+  public constructor(
+    private health: HealthCheckService, // private http: HttpHealthIndicator,
+  ) // private memory: MemoryHealthIndicator,
   // private typeorm: TypeOrmHealthIndicator,
   // private disk: DiskHealthIndicator,
   {}

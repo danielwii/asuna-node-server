@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -28,7 +28,7 @@ class UpsertMediaBody {
   @IsString() @IsOptional() useFor?: string;
 }
 
-const logger = LoggerFactory.getLogger('ContentController');
+const logger = new Logger(resolveModule(__filename, 'ContentController'));
 
 @Controller('api/v1/content')
 export class ContentController {

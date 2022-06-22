@@ -1,17 +1,19 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import ow from 'ow';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 
 import type { FindOneOptions } from 'typeorm';
 
-const logger = LoggerFactory.getLogger('AuthedUserHelper');
+const logger = new Logger(resolveModule(__filename, 'AuthedUserHelper'));
 
 export class AuthedUserHelper {
   static async createProfile(profile: UserProfile): Promise<any> {
@@ -59,7 +61,7 @@ export class AuthedUserHelper {
     /*
     const fixedId = _.isNumber(entity?.id) ? Number(id.slice(1)) : id;
     logger.log(`get user by fixed id '${fixedId}' ${r(options)}`);
-    return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options });*/
+    return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options }); */
   }
 
   static async getProfileByUserId(userId: string): Promise<UserProfile> {

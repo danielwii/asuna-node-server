@@ -1,6 +1,8 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -13,7 +15,7 @@ import { Wallet } from './financial.entities';
 import { HermesPointChangeEventKeys, PointExchange } from './points.entities';
 import { PropertyHelper } from './property.helper';
 
-const logger = LoggerFactory.getLogger('PointsHelper');
+const logger = new Logger(resolveModule(__filename, 'PointsHelper'));
 
 export interface PointChangeEventPayload {
   point: number;

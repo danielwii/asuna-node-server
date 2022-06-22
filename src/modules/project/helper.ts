@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -7,7 +9,7 @@ import Chance from 'chance';
 import { Tenant } from '../tenant/tenant.entities';
 import { Project } from './entities';
 
-const logger = LoggerFactory.getLogger('ProjectHelper');
+const logger = new Logger(resolveModule(__filename, 'ProjectHelper'));
 const chance = new Chance();
 
 export class ProjectHelper {

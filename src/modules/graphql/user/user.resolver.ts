@@ -1,7 +1,7 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 
@@ -14,7 +14,7 @@ import { GraphqlHelper } from '../helper';
 import type { GraphqlContext } from '../../dataloader';
 
 export class UserProfileQueryResolver {
-  private logger = LoggerFactory.getLogger('UserProfileQueryResolver');
+  private logger = new Logger(resolveModule(__filename, 'UserProfileQueryResolver'));
 
   @UseGuards(new GqlWXAuthGuard())
   @Query((returns) => UserProfile)
@@ -32,7 +32,7 @@ export class UserProfileQueryResolver {
 
 @Resolver(UserProfile)
 export class UserProfileResolver {
-  private logger = LoggerFactory.getLogger('UserProfileResolver');
+  private logger = new Logger(resolveModule(__filename, 'UserProfileResolver'));
 
   @ResolveField((returns) => WXMiniAppUserInfo)
   public async miniAppUserInfo(

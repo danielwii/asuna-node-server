@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -21,7 +23,7 @@ import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 import type { AlipaySdkCommonResult } from 'alipay-sdk';
 
-const logger = LoggerFactory.getLogger('PaymentHelper');
+const logger = new Logger(resolveModule(__filename, 'PaymentHelper'));
 
 interface PaymentContext {
   method: PaymentMethod;

@@ -1,6 +1,5 @@
-import { NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 
@@ -11,6 +10,7 @@ import { BaseEntity, ObjectLiteral } from 'typeorm';
 
 import { PrimaryKey, Profile } from '../../common';
 import { AppDataSource } from '../../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
@@ -18,7 +18,7 @@ import { KvHelper } from '../kv/kv.helper';
 
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 
-const logger = LoggerFactory.getLogger('RestHelper');
+const logger = new Logger(resolveModule(__filename, 'RestHelper'));
 
 export class RestHelper {
   public static async get<T extends BaseEntity>(

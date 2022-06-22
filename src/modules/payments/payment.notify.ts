@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -9,7 +11,7 @@ import { SMSConfigObject, SMSHelper } from '../sms';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentOrder } from './payment.order.entities';
 
-const logger = LoggerFactory.getLogger('PaymentNotifyHelper');
+const logger = new Logger(resolveModule(__filename, 'PaymentNotifyHelper'));
 
 export class PaymentNotifyHelper {
   private static config = SMSConfigObject.load();

@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToInstance, Transform } from 'class-transformer';
@@ -20,7 +22,7 @@ export class QiniuConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${QiniuConfigObject.key}_`;
 
-  private static logger = LoggerFactory.getLogger('QiniuConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'QiniuConfigObject'));
 
   public enable: boolean;
   // bucket 应该用 scope 来替换，用来明确概念
@@ -86,7 +88,7 @@ export class MinioConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${MinioConfigObject.key}_`;
 
-  private static logger = LoggerFactory.getLogger('MinioConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'MinioConfigObject'));
 
   public enable: boolean;
   public mode: 'alioss-compatibility' | undefined;
@@ -134,7 +136,7 @@ export class AliossConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${AliossConfigObject.key}_`;
 
-  private static logger = LoggerFactory.getLogger('AliossConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'AliossConfigObject'));
 
   public enable: boolean;
   public region: string;

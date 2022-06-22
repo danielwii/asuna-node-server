@@ -1,14 +1,11 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
-import { configLoader } from '../../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../kv';
 import { FinderController, ShortFinderController } from './finder.controller';
 import { FinderFieldKeys, FinderHelper } from './finder.helper';
 
-const logger = LoggerFactory.getLogger('FinderModule');
+const logger = new Logger(resolveModule(__filename, 'FinderModule'));
 
 @Module({
   imports: [KvModule],
@@ -48,7 +45,7 @@ export class FinderModule implements OnModuleInit {
                   field: { name: FinderFieldKeys.internalEndpoint, type: 'string', defaultValue: internalEndpoint },
                 },
               ],
-            },*/
+            }, */
             exchanges: {
               name: '地址转换',
               fields: [{ name: 'json', field: { name: FinderFieldKeys.hostExchanges, type: 'text' } }],

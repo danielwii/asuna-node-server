@@ -1,5 +1,6 @@
+import { Logger } from '@nestjs/common';
+
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -8,6 +9,7 @@ import _ from 'lodash';
 import { join } from 'path';
 
 import { configLoader } from '../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Global } from './global';
 import {
   AliossConfigObject,
@@ -22,7 +24,7 @@ import {
 import { AliossStorage } from './storage/storage.alioss.engine';
 import { UploaderConfigObject } from './uploader/config';
 
-const logger = LoggerFactory.getLogger('AsunaContext');
+const logger = new Logger(resolveModule(__filename, 'AsunaContext'));
 
 export interface IAsunaContextOpts {
   /**
@@ -55,7 +57,7 @@ export class AsunaContext {
    * @see AsunaContext.defaultStorageEngine
    * @deprecated
    *!/
-  public filesStorageEngine: IStorageEngine;*/
+  public filesStorageEngine: IStorageEngine; */
 
   public chunksStorageEngine: IStorageEngine;
   public localStorageEngine: IStorageEngine;
@@ -162,7 +164,7 @@ export class AsunaContext {
       });
     } else {
       this.filesStorageEngine = new LocalStorage(Global.uploadPath, 'files');
-    }*/
+    } */
 
     this.localStorageEngine = new LocalStorage(Global.uploadPath, 'local');
 

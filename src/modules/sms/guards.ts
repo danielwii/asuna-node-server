@@ -1,14 +1,15 @@
-import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 
+import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SMSConfigObject } from './config';
 import { SMSHelper } from './helper';
 
-import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import type { JwtAuthRequest } from '../core/auth';
 
 export class SMSVerifyCodeGuard implements CanActivate {
-  private logger = LoggerFactory.getLogger('SMSVerifyCodeGuard');
+  private logger = new Logger(resolveModule(__filename, 'SMSVerifyCodeGuard'));
   private config = SMSConfigObject.load();
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {

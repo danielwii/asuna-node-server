@@ -1,14 +1,14 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ImportExportService } from './import-export.service';
 
 import type { Request, Response } from 'express';
 
-const logger = LoggerFactory.getLogger('ImportExportController');
+const logger = new Logger(resolveModule(__filename, 'ImportExportController'));
 
 @Controller('api/v1/import-export')
 export class ImportExportController {

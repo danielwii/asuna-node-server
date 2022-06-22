@@ -1,7 +1,6 @@
-import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
 import { TokenModule } from '../token';
@@ -13,7 +12,7 @@ import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
 import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
-const logger = LoggerFactory.getLogger('AuthModule');
+const logger = new Logger(resolveModule(__filename, 'AuthModule'));
 
 @Module({
   /*

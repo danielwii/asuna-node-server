@@ -1,7 +1,9 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { configLoader } from '../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 export enum DaprConfigKeys {
   DAPR_ENABLE = 'DAPR_ENABLE',
@@ -12,7 +14,7 @@ export enum DaprConfigKeys {
 }
 
 export class DaprConfigObject {
-  static logger = LoggerFactory.getLogger('DaprConfigObject');
+  static logger = new Logger(resolveModule(__filename, 'DaprConfigObject'));
 
   enable: boolean;
   mode: 'http' | 'grpc';

@@ -1,10 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
 
 import { diff } from 'jsondiffpatch';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AuditRecord, AuditType } from './audit.entities';
 
-const logger = LoggerFactory.getLogger('AuditService');
+const logger = new Logger(resolveModule(__filename, 'AuditService'));
 
 export class AuditService {
   public addRecord(

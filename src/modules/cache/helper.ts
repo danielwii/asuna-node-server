@@ -1,12 +1,13 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
 
 import { DBCacheCleaner } from '../core/db';
 import { DataloaderCleaner } from '../dataloader/dataloader';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 import type { PrimaryKey } from '../common';
 
-const logger = LoggerFactory.getLogger('CacheHelper');
+const logger = new Logger(resolveModule(__filename, 'CacheHelper'));
 
 export interface CleanCacheType {
   action: 'clear';

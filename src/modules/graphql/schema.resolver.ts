@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as scalars from 'graphql-scalars';
@@ -16,7 +17,7 @@ class ModelSchemas {
 
 @Resolver()
 export class SchemaQueryResolver {
-  logger = LoggerFactory.getLogger('SchemaQueryResolver');
+  logger = new Logger(resolveModule(__filename, 'SchemaQueryResolver'));
 
   constructor(private readonly dbService: DBService) {}
 

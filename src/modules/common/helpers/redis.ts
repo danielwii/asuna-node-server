@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -7,7 +9,7 @@ import _ from 'lodash';
 
 import type { RedisClientType } from 'redis';
 
-const logger = LoggerFactory.getLogger('RedisHelper');
+const logger = new Logger(resolveModule(__filename, 'RedisHelper'));
 
 export class RedisHelper {
   /**

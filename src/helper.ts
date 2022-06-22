@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -12,6 +13,7 @@ import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
@@ -32,7 +34,7 @@ export function validateOptions(options: BootstrapOptions): void {
 }
 
 export async function syncDbWithLockIfPossible(app: NestExpressApplication, options: BootstrapOptions) {
-  const logger = LoggerFactory.getLogger('sync');
+  const logger = new Logger(resolveModule(__filename, 'syncDbWithLockIfPossible'));
   const syncEnabled = configLoader.loadBoolConfig('DB_SYNCHRONIZE');
   if (!syncEnabled) {
     return logger.log(`DB_SYNCHRONIZE disabled.`);
@@ -58,7 +60,7 @@ export async function syncDbWithLockIfPossible(app: NestExpressApplication, opti
 }
 
 async function syncDb(app: NestExpressApplication, options: BootstrapOptions): Promise<void> {
-  const logger = LoggerFactory.getLogger('sync');
+  const logger = new Logger(resolveModule(__filename, 'syncDb'));
 
   // --------------------------------------------------------------
   // rename old tables to newer
@@ -109,7 +111,7 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
  * @param options
  */
 export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<void> {
-  const logger = LoggerFactory.getLogger('resolveTypeormPaths');
+  const logger = new Logger(resolveModule(__filename, 'resolveTypeormPaths'));
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);
   logger.log(`main entrance is ${r(require.main.filename)}`);

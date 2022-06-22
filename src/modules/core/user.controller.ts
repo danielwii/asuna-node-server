@@ -1,16 +1,16 @@
-import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Logger, Put, Req, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard, JwtAuthRequestExtractor } from './auth/auth.guard';
 import { UserProfile } from './auth/user.entities';
 
-const logger = LoggerFactory.getLogger('UserController');
+const logger = new Logger(resolveModule(__filename, 'UserController'));
 
 export class UpdatePortraitDto {
   @IsString()

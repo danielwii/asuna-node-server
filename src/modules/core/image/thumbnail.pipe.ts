@@ -1,14 +1,15 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
 import type { FitEnum } from 'sharp';
 
-const logger = LoggerFactory.getLogger('ThumbnailPipe');
+const logger = new Logger(resolveModule(__filename, 'ThumbnailPipe'));
 
 export interface ThumbnailParam {
   width?: number;

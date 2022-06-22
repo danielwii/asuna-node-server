@@ -1,8 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -23,7 +23,7 @@ export class JwtAuthRequestExtractor {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  private logger = LoggerFactory.getLogger('JwtAuthGuard');
+  private logger = new Logger(resolveModule(__filename, 'JwtAuthGuard'));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
@@ -52,7 +52,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  private logger = LoggerFactory.getLogger('AnyAuthGuard');
+  private logger = new Logger(resolveModule(__filename, 'AnyAuthGuard'));
 
   // public constructor(private readonly opts: {}) {}
 

@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { KeyValueType, KvHelper, KVListFieldsValue, KVModelFormatType } from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
@@ -6,7 +8,7 @@ import { DynamicRouterMiddleware } from './dynamic-router.middleware';
 
 import type { MiddlewareConsumer, NestModule, OnModuleInit } from '@nestjs/common';
 
-const logger = LoggerFactory.getLogger('DynamicRouterModule');
+const logger = new Logger(resolveModule(__filename, 'DynamicRouterModule'));
 
 export class DynamicTextRouter {
   public path: string;

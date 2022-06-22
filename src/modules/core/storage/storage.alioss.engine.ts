@@ -1,5 +1,6 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import OSS from 'ali-oss';
@@ -8,6 +9,7 @@ import _ from 'lodash';
 import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UploaderConfigObject } from '../uploader/config';
 import { AliossConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
@@ -15,7 +17,7 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 import type { Response } from 'express';
 
 export class AliossStorage implements IStorageEngine {
-  private static readonly logger = LoggerFactory.getLogger(AliossStorage.name);
+  private static readonly logger = new Logger(resolveModule(__filename, AliossStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: AliossConfigObject;

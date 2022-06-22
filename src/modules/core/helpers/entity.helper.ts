@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -6,9 +7,10 @@ import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { ColumnTypeHelper } from './column.helper';
 
-const logger = LoggerFactory.getLogger('EntityHelper');
+const logger = new Logger(resolveModule(__filename, 'EntityHelper'));
 
 /**
  * @deprecated {@see safeReloadJSON}

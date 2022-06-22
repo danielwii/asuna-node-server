@@ -1,9 +1,18 @@
-import { Controller, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Logger,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -19,6 +28,7 @@ import ow from 'ow';
 import { basename, dirname, join } from 'path';
 import * as uuid from 'uuid';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { AsunaContext } from '../context';
 import { Global } from '../global';
@@ -31,7 +41,7 @@ import { RemoteFileInfo, UploaderService } from './service';
 import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import type { AnyAuthRequest } from '../../helper/interfaces';
 
-const logger = LoggerFactory.getLogger('UploaderController');
+const logger = new Logger(resolveModule(__filename, 'UploaderController'));
 
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({

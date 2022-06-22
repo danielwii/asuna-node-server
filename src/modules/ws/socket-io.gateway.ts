@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -8,12 +9,13 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { Server, Socket } from 'socket.io';
 
-const logger = LoggerFactory.getLogger('SocketIOGateway');
+const logger = new Logger(resolveModule(__filename, 'SocketIOGateway'));
 
 export class AdminWsHelper {
   private static server: Server;

@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import axios from 'axios';
@@ -16,7 +18,7 @@ import { PaymentMethod } from './payment.entities';
 import { PaymentNotifyHelper } from './payment.notify';
 import { PaymentOrder } from './payment.order.entities';
 
-const logger = LoggerFactory.getLogger('PaymentWxpayHelper');
+const logger = new Logger(resolveModule(__filename, 'PaymentWxpayHelper'));
 const chance = new Chance();
 
 type TradeType = 'MWEB' | 'JSAPI' | 'APP' | 'NATIVE';

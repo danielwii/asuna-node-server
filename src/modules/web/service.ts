@@ -1,15 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { LoggerFactory, r } from '@danielwii/asuna-helper/dist';
+import { r } from '@danielwii/asuna-helper/dist';
 
 import _ from 'lodash';
 import { FilterQuery, Model } from 'mongoose';
 import ow from 'ow';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PageView, PageViewDocument } from './schema';
 
-const logger = LoggerFactory.getLogger('WebService');
+const logger = new Logger(resolveModule(__filename, 'WebService'));
 
 @Injectable()
 export class WebService {

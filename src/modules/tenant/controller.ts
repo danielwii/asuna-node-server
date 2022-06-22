@@ -1,6 +1,6 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Logger, Req, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -10,7 +10,7 @@ import { TenantHelper, TenantInfo } from './tenant.helper';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
 
-const logger = LoggerFactory.getLogger('TenantController');
+const logger = new Logger(resolveModule(__filename, 'TenantController'));
 
 @Controller('api/v1/tenant')
 export class TenantController {

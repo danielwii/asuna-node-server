@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { CreateTenantStaffDTO } from '@danielwii/asuna-shared';
 
@@ -16,7 +16,7 @@ import { OrgUser } from './tenant.entities';
 import type { DeepPartial } from 'typeorm';
 import type { OrgJwtAuthRequest } from './auth';
 
-const logger = LoggerFactory.getLogger('AuthController');
+const logger = new Logger(resolveModule(__filename, 'AuthController'));
 
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {

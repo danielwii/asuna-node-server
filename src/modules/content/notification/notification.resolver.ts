@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { Args, Context, ID, Query, Resolver } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -15,7 +16,7 @@ import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader'
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {
-  private logger = LoggerFactory.getLogger('NotificationQueryResolver');
+  private logger = new Logger(resolveModule(__filename, 'NotificationQueryResolver'));
 
   public constructor() {
     super(Notification);

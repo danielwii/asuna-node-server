@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -17,7 +19,7 @@ import type { StatsResult } from '../stats/stats.interface';
 dayjs.extend(calendar);
 dayjs.extend(relativeTime);
 
-const logger = LoggerFactory.getLogger('CronHelper');
+const logger = new Logger(resolveModule(__filename, 'CronHelper'));
 
 export class CronHelper {
   public static crons = {};

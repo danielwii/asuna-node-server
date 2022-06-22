@@ -1,13 +1,13 @@
+import { Logger } from '@nestjs/common';
 import { Args, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
-
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import * as util from 'util';
 
 import { UnionTypeResolver } from '../graphql';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SortService } from './sort.service';
 
-const logger = LoggerFactory.getLogger('SortResolver');
+const logger = new Logger(resolveModule(__filename, 'SortResolver'));
 
 /**
  * const SortResolverProvider: Provider = {

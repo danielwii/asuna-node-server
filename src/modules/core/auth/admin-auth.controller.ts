@@ -1,6 +1,4 @@
-import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
-
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Logger, Post, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import {
@@ -9,13 +7,14 @@ import {
   AsunaExceptionHelper,
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import { AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 import * as otplib from 'otplib';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';
@@ -26,7 +25,7 @@ import { AdminUserIdentifierHelper } from './identifier';
 
 import type { AnyAuthRequest } from '../../helper/interfaces';
 
-const logger = LoggerFactory.getLogger('AdminAuthController');
+const logger = new Logger(resolveModule(__filename, 'AdminAuthController'));
 
 @ApiTags('sys-admin')
 @Controller('admin/auth')

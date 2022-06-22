@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsOptional, IsString } from 'class-validator';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { JwtAdminAuthGuard } from '../auth';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KvDef, KvHelper } from './kv.helper';
@@ -13,7 +13,7 @@ import { KvDef, KvHelper } from './kv.helper';
 import type { Response } from 'express';
 import type { AnyAuthRequest } from '../../helper';
 
-const logger = LoggerFactory.getLogger('KvController');
+const logger = new Logger(resolveModule(__filename, 'KvController'));
 
 class KvPair {
   @IsString()

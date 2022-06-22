@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -8,9 +9,10 @@ import { IsOptional } from 'class-validator';
 import { URL } from 'url';
 
 import { configLoader } from '../../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
 
-const logger = LoggerFactory.getLogger('FinderHelper');
+const logger = new Logger(resolveModule(__filename, 'FinderHelper'));
 
 export interface HostExchange {
   regex: string;

@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { oneLine } from 'common-tags';
@@ -14,6 +15,7 @@ import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 import { named } from '../../helper/annotations';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
@@ -22,7 +24,7 @@ import type { PrimaryKey } from '../../common';
 import type { CreatedUser } from './auth.service';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 
-const logger = LoggerFactory.getLogger('AbstractAuthService');
+const logger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
 
 export class PasswordHelper {
   private static readonly cryptor = new Cryptor();

@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { DataSource, Repository } from 'typeorm';
 
 import { Profile } from '../../common';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper, parseFields } from './db.helper';
 
-const logger = LoggerFactory.getLogger('DBService');
+const logger = new Logger(resolveModule(__filename, 'DBService'));
 
 @Injectable()
 export class DBService {

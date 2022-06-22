@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { plainToInstance } from 'class-transformer';
 
@@ -7,7 +9,7 @@ export const EmailTmplConfigKeys = {
 };
 
 export class EmailTmplConfigObject {
-  private static logger = LoggerFactory.getLogger('EmailTmplConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'EmailTmplConfigObject'));
 
   public templates: Record<'key', string>[];
 

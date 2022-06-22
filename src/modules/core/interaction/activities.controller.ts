@@ -1,33 +1,29 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard, JwtAuthRequest } from '../auth';
 import { PageHelper } from '../helpers';
 import { UserActivity } from './activities.entities';
 
-class CreateActivityDto {
-  @IsString()
-  type: string;
-  @IsString()
-  service: string;
-  @IsString()
-  operation: string;
-  @IsString()
-  refId: string;
+class CreateActivityDTO {
+  @IsString() type: string;
+  @IsString() service: string;
+  @IsString() operation: string;
+  @IsString() refId: string;
 }
 
-const logger = LoggerFactory.getLogger('ActivitiesController');
+const logger = new Logger(resolveModule(__filename, 'ActivitiesController'));
 
 @Controller('api/v1/activities')
 export class ActivitiesController {
   @UseGuards(AnyAuthGuard)
   @Post()
-  async addActivity(@Body() body: CreateActivityDto, @Req() req: JwtAuthRequest): Promise<UserActivity> {
+  async addActivity(@Body() body: CreateActivityDTO, @Req() req: JwtAuthRequest): Promise<UserActivity> {
     const { user } = req;
     logger.log(`save activity ${r(body)}`);
 
@@ -38,7 +34,7 @@ export class ActivitiesController {
   }
 
   @Get()
-  async latestActivities(@Query() query: Partial<CreateActivityDto>): Promise<UserActivity[]> {
+  async latestActivities(@Query() query: Partial<CreateActivityDTO>): Promise<UserActivity[]> {
     logger.log(`list latest activities ${r(query)}`);
     const count = await UserActivity.countBy({ ...query });
     return UserActivity.find({ ...query, ...PageHelper.latestSkip(count, 10) });

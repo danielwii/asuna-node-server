@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
@@ -15,13 +14,14 @@ import { ClientHelper } from '../client/helper';
 import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
 import { configLoader } from '../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { TokenHelper } from './auth/abstract.auth.service';
 import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 
 import type { RegDeviceDTO } from '@danielwii/asuna-shared/dist/dto';
 import type { RequestInfo } from '../helper';
 
-const logger = LoggerFactory.getLogger('ApiController');
+const logger = new Logger(resolveModule(__filename, 'ApiController'));
 
 @ApiTags('core')
 @Controller('api')

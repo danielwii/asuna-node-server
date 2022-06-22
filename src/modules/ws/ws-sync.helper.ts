@@ -1,18 +1,19 @@
+import { Logger } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as _ from 'lodash';
 
 import { InMemoryDB } from '../cache/db';
 import { CronHelper } from '../helper/cron';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { StatsHelper } from '../stats';
 import { AdminWsHelper } from './socket-io.gateway';
 
 import type { Server } from 'socket.io';
 
-const logger = LoggerFactory.getLogger('AdminWsSyncHelper');
+const logger = new Logger(resolveModule(__filename, 'AdminWsSyncHelper'));
 
 export class AdminWsSyncHelper {
   static get ws(): Server {

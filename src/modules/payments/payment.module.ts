@@ -1,7 +1,7 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { CronHelper } from '../helper';
 import { PaymentController } from './payment.controller';
@@ -9,7 +9,7 @@ import { PaymentHelper } from './payment.helper';
 import { PaymentQueryResolver, UserPaymentOrderResolver } from './payment.resolver';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
-const logger = LoggerFactory.getLogger('PaymentModule');
+const logger = new Logger(resolveModule(__filename, 'PaymentModule'));
 
 @Module({
   providers: [PaymentQueryResolver, UserPaymentOrderResolver],

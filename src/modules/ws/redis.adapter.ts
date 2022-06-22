@@ -1,18 +1,19 @@
+import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 // import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
-import Redis from 'ioredis';
 
+import Redis from 'ioredis';
 import _ from 'lodash';
-import { RedisAdapter, createAdapter } from 'socket.io-redis';
+import { createAdapter, RedisAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('RedisIoAdapter');
+const logger = new Logger(resolveModule(__filename, 'RedisIoAdapter'));
 
 /**
  * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)

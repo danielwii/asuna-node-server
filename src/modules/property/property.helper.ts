@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
@@ -51,7 +53,7 @@ export class ExchangePayload {
   }
 }
 
-const logger = LoggerFactory.getLogger('PropertyHelper');
+const logger = new Logger(resolveModule(__filename, 'PropertyHelper'));
 
 /**
  * 资产帮助类

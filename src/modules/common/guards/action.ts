@@ -1,7 +1,7 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as crypto from 'crypto';
@@ -12,7 +12,7 @@ import { InMemoryDB } from '../../cache/db';
 import type { JwtAuthRequest } from '../../core/auth/auth.guard';
 import type { PrimaryKey } from '../identifier';
 
-const logger = LoggerFactory.getLogger('ActionGuard');
+const logger = new Logger(resolveModule(__filename, 'ActionGuard'));
 
 @Injectable()
 export class ActionRateLimitGuard implements CanActivate {

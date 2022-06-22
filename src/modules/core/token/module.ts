@@ -1,10 +1,9 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { OperationTokenController } from './controller';
 
-const logger = LoggerFactory.getLogger('TokenModule');
+const logger = new Logger(resolveModule(__filename, 'TokenModule'));
 
 @Module({
   controllers: [OperationTokenController],

@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -13,7 +15,7 @@ import type { JwtPayload } from '../core/auth/auth.interfaces';
 
 export type OrgJwtAuthRequest<User = OrgUser> = AnyAuthRequest<JwtPayload, User>;
 
-const logger = LoggerFactory.getLogger('AuthHelper');
+const logger = new Logger(resolveModule(__filename, 'AuthHelper'));
 
 export class OrgAuthHelper {
   public static async populate(req: OrgJwtAuthRequest, payload: JwtPayload): Promise<void> {

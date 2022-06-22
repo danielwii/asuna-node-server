@@ -1,13 +1,14 @@
+import { Logger } from '@nestjs/common';
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 
 import { Notification } from './notification.entities';
 
-const logger = LoggerFactory.getLogger('LiveHelper');
+const logger = new Logger(resolveModule(__filename, 'LiveHelper'));
 
 @ObjectType()
 export class MixedNotification {

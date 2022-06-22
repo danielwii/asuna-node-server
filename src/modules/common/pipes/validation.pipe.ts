@@ -1,12 +1,12 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import { plainToInstance } from 'class-transformer';
 
-const logger = LoggerFactory.getLogger('CustomValidationPipe');
+const logger = new Logger(resolveModule(__filename, 'CustomValidationPipe'));
 
 /**
  * app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true })) is used already.

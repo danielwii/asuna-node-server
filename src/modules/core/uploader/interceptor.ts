@@ -1,11 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
 
 import { from, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('FastifyFileInterceptor');
+const logger = new Logger(resolveModule(__filename, 'FastifyFileInterceptor'));
 
 export interface FastifyUploadedFile {
   filename: string;

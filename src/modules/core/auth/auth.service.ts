@@ -1,19 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AuthUserChannel } from './base.entities';
 import { UserProfile } from './user.entities';
 import { AuthedUserHelper } from './user.helper';
 
-const logger = LoggerFactory.getLogger('AuthService');
+const logger = new Logger(resolveModule(__filename, 'AuthService'));
 
 export const HermesAuthEventKeys = {
   // 新用户
@@ -32,12 +32,12 @@ export class AuthService extends AbstractAuthService<UserProfile> {
    * 目前服务端新建了 UserProfile 来接管用户认证，将业务与认证分离。
    * 所以自定义的用户注册对象在这里无法被查询器查询到并注册。
    *
-   * @param connection
+   * @param dataSource
    */
-  constructor(@InjectConnection() private readonly connection: Connection) {
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     super(
       UserProfile,
-      connection.getRepository(UserProfile),
+      dataSource.getRepository(UserProfile),
       /* 历史 User 对象的认证数据已经迁移到了 UserProfile 中
       ((): Repository<AdminUser> => {
         // 获得用户继承的 AbstractAuthUser

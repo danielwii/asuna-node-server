@@ -1,8 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -22,7 +22,7 @@ export enum TenantRoleName {
 
 @Injectable()
 export class TenantRolesGuard implements CanActivate {
-  private logger = LoggerFactory.getLogger('TenantRolesGuard');
+  private logger = new Logger(resolveModule(__filename, 'TenantRolesGuard'));
 
   public constructor(private readonly oneOf: TenantRoleName[]) {}
 
@@ -52,7 +52,7 @@ export class TenantRolesGuard implements CanActivate {
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
-  private logger = LoggerFactory.getLogger('OrgJwtAuthGuard');
+  private logger = new Logger(resolveModule(__filename, 'OrgJwtAuthGuard'));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();

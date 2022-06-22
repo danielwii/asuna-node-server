@@ -1,17 +1,12 @@
-import { Context, ResolveField, Resolver, Root } from '@nestjs/graphql';
+import { Logger } from '@nestjs/common';
+import { Resolver } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
-import { Promise } from 'bluebird';
-
-import { UserProfile } from '../auth';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UserActivity } from './activities.entities';
 
-import type { GraphqlContext } from '../../dataloader';
-
-@Resolver(UserActivity)
+@Resolver((of) => UserActivity)
 export class ActivitiesResolver {
-  private logger = LoggerFactory.getLogger('ActivitiesResolver');
+  private logger = new Logger(resolveModule(__filename, ActivitiesResolver.name));
 
   // @ResolveField((returns) => UserProfile)
   // public async profile(@Root() activity: UserActivity, @Context() ctx: GraphqlContext): Promise<UserProfile> {

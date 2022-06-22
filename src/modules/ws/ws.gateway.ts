@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -8,13 +9,13 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { configLoader } from '../config';
 
 import type { Server } from 'ws';
 
-const logger = LoggerFactory.getLogger('WSGateway(default)');
+const logger = new Logger(resolveModule(__filename, 'WSGateway(default)'));
 
 export const WSConfigKeys = {
   WS_PORT: 'WS_PORT',

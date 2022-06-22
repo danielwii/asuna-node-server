@@ -1,7 +1,6 @@
-import { Body, Controller, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -11,11 +10,12 @@ import { IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
 
 import { AppDataSource } from '../../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { JwtAuthGuard, JwtAuthRequest, JwtAuthRequestExtractor } from '../auth';
 import { UserHelper } from '../user.helper';
 import { UserRelation, UserRelationType } from './friends.entities';
 
-const logger = LoggerFactory.getLogger('InteractionController');
+const logger = new Logger(resolveModule(__filename, 'InteractionController'));
 
 export class UserFollowDto {
   @IsString()

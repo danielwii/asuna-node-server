@@ -1,9 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { UserProfile } from '../core/auth/user.entities';
@@ -15,11 +15,11 @@ import type { WXJwtPayload } from './interfaces';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxCodeSession } from './wx.interfaces';
 
-const logger = LoggerFactory.getLogger('WXAuth');
+const logger = new Logger(resolveModule(__filename, 'WXAuth'));
 
 @Injectable()
 export class WXAuthGuard implements CanActivate {
-  logger = LoggerFactory.getLogger('WXAuthGuard');
+  logger = new Logger(resolveModule(__filename, 'WXAuthGuard'));
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<WXAuthRequest>();

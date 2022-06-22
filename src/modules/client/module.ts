@@ -1,10 +1,10 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { ClientService } from './service';
 
-const logger = LoggerFactory.getLogger('ClientModule');
+const logger = new Logger(resolveModule(__filename));
 
 @Module({
   providers: [ClientService],

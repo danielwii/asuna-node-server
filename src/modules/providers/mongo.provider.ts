@@ -1,13 +1,14 @@
+import { Logger } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { MongoConfigObject } from './mongo.config';
 
 import type { DynamicModule } from '@nestjs/common';
 
-const logger = LoggerFactory.getLogger('MongoProvider');
+const logger = new Logger(resolveModule(__filename, 'MongoProvider'));
 
 export class MongoProvider {
   public static forRootAsync = (): DynamicModule =>

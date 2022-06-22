@@ -1,7 +1,6 @@
-import { Body, Delete, Get, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Delete, Get, Logger, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -23,13 +22,14 @@ import {
 } from '../core/db';
 import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Tenant, TenantHelper } from '../tenant';
 
 import type { AnyAuthRequest } from '../helper';
 
 // import { AdminUser } from '../../core/auth';
 
-const logger = LoggerFactory.getLogger('RestCrudController');
+const logger = new Logger(resolveModule(__filename, 'RestCrudController'));
 
 export abstract class RestCrudController {
   // TODO module or prefix may not needed in future

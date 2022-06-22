@@ -1,18 +1,18 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { getIgnoreCase } from '../../common';
 import { auth, AuthType } from '../../helper';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AdminUser } from './auth.entities';
 import { API_KEY_HEADER } from './strategy';
 
 import type { JwtAuthRequest } from './auth.guard';
 
-const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');
+const logger = new Logger(resolveModule(__filename, 'JwtAdminAuthGuard'));
 
 @Injectable()
 export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {

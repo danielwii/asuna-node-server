@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -13,7 +13,7 @@ import { API_KEY_HEADER, ApiKeyRequest } from './interfaces';
 
 import type { Request } from 'express';
 
-const logger = LoggerFactory.getLogger('ApiKeyStrategy');
+const logger = new Logger(resolveModule(__filename, 'ApiKeyStrategy'));
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') {

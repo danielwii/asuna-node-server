@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { fnResolve, FutureResolveType } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -7,7 +9,7 @@ import LRUCache from 'lru-cache';
 
 import { CacheTTL } from './constants';
 
-const logger = LoggerFactory.getLogger('CacheManager');
+const logger = new Logger(resolveModule(__filename));
 
 const caches = new Map<string, LRUCache<string, any>>();
 export class CacheManager {
@@ -37,7 +39,7 @@ export class CacheManager {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const remainingTTL = this.cache.getRemainingTTL(cacheKey);
     const cacheValue = this.cache.get(cacheKey);
-    logger.verbose(`get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`) })}`);
+    logger.verbose(`get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`, 10) })}`);
     if (cacheValue) return cacheValue;
 
     const value = await fnResolve(resolver)();

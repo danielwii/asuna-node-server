@@ -5,8 +5,6 @@ import _ from 'lodash';
 
 import { configLoader } from '../../config/loader';
 
-// const logger = LoggerFactory.getLogger('LoggerConfig'); dont't use it here
-
 export type LogLevel = 'info' | 'debug' | 'verbose' | 'warn' | 'error';
 
 export class LoggerConfigObject {

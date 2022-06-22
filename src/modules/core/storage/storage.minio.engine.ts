@@ -1,5 +1,6 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -9,6 +10,7 @@ import * as minio from 'minio';
 import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
 import { getS3Region, isS3Endpoint } from './helper';
@@ -17,7 +19,7 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 
 import type { Response } from 'express';
 
-const logger = LoggerFactory.getLogger('MinioStorage');
+const logger = new Logger(resolveModule(__filename, 'MinioStorage'));
 
 export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;

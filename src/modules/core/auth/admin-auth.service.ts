@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -8,6 +7,7 @@ import { nanoid } from 'nanoid';
 import { DataSource, In } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser, Role } from './auth.entities';
@@ -15,7 +15,7 @@ import { AuthUserChannel } from './base.entities';
 
 import type { CreatedUser } from './auth.service';
 
-const logger = LoggerFactory.getLogger('AdminAuthService');
+const logger = new Logger(resolveModule(__filename, 'AdminAuthService'));
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {

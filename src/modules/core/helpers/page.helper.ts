@@ -1,13 +1,14 @@
+import { Logger } from '@nestjs/common';
 import { Field, ID, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 
 import { deserializeSafely } from '@danielwii/asuna-helper/dist';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { EntityManager } from 'typeorm';
 
 import { AppDataSource } from '../../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
@@ -32,7 +33,7 @@ export interface PageRequest {
   orderBy?: { column?: string; order?: Order };
 }
 
-const logger = LoggerFactory.getLogger('PageHelper');
+const logger = new Logger(resolveModule(__filename, 'PageHelper'));
 
 export class PageHelper {
   static async doCursorPageSeries<T>(fn: (next?: string) => Promise<string | null>): Promise<any> {

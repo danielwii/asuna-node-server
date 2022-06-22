@@ -1,23 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-const logger = LoggerFactory.getLogger('PrismaService<PrismaClient>');
+const logger = new Logger(resolveModule(__filename, 'PrismaService<PrismaClient>'));
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
   public constructor() {
     super({
-      log: [
-        { emit: 'event', level: 'query' },
-        'query',
-        'info',
-        `warn`,
-        `error`,
-      ],
+      log: [{ emit: 'event', level: 'query' }, 'query', 'info', `warn`, `error`],
     });
   }
 

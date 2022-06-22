@@ -1,7 +1,6 @@
-import { Controller, Get, Header, Param, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Header, Logger, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -13,6 +12,7 @@ import path from 'path';
 import { CacheWrapper } from '../../cache';
 import { TimeUnit } from '../../common';
 import { configLoader } from '../../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AsunaContext } from '../context';
 import { FinderHelper } from '../finder';
 import { BlurredHelper } from '../image/blurred.helper';
@@ -23,7 +23,7 @@ import { LocalStorage } from '../storage';
 import type { RequestInfo } from '../../helper';
 import type { Response } from 'express';
 
-const logger = LoggerFactory.getLogger('GetUploadsController');
+const logger = new Logger(resolveModule(__filename, 'GetUploadsController'));
 
 class ImageProxy {
   private static readonly filterRegexp = /(.+)\((.*)\)/;
@@ -150,7 +150,7 @@ class ImageProxy {
   }
 
   public static parseFilters(filters) {
-    return filters.split(':').map(function (filter) {
+    return filters.split(':').map((filter) => {
       const match = filter.match(ImageProxy.filterRegexp);
       return {
         name: match[1],
@@ -236,7 +236,7 @@ export class GetUploadsController {
     const engine = instanceToPlain(storageEngine);
     const blurred = _.has(query, 'blurred');
     const lookup = geoip.lookup(req.clientIp);
-    const usingCN = lookup == null || lookup?.country === 'CN';
+    const usingCN = lookup === null || lookup?.country === 'CN';
     logger.verbose(
       `get ${r({ bucket, filename })} by ${r({
         engine,

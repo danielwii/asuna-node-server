@@ -1,7 +1,7 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Context, Field, Info, ObjectType, Query, Resolver } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Pageable, toPage } from '../core/helpers';
@@ -28,7 +28,7 @@ class FinancialTransactionPageable extends Pageable<FinancialTransaction> {
 
 @Resolver()
 export class PropertyQueryResolver {
-  private logger = LoggerFactory.getLogger('UserQueryResolver');
+  private logger = new Logger(resolveModule(__filename, 'UserQueryResolver'));
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => PointExchangePageable)

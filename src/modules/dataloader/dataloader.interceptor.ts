@@ -1,6 +1,6 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 import SpanContext from 'opentracing/lib/span_context';
@@ -16,7 +16,7 @@ import type { RequestInfo } from '../helper';
 import type { JwtPayload, WithProfileUser } from '../core/auth';
 import type { DefaultRegisteredLoaders } from './context';
 
-const logger = LoggerFactory.getLogger('DataLoaderInterceptor');
+const logger = new Logger(resolveModule(__filename, 'DataLoaderInterceptor'));
 
 export type GraphQLResolveCacheInfo = GraphQLResolveInfo & { cacheControl: ResolveInfoCacheControl };
 export type GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> = { req: RequestInfo } & {

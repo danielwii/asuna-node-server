@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -9,7 +11,7 @@ import { DynamicRouterHelper } from './dynamic-router.helper';
 import type { NestMiddleware } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
-const logger = LoggerFactory.getLogger('DynamicRouterMiddleware');
+const logger = new Logger(resolveModule(__filename, 'DynamicRouterMiddleware'));
 
 export class DynamicRouterMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: () => void): Promise<void> {

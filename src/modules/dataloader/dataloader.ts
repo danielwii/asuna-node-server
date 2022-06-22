@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -8,7 +10,7 @@ import _ from 'lodash';
 import * as fp from 'lodash/fp';
 import { LRUMap } from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
-import { BaseEntity, FindOptionsWhere, In, ObjectType } from 'typeorm';
+import { BaseEntity, In, ObjectType } from 'typeorm';
 
 import { CacheManager } from '../cache';
 import { CacheTTL } from '../cache/constants';
@@ -21,7 +23,7 @@ import type { FieldNode } from 'graphql/language/ast';
 import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
 
-const logger = LoggerFactory.getLogger('DataLoader');
+const logger = new Logger(resolveModule(__filename));
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
@@ -51,15 +53,16 @@ export function loader<Entity extends BaseEntity>(
       // logger.debug(`cachedDataLoader load ${entity.name}: ${ids}`);
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
       logger.verbose(`${entity} primaryKey is ${primaryKey}`);
-      const options = {
-        where: {
-          [primaryKey]: In(ids),
-          ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined),
-          ...(_.has(opts, 'isDeleted') ? { isDeleted: opts.isDeleted } : undefined),
-        } as FindOptionsWhere<any>,
-        loadRelationIds: opts.loadRelationIds,
-      };
-      return entity.find(options).then(resolveIds(ids, primaryKey));
+      return entity
+        .find({
+          where: {
+            [primaryKey]: In(ids),
+            ...(_.has(opts, 'isPublished') ? { isPublished: opts.isPublished } : undefined),
+            ...(_.has(opts, 'isDeleted') ? { isDeleted: opts.isDeleted } : undefined),
+          } as any,
+          loadRelationIds: opts.loadRelationIds,
+        })
+        .then(resolveIds(ids, primaryKey));
     }),
   );
 }
@@ -152,7 +155,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           const key = `${segment}:${id}`;
           const ttl = cache.getRemainingTTL({ prefix: 'dataloader', key });
           const value = cache.get({ prefix: 'dataloader', key });
-          logger.verbose(`get (${key}) ${r({ exists: !!value, ttl: parseInt(String(ttl / 1000)) })}`);
+          logger.verbose(`get (${key}) ${r({ exists: !!value, ttl: parseInt(String(ttl / 1000), 10) })}`);
           return value;
         },
         set: async (id: string, value) => {
@@ -207,15 +210,18 @@ export function resolveRelationsFromInfo(
 
     let selectionNode; // like items node
     _.times(locations.length - 1).forEach((index) => {
+      // eslint-disable-next-line array-callback-return
       (selectionNode || fieldNode).selectionSet.selections.find((node) => {
         if (node.kind === 'FragmentSpread') {
           selectionNode = info.fragments[node.name.value].selectionSet.selections.find(
             (fragmentNode: any) => fragmentNode.name.value === locations[index + 1],
           );
+          // eslint-disable-next-line array-callback-return
           return;
         }
         if (node.name.value === locations[index + 1]) {
           selectionNode = node;
+          // eslint-disable-next-line array-callback-return
           return;
         }
       });
@@ -243,15 +249,18 @@ export function resolveFieldsFromInfo(info: GraphQLResolveInfo, path: string): s
 
     let selectionNode; // like items node
     _.times(locations.length - 1).forEach((index) => {
+      // eslint-disable-next-line array-callback-return
       (selectionNode || fieldNode).selectionSet.selections.find((node) => {
         if (node.kind === 'FragmentSpread') {
           selectionNode = info.fragments[node.name.value].selectionSet.selections.find(
             (fragmentNode: any) => fragmentNode.name.value === locations[index + 1],
           );
+          // eslint-disable-next-line array-callback-return
           return;
         }
         if (node.name.value === locations[index + 1]) {
           selectionNode = node;
+          // eslint-disable-next-line array-callback-return
           return;
         }
       });

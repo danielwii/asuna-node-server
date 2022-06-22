@@ -1,6 +1,6 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
@@ -13,7 +13,7 @@ import type { CommonRequest, SignedCookies } from './interface';
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
-  private readonly logger = LoggerFactory.getLogger('IsMobileMiddleware');
+  private readonly logger = new Logger(resolveModule(__filename, 'IsMobileMiddleware'));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
@@ -24,7 +24,7 @@ export class IsMobileMiddleware implements NestMiddleware {
 
 @Injectable()
 export class DeviceMiddleware implements NestMiddleware {
-  private readonly logger = LoggerFactory.getLogger('DeviceMiddleware');
+  private readonly logger = new Logger(resolveModule(__filename, 'DeviceMiddleware'));
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies: SignedCookies = req.signedCookies;
@@ -77,7 +77,7 @@ export class DeviceMiddleware implements NestMiddleware {
 
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
-  private readonly logger = LoggerFactory.getLogger('LandingUrlMiddleware');
+  private readonly logger = new Logger(resolveModule(__filename, 'LandingUrlMiddleware'));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void): any {
     if (!req.session?.landingUrl) {

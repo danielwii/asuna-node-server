@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/node';
 
-import { ArgumentsHost, ExceptionFilter, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -18,7 +18,7 @@ import { StatsHelper } from '../../stats';
 
 import type { Response } from 'express';
 
-const logger = LoggerFactory.getLogger('AnyExceptionFilter');
+const logger = new Logger(resolveModule(__filename, 'AnyExceptionFilter'));
 
 type QueryFailedErrorType = QueryFailedError &
   Partial<{

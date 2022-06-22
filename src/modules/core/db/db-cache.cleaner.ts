@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -6,8 +7,9 @@ import * as fp from 'lodash/fp';
 import { BaseEntity } from 'typeorm';
 
 import { AppDataSource } from '../../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('DBCacheCleaner');
+const logger = new Logger(resolveModule(__filename, 'DBCacheCleaner'));
 
 export class DBCacheCleaner {
   public static registers: { Entity: typeof BaseEntity; trigger: string }[] = [];

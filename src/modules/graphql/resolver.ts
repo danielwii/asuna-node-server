@@ -1,9 +1,10 @@
+import { Logger } from '@nestjs/common';
 import { ResolveField } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-const logger = LoggerFactory.getLogger('Resolver');
+const logger = new Logger(resolveModule(__filename, 'Resolver'));
 
 export interface CursoredQuery<After = string> {
   first: number;

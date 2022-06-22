@@ -1,10 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
 
 import { SimpleIdGenerator } from '../../ids';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { MigrationsHelper } from '../migrations/migrations.helper';
 import { AdminUser } from './auth.entities';
 
-const logger = LoggerFactory.getLogger('AuthMigrations');
+const logger = new Logger(resolveModule(__filename, 'AuthMigrations'));
 
 export class AuthMigrations {
   static readonly version = 1;

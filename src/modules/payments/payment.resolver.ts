@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { Args, Context, ObjectType, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -20,7 +21,7 @@ class CursoredVisitorResponse extends CursoredResponse(PaymentOrder) {}
 
 @Resolver()
 export class PaymentQueryResolver extends QueryResolver {
-  private logger = LoggerFactory.getLogger(PaymentQueryResolver.name);
+  private logger = new Logger(resolveModule(__filename, PaymentQueryResolver.name));
 
   public constructor() {
     super([PaymentOrder, PaymentMethod, PaymentTransaction]);
@@ -73,7 +74,7 @@ export class PaymentQueryResolver extends QueryResolver {
 
 @Resolver((of) => PaymentOrder)
 export class UserPaymentOrderResolver {
-  private logger = LoggerFactory.getLogger('UserPaymentOrderResolver');
+  private logger = new Logger(resolveModule(__filename, 'UserPaymentOrderResolver'));
 
   @ResolveField((returns) => PaymentTransaction)
   public async transaction(@Root() order: PaymentOrder, @Context() ctx: GraphqlContext): Promise<PaymentTransaction> {

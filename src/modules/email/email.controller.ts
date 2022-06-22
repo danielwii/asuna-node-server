@@ -1,7 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Logger, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsArray, IsString } from 'class-validator';
@@ -10,23 +10,21 @@ import { EmailHelper } from './email.helper';
 
 import type { MailAttachment } from './email.interface';
 
-const logger = LoggerFactory.getLogger('EmailController');
+const logger = new Logger(resolveModule(__filename, 'EmailController'));
 
 class MailBody {
   @IsArray({ always: false })
-  public to: string[];
-
-  public cc: string[];
-
-  public bcc: string[];
+  to: string[];
+  cc: string[];
+  bcc: string[];
 
   @IsString()
-  public subject: string;
+  subject: string;
 
   @IsString()
-  public content: string;
+  content: string;
 
-  public attachments: MailAttachment[];
+  attachments: MailAttachment[];
 }
 
 @ApiTags('core')

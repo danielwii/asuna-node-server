@@ -1,7 +1,7 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import passport from 'passport';
@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 
 import type { Request, Response } from 'express';
 
-const logger = LoggerFactory.getLogger('AuthInterceptor');
+const logger = new Logger(resolveModule(__filename, 'AuthInterceptor'));
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {

@@ -1,9 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DaprConfigObject } from './dapr.config';
 
-const logger = LoggerFactory.getLogger('DaprProvider');
+const logger = new Logger(resolveModule(__filename, 'DaprProvider'));
 
 export class DaprProvider {
   private readonly _stateUrl;

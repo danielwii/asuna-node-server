@@ -1,15 +1,15 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { auth, AuthType } from '../helper';
 
 import type { JwtPayload } from '../core/auth';
 
-const logger = LoggerFactory.getLogger('GqlAuthGuard');
+const logger = new Logger(resolveModule(__filename, 'GqlAuthGuard'));
 
 @Injectable()
 export class GqlAdminAuthGuard implements CanActivate {

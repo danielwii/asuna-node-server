@@ -6,6 +6,7 @@ import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -51,7 +52,6 @@ import { AsunaContext, Global } from './modules/core';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
-import { resolveModule } from './modules/logger/resolver';
 import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
 import './typeorm.fixture';
@@ -180,7 +180,6 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     process.env.TYPEORM_DRIVER_EXTRA = TYPEORM_DRIVER_EXTRA;
   }
   const appOptions: NestApplicationOptions = {
-    // logger: ['error', 'warn'],
     logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL')) + 1) || ['error', 'warn'],
     bufferLogs: true,
   };

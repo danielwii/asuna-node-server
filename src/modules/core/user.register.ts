@@ -1,15 +1,17 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { BaseEntity } from 'typeorm';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from './db/db.helper';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { UserProfile } from './auth/user.entities';
 
-const logger = LoggerFactory.getLogger('UserRegister');
+const logger = new Logger(resolveModule(__filename, 'UserRegister'));
 
 export class UserRegister {
   static Entity: ConstrainedConstructor<any> | any;

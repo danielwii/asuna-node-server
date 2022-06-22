@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsString } from 'class-validator';
@@ -33,7 +33,7 @@ class Code2SessionDto {
   code: string;
 }
 
-const logger = LoggerFactory.getLogger('WeChatController');
+const logger = new Logger(resolveModule(__filename, 'WeChatController'));
 
 @Controller('api/v1/wx')
 export class WeChatController {

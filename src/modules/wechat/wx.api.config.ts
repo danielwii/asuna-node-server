@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -10,7 +12,7 @@ import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 
 import type { RequestInfo, RequestInit, Response } from 'node-fetch';
 
-const logger = LoggerFactory.getLogger('WeChatConfigApi');
+const logger = new Logger(resolveModule(__filename, 'WeChatConfigApi'));
 
 export class WeChatServiceConfig {
   @IsBoolean() @IsOptional() login?: boolean;

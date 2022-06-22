@@ -1,11 +1,13 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 
 import { SimpleIdGenerator } from '../ids';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('JwtAdminAuthGuard');
+const logger = new Logger(resolveModule(__filename, 'JwtAdminAuthGuard'));
 
 export class IdGenerators {
   public static handlers: Record<string, SimpleIdGenerator> = {};

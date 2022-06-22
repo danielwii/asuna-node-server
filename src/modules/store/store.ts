@@ -1,11 +1,13 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisClientObject, RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
 import _ from 'lodash';
 
 import { CacheManager } from '../cache/cache';
 
-const logger = LoggerFactory.getLogger('Store');
+const logger = new Logger(resolveModule(__filename));
 
 export class Store {
   public static Global: Store;

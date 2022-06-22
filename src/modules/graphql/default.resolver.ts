@@ -1,11 +1,13 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
 import { DBCacheCleaner } from '../core/db';
 
-const logger = LoggerFactory.getLogger('QueryResolver');
+const logger = new Logger(resolveModule(__filename, 'QueryResolver'));
 
 export class QueryResolver {
   public constructor(entities) {

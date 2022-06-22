@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP2, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
 import { plainToInstance } from 'class-transformer';
@@ -12,7 +14,7 @@ export enum GraphQLConfigKeys {
   playground_enable = 'playground_enable',
 }
 
-const logger = LoggerFactory.getLogger('GraphQLConfigObject');
+const logger = new Logger(resolveModule(__filename, 'GraphQLConfigObject'));
 
 export class GraphQLConfigObject {
   private static key = YamlConfigKeys.graphql;

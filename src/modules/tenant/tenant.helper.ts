@@ -1,10 +1,12 @@
+import { Logger } from '@nestjs/common';
+
 import {
   AsunaErrorCode,
   AsunaException,
   AsunaExceptionHelper,
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -57,7 +59,7 @@ export enum TenantFieldKeys {
   firstDisplayName = 'first.display-name',
 }
 
-const logger = LoggerFactory.getLogger('TenantHelper');
+const logger = new Logger(resolveModule(__filename, 'TenantHelper'));
 
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };

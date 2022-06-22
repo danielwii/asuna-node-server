@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as amqp from 'amqplib';
@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 import { MQConfigObject } from './mq.config';
 
-const logger = LoggerFactory.getLogger('MQProvider');
+const logger = new Logger(resolveModule(__filename, 'MQProvider'));
 
 @Injectable()
 export class MQProvider {

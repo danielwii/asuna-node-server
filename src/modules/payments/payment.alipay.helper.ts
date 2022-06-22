@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -11,7 +13,7 @@ import { AppConfigObject } from '../config/app.config';
 import { PaymentMethod } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
 
-const logger = LoggerFactory.getLogger('PaymentAlipayHelper');
+const logger = new Logger(resolveModule(__filename, 'PaymentAlipayHelper'));
 
 export class PaymentAlipayHelper {
   public static async sdk(): Promise<AlipaySdk> {

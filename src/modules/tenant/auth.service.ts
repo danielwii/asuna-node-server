@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import Chance from 'chance';
 import _ from 'lodash';
 import ow from 'ow';
-import { Connection, In } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 import { AbstractAuthService, AuthUserChannel, CreatedUser, PasswordHelper } from '../core/auth';
 import { TenantRoleName } from './auth.guard';
@@ -15,14 +15,14 @@ import { OrgRole, OrgUser } from './tenant.entities';
 
 import type { CreateStaffVO } from '@danielwii/asuna-shared';
 
-const logger = LoggerFactory.getLogger('TenantAuthService');
+const logger = new Logger(resolveModule(__filename, 'TenantAuthService'));
 
 const chance = new Chance();
 
 @Injectable()
 export class TenantAuthService extends AbstractAuthService<OrgUser> {
-  public constructor(@InjectConnection() private readonly connection: Connection) {
-    super(OrgUser, connection.getRepository<OrgUser>(OrgUser));
+  public constructor(@InjectDataSource() private readonly dataSource: DataSource) {
+    super(OrgUser, dataSource.getRepository<OrgUser>(OrgUser));
 
     _.values(TenantRoleName).forEach((name) =>
       OrgRole.findOne({ where: { name } }).then((exists) => {

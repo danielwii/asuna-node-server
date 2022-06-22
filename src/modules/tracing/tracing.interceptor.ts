@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Tags } from 'opentracing';
 import { Observable } from 'rxjs';
@@ -11,7 +12,7 @@ import { TracingHelper, WithSpanContext } from './tracing.helper';
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import type { Request } from 'express';
 
-const logger = LoggerFactory.getLogger('TracingInterceptor');
+const logger = new Logger(resolveModule(__filename, 'TracingInterceptor'));
 
 export type TraceRequest = Request & WithSpanContext;
 

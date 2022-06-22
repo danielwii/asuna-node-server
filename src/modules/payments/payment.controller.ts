@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsBoolean, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
@@ -40,7 +40,7 @@ class UpdateOrderDTO {
   public data?: Record<string, unknown>;
 }
 
-const logger = LoggerFactory.getLogger('PaymentController');
+const logger = new Logger(resolveModule(__filename, 'PaymentController'));
 
 @Controller('api/v1/payment')
 export class PaymentController {

@@ -1,9 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
 
 import { encode } from 'blurhash';
 import sharp from 'sharp';
 
-const logger = LoggerFactory.getLogger('BlurredHelper');
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
+const logger = new Logger(resolveModule(__filename, 'BlurredHelper'));
 
 export class BlurredHelper {
   public static async encodeImageToBlurhash(path: string): Promise<string> {

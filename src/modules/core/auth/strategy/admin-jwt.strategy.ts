@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,7 +13,7 @@ import { AdminAuthService } from '../admin-auth.service';
 
 import type { JwtPayload } from '../auth.interfaces';
 
-const logger = LoggerFactory.getLogger('AdminJwtStrategy');
+const logger = new Logger(resolveModule(__filename, 'AdminJwtStrategy'));
 
 @Injectable()
 export class AdminJwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {

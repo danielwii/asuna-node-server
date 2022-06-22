@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -11,7 +13,7 @@ import type { CronStatsInterface } from './stats.interface';
 
 type CronStat = Omit<CronStatsInterface, 'events'>;
 
-const logger = LoggerFactory.getLogger('StatsHelper');
+const logger = new Logger(resolveModule(__filename));
 
 export class StatsHelper {
   private static enable = FeaturesConfigObject.instance.errorStats;

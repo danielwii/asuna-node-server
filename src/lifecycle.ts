@@ -22,7 +22,7 @@ import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
-import { resolveModule } from './modules/logger/resolver';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PrismaService } from './modules/prisma/service';
 import { Store } from './modules/store/store';
 

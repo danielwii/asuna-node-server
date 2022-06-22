@@ -1,6 +1,6 @@
-// import { PrismaClient } from '@prisma/client';
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -30,12 +30,13 @@ import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 
 import { Profile } from '../../common/helpers/normal';
 import { AppDataSource } from '../../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Role } from '../auth/auth.entities';
 import { AsunaContext } from '../context';
 
 import type { Condition, EntityMetaInfoOptions, MetaInfoOptions } from '../../common/decorators/meta.decorator';
 
-const logger = LoggerFactory.getLogger('DBHelper');
+const logger = new Logger(resolveModule(__filename, 'DBHelper'));
 
 export interface ColumnSchema {
   name: string;

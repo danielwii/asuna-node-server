@@ -1,12 +1,13 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 
-const logger = LoggerFactory.getLogger('JpegPipe');
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
+const logger = new Logger(resolveModule(__filename, 'JpegPipe'));
 
 export interface JpegParam {
   quality?: number;

@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -7,7 +9,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { CacheManager } from '../cache';
 import { WxBaseApi } from './wx.api.common';
 
-const logger = LoggerFactory.getLogger('WxHelper');
+const logger = new Logger(resolveModule(__filename, 'WxHelper'));
 
 enum WxKeys {
   accessToken = 'wx-access-token',

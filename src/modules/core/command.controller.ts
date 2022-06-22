@@ -1,15 +1,15 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard } from './auth/auth.guard';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
 
-const logger = LoggerFactory.getLogger('CommandController');
+const logger = new Logger(resolveModule(__filename, 'CommandController'));
 
 // TODO TDB...
 export class CommandDTO {}

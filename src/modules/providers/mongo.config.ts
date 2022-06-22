@@ -1,10 +1,12 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config';
 
-const logger = LoggerFactory.getLogger('MongoConfig');
+const logger = new Logger(resolveModule(__filename, 'MongoConfig'));
 
 export const MongoConfigKeys = {
   MONGO_ENABLE: 'MONGO_ENABLE',

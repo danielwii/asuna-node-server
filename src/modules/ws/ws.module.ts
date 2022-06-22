@@ -1,13 +1,11 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SocketIOGateway } from './socket-io.gateway';
-import { AdminWsSyncHelper } from './ws-sync.helper';
-import { WSGateway } from './ws.gateway';
 
-const logger = LoggerFactory.getLogger('WSModule');
+const logger = new Logger(resolveModule(__filename, 'WSModule'));
 
 @Module({
   providers: [

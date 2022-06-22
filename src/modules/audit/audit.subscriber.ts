@@ -1,20 +1,16 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import {
-  EntitySubscriberInterface,
-  EventSubscriber,
-  getRepository,
-  InsertEvent,
-  RemoveEvent,
-  UpdateEvent,
-} from 'typeorm';
+import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 
 import { FeaturesConfigObject } from '../config/features.config';
+import { AppDataSource } from '../datasource';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AuditService } from './audit.service';
 
-const logger = LoggerFactory.getLogger('AuditSubscriber');
+const logger = new Logger(resolveModule(__filename, 'AuditSubscriber'));
 
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
@@ -41,7 +37,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('beforeUpdate', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    const entity = await getRepository(event.entity.constructor.name).findOne({
+    const entity = await AppDataSource.dataSource.getRepository(event.entity.constructor.name).findOne({
       where: { id: event.entity.id },
       loadRelationIds: true,
     });

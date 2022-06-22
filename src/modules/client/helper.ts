@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -9,7 +11,7 @@ import { SessionUser, VirtualDevice, VirtualSession } from './entities';
 
 import type { RequestInfo } from '../helper';
 
-const logger = LoggerFactory.getLogger('DeviceHelper');
+const logger = new Logger(resolveModule(__filename));
 
 export class ClientHelper {
   public static async reg(seid: string, sdid: string, req: RequestInfo): Promise<SessionUser> {

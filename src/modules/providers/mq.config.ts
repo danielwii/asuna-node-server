@@ -1,12 +1,14 @@
+import { Logger } from '@nestjs/common';
+
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config/loader';
 
-const logger = LoggerFactory.getLogger('MQConfig');
+const logger = new Logger(resolveModule(__filename, 'MQConfig'));
 
 export enum MQConfigKeys {
   enable = 'enable',
@@ -18,7 +20,7 @@ export enum MQConfigKeys {
 }
 
 export class MQConfigObject {
-  private static logger = LoggerFactory.getLogger('MQConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'MQConfigObject'));
   private static key = YamlConfigKeys.mq;
   private static prefix = `${MQConfigObject.key}_`;
 

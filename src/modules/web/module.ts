@@ -1,13 +1,12 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { WebController } from './controller';
 import { PageView, PageViewSchema } from './schema';
 import { WebService } from './service';
 
-const logger = LoggerFactory.getLogger('WebModule');
+const logger = new Logger(resolveModule(__filename, 'WebModule'));
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: PageView.name, schema: PageViewSchema }])],

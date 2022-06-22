@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -13,7 +13,7 @@ import { Store } from '../store';
 
 import type { WXJwtPayload } from './interfaces';
 
-const logger = LoggerFactory.getLogger('WXJwtStrategy');
+const logger = new Logger(resolveModule(__filename, 'WXJwtStrategy'));
 
 @Injectable()
 export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {

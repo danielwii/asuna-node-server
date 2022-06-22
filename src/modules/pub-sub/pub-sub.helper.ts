@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
@@ -7,7 +9,7 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 
-const logger = LoggerFactory.getLogger('PubSubHelper');
+const logger = new Logger(resolveModule(__filename, 'PubSubHelper'));
 
 export enum PubSubChannels {
   dataloader = 'dataloader',

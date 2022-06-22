@@ -1,9 +1,11 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-const logger = LoggerFactory.getLogger('StateMachine');
+const logger = new Logger(resolveModule(__filename, 'StateMachine'));
 
 export interface StateMachineAction<Action, State> {
   type: Action;

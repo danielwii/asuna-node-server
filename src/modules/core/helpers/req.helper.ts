@@ -1,13 +1,16 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import pump from 'pump';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
 import type { Request } from 'express';
 
-const logger = LoggerFactory.getLogger('ReqHelper');
+const logger = new Logger(resolveModule(__filename, 'ReqHelper'));
 
 export class ReqHelper {
   /**

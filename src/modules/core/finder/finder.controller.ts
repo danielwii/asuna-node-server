@@ -1,19 +1,19 @@
-import { Controller, Get, Param, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import querystring from 'query-string';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { FinderHelper } from './finder.helper';
 
 import type { Request, Response } from 'express';
 
-const logger = LoggerFactory.getLogger('FinderController');
+const logger = new Logger(resolveModule(__filename, 'FinderController'));
 
 /**
  * 主要应用来定位资源，设计上，可以作为一个调度器，用来调度到其他的平台上

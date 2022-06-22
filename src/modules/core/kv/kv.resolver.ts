@@ -1,12 +1,12 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 
 import { GqlAdminAuthGuard } from '../../graphql';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { KeyValuePair } from './kv.entities';
 import { KvHelper, recognizeTypeValue } from './kv.helper';
 import { KeyValueModel } from './kv.isolated.entities';
@@ -15,7 +15,7 @@ import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 
 @Resolver()
 export class KvQueryResolver {
-  private logger = LoggerFactory.getLogger('KvQueryResolver');
+  private logger = new Logger(resolveModule(__filename, 'KvQueryResolver'));
 
   @Query((returns) => KeyValuePair, { nullable: true })
   public async kv(
@@ -44,7 +44,7 @@ export class KvQueryResolver {
 
 @Resolver(KeyValueModel)
 export class KeyValueModelResolver {
-  private logger = LoggerFactory.getLogger('KeyValueModelResolver');
+  private logger = new Logger(resolveModule(__filename, 'KeyValueModelResolver'));
 
   @ResolveField((returns) => KeyValuePair)
   public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {

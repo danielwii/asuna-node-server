@@ -1,9 +1,9 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -21,7 +21,7 @@ import { WSModule } from './ws';
 
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 
-const logger = LoggerFactory.getLogger('<DefaultModule>');
+const logger = new Logger(resolveModule(__filename, '<DefaultModule>'));
 
 @Module({
   imports: _.compact([

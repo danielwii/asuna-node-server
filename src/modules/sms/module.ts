@@ -1,11 +1,10 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SMSController } from './controller';
 import { SMSHelper } from './helper';
 
-const logger = LoggerFactory.getLogger('SMSModule');
+const logger = new Logger(resolveModule(__filename, 'SMSModule'));
 
 @Module({
   providers: [],

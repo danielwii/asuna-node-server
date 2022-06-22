@@ -1,9 +1,8 @@
-import { CacheModule, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { CacheModule, Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -38,6 +37,7 @@ import { EmailModule } from './email/email.module';
 import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PaymentModule } from './payments/payment.module';
 import { PrismaModule } from './prisma';
 import { PropertyModule } from './property';
@@ -59,7 +59,7 @@ import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
 import { WebModule } from './web';
 
-const logger = LoggerFactory.getLogger('AdminInternalModule');
+const logger = new Logger(resolveModule(__filename, 'AdminInternalModule'));
 
 @Module({
   imports: _.compact([

@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
@@ -7,7 +9,7 @@ import { WxConfigApi } from './wx.api.config';
 
 import type { WxAccessToken } from './wx.interfaces';
 
-const logger = LoggerFactory.getLogger('WeChatBaseApi');
+const logger = new Logger(resolveModule(__filename, 'WeChatBaseApi'));
 
 export class WxBaseApi {
   /**

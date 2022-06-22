@@ -1,6 +1,6 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { ContentAdminController } from './content.admin-controller';
 import { ContentController } from './content.controller';
@@ -8,7 +8,7 @@ import { FeedbackQueryResolver, UserFeedbackResolver } from './feedback.resolver
 import { NotificationModule } from './notification';
 import { ContentQueryResolver } from './resolver';
 
-const logger = LoggerFactory.getLogger('ContentModule');
+const logger = new Logger(resolveModule(__filename, 'ContentModule'));
 
 @Module({
   imports: [NotificationModule],

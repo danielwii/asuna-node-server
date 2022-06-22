@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { fnResolve } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
@@ -7,10 +8,11 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { TimeUnit } from '../common/helpers/utils';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { CacheManager } from './cache';
 import { CacheTTL } from './constants';
 
-const logger = LoggerFactory.getLogger('InMemoryDB');
+const logger = new Logger(resolveModule(__filename, 'InMemoryDB'));
 
 export interface CacheKey {
   prefix?: string;

@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -10,6 +9,7 @@ import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import _ from 'lodash';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenHelper } from './helper';
@@ -73,7 +73,7 @@ class GetParams {
   readonly token: string;
 }
 
-const logger = LoggerFactory.getLogger('OperationTokenController');
+const logger = new Logger(resolveModule(__filename, 'OperationTokenController'));
 
 @ApiTags('core')
 @Controller('api/v1/operation-token')

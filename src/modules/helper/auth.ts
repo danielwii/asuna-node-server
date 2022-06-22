@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -23,7 +25,7 @@ import type { WxCodeSession } from '../wechat/wx.interfaces';
 import type { Request, Response } from 'express';
 import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 
-const logger = LoggerFactory.getLogger('AuthHelper');
+const logger = new Logger(resolveModule(__filename, 'AuthHelper'));
 
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;

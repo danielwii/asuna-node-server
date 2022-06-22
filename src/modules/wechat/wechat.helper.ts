@@ -1,7 +1,9 @@
+import { Logger } from '@nestjs/common';
+
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -41,7 +43,7 @@ import type {
   WxSendTemplateInfo,
 } from './wx.interfaces';
 
-const logger = LoggerFactory.getLogger('WeChatHelper');
+const logger = new Logger(resolveModule(__filename, 'WeChatHelper'));
 
 /*
 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html

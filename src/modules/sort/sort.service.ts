@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { EntityTarget, getRepository } from 'typeorm';
 
 import { DBHelper } from '../core/db';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('SortService');
+const logger = new Logger(resolveModule(__filename, 'SortService'));
 
 export interface Sort {
   id: number;

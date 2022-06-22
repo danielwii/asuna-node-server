@@ -1,4 +1,6 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { CacheScope } from 'apollo-server-types';
 import { Promise } from 'bluebird';
@@ -7,7 +9,7 @@ import { CacheKey, InMemoryDB } from './db';
 
 import type { GraphqlContext, GraphQLResolveCacheInfo } from '../dataloader/dataloader.interceptor';
 
-const logger = LoggerFactory.getLogger('CacheWrapper');
+const logger = new Logger(resolveModule(__filename, 'CacheWrapper'));
 
 interface CacheWrapperDoOptions<V> {
   prefix?: string;

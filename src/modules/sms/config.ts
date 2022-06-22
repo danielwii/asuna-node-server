@@ -1,9 +1,10 @@
-import { AbstractConfigLoader } from '@danielwii/asuna-helper/dist/config';
-import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { AbstractConfigLoader, YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { parseJSONIfCould, withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { configLoader } from '../config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 export enum SMSConfigKeys {
   enable = 'enable',
@@ -24,7 +25,7 @@ export interface AliSMSExtra {
 }
 
 export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
-  private static logger = LoggerFactory.getLogger('SMSConfigObject');
+  private static logger = new Logger(resolveModule(__filename, 'SMSConfigObject'));
   private static key = YamlConfigKeys.sms;
   private static _: SMSConfigObject;
 

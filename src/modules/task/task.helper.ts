@@ -1,10 +1,12 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { MQProvider } from '../providers';
 import { TaskRecord } from './task.entities';
 
-const logger = LoggerFactory.getLogger('TaskHelper');
+const logger = new Logger(resolveModule(__filename, 'TaskHelper'));
 
 export enum TaskState {
   OPEN = 'OPEN',

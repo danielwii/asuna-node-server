@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
@@ -11,6 +13,7 @@ import * as fp from 'lodash/fp';
 
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
+import { named } from '../../helper/annotations';
 import { auth, AuthType } from '../../helper/auth';
 import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
@@ -20,7 +23,7 @@ import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 import type { IdentifierHelper } from '../../common/identifier';
 import type { EnumValueStatic } from '../../enum-values';
 
-const logger = LoggerFactory.getLogger('KvHelper');
+const logger = new Logger(resolveModule(__filename, 'KvHelper'));
 
 const castToBoolean = (value): boolean => value === 'true';
 const isJson = (value): boolean => {
@@ -355,13 +358,16 @@ export class KvHelper {
         [, item.value] = recognizeTypeValue(item.type, item.value);
         return item;
       }),
-    );*/
+    ); */
   }
 
+  @named
   public static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
     kvDef: KvDef,
     keyValues: KeyValues,
+    funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
+    logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
     return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 

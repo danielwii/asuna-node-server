@@ -1,4 +1,4 @@
-import { Body, Get, HttpCode, HttpStatus, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Get, HttpCode, HttpStatus, Logger, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import {
   AsunaErrorCode,
@@ -7,7 +7,6 @@ import {
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -16,9 +15,9 @@ import Chance from 'chance';
 import { registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
 import { BaseEntity } from 'typeorm';
-import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 import { isNotBlank } from '../../common';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from '../db';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDto } from './auth.dto';
@@ -30,7 +29,7 @@ import type { DeepPartial } from 'typeorm';
 import type { CreatedUser } from './auth.service';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
-const logger = LoggerFactory.getLogger('AbstractAuthController');
+const logger = new Logger(resolveModule(__filename, 'AbstractAuthController'));
 
 export const UsernameValidationSchema: ValidationSchema = {
   name: 'usernameValidationSchema',
@@ -222,7 +221,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
       const profile = await UserProfile.findOne({
-        where: { id: profileId } as FindOptionsWhere<UserProfile>,
+        where: { id: profileId },
         relations: ['wallet'],
       });
       // const desensitized = _.omit(profile, 'salt', 'password', 'info');

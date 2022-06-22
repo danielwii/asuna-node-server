@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { plainToInstance, Transform } from 'class-transformer';
@@ -7,10 +8,11 @@ import { addMonths } from 'date-fns';
 import _ from 'lodash';
 
 import { sha1 } from '../../common/helpers';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { OperationToken, OperationTokenHelper } from '../token';
 import { UploaderTokenServiceName } from './model';
 
-const logger = LoggerFactory.getLogger('UploaderHelper');
+const logger = new Logger(resolveModule(__filename, 'UploaderHelper'));
 
 export class ChunksUploadPayload {
   @IsString()

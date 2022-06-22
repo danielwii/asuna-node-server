@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { Hermes, InMemoryAsunaQueue } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -20,7 +20,7 @@ import { FileInfo } from '../storage';
 import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
 
-const logger = LoggerFactory.getLogger('UploaderService');
+const logger = new Logger(resolveModule(__filename, 'UploaderService'));
 
 export class ChunkFileInfo {
   @IsString()

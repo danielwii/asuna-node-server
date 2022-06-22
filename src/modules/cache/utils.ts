@@ -1,14 +1,16 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';
 
 export class CacheUtils {
-  private static logger = LoggerFactory.getLogger('CacheUtils');
+  private static logger = new Logger(resolveModule(__filename, 'CacheUtils'));
 
   public static clear(opts: { prefix?: string; key: string | object }): void {
     this.logger.debug(`clear cache ${r(opts)}`);

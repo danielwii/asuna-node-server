@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToInstance, Transform } from 'class-transformer';
@@ -19,7 +21,7 @@ export enum EmailConfigKeys {
 }
 
 export class EmailConfigObject {
-  public static logger = LoggerFactory.getLogger('EmailConfigObject');
+  public static logger = new Logger(resolveModule(__filename));
   public static key = YamlConfigKeys.email;
   public static prefix = `${EmailConfigObject.key}_`;
 

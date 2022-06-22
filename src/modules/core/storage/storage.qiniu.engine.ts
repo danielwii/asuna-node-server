@@ -1,5 +1,6 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -8,6 +9,7 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 
 import { convertFilename } from '../../common/helpers';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UploaderConfigObject } from '../uploader/config';
 import { QiniuConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
@@ -15,7 +17,7 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 import type { Response } from 'express';
 
 export class QiniuStorage implements IStorageEngine {
-  private static readonly logger = LoggerFactory.getLogger(QiniuStorage.name);
+  private static readonly logger = new Logger(resolveModule(__filename, QiniuStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: QiniuConfigObject;

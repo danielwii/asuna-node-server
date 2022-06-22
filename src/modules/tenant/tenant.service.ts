@@ -1,5 +1,7 @@
+import { Logger } from '@nestjs/common';
+
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -16,7 +18,7 @@ import { TenantHelper } from './tenant.helper';
 import type { PrimaryKey } from '../common';
 import type { StatsResult } from '../stats';
 
-const logger = LoggerFactory.getLogger('TenantService');
+const logger = new Logger(resolveModule(__filename, 'TenantService'));
 
 export class TenantService {
   /**

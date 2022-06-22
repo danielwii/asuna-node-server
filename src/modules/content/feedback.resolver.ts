@@ -1,7 +1,7 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { Args, Context, Field, Info, ObjectType, Query, ResolveField, Resolver, Root } from '@nestjs/graphql';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -23,7 +23,7 @@ class FeedbackPageable extends Pageable<Feedback> {
 
 @Resolver()
 export class FeedbackQueryResolver extends QueryResolver {
-  private logger = LoggerFactory.getLogger('FeedbackQueryResolver');
+  private logger = new Logger(resolveModule(__filename, 'FeedbackQueryResolver'));
 
   constructor() {
     super(Feedback);
@@ -59,7 +59,7 @@ export class FeedbackQueryResolver extends QueryResolver {
 
 @Resolver(Feedback)
 export class UserFeedbackResolver {
-  private logger = LoggerFactory.getLogger('UserFeedbackResolver');
+  private logger = new Logger(resolveModule(__filename, 'UserFeedbackResolver'));
 
   @ResolveField('replies', (returns) => [FeedbackReply])
   async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {

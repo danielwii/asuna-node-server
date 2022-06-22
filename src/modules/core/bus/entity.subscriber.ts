@@ -1,4 +1,5 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
@@ -7,13 +8,14 @@ import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, Re
 import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 
 import { CacheHelper, CleanCacheType } from '../../cache';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
 import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 
 import type { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import type { MetaInfoOptions } from '../../common/decorators';
 
-const logger = LoggerFactory.getLogger('EntitySubscriber');
+const logger = new Logger(resolveModule(__filename, 'EntitySubscriber'));
 
 const safeReload = (metadata: EntityMetadata, entity): void => {
   if (!_.isObject(entity)) return;

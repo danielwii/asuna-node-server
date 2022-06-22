@@ -1,8 +1,8 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = LoggerFactory.getLogger('<NoModule>');
+const logger = new Logger(resolveModule(__filename, '<NoModule>'));
 
 @Module({
   imports: [],

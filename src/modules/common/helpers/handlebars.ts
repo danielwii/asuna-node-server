@@ -1,10 +1,12 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import dayjs from 'dayjs';
 import * as Handlebars from 'handlebars';
 import _ from 'lodash';
 
-const logger = LoggerFactory.getLogger('HandlebarsHelper');
+const logger = new Logger(resolveModule(__filename, 'HandlebarsHelper'));
 
 // --------------------------------------------------------------
 // register Handlebars helpers

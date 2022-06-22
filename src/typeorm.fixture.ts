@@ -1,10 +1,12 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Logger } from '@nestjs/common';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { FindManyOptions, FindOneOptions, FindOptionsUtils, JoinOptions, ObjectLiteral } from 'typeorm';
 
-const logger = LoggerFactory.getLogger('FindOptionsFixture');
+const logger = new Logger(resolveModule(__filename, 'FindOptionsFixture'));
 
 const oldApplyOptionsToQueryBuilder = FindOptionsUtils.applyOptionsToTreeQueryBuilder;
 

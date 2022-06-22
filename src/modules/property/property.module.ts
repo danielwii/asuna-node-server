@@ -1,6 +1,6 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as R from 'ramda';
@@ -12,7 +12,7 @@ import { AppDataSource } from '../datasource';
 import { FinancialTransaction, Wallet } from './financial.entities';
 import { PropertyQueryResolver } from './property.resolver';
 
-const logger = LoggerFactory.getLogger('PropertyModule');
+const logger = new Logger(resolveModule(__filename, 'PropertyModule'));
 
 @Module({
   imports: [KvModule],

@@ -1,10 +1,9 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { DynamicModule, Module, OnModuleInit } from '@nestjs/common';
+import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomScalar, GraphQLModule, Scalar } from '@nestjs/graphql';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -28,12 +27,13 @@ import { AppModule } from './app';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
 import type { GraphQLServiceContext } from 'apollo-server-types';
 
-const logger = LoggerFactory.getLogger('GraphqlModule');
+const logger = new Logger(resolveModule(__filename, 'GraphqlModule'));
 
 @Scalar('DateTime', (type) => Date)
 export class DateScalar implements CustomScalar<number, Date> {

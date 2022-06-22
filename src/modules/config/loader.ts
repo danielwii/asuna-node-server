@@ -1,10 +1,12 @@
+import { Logger } from '@nestjs/common';
+
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
 import { resolve } from 'path';
 
-const logger = LoggerFactory.getLogger('ConfigLoader');
+const logger = new Logger(resolveModule(__filename, 'ConfigLoader'));
 
 export const configLoader: ConfigLoader = createConfigLoader({
   requiredVariables: [

@@ -1,20 +1,19 @@
-import { Body, Controller, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Logger, Post, Query, Req } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
-import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
 import { Builder } from 'builder-pattern';
 import geoip from 'geoip-lite';
 import _ from 'lodash';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PageView } from './schema';
 import { WebService } from './service';
 
 import type { RequestInfo } from '../helper';
 import type { PageViewDTO } from '@danielwii/asuna-shared/dist/dto';
 
-const logger = LoggerFactory.getLogger('WebController');
+const logger = new Logger(resolveModule(__filename, 'WebController'));
 
 @Controller('api/v1/web')
 export class WebController {

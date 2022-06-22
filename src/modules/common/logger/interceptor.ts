@@ -1,21 +1,23 @@
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import type { Request } from 'express';
 import type { CommonRequest } from '../interface';
 
-const logger = LoggerFactory.getLogger('LoggerInterceptor');
+const logger = new Logger(resolveModule(__filename));
 
 export class LoggerInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     let req = context.switchToHttp().getRequest<Request & CommonRequest>();
     if (!req) {
-      req = require('@nestjs/graphql').GqlExecutionContext.create(context).getContext().req;
+      req = GqlExecutionContext.create(context).getContext().req;
     }
 
     // ws subscription request

@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { LeadUser, SessionUser } from './entities';
 
 @Injectable()
 export class ClientService {
-  private readonly logger = LoggerFactory.getLogger(ClientService.name);
+  private readonly logger = new Logger(resolveModule(__filename, ClientService.name));
 
   /**
    * @param tenantId

@@ -1,10 +1,11 @@
+import { Logger } from '@nestjs/common';
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 
-import { LoggerFactory } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as mime from 'mime-types';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AsunaContext, StorageEngineMode } from '../context';
 import { OperationToken } from '../token';
 import { UploaderRoot } from './model';
@@ -20,7 +21,7 @@ export class UploadCommand {
 
 @CommandHandler(UploadCommand)
 export class UploaderHandler implements ICommandHandler<UploadCommand> {
-  private static readonly logger = LoggerFactory.getLogger(UploaderHandler.name);
+  private static readonly logger = new Logger(resolveModule(__filename, UploaderHandler.name));
 
   public constructor(private readonly publisher: EventPublisher) {}
 
