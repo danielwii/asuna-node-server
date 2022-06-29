@@ -27,7 +27,7 @@ export class MinioStorage implements IStorageEngine {
   private readonly defaultBucket;
   private readonly config = UploaderConfigObject.load();
 
-  private readonly configObject: MinioConfigObject;
+  public readonly configObject: MinioConfigObject;
 
   public constructor(configure: () => MinioConfigObject, opts: { defaultBucket?: string } = {}) {
     this.defaultBucket = opts.defaultBucket || 'default';

@@ -1,4 +1,8 @@
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
 import {
+  Body,
   Controller,
   Logger,
   Post,
@@ -13,7 +17,9 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
@@ -25,14 +31,14 @@ import * as mime from 'mime-types';
 import * as multer from 'multer';
 import * as os from 'os';
 import ow from 'ow';
-import { basename, dirname, join } from 'path';
+import { basename, dirname, extname, join } from 'path';
 import * as uuid from 'uuid';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { named } from '../../helper';
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { AsunaContext } from '../context';
 import { Global } from '../global';
-import { DocMimeType, FileInfo, ImageMimeType, SavedFile, VideoMimeType } from '../storage';
+import { DocMimeType, FileInfo, ImageMimeType, MinioStorage, SavedFile, VideoMimeType } from '../storage';
 import { OperationToken, OperationTokenGuard, OperationTokenRequest } from '../token';
 import { UploaderConfigObject } from './config';
 import { UploaderHelper } from './helper';
@@ -41,7 +47,7 @@ import { RemoteFileInfo, UploaderService } from './service';
 import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import type { AnyAuthRequest } from '../../helper/interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'UploaderController'));
+const logger = new Logger(resolveModule(__filename));
 
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
@@ -49,9 +55,12 @@ const fileInterceptorOptions: MulterOptions = {
       const mimetype = file.mimetype.split('/').slice(-1).join('');
       const lookup = mime.lookup(file.originalname);
       const extension = mime.extension(lookup || 'bin');
-      const name = basename(file.originalname, `.${extension}`).replace('.', '_').replace(' ', '_');
+      const noExtName = basename(file.originalname, extname(file.originalname));
+      const name = noExtName.replace('.', '_').replace(' ', '_');
       const filename = `${uuid.v4()}.${name.toLowerCase()}.${extension}`;
-      logger.debug(`set filename ${r({ filename, extension, mimetype, originalname: file.originalname, lookup })}`);
+      logger.debug(
+        `set filename ${r({ noExtName, filename, extension, mimetype, originalname: file.originalname, lookup })}`,
+      );
       cb(undefined, filename);
     },
   }),
@@ -69,30 +78,30 @@ const fileInterceptorOptions: MulterOptions = {
   },
 };
 
-class CreateChunksUploadTaskDto {
+class CreateChunksUploadTaskDTO {
   @IsString()
   @Transform(({ value }) => _.trim(value))
-  public filename: string;
+  filename: string;
 
   @IsNumber()
   @Min(1)
-  public totalChunks: number;
+  totalChunks: number;
 }
 
 class CreateChunksUploadTaskQuery {
   @IsString()
   @Transform(({ value }) => _.trim(value))
-  public readonly key: string;
+  readonly key: string;
 
   @IsString()
   @Transform(({ value }) => _.trim(value))
-  public readonly filename: string;
+  readonly filename: string;
 
   @IsNumber()
   @Min(1)
   @IsOptional()
   @Transform(({ value }) => Number(value))
-  public readonly totalChunks: number = 1;
+  readonly totalChunks: number = 1;
 }
 
 @ApiTags('core')
@@ -100,7 +109,39 @@ class CreateChunksUploadTaskQuery {
 export class UploaderController {
   private context = AsunaContext.instance;
 
-  public constructor(private readonly uploaderService: UploaderService) {}
+  constructor(private readonly uploaderService: UploaderService) {}
+
+  @UseGuards(AnyAuthGuard)
+  @Post('pre-signed-url')
+  @named
+  async getPreSignedUrl(
+    @Body('bucket') bucket: string,
+    @Body('prefix') prefix: string,
+    @Body('filename') filename: string,
+    @Req() req: AnyAuthRequest,
+    funcName?: string,
+  ) {
+    ow(filename, 'filename', ow.string.nonEmpty);
+    ow(bucket, 'bucket', ow.string.nonEmpty);
+    ow(prefix, 'prefix', ow.string.nonEmpty);
+
+    const lookup = mime.lookup(filename) as string;
+    const extension = mime.extension(lookup || 'bin');
+    const noExtName = basename(filename, extname(filename));
+    const name = noExtName.replace('.', '_').replace(' ', '_');
+    const key = `${bucket}/${prefix}/${uuid.v4()}.${name.toLowerCase()}.${extension}`;
+    logger.log(`#${funcName} generate ${r({ bucket, filename, key })}`);
+
+    // TODO assume current storage is minio
+    const storageEngine = AsunaContext.instance.getStorageEngine(bucket) as MinioStorage;
+    const region = storageEngine.region;
+    const Bucket = storageEngine.configObject.endpoint.slice(0, storageEngine.configObject.endpoint.indexOf('s3') - 1);
+    const s3Client = new S3Client({ region });
+    const command = new PutObjectCommand({ Bucket, Key: key });
+    const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    logger.log(`#${funcName} Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
+    return ApiResponse.success({ signedUrl, fullpath: `/uploads/${key}` });
+  }
 
   /**
    * 创建 chunk 上传任务
@@ -109,7 +150,7 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard)
   @Post('create-chunks-upload-task')
-  public createChunksUploadTask(
+  createChunksUploadTask(
     @Query() query: CreateChunksUploadTaskQuery,
     @Req() req: AnyAuthRequest,
   ): Promise<OperationToken> {
@@ -130,7 +171,7 @@ export class UploaderController {
   @ApiQuery({ name: 'chunk', required: false, description: 'chunked upload file index' })
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks-stream')
-  public async streamChunkedUploader(
+  async streamChunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: string,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
@@ -168,7 +209,7 @@ export class UploaderController {
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('chunks')
   @UseInterceptors(FileInterceptor('file', fileInterceptorOptions))
-  public async chunkedUploader(
+  async chunkedUploader(
     @Query('filename') filename: string,
     @Query('chunk') chunk: number,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
@@ -187,7 +228,7 @@ export class UploaderController {
    */
   @UseGuards(AnyAuthGuard, OperationTokenGuard)
   @Post('merge-chunks')
-  public async mergeChunks(
+  async mergeChunks(
     @Query('filename') filename: string,
     @Req() req: AnyAuthRequest & OperationTokenRequest,
   ): Promise<RemoteFileInfo> {
@@ -217,7 +258,7 @@ export class UploaderController {
     // new FastifyFileInterceptor('files'),
     FilesInterceptor('files', UploaderConfigObject.instance.maxCount, fileInterceptorOptions),
   )
-  public async uploader(
+  async uploader(
     @Query('bucket') bucket = '',
     @Query('prefix') prefix = '',
     @Query('local') local: string, // 是否使用本地存储
@@ -244,7 +285,7 @@ export class UploaderController {
    */
   // @UseGuards(AnyAuthGuard)
   @Post('stream')
-  public async streamUpload(
+  async streamUpload(
     @Query('bucket') bucket = '',
     @Query('prefix') prefix = '',
     @Query('filename') filename: string,
@@ -293,6 +334,7 @@ export class UploaderController {
       }
 
       const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
+      /*
       if (_.includes(ImageMimeType, file.mimetype)) {
         logger.log(`save image[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         // return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
@@ -308,7 +350,7 @@ export class UploaderController {
         // bucket = bucket || 'files';
         // logger.log(oneLineTrim`unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.`);
         return storageEngine.saveEntity(file, { bucket, prefix });
-      }
+      } */
       return storageEngine.saveEntity(file, { bucket, prefix });
     });
   }
