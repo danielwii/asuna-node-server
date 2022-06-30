@@ -16,21 +16,21 @@ import { Promise } from 'bluebird';
 import Chance from 'chance';
 import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
-import { BaseEntity } from 'typeorm';
+import { BaseEntity, DeepPartial } from 'typeorm';
 
 import { isNotBlank, TimeUnit } from '../../common';
 import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
+import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { AppleConfigObject } from './apple.config';
-import { ResetAccountDto, ResetPasswordDto, SignInDto, UpdateProfileDto } from './auth.dto';
+import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { AppleUserProfile, UserProfile } from './user.entities';
 
-import type { DeepPartial } from 'typeorm';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { CreatedUser } from './auth.service';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 
 const logger = new Logger(resolveModule(__filename, 'AbstractAuthController'));
 
@@ -57,10 +57,10 @@ class SignInWithAppleDTO {
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
   private readonly appleConfig = AppleConfigObject.load();
 
-  public constructor(
-    public readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
-    public readonly authService: AbstractAuthService<AuthUser>,
-    public readonly handlers: {
+  constructor(
+    readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
+    readonly authService: AbstractAuthService<AuthUser>,
+    readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
       onSignUp?: (result: CreatedUser<U>, body) => Promise<void>;
       onCurrent?: (user: U) => Promise<U & Record<any, any>>;
@@ -70,7 +70,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @HttpCode(200)
   @Post('reset-password')
   @UseGuards(JwtAuthGuard)
-  public async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
+  async resetPassword(@Body() dto: ResetPasswordDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload } = req;
     logger.log(`reset password: ${r({ dto, payload })}`);
 
@@ -84,7 +84,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @HttpCode(200)
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
-  public async resetAccount(@Body() dto: ResetAccountDto, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
+  async resetAccount(@Body() dto: ResetAccountDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload, user } = req;
     logger.log(`reset account: ${r({ dto, payload, user })}`);
 
@@ -110,7 +110,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  public async updateProfile(@Body() dto: UpdateProfileDto, @Req() req: JwtAuthRequest): Promise<void> {
+  async updateProfile(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     logger.log(`update profile: ${r({ dto, payload, user })}`);
 
@@ -127,7 +127,11 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @Post('sign-in-with-apple')
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
   @named
-  async signInWithApple(@Body() dto: SignInWithAppleDTO, @Req() req: JwtAuthRequest, funcName?: string) {
+  async signInWithApple(
+    @Body() dto: SignInWithAppleDTO,
+    @Req() req: JwtAuthRequest,
+    funcName?: string,
+  ): Promise<CreatedToken> {
     const { payload } = req;
     logger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
     if (!this.appleConfig.enable) {
@@ -154,7 +158,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     });
     logger.debug(`#${funcName} ${r({ token })}`);
     const verified = await appleSignIn.verifyIdToken(token.id_token, {
-      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
       audience: clientID, // client id - can also be an array
       // nonce: 'NONCE', // nonce // Check this note if coming from React Native AS RN automatically SHA256-hashes the nonce https://github.com/invertase/react-native-apple-authentication#nonce
       // If you want to handle expiration on your own, or if you want the expired tokens decoded
@@ -211,7 +215,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   async appleRefreshToken(@Query() query, funcName?: string) {
     logger.log(`#${funcName} ${r(query)}`);
     return await appleSignIn.verifyIdToken(query.id_token, {
-      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorpublickey-options-callback
+      // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
       audience: 'io.github.danielwii.robin-board', // client id - can also be an array
       // nonce: 'NONCE', // nonce // Check this note if coming from React Native AS RN automatically SHA256-hashes the nonce https://github.com/invertase/react-native-apple-authentication#nonce
       // If you want to handle expiration on your own, or if you want the expired tokens decoded
@@ -226,7 +230,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   } */
 
   @Post('quick-pass')
-  public async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
+  async quickPass(@Body() body): Promise<{ username: string; defaultPassword: string; token: CreatedToken }> {
     const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
     const password = chance.string({ length: 6, pool: '0123456789' });
 
@@ -251,7 +255,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Post('sign-up')
-  public async signUp(@Body() body) {
+  async signUp(@Body() body) {
     logger.log(`sign-up: ${r(body)}`);
     const errors = await validate('usernameValidationSchema', { username: body.username });
     if (errors.length) {
@@ -280,9 +284,26 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       });
   }
 
+  // refresh access token by refresh token
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh-token')
+  @named
+  async refreshToken(
+    @Body('refreshToken') refreshToken: string,
+    @Req() req: JwtAuthRequest,
+    funcName?: string,
+  ): Promise<CreatedToken> {
+    const available = await OperationTokenHelper.checkAvailableByToken(refreshToken);
+    logger.log(`#${funcName} token is available: ${r({ refreshToken, available })}`);
+    if (!available) {
+      throw new AsunaException(AsunaErrorCode.InvalidToken, 'refresh token not invalid');
+    }
+    return this.authService.createToken(req.profile, { uid: `${req.user.id}` });
+  }
+
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  public async getToken(@Body() signInDto: SignInDto): Promise<CreatedToken> {
+  async getToken(@Body() signInDto: SignInDTO): Promise<CreatedToken> {
     logger.log(`getToken() >> ${signInDto.username}`);
     const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
 
@@ -310,7 +331,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Get('current')
   @UseGuards(JwtAuthGuard)
-  public async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
+  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
@@ -352,7 +373,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Get('authorized')
   @UseGuards(JwtAuthGuard)
-  public async authorized(): Promise<void> {
+  async authorized(): Promise<void> {
     logger.log('Authorized route...');
   }
 }

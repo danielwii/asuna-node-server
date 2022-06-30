@@ -7,6 +7,7 @@ import {
   AsunaExceptionHelper,
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -14,28 +15,27 @@ import { AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 import * as otplib from 'otplib';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';
 import { AdminAuthService } from './admin-auth.service';
-import { AdminResetPasswordDto, SignDto } from './auth.dto';
+import { AdminResetPasswordDTO, SignDTO } from './auth.dto';
 import { AdminUser } from './auth.entities';
 import { AdminUserIdentifierHelper } from './identifier';
 
 import type { AnyAuthRequest } from '../../helper/interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'AdminAuthController'));
+const logger = new Logger(resolveModule(__filename));
 
 @ApiTags('sys-admin')
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
-  public constructor(private readonly adminAuthService: AdminAuthService) {
+  constructor(private readonly adminAuthService: AdminAuthService) {
     super('auth');
   }
 
   @Post('otp')
-  public async otp(@Req() request, @Res() res): Promise<void> {
+  async otp(@Req() request, @Res() res): Promise<void> {
     const { user } = request;
     if (!user) {
       return res.status(HttpStatus.I_AM_A_TEAPOT).send();
@@ -66,7 +66,7 @@ export class AdminAuthController extends RestCrudController {
   // FIXME type ResetPasswordDto not recognise email
   @HttpCode(200)
   @Post('reset-password')
-  public async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDto): Promise<ApiResponse> {
+  async resetPassword(@Body() resetPasswordDto: AdminResetPasswordDTO): Promise<ApiResponse> {
     // ow(resetPasswordDto.email, 'email', ow.string.nonEmpty);
     const data = _.omitBy({ username: resetPasswordDto.username, email: resetPasswordDto.email }, _.isNull);
     logger.log(`reset password: ${r({ resetPasswordDto, data })}`);
@@ -83,7 +83,7 @@ export class AdminAuthController extends RestCrudController {
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  public async getToken(@Body() signDto: SignDto): Promise<{ expiresIn: number; accessToken: string }> {
+  async getToken(@Body() signDto: SignDTO): Promise<{ expiresIn: number; accessToken: string }> {
     logger.log(`getToken() >> ${r(_.omit(signDto, 'password'))}`);
     const user = await this.adminAuthService.getUserWithPassword(
       _.omitBy({ email: signDto.email, username: signDto.username }, _.isNil),
@@ -104,7 +104,7 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Get('authorized')
-  public authorized(): void {
+  authorized(): void {
     logger.log('Authorized route...');
     const ac = new AccessControl();
     // prettier-ignore
@@ -129,7 +129,7 @@ export class AdminAuthController extends RestCrudController {
   }
 
   @Get('current')
-  public async current(@Req() req: AnyAuthRequest): Promise<AdminUser> {
+  async current(@Req() req: AnyAuthRequest): Promise<AdminUser> {
     const { user } = req;
     logger.log(`current... ${r(user)}`);
     const currentUser = await this.adminAuthService.getUser(user, true, { relations: ['roles'] });

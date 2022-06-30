@@ -4,7 +4,7 @@ import { Exclude, Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsObject, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import _ from 'lodash';
 
-export class AdminResetPasswordDto {
+export class AdminResetPasswordDTO {
   @ApiProperty({ type: 'username' })
   @IsString()
   @Transform(({ value }) => _.trim(value))
@@ -22,14 +22,14 @@ export class AdminResetPasswordDto {
   readonly password: string;
 }
 
-export class ResetPasswordDto {
+export class ResetPasswordDTO {
   @ApiProperty({ minLength: 6 })
   @IsNotEmpty()
   @MinLength(6)
   readonly password: string;
 }
 
-export class UpdateProfileDto {
+export class UpdateProfileDTO {
   @ApiProperty({ minLength: 1 })
   @IsString()
   @IsOptional()
@@ -41,7 +41,7 @@ export class UpdateProfileDto {
   readonly position?: JSON;
 }
 
-export class ResetAccountDto {
+export class ResetAccountDTO {
   @ApiProperty({ type: 'username' })
   @IsString()
   @Transform(({ value }) => _.trim(value))
@@ -57,7 +57,7 @@ export class ResetAccountDto {
 /**
  * for admin auth currently
  */
-export class SignDto {
+export class SignDTO {
   @ApiProperty({ type: 'email' })
   @ValidateIf((o) => _.isEmpty(o.username))
   @IsString()
@@ -77,7 +77,7 @@ export class SignDto {
   readonly password: string;
 }
 
-export class SignInDto {
+export class SignInDTO {
   @IsString()
   @Transform(({ value }) => _.trim(value))
   @IsNotEmpty()
@@ -88,7 +88,7 @@ export class SignInDto {
   readonly password: string;
 }
 
-export class SignUpDto {
+export class SignUpDTO {
   @IsEmail()
   @Transform(({ value }) => (value ? _.trim(value) : undefined))
   @IsOptional()

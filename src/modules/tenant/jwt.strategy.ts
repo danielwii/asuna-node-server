@@ -13,7 +13,7 @@ import { TenantAuthService } from './auth.service';
 
 import type { JwtPayload } from '../core/auth';
 
-const logger = new Logger(resolveModule(__filename, 'JwtStrategy'));
+const logger = new Logger(resolveModule(__filename, 'OrgJwtStrategy'));
 
 @Injectable()
 export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {

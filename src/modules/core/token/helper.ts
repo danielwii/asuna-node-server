@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { random } from '@danielwii/asuna-helper/dist/random';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
@@ -10,13 +11,13 @@ import { IsDate, IsInt, IsString } from 'class-validator';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 
-const logger = new Logger(resolveModule(__filename, 'OperationTokenHelper'));
+const logger = new Logger(resolveModule(__filename));
 
 export const SysTokenServiceName = {
   AdminLogin: 'admin#login',
+  User: 'user',
   SysInvite: 'sys#sys-invite',
 };
 

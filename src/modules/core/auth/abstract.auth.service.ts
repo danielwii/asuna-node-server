@@ -2,10 +2,11 @@ import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { oneLine } from 'common-tags';
-import { differenceInCalendarDays } from 'date-fns';
+import { addMonths, differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
@@ -15,7 +16,7 @@ import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 import { named } from '../../helper/annotations';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { OperationTokenHelper, SysTokenServiceName } from '../token';
 
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
@@ -24,16 +25,14 @@ import type { PrimaryKey } from '../../common';
 import type { CreatedUser } from './auth.service';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 
-const logger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
-
 export class PasswordHelper {
   private static readonly cryptor = new Cryptor();
 
-  public static encrypt(password: string): { hash: string; salt: string } {
+  static encrypt(password: string): { hash: string; salt: string } {
     return this.cryptor.passwordEncrypt(password);
   }
 
-  public static passwordVerify(password: string, user: AuthUser): boolean {
+  static passwordVerify(password: string, user: AuthUser): boolean {
     return this.cryptor.passwordCompare(password, user.password, user.salt);
   }
 }
@@ -41,28 +40,31 @@ export class PasswordHelper {
 export interface CreatedToken {
   expiresIn: number;
   accessToken: string;
+  refreshToken: string;
 }
 
 export class TokenHelper {
-  public static decode<Payload = JwtPayload>(token: string): Payload {
+  private static logger = new Logger(resolveModule(__filename, 'TokenHelper'));
+
+  static decode<Payload = JwtPayload>(token: string): Payload {
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  public static async createSessionToken(clientUser, extra?: { scid?: string }) {
+  static async createSessionToken(clientUser, extra?: { scid?: string }) {
     const expiresIn = TimeUnit.DAYS.toSeconds(1);
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<Partial<JwtPayload>, 'iat' | 'exp'> = { type: 'SessionToken', ...extra };
-    logger.log(`sign payload ${r(payload)}`);
+    this.logger.log(`sign payload ${r(payload)}`);
     const token = jwt.sign(payload, secretOrKey, { expiresIn });
     return { expiresIn, accessToken: token };
   }
 
-  public static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
+  static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
     ow(user, 'user', ow.object.nonEmpty);
 
     const type = _.get(user, 'constructor.name');
-    logger.log(`createToken >> ${r({ user, extra, type })}`);
+    this.logger.log(`createToken >> ${r({ user, extra, type })}`);
     const expiresIn = TimeUnit.DAYS.toSeconds(30); // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
@@ -73,28 +75,44 @@ export class TokenHelper {
       ...extra,
       type,
     };
-    logger.log(`sign payload ${r(payload)}`);
-    const token = jwt.sign(payload, secretOrKey, { expiresIn });
-    return { expiresIn, accessToken: token };
+    this.logger.log(`sign payload ${r(payload)}`);
+    const accessToken = jwt.sign(payload, secretOrKey, { expiresIn });
+    await OperationTokenHelper.deprecateToken({
+      key: 'refresh-token',
+      role: 'auth',
+      service: SysTokenServiceName.User,
+      identifier: user.id,
+    });
+    const refreshToken = await OperationTokenHelper.obtainToken({
+      type: 'TimeBased',
+      key: `refresh-token`,
+      role: 'auth',
+      service: SysTokenServiceName.User,
+      identifier: user.id,
+      expiredAt: addMonths(new Date(), 3),
+    });
+    return { expiresIn, accessToken, refreshToken: refreshToken.token };
   }
 
-  public static createCustomToken(
+  static createCustomToken(
     payload: string | Buffer | object,
     secretOrPrivateKey: Secret,
     options?: SignOptions,
   ): string {
-    logger.log(`createCustomToken >> ${r(payload)}`);
+    this.logger.log(`createCustomToken >> ${r(payload)}`);
     return jwt.sign(payload, secretOrPrivateKey, options);
   }
 }
 
 export abstract class AbstractAuthService<U extends AuthUser> {
+  private logger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
+
   protected constructor(
-    public readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,
-    public readonly authUserRepository: Repository<U>,
+    readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,
+    readonly authUserRepository: Repository<U>,
   ) {}
 
-  public abstract createUser(
+  abstract createUser(
     username: string,
     email: string,
     password: string,
@@ -102,14 +120,14 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     roleNames?: string[],
   ): Promise<CreatedUser<U>>;
 
-  public async validateUser(payload: JwtPayload): Promise<boolean> {
+  async validateUser(payload: JwtPayload): Promise<boolean> {
     const identifier = { email: payload.email, username: payload.username };
     const user = await this.getUser(identifier, true);
 
     const left = Math.floor(payload.exp - Date.now() / 1000);
     const validated = !_.isNil(user) && user.id === payload.id;
     if (!validated) {
-      logger.debug(oneLine`
+      this.logger.debug(oneLine`
         validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
         left: ${formatTime(left)}
       `);
@@ -117,22 +135,19 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return validated;
   }
 
-  public async createToken(authUser: U, extra?: { uid: string }): Promise<CreatedToken> {
+  async createToken(authUser: U, extra?: { uid: string }): Promise<CreatedToken> {
     authUser.lastSignedAt = new Date();
     await authUser.save();
     return TokenHelper.createToken(authUser, extra);
   }
 
   @named
-  public async updateLastLoginDate(
-    uid: PrimaryKey,
-    funcName?: string,
-  ): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
+  async updateLastLoginDate(uid: PrimaryKey, funcName?: string): Promise<{ sameDay?: boolean; lastLoginAt?: Date }> {
     const authUser = await this.authUserRepository.findOneBy({ id: uid as any });
     if (authUser) {
       const currentDate = new Date();
       const calendarDays = differenceInCalendarDays(currentDate, authUser.lastLoginAt);
-      logger.debug(`<${funcName}> ${r({ lastLoginAt: authUser.lastLoginAt, currentDate, diff: calendarDays })}`);
+      this.logger.debug(`<${funcName}> ${r({ lastLoginAt: authUser.lastLoginAt, currentDate, diff: calendarDays })}`);
       if (authUser.lastLoginAt && calendarDays < 1) {
         return { sameDay: true, lastLoginAt: authUser.lastLoginAt };
       }
@@ -143,7 +158,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     return {};
   }
 
-  public async getUser(
+  async getUser(
     identifier: { email?: string; username?: string },
     isActive?: boolean,
     options?: Exclude<FindOneOptions<U>, 'where'>,
@@ -152,14 +167,14 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       { email: identifier.email, username: identifier.username, isActive },
       (v) => !_.isUndefined(v),
     ) as FindOptionsWhere<U>;
-    logger.debug(`get user by where ${r(where)}`);
+    this.logger.debug(`get user by where ${r(where)}`);
     if (isBlank(where.email) && isBlank(where.username)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
     return this.authUserRepository.findOne({ where, ...options });
   }
 
-  public getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
+  getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
     return this.authUserRepository.findOne({
       where: {
         // ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),
@@ -172,13 +187,13 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     });
   }
 
-  public async updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<void> {
-    logger.log(`update password ${r({ uid, password, salt })}`);
+  async updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<void> {
+    this.logger.log(`update password ${r({ uid, password, salt })}`);
     await this.authUserRepository.update(uid, { password, salt } as any);
     // return UserProfile.update(uid, { password, salt });
   }
 
-  public async updateAccount(uid: PrimaryKey, { username, email }: { username: string; email?: string }): Promise<U> {
+  async updateAccount(uid: PrimaryKey, { username, email }: { username: string; email?: string }): Promise<U> {
     const authUser = await this.AuthUserEntity.findOneByOrFail<AuthUser>({ id: uid as any });
     if (username) authUser.username = username;
     if (email) authUser.email = email;

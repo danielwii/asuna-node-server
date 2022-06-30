@@ -3,12 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { configLoader } from '../../../config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AuthService } from '../auth.service';
 
 import type { JwtPayload } from '../auth.interfaces';
@@ -29,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: JwtPayload): Promise<JwtPayload> {
-    logger.log(`validate ${r(payload)}`);
+    logger.debug(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {
       throw new AsunaException(AsunaErrorCode.InvalidAuthToken, 'jwt auth failed');
