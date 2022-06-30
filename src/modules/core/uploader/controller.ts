@@ -124,19 +124,26 @@ export class UploaderController {
     ow(filename, 'filename', ow.string.nonEmpty);
     ow(bucket, 'bucket', ow.string.nonEmpty);
     ow(prefix, 'prefix', ow.string.nonEmpty);
+    logger.log(`#${funcName} ${r({ bucket, prefix, filename })}`);
 
     const lookup = mime.lookup(filename) as string;
     const extension = mime.extension(lookup || 'bin');
     const noExtName = basename(filename, extname(filename));
     const name = noExtName.replace('.', '_').replace(' ', '_');
     const key = `${bucket}/${prefix}/${uuid.v4()}.${name.toLowerCase()}.${extension}`;
-    logger.log(`#${funcName} generate ${r({ bucket, filename, key })}`);
 
     // TODO assume current storage is minio
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket) as MinioStorage;
     const region = storageEngine.region;
     const Bucket = storageEngine.configObject.endpoint.slice(0, storageEngine.configObject.endpoint.indexOf('s3') - 1);
-    const s3Client = new S3Client({ region });
+    logger.log(`#${funcName} generate by ${r({ region, key })}`);
+    const s3Client = new S3Client({
+      region,
+      credentials: {
+        accessKeyId: storageEngine.configObject.accessKey,
+        secretAccessKey: storageEngine.configObject.secretKey,
+      },
+    });
     const command = new PutObjectCommand({ Bucket, Key: key });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
     logger.log(`#${funcName} Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
