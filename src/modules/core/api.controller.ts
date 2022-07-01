@@ -29,14 +29,12 @@ export class ApiController {
   private readonly appEnv = AppEnv.instance;
 
   @Get('version')
-  public currentVersion(): ApiResponse<{ version: string }> {
+  currentVersion(): ApiResponse<{ version: string }> {
     return ApiResponse.success({ version: `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}` });
-    // return 1;
-    // return `${this.appEnv.version}-${this.appEnv.upTime.toISOString()}`;
   }
 
   @Get('info')
-  public info(@Req() req: RequestInfo) {
+  info(@Req() req: RequestInfo) {
     return {
       upTime: this.appEnv.upTime.toISOString(),
       version: this.appEnv.version,
@@ -44,7 +42,7 @@ export class ApiController {
   }
 
   @Get('verbose')
-  public debug(@Req() req: RequestInfo) {
+  debug(@Req() req: RequestInfo) {
     return {
       clientIp: req.clientIp,
       isMobile: req.isMobile,
@@ -65,19 +63,19 @@ export class ApiController {
 
   @UseGuards(new ActionRateLimitGuard('api/v1/csurf-token', 1))
   @Post('v1/csurf-token')
-  public csurfToken(): ApiResponse<string> {
+  csurfToken(): ApiResponse<string> {
     return ApiResponse.success(CsurfHelper.generate());
   }
 
   @UseGuards(CsurfGuard)
   @Post('v1/csurf-test')
-  public csurfTest(): ApiResponse {
+  csurfTest(): ApiResponse {
     return ApiResponse.success();
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), new ActionRateLimitGuard('api/v1/reg-device', 1))
   @Post('v1/reg-device')
-  public async regDevice(@Req() req: JwtAuthRequest, @Body() body: RegDeviceDTO): Promise<ApiResponse> {
+  async regDevice(@Req() req: JwtAuthRequest, @Body() body: RegDeviceDTO): Promise<ApiResponse> {
     const { identifier, user, payload, scid, sessionID, deviceID } = req;
     if (!configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'COOKIE_SUPPORT needed.');
@@ -96,7 +94,7 @@ export class ApiController {
 
   @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
   @Post('v1/session-token')
-  public async getToken(
+  async getToken(
     @Body() body: Record<string, any>,
     @Req() req: JwtAuthRequest,
   ): Promise<{ expiresIn: number; accessToken: string }> {
@@ -109,7 +107,7 @@ export class ApiController {
   }
   @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
   @Post('v2/session-token')
-  public async getTokenV2(
+  async getTokenV2(
     @Body() body: Record<string, any>,
     @Req() req: JwtAuthRequest,
   ): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {

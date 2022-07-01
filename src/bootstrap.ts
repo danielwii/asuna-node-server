@@ -91,13 +91,14 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
   });
 
-  const provider = new NodeTracerProvider(/* {
+  /*
+  const provider = new NodeTracerProvider(/!* {
     resource: new Resource({
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       [SemanticResourceAttributes.HOST_NAME]: require('os').hostname(),
       [SemanticResourceAttributes.SERVICE_NAME]: 'asuna-node-server',
     }),
-  } */);
+  } *!/);
 
   // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
   // but instrumentations needs to be added
@@ -106,19 +107,21 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     instrumentations: [
       new GraphQLInstrumentation(),
       new ExpressInstrumentation(),
-      new HttpInstrumentation(/* {
+      new HttpInstrumentation(/!* {
       requestHook: (span, request) => {
         span.setAttribute("custom request hook attribute", "request");
       },
-    } */),
+    } *!/),
     ],
   });
   opentelemetry.trace.setGlobalTracerProvider(provider);
 
   const exporter = new JaegerExporter();
   provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any);
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()) as any);
-  provider.register();
+  if (process.env.NODE_ENV !== 'production') {
+    provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()) as any);
+  }
+  provider.register(); */
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
   registerEnumType(NotificationEnum, {
