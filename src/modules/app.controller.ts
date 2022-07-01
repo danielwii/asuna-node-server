@@ -4,6 +4,7 @@ import { Controller, Get, Logger, Req, Res } from '@nestjs/common';
 
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import type { Request, Response } from 'express';
 
@@ -15,10 +16,12 @@ export class AppController {
 
   @Get()
   info(@Req() req: Request, @Res() res: Response) {
+    const currentSpan = opentelemetry.trace.getSpan(opentelemetry.context.active());
+    logger.log(`currentSpan is ${r(currentSpan)}`);
     /*
     const provider = opentelemetry.trace.getTracerProvider();
     logger.log(`provider is ${r(provider)}`); */
-    const tracer = opentelemetry.trace.getTracer('default');
+    const tracer = opentelemetry.trace.getTracer('basic');
     /*
     logger.log(`tracer is ${r(tracer)}`);
     const context = opentelemetry.context.active();
@@ -26,6 +29,9 @@ export class AppController {
     const span = opentelemetry.trace.getSpan(context);
     logger.log(`span is ${r(span)}`); */
     const span = tracer.startSpan('info');
+    span.setAttribute('key', 'value');
+    // Annotate our span to capture metadata about our operation
+    span.addEvent('invoking work');
     span.addEvent('Info API Called', { randomIndex: 1 });
     res.send({
       env: process.env.NODE_ENV,
