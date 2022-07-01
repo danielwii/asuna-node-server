@@ -1,3 +1,9 @@
+import opentelemetry from '@opentelemetry/api';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import * as Sentry from '@sentry/node';
 
 import { ClassSerializerInterceptor, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
@@ -80,6 +86,24 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   process.on('exit', (reason) => {
     logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
   });
+
+  const provider = new NodeTracerProvider();
+  provider.register();
+
+  // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
+  // but instrumentations needs to be added
+  registerInstrumentations({
+    instrumentations: [
+      new GraphQLInstrumentation(),
+      new ExpressInstrumentation(),
+      new HttpInstrumentation(/* {
+      requestHook: (span, request) => {
+        span.setAttribute("custom request hook attribute", "request");
+      },
+    } */),
+    ],
+  });
+  opentelemetry.trace.setGlobalTracerProvider(provider);
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
   registerEnumType(NotificationEnum, {
