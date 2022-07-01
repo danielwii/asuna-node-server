@@ -1,13 +1,3 @@
-import opentelemetry from '@opentelemetry/api';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
-import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { Resource } from '@opentelemetry/resources';
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import * as Sentry from '@sentry/node';
 
 import { ClassSerializerInterceptor, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
@@ -90,38 +80,6 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   process.on('exit', (reason) => {
     logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
   });
-
-  /*
-  const provider = new NodeTracerProvider(/!* {
-    resource: new Resource({
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      [SemanticResourceAttributes.HOST_NAME]: require('os').hostname(),
-      [SemanticResourceAttributes.SERVICE_NAME]: 'asuna-node-server',
-    }),
-  } *!/);
-
-  // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
-  // but instrumentations needs to be added
-  registerInstrumentations({
-    tracerProvider: provider,
-    instrumentations: [
-      new GraphQLInstrumentation(),
-      new ExpressInstrumentation(),
-      new HttpInstrumentation(/!* {
-      requestHook: (span, request) => {
-        span.setAttribute("custom request hook attribute", "request");
-      },
-    } *!/),
-    ],
-  });
-  opentelemetry.trace.setGlobalTracerProvider(provider);
-
-  const exporter = new JaegerExporter();
-  provider.addSpanProcessor(new BatchSpanProcessor(exporter) as any);
-  if (process.env.NODE_ENV !== 'production') {
-    provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()) as any);
-  }
-  provider.register(); */
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
   registerEnumType(NotificationEnum, {
