@@ -5,10 +5,10 @@ import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/comm
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-const logger = new Logger(resolveModule(__filename, 'PrismaService<PrismaClient>'));
-
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, PrismaService.name));
+
   public constructor() {
     super({
       log: [{ emit: 'event', level: 'query' }, 'query', 'info', `warn`, `error`],
@@ -16,25 +16,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   public async onModuleInit() {
-    logger.log('connect to db...');
+    this.logger.log('connect to db...');
     await this.$connect().catch((reason) => {
-      logger.error(`connect to db error ${r(reason)}`);
+      this.logger.error(`connect to db error ${r(reason)}`);
       throw reason;
     });
 
     this.$on('query' as any, (e: any) => {
       if (e.duration > 1000) {
-        logger.debug('Timestamp: ' + e.timestamp);
-        logger.debug('Query: ' + e.query);
-        logger.debug('Params: ' + e.params);
-        logger.debug('Duration: ' + e.duration + 'ms');
+        this.logger.debug('Timestamp: ' + e.timestamp);
+        this.logger.debug('Query: ' + e.query);
+        this.logger.debug('Params: ' + e.params);
+        this.logger.debug('Duration: ' + e.duration + 'ms');
       }
     });
   }
 
   public async enableShutdownHooks(app: INestApplication) {
     this.$on('beforeExit', async () => {
-      logger.log('shutdown db...');
+      this.logger.log('shutdown db...');
       await app.close();
     });
   }

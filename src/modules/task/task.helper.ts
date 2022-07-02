@@ -2,11 +2,8 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { MQProvider } from '../providers';
 import { TaskRecord } from './task.entities';
-
-const logger = new Logger(resolveModule(__filename, 'TaskHelper'));
 
 export enum TaskState {
   OPEN = 'OPEN',
@@ -37,10 +34,10 @@ export class TaskHelper {
 
   public static async invoke(id: string): Promise<void> {
     const task = await TaskRecord.findOneBy({ id });
-    logger.log(`invoke ${r(task)}`);
+    Logger.log(`invoke ${r(task)}`);
     await this.mq
       .send(task.channel, task.body)
-      .catch((reason) => logger.error(`send message to mq error: ${r(reason)}`));
+      .catch((reason) => Logger.error(`send message to mq error: ${r(reason)}`));
   }
 
   public static search(type: string, service: string, identifier: string): Promise<TaskRecord> {

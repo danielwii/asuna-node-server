@@ -7,10 +7,7 @@ import { DateTime, Duration } from 'luxon';
 import { BaseEntity } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { ColumnTypeHelper } from './column.helper';
-
-const logger = new Logger(resolveModule(__filename, 'EntityHelper'));
 
 /**
  * @deprecated {@see safeReloadJSON}
@@ -24,7 +21,7 @@ export function safeReloadArray<Entity>(entity: Entity, ...columns: (keyof Entit
             entity[column] = JSON.parse(entity[column] as any);
           }
         } catch (error) {
-          logger.error(error);
+          Logger.error(error);
           entity[column] = [] as any;
         }
       } else {
@@ -46,7 +43,7 @@ export function safeReloadObject<Entity>(entity: Entity, ...columns: (keyof Enti
             entity[column] = JSON.parse(entity[column] as any);
           }
         } catch (error) {
-          logger.error(error);
+          Logger.error(error);
           entity[column] = {} as any;
         }
       } else {
@@ -65,7 +62,7 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
           entity[column] = JSON.parse(entity[column] as any);
         }
       } catch (error) {
-        logger.error(`safeReloadJSON '${String(column)}' error: ${error}, ${r(entity[column])}`);
+        Logger.error(`safeReloadJSON '${String(column)}' error: ${error}, ${r(entity[column])}`);
         entity[column] = defaultValue;
       }
     } else {

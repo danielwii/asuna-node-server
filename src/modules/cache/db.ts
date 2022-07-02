@@ -8,11 +8,8 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { TimeUnit } from '../common/helpers/utils';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { CacheManager } from './cache';
 import { CacheTTL } from './constants';
-
-const logger = new Logger(resolveModule(__filename, 'InMemoryDB'));
 
 export interface CacheKey {
   prefix?: string;
@@ -43,7 +40,7 @@ export class InMemoryDB {
           const saved = ((await CacheManager.default.get(keyStr)) as Array<Value>) ?? [];
           return [...saved, value];
         })
-        .catch((reason) => logger.error(reason));
+        .catch((reason) => Logger.error(reason));
       return value;
     }
 
@@ -156,7 +153,7 @@ export class InMemoryDB {
   public static async clear(cacheKey: CacheKey): Promise<number | boolean> {
     const { key, prefix } = cacheKey;
     const keyStr = `${prefix ? `${prefix}#` : ''}${_.isString(key) ? (key as string) : JSON.stringify(key)}`;
-    logger.debug(`remove ${keyStr}`);
+    Logger.debug(`remove ${keyStr}`);
     const redis = RedisProvider.getRedisClient(prefix);
     if (!redis.isEnabled) {
       return CacheManager.default.clear(keyStr);

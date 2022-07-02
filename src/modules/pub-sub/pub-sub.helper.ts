@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
@@ -8,8 +7,6 @@ import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 import { Promise } from 'bluebird';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
-
-const logger = new Logger(resolveModule(__filename, 'PubSubHelper'));
 
 export enum PubSubChannels {
   dataloader = 'dataloader',
@@ -20,7 +17,7 @@ export class PubSubHelper {
     const redis = RedisProvider.getRedisClient('pub_sub_publisher');
     if (!redis.isEnabled) return Promise.resolve();
 
-    logger.log(`publish ... ${r({ channel, payload })}`);
+    Logger.log(`publish ... ${r({ channel, payload })}`);
     const value = _.isObject(payload) ? JSON.stringify(payload) : payload;
     return redis.client.publish(channel, value);
   }
@@ -29,7 +26,7 @@ export class PubSubHelper {
     const redis = RedisProvider.getRedisClient('pub_sub_subscriber');
     const subscription = new Subject<T>();
     if (redis.isEnabled) {
-      logger.log(`subscribe ... ${channels}`);
+      Logger.log(`subscribe ... ${channels}`);
       const subscriber = redis.client;
       /*
       subscriber.subscribe(channels, (err, reply) => {

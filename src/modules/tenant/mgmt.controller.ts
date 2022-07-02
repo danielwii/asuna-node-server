@@ -1,6 +1,4 @@
-import { Body, Controller, Get, Logger, Post, Req, UseGuards } from '@nestjs/common';
-
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 
 import { Promise } from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
@@ -11,8 +9,6 @@ import { TenantHelper, TenantInfo } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
-
-const logger = new Logger(resolveModule(__filename, 'TenantAdminController'));
 
 export class RegisterTenantDto {
   @IsString() name: string;

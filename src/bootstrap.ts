@@ -6,7 +6,6 @@ import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -57,28 +56,27 @@ import { TracingInterceptor } from './modules/tracing';
 import './typeorm.fixture';
 
 import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
-import type { LogLevel } from '@nestjs/common/services/logger.service';
+import type { LogLevel } from '@nestjs/common/services/Logger.service';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
 export const bootstrap = (appModule, options: BootstrapOptions) => {
-  const logger = new Logger(resolveModule(__filename, 'bootstrap'));
   process.on('unhandledRejection', (reason, p) => {
-    logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
+    Logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
     consola.error(r(reason));
     Sentry.captureException(reason);
   });
   process.on('uncaughtException', (reason, e) => {
-    logger.error(`Uncaught Exception at: ${r({ e, reason })}`);
+    Logger.error(`Uncaught Exception at: ${r({ e, reason })}`);
     consola.error(r(reason));
     Sentry.captureException(reason);
     process.exit(1);
   });
   process.on('beforeExit', (reason) => {
-    logger[reason ? 'error' : 'log'](`App will exit cause: ${r(reason)}`);
+    Logger[reason ? 'error' : 'log'](`App will exit cause: ${r(reason)}`);
   });
   process.on('exit', (reason) => {
-    logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
+    Logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
   });
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
@@ -105,11 +103,11 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   registerEnumType(ExchangeCurrencyEnum, { name: 'ExchangeCurrencyEnum' });
 
   if (configLoader.loadBoolConfig('DEBUG')) {
-    logger.debug(`Configs is ${r(configLoader.loadConfigs())}`);
+    Logger.debug(`Configs is ${r(configLoader.loadConfigs())}`);
   }
 
   return run(appModule, options).catch((reason) => {
-    logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
+    Logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
     setTimeout(() => {
       consola.error(`[bootstrap] System will exit in 1s because of error: ${reason?.message} ${r(reason?.stack)}`);
@@ -126,22 +124,20 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   // eslint-disable-next-line
   require('events').EventEmitter.defaultMaxListeners = 15;
 
-  const logger = new Logger(resolveModule(__filename, 'run'));
-
-  logger.log(`options: ${r({ appModule, options })}`);
+  Logger.log(`options: ${r({ appModule, options })}`);
 
   await AppLifecycle.preload();
   await CacheUtils.clearAll();
-  // logger.log(`configs: ${r(configLoader.loadConfigs())}`);
+  // Logger.log(`configs: ${r(configLoader.loadConfigs())}`);
 
   process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME = process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME || '2000';
-  logger.log(`set slow query time ${process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME}`);
+  Logger.log(`set slow query time ${process.env.TYPEORM_MAX_QUERY_EXECUTION_TIME}`);
   // const dbConfig = await getConnectionOptions();
-  logger.log(`Global is ${r({ ...Global })}`);
-  // logger.log(`dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`);
+  Logger.log(`Global is ${r({ ...Global })}`);
+  // Logger.log(`dbConfig: ${r(_.omit(dbConfig, 'password'))} withPassword: *$****${_.get(dbConfig, 'password').slice(-4)}`);
 
   const mongoConfig = MongoConfigObject.load();
-  logger.log(
+  Logger.log(
     `mongoConfig: ${r(_.omit(mongoConfig, 'password'))} withPassword: *$****${_.get(mongoConfig, 'password')?.slice(
       -4,
     )}`,
@@ -149,17 +145,17 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const appSettings = AppConfigObject.load();
   const features = FeaturesConfigObject.load();
-  logger.log(`load app settings ${r(appSettings)}`);
-  logger.log(`load features ${r(features)}`);
-  logger.log(
-    `init logger: ${r({
+  Logger.log(`load app settings ${r(appSettings)}`);
+  Logger.log(`load features ${r(features)}`);
+  Logger.log(
+    `init Logger: ${r({
       config: LoggerConfigObject.load(),
       envs: _.pickBy(configLoader.loadConfigs(), (v, k) => k.startsWith('LOGGER_')),
     })}`,
   );
 
   // if (configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN)) {
-  //   rookout.start({ token: configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN) }).catch((reason) => logger.error(reason));
+  //   rookout.start({ token: configLoader.loadConfig(ConfigKeys.ROOKOUT_TOKEN) }).catch((reason) => Logger.error(reason));
   // }
 
   AsunaContext.instance.setup(options.context);
@@ -176,18 +172,19 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     const extra = parseJSONIfCould(process.env.TYPEORM_DRIVER_EXTRA) ?? {};
     extra.charset = 'utf8mb4_unicode_ci';
     const TYPEORM_DRIVER_EXTRA = JSON.stringify(extra);
-    logger.log(`🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA=${TYPEORM_DRIVER_EXTRA}`);
+    Logger.log(`🐛 fix typeorm utf8mb4 connection issue... set TYPEORM_DRIVER_EXTRA=${TYPEORM_DRIVER_EXTRA}`);
     process.env.TYPEORM_DRIVER_EXTRA = TYPEORM_DRIVER_EXTRA;
   }
   const appOptions: NestApplicationOptions = {
     logger: logLevels.slice(0, logLevels.indexOf(configLoader.loadConfig('LOGGER_LEVEL')) + 1) || ['error', 'warn'],
-    bufferLogs: true,
+    // autoFlushLogs: true,
+    // bufferLogs: true,
   };
   const module = options.loadDefaultModule ? DefaultModule.forRoot(appModule) : appModule;
-  logger.log(`create app ... ${r({ module, appOptions, options })}`);
+  Logger.log(`create app ... ${r({ module, appOptions, options })}`);
   const app = await NestFactory.create<NestExpressApplication>(module, appOptions);
 
-  logger.log(`sync db ...`);
+  Logger.log(`sync db ...`);
   await syncDbWithLockIfPossible(app, options);
   await AppLifecycle.onInit(app);
 
@@ -214,7 +211,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     // allowedHeaders: '*',
     // methods: '*',
   };
-  logger.log(`setup cors ${r(corsOptions)}`);
+  Logger.log(`setup cors ${r(corsOptions)}`);
   app.enableCors(corsOptions);
 
   // see https://expressjs.com/en/guide/behind-proxies.html
@@ -269,7 +266,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
 
   const sessionRedisDB = configLoader.loadNumericConfig('SESSION_REDIS_DB', 2);
   const sessionRedis = RedisProvider.getRedisClient('session', sessionRedisDB, true);
-  logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
+  Logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({
       // name 返回客户端的key的名称，默认为asn.seid,也可以自己设置。
@@ -304,13 +301,13 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
       max: configLoader.loadNumericConfig(ConfigKeys.RATE_LIMIT, 100), // limit each IP to 1000 requests per windowMs
       message: 'Too many requests from this IP, please try again after 1474560 minutes.',
     };
-    logger.log(`init rate limit with ${r(rateOptions)}`);
+    Logger.log(`init rate limit with ${r(rateOptions)}`);
     app.use(rateLimit(rateOptions));
   }
   app.use(morgan('combined'));
 
   const limit = appSettings.payloadLimit;
-  logger.log(`set json payload limit to ${limit}`);
+  Logger.log(`set json payload limit to ${limit}`);
   app.use(express.json({ limit }));
   app.use(express.urlencoded({ limit, extended: true }));
 
@@ -328,7 +325,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   }
 
   if (options.staticAssets) {
-    logger.log(`set static assets path to ${options.staticAssets}`);
+    Logger.log(`set static assets path to ${options.staticAssets}`);
     app.useStaticAssets(options.staticAssets, { maxAge: TimeUnit.MINUTES.toMillis(10) });
   }
 
@@ -341,7 +338,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   app.enableShutdownHooks();
 
   if (AsunaContext.isDebugMode) {
-    logger.warn('[X] debug mode is enabled, but no features for debug mode exists :P');
+    Logger.warn('[X] debug mode is enabled, but no features for debug mode exists :P');
   }
 
   // --------------------------------------------------------------
@@ -349,7 +346,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   // --------------------------------------------------------------
 
   if (features.swaggerEnable) {
-    logger.log('[X] init swagger at /swagger');
+    Logger.log('[X] init swagger at /swagger');
     const swaggerOptions = new DocumentBuilder()
       .setTitle('API Server')
       .setVersion(process.env.npm_package_version)
@@ -361,12 +358,12 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   const port = configLoader.loadNumericConfig(ConfigKeys.PORT, 5000);
 
   await AppLifecycle.beforeBootstrap(app);
-  logger.log('bootstrap app ...');
+  Logger.log('bootstrap app ...');
   return app.listen(port).then(async () => {
     await AppLifecycle.onAppStartListening(app);
-    logger.log(`===============================================================`);
-    logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}. ${await app.getUrl()}`);
-    logger.log(`===============================================================`);
+    Logger.log(`===============================================================`);
+    Logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}. ${await app.getUrl()}`);
+    Logger.log(`===============================================================`);
     return app;
   });
 }

@@ -1,7 +1,6 @@
 import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -10,8 +9,6 @@ import { tap } from 'rxjs/operators';
 
 import type { Request } from 'express';
 import type { CommonRequest } from '../interface';
-
-const logger = new Logger(resolveModule(__filename));
 
 export class LoggerInterceptor implements NestInterceptor {
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
@@ -45,15 +42,15 @@ export class LoggerInterceptor implements NestInterceptor {
     };
 
     const TAG = `${context.getClass().name}.${context.getHandler().name}`;
-    logger.debug(`#${TAG} call...`);
+    Logger.debug(`#${TAG} call...`);
     const now = Date.now();
     return next.handle().pipe(
       tap(
-        () => logger.debug(`#${TAG} spent ${Date.now() - now}ms`),
+        () => Logger.debug(`#${TAG} spent ${Date.now() - now}ms`),
         (e) => {
           const skipNotFound = _.get(e, 'status') !== 404;
           if (skipNotFound) {
-            logger.warn(`#${TAG} ${r(info)}`);
+            Logger.warn(`#${TAG} ${r(info)}`);
           }
         },
       ),

@@ -1,11 +1,8 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-
-const logger = new Logger(resolveModule(__filename, 'StateMachine'));
 
 export interface StateMachineAction<Action, State> {
   type: Action;
@@ -32,7 +29,7 @@ export abstract class AbstractStateMachine<StatusType, ActionType> {
 
   public do(from: StatusType, type: ActionType): StatusType {
     const found = _.find(this.actions, (action) => action.from === from && action.type === type);
-    logger.debug(`do ${this.key} ${r({ found, from, type })}`);
+    Logger.debug(`do ${this.key} ${r({ found, from, type })}`);
     return found?.to ?? from;
   }
 

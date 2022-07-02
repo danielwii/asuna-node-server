@@ -1,14 +1,11 @@
 import { Logger } from '@nestjs/common';
 
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config/loader';
-
-const logger = new Logger(resolveModule(__filename, 'MQConfig'));
 
 export enum MQConfigKeys {
   enable = 'enable',
@@ -20,7 +17,6 @@ export enum MQConfigKeys {
 }
 
 export class MQConfigObject {
-  private static logger = new Logger(resolveModule(__filename, 'MQConfigObject'));
   private static key = YamlConfigKeys.mq;
   private static prefix = `${MQConfigObject.key}_`;
 
@@ -40,7 +36,7 @@ export class MQConfigObject {
 
   public static load(mqPrefix = ''): MQConfigObject {
     const appendPrefix = `${this.prefix}${mqPrefix ? `${mqPrefix}_`.toUpperCase() : ''}`;
-    logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.enable}`);
+    Logger.verbose(`try load env: ${appendPrefix}${MQConfigKeys.enable}`);
     return withP2(
       (p): any => configLoader.loadConfig2(MQConfigObject.key, p),
       MQConfigKeys,

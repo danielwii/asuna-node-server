@@ -10,8 +10,6 @@ import { EmailHelper } from './email.helper';
 
 import type { MailAttachment } from './email.interface';
 
-const logger = new Logger(resolveModule(__filename, 'EmailController'));
-
 class MailBody {
   @IsArray({ always: false })
   to: string[];
@@ -30,12 +28,14 @@ class MailBody {
 @ApiTags('core')
 @Controller('api/email')
 export class EmailController {
+  private readonly logger = new Logger(resolveModule(__filename, EmailController.name));
+
   @Post()
   public send(@Body() body: MailBody): void {
-    logger.log(`send ${r(body)}`);
+    this.logger.log(`send ${r(body)}`);
 
     EmailHelper.send(body)
-      .then((value) => logger.log(`send mail done: ${r(value)}`))
-      .catch((error) => logger.error(error));
+      .then((value) => this.logger.log(`send mail done: ${r(value)}`))
+      .catch((error) => this.logger.error(error));
   }
 }

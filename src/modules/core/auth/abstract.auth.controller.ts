@@ -32,8 +32,6 @@ import { AppleUserProfile, UserProfile } from './user.entities';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { CreatedUser } from './auth.service';
 
-const logger = new Logger(resolveModule(__filename, 'AbstractAuthController'));
-
 const chance = new Chance();
 export const UsernameValidationSchema: ValidationSchema = {
   name: 'usernameValidationSchema',
@@ -55,6 +53,7 @@ class SignInWithAppleDTO {
 }
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
+  private readonly superLogger = new Logger(resolveModule(__filename, AbstractAuthController.name));
   private readonly appleConfig = AppleConfigObject.load();
 
   constructor(
@@ -69,10 +68,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @HttpCode(200)
   @Post('reset-password')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   async resetPassword(@Body() dto: ResetPasswordDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload } = req;
-    logger.log(`reset password: ${r({ dto, payload })}`);
+    this.superLogger.log(`reset password: ${r({ dto, payload })}`);
 
     const { hash, salt } = PasswordHelper.encrypt(dto.password);
     await this.authService
@@ -83,10 +82,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @HttpCode(200)
   @Post('reset-account')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   async resetAccount(@Body() dto: ResetAccountDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload, user } = req;
-    logger.log(`reset account: ${r({ dto, payload, user })}`);
+    this.superLogger.log(`reset account: ${r({ dto, payload, user })}`);
 
     if (user.isBanned) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
@@ -109,10 +108,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Put('profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   async updateProfile(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
-    logger.log(`update profile: ${r({ dto, payload, user })}`);
+    this.superLogger.log(`update profile: ${r({ dto, payload, user })}`);
 
     if (user.isBanned) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `account already reset.`);
@@ -133,7 +132,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     funcName?: string,
   ): Promise<CreatedToken> {
     const { payload } = req;
-    logger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
+    this.superLogger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
     if (!this.appleConfig.enable) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `apple sign in is disabled.`);
     }
@@ -150,13 +149,13 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       // OPTIONAL
       expAfter: TimeUnit.DAYS.toSeconds(30), // Unix time in seconds after which to expire the clientSecret JWT. Default is now+5 minutes.
     });
-    logger.debug(`#${funcName} ${r({ clientSecret })}`);
+    this.superLogger.debug(`#${funcName} ${r({ clientSecret })}`);
     const token = await appleSignIn.getAuthorizationToken(dto.code, {
       clientID, // Apple Client ID
       redirectUri: this.appleConfig.redirectUri, // use the same value which you passed to authorisation URL.
       clientSecret,
     });
-    logger.debug(`#${funcName} ${r({ token })}`);
+    this.superLogger.debug(`#${funcName} ${r({ token })}`);
     const verified = await appleSignIn.verifyIdToken(token.id_token, {
       // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
       audience: clientID, // client id - can also be an array
@@ -164,7 +163,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       // If you want to handle expiration on your own, or if you want the expired tokens decoded
       ignoreExpiration: true, // default is false
     });
-    logger.debug(`#${funcName} ${r({ verified })}`);
+    this.superLogger.debug(`#${funcName} ${r({ verified })}`);
     let exists = await AppleUserProfile.findOne({ where: { id: verified.sub }, relations: ['profile'] });
     if (!exists) {
       // const profile = await UserProfile.findOneBy({ id: dto.profileId });
@@ -179,9 +178,9 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
           : verified.is_private_email,
         profile: await UserProfile.findOneBy({ id: dto.profileId }),
       });
-      logger.debug(`#${funcName} ${r({ appleProfile: exists })}`);
+      this.superLogger.debug(`#${funcName} ${r({ appleProfile: exists })}`);
     }
-    logger.debug(`#${funcName} ${r({ exists })}`);
+    this.superLogger.debug(`#${funcName} ${r({ exists })}`);
 
     if (!exists.profileId && dto.profileId) {
       // 未绑定profileId时直接绑定即可
@@ -191,15 +190,15 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     } else if (!exists.profileId) {
       // 不存在profileId时创建一个并绑定
       const username = chance.string({ length: 12, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
-      logger.debug(`#${funcName} ${r({ username })}`);
+      this.superLogger.debug(`#${funcName} ${r({ username })}`);
       const signed = await this.authService.createUser(username, null, null, AuthUserChannel.apple);
-      logger.debug(`#${funcName} ${r({ signed })}`);
+      this.superLogger.debug(`#${funcName} ${r({ signed })}`);
       const profile = await this.authService.getUserWithPassword({ username });
       if (dto.givenName && !profile.nickname) {
         profile.nickname = `${dto.givenName} ${dto.familyName ?? ''}`.trim();
         await profile.save();
       }
-      logger.debug(`#${funcName} ${r({ profile })}`);
+      this.superLogger.debug(`#${funcName} ${r({ profile })}`);
       exists.profileId = profile.id;
       await exists.save();
       return await this.authService.createToken(profile, { uid: `${signed.user.id}` });
@@ -213,7 +212,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @Get('apple/refresh')
   @named
   async appleRefreshToken(@Query() query, funcName?: string) {
-    logger.log(`#${funcName} ${r(query)}`);
+    this.superLogger.log(`#${funcName} ${r(query)}`);
     return await appleSignIn.verifyIdToken(query.id_token, {
       // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
       audience: 'io.github.danielwii.robin-board', // client id - can also be an array
@@ -226,7 +225,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @Get('apple-callback')
   @named
   async appleCallback(@Query() query, funcName?: string) {
-    logger.log(`#${funcName} ${r(query)}`);
+    this.superLogger.log(`#${funcName} ${r(query)}`);
   } */
 
   @Post('quick-pass')
@@ -256,10 +255,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Post('sign-up')
   async signUp(@Body() body) {
-    logger.log(`sign-up: ${r(body)}`);
+    this.superLogger.log(`sign-up: ${r(body)}`);
     const errors = await validate('usernameValidationSchema', { username: body.username });
     if (errors.length) {
-      logger.warn(`validate body error ${r(errors)}`);
+      this.superLogger.warn(`validate body error ${r(errors)}`);
       throw new AsunaException(AsunaErrorCode.Unprocessable, '用户名格式不正确，只能包含英文和数字');
     }
     const found = await this.authService.getUser(_.pick(body, ['email', 'username']), true);
@@ -271,7 +270,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     return this.authService
       .createUser(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
       .then(async (result) => {
-        logger.log(`created user ${r(result)}`);
+        this.superLogger.log(`created user ${r(result)}`);
         if (isNotBlank(body.nickname)) {
           await UserProfile.update(result.profile.id, { nickname: body.nickname });
         }
@@ -285,7 +284,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   // refresh access token by refresh token
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Post('refresh-token')
   @named
   async refreshToken(
@@ -294,7 +293,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     funcName?: string,
   ): Promise<CreatedToken> {
     const available = await OperationTokenHelper.checkAvailableByToken(refreshToken);
-    logger.log(`#${funcName} token is available: ${r({ refreshToken, available })}`);
+    this.superLogger.log(`#${funcName} token is available: ${r({ refreshToken, available })}`);
     if (!available) {
       throw new AsunaException(AsunaErrorCode.InvalidToken, 'refresh token not invalid');
     }
@@ -304,10 +303,10 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   @Post('token')
   @HttpCode(HttpStatus.OK)
   async getToken(@Body() signInDto: SignInDTO): Promise<CreatedToken> {
-    logger.log(`getToken() >> ${signInDto.username}`);
+    this.superLogger.log(`getToken() >> ${signInDto.username}`);
     const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
 
-    logger.debug(`get user profile from token ${r(profile)}`);
+    this.superLogger.debug(`get user profile from token ${r(profile)}`);
     if (!profile?.password) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
@@ -325,15 +324,15 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       ? await this.UserEntity.findOneOrFail({ where: { profileId: profile.id } as any })
       : profile;
     // return TokenHelper.createToken(profile, { uid: user.id });
-    logger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
+    this.superLogger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
     return this.authService.createToken(profile, hasProfile ? { uid: `${authUser.id}` } : undefined);
   }
 
   @Get('current')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
-    logger.log(`current... ${r({ user, payload })}`);
+    this.superLogger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user?.username}' not active or exist.`);
     }
@@ -347,15 +346,15 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {
-        logger.debug(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
+        this.superLogger.debug(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
         if (!sameDay) Hermes.emit(AbstractAuthController.name, 'user.first-login-everyday', payload);
         // !sameDay && Hermes.emit(AuthController.name, HermesUserEventKeys.firstLoginEveryday, payload);
       })
-      .catch((reason) => logger.error(reason));
-    // logger.debug(`current authed user is ${r(loaded)}`);
+      .catch((reason) => this.superLogger.error(reason));
+    // this.superLogger.debug(`current authed user is ${r(loaded)}`);
     const result = _.omit({ ...user }, 'channel', 'info'); // ...
     const relations = DBHelper.getRelationPropertyNames(this.UserEntity);
-    logger.debug(`relations is ${r(relations)}`);
+    this.superLogger.debug(`relations is ${r(relations)}`);
     if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
       const profile = await UserProfile.findOne({
@@ -364,7 +363,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       });
       // const desensitized = _.omit(profile, 'salt', 'password', 'info');
       const { salt, password, ...desensitized } = profile;
-      // logger.debug(`current profile is ${r({ profile, desensitized })}`);
+      // this.superLogger.debug(`current profile is ${r({ profile, desensitized })}`);
       _.set(result, 'profile', desensitized);
     }
     result.profile.isBindApple = await AppleUserProfile.findOneBy({ profileId: payload.id }).then((o) => !!o);
@@ -372,8 +371,8 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Get('authorized')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   async authorized(): Promise<void> {
-    logger.log('Authorized route...');
+    this.superLogger.log('Authorized route...');
   }
 }

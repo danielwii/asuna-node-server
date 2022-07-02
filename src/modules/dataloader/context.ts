@@ -6,10 +6,10 @@ import { Notification } from '../content/notification';
 import { UserProfile } from '../core/auth';
 import { UserActivity } from '../core/interaction';
 import { KeyValuePair } from '../core/kv/kv.entities';
+import { KeyValueModel } from '../core/kv/kv.isolated.entities';
 import { PaymentItem, PaymentMethod, PaymentOrder, PaymentTransaction } from '../payments';
 import { WXMiniAppUserInfo } from '../wechat';
 import { DataLoaderFunction, loader } from './dataloader';
-import { KeyValueModel } from '../core/kv/kv.isolated.entities';
 
 export interface DefaultRegisteredLoaders {
   wxMiniAppUserInfo: DataLoaderFunction<WXMiniAppUserInfo>;

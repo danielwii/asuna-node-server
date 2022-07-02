@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { EntityManager } from 'typeorm';
 
 import { AppDataSource } from '../../datasource';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
@@ -33,12 +32,10 @@ export interface PageRequest {
   orderBy?: { column?: string; order?: Order };
 }
 
-const logger = new Logger(resolveModule(__filename, 'PageHelper'));
-
 export class PageHelper {
   static async doCursorPageSeries<T>(fn: (next?: string) => Promise<string | null>): Promise<any> {
     const recursion = async (next?: string) => {
-      logger.debug(`doCursorPageSeries: ${next}...`);
+      Logger.debug(`doCursorPageSeries: ${next}...`);
       if (next) return recursion(await fn(next));
       return null;
     };
@@ -156,7 +153,7 @@ export const toPage = (pageRequest: PageRequest): PageInfo => {
   const pageNumber = pageIndex + 1;
 
   if (size > MAX_PAGE_SIZE) {
-    logger.warn(`max page size is ${MAX_PAGE_SIZE}, change size: ${size}`);
+    Logger.warn(`max page size is ${MAX_PAGE_SIZE}, change size: ${size}`);
     size = MAX_PAGE_SIZE;
   }
 

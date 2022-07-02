@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
@@ -23,8 +22,6 @@ import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 import type { IdentifierHelper } from '../../common/identifier';
 import type { EnumValueStatic } from '../../enum-values';
 
-const logger = new Logger(resolveModule(__filename, 'KvHelper'));
-
 const castToBoolean = (value): boolean => value === 'true';
 const isJson = (value): boolean => {
   try {
@@ -38,7 +35,7 @@ const toJson = (value): JSON => {
   try {
     return JSON.parse(value);
   } catch (error) {
-    logger.error(`${r({ value })} toJson error: ${r(error)}`);
+    Logger.error(`${r({ value })} toJson error: ${r(error)}`);
     return value;
   }
 };
@@ -121,7 +118,7 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
     newType = KeyValueType.json;
     newValue = toJson(value);
   }
-  // logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
+  // Logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
   return [newType || KeyValueType.string, newValue];
 }
 
@@ -216,11 +213,11 @@ export class KvHelper {
   }
 
   public static async syncMergedConstants(): Promise<void> {
-    logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
+    Logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
     if (KvHelper.constantMapsPair) {
       await KvHelper.set(KvHelper.constantMapsPair);
     }
-    logger.log(`merge enum constants ${r(KvHelper.enumValueConstantMapsPair)}`);
+    Logger.log(`merge enum constants ${r(KvHelper.enumValueConstantMapsPair)}`);
     if (KvHelper.enumValueConstantMapsPair) {
       await KvHelper.set(KvHelper.enumValueConstantMapsPair);
     }
@@ -265,7 +262,7 @@ export class KvHelper {
     const { name, type, value } = opts;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
-    logger.verbose(`recognize ${r({ type, newType, value, stringifyValue })}`);
+    Logger.verbose(`recognize ${r({ type, newType, value, stringifyValue })}`);
 
     const entity = {
       key,
@@ -278,7 +275,7 @@ export class KvHelper {
     const exists = await KvHelper.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOneBy({ name: opts.name });
-      logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
+      Logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
         model.formatType = formatType;
@@ -289,11 +286,11 @@ export class KvHelper {
     if (exists && noUpdate && exists.value) return exists;
     if (exists && merge) {
       exists.value = JSON.stringify({ ...exists.value, ..._.omit(value as any, 'values') });
-      logger.debug(`inspect ${r(exists)}`);
+      Logger.debug(`inspect ${r(exists)}`);
       return exists.save();
     }
 
-    logger.debug(`set ${r(entity)}`);
+    Logger.debug(`set ${r(entity)}`);
     return KeyValuePair.create({
       // ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
       ...(exists ? { id: exists.id } : {}),
@@ -367,7 +364,7 @@ export class KvHelper {
     keyValues: KeyValues,
     funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
+    Logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
     return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 
@@ -419,7 +416,7 @@ export class KvHelper {
     });
     if (!fields) return;
 
-    // logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    // Logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
     return {
       value: _.get(fields.values, fieldKey),
       field: _.get(

@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -8,8 +7,6 @@ import { parse } from 'json5';
 import _ from 'lodash';
 
 import type { RedisClientType } from 'redis';
-
-const logger = new Logger(resolveModule(__filename, 'RedisHelper'));
 
 export class RedisHelper {
   /**
@@ -21,7 +18,7 @@ export class RedisHelper {
     if (_.isEmpty(patterns)) return [];
     const mappedKeys = await Promise.map(patterns, (pattern) => RedisHelper.keys(redis, pattern));
     const keys = _.flow(_.flatten, _.uniq)(mappedKeys);
-    logger.debug(`get keys ${r({ patterns, mappedKeys, keys })}`);
+    Logger.debug(`get keys ${r({ patterns, mappedKeys, keys })}`);
     return keys as any;
   }
 
@@ -29,7 +26,7 @@ export class RedisHelper {
     if (_.isEmpty(keys)) return {};
     const values = await RedisHelper.mget(redis, keys);
     const zipped = _.zipObject(keys, values.map(parse as any));
-    logger.debug(`get multi keys ${r({ keys, values, zipped })}`);
+    Logger.debug(`get multi keys ${r({ keys, values, zipped })}`);
     return zipped as any;
   }
 
@@ -40,7 +37,7 @@ export class RedisHelper {
     // } else {
     const randomOne = await RedisHelper.randomkey(redis);
     const [, loaded] = await RedisHelper.scan(redis);
-    logger.debug(`get getRandomKeys keys ${r({ count, randomOne, loaded })}`);
+    Logger.debug(`get getRandomKeys keys ${r({ count, randomOne, loaded })}`);
     return _.uniq(_.flatten([randomOne, loaded]));
     // }
   }
@@ -68,7 +65,7 @@ export class RedisHelper {
     return redis.sendCommand([`scan`, ...args]);
     // return new Promise((resolve, reject) => {
     //   const reply = redis.sendCommand(`scan`, args, (err, reply) => {
-    //     logger.verbose(`scan ${r({ args, err, reply })}`);
+    //     Logger.verbose(`scan ${r({ args, err, reply })}`);
     //     err ? reject(err) : resolve(reply);
     //   });
     // });
@@ -83,11 +80,11 @@ export class RedisHelper {
     return redis.mGet(keys);
   }
   public static async setex(redis: RedisClientType, key: string, expires: number, value: string): Promise<string> {
-    logger.debug(`setex ${r({ key, expires, value })}`);
+    Logger.debug(`setex ${r({ key, expires, value })}`);
     return redis.setEx(key, expires, value);
   }
   public static async del(redis: RedisClientType, keys: string[]): Promise<void> {
-    logger.debug(`del ${r(keys)}`);
+    Logger.debug(`del ${r(keys)}`);
     // await Promise.all(_.map(keys, (key) => promisify(redis.del, redis)(key)));
     if (!_.isEmpty(keys)) await redis.del(keys);
     // redis.sendCommand(['del', ...keys]);

@@ -5,9 +5,6 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import _ from 'lodash';
 
 import { SimpleIdGenerator } from '../ids';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-const logger = new Logger(resolveModule(__filename, 'JwtAdminAuthGuard'));
 
 export class IdGenerators {
   public static handlers: Record<string, SimpleIdGenerator> = {};
@@ -22,7 +19,7 @@ export class IdGenerators {
     if (!prefixExists && !entityExists) {
       return false;
     }
-    logger.error(`${prefix} or ${entity} already exists in id generators.`);
+    Logger.error(`${prefix} or ${entity} already exists in id generators.`);
     // throw new AsunaException(AsunaErrorCode.Unprocessable, `${prefix} or ${entity} already exists in id generators.`);
     return false;
   }

@@ -1,14 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { EntityTarget, getRepository } from 'typeorm';
 
 import { DBHelper } from '../core/db';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { AppDataSource } from '../datasource';
 
-const logger = new Logger(resolveModule(__filename, 'SortService'));
+import type { EntityTarget } from 'typeorm';
 
 export interface Sort {
   id: number;
@@ -27,6 +27,8 @@ export interface Sort {
  */
 @Injectable()
 export class SortService {
+  private readonly logger = new Logger(resolveModule(__filename, SortService.name));
+
   public constructor(private readonly Sort: EntityTarget<any>) {}
 
   public async findItems(sort: Sort): Promise<any[]> {
@@ -34,19 +36,19 @@ export class SortService {
     const { positions } = sort;
     if (sort.id && sort.type) {
       const relation = sort.type.toLowerCase();
-      logger.debug(`resolve ${relation} for sorts.`);
-      const withRelation = await getRepository<any>(this.Sort).findOne({
+      this.logger.debug(`resolve ${relation} for sorts.`);
+      const withRelation = await AppDataSource.dataSource.getRepository<any>(this.Sort).findOne({
         where: { id: sort.id },
         relations: [relation],
         cache: true,
       });
       items = withRelation[relation];
-      logger.debug(`loaded ${items.length} items.`);
+      this.logger.debug(`loaded ${items.length} items.`);
 
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(relation)));
       items.sort((a: any, b: any) => positions.indexOf(a[primaryKey]) - positions.indexOf(b[primaryKey]));
     } else {
-      logger.warn(`sort not available: ${r(sort)}`);
+      this.logger.warn(`sort not available: ${r(sort)}`);
     }
 
     return items;

@@ -1,11 +1,9 @@
 import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
 
-import { from, Observable } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = new Logger(resolveModule(__filename, 'FastifyFileInterceptor'));
+import { from, Observable } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 export interface FastifyUploadedFile {
   filename: string;
@@ -19,12 +17,13 @@ export type FastifyUploadedFileRequest = /* FastifyRequest & */ any & {
 };
 
 export class FastifyFileInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(resolveModule(__filename, FastifyFileInterceptor.name));
   // 该 field 目前没有用户，multipart 中直接可以拿到 field
   constructor(private readonly field: string) {}
 
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     const request: FastifyUploadedFileRequest = context.switchToHttp().getRequest();
-    logger.debug(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
+    this.logger.debug(`${context.getClass().name}.${context.getHandler().name} url: ${request.raw.url}`);
 
     request.files = [];
 

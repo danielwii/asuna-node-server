@@ -2,18 +2,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { r } from '@danielwii/asuna-helper/dist';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 import { FilterQuery, Model } from 'mongoose';
 import ow from 'ow';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PageView, PageViewDocument } from './schema';
-
-const logger = new Logger(resolveModule(__filename, 'WebService'));
 
 @Injectable()
 export class WebService {
+  private readonly logger = new Logger(resolveModule(__filename, WebService.name));
+
   public constructor(@InjectModel(PageView.name) private readonly PageViewModel: Model<PageViewDocument>) {}
 
   public addPageView(view: PageView): Promise<PageView> {
@@ -24,7 +24,7 @@ export class WebService {
   public async loadPageViews(suid: string): Promise<PageView[]> {
     ow(suid, 'suid', ow.string.nonEmpty);
     const filter: FilterQuery<PageViewDocument> = { scid: RegExp(`^${suid.trim()}.*`) };
-    logger.log(`loadPageViews ${r({ suid, filter })}`);
+    this.logger.log(`loadPageViews ${r({ suid, filter })}`);
     return this.PageViewModel.find(filter).sort({ at: -1 }).limit(6).exec();
   }
 

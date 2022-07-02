@@ -1,6 +1,5 @@
 import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
 import { TokenModule } from '../token';
@@ -11,8 +10,6 @@ import { AuthService } from './auth.service';
 import { AdminJwtStrategy } from './strategy/admin-jwt.strategy';
 import { ApiKeyStrategy } from './strategy/api-key.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
-
-const logger = new Logger(resolveModule(__filename, 'AuthModule'));
 
 @Module({
   /*
@@ -32,12 +29,12 @@ export class AuthModule implements NestModule, OnModuleInit {
   public constructor(private readonly adminAuthService: AdminAuthService) {}
 
   public configure(consumer: MiddlewareConsumer): void {
-    logger.log('configure...');
+    Logger.log('configure...');
     consumer.apply(AdminAuthMiddleware.forRoutes('/admin' /* '/rest' */)).forRoutes('*');
   }
 
   public onModuleInit(): void {
-    logger.log('init...');
-    this.adminAuthService.initSysAccount().catch((error) => logger.error(error));
+    Logger.log('init...');
+    this.adminAuthService.initSysAccount().catch((error) => Logger.error(error));
   }
 }

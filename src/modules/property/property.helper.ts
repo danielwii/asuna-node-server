@@ -1,7 +1,4 @@
-import { Logger } from '@nestjs/common';
-
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
@@ -13,23 +10,11 @@ import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
 
 export class TopUpPayload {
-  @IsString()
-  public type: FinancialTransactionEventKey;
-
-  @IsString()
-  public profileId: string;
-
-  @IsInt()
-  // @Min(1) // must gt 0
-  public amount: number;
-
-  @IsString()
-  @IsOptional()
-  public remark?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  public rebate?: boolean;
+  @IsString() type: FinancialTransactionEventKey;
+  @IsString() profileId: string;
+  @IsInt() amount: number;
+  @IsString() @IsOptional() remark?: string;
+  @IsBoolean() @IsOptional() rebate?: boolean;
 
   public constructor(o: TopUpPayload) {
     Object.assign(this, deserializeSafely(TopUpPayload, o));
@@ -52,8 +37,6 @@ export class ExchangePayload {
     Object.assign(this, deserializeSafely(ExchangePayload, o));
   }
 }
-
-const logger = new Logger(resolveModule(__filename, 'PropertyHelper'));
 
 /**
  * 资产帮助类

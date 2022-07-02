@@ -1,14 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 import { read, utils, write } from 'xlsx';
 
 import { DBHelper } from '../core/db';
-
-const logger = new Logger(resolveModule(__filename, 'ImportExportService'));
 
 @Injectable()
 export class ImportExportService {
@@ -82,7 +79,7 @@ export class ImportExportService {
           entity[keyName] = value;
         }
       }
-      logger.debug(`save ${modelName}: ${r(entity)} by ${r(jsonArray[row])}`);
+      Logger.debug(`save ${modelName}: ${r(entity)} by ${r(jsonArray[row])}`);
       const saveRes = await repository.save(entity);
       status.push(saveRes);
     }

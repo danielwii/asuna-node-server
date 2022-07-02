@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -34,8 +33,6 @@ import type { ClassType } from '@danielwii/asuna-helper';
 import type { PrimaryKey } from '../common';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
-
-const logger = new Logger(resolveModule(__filename, 'GraphqlHelper'));
 
 interface ResolveFindOptionsType<Entity extends BaseEntity> {
   cls: ClassType<Entity>;
@@ -125,7 +122,7 @@ export class GraphqlHelper {
   }): Promise<PageInfo & { items: any[]; total: number }> {
     const entityRepo = cls as any as Repository<Entity>;
     const pageInfo = toPage(pageRequest);
-    logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, relationPath, loader })}`);
+    Logger.debug(`handlePagedDefaultQueryRequest  ${r({ cls, query, where, pageInfo, relationPath, loader })}`);
     const items = await this.handleDefaultQueryRequest({
       cls,
       query,
@@ -137,7 +134,7 @@ export class GraphqlHelper {
       loader,
     });
     const total = await entityRepo.count({ where: where ?? {} });
-    logger.debug(`handlePagedDefaultQueryRequest  ${r({ where, total })}`);
+    Logger.debug(`handlePagedDefaultQueryRequest  ${r({ where, total })}`);
     return this.pagedResult({ pageRequest, items, mapper, total });
   }
 
@@ -211,10 +208,10 @@ export class GraphqlHelper {
     where = _.isString(where) ? where : { ...where, ...(publishable ? { isPublished: true } : {}) };
 
     if (query.random > 0) {
-      logger.debug(`parse where ${r({ publishable, cls, where })}`);
+      Logger.debug(`parse where ${r({ publishable, cls, where })}`);
       const count = await entityRepo.countBy(where);
       const skip = count - query.random > 0 ? Math.floor(Math.random() * (count - query.random)) : 0;
-      logger.debug(`ready for random ${r({ count, skip })}`);
+      Logger.debug(`ready for random ${r({ count, skip })}`);
       const opts = await this.genericFindOptions<Entity>({
         cls,
         select: [primaryKey],
@@ -224,10 +221,10 @@ export class GraphqlHelper {
         relationPath,
         // skip, take: query.random
       });
-      // logger.debug(`opts ${r(opts)}`);
+      // Logger.debug(`opts ${r(opts)}`);
       const randomIds = await entityRepo.find(opts);
       const ids: PrimaryKey[] = _.chain(randomIds).map(fp.get(primaryKey)).shuffle().take(query.random).value();
-      logger.debug(`ids for ${cls.name} is ${r(ids)}`);
+      Logger.debug(`ids for ${cls.name} is ${r(ids)}`);
       if (_.isEmpty(ids)) return [];
 
       const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
@@ -249,11 +246,11 @@ export class GraphqlHelper {
       // skip: pageInfo.skip,
       // take: pageInfo.take,
     });
-    // logger.debug(`options ${r(options)}`);
+    // Logger.debug(`options ${r(options)}`);
 
     const ids = await entityRepo.find(options).then(fp.map(fp.get(primaryKey)));
     if (_.isEmpty(ids)) return [];
-    logger.debug(`ids for ${cls.name} is ${r(ids)}`);
+    Logger.debug(`ids for ${cls.name} is ${r(ids)}`);
 
     const items = await (dataloader ? dataloader.load(ids) : entityRepo.findByIds(ids));
     // const items = await (dataloader && _.isEmpty(options.loadRelationIds)
@@ -310,7 +307,7 @@ export class GraphqlHelper {
       const categoryClsRepoAlike = categoryCls as any as Repository<AbstractCategoryEntity>;
       const category = await categoryClsRepoAlike.findOneBy({ name: query.category, isPublished: true });
 
-      logger.debug(`category is ${r(category)}`);
+      Logger.debug(`category is ${r(category)}`);
       // if (category != null) {}
       Object.assign(whereCondition, { [categoryRef || 'categoryId']: _.get(category, 'id') });
     }
@@ -321,7 +318,7 @@ export class GraphqlHelper {
       Object.assign(whereCondition, afterCondition, beforeCondition);
     }
     const loadRelationIds = relations ?? resolveRelationsFromInfo(info, relationPath);
-    logger.debug(`loadRelationIds: ${r({ relations, relationPath, loadRelationIds })}`);
+    Logger.debug(`loadRelationIds: ${r({ relations, relationPath, loadRelationIds })}`);
     const selectFields = DBHelper.filterSelect(cls, resolveSelectsFromInfo(info, selectionPath) ?? select);
     const options: FindManyOptions<Entity> = {
       ...(pageRequest ? toPage(pageRequest) : {}),
@@ -332,7 +329,7 @@ export class GraphqlHelper {
       order,
       cache,
     };
-    logger.debug(`resolved FindOptions is ${r(options)}`);
+    Logger.debug(`resolved FindOptions is ${r(options)}`);
     return options;
   }
 
@@ -342,7 +339,7 @@ export class GraphqlHelper {
   ): Promise<RelationEntity> {
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
-      logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
+      Logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
         `unresolved relation ${String(opts.key)} for ${opts.cls.name}`,
@@ -357,7 +354,7 @@ export class GraphqlHelper {
       cache: opts.cache,
     })) as Entity;
     const id = result[opts.key] as any;
-    // logger.debug(`resolveProperty ${r({ result, opts, id })}`);
+    // Logger.debug(`resolveProperty ${r({ result, opts, id })}`);
     if (!id) return;
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
@@ -375,7 +372,7 @@ export class GraphqlHelper {
    * 还有另外一种方法，即通过反向逻辑，构建拉取关联的 dataloader，然后通过 dataloader 的 batch 策略拉取。
    *
    private static async adsLoaderFn(categoryIds: Array<number>): Promise<Ad[][]> {
-    AdCategoryResolver.logger.debug(`load ads by ads loader ${r(categoryIds)}`);
+    AdCategoryResolver.Logger.debug(`load ads by ads loader ${r(categoryIds)}`);
     // TODO 这里会报 ·but the function did not return a Promise of an Array of the same length as the Array of keys· 暂时通过嵌套数组的方式处理
     return Promise.all([Ad.find({ where: { category: In(categoryIds) } })]);
   }
@@ -405,18 +402,18 @@ export class GraphqlHelper {
     const { mapper } = opts as BaseResolvePropertyWithMapper<Entity, RelationEntity, MixedRelationEntity>;
     const relations = DBHelper.getRelationPropertyNames(opts.cls);
     if (!relations.includes(opts.key as string)) {
-      logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
+      Logger.error(`no relation ${String(opts.key)} exists in ${opts.cls.name}. list: ${relations}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
         `unresolved relation ${String(opts.key)} for ${opts.cls.name}`,
       );
     }
 
-    // logger.debug(`resolve properties by ${r(opts)}`);
+    // Logger.debug(`resolve properties by ${r(opts)}`);
     let ids = opts.instance[opts.key];
     if (_.isNil(ids)) {
       const primaryKey = _.first(DBHelper.getPrimaryKeys(DBHelper.repo(opts.cls)));
-      logger.debug(
+      Logger.debug(
         `no ids for ${String(opts.key)} found for ${opts.cls.name} ${opts.instance[primaryKey]}, load it...`,
       );
       const result: any = (await (opts.cls as any as typeof BaseEntity).findOne({
@@ -424,7 +421,7 @@ export class GraphqlHelper {
         loadRelationIds: { relations: [opts.key as string] },
         cache: opts.cache,
       })) as Entity;
-      logger.debug(
+      Logger.debug(
         `load ${result[opts.key].length} ${String(opts.key)} for ${opts.cls.name} ${opts.instance[primaryKey]}`,
       );
       ids = result[opts.key];
@@ -437,7 +434,7 @@ export class GraphqlHelper {
     }
 
     const _opts = opts as ResolvePropertyByTarget<RelationEntity>;
-    logger.warn(`no loader found for ${_opts.targetCls.name}... may cause performance issue`);
+    Logger.warn(`no loader found for ${_opts.targetCls.name}... may cause performance issue`);
     const targetRepo = _opts.targetCls as any as Repository<RelationEntity>;
     return targetRepo.findByIds(ids as any).then((items) => mapItems(items, mapper));
   }
@@ -502,7 +499,7 @@ export class GraphqlHelper {
       : { createdAt: 'DESC' };
     // const skip = PageHelper.latestSkip(count, limit);
 
-    logger.debug(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
+    Logger.debug(`load mixed relation ${r({ where: _.assign({}, where, query?.where), order, take })}`);
     const items = await targetRepo.find({ where: _.assign({}, where, query?.where), order, take });
 
     return { count, items };
@@ -534,7 +531,7 @@ export class GraphqlHelper {
     const hasNextPage = first === items.length;
     const latest = _.last(items);
     const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? request.after };
-    logger.debug(
+    Logger.debug(
       `handleCursoredQueryRequest ${r({ countOptions, total, findOptions, first, request, latest, cursorInfo })}`,
     );
     return { items, total, cursorInfo };
@@ -547,7 +544,7 @@ export class GraphqlHelper {
     const hasNextPage = first === items.length;
     const latest = _.last(items);
     const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? request.after };
-    logger.debug(`handleCursoredRequest ${r({ total, first, request, latest, cursorInfo })}`);
+    Logger.debug(`handleCursoredRequest ${r({ total, first, request, latest, cursorInfo })}`);
     return { items, total, cursorInfo };
   }
 }

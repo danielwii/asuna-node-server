@@ -13,10 +13,10 @@ import { Store } from '../store';
 
 import type { WXJwtPayload } from './interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'WXJwtStrategy'));
-
 @Injectable()
 export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {
+  private readonly logger = new Logger(resolveModule(__filename, WXJwtStrategy.name));
+
   constructor() {
     super(
       {
@@ -29,7 +29,7 @@ export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {
   }
 
   async validate(payload: WXJwtPayload): Promise<WXJwtPayload> {
-    logger.debug(`validate ${r(payload)}`);
+    this.logger.debug(`validate ${r(payload)}`);
     const isValid = await Store.Global.getItem(payload.key);
     if (!isValid) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials);

@@ -1,12 +1,9 @@
 import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import { plainToInstance } from 'class-transformer';
-
-const logger = new Logger(resolveModule(__filename, 'CustomValidationPipe'));
 
 /**
  * app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true })) is used already.
@@ -14,10 +11,10 @@ const logger = new Logger(resolveModule(__filename, 'CustomValidationPipe'));
 @Injectable()
 export class CustomValidationPipe implements PipeTransform<any> {
   transform(value: any, { metatype }: ArgumentMetadata) {
-    logger.debug(`transform ${r({ value, metatype })}`);
+    Logger.debug(`transform ${r({ value, metatype })}`);
     if (value) {
       if (!metatype || !this.toValidate(metatype)) {
-        logger.debug(`return value directly ${r(this.toValidate(metatype))}`);
+        Logger.debug(`return value directly ${r(this.toValidate(metatype))}`);
         return value;
       }
       const object = plainToInstance(metatype, value, { enableImplicitConversion: true });

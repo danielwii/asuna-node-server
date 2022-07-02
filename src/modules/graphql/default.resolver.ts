@@ -1,18 +1,15 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
 import { DBCacheCleaner } from '../core/db';
 
-const logger = new Logger(resolveModule(__filename, 'QueryResolver'));
-
 export class QueryResolver {
   public constructor(entities) {
     const keys = Object.getOwnPropertyNames(this.constructor.prototype).filter((name) => name !== 'constructor');
-    logger.debug(`init ... ${r({ keys })}`);
+    Logger.debug(`init ... ${r({ keys })}`);
     if (_.isArray(entities)) {
       _.forEach(entities, (Entity) => _.forEach(keys, (key) => DBCacheCleaner.regTrigger(Entity, key)));
     } else {

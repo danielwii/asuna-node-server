@@ -1,6 +1,6 @@
 import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { Publishable } from '../base/abilities';
 import { NoPrimaryKeyBaseEntity } from '../base/base.entity';

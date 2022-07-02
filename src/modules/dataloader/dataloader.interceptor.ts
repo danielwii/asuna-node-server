@@ -1,7 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import _ from 'lodash';
 import SpanContext from 'opentracing/lib/span_context';
 import { Observable } from 'rxjs';
@@ -15,8 +13,6 @@ import type { GraphQLResolveInfo } from 'graphql';
 import type { RequestInfo } from '../helper';
 import type { JwtPayload, WithProfileUser } from '../core/auth';
 import type { DefaultRegisteredLoaders } from './context';
-
-const logger = new Logger(resolveModule(__filename, 'DataLoaderInterceptor'));
 
 export type GraphQLResolveCacheInfo = GraphQLResolveInfo & { cacheControl: ResolveInfoCacheControl };
 export type GraphqlContext<RegisteredLoaders = DefaultRegisteredLoaders, U = WithProfileUser> = { req: RequestInfo } & {
@@ -40,7 +36,7 @@ export class DataLoaderInterceptor implements NestInterceptor {
         // this.logger.debug('Data loaders exist', this.constructor.name);
       } else {
         if (_.isEmpty(GenericDataLoader.loaders())) {
-          logger.error(`no data loaders for request found, may not initialized at startup.`);
+          Logger.error(`no data loaders for request found, may not initialized at startup.`);
         }
         // logger.debug(`Creating data loaders for request: ${r({ url: request.url, id: request.id })} ${r({ loaders })}`);
         request.dataLoaders = new GenericDataLoader().createLoaders();

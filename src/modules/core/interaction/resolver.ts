@@ -14,7 +14,7 @@ import type { GraphQLResolveInfo } from 'graphql';
 
 @Resolver()
 export class UserRelationQueryResolver extends QueryResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserRelationQueryResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'UserRelationQueryResolver'));
 
   constructor() {
     super(UserRelation);
@@ -34,7 +34,7 @@ export class UserRelationQueryResolver extends QueryResolver {
 
 @Resolver((of) => UserRelation)
 export class UserRelationResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserRelationResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'UserRelationResolver'));
 
   /*
   @ResolveField((returns) => UserProfile)

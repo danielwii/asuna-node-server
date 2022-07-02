@@ -2,10 +2,7 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DaprConfigObject } from './dapr.config';
-
-const logger = new Logger(resolveModule(__filename, 'DaprProvider'));
 
 export class DaprProvider {
   private readonly _stateUrl;
@@ -26,7 +23,7 @@ export class DaprProvider {
 
   private constructor() {
     const config = DaprConfigObject.load();
-    logger.log(`init with ${r(config)}`);
+    Logger.log(`init with ${r(config)}`);
     this._stateUrl = `http://localhost:${config.port}/v1.0/state`;
   }
 }

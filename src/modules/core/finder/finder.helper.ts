@@ -9,10 +9,7 @@ import { IsOptional } from 'class-validator';
 import { URL } from 'url';
 
 import { configLoader } from '../../config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';
-
-const logger = new Logger(resolveModule(__filename, 'FinderHelper'));
 
 export interface HostExchange {
   regex: string;
@@ -71,12 +68,12 @@ export class FinderHelper {
       : /* config.endpoint ?? */ isCN
       ? defaultCNAssetsEndpoint
       : defaultAssetsEndpoint;
-    logger.verbose(
+    Logger.verbose(
       `get endpoint ${r({ type, internal, config, endpoint, defaultAssetsEndpoint, defaultCNAssetsEndpoint })}`,
     );
 
     if (!endpoint) {
-      logger.warn(`${name ?? 'default'} not available in upstream endpoint ${endpoint}`);
+      Logger.warn(`${name ?? 'default'} not available in upstream endpoint ${endpoint}`);
       throw new AsunaException(
         AsunaErrorCode.Unprocessable,
         `${name ?? 'default'} not available in upstream endpoint ${endpoint}`,
@@ -87,14 +84,14 @@ export class FinderHelper {
     if (config.hostExchanges) {
       try {
         const exchanges: HostExchange[] = JSON.parse(config.hostExchanges);
-        logger.verbose(`parse exchanges ${r({ exchanges })}`);
+        Logger.verbose(`parse exchanges ${r({ exchanges })}`);
         const exchange = exchanges.find((x) => new RegExp(x.regex).test(path));
         if (exchange) {
-          logger.verbose(`check exchange ${r({ exchange, path })}`);
+          Logger.verbose(`check exchange ${r({ exchange, path })}`);
           return new URL(path, `${exchange.endpoint ?? ''}/`).toString();
         }
       } catch (e) {
-        logger.error(`handle exchange error: ${e}`);
+        Logger.error(`handle exchange error: ${e}`);
       }
     }
 
@@ -102,7 +99,7 @@ export class FinderHelper {
       return new URL(path, `${endpoint ?? ''}/`).toString();
     }
     // TODO add other handlers later
-    logger.warn('only type assets is available');
+    Logger.warn('only type assets is available');
     throw new AsunaException(AsunaErrorCode.InvalidParameter, 'only type assets is available');
   }
 }

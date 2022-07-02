@@ -1,6 +1,7 @@
 import { Body, Controller, Logger, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -10,12 +11,9 @@ import { IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
 
 import { AppDataSource } from '../../datasource';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { JwtAuthGuard, JwtAuthRequest, JwtAuthRequestExtractor } from '../auth';
 import { UserHelper } from '../user.helper';
 import { UserRelation, UserRelationType } from './friends.entities';
-
-const logger = new Logger(resolveModule(__filename, 'InteractionController'));
 
 export class UserFollowDto {
   @IsString()
@@ -38,23 +36,25 @@ class UserRelationRequestDto {
 
 @Controller('api/v1/interaction')
 export class InteractionController {
-  @UseGuards(JwtAuthGuard)
+  private readonly logger = new Logger(resolveModule(__filename, InteractionController.name));
+
+  @UseGuards(new JwtAuthGuard())
   @Post('follow')
   async follow(@Body() body: UserFollowDto, @Req() req: JwtAuthRequest): Promise<void> {
     const authInfo = JwtAuthRequestExtractor.of(req);
-    logger.debug(`follow ${r({ authInfo, body })}`);
+    this.logger.debug(`follow ${r({ authInfo, body })}`);
     await UserHelper.follow(authInfo.profile, body.type, body.refId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Post('unfollow')
   async unfollow(@Body() body: UserUnfollowDto, @Req() req: JwtAuthRequest): Promise<void> {
     const authInfo = JwtAuthRequestExtractor.of(req);
-    logger.debug(`unfollow ${r({ authInfo, body })}`);
+    this.logger.debug(`unfollow ${r({ authInfo, body })}`);
     await UserHelper.unfollow(authInfo.profile, body.type, body.refId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Post(':id/request')
   async request(@Param('id') profileId: string, @Body() dto: UserRelationRequestDto, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -62,7 +62,7 @@ export class InteractionController {
       throw new AsunaException(AsunaErrorCode.Unprocessable, '无法添加自己为好友');
     }
     const exists = await UserRelation.findOneBy({ profileId, requesterId: payload.id });
-    logger.log(`request relation ${r({ profileId, payload, dto, relation: exists })}`);
+    this.logger.log(`request relation ${r({ profileId, payload, dto, relation: exists })}`);
     if (!exists) {
       return UserRelation.of({ profileId, requesterId: payload.id, message: dto.message }).save();
     }
@@ -76,7 +76,7 @@ export class InteractionController {
     return ApiResponse.success();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Put(':id/accept')
   async accept(@Param('id') relationId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -113,7 +113,7 @@ export class InteractionController {
     return ApiResponse.success();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Put(':id/ignore')
   async ignore(@Param('id') relationId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -127,7 +127,7 @@ export class InteractionController {
   }
 
   // TODO block 的 user.profileId 是 requester，发起者是自己也就是 UserRelation 的 profileId
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Put(':id/block')
   async block(@Param('id') profileId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -141,7 +141,7 @@ export class InteractionController {
   }
 
   // TODO
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Put(':id/unblock')
   async unblock(@Param('id') profileId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;

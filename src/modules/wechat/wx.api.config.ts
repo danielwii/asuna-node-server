@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -11,8 +10,6 @@ import fetch from 'node-fetch';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 
 import type { RequestInfo, RequestInit, Response } from 'node-fetch';
-
-const logger = new Logger(resolveModule(__filename, 'WeChatConfigApi'));
 
 export class WeChatServiceConfig {
   @IsBoolean() @IsOptional() login?: boolean;
@@ -65,7 +62,7 @@ export class WxConfigApi {
     return fetch(url, init)
       .then(WxConfigApi.logInterceptor)
       .catch((reason) => {
-        logger.error(`fetch ${r({ url, init })} reason: ${r(reason)}`);
+        Logger.error(`fetch ${r({ url, init })} reason: ${r(reason)}`);
         return reason;
       });
   }
@@ -74,10 +71,10 @@ export class WxConfigApi {
     const { url, status } = response;
     const json: any = await response.json();
     if (json.errcode) {
-      logger.error(`[${status}] call '${url}' error: ${r(json)}`);
+      Logger.error(`[${status}] call '${url}' error: ${r(json)}`);
       throw new Error(`[${status}] call '${url}' response: ${r(json)}`);
     } else {
-      logger.debug(`[${status}] call '${url}': ${r(json)}`);
+      Logger.debug(`[${status}] call '${url}': ${r(json)}`);
     }
     return json;
   }

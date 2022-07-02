@@ -14,8 +14,6 @@ import { AuthUserChannel } from './base.entities';
 import { UserProfile } from './user.entities';
 import { AuthedUserHelper } from './user.helper';
 
-const logger = new Logger(resolveModule(__filename, 'AuthService'));
-
 export const HermesAuthEventKeys = {
   // 新用户
   userCreated: 'user.created',
@@ -28,6 +26,8 @@ export interface CreatedUser<U> {
 
 @Injectable()
 export class AuthService extends AbstractAuthService<UserProfile> {
+  private readonly logger = new Logger(resolveModule(__filename, AuthService.name));
+
   /**
    * 这里会根据继承 AbstractAuthUser / AbstractTimeBasedAuthUser 的实体来注册用户
    * 目前服务端新建了 UserProfile 来接管用户认证，将业务与认证分离。
@@ -50,10 +50,10 @@ export class AuthService extends AbstractAuthService<UserProfile> {
             : false,
         );
         if (!entityMetadata) {
-          logger.warn('no auth user repo found.');
+          this.logger.warn('no auth user repo found.');
           return null;
         }
-        logger.log(`reg auth user: ${entityMetadata.target.constructor.name}`);
+        this.logger.log(`reg auth user: ${entityMetadata.target.constructor.name}`);
         return connection.getRepository(entityMetadata.target) as any;
       })(),
     */
@@ -70,9 +70,9 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     if (channel === AuthUserChannel.apple) {
       ow(username, 'username', ow.string.nonEmpty);
       const entity = this.authUserRepository.create({ username, isActive: true, channel });
-      logger.debug(`create user ${r(entity)}`);
+      this.logger.debug(`create user ${r(entity)}`);
       return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
-        logger.debug(`created ${r({ profile, user })}`);
+        this.logger.debug(`created ${r({ profile, user })}`);
         Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
         return { profile, user };
       });
@@ -82,7 +82,7 @@ export class AuthService extends AbstractAuthService<UserProfile> {
 
       const found = await this.getUser({ email, username });
       if (found) {
-        logger.log(`found user ${r(found)}`);
+        this.logger.log(`found user ${r(found)}`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `user ${r({ username, email })} already exists.`);
       }
 
@@ -94,9 +94,9 @@ export class AuthService extends AbstractAuthService<UserProfile> {
         salt,
         channel,
       });
-      logger.debug(`create user ${r(entity)}`);
+      this.logger.debug(`create user ${r(entity)}`);
       return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
-        logger.debug(`created ${r({ profile, user })}`);
+        this.logger.debug(`created ${r({ profile, user })}`);
         Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
         return { profile, user };
       });

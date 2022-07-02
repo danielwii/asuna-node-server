@@ -2,18 +2,16 @@ import { Controller, Get, Logger, Param, Query, Req, Res } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 import querystring from 'query-string';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { FinderHelper } from './finder.helper';
 
 import type { Request, Response } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'FinderController'));
 
 /**
  * 主要应用来定位资源，设计上，可以作为一个调度器，用来调度到其他的平台上
@@ -23,6 +21,7 @@ const logger = new Logger(resolveModule(__filename, 'FinderController'));
 @ApiTags('core')
 @Controller('api/v1/finder')
 export class FinderController {
+  private readonly logger = new Logger(resolveModule(__filename, FinderController.name));
   @Get()
   async redirect(
     @Query('encrypt') encrypt: boolean,
@@ -31,13 +30,13 @@ export class FinderController {
     @Req() req,
     @Res() res,
   ): Promise<void> {
-    logger.log(`find ${r({ encrypt, query, type })}`);
+    this.logger.log(`find ${r({ encrypt, query, type })}`);
     if (!(_.isString(query) && query.length > 0) || !(_.isString(type) && ['zones', 'assets'].includes(type))) {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
     }
 
     const queryParam = querystring.parse(encrypt ? Cryptor.desDecrypt(query) : query) as any;
-    logger.log(`query ${r(queryParam)} with ${type}`);
+    this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
     const url = await FinderHelper.resolveUrl({ type, name, path });
@@ -51,9 +50,11 @@ export class FinderController {
 @ApiTags('core')
 @Controller('f')
 export class ShortFinderController {
+  private readonly logger = new Logger(resolveModule(__filename, ShortFinderController.name));
+
   @Get(':q')
   async redirect(@Param('q') q: string, @Req() req: Request, @Res() res: Response): Promise<void> {
-    logger.log(`find short ${r({ q })}`);
+    this.logger.log(`find short ${r({ q })}`);
     if (!(_.isString(q) && q.length > 0)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
     }
@@ -74,7 +75,7 @@ export class ShortFinderController {
     }
 
     const queryParam = querystring.parse(encrypt === true ? Cryptor.desDecrypt(query) : query) as any;
-    logger.log(`query ${r(queryParam)} with ${type}`);
+    this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
     const url = await FinderHelper.resolveUrl({ type, name, path });

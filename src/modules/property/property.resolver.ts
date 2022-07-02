@@ -28,7 +28,7 @@ class FinancialTransactionPageable extends Pageable<FinancialTransaction> {
 
 @Resolver()
 export class PropertyQueryResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserQueryResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'UserQueryResolver'));
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => PointExchangePageable)

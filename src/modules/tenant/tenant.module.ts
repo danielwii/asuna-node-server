@@ -19,8 +19,6 @@ import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
-const logger = new Logger(resolveModule(__filename, 'TenantModule'));
-
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
  * tenant 🚧 可以配置一个待创建的模型入口，用于首次创建
@@ -38,9 +36,11 @@ const logger = new Logger(resolveModule(__filename, 'TenantModule'));
   controllers: [TenantController, TenantAdminController, TenantAuthController],
 })
 export class TenantModule implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, TenantModule.name));
+
   async onModuleInit(): Promise<void> {
     await TenantHelper.preload();
-    logger.log(`init... ${r(await TenantHelper.getConfig())}`);
+    this.logger.log(`init... ${r(await TenantHelper.getConfig())}`);
 
     await this.initKV();
     await this.initAC();

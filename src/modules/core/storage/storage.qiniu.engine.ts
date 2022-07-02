@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -9,7 +10,6 @@ import { join } from 'path';
 import * as qiniu from 'qiniu';
 
 import { convertFilename } from '../../common/helpers';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UploaderConfigObject } from '../uploader/config';
 import { QiniuConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
@@ -17,21 +17,21 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 import type { Response } from 'express';
 
 export class QiniuStorage implements IStorageEngine {
-  private static readonly logger = new Logger(resolveModule(__filename, QiniuStorage.name));
+  private readonly logger = new Logger(resolveModule(__filename, QiniuStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: QiniuConfigObject;
 
   public constructor(configure: () => QiniuConfigObject) {
     this.configObject = configure();
-    QiniuStorage.logger.log(`[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`);
+    this.logger.log(`[constructor] init [${this.configObject.bucket}] with path:${this.configObject.path} ...`);
 
     if (this.configObject.enable !== true) {
       throw new Error(
         `qiniu must enable when using qiniu storage engine: ${r({ configs: instanceToPlain(this.configObject) })}`,
       );
     }
-    QiniuStorage.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
+    this.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
   }
 
   public saveEntity(
@@ -48,9 +48,9 @@ export class QiniuStorage implements IStorageEngine {
       const prefix = opts.prefix || yearMonthStr();
       const filename = convertFilename(file.filename);
       const filenameWithPrefix = join(prefix, filename);
-      QiniuStorage.logger.log(`generate key by '${r({ bucket, filenameWithPrefix, self: this.configObject, file })}`);
+      this.logger.log(`generate key by '${r({ bucket, filenameWithPrefix, self: this.configObject, file })}`);
       const key = join('/', bucket, filenameWithPrefix).slice(1);
-      QiniuStorage.logger.log(`upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`);
+      this.logger.log(`upload file to '${this.configObject.bucket}', Key: '${key}' ${r(opts)}`);
       const uploadToken = new qiniu.rs.PutPolicy({ scope: this.configObject.bucket }).uploadToken(mac);
 
       new qiniu.form_up.FormUploader().putFile(
@@ -64,7 +64,7 @@ export class QiniuStorage implements IStorageEngine {
             // throw new AsunaException(AsunaErrorCode.Unprocessable, `upload file '${key}' error`, err);
             // throw new ErrorException('QiniuStorage', `upload file '${key}' error`, err);
           } else {
-            QiniuStorage.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
+            this.logger.log(`upload file '${r({ key, /* info, */ body })}'`);
             const resourcePath = this.config.resourcePath;
             const appendPrefix = join('/', this.configObject.path || '').startsWith(resourcePath)
               ? join(bucket)
@@ -124,7 +124,7 @@ export class QiniuStorage implements IStorageEngine {
     const resolved = opts.resolver ? await opts.resolver(path) : path;
     // TODO 在非默认 storage 下访问会出现问题
     const url = resolved.startsWith('http') ? resolved : `${this.configObject.domain}${path}`;
-    QiniuStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery, resolved })}`);
+    this.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery, resolved })}`);
     return res.redirect(url);
   }
 }

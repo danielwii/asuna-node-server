@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -15,13 +14,11 @@ import type { JwtPayload } from '../core/auth/auth.interfaces';
 
 export type OrgJwtAuthRequest<User = OrgUser> = AnyAuthRequest<JwtPayload, User>;
 
-const logger = new Logger(resolveModule(__filename, 'AuthHelper'));
-
 export class OrgAuthHelper {
   public static async populate(req: OrgJwtAuthRequest, payload: JwtPayload): Promise<void> {
     // TODO user not include tenant and roles, only admin-user has currently
     const user = await OrgUser.findOne({ where: { id: payload.id }, relations: ['tenant', 'roles'] });
-    logger.debug(`jwt user ${r(user)}`);
+    Logger.debug(`jwt user ${r(user)}`);
     // req.identifier = UserIdentifierHelper.stringify(payload);
     req.isOrgUser = true;
     req.payload = payload;
@@ -34,9 +31,9 @@ export class OrgAuthHelper {
   public static auth(req: OrgJwtAuthRequest, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('org-jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
-        logger.log(`jwt auth ${r({ payload })}`);
+        Logger.log(`jwt auth ${r({ payload })}`);
         if (err || info) {
-          logger.warn(`jwt auth error: ${r(err)}`);
+          Logger.warn(`jwt auth error: ${r(err)}`);
         } else {
           await OrgAuthHelper.populate(req, payload);
         }

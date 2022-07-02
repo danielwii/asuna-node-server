@@ -1,12 +1,8 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import { Expose, plainToInstance, Transform } from 'class-transformer';
 
 import { configLoader } from '../config';
-
-const logger = new Logger(resolveModule(__filename, 'MongoConfig'));
 
 export const MongoConfigKeys = {
   MONGO_ENABLE: 'MONGO_ENABLE',
@@ -35,7 +31,7 @@ export class MongoConfigObject {
   }
 
   static load(): MongoConfigObject {
-    logger.verbose(`try load env: ${MongoConfigKeys.MONGO_ENABLE}`);
+    Logger.verbose(`try load env: ${MongoConfigKeys.MONGO_ENABLE}`);
     return new MongoConfigObject({
       srv: configLoader.loadBoolConfig(MongoConfigKeys.MONGO_SRV, false),
       enable: configLoader.loadBoolConfig(MongoConfigKeys.MONGO_ENABLE, false),

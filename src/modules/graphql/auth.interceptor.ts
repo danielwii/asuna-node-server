@@ -9,10 +9,9 @@ import { Observable } from 'rxjs';
 
 import type { Request, Response } from 'express';
 
-const logger = new Logger(resolveModule(__filename, 'AuthInterceptor'));
-
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(resolveModule(__filename, AuthInterceptor.name));
   private jwtAuthenticator = passport.authenticate('jwt', { session: false });
 
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
@@ -20,9 +19,9 @@ export class AuthInterceptor implements NestInterceptor {
     const ctx = GqlExecutionContext.create(context);
 
     const result = this.jwtAuthenticator(http.getRequest<Request>(), http.getResponse<Response>());
-    logger.log(`result is ${r(result)}`);
+    this.logger.log(`result is ${r(result)}`);
     return next.handle().pipe((source) => {
-      logger.log(`piping source is ${JSON.stringify(source)}`);
+      this.logger.log(`piping source is ${JSON.stringify(source)}`);
       return result || null;
     });
   }

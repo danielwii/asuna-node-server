@@ -1,9 +1,6 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-const logger = new Logger(resolveModule(__filename));
 
 @Controller()
 export class AppController {

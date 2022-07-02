@@ -5,7 +5,6 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { Access, AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from '../db';
 
 export enum ACRole {
@@ -27,8 +26,6 @@ export enum ACResource {
 
 export type ACResources = ACResourceType[];
 export type ACResourceType = keyof typeof ACResource;
-
-const logger = new Logger(resolveModule(__filename, 'AccessControlHelper'));
 
 export class AccessControlHelper {
   private static accessControl: AccessControl;
@@ -59,7 +56,7 @@ export class AccessControlHelper {
     // .deleteAny('video')
     ;
 
-    logger.log(
+    Logger.log(
       `init ${r({
         // grants: this.accessControl.getGrants(),
         resources: AccessControlHelper.accessControl.getResources(),

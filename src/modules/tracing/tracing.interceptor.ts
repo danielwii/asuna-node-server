@@ -1,26 +1,22 @@
-import { Logger } from '@nestjs/common';
+import api from '@opentelemetry/api';
+
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-import { Tags } from 'opentracing';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
-import { TracingHelper, WithSpanContext } from './tracing.helper';
 
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
-import type { Request } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'TracingInterceptor'));
+import type { WithSpanContext } from './tracing.helper';
+import type { Request, Response } from 'express';
 
 export type TraceRequest = Request & WithSpanContext;
 
 export class TracingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
     let request = context.switchToHttp().getRequest<TraceRequest>();
+    let response = context.switchToHttp().getResponse<Response>();
     if (!request) {
       request = GqlExecutionContext.create(context).getContext().req;
+      response = GqlExecutionContext.create(context).getContext().res;
     }
 
     // ws subscription request
@@ -45,9 +41,15 @@ export class TracingInterceptor implements NestInterceptor {
 
     const serviceName = `${context.getClass().name}.${context.getHandler().name}`;
     // logger.debug(`[trace] start span ${serviceName}`);
+    if (response.setHeader) {
+      const currentSpan = api.trace.getSpan(api.context.active());
+      response.setHeader('x-trace-context', currentSpan.spanContext().traceId);
+    }
+    /*
     const span = TracingHelper.tracer.startSpan(serviceName);
-    request.trace = span.context();
-    return next.handle().pipe(
+    request.trace = span.context();*/
+    return next.handle();
+    /*.pipe(
       tap(
         () => {
           span.log({ event: 'success', info });
@@ -63,6 +65,6 @@ export class TracingInterceptor implements NestInterceptor {
           // logger.debug(`[trace] finish span ${serviceName}`);
         },
       ),
-    );
+    );*/
   }
 }

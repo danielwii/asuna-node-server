@@ -4,6 +4,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { CustomScalar, GraphQLModule, Scalar } from '@nestjs/graphql';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -27,13 +28,10 @@ import { AppModule } from './app';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
 import type { GraphQLServiceContext } from 'apollo-server-types';
-
-const logger = new Logger(resolveModule(__filename, 'GraphqlModule'));
 
 @Scalar('DateTime', (type) => Date)
 export class DateScalar implements CustomScalar<number, Date> {
@@ -62,6 +60,8 @@ export class DateScalar implements CustomScalar<number, Date> {
 
 @Module({ providers: [DateScalar] })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, GraphqlModule.name));
+
   public static forRoot(modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
@@ -73,11 +73,11 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
         `${path.join(require.main.path, '../src')}/**/*.graphql`,
       ]),
     );
-    logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
+    Logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
 
     const redisConfig = RedisConfigObject.load('graphql');
     const cache = redisConfig.enable ? new RedisCache(redisConfig.getIoOptions()) : new InMemoryLRUCache();
-    logger.log(`load cache ${r(cache, { depth: 1 })}`);
+    Logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
     return {
       module: GraphqlModule,
@@ -135,13 +135,13 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           plugins: _.compact([
             {
               async serverWillStart(service: GraphQLServiceContext) {
-                logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
+                Logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
             responseCachePlugin({
               sessionId: (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
-                if (sessionID) logger.debug(`cache sessionID: ${sessionID}`);
+                if (sessionID) Logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
               },
             }),
@@ -182,7 +182,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           */
           formatResponse: (response) => {
             if (response.errors) {
-              logger.error(`response: ${r(response.errors)}`);
+              Logger.error(`response: ${r(response.errors)}`);
             }
             // logger.verbose(`response: ${r(response.data)}`);
             return response;

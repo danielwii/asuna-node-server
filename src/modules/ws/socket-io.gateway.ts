@@ -9,13 +9,10 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import type { Server, Socket } from 'socket.io';
-
-const logger = new Logger(resolveModule(__filename, 'SocketIOGateway'));
 
 export class AdminWsHelper {
   private static server: Server;
@@ -53,6 +50,8 @@ export interface AsunaSocketRoomsType {
   serveClient: false,
 })
 export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(resolveModule(__filename, SocketIOGateway.name));
+
   @WebSocketServer()
   private readonly server?: Server;
   private readonly timestamp = Date.now();
@@ -64,7 +63,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   constructor() {
     setInterval(() => {
       if (this.views !== this.history) {
-        logger.log(`online: ${this.views}`);
+        this.logger.log(`online: ${this.views}`);
         this.history = this.views;
 
         if (this.server) {
@@ -74,7 +73,7 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
             // rooms: this.server.sockets._rooms,
           };
           this.server.volatile.emit('views', { count: this.views, rooms });
-          logger.debug(`clients: ${r(rooms)}`);
+          this.logger.debug(`clients: ${r(rooms)}`);
 
           // const id = _.head(_.keys(this.server.sockets._ids));
           // this.server.to(id).emit('first', 'hello world');
@@ -91,18 +90,18 @@ export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGa
   }
 
   public afterInit(server: Server): any {
-    logger.log('init...');
+    this.logger.log('init...');
     // SocketIOGateway.ws.next(server);
     AdminWsHelper.ws = server;
   }
 
   public handleConnection(client: Socket): any {
     this.views += 1;
-    logger.log(`[${client.id}] connected (${this.views})`);
+    this.logger.log(`[${client.id}] connected (${this.views})`);
   }
 
   public handleDisconnect(client: Socket): any {
     this.views -= 1;
-    logger.log(`[${client.id}] disconnect (${this.views})`);
+    this.logger.log(`[${client.id}] disconnect (${this.views})`);
   }
 }

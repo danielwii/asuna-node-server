@@ -1,6 +1,7 @@
 import { Body, Delete, Get, Logger, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -22,21 +23,20 @@ import {
 } from '../core/db';
 import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Tenant, TenantHelper } from '../tenant';
 
 import type { AnyAuthRequest } from '../helper';
 
 // import { AdminUser } from '../../core/auth';
 
-const logger = new Logger(resolveModule(__filename, 'RestCrudController'));
-
 export abstract class RestCrudController {
+  private readonly superLogger = new Logger(resolveModule(__filename, RestCrudController.name));
+
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {
     // this.module = this.module ? `${this.module}__` : '';
     // this.prefix = this.prefix ? `${this.prefix}_` : '';
-    logger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
+    this.superLogger.log(`set module: '${this.module}', prefix: '${this.prefix}'`);
   }
 
   /**
@@ -86,7 +86,7 @@ export abstract class RestCrudController {
   public query(@Param('model') model: string, @Query('action') action: string, @Query('args') args: string) {
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
     const opts = parseJSONIfCould(args);
-    logger.log(`query ${r({ model, modelNameObject, action, opts, args })}`);
+    this.superLogger.log(`query ${r({ model, modelNameObject, action, opts, args })}`);
     return DBHelper.prismaClient[modelNameObject.dbName][action][opts];
   }
 */
@@ -114,14 +114,14 @@ export abstract class RestCrudController {
     const order = parseOrder(modelName.model, sortStr);
     const query = { where, order, parsedFields, skip: (page - 1) * size, take: Number(size) };
 
-    // logger.log(`list ${r({ whereStr, query, order })}`);
+    // this.superLogger.log(`list ${r({ whereStr, query, order })}`);
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns
       .filter((column) => column.isPrimary)
       .map((column) => column.propertyName);
 
-    // logger.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
+    // this.superLogger.log(`list ${r({ modelName, primaryKeys, parsedFields })}`);
     DBHelper.wrapParsedFields(modelName.model, { queryBuilder, parsedFields, primaryKeys });
     DBHelper.wrapProfile(modelName.model, queryBuilder, repository, profile, relationsStr, parsedFields, where);
 
@@ -130,7 +130,7 @@ export abstract class RestCrudController {
     const dataFilter = DBHelper.loadDataFilter(roles, modelName.entityName);
     const filterWheres = parseWhere(JSON.stringify(dataFilter));
     const parsedNormalWheres = parseNormalWheres(where, repository);
-    logger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
+    this.superLogger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
 
     // TODO 这里的 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
     if (parsedNormalWheres.length > 1) queryBuilder.where(where);
@@ -143,7 +143,9 @@ export abstract class RestCrudController {
 
     const [items, total] = await queryBuilder.take(query.take).skip(query.skip).getManyAndCount();
 
-    logger.log(`list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`);
+    this.superLogger.log(
+      `list ${r(modelName)} ${r({ total, limit: query.take, offset: query.skip, length: items.length })}`,
+    );
 
     return { query, items: instanceToPlain(items) as any[], total, page: Number(page), size: Number(size) };
   }
@@ -206,10 +208,10 @@ export abstract class RestCrudController {
       await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
       if (await TenantHelper.tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
     }
-    logger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
+    this.superLogger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
-      logger.log('update by kv...');
+      this.superLogger.log('update by kv...');
       return KvHelper.update(id as any, updateTo.name, updateTo.type, updateTo.value);
     }
 
@@ -221,20 +223,20 @@ export abstract class RestCrudController {
         [relation.propertyName]: _.get(relation, 'target.entityInfo.name'),
       })),
     );
-    logger.log(`load relationIds ${r({ modelName, id, relationKeys })}`);
+    this.superLogger.log(`load relationIds ${r({ modelName, id, relationKeys })}`);
     const relationIds = R.mapObjIndexed((value, relation) => {
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
-      logger.debug(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
+      this.superLogger.debug(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)
         ? (value as any[]).map((currentId) => ({ [_.first(primaryKeys)]: currentId }))
         : { [_.first(primaryKeys)]: value };
     })(R.pick(_.keys(relationKeys))(updateTo));
-    logger.log(`patch ${r({ id, relationKeys, relationIds })}`);
+    this.superLogger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
     const entity = await repository.findOneOrFail({ where: { id, ...whereOptions } as any });
 
     const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username } as any);
-    logger.log(`patch ${r({ entityTo })}`);
+    this.superLogger.log(`patch ${r({ entityTo })}`);
     return repository.save(entityTo);
   }
 }

@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -25,8 +24,6 @@ import type { WxCodeSession } from '../wechat/wx.interfaces';
 import type { Request, Response } from 'express';
 import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'AuthHelper'));
-
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
@@ -41,9 +38,9 @@ export class AuthHelper {
   public static authAdminApiKey(req: AnyAuthRequest<ApiKeyPayload>, res: Response): Promise<AuthResult<ApiKeyPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('admin-api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
-        logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
+        Logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
         if (err || info) {
-          logger.error(`api-key auth error: ${r({ err, info })}`);
+          Logger.error(`api-key auth error: ${r({ err, info })}`);
         } else {
           req.payload = payload;
           req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
@@ -56,9 +53,9 @@ export class AuthHelper {
   public static authAdmin(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('admin-jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
-        // logger.log(`admin-jwt auth ${r({ user })}`);
+        // Logger.log(`admin-jwt auth ${r({ user })}`);
         if (err || info) {
-          logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
+          Logger.warn(`admin-jwt auth error: ${r({ err, info })}`);
         } else {
           const admin = await AdminUser.findOne({ where: { id: payload.id }, relations: ['roles' /* , 'tenant' */] });
           req.identifier = AdminUserIdentifierHelper.stringify(payload);
@@ -80,12 +77,12 @@ export class AuthHelper {
         { session: false, authInfo: true },
         // eslint-disable-next-line consistent-return
         async (err: string | Error, payload: WXJwtPayload, info) => {
-          logger.debug(`wx-jwt auth ${r({ payload, err, info })}`);
+          Logger.debug(`wx-jwt auth ${r({ payload, err, info })}`);
           if (err || info) {
-            logger.warn(`wx-jwt auth error: ${r(err)}`);
+            Logger.warn(`wx-jwt auth error: ${r(err)}`);
           } else {
             const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
-            logger.log(`wx-jwt load user by ${r(codeSession)}`);
+            Logger.log(`wx-jwt load user by ${r(codeSession)}`);
             if (codeSession?.openid) {
               req.payload = payload;
               const profile = await UserProfile.findOneBy({ username: codeSession.openid });
@@ -99,7 +96,7 @@ export class AuthHelper {
               req.identifier = UserIdentifierHelper.stringify(profile);
               // req.tenant = user?.tenant;
               // req.roles = user?.roles; // TODO 目前的 roles 属于后端角色
-              logger.debug(`wx-jwt found user by ${r(req.user)}`);
+              Logger.debug(`wx-jwt found user by ${r(req.user)}`);
             }
           }
           resolve({ err: err || wrapErrorInfo(info), payload, info });
@@ -111,9 +108,9 @@ export class AuthHelper {
   public static authJwt(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
-        logger.log(`jwt auth ${r({ payload })}`);
+        Logger.log(`jwt auth ${r({ payload })}`);
         if (err || info) {
-          logger.warn(`jwt auth error: ${r(err)}`);
+          Logger.warn(`jwt auth error: ${r(err)}`);
         } else {
           // TODO user not include tenant and roles, only admin-user has currently
           const user = await AuthedUserHelper.getUserByProfileId(payload.id, ['profile']);
@@ -142,7 +139,7 @@ export async function auth<Payload = PayloadType>(
   res: Response,
   type: AuthType = AuthType.all,
 ): Promise<AuthResult<Payload>> {
-  logger.debug(
+  Logger.debug(
     `auth ${r({
       type,
       isApiKeyRequest: isApiKeyRequest(req),

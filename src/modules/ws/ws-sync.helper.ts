@@ -7,13 +7,10 @@ import * as _ from 'lodash';
 
 import { InMemoryDB } from '../cache/db';
 import { CronHelper } from '../helper/cron';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { StatsHelper } from '../stats';
 import { AdminWsHelper } from './socket-io.gateway';
 
 import type { Server } from 'socket.io';
-
-const logger = new Logger(resolveModule(__filename, 'AdminWsSyncHelper'));
 
 export class AdminWsSyncHelper {
   static get ws(): Server {
@@ -30,7 +27,7 @@ export class AdminWsSyncHelper {
         const stats = await InMemoryDB.get(`error-stats`);
         const diff = _.omitBy(stats, (value, key) => AdminWsSyncHelper.sentStats?.[key] === value);
         if (!_.isEmpty(diff)) {
-          logger.debug(`diff ${r({ diff, stats, sent: AdminWsSyncHelper.sentStats })}`);
+          Logger.debug(`diff ${r({ diff, stats, sent: AdminWsSyncHelper.sentStats })}`);
           AdminWsSyncHelper.sentStats = stats;
           const results = await Promise.all(
             _.map([...StatsHelper.keys], async (key) => {

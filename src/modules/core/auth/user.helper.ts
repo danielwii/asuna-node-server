@@ -6,19 +6,16 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import ow from 'ow';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
 
 import type { FindOneOptions } from 'typeorm';
 
-const logger = new Logger(resolveModule(__filename, 'AuthedUserHelper'));
-
 export class AuthedUserHelper {
   static async createProfile(profile: UserProfile): Promise<any> {
     const saved = await profile.save();
-    const user = await UserRegister.createUserByProfile(saved).catch((reason) => logger.error(reason));
+    const user = await UserRegister.createUserByProfile(saved).catch((reason) => Logger.error(reason));
     return [saved, user];
   }
 
@@ -52,7 +49,7 @@ export class AuthedUserHelper {
       return UserRegister.Entity.findOneOrFail({ where: { id }, ...options });
     }
     ow(id, 'id', ow.string.nonEmpty);
-    logger.log(`get user by id '${id}' ${r(options)}`);
+    Logger.log(`get user by id '${id}' ${r(options)}`);
     const entity = await UserRegister.Entity.findOne({ where: { id }, ...options });
     if (!entity) {
       throw new AsunaException(AsunaErrorCode.InvalidAuthToken, `no user found`);

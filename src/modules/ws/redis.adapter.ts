@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 // import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -11,33 +12,32 @@ import _ from 'lodash';
 import { createAdapter, RedisAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-const logger = new Logger(resolveModule(__filename, 'RedisIoAdapter'));
 
 /**
  * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)
  * https://github.com/socketio/socket.io/issues/1739
  */
 export class RedisIoAdapter extends IoAdapter {
+  private readonly logger = new Logger(resolveModule(__filename, RedisIoAdapter.name));
+
   private static redisAdapter: RedisAdapter;
 
   constructor(app) {
     super(app);
     if (!RedisIoAdapter.redisAdapter) {
-      logger.log(`init io-redis adapter...`);
+      this.logger.log(`init io-redis adapter...`);
       const configObject = RedisConfigObject.loadOr('ws');
 
       if (!configObject.enable) {
-        logger.warn(`no redis config found: ${r(configObject, { transform: true })}`);
+        this.logger.warn(`no redis config found: ${r(configObject, { transform: true })}`);
         return;
       }
 
       const db = configLoader.loadNumericConfig(ConfigKeys.WS_REDIS_DB, 1);
-      logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
+      this.logger.log(`init redis ws-adapter: ${r(configObject, { transform: true })} with ws db: ${db}`);
       const redis = new Redis(configObject.getIoOptions(db));
       redis.on('error', (reason) => {
-        logger.error(`ioredis connection error ${r(reason)}`);
+        this.logger.error(`ioredis connection error ${r(reason)}`);
       });
       const pubClient = redis;
       // const pubClient = RedisProvider.getRedisClient('ws', db, true).client;
@@ -55,7 +55,7 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   create(port: number, options: any = {}): any {
-    logger.log(`create ${r({ port, options: _.omit(options, 'server') })}`);
+    this.logger.log(`create ${r({ port, options: _.omit(options, 'server') })}`);
     return super.create(port, {
       ...options,
       handlePreflightRequest: (req, res) => {
@@ -73,7 +73,7 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: any): any {
-    logger.log(`createIOServer ${r({ port, options })}`);
+    this.logger.log(`createIOServer ${r({ port, options })}`);
     const server = super.createIOServer(port, {
       ...options,
       handlePreflightRequest: (req, res) => {

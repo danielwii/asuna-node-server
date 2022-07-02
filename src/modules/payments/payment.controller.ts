@@ -16,55 +16,51 @@ import type { Request, Response } from 'express';
 
 class CreateOrderDTO {
   @IsString()
-  public itemId: string;
+  itemId: string;
   @IsString()
-  public callback: string;
+  callback: string;
   @IsDefined()
-  public methodId: string;
+  methodId: string;
   @IsDefined()
-  public paymentInfo: Record<'mobile' | string, unknown>;
+  paymentInfo: Record<'mobile' | string, unknown>;
   @IsOptional()
-  public extra?: Record<string, unknown>;
+  extra?: Record<string, unknown>;
   @IsBoolean()
   @IsOptional()
-  public useWxJsApi?: boolean;
+  useWxJsApi?: boolean;
   @IsString()
   @IsOptional()
-  public openid?: string;
+  openid?: string;
 }
 
 class UpdateOrderDTO {
   @IsString()
-  public orderId: string;
+  orderId: string;
   @IsOptional()
-  public data?: Record<string, unknown>;
+  data?: Record<string, unknown>;
 }
-
-const logger = new Logger(resolveModule(__filename, 'PaymentController'));
 
 @Controller('api/v1/payment')
 export class PaymentController {
+  private readonly logger = new Logger(resolveModule(__filename, PaymentController.name));
+
   // @Get('query/:id')
-  // public async queryOrder(@Param('id') id) {
+  //  async queryOrder(@Param('id') id) {
   //   return PaymentWxpayHelper.query(id);
   // }
 
   @Post('notify')
-  public async postNotify(@Body() body, @Req() req: Request) {
+  async postNotify(@Body() body, @Req() req: Request) {
     const isWxPay = _.isEmpty(body);
     const data = isWxPay ? await WeChatHelper.parseXmlToJson(req) : body;
-    logger.log(`notify ${r(data)}`);
+    this.logger.log(`notify ${r(data)}`);
     await PaymentNotifyHelper.handlePaymentNotify(data, isWxPay);
   }
 
   @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)
   @Post('order')
-  public async createOrder(
-    @Body() body: CreateOrderDTO,
-    @Req() req: JwtAuthRequest,
-    @Res() res: Response,
-  ): Promise<void> {
-    logger.log(`createOrder ${r(body)}`);
+  async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<void> {
+    this.logger.log(`createOrder ${r(body)}`);
     const order = await PaymentHelper.createOrder({ ...body, profileId: req.payload?.id });
     const result = await PaymentHelper.pay(order.transactionId, {
       callback: body.callback,
@@ -73,7 +69,7 @@ export class PaymentController {
       openid: body.openid,
       isMobile: req.isMobile,
     });
-    logger.log(`payment result is ${r(result)}`);
+    this.logger.log(`payment result is ${r(result)}`);
     if (_.isString(result) && isURL(result)) {
       res.redirect(result);
     } else {
@@ -83,7 +79,7 @@ export class PaymentController {
 
   @UseGuards(new JwtAuthGuard())
   @Put('order')
-  public async updateOrder(@Body() body: UpdateOrderDTO) {
+  async updateOrder(@Body() body: UpdateOrderDTO) {
     return PaymentHelper.updateOrder(body.orderId, body.data);
   }
 }

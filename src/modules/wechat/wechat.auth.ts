@@ -15,11 +15,9 @@ import type { WXJwtPayload } from './interfaces';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxCodeSession } from './wx.interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'WXAuth'));
-
 @Injectable()
 export class WXAuthGuard implements CanActivate {
-  logger = new Logger(resolveModule(__filename, 'WXAuthGuard'));
+  private readonly logger = new Logger(resolveModule(__filename, WXAuthGuard.name));
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<WXAuthRequest>();
@@ -43,6 +41,8 @@ export class WXAuthGuard implements CanActivate {
 
 @Injectable()
 export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
+  private readonly logger = new Logger(resolveModule(__filename, GqlWXAuthGuard.name));
+
   /**
    * @param opts.anonymousSupport default false
    */
@@ -58,14 +58,14 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
       if (this.opts.anonymousSupport) {
         return null;
       }
-      logger.log(`handleRequest(wx-jwt) ${r({ err, payload, info })}`);
+      this.logger.log(`handleRequest(wx-jwt) ${r({ err, payload, info })}`);
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions);
     }
     const codeSession = await Store.Global.getItem<WxCodeSession>(payload.key, { json: true });
-    logger.log(`wx-jwt load user by ${r(codeSession)}`);
+    this.logger.log(`wx-jwt load user by ${r(codeSession)}`);
     if (codeSession?.openid) {
       const user = await UserProfile.findOneBy({ username: codeSession.openid });
-      logger.debug(`wx-jwt found user by ${r(user)}`);
+      this.logger.debug(`wx-jwt found user by ${r(user)}`);
       return user;
     }
     throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'code-session not found');
@@ -93,7 +93,7 @@ export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.verbose(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    this.logger.verbose(`${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     return req;
   }
 }

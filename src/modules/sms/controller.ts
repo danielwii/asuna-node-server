@@ -1,6 +1,7 @@
 import { Body, Controller, Logger, Post, Req, UseGuards } from '@nestjs/common';
 
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -9,20 +10,19 @@ import _ from 'lodash';
 
 import { ActionRateLimitGuard } from '../common';
 import { CsurfGuard } from '../common/guards/csurf';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SMSHelper } from './helper';
 
 import type { RequestInfo } from '../helper';
 
-const logger = new Logger(resolveModule(__filename, 'SMSController'));
-
 @Controller('api/v1/sms')
 export class SMSController {
+  private readonly logger = new Logger(resolveModule(__filename, SMSController.name));
+
   @UseGuards(new ActionRateLimitGuard('api/v1/sms/verify-code', 5), CsurfGuard)
   @Post('verify-code')
   public async sendVerifyCode(@Body() body: { phoneNumber: string }, @Req() req: RequestInfo): Promise<void> {
     const phoneNumber = parsePhoneNumber(body.phoneNumber);
-    logger.log(`parse phone number ${r(_.omit(phoneNumber, 'metadata'))}`);
+    this.logger.log(`parse phone number ${r(_.omit(phoneNumber, 'metadata'))}`);
 
     if (
       phoneNumber.country === 'CN' &&
@@ -30,7 +30,7 @@ export class SMSController {
     ) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.FormatError);
     }
-    logger.log(`sendVerifyCode ${r({ ..._.pick(req, 'sessionID', 'payload.id'), body })}`);
+    this.logger.log(`sendVerifyCode ${r({ ..._.pick(req, 'sessionID', 'payload.id'), body })}`);
     await SMSHelper.sendVerifyCode(req, phoneNumber.nationalNumber);
   }
 }

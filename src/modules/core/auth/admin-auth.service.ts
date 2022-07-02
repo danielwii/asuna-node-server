@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -7,7 +8,6 @@ import { nanoid } from 'nanoid';
 import { DataSource, In } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser, Role } from './auth.entities';
@@ -15,10 +15,10 @@ import { AuthUserChannel } from './base.entities';
 
 import type { CreatedUser } from './auth.service';
 
-const logger = new Logger(resolveModule(__filename, 'AdminAuthService'));
-
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
+  private readonly logger = new Logger(resolveModule(__filename, AdminAuthService.name));
+
   public constructor(private readonly dataSource: DataSource) {
     super(AdminUser, dataSource.getRepository<AdminUser>(AdminUser));
   }
@@ -37,11 +37,11 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
     if (!user) {
       user = this.authUserRepository.create({ email, username, isActive: true });
     }
-    logger.log(`found user ${r(user)}`);
+    this.logger.log(`found user ${r(user)}`);
     user.password = hash;
     user.salt = salt;
     user.roles = roles;
-    logger.log(`update user with roles ${r({ roleNames, roles })}`);
+    this.logger.log(`update user with roles ${r({ roleNames, roles })}`);
     return this.dataSource.manager.save(user).then((user) => ({ user }));
   }
 
@@ -59,20 +59,20 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
       const entity = Role.create({ name: SYS_ROLE });
       await this.dataSource.manager.save(entity);
     }
-    logger.log(`found sys role: ${!!role}`);
+    this.logger.log(`found sys role: ${!!role}`);
 
     const sysRole = await Role.findOne({ where: { name: SYS_ROLE }, relations: ['users'] });
-    logger.log(`found sys role: ${r(sysRole)}`);
-    logger.log(`found users for sys role: ${sysRole.users.length}`);
+    this.logger.log(`found sys role: ${r(sysRole)}`);
+    this.logger.log(`found users for sys role: ${sysRole.users.length}`);
     if (sysRole.users.length === 0) {
       await AdminUser.delete({ email });
       await AdminUser.delete({ email: 'admin@example.com' });
 
-      logger.log(`---------------------------------------------------------------`);
-      logger.log(`create SYS_ADMIN account: ${email}:${password}`);
-      logger.log(`---------------------------------------------------------------`);
+      this.logger.log(`---------------------------------------------------------------`);
+      this.logger.log(`create SYS_ADMIN account: ${email}:${password}`);
+      this.logger.log(`---------------------------------------------------------------`);
       this.createUser('Administrator', email, password, undefined, [SYS_ROLE]).catch((error) => {
-        logger.warn('cannot create default SYS_ADMIN account', error);
+        this.logger.warn('cannot create default SYS_ADMIN account', error);
       });
     }
   }

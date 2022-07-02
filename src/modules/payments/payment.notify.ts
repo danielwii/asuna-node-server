@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -10,8 +9,6 @@ import _ from 'lodash';
 import { SMSConfigObject, SMSHelper } from '../sms';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentOrder } from './payment.order.entities';
-
-const logger = new Logger(resolveModule(__filename, 'PaymentNotifyHelper'));
 
 export class PaymentNotifyHelper {
   private static config = SMSConfigObject.load();
@@ -32,9 +29,9 @@ export class PaymentNotifyHelper {
       const phoneNumber = _.get(order.transaction, phonePath);
       if (PaymentNotifyHelper.config.enable) {
         if (tmplId && phoneNumber) {
-          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => logger.error(reason));
+          SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => Logger.error(reason));
         } else {
-          logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
+          Logger.error(`send payment-success message error ${r({ tmplPath, tmplId, phonePath, phoneNumber })}`);
         }
       }
     }
@@ -62,19 +59,19 @@ export class PaymentNotifyHelper {
         transaction_id: string;
       };
       const validated = true; // TODO await PaymentWxpayHelper.validateSign(body);
-      logger.log(`validated wxpay is ${r(validated)}`);
+      Logger.log(`validated wxpay is ${r(validated)}`);
       if (!validated) {
-        // logger.error(`${body.subject} not validated.`);
+        // Logger.error(`${body.subject} not validated.`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.out_trade_no} not validated.`);
       }
 
       // const params = parseJSONIfCould(body.passback_params);
-      logger.log(`find order ${body.out_trade_no}`);
+      Logger.log(`find order ${body.out_trade_no}`);
       const order = await PaymentOrder.findOneOrFail({ where: { id: body.out_trade_no }, relations: ['transaction'] });
-      logger.log(`update order ${r({ order, body })} status to done`);
+      Logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
-        logger.log(`already done, skip.`);
+        Logger.log(`already done, skip.`);
         return undefined;
       }
 
@@ -116,22 +113,22 @@ export class PaymentNotifyHelper {
       };
 
       const validated = await PaymentAlipayHelper.validateSign(body);
-      logger.log(`validated alipay is ${r(validated)}`);
+      Logger.log(`validated alipay is ${r(validated)}`);
       if (!validated) {
-        logger.error(`${body.subject} not validated. ${r(body)}`);
+        Logger.error(`${body.subject} not validated. ${r(body)}`);
         throw new AsunaException(AsunaErrorCode.Unprocessable, `${body.subject} not validated.`);
       }
 
       const params = parseJSONIfCould(body.passback_params);
-      logger.log(`find order ${params.orderId ?? body.subject}`);
+      Logger.log(`find order ${params.orderId ?? body.subject}`);
       const order = await PaymentOrder.findOneOrFail({
         where: { id: params.orderId ?? body.subject },
         relations: ['transaction'],
       });
-      logger.log(`update order ${r({ order, body })} status to done`);
+      Logger.log(`update order ${r({ order, body })} status to done`);
 
       if (order.transaction.status === 'done') {
-        logger.log(`already done, skip.`);
+        Logger.log(`already done, skip.`);
         return undefined;
       }
 

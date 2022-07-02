@@ -10,15 +10,15 @@ import { TenantHelper, TenantInfo } from './tenant.helper';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
 
-const logger = new Logger(resolveModule(__filename, 'TenantController'));
-
 @Controller('api/v1/tenant')
 export class TenantController {
-  @UseGuards(JwtAuthGuard)
+  private readonly logger = new Logger(resolveModule(__filename, TenantController.name));
+
+  @UseGuards(new JwtAuthGuard())
   @Get('info')
   async info(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
     const { payload, user, identifier, tenant, profile } = req;
-    logger.log(`info ${r({ payload, user, identifier, tenant, profile })}`);
+    this.logger.log(`info ${r({ payload, user, identifier, tenant, profile })}`);
     return TenantHelper.info(user.id);
   }
 }

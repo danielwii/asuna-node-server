@@ -1,12 +1,9 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { FindManyOptions, FindOneOptions, FindOptionsUtils, JoinOptions, ObjectLiteral } from 'typeorm';
-
-const logger = new Logger(resolveModule(__filename, 'FindOptionsFixture'));
 
 const oldApplyOptionsToQueryBuilder = FindOptionsUtils.applyOptionsToTreeQueryBuilder;
 
@@ -18,7 +15,7 @@ FindOptionsUtils.applyOptionsToTreeQueryBuilder = <T>(qb, options: FindOptionsFi
   const join = options?.join;
 
   if (join) {
-    logger.verbose(`apply join ${r(join)}`);
+    Logger.verbose(`apply join ${r(join)}`);
     if (join.leftJoin)
       Object.keys(join.leftJoin).forEach((key) => {
         const extra = join.options?.[key] || {};
@@ -45,11 +42,11 @@ FindOptionsUtils.applyOptionsToTreeQueryBuilder = <T>(qb, options: FindOptionsFi
   }
 
   const extra = _.omit(options, 'join');
-  logger.verbose(`apply extra ${r(options)}`);
+  Logger.verbose(`apply extra ${r(options)}`);
   try {
     return oldApplyOptionsToQueryBuilder.bind(FindOptionsUtils)(qb, extra);
   } catch (e) {
-    logger.error(`resolve sql error: ${r({ e, extra, sql: qb.getSql() })}`);
+    Logger.error(`resolve sql error: ${r({ e, extra, sql: qb.getSql() })}`);
     throw e;
   }
 };

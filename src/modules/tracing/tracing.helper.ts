@@ -1,14 +1,11 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { initTracer, JaegerTracer, TracingConfig, TracingOptions } from 'jaeger-client';
 import SpanContext from 'opentracing/lib/span_context';
 
 import { TracingConfigObject } from './tracing.config';
-
-const logger = new Logger(resolveModule(__filename, 'TracingHelper'));
 
 export interface WithSpanContext {
   trace: SpanContext;
@@ -22,7 +19,7 @@ export class TracingHelper {
 
     const config = TracingConfigObject.load();
 
-    logger.log(`init... ${r({ tracingConfig, tracingOptions, config, JAEGER_DISABLED: process.env.JAEGER_DISABLED })}`);
+    Logger.log(`init... ${r({ tracingConfig, tracingOptions, config, JAEGER_DISABLED: process.env.JAEGER_DISABLED })}`);
     this.tracer = initTracer(
       {
         disable: !config.enabled,

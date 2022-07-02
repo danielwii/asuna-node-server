@@ -2,8 +2,6 @@ import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-const logger = new Logger(resolveModule(__filename, '<NoModule>'));
-
 @Module({
   imports: [],
   providers: [],
@@ -11,7 +9,9 @@ const logger = new Logger(resolveModule(__filename, '<NoModule>'));
   exports: [],
 })
 export class NoModule implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, NoModule.name));
+
   async onModuleInit(): Promise<void> {
-    logger.log('init for nothing.');
+    this.logger.log('init for nothing.');
   }
 }

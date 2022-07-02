@@ -1,6 +1,7 @@
 import { Controller, Get, Header, Logger, Param, Query, Req, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -12,7 +13,6 @@ import path from 'path';
 import { CacheWrapper } from '../../cache';
 import { TimeUnit } from '../../common';
 import { configLoader } from '../../config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AsunaContext } from '../context';
 import { FinderHelper } from '../finder';
 import { BlurredHelper } from '../image/blurred.helper';
@@ -22,8 +22,6 @@ import { LocalStorage } from '../storage';
 
 import type { RequestInfo } from '../../helper';
 import type { Response } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'GetUploadsController'));
 
 class ImageProxy {
   private static readonly filterRegexp = /(.+)\((.*)\)/;
@@ -163,6 +161,7 @@ class ImageProxy {
 @ApiTags('core')
 @Controller('i')
 export class GetImageController {
+  private readonly logger = new Logger(resolveModule(__filename, GetImageController.name));
   private readonly apiEndpoint = configLoader.loadConfig('MASTER_ADDRESS');
   private readonly thumborEndpoint = configLoader.loadConfig('THUMBOR_ENDPOINT', 'http://localhost:8888');
 
@@ -181,7 +180,7 @@ export class GetImageController {
           ? parsed.image
           : `/${parsed.image}`
         : `${this.thumborEndpoint}/${bucket}/${parsedUrl}`;
-    logger.verbose(
+    this.logger.verbose(
       `get ${r({ bucket, filename: url })} by ${r({
         bucket,
         filename,
@@ -199,6 +198,7 @@ export class GetImageController {
 @ApiTags('core')
 @Controller('uploads')
 export class GetUploadsController {
+  private readonly logger = new Logger(resolveModule(__filename, GetUploadsController.name));
   /**
    * 1. /images/2018/4/****.png
    * 1.1 /images/2018/4/****.png?thumbnail/<Width>x<Height>
@@ -237,7 +237,7 @@ export class GetUploadsController {
     const blurred = _.has(query, 'blurred');
     const lookup = geoip.lookup(req.clientIp);
     const usingCN = lookup === null || lookup?.country === 'CN';
-    logger.verbose(
+    this.logger.verbose(
       `get ${r({ bucket, filename })} by ${r({
         engine,
         thumbnailConfig,
@@ -268,7 +268,7 @@ export class GetUploadsController {
           expiresInSeconds: TimeUnit.DAYS.toSeconds(7),
           resolver: () => BlurredHelper.encodeImageToBlurhash(filepath),
         });
-        logger.verbose(`get blurred image ${r({ bucket, filename })}: ${blurhash}`);
+        this.logger.verbose(`get blurred image ${r({ bucket, filename })}: ${blurhash}`);
         res.send(blurhash);
         return;
       }

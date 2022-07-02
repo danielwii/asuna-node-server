@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -22,8 +21,6 @@ import { PaymentOrder } from './payment.order.entities';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
 import type { AlipaySdkCommonResult } from 'alipay-sdk';
-
-const logger = new Logger(resolveModule(__filename, 'PaymentHelper'));
 
 interface PaymentContext {
   method: PaymentMethod;
@@ -51,12 +48,12 @@ export class PaymentHelper {
     extra?: Record<string, unknown>;
     profileId: string;
   }): Promise<PaymentOrder> {
-    logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo, extra })}`);
+    Logger.log(`create order by ${r({ itemId, methodId, profileId, paymentInfo, extra })}`);
     // create order first
     const item = await PaymentItem.findOneByOrFail({ id: itemId });
     const order = await PaymentOrder.create({ name: item.name, items: [item], amount: item.price, profileId }).save();
     const method = await PaymentMethod.findOneByOrFail({ id: methodId });
-    // logger.log(`created order ${r({ item, method, order })}`);
+    // Logger.log(`created order ${r({ item, method, order })}`);
 
     // create transaction
     await PaymentTransaction.create({
@@ -68,7 +65,7 @@ export class PaymentHelper {
       order,
     }).save();
     await order.reload();
-    logger.log(`created order is ${r(order)}`);
+    Logger.log(`created order is ${r(order)}`);
     return order;
   }
 
@@ -87,7 +84,7 @@ export class PaymentHelper {
     await transaction.save();
 
     if (sign?.toLowerCase() !== remoteSign?.toLowerCase()) {
-      logger.error(`invalid sign ${r({ sign, remoteSign, remoteSignPath })}`);
+      Logger.error(`invalid sign ${r({ sign, remoteSign, remoteSignPath })}`);
       transaction.status = 'error';
       await transaction.save();
       throw new Error('failure');
@@ -148,7 +145,7 @@ export class PaymentHelper {
   ): Promise<
     string | AlipaySdkCommonResult | { payload: Record<string, unknown>; result?: string } | Record<string, unknown>
   > {
-    logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid, isMobile })}`);
+    Logger.log(`pay ${r({ transactionId, callback, clientIp, wxJsApi, openid, isMobile })}`);
     const transaction = await PaymentTransaction.findOneOrFail({
       where: { id: transactionId },
       relations: ['method', 'order'],
@@ -193,10 +190,10 @@ export class PaymentHelper {
     Object.assign(context, { md5sign });
     const body = Handlebars.compile(method.bodyTmpl ?? '')(context);
 
-    logger.debug(`parse body '${body}' with context ${r(context)}`);
+    Logger.debug(`parse body '${body}' with context ${r(context)}`);
 
     const payload = JSON.parse(body);
-    logger.log(`sign by ${r({ signed, payload })}`);
+    Logger.log(`sign by ${r({ signed, payload })}`);
     transaction.sign = md5sign;
     transaction.status = 'signed';
     await transaction.save();
@@ -207,7 +204,7 @@ export class PaymentHelper {
       const url = `${method.endpoint}?${qs.stringify(payload)}`;
       const response = await fetch(url);
       const result = await response.text();
-      logger.debug(`fetch ${url} response is ${result}`);
+      Logger.debug(`fetch ${url} response is ${result}`);
       if (result) {
         const parsed = parseJSONIfCould(result);
         await this.updateOrder(order.id, parsed);
@@ -227,13 +224,13 @@ export class PaymentHelper {
   public static async cleanExpiredPayments(): Promise<void> {
     const oneDayAgo = sub(new Date(), { days: 1 });
     const transactions = await PaymentTransaction.countBy({ createdAt: LessThan(oneDayAgo), status: IsNull() });
-    logger.debug(`remove expired transactions: ${transactions}`);
+    Logger.debug(`remove expired transactions: ${transactions}`);
     if (transactions) {
       await PaymentTransaction.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
     }
 
     // const orders = await PaymentOrder.count({ where: { createdAt: LessThan(oneDayAgo), status: IsNull() } });
-    // logger.debug(`remove expired orders: ${orders}`);
+    // Logger.debug(`remove expired orders: ${orders}`);
     // await PaymentOrder.delete({ createdAt: LessThan(oneDayAgo), status: IsNull() });
   }
 }

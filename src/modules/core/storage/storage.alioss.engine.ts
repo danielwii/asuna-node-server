@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import OSS from 'ali-oss';
@@ -9,7 +10,6 @@ import _ from 'lodash';
 import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UploaderConfigObject } from '../uploader/config';
 import { AliossConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
@@ -17,14 +17,14 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 import type { Response } from 'express';
 
 export class AliossStorage implements IStorageEngine {
-  private static readonly logger = new Logger(resolveModule(__filename, AliossStorage.name));
+  private readonly logger = new Logger(resolveModule(__filename, AliossStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: AliossConfigObject;
 
   public constructor(configure: () => AliossConfigObject) {
     this.configObject = configure();
-    AliossStorage.logger.log(
+    this.logger.log(
       `[constructor] init [${this.configObject.defaultBucket}] with region:${this.configObject.region} ...`,
     );
 
@@ -33,7 +33,7 @@ export class AliossStorage implements IStorageEngine {
         `alioss must enable when using alioss storage engine: ${r({ configs: instanceToPlain(this.configObject) })}`,
       );
     }
-    AliossStorage.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
+    this.logger.log(`[constructor] init ${r({ configs: instanceToPlain(this.configObject) })}`);
   }
 
   public get client(): OSS {
@@ -57,12 +57,12 @@ export class AliossStorage implements IStorageEngine {
     const prefix = opts.prefix || yearMonthStr();
     const filename = convertFilename(file.filename);
     const filenameWithPrefix = join(prefix, filename);
-    AliossStorage.logger.log(`generate key by '${r({ bucket, filenameWithPrefix, self: this.configObject, file })}`);
+    this.logger.log(`generate key by '${r({ bucket, filenameWithPrefix, self: this.configObject, file })}`);
     const key = join('/', bucket, filenameWithPrefix).slice(1);
-    AliossStorage.logger.log(`upload file to '${this.configObject.defaultBucket}', Key: '${key}' ${r(opts)}`);
+    this.logger.log(`upload file to '${this.configObject.defaultBucket}', Key: '${key}' ${r(opts)}`);
 
     return this.client.put(key, file.path).then((result) => {
-      AliossStorage.logger.log(`upload file '${r({ key, /* info, */ result })}'`);
+      this.logger.log(`upload file '${r({ key, /* info, */ result })}'`);
       const resourcePath = this.config.resourcePath;
       const appendPrefix = join('/', this.configObject.defaultBucket || '').startsWith(resourcePath)
         ? join(bucket)
@@ -108,7 +108,7 @@ export class AliossStorage implements IStorageEngine {
     const resolved = opts.resolver ? await opts.resolver(path) : path;
     // TODO 在非默认 storage 下访问会出现问题
     const url = resolved.startsWith('http') ? resolved : `${this.configObject.defaultBucket}${path}`;
-    AliossStorage.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery, resolved })}`);
+    this.logger.log(`resolve url '${url}' by ${r({ bucket, prefix, filename, resolvedQuery, resolved })}`);
     return res.redirect(url);
   }
 }

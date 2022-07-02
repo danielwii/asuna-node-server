@@ -8,10 +8,10 @@ import { ImportExportService } from './import-export.service';
 
 import type { Request, Response } from 'express';
 
-const logger = new Logger(resolveModule(__filename, 'ImportExportController'));
-
 @Controller('api/v1/import-export')
 export class ImportExportController {
+  private readonly logger = new Logger(resolveModule(__filename, ImportExportController.name));
+
   public constructor(private readonly importExportService: ImportExportService) {}
 
   // 导入Excel 请求地址传入param参数，传入导入的表名
@@ -23,7 +23,7 @@ export class ImportExportController {
       return '文件格式有误！(.xlsx, .xls)';
     }
     const resEntity = await this.importExportService.importExcel(file.buffer, name);
-    logger.log(`imported excel is ${r(resEntity)}`);
+    this.logger.log(`imported excel is ${r(resEntity)}`);
     return resEntity;
   }
 
@@ -32,7 +32,7 @@ export class ImportExportController {
   public exportExcel(@Res() res: Response, @Body() body: any[]) {
     const buf = this.importExportService.exportExcel(body);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    logger.log('export excel');
+    this.logger.log('export excel');
     res.end(buf);
   }
 
@@ -45,7 +45,7 @@ export class ImportExportController {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename=model.xlsx',
     });
-    logger.log('export excel model');
+    this.logger.log('export excel model');
     res.end(buf);
   }
 }

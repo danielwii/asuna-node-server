@@ -33,10 +33,10 @@ class Code2SessionDto {
   code: string;
 }
 
-const logger = new Logger(resolveModule(__filename, 'WeChatController'));
-
 @Controller('api/v1/wx')
 export class WeChatController {
+  private readonly logger = new Logger(resolveModule(__filename, WeChatController.name));
+
   @Get()
   async wxValidation(@Query() query: ValidationDto): Promise<string> {
     return (await WeChatHelper.checkSignature(query)) ? query.echostr : 'mismatch';
@@ -44,7 +44,7 @@ export class WeChatController {
 
   @Post()
   async wx(@Query() query, @Body() body, @Req() req: Request): Promise<string> {
-    logger.log(`post ${r({ query, body })}`);
+    this.logger.log(`post ${r({ query, body })}`);
     if (!(await WeChatHelper.checkSignature(query))) {
       return 'mismatch';
     }
@@ -54,13 +54,13 @@ export class WeChatController {
 
   @Post('code2session')
   async code2Session(@Body() body: Code2SessionDto): Promise<string> {
-    logger.log(`code2Session ${r({ body })}`);
+    this.logger.log(`code2Session ${r({ body })}`);
     return WeChatHelper.code2Session(body.code);
   }
 
   @Post('ticket')
   async ticket(@Body('type') type: WxTicketType, @Body('value') value: string): Promise<WxQrTicketInfo> {
-    logger.log(`ticket ${r({ type, value })}`);
+    this.logger.log(`ticket ${r({ type, value })}`);
     return WeChatHelper.getTicketByType(type, value);
   }
 
@@ -68,7 +68,7 @@ export class WeChatController {
   @Get('user-info')
   async userInfo(@Req() req: WXAuthRequest): Promise<WXMiniAppUserInfo> {
     const { payload, user, identifier } = req;
-    logger.log(`get user-info ${r({ payload, user, identifier })}`);
+    this.logger.log(`get user-info ${r({ payload, user, identifier })}`);
     return WXMiniAppUserInfo.findOne({ where: { profileId: user.id }, relations: ['profile'] });
   }
 
@@ -79,7 +79,7 @@ export class WeChatController {
     @Req() req: WXAuthRequest,
   ): Promise<void> {
     const { payload, user } = req;
-    logger.log(`update phone number for ${user.username}`);
+    this.logger.log(`update phone number for ${user.username}`);
     return WeChatHelper.updateUserPhoneNumber(payload, user, body);
   }
 
@@ -87,7 +87,7 @@ export class WeChatController {
   @Post('user-info')
   async updateUserInfo(@Body() userInfo: UserInfo, @Req() req: WXAuthRequest): Promise<void> {
     const { user } = req;
-    logger.log(`update user-info ${r(userInfo)} for ${user.username}`);
+    this.logger.log(`update user-info ${r(userInfo)} for ${user.username}`);
     return WeChatHelper.updateUserInfo(user, userInfo);
   }
 

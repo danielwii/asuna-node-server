@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as crypto from 'crypto';
@@ -12,8 +11,6 @@ import { InMemoryDB } from '../../cache/db';
 import type { JwtAuthRequest } from '../../core/auth/auth.guard';
 import type { PrimaryKey } from '../identifier';
 
-const logger = new Logger(resolveModule(__filename, 'ActionGuard'));
-
 @Injectable()
 export class ActionRateLimitGuard implements CanActivate {
   public constructor(private readonly key: string, private readonly expiresInSeconds = 5) {}
@@ -23,7 +20,7 @@ export class ActionRateLimitGuard implements CanActivate {
     // const res = context.switchToHttp().getResponse<Response>();
     // const next = context.switchToHttp().getNext();
 
-    logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
+    Logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
     await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expiresInSeconds);
 
     return true;
@@ -61,12 +58,12 @@ class ActionHelper {
     const key = `${actionType}#${md5.update(actionStr).digest('hex')}`;
     const calcKey = { prefix: 'action', key };
     const exists = await InMemoryDB.get(calcKey, 6);
-    logger.log(`get action ${r({ exists, calcKey })}`);
+    Logger.log(`get action ${r({ exists, calcKey })}`);
     if (exists) {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
     InMemoryDB.save(calcKey, true, { expiresInSeconds: expiresInSeconds || 5, db: 6 }).catch((reason) =>
-      logger.error(reason),
+      Logger.error(reason),
     );
   }
 }

@@ -1,13 +1,10 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisClientObject, RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 
 import _ from 'lodash';
 
 import { CacheManager } from '../cache/cache';
-
-const logger = new Logger(resolveModule(__filename));
 
 export class Store {
   public static Global: Store;
@@ -21,7 +18,7 @@ export class Store {
 
     this.redis = RedisProvider.getRedisClient(this.prefix);
     this.redisMode = this.redis.isEnabled;
-    logger.log(`init with ${this.prefix} redis: ${this.redisMode}`);
+    Logger.log(`init with ${this.prefix} redis: ${this.redisMode}`);
   }
 
   public static async init(): Promise<void> {

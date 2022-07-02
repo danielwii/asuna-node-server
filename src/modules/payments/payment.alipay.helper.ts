@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
@@ -12,8 +11,6 @@ import _ from 'lodash';
 import { AppConfigObject } from '../config/app.config';
 import { PaymentMethod } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
-
-const logger = new Logger(resolveModule(__filename, 'PaymentAlipayHelper'));
 
 export class PaymentAlipayHelper {
   public static async sdk(): Promise<AlipaySdk> {
@@ -26,13 +23,13 @@ export class PaymentAlipayHelper {
       privateKey: method.privateKey,
       alipayPublicKey: _.get(method.extra, 'alipayPublicKey') as string,
     };
-    // logger.debug(`alipay config is ${r(config)}`);
+    // Logger.debug(`alipay config is ${r(config)}`);
     return new AlipaySdk(config);
   }
 
   public static async authToken(): Promise<AlipaySdkCommonResult | string> {
     const sdk = await PaymentAlipayHelper.sdk();
-    logger.debug(`alipay sdk is ${r(sdk)}`);
+    Logger.debug(`alipay sdk is ${r(sdk)}`);
 
     const result = await sdk
       .exec('alipay.system.oauth.token', {
@@ -41,13 +38,13 @@ export class PaymentAlipayHelper {
         refreshToken: 'token',
       })
       .catch((reason) => {
-        logger.error(
+        Logger.error(
           `authorized code error ${r(reason)} data: ${r(parseJSONIfCould(_.get(reason, 'serverResult.data')))}`,
         );
         throw reason;
       });
 
-    logger.log(`[alipay.system.oauth.token] result is ${r(result)}`);
+    Logger.log(`[alipay.system.oauth.token] result is ${r(result)}`);
     return result;
   }
 
@@ -56,7 +53,7 @@ export class PaymentAlipayHelper {
     goods: { cost: number; name: string; packParams: object },
     { returnUrl, isMobile }: { returnUrl?: string; isMobile?: boolean },
   ): Promise<AlipaySdkCommonResult | string> {
-    logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
+    Logger.debug(`create payment order ${r({ method, goods, returnUrl })}`);
     // const token = await this.authToken();
 
     const sdk = await PaymentAlipayHelper.sdk();
@@ -91,10 +88,10 @@ export class PaymentAlipayHelper {
     else throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');
     formData.addField('bizContent', bizContent); // 将必要的参数集合添加进 form 表单
 
-    logger.debug(`exec ${execMethod} ${r(formData)}`);
+    Logger.debug(`exec ${execMethod} ${r(formData)}`);
     // 异步向支付宝发送生成订单请求, 第二个参数为公共参数，不需要的话传入空对象就行
     const result = await sdk.exec(execMethod, {}, { formData });
-    logger.debug(`result is ${r(result)}`);
+    Logger.debug(`result is ${r(result)}`);
     // 返回订单的结果信息
     return result;
   }

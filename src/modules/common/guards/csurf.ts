@@ -9,10 +9,9 @@ import { CacheKey, InMemoryDB } from '../../cache';
 
 import type { JwtAuthRequest } from '../../core/auth';
 
-const logger = new Logger(resolveModule(__filename, 'CsurfGuard'));
-
 @Injectable()
 export class CsurfGuard implements CanActivate {
+  private readonly logger = new Logger(resolveModule(__filename, CsurfGuard.name));
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
     // const res = context.switchToHttp().getResponse<Response>();
@@ -25,15 +24,15 @@ export class CsurfGuard implements CanActivate {
       req.headers['xsrf-token'] ??
       req.headers['x-csrf-token'] ??
       req.headers['x-xsrf-token'];
-    logger.log(`check url: ${req.url} - ${token}`);
+    this.logger.log(`check url: ${req.url} - ${token}`);
 
     const calcKey: CacheKey = { prefix: 'csurf', key: token };
     const exists = await InMemoryDB.get(calcKey);
-    logger.log(`csurf ${r({ exists, calcKey })}`);
+    this.logger.log(`csurf ${r({ exists, calcKey })}`);
     if (!exists) {
       throw new AsunaException(AsunaErrorCode.InvalidCsrfToken);
     }
-    InMemoryDB.clear(calcKey).catch((reason) => logger.error(reason));
+    InMemoryDB.clear(calcKey).catch((reason) => this.logger.error(reason));
 
     return true;
   }
@@ -43,8 +42,8 @@ export class CsurfHelper {
   public static generate(): string {
     const token = random(30);
     const key = { prefix: 'csurf', key: token };
-    logger.log(`generate csurf ${r(key)}`);
-    InMemoryDB.save(key, () => ({ token }), { expiresInSeconds: 60 * 60 }).catch((reason) => logger.error(reason));
+    Logger.log(`generate csurf ${r(key)}`);
+    InMemoryDB.save(key, () => ({ token }), { expiresInSeconds: 60 * 60 }).catch((reason) => Logger.error(reason));
     return token;
   }
 }

@@ -2,18 +2,16 @@ import AliPopCore from '@alicloud/pop-core';
 
 import { Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import Chance from 'chance';
 import _ from 'lodash';
 
 import { InMemoryDB } from '../cache';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { SMSConfigObject } from './config';
 
 import type { RequestInfo } from '../helper';
-
-const logger = new Logger(resolveModule(__filename, 'SMSHelper'));
 
 const chance = new Chance();
 
@@ -31,6 +29,8 @@ interface AliSendSMSParams {
 }
 
 export class AliyunSMSAdapter implements SMSAdapter {
+  private readonly logger = new Logger(resolveModule(__filename, AliyunSMSAdapter.name));
+
   private client: AliPopCore;
   private config: SMSConfigObject;
 
@@ -52,17 +52,17 @@ export class AliyunSMSAdapter implements SMSAdapter {
       TemplateCode: id,
       TemplateParam: JSON.stringify(tmplData),
     };
-    logger.log(`[Aliyun] send ${r({ params, fakeMode: this.config.fakeMode })}`);
+    this.logger.log(`[Aliyun] send ${r({ params, fakeMode: this.config.fakeMode })}`);
 
     if (this.config.fakeMode) return true;
 
     const res: any = await this.client.request('SendSms', params, { method: 'POST' });
-    logger.log(`[Aliyun] sent response is ${r(res)}`);
+    this.logger.log(`[Aliyun] sent response is ${r(res)}`);
     return res.status === 201;
   }
 
   public getTmplId(type: 'verify-code'): string {
-    logger.debug(`getTmplId ${r({ templates: this.config.templates, type })}`);
+    this.logger.debug(`getTmplId ${r({ templates: this.config.templates, type })}`);
     return _.get(this.config.templates, type);
   }
 }
@@ -72,7 +72,7 @@ export class SMSHelper {
 
   public static init() {
     const config = SMSConfigObject.load();
-    logger.log(`init sms by ${r(config)}`);
+    Logger.log(`init sms by ${r(config)}`);
 
     if (config.enable) {
       switch (config.provider) {
@@ -88,7 +88,7 @@ export class SMSHelper {
   public static generateVerifyCode(key: string): Promise<string> {
     const code = chance.string({ length: 6, pool: '1234567890' });
     const calcKey = { prefix: 'verify-code', key: code };
-    logger.log(`generate verify-code ${r({ calcKey, code })}`);
+    Logger.log(`generate verify-code ${r({ calcKey, code })}`);
     return InMemoryDB.save(calcKey, code, { expiresInSeconds: 56 });
   }
 
@@ -103,8 +103,8 @@ export class SMSHelper {
     const calcKey = { prefix: 'verify-code', key: code };
     const exists = await InMemoryDB.get(calcKey);
     const validated = `${exists}` === `${code}`;
-    InMemoryDB.clear(calcKey).catch((reason) => logger.error(reason));
-    logger.log(`check verify-code ${r({ calcKey, code, exists, validated })}`);
+    InMemoryDB.clear(calcKey).catch((reason) => Logger.error(reason));
+    Logger.log(`check verify-code ${r({ calcKey, code, exists, validated })}`);
     return validated;
   }
 

@@ -5,17 +5,14 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { CacheManager } from './cache';
 import { CacheWrapper } from './wrapper';
 
 export class CacheUtils {
-  private static logger = new Logger(resolveModule(__filename, 'CacheUtils'));
-
   public static clear(opts: { prefix?: string; key: string | object }): void {
-    this.logger.debug(`clear cache ${r(opts)}`);
+    Logger.debug(`clear cache ${r(opts)}`);
 
-    CacheWrapper.clear(opts).catch((reason) => this.logger.error(reason));
+    CacheWrapper.clear(opts).catch((reason) => Logger.error(reason));
     CacheManager.default.clear(opts.key);
   }
 
@@ -26,7 +23,7 @@ export class CacheUtils {
       const redisKeys = await redis.client.keys('kv#*');
 
       if (!_.isEmpty(redisKeys)) {
-        this.logger.log(`clean keys... ${r(redisKeys)}`);
+        Logger.log(`clean keys... ${r(redisKeys)}`);
         redisKeys.forEach((key) => redis.client.del(key));
       }
     }

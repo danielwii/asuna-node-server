@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -42,8 +41,6 @@ import type {
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
-
-const logger = new Logger(resolveModule(__filename, 'WeChatHelper'));
 
 /*
 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html
@@ -169,14 +166,14 @@ export class WeChatHelper {
     const hashCode = crypto.createHash('sha1');
     const result = hashCode.update(validation, 'utf8').digest('hex');
     const validated = result === opts.signature;
-    logger.log(`validate ${r({ config, opts, validation, result, validated })}`);
+    Logger.log(`validate ${r({ config, opts, validation, result, validated })}`);
     return validated;
   }
 
   public static async parseXmlToJson<T = any>(req: Request): Promise<T> {
     const value = await rawBody(req);
     const json = (await Promise.promisify(xml2js.parseString)(value)) as { xml: { [key: string]: any[] } };
-    logger.debug(`parsed json is ${r(json)}`);
+    Logger.debug(`parsed json is ${r(json)}`);
     return _.mapValues(json.xml, (values) => (values.length === 1 ? values[0] : values)) as T;
   }
 
@@ -189,12 +186,12 @@ export class WeChatHelper {
 
   public static async syncAdminUsers(): Promise<void> {
     const config = await WxConfigApi.getServiceConfig();
-    logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
+    Logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
       const BATCH_SIZE = AppConfigObject.load().batchSize;
       await PageHelper.doCursorPageSeries(async (next) => {
         const userList = await WxApi.getUserList(next);
-        logger.debug(`userList is ${r(_.omit(userList, 'data'))}`);
+        Logger.debug(`userList is ${r(_.omit(userList, 'data'))}`);
         const users = userList.data.openid;
         await PageHelper.doPageSeries(userList.count, BATCH_SIZE, async ({ start, end }) => {
           const currentUserIds = _.slice(users, start, end);
@@ -202,7 +199,7 @@ export class WeChatHelper {
           return Promise.mapSeries(currentUsers, async (userInfo) => WeChatHelper.updateWeChatUserByUserInfo(userInfo));
         });
         await Promise.mapSeries<string, unknown>(users, (openId) =>
-          WeChatHelper.syncAdminUser(openId).catch((reason) => logger.error(reason)),
+          WeChatHelper.syncAdminUser(openId).catch((reason) => Logger.error(reason)),
         );
         // 10000 is the max count of a request
         return userList.count === 10000 ? userList.next_openid : undefined;
@@ -212,7 +209,7 @@ export class WeChatHelper {
 
   public static async syncAdminUser(openId: string): Promise<void> {
     const user = await WeChatHelper.updateWeChatUser(openId);
-    logger.log(`sync user '${user?.openId}' to admin`);
+    Logger.log(`sync user '${user?.openId}' to admin`);
     if (user) {
       await WeChatHelper.updateAdmin(user);
     }
@@ -222,7 +219,7 @@ export class WeChatHelper {
     message: WXSubscribeMessage | WXTextMessage | WXQrSceneMessage | WXSubscribedQrSceneMessage,
   ): Promise<string> {
     const config = await WxConfigApi.getServiceConfig();
-    logger.log(`handle message ${r(message)}`);
+    Logger.log(`handle message ${r(message)}`);
 
     if (message.MsgType === 'event' && message.Event === 'subscribe') {
       const event = message as WXSubscribeMessage;
@@ -238,14 +235,14 @@ export class WeChatHelper {
     } else if (message.MsgType === 'event' && message.Event === 'SCAN') {
       const event = message as WXSubscribedQrSceneMessage;
       const [type] = event.EventKey.split(':');
-      logger.log(`handle message type: ${type}`);
+      Logger.log(`handle message type: ${type}`);
       if (type === WxTicketType['admin-login']) {
         this.handleAdminLogin(event);
       } else {
-        logger.warn(`unhandled message type ${type} for event ${r(event)}`);
+        Logger.warn(`unhandled message type ${type} for event ${r(event)}`);
       }
     } else {
-      logger.warn(`unhandled message ${r(message)}`);
+      Logger.warn(`unhandled message ${r(message)}`);
     }
     Hermes.emit('WeChatHelper', 'wx', message);
     return 'success';
@@ -264,7 +261,7 @@ export class WeChatHelper {
         })
         .value(),
     );
-    // logger.debug(`tmplData is ${r(tmplData)}`);
+    // Logger.debug(`tmplData is ${r(tmplData)}`);
     return _.mapValues(tmplData, (tmpl) =>
       _.mapValues(tmpl, (value) => HandlebarsHelper.injectContext(value, context)),
     ) as any;
@@ -274,7 +271,7 @@ export class WeChatHelper {
     const [type, sid] = message.EventKey.split(':');
     const user = await WeChatUser.findOneBy({ openId: message.FromUserName });
     const admin = await AdminUser.findOneBy({ email: `${message.FromUserName}@wx.openid` });
-    logger.log(`handle type ${type} with sid ${sid} ... ${r({ user, admin })}`);
+    Logger.log(`handle type ${type} with sid ${sid} ... ${r({ user, admin })}`);
     if (admin) {
       if (admin.isActive) {
         const token = await TokenHelper.createToken(admin);
@@ -289,9 +286,9 @@ export class WeChatHelper {
 
   public static async updateAdmin(user: WeChatUser): Promise<void> {
     const isActive = user.subscribe !== 0;
-    logger.log(`admin is ${r(user.admin)}`);
+    Logger.log(`admin is ${r(user.admin)}`);
     if (!user.admin) {
-      logger.log(`admin for user '${user.openId}' is not exists, create one with status '${isActive}' ...`);
+      Logger.log(`admin for user '${user.openId}' is not exists, create one with status '${isActive}' ...`);
       await AdminUser.delete({ username: user.openId });
       const admin = await AdminUser.create({
         username: `${user.nickname}#${user.openId}`,
@@ -301,7 +298,7 @@ export class WeChatHelper {
       }).save();
       await WeChatUser.update(user.openId, { admin });
     } else {
-      logger.log(`update admin user '${user.openId}' status '${isActive}' ...`);
+      Logger.log(`update admin user '${user.openId}' status '${isActive}' ...`);
       await AdminUser.update(
         { email: `${user.openId}@wx.openid` },
         { username: `${user.nickname}#${user.openId}`, isActive },
@@ -311,14 +308,14 @@ export class WeChatHelper {
 
   public static async updateWeChatUserByUserInfo(userInfo: WxUserInfo): Promise<WeChatUser | undefined> {
     if (!userInfo?.openid) {
-      logger.warn(`unresolved userInfo: ${r(userInfo)}`);
+      Logger.warn(`unresolved userInfo: ${r(userInfo)}`);
       return undefined;
     }
     const { openid: openId } = userInfo;
     if (await WeChatUser.findOneBy({ openId })) {
       const weChatUser = instanceToPlain(userInfo.toWeChatUser());
       const updatedTo = _.omitBy(_.omit(weChatUser, 'openId'), fp.isNull);
-      logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
+      Logger.log(`update user '${openId}' to ${r({ weChatUser, updatedTo })}`);
       await WeChatUser.update(openId, updatedTo);
       return WeChatUser.findOneBy({ openId });
     }
@@ -327,7 +324,7 @@ export class WeChatHelper {
 
   public static async updateWeChatUser(openId: string): Promise<WeChatUser | undefined> {
     const userInfo = await WeChatHelper.getUserInfo(openId);
-    logger.log(`get user info ${r(userInfo)}`);
+    Logger.log(`get user info ${r(userInfo)}`);
     return WeChatHelper.updateWeChatUserByUserInfo(userInfo);
   }
 
@@ -366,7 +363,7 @@ export class WeChatHelper {
 
       decoded = JSON.parse(decoded);
     } catch (err) {
-      logger.error(`decrypt data ${r({ key, encryptedData, iv })} error: ${err}`);
+      Logger.error(`decrypt data ${r({ key, encryptedData, iv })} error: ${err}`);
       throw new Error('Illegal Buffer');
     }
 
@@ -380,7 +377,7 @@ export class WeChatHelper {
   ): Promise<void> {
     const key = await this.getSessionKey(payload);
     const decoded = await this.decryptData<GetPhoneNumber>(key, body.encryptedData, body.iv);
-    // logger.debug(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
+    // Logger.debug(`updateUserPhoneNumber ${r({ payload, body, key, decoded })}`);
     const userInfo = await WXMiniAppUserInfo.findOneBy({ profileId: user.id });
     userInfo.mobile = decoded.phoneNumber;
     await userInfo.save();
@@ -388,7 +385,7 @@ export class WeChatHelper {
 
   public static async code2Session(code: string): Promise<string> {
     const codeSession = await WxApi.code2Session(code);
-    logger.log(`code2session ${r({ code, codeSession })}`);
+    Logger.log(`code2session ${r({ code, codeSession })}`);
     const key = nanoid();
     await Store.Global.setItem(key, codeSession);
     if (codeSession.errcode) {
@@ -436,9 +433,9 @@ export class WeChatHelper {
     return WxApi.sendTemplateMsg(opts).then((sendInfo) => {
       const info = { sendInfo, opts };
       if (sendInfo.errcode) {
-        logger.error(`send template message to ${openId} error: ${r(info)}`);
+        Logger.error(`send template message to ${openId} error: ${r(info)}`);
       } else {
-        logger.debug(`send template message to ${openId} done: ${r(info)}`);
+        Logger.debug(`send template message to ${openId} done: ${r(info)}`);
       }
       return sendInfo;
     });
@@ -459,9 +456,9 @@ export class WeChatHelper {
     return WxApi.sendSubscribeMsg(opts).then((messageInfo) => {
       const info = { messageInfo, opts };
       if (messageInfo.errcode) {
-        logger.error(`send subscribe message to ${openId} error: ${r(info)}`);
+        Logger.error(`send subscribe message to ${openId} error: ${r(info)}`);
       } else {
-        logger.debug(`send subscribe message to ${openId} done: ${r(info)}`);
+        Logger.debug(`send subscribe message to ${openId} done: ${r(info)}`);
       }
       return messageInfo;
     });

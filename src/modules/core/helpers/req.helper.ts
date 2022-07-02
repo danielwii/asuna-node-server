@@ -6,11 +6,7 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import pump from 'pump';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import type { Request } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'ReqHelper'));
 
 export class ReqHelper {
   /**
@@ -25,7 +21,7 @@ export class ReqHelper {
 
     return new Promise((resolve) => {
       req.on('end', () => {
-        logger.log(`save to ${tempfile} done.`);
+        Logger.log(`save to ${tempfile} done.`);
         resolve(tempfile);
       });
     });
@@ -33,7 +29,7 @@ export class ReqHelper {
 
   static saveFile(fileStream: pump.Stream, filename: string): Promise<string> {
     const tempfile = `${os.tmpdir()}/${filename}`;
-    logger.log(`save file to ${r({ filename, tempfile })}`);
+    Logger.log(`save file to ${r({ filename, tempfile })}`);
     return new Promise((resolve, reject) => {
       pump(fileStream, fs.createWriteStream(tempfile), (err) => (err ? reject(err) : resolve(tempfile)));
     });

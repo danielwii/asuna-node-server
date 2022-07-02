@@ -1,7 +1,6 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
@@ -9,13 +8,11 @@ import { EmailTmplConfigKeys } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { EmailHelper } from './email.helper';
 
-const logger = new Logger(resolveModule(__filename));
-
 @Module({})
 export class EmailModule extends InitContainer implements OnModuleInit {
   public async onModuleInit(): Promise<void> {
     return this.init(async () => {
-      logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
+      Logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
 
       await this.initKV();
       await EmailHelper.init();

@@ -28,20 +28,20 @@ class UpsertMediaBody {
   @IsString() @IsOptional() useFor?: string;
 }
 
-const logger = new Logger(resolveModule(__filename, 'ContentController'));
-
 @Controller('api/v1/content')
 export class ContentController {
-  @UseGuards(JwtAuthGuard)
+  private readonly logger = new Logger(resolveModule(__filename, ContentController.name));
+
+  @UseGuards(new JwtAuthGuard())
   @Post('feedback')
   async addFeedback(@Body() body: CreateFeedbackDto, @Req() req: JwtAuthRequest): Promise<Feedback> {
     const { user } = req;
-    logger.log(`save feedback ${r(body)}`);
+    this.logger.log(`save feedback ${r(body)}`);
     const feedback = Feedback.create({ ...body, profile: user, status: 'submitted' });
     return Feedback.save(feedback);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Post('feedback/:feedbackId/reply')
   async addFeedbackReply(
     @Param('feedbackId') feedbackId: number,
@@ -49,7 +49,7 @@ export class ContentController {
     @Req() req: JwtAuthRequest,
   ): Promise<FeedbackReply> {
     const { user } = req;
-    logger.log(`save feedback reply ${r({ feedbackId, body })}`);
+    this.logger.log(`save feedback reply ${r({ feedbackId, body })}`);
     const feedbackReply = FeedbackReply.create({
       feedback: { id: feedbackId },
       description: body.description,
@@ -60,11 +60,11 @@ export class ContentController {
     return FeedbackReply.save(feedbackReply);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Post('media')
   async addMedia(@Body() body: UpsertMediaBody, @Req() req: JwtAuthRequest) {
     const { payload } = req;
-    logger.log(`add media ${r({ payload, body })}`);
+    this.logger.log(`add media ${r({ payload, body })}`);
     return ContentMedia.create({
       profileId: payload.id,
       type: MediaType[body.type],
@@ -73,13 +73,13 @@ export class ContentController {
     } as ContentMedia).save();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Put(':id/media')
   async editMedia(@Param('id') id: string, @Body() body: UpsertMediaBody, @Req() req: JwtAuthRequest) {
     // ow(id, 'id', ow.string.nonEmpty);
 
     const { payload } = req;
-    logger.log(`edit media ${r({ payload, id, body })}`);
+    this.logger.log(`edit media ${r({ payload, id, body })}`);
     const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id });
     if (!media) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, '找不到对应的资源');
@@ -90,13 +90,13 @@ export class ContentController {
     return media.save();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(new JwtAuthGuard())
   @Delete(':id/media')
   async deleteMedia(@Param('id') id: string, @Req() req: JwtAuthRequest) {
     // ow(id, 'id', ow.string.nonEmpty);
 
     const { payload } = req;
-    logger.log(`delete media ${r({ payload, id })}`);
+    this.logger.log(`delete media ${r({ payload, id })}`);
     const media = await ContentMedia.findOneByOrFail({ id, profileId: payload.id });
     // if (!media) {
     //   throw new AsunaException(AsunaErrorCode.Unprocessable, '找不到对应的资源');

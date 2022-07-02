@@ -13,10 +13,10 @@ import { TenantAuthService } from './auth.service';
 
 import type { JwtPayload } from '../core/auth';
 
-const logger = new Logger(resolveModule(__filename, 'OrgJwtStrategy'));
-
 @Injectable()
 export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {
+  private readonly logger = new Logger(resolveModule(__filename, OrgJwtStrategy.name));
+
   constructor(private readonly authService: TenantAuthService) {
     super(
       {
@@ -29,7 +29,7 @@ export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {
   }
 
   async validate(payload: JwtPayload): Promise<JwtPayload> {
-    logger.debug(`validate ${r(payload)}`);
+    this.logger.debug(`validate ${r(payload)}`);
     const isValid = await this.authService.validateUser(payload);
     if (!isValid) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'org jwt auth strategy failed');

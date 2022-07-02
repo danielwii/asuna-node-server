@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -37,7 +38,6 @@ import { EmailModule } from './email/email.module';
 import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PaymentModule } from './payments/payment.module';
 import { PrismaModule } from './prisma';
 import { PropertyModule } from './property';
@@ -58,8 +58,6 @@ import { TaskController } from './task/task.controller';
 import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
 import { WebModule } from './web';
-
-const logger = new Logger(resolveModule(__filename, 'AdminInternalModule'));
 
 @Module({
   imports: _.compact([
@@ -86,7 +84,7 @@ const logger = new Logger(resolveModule(__filename, 'AdminInternalModule'));
     CacheModule.registerAsync({
       useFactory: () => {
         const redisConfig = RedisConfigObject.load('graphql');
-        logger.log(`init cache module with redis: ${r(redisConfig)}`);
+        Logger.log(`init cache module with redis: ${r(redisConfig)}`);
         return redisConfig.enable ? { store: redisStore, ...redisConfig.getOptions() } : {};
       },
     }),
@@ -114,13 +112,15 @@ const logger = new Logger(resolveModule(__filename, 'AdminInternalModule'));
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
 export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, AdminInternalModule.name));
+
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');
     if (configLoader.loadBoolConfig(ConfigKeys.COOKIE_SUPPORT)) {
       consumer.apply(DeviceMiddleware).forRoutes('*');
       consumer.apply(LandingUrlMiddleware).forRoutes('*');
     } else {
-      logger.warn(`COOKIE_SUPPORT disabled, device and landing middleware will not work.`);
+      this.logger.warn(`COOKIE_SUPPORT disabled, device and landing middleware will not work.`);
     }
   }
 

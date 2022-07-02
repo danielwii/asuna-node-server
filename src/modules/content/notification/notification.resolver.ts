@@ -16,7 +16,7 @@ import type { DefaultRegisteredLoaders, GraphqlContext } from '../../dataloader'
 
 @Resolver()
 export class NotificationQueryResolver extends QueryResolver {
-  private logger = new Logger(resolveModule(__filename, 'NotificationQueryResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'NotificationQueryResolver'));
 
   public constructor() {
     super(Notification);

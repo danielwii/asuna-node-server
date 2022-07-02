@@ -47,8 +47,6 @@ import { RemoteFileInfo, UploaderService } from './service';
 import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import type { AnyAuthRequest } from '../../helper/interfaces';
 
-const logger = new Logger(resolveModule(__filename));
-
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
     filename(req, file, cb) {
@@ -58,21 +56,21 @@ const fileInterceptorOptions: MulterOptions = {
       const noExtName = basename(file.originalname, extname(file.originalname));
       const name = noExtName.replace('.', '_').replace(' ', '_');
       const filename = `${uuid.v4()}.${name.toLowerCase()}.${extension}`;
-      logger.debug(
+      Logger.debug(
         `set filename ${r({ noExtName, filename, extension, mimetype, originalname: file.originalname, lookup })}`,
       );
       cb(undefined, filename);
     },
   }),
   fileFilter(req, file, cb) {
-    logger.debug(`validate file ${r(file)}`);
+    Logger.debug(`validate file ${r(file)}`);
     const supportedImage = isEnum(file.mimetype, ImageMimeType);
     const supportedVideo = isEnum(file.mimetype, VideoMimeType);
     const supportedDoc = isEnum(file.mimetype, DocMimeType);
-    logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
+    Logger.log(`validate file ${r({ supportedImage, supportedVideo, supportedDoc })}`);
     if (!(supportedImage || supportedVideo || supportedDoc)) {
       // req.fileValidationError = `unsupported mime type: '${file.mimetype}'`;
-      logger.log(`unsupported mime type: ${file.mimetype}, save as normal file.`);
+      Logger.log(`unsupported mime type: ${file.mimetype}, save as normal file.`);
     }
     cb(undefined, true);
   },
@@ -107,6 +105,7 @@ class CreateChunksUploadTaskQuery {
 @ApiTags('core')
 @Controller('api/v1/uploader')
 export class UploaderController {
+  private readonly logger = new Logger(resolveModule(__filename, UploaderController.name));
   private context = AsunaContext.instance;
 
   constructor(private readonly uploaderService: UploaderService) {}
@@ -124,7 +123,7 @@ export class UploaderController {
     ow(filename, 'filename', ow.string.nonEmpty);
     ow(bucket, 'bucket', ow.string.nonEmpty);
     ow(prefix, 'prefix', ow.string.nonEmpty);
-    logger.log(`#${funcName} ${r({ bucket, prefix, filename })}`);
+    this.logger.log(`#${funcName} ${r({ bucket, prefix, filename })}`);
 
     const lookup = mime.lookup(filename) as string;
     const extension = mime.extension(lookup || 'bin');
@@ -136,7 +135,7 @@ export class UploaderController {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket) as MinioStorage;
     const region = storageEngine.region;
     const Bucket = storageEngine.configObject.endpoint.slice(0, storageEngine.configObject.endpoint.indexOf('s3') - 1);
-    logger.log(`#${funcName} generate by ${r({ region, key })}`);
+    this.logger.log(`#${funcName} generate by ${r({ region, key })}`);
     const s3Client = new S3Client({
       region,
       credentials: {
@@ -146,7 +145,7 @@ export class UploaderController {
     });
     const command = new PutObjectCommand({ Bucket, Key: key });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-    logger.log(`#${funcName} Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
+    this.logger.log(`#${funcName} Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
     return ApiResponse.success({ signedUrl, fullpath: `/uploads/${key}` });
   }
 
@@ -162,7 +161,7 @@ export class UploaderController {
     @Req() req: AnyAuthRequest,
   ): Promise<OperationToken> {
     const { identifier } = req;
-    logger.log(`createChunksUploadTask: ${r(query)}`);
+    this.logger.log(`createChunksUploadTask: ${r(query)}`);
     return UploaderHelper.createChunksUploadTask({ ...query, identifier });
   }
 
@@ -193,7 +192,7 @@ export class UploaderController {
 
     await new Promise((resolve) => {
       req.on('end', () => {
-        logger.log(`save to ${tempFile} done.`);
+        this.logger.log(`save to ${tempFile} done.`);
         resolve();
       });
     });
@@ -276,14 +275,14 @@ export class UploaderController {
     if (req.fileValidationError) {
       throw new UploadException(req.fileValidationError);
     } */
-    logger.log(`upload files ${r({ bucket, prefix, files })}`);
+    this.logger.log(`upload files ${r({ bucket, prefix, files })}`);
     const results = await this.saveFiles(bucket, prefix, local, files).catch((error) => {
-      logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
+      this.logger.error(`upload files ${r({ bucket, prefix, files })} error: ${r(error)}`);
       console.error({ type: typeof error, error });
-      // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
+      // fs.rmdir(tempFolder).catch(reason => this.logger.warn(r(reason)));
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Upload, null, error);
     });
-    logger.log(`results is ${r(results)}`);
+    this.logger.log(`results is ${r(results)}`);
     return results;
   }
 
@@ -304,14 +303,14 @@ export class UploaderController {
     const tempDir = join(Global.tempPath, 'stream');
     await fs.ensureDir(tempDir);
     const tempFolder = await fs.mkdtemp(join(tempDir, 'temp-'));
-    logger.log(`create temp folder: ${tempFolder}`);
+    this.logger.log(`create temp folder: ${tempFolder}`);
     const tempFile = join(tempFolder, baseFilename);
     const stream = fs.createWriteStream(tempFile);
     req.pipe(stream);
 
     await new Promise((resolve) => {
       req.on('end', () => {
-        logger.log(`save to ${tempFile} done.`);
+        this.logger.log(`save to ${tempFile} done.`);
         resolve();
       });
     });
@@ -319,13 +318,13 @@ export class UploaderController {
     const fileInfo = new FileInfo({ filename: baseFilename, path: tempFile });
     // fileInfo.filename = `${uuid.v4()}.${fileInfo.mimetype.split('/').slice(-1)}__${baseFilename}`;
     const results = await this.saveFiles(bucket, fixedPrefix, '0', [fileInfo]).catch((error) => {
-      logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);
-      // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
+      this.logger.error(`save ${r({ bucket, fixedPrefix, fileInfo })} error: ${r(error)}`);
+      // fs.rmdir(tempFolder).catch(reason => this.logger.warn(r(reason)));
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Upload, null, error);
     });
     // TODO remove temp files in storage engine now
-    // fs.rmdir(tempFolder).catch(reason => logger.warn(r(reason)));
-    logger.log(`results is ${r(results)}`);
+    // fs.rmdir(tempFolder).catch(reason => this.logger.warn(r(reason)));
+    this.logger.log(`results is ${r(results)}`);
     return _.first(results);
   }
 
@@ -333,7 +332,7 @@ export class UploaderController {
     return Promise.map(files, (file) => {
       const bucket = defaultBucket || `${file.mimetype.split('/')[0]}s`;
       if (local === '1') {
-        logger.log(oneLineTrim`
+        this.logger.log(oneLineTrim`
             save file[${file.mimetype}] to local storage
             ${r({ bucket, prefix, filename: file.filename })}
           `);
@@ -343,19 +342,19 @@ export class UploaderController {
       const storageEngine = AsunaContext.instance.getStorageEngine(bucket);
       /*
       if (_.includes(ImageMimeType, file.mimetype)) {
-        logger.log(`save image[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
+        this.logger.log(`save image[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         // return this.context.defaultStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(VideoMimeType, file.mimetype)) {
-        logger.log(`save video[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
+        this.logger.log(`save video[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         // return this.context.videosStorageEngine.saveEntity(file, { bucket, prefix });
       }
       if (_.includes(DocMimeType, file.mimetype)) {
-        logger.log(`save doc[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
+        this.logger.log(`save doc[${file.mimetype}] to ${r({ bucket, prefix })} filename: ${file.filename}`);
         // return this.context.filesStorageEngine.saveEntity(file, { bucket, prefix });
       } else {
         // bucket = bucket || 'files';
-        // logger.log(oneLineTrim`unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.`);
+        // this.logger.log(oneLineTrim`unresolved file type [${file.mimetype}] ${r({ bucket, prefix, filename: file.filename })}.`);
         return storageEngine.saveEntity(file, { bucket, prefix });
       } */
       return storageEngine.saveEntity(file, { bucket, prefix });

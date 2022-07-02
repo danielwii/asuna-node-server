@@ -1,7 +1,5 @@
-import { BadRequestException, Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
 import * as R from 'ramda';
@@ -9,8 +7,6 @@ import * as R from 'ramda';
 import { Profile } from '../common';
 import { DBHelper, parseListParam, parseNormalWhereAndRelatedFields, parseOrder, parseWhere } from '../core/db';
 import { AppDataSource } from '../datasource';
-
-const logger = new Logger(resolveModule(__filename, 'SearchController'));
 
 @ApiTags('core')
 @Controller('api/search')

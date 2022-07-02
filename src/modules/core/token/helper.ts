@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { random } from '@danielwii/asuna-helper/dist/random';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
@@ -12,8 +11,6 @@ import dayjs from 'dayjs';
 import _ from 'lodash';
 
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
-
-const logger = new Logger(resolveModule(__filename));
 
 export const SysTokenServiceName = {
   AdminLogin: 'admin#login',
@@ -106,10 +103,10 @@ export class OperationTokenHelper {
    * same { role, identifier, service } will return same token
    */
   static async obtainToken(opts: ObtainTokenOpts): Promise<OperationToken> {
-    logger.debug(`obtain token: ${r(opts)}`);
+    Logger.debug(`obtain token: ${r(opts)}`);
     const { key, role, identifier, service, type, payload } = opts;
     const existToken = _.first(await OperationTokenHelper.redeemTokens({ key, role, identifier, service }));
-    logger.log(`found token: ${r(existToken)}`);
+    Logger.log(`found token: ${r(existToken)}`);
     if (existToken) return existToken;
 
     const token = random(32);
@@ -131,7 +128,7 @@ export class OperationTokenHelper {
       },
     }[type];
 
-    logger.log(`create token with type options ${r(typeOptions)}`);
+    Logger.log(`create token with type options ${r(typeOptions)}`);
 
     const operationToken = OperationToken.create<OperationToken>({
       key,
@@ -159,7 +156,7 @@ export class OperationTokenHelper {
    * @param service
    */
   static redeemTokens({ key, role, identifier, service }: RedeemTokenOpts): Promise<OperationToken[]> {
-    logger.log(`redeem token: ${r({ key, role, identifier, service })}`);
+    Logger.log(`redeem token: ${r({ key, role, identifier, service })}`);
     return OperationToken.find({
       where: {
         ...(key ? { key } : null),

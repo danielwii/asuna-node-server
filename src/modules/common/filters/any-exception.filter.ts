@@ -4,7 +4,6 @@ import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/comm
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
@@ -17,8 +16,6 @@ import { AppDataSource } from '../../datasource';
 import { StatsHelper } from '../../stats';
 
 import type { Response } from 'express';
-
-const logger = new Logger(resolveModule(__filename));
 
 type QueryFailedErrorType = QueryFailedError &
   Partial<{
@@ -42,7 +39,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = AppDataSource.dataSource.getRepository(model);
       if (!metadata) {
-        logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
+        Logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
         return new AsunaException(AsunaErrorCode.Unprocessable, 'dup entry error');
       }
       const [index] = metadata.indices.filter((i) => i.name === key);
@@ -84,7 +81,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       return new AsunaException(AsunaErrorCode.Unprocessable, 'connection lost, reconnect...');
     }
 
-    logger.error(`unresolved QueryFailedError: ${r(exception)}`);
+    Logger.error(`unresolved QueryFailedError: ${r(exception)}`);
     return exception;
   }
 
@@ -103,7 +100,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       processed.status = HttpStatus.NOT_FOUND;
     } else if (exception.name === 'ArgumentError') {
       processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
-      logger.warn(`[ArgumentError] found ${r(processed)}, need to convert to 400 error body`);
+      Logger.warn(`[ArgumentError] found ${r(processed)}, need to convert to 400 error body`);
     } else if (processed.code) {
       if (processed.code === 'ERR_ASSERTION') {
         // TODO wrap with AsunaException
@@ -114,19 +111,19 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
 
-    // logger.log(`check status ${r({ httpStatus, processed })}`);
+    // Logger.log(`check status ${r({ httpStatus, processed })}`);
 
     if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
-      // logger.warn(`[bad_request] ${r(processed)}`);
-      logger.warn(`[bad_request] ${r(processed.message)}`);
+      // Logger.warn(`[bad_request] ${r(processed)}`);
+      Logger.warn(`[bad_request] ${r(processed.message)}`);
     } else if (httpStatus && httpStatus === HttpStatus.NOT_FOUND) {
-      logger.warn(`[not_found] ${r(processed.message)}`);
+      Logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40[13]/.test(`${httpStatus}`)) {
-      // logger.warn(`[unauthorized] ${r(processed)}`);
+      // Logger.warn(`[unauthorized] ${r(processed)}`);
     } else if (/4\d+/.test(`${httpStatus}`)) {
-      logger.warn(`[client_error] ${r(processed)}`);
+      Logger.warn(`[client_error] ${r(processed)}`);
     } else {
-      logger.error(`[unhandled exception] ${r(processed)}`);
+      Logger.error(`[unhandled exception] ${r(processed)}`);
       Sentry.captureException(processed);
     }
 
@@ -168,7 +165,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
 
     if (_.isNil(body.error.code)) {
-      logger.warn(`no code found for one error: ${r(message)}`);
+      Logger.warn(`no code found for one error: ${r(message)}`);
     }
 
     const isGraphqlRes = !res.status;
@@ -185,15 +182,15 @@ export class AnyExceptionFilter implements ExceptionFilter {
     };
     if (![404].includes(httpStatus)) {
       if ([401, 403].includes(httpStatus)) {
-        logger.warn(`[unauthorized]: ${r(errorInfo)}`);
+        Logger.warn(`[unauthorized]: ${r(errorInfo)}`);
       } else {
-        logger.error(`[ERROR]: ${r(errorInfo)}`);
+        Logger.error(`[ERROR]: ${r(errorInfo)}`);
         StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
       }
     }
     /*
     if (exception instanceof Error && httpStatus !== 500) {
-      logger.error(exception);
+      Logger.error(exception);
     }
 */
 
@@ -202,7 +199,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       throw new Error(JSON.stringify(body));
     }
 
-    // logger.error(`send ${r(body)} status: ${httpStatus}`);
+    // Logger.error(`send ${r(body)} status: ${httpStatus}`);
     const response = ApiResponse.failure({
       status: body.error.httpStatus,
       code: body.error.code,

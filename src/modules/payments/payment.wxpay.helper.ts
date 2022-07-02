@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import axios from 'axios';
@@ -18,7 +17,6 @@ import { PaymentMethod } from './payment.entities';
 import { PaymentNotifyHelper } from './payment.notify';
 import { PaymentOrder } from './payment.order.entities';
 
-const logger = new Logger(resolveModule(__filename, 'PaymentWxpayHelper'));
 const chance = new Chance();
 
 type TradeType = 'MWEB' | 'JSAPI' | 'APP' | 'NATIVE';
@@ -30,29 +28,29 @@ export class PaymentWxpayHelper {
       relations: ['transaction', 'transaction.method'],
     });
     if (count) {
-      logger.log(`check payment orders: ${count}`);
+      Logger.log(`check payment orders: ${count}`);
       await Promise.mapSeries(orders, async (order) => {
-        // logger.log(`handle order ${r(order)}`);
+        // Logger.log(`handle order ${r(order)}`);
         if (!order.transaction) {
-          logger.error(`no transaction found for transaction ${r(order)}`);
+          Logger.error(`no transaction found for transaction ${r(order)}`);
           return Promise.resolve();
         }
         if (!order.transaction.method) {
-          logger.error(`no method found for transaction ${r(order.transaction)}`);
+          Logger.error(`no method found for transaction ${r(order.transaction)}`);
           return Promise.resolve();
         }
         if (order.transaction.method.type !== 'wxpay') {
-          logger.verbose(`order type is ${order.transaction.method.type}, ignore it.`);
+          Logger.verbose(`order type is ${order.transaction.method.type}, ignore it.`);
           return Promise.resolve();
         }
         await order.reload();
         if (order.status === 'done') {
-          logger.verbose(`${order.id} already handled`);
+          Logger.verbose(`${order.id} already handled`);
           return Promise.resolve();
         }
         const queried = await PaymentWxpayHelper.query(order.id);
         if (queried.trade_state === 'SUCCESS') {
-          logger.log(`update order ${order.id} status to done.`);
+          Logger.log(`update order ${order.id} status to done.`);
           order.transaction.status = 'done';
           order.transaction.data = queried;
           await order.transaction.save();
@@ -73,7 +71,7 @@ export class PaymentWxpayHelper {
       relations: ['transaction', 'transaction.method'],
     });
     const method = order.transaction.method;
-    logger.log(`query order ${r({ id, order })}`);
+    Logger.log(`query order ${r({ id, order })}`);
     const queryObject = {
       appid: method.apiKey,
       mch_id: method.merchant,
@@ -97,7 +95,7 @@ export class PaymentWxpayHelper {
     const response = await axios.post('https://api.mch.weixin.qq.com/pay/orderquery', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
-    logger.debug(`response is ${r(data)}`);
+    Logger.debug(`response is ${r(data)}`);
     return data;
   }
 
@@ -112,12 +110,12 @@ export class PaymentWxpayHelper {
       clientIp: string;
     },
   ): Promise<Record<string, unknown>> {
-    logger.log(`create order ${r({ method, goods, openid })}`);
+    Logger.log(`create order ${r({ method, goods, openid })}`);
     const xmlData = await this.createXmlData(method, goods, tradeType, { openid });
     const response = await axios.post<any>('https://api.mch.weixin.qq.com/pay/unifiedorder', xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
-    logger.debug(`response is ${r(data)}`);
+    Logger.debug(`response is ${r(data)}`);
     if (data.return_code !== 'SUCCESS') {
       throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
     }
@@ -135,12 +133,12 @@ export class PaymentWxpayHelper {
     },
     { redirectUrl, isMobile }: { redirectUrl?: string; isMobile?: boolean },
   ): Promise<string> {
-    logger.log(`create payment order ${r({ method, goods, redirectUrl })}`);
+    Logger.log(`create payment order ${r({ method, goods, redirectUrl })}`);
     const xmlData = await this.createXmlData(method, goods);
     const response = await axios.post<any>(method.endpoint, xmlData);
     const json = (await Promise.promisify(xml2js.parseString)(response.data)) as { xml: { [key: string]: any[] } };
     const data = _.mapValues(json.xml, (value) => (_.isArray(value) && value.length === 1 ? _.head(value) : value));
-    logger.debug(`response is ${r(data)}`);
+    Logger.debug(`response is ${r(data)}`);
 
     if (data.return_code !== 'SUCCESS') {
       throw new AsunaException(AsunaErrorCode.Unprocessable, response.data);
@@ -163,7 +161,7 @@ export class PaymentWxpayHelper {
     tradeType: TradeType = 'MWEB',
     extra: { openid?: string } = {},
   ): Promise<string> {
-    logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
+    Logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
     const MASTER_HOST = AppConfigObject.load().masterAddress;
     const notifyUrl = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
     if (_.isEmpty(notifyUrl)) {
@@ -198,7 +196,7 @@ export class PaymentWxpayHelper {
 
     const xmlData = new xml2js.Builder({ xmldec: undefined, rootName: 'xml', cdata: true }).buildObject(postBody);
 
-    logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url: notifyUrl })}`);
+    Logger.debug(`signed ${r({ signObject, signStr, sign, postBody, xmlData, notify_url: notifyUrl })}`);
     return xmlData;
   }
 }

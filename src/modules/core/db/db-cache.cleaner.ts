@@ -7,9 +7,6 @@ import * as fp from 'lodash/fp';
 import { BaseEntity } from 'typeorm';
 
 import { AppDataSource } from '../../datasource';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-const logger = new Logger(resolveModule(__filename, 'DBCacheCleaner'));
 
 export class DBCacheCleaner {
   public static registers: { Entity: typeof BaseEntity; trigger: string }[] = [];
@@ -21,15 +18,15 @@ export class DBCacheCleaner {
   public static clear(name: string): void {
     const triggers = _.flow([
       fp.filter(({ Entity, trigger }) => {
-        if (!Entity) logger.error(`no entity found for trigger: ${trigger}.`);
+        if (!Entity) Logger.error(`no entity found for trigger: ${trigger}.`);
         return !!Entity;
       }),
       fp.filter(({ Entity }) => Entity.name === name),
       fp.map(fp.get('trigger')),
     ])(this.registers);
     if (!_.isEmpty(triggers)) {
-      logger.debug(`clear ${r(triggers)}`);
-      AppDataSource.dataSource.queryResultCache?.remove(triggers).catch((reason) => logger.error(reason));
+      Logger.debug(`clear ${r(triggers)}`);
+      AppDataSource.dataSource.queryResultCache?.remove(triggers).catch((reason) => Logger.error(reason));
     }
   }
 }

@@ -20,8 +20,6 @@ import { FileInfo } from '../storage';
 import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
 
-const logger = new Logger(resolveModule(__filename, 'UploaderService'));
-
 export class ChunkFileInfo {
   @IsString()
   @Transform(({ value }) => _.trim(value))
@@ -66,11 +64,12 @@ export class RemoteFileInfo extends FileInfo {
 
 @Injectable()
 export class UploaderService {
+  private readonly logger = new Logger(resolveModule(__filename, UploaderService.name));
   private readonly context = AsunaContext.instance;
 
   constructor(private readonly commandBus: CommandBus) {
     Hermes.subscribe(this.constructor.name, /^commands$/, (event) => {
-      logger.log(r(event));
+      this.logger.log(r(event));
     });
   }
 
@@ -85,7 +84,7 @@ export class UploaderService {
       fingerprint,
       chunk,
     });
-    logger.log(`upload chunk file ${r(chunkFileInfo)}`);
+    this.logger.log(`upload chunk file ${r(chunkFileInfo)}`);
 
     return this.context.chunksStorageEngine
       .saveEntity({ ...file, filename: chunkname }, { prefix: fingerprint })
@@ -103,7 +102,7 @@ export class UploaderService {
 
   async mergeChunks(token: OperationToken, filename?: string): Promise<RemoteFileInfo> {
     const payload = new ChunksUploadPayload(token.body);
-    logger.log(
+    this.logger.log(
       r({
         sum: _.sum(payload.finished),
         total: payload.totalChunks,
@@ -117,15 +116,15 @@ export class UploaderService {
       );
     }
     const _filename = filename || payload.filename;
-    logger.log(`merge file '${_filename}' chunks... ${r(payload)}`);
+    this.logger.log(`merge file '${_filename}' chunks... ${r(payload)}`);
 
     // TODO bucket 在 localStorage 中需要主动传递
-    logger.debug(`chunks storage engine type is ${this.context.chunksStorageEngine.constructor.name}`);
+    this.logger.debug(`chunks storage engine type is ${this.context.chunksStorageEngine.constructor.name}`);
     const chunks = await this.context.chunksStorageEngine.listEntities({
       prefix: payload.fingerprint,
       bucket: this.context.chunksStorageEngine.constructor.name === 'LocalStorage' ? 'chunks' : null,
     });
-    logger.debug(`found ${r(chunks.length)} chunks`);
+    this.logger.debug(`found ${r(chunks.length)} chunks`);
 
     if (chunks.length <= 0) {
       throw new AsunaException(
@@ -135,17 +134,17 @@ export class UploaderService {
     }
 
     // try to merge all chunks
-    logger.verbose(`try to merge chunks: ${r(chunks)}`);
+    this.logger.verbose(`try to merge chunks: ${r(chunks)}`);
     const filepaths = _.sortBy(
       await Promise.all(chunks.map((chunk) => this.context.chunksStorageEngine.getEntity(chunk, Global.tempPath))),
       (name) => Number(name.slice(name.lastIndexOf('.') + 1)),
     );
     const tempDirectory = join(Global.tempPath, 'chunks', payload.fingerprint);
 
-    logger.log(`create temp folder: ${tempDirectory}`);
+    this.logger.log(`create temp folder: ${tempDirectory}`);
     fs.mkdirpSync(tempDirectory);
     const dest = join(tempDirectory, _filename);
-    logger.log(`merge files: ${r(filepaths)} to ${dest}`);
+    this.logger.log(`merge files: ${r(filepaths)} to ${dest}`);
     const writableStream = fs.createWriteStream(dest);
 
     highland(filepaths).map(fs.createReadStream).flatMap(highland).pipe(writableStream);
@@ -153,11 +152,11 @@ export class UploaderService {
     await new Promise((resolve) => {
       writableStream.on('close', () => {
         const directory = dirname(filepaths[0]);
-        logger.log(`merge file done: ${dest}, clean chunks in ${directory} ...`);
+        this.logger.log(`merge file done: ${dest}, clean chunks in ${directory} ...`);
         resolve();
-        // fs.remove(directory).catch(error => logger.warn(`remove ${directory} error: ${r(error)}`));
+        // fs.remove(directory).catch(error => this.logger.warn(`remove ${directory} error: ${r(error)}`));
       });
-    }).catch((reason) => logger.error(reason));
+    }).catch((reason) => this.logger.error(reason));
 
     const fileInfo = new FileInfo({ filename: _filename, path: dest });
     // const mimetype = mime.lookup(filename) || 'application/octet-stream';

@@ -15,8 +15,6 @@ import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from '
 import { WXJwtStrategy } from './wx-jwt.strategy';
 import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
 
-const logger = new Logger(resolveModule(__filename, 'WeChatModule'));
-
 @Module({
   imports: [],
   providers: [WXJwtStrategy],
@@ -24,8 +22,10 @@ const logger = new Logger(resolveModule(__filename, 'WeChatModule'));
   controllers: [WeChatController],
 })
 export class WeChatModule implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, WeChatModule.name));
+
   async onModuleInit(): Promise<void> {
-    logger.log('init...');
+    this.logger.log('init...');
     await this.initKV();
     await this.initCron();
     await this.initSubscriber();
@@ -83,7 +83,7 @@ export class WeChatModule implements OnModuleInit {
 
   async initSubscriber(): Promise<void> {
     Hermes.subscribe(this.constructor.name, /^wx$/, async (event) => {
-      logger.log(`subscribe event: ${r(event)}`);
+      this.logger.log(`subscribe event: ${r(event)}`);
       if (WXEventMessageHelper.isWXSubscribedQrSceneMessage(event.payload)) {
         const message = event.payload as WXSubscribedQrSceneMessage;
         const admin = await AdminUser.findOneBy({ email: `${message.FromUserName}@wx.openid` });
@@ -91,7 +91,7 @@ export class WeChatModule implements OnModuleInit {
           //
         }
       } else {
-        logger.log(`unhandled event: ${r(event)}`);
+        this.logger.log(`unhandled event: ${r(event)}`);
       }
     });
   }

@@ -23,48 +23,43 @@ import type { JsonMap } from '../common/decorators';
 import type { AnyAuthRequest } from '../helper/interfaces';
 
 class CreateDraftDto {
-  @IsObject()
-  content: JsonMap;
-  @IsString()
-  type: string;
-  @IsOptional()
-  refId?: PrimaryKey;
+  @IsObject() content: JsonMap;
+  @IsString() type: string;
+  @IsOptional() refId?: PrimaryKey;
 }
 
 class GetDraftsQuery {
-  @IsString()
-  type: string;
-  @IsDefined()
-  refId: PrimaryKey;
+  @IsString() type: string;
+  @IsDefined() refId: PrimaryKey;
 }
-
-const logger = new Logger(resolveModule(__filename, 'ContentAdminController'));
 
 @Controller('admin/v1/content')
 export class ContentAdminController {
+  private readonly logger = new Logger(resolveModule(__filename, ContentAdminController.name));
+
   @UseGuards(AnyAuthGuard)
   @Post('draft')
   async createDraft(@Body() body: CreateDraftDto, @Req() req: AnyAuthRequest): Promise<Draft | JsonMap> {
     const { roles, tenant } = req;
     const rolesStr = _.map(roles, fp.get('name'));
-    logger.log(`createDraft ${r({ body, roles, rolesStr })}`);
+    this.logger.log(`createDraft ${r({ body, roles, rolesStr })}`);
     const permission = AccessControlHelper.ac.can(rolesStr).create(body.type);
     const permissionAny = AccessControlHelper.ac.can(rolesStr).createAny(body.type);
     const permissionOwn = AccessControlHelper.ac.can(rolesStr).createOwn(body.type);
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    this.logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
     }
 
     const modelNameObject = DBHelper.getModelNameObject(body.type);
-    logger.log(`get model ${r(modelNameObject)}`);
+    this.logger.log(`get model ${r(modelNameObject)}`);
     const isTenantEntity = await TenantHelper.isTenantEntity(modelNameObject.entityName);
     const hasTenantRoles = await TenantHelper.hasTenantRole(roles);
-    logger.log(`tenant detect ${r({ isTenantEntity, hasTenantRoles })}`);
+    this.logger.log(`tenant detect ${r({ isTenantEntity, hasTenantRoles })}`);
     if (isTenantEntity && hasTenantRoles) {
       let { refId } = body;
       // 如果不存在原型，先创建未发布的原型
@@ -72,7 +67,7 @@ export class ContentAdminController {
         const primaryKey = DBHelper.getPrimaryKeyByModel(modelNameObject);
         const ref = await RestHelper.save<{}>({ model: modelNameObject, body: { ...body.content, tenant } }, req);
         refId = ref[primaryKey];
-        logger.log(`save ref ${r(ref)}, ref id is ${r({ primaryKey, refId })}`);
+        this.logger.log(`save ref ${r(ref)}, ref id is ${r({ primaryKey, refId })}`);
       }
 
       // const entity = await DBHelper.repo(modelNameObject.entityName).findOne({ where: { id: body.refId, tenant } });
@@ -97,7 +92,7 @@ export class ContentAdminController {
     const rolesStr = _.map(roles, fp.get('name'));
 
     const filteredRoles = await AccessControlHelper.filterRoles(rolesStr);
-    logger.log(`get drafts ${r({ query, roles, rolesStr, filteredRoles })}`);
+    this.logger.log(`get drafts ${r({ query, roles, rolesStr, filteredRoles })}`);
     if (_.isEmpty(filteredRoles)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'role not included in ac');
     }
@@ -108,7 +103,7 @@ export class ContentAdminController {
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    this.logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
@@ -130,14 +125,14 @@ export class ContentAdminController {
     if (!draft) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `invalid operation`);
     }
-    logger.log(`get drafts ${r({ id, roles, rolesStr })}`);
+    this.logger.log(`get drafts ${r({ id, roles, rolesStr })}`);
     const permission = AccessControlHelper.ac.can(rolesStr).create(draft.type);
     const permissionAny = AccessControlHelper.ac.can(rolesStr).createAny(draft.type);
     const permissionOwn = AccessControlHelper.ac.can(rolesStr).createOwn(draft.type);
     const granted = permission.granted;
     const anyGranted = permissionAny.granted;
     const ownGranted = permissionOwn.granted;
-    logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
+    this.logger.debug(`permission ${r({ permission, permissionAny, permissionOwn, granted, anyGranted, ownGranted })}`);
 
     if (!(granted || anyGranted || ownGranted)) {
       throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'not granted');
@@ -147,7 +142,7 @@ export class ContentAdminController {
     const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(modelNameObject.entityName));
     const isTenantEntity = await TenantHelper.isTenantEntity(modelNameObject.entityName);
     // const entity = await DBHelper.repo(modelNameObject.entityName).findOne({ where: { id: draft.refId, tenant } });
-    logger.log(`update ${r({ modelNameObject, primaryKey, isTenantEntity })}`);
+    this.logger.log(`update ${r({ modelNameObject, primaryKey, isTenantEntity })}`);
     await DBHelper.repo(modelNameObject.entityName).update(draft.refId, { ...draft.content, isPublished: true });
     await Draft.delete(draft.id);
   }
@@ -160,7 +155,7 @@ export class ContentAdminController {
     @Req() req: AnyAuthRequest,
   ): Promise<FeedbackReply> {
     const { user } = req;
-    logger.log(`save feedback reply ${r({ feedbackId, body })}`);
+    this.logger.log(`save feedback reply ${r({ feedbackId, body })}`);
     const feedbackReply = FeedbackReply.create({
       feedback: { id: feedbackId },
       description: body.description,

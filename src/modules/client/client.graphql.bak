@@ -1,7 +1,0 @@
-type ClientUser implements BaseEntity {
-  id: Int!
-  createdAt: Date!
-  updatedAt: Date!
-
-  uuid: String!
-}

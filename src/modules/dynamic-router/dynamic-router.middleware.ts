@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -10,8 +9,6 @@ import { DynamicRouterHelper } from './dynamic-router.helper';
 
 import type { NestMiddleware } from '@nestjs/common';
 import type { Request, Response } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'DynamicRouterMiddleware'));
 
 export class DynamicRouterMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: () => void): Promise<void> {
@@ -28,7 +25,7 @@ export class DynamicRouterMiddleware implements NestMiddleware {
 
     const found = _.find(config?.textRouter, (field) => resolve(`/${field.path}`) === req.baseUrl);
     if (found) {
-      logger.log(`found ${r({ config, found })}`);
+      Logger.log(`found ${r({ config, found })}`);
       res.send(found.text);
       return;
     }

@@ -7,13 +7,12 @@ import { Promise } from 'bluebird';
 import { glob } from 'glob';
 import _ from 'lodash';
 import { dirname, extname, resolve } from 'path';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
@@ -34,24 +33,23 @@ export function validateOptions(options: BootstrapOptions): void {
 }
 
 export async function syncDbWithLockIfPossible(app: NestExpressApplication, options: BootstrapOptions) {
-  const logger = new Logger(resolveModule(__filename, 'syncDbWithLockIfPossible'));
   const syncEnabled = configLoader.loadBoolConfig('DB_SYNCHRONIZE');
   if (!syncEnabled) {
-    return logger.log(`DB_SYNCHRONIZE disabled.`);
+    return Logger.log(`DB_SYNCHRONIZE disabled.`);
   }
 
-  logger.log(`DB_SYNCHRONIZE: ${syncEnabled}`);
+  Logger.log(`DB_SYNCHRONIZE: ${syncEnabled}`);
   const redisEnabled = configLoader.loadConfig2('redis', 'enable');
   if (redisEnabled) {
-    logger.log('try sync db with redis redlock...');
+    Logger.log('try sync db with redis redlock...');
     const { exists, results } = await RedisLockProvider.instance.lockProcess(
       'sync-db',
       async () => syncDb(app, options),
       { ttl: TimeUnit.MINUTES.toMillis(3), waiting: true },
     );
-    logger.log(`sync results is ${r({ exists, results })}`);
+    Logger.log(`sync results is ${r({ exists, results })}`);
     if (exists) {
-      logger.log('another runner is syncing db now, skip.');
+      Logger.log('another runner is syncing db now, skip.');
     }
     return results;
   } else {
@@ -60,27 +58,25 @@ export async function syncDbWithLockIfPossible(app: NestExpressApplication, opti
 }
 
 async function syncDb(app: NestExpressApplication, options: BootstrapOptions): Promise<void> {
-  const logger = new Logger(resolveModule(__filename, 'syncDb'));
-
   // --------------------------------------------------------------
   // rename old tables to newer
   // --------------------------------------------------------------
 
   const beforeSyncDB = Date.now();
-  const connection = app.get<Connection>(Connection);
-  logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
+  const connection = app.get<DataSource>(DataSource);
+  Logger.log(`db connected: ${r({ isConnected: connection.isConnected, name: connection.name })}`);
 
-  logger.log('sync db ...');
+  Logger.log('sync db ...');
   const queryRunner = connection.createQueryRunner();
   await Promise.all(
     _.map(_.compact(renameTables.concat(options.renamer)), async ({ from, to }) => {
-      logger.log(`rename table ${r({ from, to })}`);
+      Logger.log(`rename table ${r({ from, to })}`);
       const fromTable = await queryRunner.getTable(from);
       const toTable = await queryRunner.getTable(to);
       if (toTable) {
-        logger.warn(`Table ${to} already exists.`);
+        Logger.warn(`Table ${to} already exists.`);
       } else if (fromTable) {
-        logger.log(`rename ${from} -> ${to}`);
+        Logger.log(`rename ${from} -> ${to}`);
         await queryRunner.renameTable(fromTable, to);
       }
     }),
@@ -90,20 +86,20 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
     await connection.query('SET FOREIGN_KEY_CHECKS=0');
   }
 
-  logger.log(`synchronize ...`);
+  Logger.log(`synchronize ...`);
   await connection.synchronize();
-  logger.log(`synchronize ... done`);
+  Logger.log(`synchronize ... done`);
 
-  logger.log(`run custom migrations ...`);
+  Logger.log(`run custom migrations ...`);
   await runCustomMigrations(options.migrations);
-  logger.log(`run custom migrations ... done`);
+  Logger.log(`run custom migrations ... done`);
 
   if (['mariadb', 'mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {
     await connection.query('SET FOREIGN_KEY_CHECKS=1');
   }
-  logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
+  Logger.log(`sync db done. ${Date.now() - beforeSyncDB}ms`);
 
-  logger.log(`pending migrations: ${await connection.showMigrations()}`);
+  Logger.log(`pending migrations: ${await connection.showMigrations()}`);
 }
 
 /**
@@ -111,10 +107,9 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
  * @param options
  */
 export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<void> {
-  const logger = new Logger(resolveModule(__filename, 'resolveTypeormPaths'));
   // const wasBuilt = __filename.endsWith('js');
   const rootDir = dirname(require.main.filename);
-  logger.log(`main entrance is ${r(require.main.filename)}`);
+  Logger.log(`main entrance is ${r(require.main.filename)}`);
   const suffix = extname(__filename).slice(1);
   const currentSuffix = extname(require.main.filename).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
@@ -128,13 +123,13 @@ export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<v
   ];
   const entities = _.uniq(_.compact([...pathResolver('entities'), ...(options?.typeormEntities || [])]));
   const subscribers = _.uniq(_.compact([...pathResolver('subscriber'), ...(options?.typeormSubscriber || [])]));
-  logger.log(`options is ${r({ options, __dirname, rootDir, suffix, entities, subscribers, __filename })}`);
+  Logger.log(`options is ${r({ options, __dirname, rootDir, suffix, entities, subscribers, __filename })}`);
 
-  logger.log(`resolve typeorm entities: ${r(entities)}`);
-  logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
+  Logger.log(`resolve typeorm entities: ${r(entities)}`);
+  Logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
 
-  await Promise.map(entities, promisifyGlob).then((resolved) => logger.debug(`resolved entities ${r(resolved)}`));
-  await Promise.map(subscribers, promisifyGlob).then((resolved) => logger.debug(`resolved subscribers ${r(resolved)}`));
+  await Promise.map(entities, promisifyGlob).then((resolved) => Logger.debug(`resolved entities ${r(resolved)}`));
+  await Promise.map(subscribers, promisifyGlob).then((resolved) => Logger.debug(`resolved subscribers ${r(resolved)}`));
 
   process.env.TYPEORM_ENTITIES = entities.join();
   process.env.TYPEORM_SUBSCRIBERS = subscribers.join();

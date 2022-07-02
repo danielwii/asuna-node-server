@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AnyAuthGuard, JwtAuthRequest } from '../auth';
 import { PageHelper } from '../helpers';
 import { UserActivity } from './activities.entities';
@@ -17,15 +17,14 @@ class CreateActivityDTO {
   @IsString() refId: string;
 }
 
-const logger = new Logger(resolveModule(__filename, 'ActivitiesController'));
-
 @Controller('api/v1/activities')
 export class ActivitiesController {
+  private readonly logger = new Logger(resolveModule(__filename, ActivitiesController.name));
   @UseGuards(AnyAuthGuard)
   @Post()
   async addActivity(@Body() body: CreateActivityDTO, @Req() req: JwtAuthRequest): Promise<UserActivity> {
     const { user } = req;
-    logger.log(`save activity ${r(body)}`);
+    this.logger.log(`save activity ${r(body)}`);
 
     const exists = await UserActivity.findOneBy({ ...body, profile: user });
     if (exists) return exists;
@@ -35,7 +34,7 @@ export class ActivitiesController {
 
   @Get()
   async latestActivities(@Query() query: Partial<CreateActivityDTO>): Promise<UserActivity[]> {
-    logger.log(`list latest activities ${r(query)}`);
+    this.logger.log(`list latest activities ${r(query)}`);
     const count = await UserActivity.countBy({ ...query });
     return UserActivity.find({ ...query, ...PageHelper.latestSkip(count, 10) });
   }

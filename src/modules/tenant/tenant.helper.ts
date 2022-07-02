@@ -6,7 +6,6 @@ import {
   AsunaExceptionHelper,
   AsunaExceptionTypes,
 } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -59,8 +58,6 @@ export enum TenantFieldKeys {
   firstDisplayName = 'first.display-name',
 }
 
-const logger = new Logger(resolveModule(__filename, 'TenantHelper'));
-
 export class TenantHelper {
   static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
@@ -88,7 +85,7 @@ export class TenantHelper {
           ),
       ),
     ])(DBHelper.loadMetadatas());
-    logger.debug(
+    Logger.debug(
       `entities waiting for scan ${r({
         filtered: filtered.length,
         entityNames: _.map(filtered, fp.get('name')),
@@ -121,14 +118,14 @@ export class TenantHelper {
           ...entities.map((entity) => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
           ...entities.map((entity) => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
         );
-        // logger.log(`load config by ${r({ kvDef: TenantHelper.kvDef, keyValues })}`);
+        // Logger.log(`load config by ${r({ kvDef: TenantHelper.kvDef, keyValues })}`);
         const tenantConfig = new TenantConfig(await KvHelper.getConfigsByEnumKeys(TenantHelper.kvDef, keyValues));
 
         // bind 模式下的资源限制默认是 1
         if (tenantConfig.firstModelBind && tenantConfig.firstModelName) {
           tenantConfig[`limit.${tenantConfig.firstModelName}`] = 1;
         }
-        // logger.log(`tenant config is ${r(tenantConfig)}`);
+        // Logger.log(`tenant config is ${r(tenantConfig)}`);
         return tenantConfig;
       },
       60,
@@ -142,7 +139,7 @@ export class TenantHelper {
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
-    logger.log(`tenant info for ${r({ admin, config })}`);
+    Logger.log(`tenant info for ${r({ admin, config })}`);
 
     const { tenant } = admin ?? {};
     const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
@@ -187,7 +184,7 @@ export class TenantHelper {
   static async tenantSupport(fullModelName: string, roles: OrgRole[]): Promise<boolean> {
     const isTenantEntity = await TenantHelper.isTenantEntity(fullModelName);
     const hasTenantRoles = await TenantHelper.hasTenantRole(roles);
-    logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
+    Logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
     return isTenantEntity && hasTenantRoles;
   }
 
@@ -196,12 +193,12 @@ export class TenantHelper {
     const roleNames = _.map(roles, fp.get('name'));
     const bindRoles = _.compact(_.split(config.bindRoles, ','));
     const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
-    logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
+    Logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
     return results;
   }
 
   static async checkPermission(userId: string, fullModelName: string): Promise<void> {
-    logger.log(`check permission for ${r({ userId, fullModelName })}`);
+    Logger.log(`check permission for ${r({ userId, fullModelName })}`);
     if (!(await TenantHelper.isTenantEntity(fullModelName))) {
       return;
     }
@@ -224,7 +221,7 @@ export class TenantHelper {
     const info = await TenantHelper.info(userId);
     const count = info.recordCounts[fullModelName];
     const limit = _.get(info.config, `limit.${fullModelName}`);
-    logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
+    Logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
     if (count >= limit) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ResourceLimit, ['tenant', limit]);
     }

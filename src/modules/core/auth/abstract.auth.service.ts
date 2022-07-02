@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 
-import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist';
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -44,8 +44,6 @@ export interface CreatedToken {
 }
 
 export class TokenHelper {
-  private static logger = new Logger(resolveModule(__filename, 'TokenHelper'));
-
   static decode<Payload = JwtPayload>(token: string): Payload {
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     return jwt.verify(token, secretOrKey) as any;
@@ -55,7 +53,7 @@ export class TokenHelper {
     const expiresIn = TimeUnit.DAYS.toSeconds(1);
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<Partial<JwtPayload>, 'iat' | 'exp'> = { type: 'SessionToken', ...extra };
-    this.logger.log(`sign payload ${r(payload)}`);
+    Logger.log(`sign payload ${r(payload)}`);
     const token = jwt.sign(payload, secretOrKey, { expiresIn });
     return { expiresIn, accessToken: token };
   }
@@ -64,7 +62,7 @@ export class TokenHelper {
     ow(user, 'user', ow.object.nonEmpty);
 
     const type = _.get(user, 'constructor.name');
-    this.logger.log(`createToken >> ${r({ user, extra, type })}`);
+    Logger.log(`createToken >> ${r({ user, extra, type })}`);
     const expiresIn = TimeUnit.DAYS.toSeconds(30); // one month
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
@@ -75,7 +73,7 @@ export class TokenHelper {
       ...extra,
       type,
     };
-    this.logger.log(`sign payload ${r(payload)}`);
+    Logger.log(`sign payload ${r(payload)}`);
     const accessToken = jwt.sign(payload, secretOrKey, { expiresIn });
     await OperationTokenHelper.deprecateToken({
       key: 'refresh-token',
@@ -99,13 +97,13 @@ export class TokenHelper {
     secretOrPrivateKey: Secret,
     options?: SignOptions,
   ): string {
-    this.logger.log(`createCustomToken >> ${r(payload)}`);
+    Logger.log(`createCustomToken >> ${r(payload)}`);
     return jwt.sign(payload, secretOrPrivateKey, options);
   }
 }
 
 export abstract class AbstractAuthService<U extends AuthUser> {
-  private logger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
+  private readonly superLogger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
 
   protected constructor(
     readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,
@@ -127,7 +125,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     const left = Math.floor(payload.exp - Date.now() / 1000);
     const validated = !_.isNil(user) && user.id === payload.id;
     if (!validated) {
-      this.logger.debug(oneLine`
+      this.superLogger.debug(oneLine`
         validated(${validated}) >> identifier: ${r(identifier)} exists: ${!!user}.
         left: ${formatTime(left)}
       `);
@@ -147,7 +145,9 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     if (authUser) {
       const currentDate = new Date();
       const calendarDays = differenceInCalendarDays(currentDate, authUser.lastLoginAt);
-      this.logger.debug(`<${funcName}> ${r({ lastLoginAt: authUser.lastLoginAt, currentDate, diff: calendarDays })}`);
+      this.superLogger.debug(
+        `<${funcName}> ${r({ lastLoginAt: authUser.lastLoginAt, currentDate, diff: calendarDays })}`,
+      );
       if (authUser.lastLoginAt && calendarDays < 1) {
         return { sameDay: true, lastLoginAt: authUser.lastLoginAt };
       }
@@ -167,7 +167,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       { email: identifier.email, username: identifier.username, isActive },
       (v) => !_.isUndefined(v),
     ) as FindOptionsWhere<U>;
-    this.logger.debug(`get user by where ${r(where)}`);
+    this.superLogger.debug(`get user by where ${r(where)}`);
     if (isBlank(where.email) && isBlank(where.username)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }
@@ -188,7 +188,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   async updatePassword(uid: PrimaryKey, password: string, salt: string): Promise<void> {
-    this.logger.log(`update password ${r({ uid, password, salt })}`);
+    this.superLogger.log(`update password ${r({ uid, password, salt })}`);
     await this.authUserRepository.update(uid, { password, salt } as any);
     // return UserProfile.update(uid, { password, salt });
   }

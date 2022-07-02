@@ -1,15 +1,11 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
 
 import { WxConfigApi } from './wx.api.config';
 
 import type { WxAccessToken } from './wx.interfaces';
-
-const logger = new Logger(resolveModule(__filename, 'WeChatBaseApi'));
 
 export class WxBaseApi {
   /**
@@ -20,7 +16,7 @@ export class WxBaseApi {
     WxConfigApi.withConfig((config) => {
       const appId = opts?.appId || (opts.mini ? config.miniAppId : config.appId);
       const appSecret = opts?.appSecret || (opts.mini ? config.miniAppSecret : config.appSecret);
-      logger.debug(`getAccessToken for app: ${appId}`);
+      Logger.debug(`getAccessToken for app: ${appId}`);
       return WxConfigApi.wrappedFetch(
         oneLineTrim`https://api.weixin.qq.com/cgi-bin/token
           ?grant_type=client_credential

@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { oneLineTrim } from 'common-tags';
@@ -10,16 +11,14 @@ import { extname, join } from 'path';
 import sharp from 'sharp';
 
 import { convertFilename } from '../../common/helpers';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Global } from '../global';
 import { UploaderConfigObject } from '../uploader/config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 import type { Response } from 'express';
 
-const logger = new Logger(resolveModule(__filename, 'LocalStorage'));
-
 export class LocalStorage implements IStorageEngine {
+  private readonly logger = new Logger(resolveModule(__filename, LocalStorage.name));
   private readonly storagePath: string;
 
   private readonly bucket: string;
@@ -28,10 +27,10 @@ export class LocalStorage implements IStorageEngine {
   public constructor(storagePath: string, defaultBucket = 'default') {
     this.bucket = defaultBucket || 'default';
     this.storagePath = storagePath;
-    logger.log(oneLineTrim`
+    this.logger.log(oneLineTrim`
       [constructor] init default[${this.bucket}] storage path: '${this.storagePath}/${this.bucket}'
     `);
-    fs.mkdirs(join(this.storagePath, this.bucket)).catch((error) => logger.warn(r(error)));
+    fs.mkdirs(join(this.storagePath, this.bucket)).catch((error) => this.logger.warn(r(error)));
   }
 
   public saveEntity(
@@ -45,7 +44,7 @@ export class LocalStorage implements IStorageEngine {
     const prefix = opts.prefix || yearMonthStr();
     const filename = convertFilename(file.filename);
     const dest = join(this.storagePath, bucket, prefix, filename);
-    logger.log(`file is '${r({ file, dest })}'`);
+    this.logger.log(`file is '${r({ file, dest })}'`);
 
     if (fs.existsSync(dest)) fs.removeSync(dest);
     fs.moveSync(file.path, dest);
@@ -63,14 +62,14 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public async getEntity(fileInfo: SavedFile, toPath?: string): Promise<string> {
-    logger.debug(`getEntity ${r({ fileInfo, toPath })}`);
+    this.logger.debug(`getEntity ${r({ fileInfo, toPath })}`);
     return join(Global.uploadPath, fileInfo.bucket ?? '', fileInfo.prefix ?? '', fileInfo.path);
   }
 
   public async listEntities(opts: { bucket?: string; prefix?: string }): Promise<SavedFile[]> {
     const path = join(Global.uploadPath, opts.bucket ?? '', opts.prefix ?? '');
     const directory = fs.readdirSync(path);
-    logger.debug(`listEntities ${r({ opts, directory })}`);
+    this.logger.debug(`listEntities ${r({ opts, directory })}`);
     return directory.map((filename) => {
       const fileInfo = new FileInfo({ filename, path: join(path, filename) });
       return new SavedFile({
@@ -86,7 +85,7 @@ export class LocalStorage implements IStorageEngine {
   }
 
   public removeEntities(opts: { bucket?: string; prefix?: string; filename?: string }): Promise<void> {
-    logger.debug(`removeEntities ${r(opts)}`);
+    this.logger.debug(`removeEntities ${r(opts)}`);
     throw new Error('Method not implemented.');
   }
 
@@ -119,10 +118,10 @@ export class LocalStorage implements IStorageEngine {
       return;
     }
 
-    logger.log(`resolveUrl ${r({ filename, prefix, type, ext, bucket, thumbnailConfig, jpegConfig })}`);
+    this.logger.log(`resolveUrl ${r({ filename, prefix, type, ext, bucket, thumbnailConfig, jpegConfig })}`);
 
     if (type.startsWith('video/')) {
-      logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
+      this.logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
       res.type(ext).sendFile(fullFilePath);
     } else if (type.startsWith('image/')) {
       // const ext = _.last(fullFilePath.split('.'));
@@ -138,30 +137,30 @@ export class LocalStorage implements IStorageEngine {
         ? `${fullFileDir}/${outputFilename}`
         : `${fullFileDir}/${outputFilename}.${ext}`;
 
-      logger.log(`resolve file ${r({ fullFilePath, fullFileDir, outputFilename, fileExt, ext, outputPath })}`);
+      this.logger.log(`resolve file ${r({ fullFilePath, fullFileDir, outputFilename, fileExt, ext, outputPath })}`);
 
-      logger.log(`check file type '${ext}' for '${outputPath}'`);
+      this.logger.log(`check file type '${ext}' for '${outputPath}'`);
       if (!['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
         if (fs.existsSync(outputPath)) {
-          logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
+          this.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
           res.type(ext).sendFile(fullFilePath);
           return;
         }
         throw new AsunaException(AsunaErrorCode.NotFound);
       }
 
-      logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
+      this.logger.log(`check if '${ext}' file outputPath '${outputPath}' exists`);
       if (fs.existsSync(outputPath)) {
-        logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
+        this.logger.log(`${fullFileDir} with type '${ext}' exists. send to client.`);
         res.type(ext).sendFile(outputPath);
         return;
       }
 
       fs.mkdirpSync(fullFileDir);
-      logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
+      this.logger.log(`create outputPath '${outputPath}' for file '${fullFilePath}'`);
       const imageProcess = sharp(fullFilePath);
       if (thumbnailConfig.opts) {
-        logger.debug(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
+        this.logger.debug(`resize image '${fullFilePath}' by '${r(thumbnailConfig)}'`);
         imageProcess.resize(thumbnailConfig.opts.width, thumbnailConfig.opts.height, { fit: thumbnailConfig.opts.fit });
       }
 
@@ -173,15 +172,15 @@ export class LocalStorage implements IStorageEngine {
 
       imageProcess.toFile(outputPath, (err, info) => {
         if (err) {
-          logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
+          this.logger.error(`create outputPath image error ${r({ outputPath, err: err.stack, info })}`);
           throw new AsunaException(AsunaErrorCode.NotFound, err.message);
         } else {
-          // logger.log(`convert file ${r(info)}`);
+          // this.logger.log(`convert file ${r(info)}`);
           res.type(ext).sendFile(outputPath);
         }
       });
     } else if (fs.existsSync(fullFilePath)) {
-      logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
+      this.logger.log(`${fullFilePath} with type '${ext}' exists. send to client.`);
       res.type(ext).sendFile(fullFilePath);
     }
   }

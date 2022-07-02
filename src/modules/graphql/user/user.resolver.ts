@@ -14,7 +14,7 @@ import { GraphqlHelper } from '../helper';
 import type { GraphqlContext } from '../../dataloader';
 
 export class UserProfileQueryResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserProfileQueryResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'UserProfileQueryResolver'));
 
   @UseGuards(new GqlWXAuthGuard())
   @Query((returns) => UserProfile)

@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
@@ -9,7 +10,6 @@ import _ from 'lodash';
 import { join } from 'path';
 
 import { configLoader } from '../config';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { Global } from './global';
 import {
   AliossConfigObject,
@@ -24,8 +24,6 @@ import {
 import { AliossStorage } from './storage/storage.alioss.engine';
 import { UploaderConfigObject } from './uploader/config';
 
-const logger = new Logger(resolveModule(__filename, 'AsunaContext'));
-
 export interface IAsunaContextOpts {
   /**
    * default: app
@@ -37,6 +35,7 @@ export interface IAsunaContextOpts {
 export type StorageEngineMode = 'chunks';
 
 export class AsunaContext {
+  private readonly logger = new Logger(resolveModule(__filename, AsunaContext.name));
   private readonly config = UploaderConfigObject.load();
 
   public static instance: AsunaContext;
@@ -63,7 +62,7 @@ export class AsunaContext {
   public localStorageEngine: IStorageEngine;
 
   private constructor() {
-    logger.log('init ...');
+    this.logger.log('init ...');
     this.dirname = join(__dirname, '../..');
     this.setup({
       defaultModulePrefix: 'www',
@@ -72,7 +71,7 @@ export class AsunaContext {
 
     if (this.config.enable) this.initStorageEngine(`${process.cwd()}/uploads`);
     // this.tempPath = `${process.cwd()}/temp`;
-    fs.mkdirs(join(Global.tempPath)).catch((error) => logger.warn(r(error)));
+    fs.mkdirs(join(Global.tempPath)).catch((error) => this.logger.warn(r(error)));
   }
 
   public static async init() {
@@ -80,7 +79,7 @@ export class AsunaContext {
   }
 
   public setup(opts: Partial<IAsunaContextOpts> = {}): void {
-    logger.log(`setup ${r(opts)}`);
+    this.logger.log(`setup ${r(opts)}`);
     this.opts = {
       defaultModulePrefix: opts.defaultModulePrefix || 'www',
       // root: opts.root,
@@ -91,7 +90,7 @@ export class AsunaContext {
   public getStorageEngine = _.memoize((bucket: string): IStorageEngine => {
     const KEY = `${bucket.toUpperCase()}_STORAGE`;
     const storageType = configLoader.loadConfig(KEY);
-    logger.debug(`getStorageEngine by ${bucket}, ${KEY}: ${storageType}, fallback is default`);
+    this.logger.debug(`getStorageEngine by ${bucket}, ${KEY}: ${storageType}, fallback is default`);
     if (storageType === StorageMode.QINIU) {
       return new QiniuStorage(() => QiniuConfigObject.loadOr(bucket));
     }
@@ -106,7 +105,7 @@ export class AsunaContext {
     Global.uploadPath = uploadPath;
 
     const defaultStorage = configLoader.loadConfig(ConfigKeys.STORAGE_DEFAULT);
-    logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
+    this.logger.log(`initStorageEngine ${r({ uploadPath, defaultStorage })}`);
 
     if (defaultStorage && !_.values<string>(StorageMode).includes(defaultStorage)) {
       throw new Error(`${defaultStorage} engine not support!`);
@@ -179,7 +178,7 @@ export class AsunaContext {
       this.chunksStorageEngine = new LocalStorage(Global.uploadPath, 'chunks');
     }
 
-    logger.log(
+    this.logger.log(
       `initStorageEngine ${r({
         default: instanceToPlain(this.defaultStorageEngine),
         // videos: this.videosStorageEngine,

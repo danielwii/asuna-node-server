@@ -1,7 +1,6 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -18,8 +17,6 @@ import { TenantHelper } from './tenant.helper';
 import type { PrimaryKey } from '../common';
 import type { StatsResult } from '../stats';
 
-const logger = new Logger(resolveModule(__filename, 'TenantService'));
-
 export class TenantService {
   /**
    * @param userId
@@ -27,12 +24,12 @@ export class TenantService {
    * @param firstModelPayload 用来新建需要绑定的核心模型数据
    */
   static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
-    logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
+    Logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
     const info = await TenantHelper.info(userId);
     if (info.tenant) return info.tenant;
 
     if (_.isEmpty(info.roles)) {
-      logger.warn(`no tenant roles found for user. ${r({ userId, info })}`);
+      Logger.warn(`no tenant roles found for user. ${r({ userId, info })}`);
       // throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
@@ -45,7 +42,7 @@ export class TenantService {
     await user.save();
 
     if (info.config.firstModelBind && info.config.firstModelName && firstModelPayload) {
-      logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
+      Logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
 
       await RestHelper.save(
         { model: DBHelper.getModelNameObject(info.config.firstModelName), body: firstModelPayload },
@@ -85,7 +82,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        logger.debug(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        Logger.debug(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -120,7 +117,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        logger.debug(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        Logger.debug(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -151,37 +148,37 @@ export class TenantService {
       if (!entityInfo) return;
 
       const entities = await DBHelper.getModelsHasRelation(Tenant);
-      // logger.log(`check entities: ${entities}`);
+      // Logger.log(`check entities: ${entities}`);
       const modelName = entityInfo.name;
       const hasTenantField = entities.find((o) => o.entityInfo.name === modelName);
       if (!hasTenantField) return;
 
-      logger.debug(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
+      Logger.debug(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
       const metadata = DBHelper.getMetadata(modelName);
       const relation = metadata.manyToOneRelations.find(
         (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
       );
       if (!relation) return;
 
-      logger.log(
+      Logger.log(
         `handle ${r(entityInfo)} ${r({
           entity,
           relation: relation.propertyName,
           firstModelName: config.firstModelName,
         })}`,
       );
-      // logger.log(`get ${relation.propertyName} for ${r(entity)}`);
+      // Logger.log(`get ${relation.propertyName} for ${r(entity)}`);
       const firstModel = await entity[relation.propertyName];
       if (firstModel) {
-        logger.log(`get tenant from firstModel ... ${firstModel} ${r(relation.inverseEntityMetadata.target)}`);
+        Logger.log(`get tenant from firstModel ... ${firstModel} ${r(relation.inverseEntityMetadata.target)}`);
         const tenant = await Tenant.findOne({ where: { [relation.propertyName]: firstModel } });
         // const relationEntity = await (relation.inverseEntityMetadata.target as any).findOne(firstModel, {
         //   relations: ['tenant'],
         // });
-        logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
+        Logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
         // 没找到关联资源的情况下移除原有的绑定
         // if (!tenant) {
-        //   logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
+        //   Logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
         //   // this.registerTenant()
         //   return;
         // }
@@ -190,7 +187,7 @@ export class TenantService {
         entity.tenant = tenant;
         await (entity as any).save();
       } else {
-        // logger.error(`tenant column found but firstModelName not detected.`);
+        // Logger.error(`tenant column found but firstModelName not detected.`);
       }
     }
   }

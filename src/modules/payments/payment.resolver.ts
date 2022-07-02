@@ -21,7 +21,7 @@ class CursoredVisitorResponse extends CursoredResponse(PaymentOrder) {}
 
 @Resolver()
 export class PaymentQueryResolver extends QueryResolver {
-  private logger = new Logger(resolveModule(__filename, PaymentQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(__filename, PaymentQueryResolver.name));
 
   public constructor() {
     super([PaymentOrder, PaymentMethod, PaymentTransaction]);
@@ -74,7 +74,7 @@ export class PaymentQueryResolver extends QueryResolver {
 
 @Resolver((of) => PaymentOrder)
 export class UserPaymentOrderResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserPaymentOrderResolver'));
+  private readonly logger = new Logger(resolveModule(__filename, 'UserPaymentOrderResolver'));
 
   @ResolveField((returns) => PaymentTransaction)
   public async transaction(@Root() order: PaymentOrder, @Context() ctx: GraphqlContext): Promise<PaymentTransaction> {

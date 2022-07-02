@@ -9,15 +9,15 @@ import { PaymentHelper } from './payment.helper';
 import { PaymentQueryResolver, UserPaymentOrderResolver } from './payment.resolver';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
 
-const logger = new Logger(resolveModule(__filename, 'PaymentModule'));
-
 @Module({
   providers: [PaymentQueryResolver, UserPaymentOrderResolver],
   controllers: [PaymentController],
 })
 export class PaymentModule implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(__filename, PaymentModule.name));
+
   public async onModuleInit(): Promise<void> {
-    logger.log('init...');
+    this.logger.log('init...');
 
     await this.initCron();
   }

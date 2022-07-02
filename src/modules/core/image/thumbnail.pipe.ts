@@ -5,11 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import * as fp from 'lodash/fp';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import type { FitEnum } from 'sharp';
-
-const logger = new Logger(resolveModule(__filename, 'ThumbnailPipe'));
 
 export interface ThumbnailParam {
   width?: number;
@@ -40,11 +36,11 @@ export class ThumbnailPipe implements PipeTransform {
           : null;
         thumbnail.format = format as any;
         [thumbnail.width, thumbnail.height] = params[0].split('x').map((val) => (val ? _.toNumber(val) : null));
-        logger.log(r({ value, metatype, param, params, thumbnail }));
+        Logger.log(r({ value, metatype, param, params, thumbnail }));
         return { opts: thumbnail, param };
       }
     } catch (error) {
-      logger.warn(r(error));
+      Logger.warn(r(error));
       return { opts: thumbnail, param };
     }
     return {};

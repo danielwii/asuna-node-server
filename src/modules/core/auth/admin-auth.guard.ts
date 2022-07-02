@@ -2,20 +2,19 @@ import { ExecutionContext, Injectable, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { getIgnoreCase } from '../../common';
 import { auth, AuthType } from '../../helper';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AdminUser } from './auth.entities';
 import { API_KEY_HEADER } from './strategy';
 
 import type { JwtAuthRequest } from './auth.guard';
 
-const logger = new Logger(resolveModule(__filename, 'JwtAdminAuthGuard'));
-
 @Injectable()
 export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
+  private readonly logger = new Logger(resolveModule(__filename, JwtAdminAuthGuard.name));
   // @ts-ignore
   public async handleRequest(err, payload, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
@@ -24,7 +23,7 @@ export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
       return getIgnoreCase(req.headers, API_KEY_HEADER);
     }
 
-    logger.debug(`handleRequest ${r({ err, payload, info })}`);
+    this.logger.debug(`handleRequest ${r({ err, payload, info })}`);
     if (err || !payload) {
       throw err || new AsunaException(AsunaErrorCode.InsufficientPermissions, 'admin-jwt auth failed');
     }

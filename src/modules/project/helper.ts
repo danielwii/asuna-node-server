@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -9,7 +8,6 @@ import Chance from 'chance';
 import { Tenant } from '../tenant/tenant.entities';
 import { Project } from './entities';
 
-const logger = new Logger(resolveModule(__filename, 'ProjectHelper'));
 const chance = new Chance();
 
 export class ProjectHelper {
@@ -22,7 +20,7 @@ export class ProjectHelper {
     //
     const id = chance.string({ length: 18, symbols: false });
     const created = await Project.create({ id, tenantId: tenant.id }).save();
-    logger.log(`created default project ${r(created)}`);
+    Logger.log(`created default project ${r(created)}`);
     return created;
   }
 

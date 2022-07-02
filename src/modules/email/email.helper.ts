@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { Promise } from 'bluebird';
@@ -21,8 +20,6 @@ import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { isMailAttachment, MailInfo } from './email.interface';
 
 import type { Attachment, Options } from 'nodemailer/lib/mailer';
-
-const logger = new Logger(resolveModule(__filename, 'EmailHelper'));
 
 // type SendAction = { future: () => Promise<any> };
 
@@ -60,7 +57,7 @@ export class EmailHelper {
     const config = await EmailHelper.getConfig();
 
     if (config.enable) {
-      logger.log(`init by ${r(config)}`);
+      Logger.log(`init by ${r(config)}`);
       const transport: SMTPTransport.Options = {
         logger: true,
         host: config.host,
@@ -71,7 +68,7 @@ export class EmailHelper {
       };
       EmailHelper.transporter = createTransport(transport);
     } else {
-      logger.warn(`EMAIL settings must be set up and enabled to send mail in real world ${r(config)}`);
+      Logger.warn(`EMAIL settings must be set up and enabled to send mail in real world ${r(config)}`);
       EmailHelper.transporter = createTransport({ jsonTransport: true });
     }
 
@@ -85,19 +82,19 @@ export class EmailHelper {
 
     EmailHelper.sender$.subscribe(({ email, cb }) =>
       EmailHelper.send(email)
-        .catch((error) => logger.error(error))
+        .catch((error) => Logger.error(error))
         .finally(() => cb(email)),
     );
-    logger.log(`initialized done ...`);
+    Logger.log(`initialized done ...`);
   }
 
   public static async send(mailInfo: MailInfo): Promise<SentMessageInfo> {
-    logger.debug(`send ${r(_.omit(mailInfo, 'content'))}`);
+    Logger.debug(`send ${r(_.omit(mailInfo, 'content'))}`);
     const { to, cc, bcc, subject, content, attachments } = mailInfo;
     const { from } = await EmailHelper.getConfig();
     const storageConfigs = DynamicConfigs.get(DynamicConfigKeys.imageStorage);
     let domain = '';
-    if (!storageConfigs) logger.warn(`no storage set for image`);
+    if (!storageConfigs) Logger.warn(`no storage set for image`);
     else if (storageConfigs.mode === StorageMode.QINIU) {
       domain = (storageConfigs.loader() as QiniuConfigObject).domain;
     } else if (storageConfigs.mode === StorageMode.MINIO) {
@@ -117,7 +114,7 @@ export class EmailHelper {
       ),
       ...(content ? { html: content } : {}),
     };
-    logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
+    Logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
     return EmailHelper.transporter.sendMail(mailOptions);
   }
 
@@ -129,10 +126,10 @@ export class EmailHelper {
     const loaded = WeChatHelper.parseTemplateData(templates, context);
     const { subject, template } = loaded?.[key] ?? {};
     if (!subject && !template) {
-      logger.error(`no ${key} found in email templates...`);
+      Logger.error(`no ${key} found in email templates...`);
       return Promise.reject(new Error(`no ${key} found in email templates...`));
     }
-    logger.debug(`send template mail ${r({ key, subject })}`);
+    Logger.debug(`send template mail ${r({ key, subject })}`);
     return new Promise((resolve) => {
       EmailHelper.sender.next({
         email: { to, subject, content: template, attachments },
@@ -147,7 +144,7 @@ export class EmailHelper {
     { to, cc, bcc, subject, content, attachments }: MailInfo,
   ): Promise<any> {
     const templatePath = path.join(__dirname, 'emails', 'hello');
-    logger.log(`found template for path: ${templatePath}`);
+    Logger.log(`found template for path: ${templatePath}`);
     return EmailHelper.emailTemplate.send({
       // text: body.content,
       template: templatePath,

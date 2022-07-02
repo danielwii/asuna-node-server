@@ -1,7 +1,4 @@
-import { Logger } from '@nestjs/common';
-
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
@@ -11,7 +8,9 @@ import ow from 'ow';
 
 import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';
 import { WxHelper } from './wx.helper';
-import {
+import { WxUserInfo, WxUserList } from './wx.vo';
+
+import type {
   MiniSubscribeData,
   SubscribeMessageInfo,
   TemplateData,
@@ -19,9 +18,6 @@ import {
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
-import { WxUserInfo, WxUserList } from './wx.vo';
-
-const logger = new Logger(resolveModule(__filename, 'WeChatApi'));
 
 type QrScene =
   | {

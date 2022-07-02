@@ -9,10 +9,9 @@ import { auth, AuthType } from '../helper';
 
 import type { JwtPayload } from '../core/auth';
 
-const logger = new Logger(resolveModule(__filename, 'GqlAuthGuard'));
-
 @Injectable()
 export class GqlAdminAuthGuard implements CanActivate {
+  private readonly logger = new Logger(resolveModule(__filename, GqlAdminAuthGuard.name));
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const { req, res } = ctx.getContext();
@@ -29,7 +28,7 @@ export class GqlAdminAuthGuard implements CanActivate {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.verbose(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    this.logger.verbose(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     const result = await auth(req, res, AuthType.admin);
 
     if (!result.payload) {
@@ -49,6 +48,7 @@ export class GqlAdminAuthGuard implements CanActivate {
  */
 @Injectable()
 export class GqlAuthGuard implements CanActivate {
+  private readonly logger = new Logger(resolveModule(__filename, GqlAuthGuard.name));
   /**
    * @param opts.anonymousSupport default false
    */
@@ -75,7 +75,7 @@ export class GqlAuthGuard implements CanActivate {
       ips: req.ips,
       hostname: req.hostname,
     };
-    logger.verbose(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
+    this.logger.verbose(`canActivate ${context.getClass().name}.${context.getHandler().name} ${r(info)}`);
     const result = await auth(req, res, this.opts.type);
 
     if (this.opts.anonymousSupport) {

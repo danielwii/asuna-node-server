@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -12,8 +11,6 @@ import { FeaturesConfigObject } from '../config/features.config';
 import type { CronStatsInterface } from './stats.interface';
 
 type CronStat = Omit<CronStatsInterface, 'events'>;
-
-const logger = new Logger(resolveModule(__filename));
 
 export class StatsHelper {
   private static enable = FeaturesConfigObject.instance.errorStats;
@@ -29,7 +26,7 @@ export class StatsHelper {
     // logger.debug(`add error info ${r({ key, info })}`);
     const opts = { prefix: this.prefix, key };
     const errors = await InMemoryDB.list(opts);
-    logger.debug(`current errors length is ${errors?.length}`);
+    Logger.debug(`current errors length is ${errors?.length}`);
     if (errors?.length > 1000) {
       // todo remove more
       await InMemoryDB.clear(opts);
@@ -44,7 +41,7 @@ export class StatsHelper {
         const stats = saved ?? {};
         const newValue = _.isNumber(stats[key]) ? stats[key] + 1 : 0;
         const newStats = { ...stats, [key]: newValue };
-        logger.debug(`update stats ${r({ stats, newStats, key, value: stats[key], newValue })}`);
+        Logger.debug(`update stats ${r({ stats, newStats, key, value: stats[key], newValue })}`);
         return newStats;
       },
       { expiresInSeconds: CacheTTL.WEEK },
@@ -78,10 +75,10 @@ export class StatsHelper {
   }
 
   public static async addCronFailureEvent(key: string, event): Promise<void> {
-    logger.log(`add cron failure event ${r({ key, event })}`);
+    Logger.log(`add cron failure event ${r({ key, event })}`);
     const cronStat = (await InMemoryDB.get({ prefix: this.prefix, key })) as CronStat;
     if (cronStat) {
-      logger.log(`current stat is ${r(cronStat)}`);
+      Logger.log(`current stat is ${r(cronStat)}`);
       await InMemoryDB.save({ prefix: this.prefix, key }, () =>
         Promise.resolve({
           ...cronStat,

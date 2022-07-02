@@ -1,11 +1,7 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { HealthCheck, HealthCheckService } from '@nestjs/terminus';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
 import _ from 'lodash';
-
-const logger = new Logger(resolveModule(__filename, 'HealthController'));
 
 @Controller('health')
 export class HealthController {
@@ -15,9 +11,8 @@ export class HealthController {
 
   // eslint-disable-next-line max-params
   public constructor(
-    private health: HealthCheckService, // private http: HttpHealthIndicator,
-  ) // private memory: MemoryHealthIndicator,
-  // private typeorm: TypeOrmHealthIndicator,
+    private health: HealthCheckService, // private http: HttpHealthIndicator, // private memory: MemoryHealthIndicator,
+  ) // private typeorm: TypeOrmHealthIndicator,
   // private disk: DiskHealthIndicator,
   {}
 

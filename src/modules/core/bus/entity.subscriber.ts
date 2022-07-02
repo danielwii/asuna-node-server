@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
@@ -8,14 +9,11 @@ import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, Re
 import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 
 import { CacheHelper, CleanCacheType } from '../../cache';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
 import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 
 import type { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import type { MetaInfoOptions } from '../../common/decorators';
-
-const logger = new Logger(resolveModule(__filename, 'EntitySubscriber'));
 
 const safeReload = (metadata: EntityMetadata, entity): void => {
   if (!_.isObject(entity)) return;
@@ -39,11 +37,13 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
+  private readonly logger = new Logger(resolveModule(__filename, EntitySubscriber.name));
+
   constructor() {
-    logger.log('init ...');
+    this.logger.log('init ...');
 
     PubSubHelper.subscribe<CleanCacheType>(PubSubChannels.dataloader).subscribe(({ action, payload }) => {
-      logger.debug(`sub ${r({ action, payload })}`);
+      this.logger.debug(`sub ${r({ action, payload })}`);
       CacheHelper.clear(payload);
     });
   }

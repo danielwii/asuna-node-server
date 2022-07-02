@@ -2,13 +2,10 @@ import { Logger } from '@nestjs/common';
 
 import { DeleteResult } from 'typeorm';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { UserProfile } from './auth';
 import { UserFollow } from './interaction/follow.entities';
 
 import type { InteractionFollowType } from './interaction/enum-values';
-
-const logger = new Logger(resolveModule(__filename, 'UserHelper'));
 
 export class UserHelper {
   static async follow(follower: UserProfile, type: InteractionFollowType, following: string): Promise<UserFollow> {
@@ -17,7 +14,7 @@ export class UserHelper {
       return UserFollow.create({ type, follower, following }).save();
     }
     if (count > 1) {
-      UserFollow.delete(items.slice(1).map((item) => item.id)).catch((reason) => logger.error(reason));
+      UserFollow.delete(items.slice(1).map((item) => item.id)).catch((reason) => Logger.error(reason));
     }
     return items[1];
   }

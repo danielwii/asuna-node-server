@@ -10,15 +10,12 @@ import { BaseEntity, ObjectLiteral } from 'typeorm';
 
 import { PrimaryKey, Profile } from '../../common';
 import { AppDataSource } from '../../datasource';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
 import { KvHelper } from '../kv/kv.helper';
 
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
-
-const logger = new Logger(resolveModule(__filename, 'RestHelper'));
 
 export class RestHelper {
   public static async get<T extends BaseEntity>(
@@ -36,7 +33,7 @@ export class RestHelper {
     const repository = DBHelper.repo<T>(model);
     const parsedFields = parseFields(fields);
 
-    logger.log(`get ${r({ profile, model, id, parsedFields, relationsStr })}`);
+    Logger.log(`get ${r({ profile, model, id, parsedFields, relationsStr })}`);
 
     const queryBuilder = repository.createQueryBuilder(model.model);
 
@@ -53,7 +50,7 @@ export class RestHelper {
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
-    logger.log(`save ${r({ model, body })}`);
+    Logger.log(`save ${r({ model, body })}`);
     const tenantRelatedFields = {};
     if (tenant) {
       await TenantHelper.checkPermission(user.id as string, model.entityName);
@@ -76,17 +73,17 @@ export class RestHelper {
         }
       }
     }
-    logger.debug(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
+    Logger.debug(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
-      logger.log(`save by kv... ${r(pair)}`);
+      Logger.log(`save by kv... ${r(pair)}`);
       return (await KvHelper.set(pair)) as any;
     }
 
     const repository = DBHelper.repo(model);
     const relationKeys = repository.metadata.relations.map((relation) => relation.propertyName);
-    logger.log(`pick ${r({ relationKeys, body })}`);
+    Logger.log(`pick ${r({ relationKeys, body })}`);
     const relationIds = R.map((value) => (_.isArray(value) ? value.map((id) => ({ id })) : { id: value }))(
       R.pick(relationKeys, body || {}) as any,
     );
@@ -114,7 +111,7 @@ export class RestHelper {
       .distinct(true)
       .getRawMany();
     const arr = _.compact(_.flatMap(raw, fp.get(column)));
-    logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
+    Logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
     return arr;
   }
 
@@ -142,7 +139,7 @@ export class RestHelper {
       fp.mapValues((v) => _.assign({}, ...v)), // merge values
       // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
     )(raw);
-    logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats })}`);
+    Logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats })}`);
     return stats;
   }
 }

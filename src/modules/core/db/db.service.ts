@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { DataSource, Repository } from 'typeorm';
 
 import { Profile } from '../../common';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { DBHelper, parseFields } from './db.helper';
-
-const logger = new Logger(resolveModule(__filename, 'DBService'));
 
 @Injectable()
 export class DBService {
+  private readonly logger = new Logger(resolveModule(__filename, DBService.name));
+
   constructor(private readonly dataSource: DataSource) {}
 
   repos(): Repository<any>[] {
@@ -30,7 +30,7 @@ export class DBService {
     const repository = DBHelper.repo(opts.entity);
     const parsedFields = parseFields(opts.fields);
 
-    logger.log(`get ${r({ opts, parsedFields })}`);
+    this.logger.log(`get ${r({ opts, parsedFields })}`);
 
     const queryBuilder = repository.createQueryBuilder(opts.entity);
 

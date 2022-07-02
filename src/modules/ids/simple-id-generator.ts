@@ -1,5 +1,5 @@
-import { oneLineTrim } from 'common-tags';
 import Chance from 'chance';
+import { oneLineTrim } from 'common-tags';
 
 /**
  * ?????????????????? - 0000     - 000000

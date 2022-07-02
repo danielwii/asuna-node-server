@@ -15,12 +15,12 @@ import { OrgRole, OrgUser } from './tenant.entities';
 
 import type { CreateStaffVO } from '@danielwii/asuna-shared';
 
-const logger = new Logger(resolveModule(__filename, 'TenantAuthService'));
-
 const chance = new Chance();
 
 @Injectable()
 export class TenantAuthService extends AbstractAuthService<OrgUser> {
+  private readonly logger = new Logger(resolveModule(__filename, TenantAuthService.name));
+
   public constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     super(OrgUser, dataSource.getRepository<OrgUser>(OrgUser));
 
@@ -39,13 +39,13 @@ export class TenantAuthService extends AbstractAuthService<OrgUser> {
     // roleNames?: string[],
   ): Promise<CreatedUser<OrgUser>> {
     const roleNames = [TenantRoleName.admin];
-    logger.log(`createUser ${r({ username, email, channel, roleNames })}`);
+    this.logger.log(`createUser ${r({ username, email, channel, roleNames })}`);
     const { hash, salt } = PasswordHelper.encrypt(password);
     const roles = _.isEmpty(roleNames) ? null : await OrgRole.findBy({ name: In(roleNames) });
 
     const user = await this.getUser({ username, email });
     if (user) {
-      logger.log(`found user ${r(user)}`);
+      this.logger.log(`found user ${r(user)}`);
       return { user };
     }
 
@@ -71,10 +71,10 @@ export class TenantAuthService extends AbstractAuthService<OrgUser> {
     ow(username, 'username', ow.string.nonEmpty);
     ow(email, 'email', ow.string.nonEmpty);
 
-    logger.log(`createStaff ${r({ tenantId, username, email, nickname, password })}`);
+    this.logger.log(`createStaff ${r({ tenantId, username, email, nickname, password })}`);
     const staff = await this.getUser({ username, email });
     if (staff) {
-      logger.log(`found staff ${r(staff)}`);
+      this.logger.log(`found staff ${r(staff)}`);
       return { staff };
     }
 

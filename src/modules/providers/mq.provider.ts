@@ -8,10 +8,9 @@ import _ from 'lodash';
 
 import { MQConfigObject } from './mq.config';
 
-const logger = new Logger(resolveModule(__filename, 'MQProvider'));
-
 @Injectable()
 export class MQProvider {
+  private readonly logger = new Logger(resolveModule(__filename, MQProvider.name));
   private static _instance: MQProvider;
 
   private _connectionFuture?: amqp.Connection;
@@ -24,21 +23,21 @@ export class MQProvider {
 
   private async createConnection(): Promise<amqp.Connection> {
     if (!MQProvider.enabled) {
-      logger.error(`mq not enabled: ${MQProvider.enabled}`);
+      this.logger.error(`mq not enabled: ${MQProvider.enabled}`);
       return Promise.reject();
     }
 
     const { url } = MQConfigObject.load();
-    logger.log(`connecting to ${url}`);
+    this.logger.log(`connecting to ${url}`);
     await amqp
       .connect(url)
       .then((connection) => {
         this._connectionFuture = connection as amqp.Connection;
         this.isHealthy = true;
-        logger.log('connection established');
+        this.logger.log('connection established');
       })
       .catch((error) => {
-        logger.error(`connect to mq error: ${r(error)}`);
+        this.logger.error(`connect to mq error: ${r(error)}`);
 
         this.isHealthy = false;
         /*
@@ -57,7 +56,7 @@ export class MQProvider {
             .catch(() => {
               this.isHealthy = false;
               // this._retryLimit -= 1;
-              logger.error(`reconnect to mq error, retry in 10s.`);
+              this.logger.error(`reconnect to mq error, retry in 10s.`);
             });
         }, 10000);
         return Promise.reject();
@@ -84,7 +83,7 @@ export class MQProvider {
     }
 
     return this.channel.assertQueue(topic).then((ok) => {
-      logger.log(`send payload(${r(payload)}) to topic(${topic})`);
+      this.logger.log(`send payload(${r(payload)}) to topic(${topic})`);
       return this.channel.sendToQueue(topic, Buffer.from(JSON.stringify(payload)));
     });
   }

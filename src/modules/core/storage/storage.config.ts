@@ -22,8 +22,6 @@ export class QiniuConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${QiniuConfigObject.key}_`;
 
-  private static logger = new Logger(resolveModule(__filename, 'QiniuConfigObject'));
-
   public enable: boolean;
   // bucket 应该用 scope 来替换，用来明确概念
   public bucket: string;
@@ -44,7 +42,7 @@ export class QiniuConfigObject {
 
   public static load(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject {
     const appendPrefix = prefix ? `${prefix}_`.toUpperCase() : '';
-    this.logger.verbose(`try load env: ${QiniuConfigObject.prefix}${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
+    Logger.verbose(`try load env: ${QiniuConfigObject.prefix}${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
     return withP2(
       (p): any => configLoader.loadConfig2(QiniuConfigObject.key, p),
       QiniuConfigKeys,
@@ -62,7 +60,7 @@ export class QiniuConfigObject {
 
   static loadOr(prefix: 'videos' | 'images' | 'files' | 'chunks' | string = ''): QiniuConfigObject | null {
     const appendPrefix = (prefix.length ? `${prefix}_` : '').toUpperCase();
-    this.logger.log(`loadOr env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
+    Logger.log(`loadOr env: ${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
     const enable = configLoader.loadBoolConfig(`${appendPrefix}${QiniuConfigKeys.QINIU_ENABLE}`);
     if (enable === true) {
       return QiniuConfigObject.load(prefix);

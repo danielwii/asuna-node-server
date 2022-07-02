@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -10,8 +9,6 @@ import { AppDataSource } from '../datasource';
 import { SessionUser, VirtualDevice, VirtualSession } from './entities';
 
 import type { RequestInfo } from '../helper';
-
-const logger = new Logger(resolveModule(__filename));
 
 export class ClientHelper {
   public static async reg(seid: string, sdid: string, req: RequestInfo): Promise<SessionUser> {
@@ -40,7 +37,7 @@ export class ClientHelper {
       }
 
       const lastSessionUserByDevice = await SessionUser.findOneBy({ deviceId: sdid });
-      logger.log(`lastSessionUserByDevice ${r({ seid, lastSessionUserByDevice })}`);
+      Logger.log(`lastSessionUserByDevice ${r({ seid, lastSessionUserByDevice })}`);
 
       sessionUser = await manager.save(
         SessionUser.create({
@@ -49,7 +46,7 @@ export class ClientHelper {
           sessionId: seid,
         }),
       );
-      logger.log(`create session user ${r(sessionUser)}`);
+      Logger.log(`create session user ${r(sessionUser)}`);
     });
 
     return sessionUser;
@@ -95,7 +92,7 @@ export class ClientHelper {
 
     if (!doNotCreate) {
       const lastSessionUserByDevice = await SessionUser.findOneBy({ deviceId: virtualSession.deviceId });
-      logger.log(`lastSessionUserByDevice ${r({ virtualSession, lastSessionUserByDevice })}`);
+      Logger.log(`lastSessionUserByDevice ${r({ virtualSession, lastSessionUserByDevice })}`);
 
       return SessionUser.create({
         uid: lastSessionUserByDevice?.uid ?? SessionUser.generator.nextId(),

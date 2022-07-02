@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -22,8 +21,6 @@ import type { GraphQLResolveInfo } from 'graphql';
 import type { FieldNode } from 'graphql/language/ast';
 import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
-
-const logger = new Logger(resolveModule(__filename));
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);
@@ -50,9 +47,9 @@ export function loader<Entity extends BaseEntity>(
 ): DataLoaderFunction<Entity> {
   return build<Entity>(
     cachedDataLoader(entity.name, (ids) => {
-      // logger.debug(`cachedDataLoader load ${entity.name}: ${ids}`);
+      // Logger.debug(`cachedDataLoader load ${entity.name}: ${ids}`);
       const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(entity));
-      logger.verbose(`${entity} primaryKey is ${primaryKey}`);
+      Logger.verbose(`${entity} primaryKey is ${primaryKey}`);
       return entity
         .find({
           where: {
@@ -71,13 +68,13 @@ export class DataloaderCleaner {
   public static redisLoaders: Record<string, any> = {};
 
   public static reg(segment: string, loader) {
-    logger.log(`reg redis cleaner ${segment}`);
+    Logger.log(`reg redis cleaner ${segment}`);
     DataloaderCleaner.redisLoaders[segment] = loader;
   }
 
   public static clear(segment: string, id: PrimaryKey): void {
     const key = `${segment}:${id}`;
-    logger.log(`remove loader cache ... ${r(key)}`);
+    Logger.log(`remove loader cache ... ${r(key)}`);
     if (DataloaderCleaner.redisLoaders[segment]) {
       const redisLoader = DataloaderCleaner.redisLoaders[segment];
       redisLoader.clear(id);
@@ -98,7 +95,7 @@ export class GenericDataLoader<T extends DefaultRegisteredLoaders> {
   }
 
   public initLoaders(loaders: T): void {
-    logger.debug(`init loaders ${r(loaders)}`);
+    Logger.debug(`init loaders ${r(loaders)}`);
     GenericDataLoader._loaders = loaders;
   }
 
@@ -112,17 +109,17 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   const enableRedisDataLoader = configLoader.loadBoolConfig('DATALOADER_REDIS_CACHE', true);
   // const redis = RedisProvider.getRedisClient('dataloader');
   if (redisConfig.enable && enableRedisDataLoader) {
-    logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig.host)}`);
+    Logger.log(`init redis dataloader for ${segment} ... ${r(redisConfig.host)}`);
     const redis = new Redis(redisConfig.getIoOptions());
     redis.on('error', (reason) => {
-      logger.error(`ioredis connection error ${r(reason)}`);
+      Logger.error(`ioredis connection error ${r(reason)}`);
     });
     const redisLoader = new (createRedisDataloader({ redis }))(
       `dataloader-${segment}`,
       // create a regular dataloader. This should always be set with caching disabled.
       new DataLoader(
         (ids) => {
-          logger.debug(`redis dataloader load ${segment}: ${ids}`);
+          Logger.debug(`redis dataloader load ${segment}: ${ids}`);
           return fn(ids);
         },
         { batchScheduleFn: (callback) => setTimeout(callback, 20), cache: false },
@@ -145,7 +142,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
   const cache = new CacheManager('dataloader');
   return new DataLoader(
     (ids) => {
-      logger.debug(`dataloader load ${segment}: ${ids}`);
+      Logger.debug(`dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     {
@@ -155,29 +152,29 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
           const key = `${segment}:${id}`;
           const ttl = cache.getRemainingTTL({ prefix: 'dataloader', key });
           const value = cache.get({ prefix: 'dataloader', key });
-          logger.verbose(`get (${key}) ${r({ exists: !!value, ttl: parseInt(String(ttl / 1000), 10) })}`);
+          Logger.verbose(`get (${key}) ${r({ exists: !!value, ttl: parseInt(String(ttl / 1000), 10) })}`);
           return value;
         },
         set: async (id: string, value) => {
           const key = `${segment}:${id}`;
           const promised = await value;
           if (promised) {
-            logger.verbose(`dataloader set ${key}`);
+            Logger.verbose(`dataloader set ${key}`);
             const result = cache.set({ prefix: 'dataloader', key }, promised, CacheTTL.FLASH / 1000);
-            logger.debug(`set (${key}) size ${result.size}/${result.max}/${result.maxSize}`);
+            Logger.debug(`set (${key}) size ${result.size}/${result.max}/${result.maxSize}`);
           }
         },
         delete: (id: string) => {
           const key = `${segment}:${id}`;
           cache.clear({ prefix: 'dataloader', key });
           PubSubHelper.publish(PubSubChannels.dataloader, { action: 'delete', payload: key }).catch((reason) =>
-            logger.error(reason),
+            Logger.error(reason),
           );
         },
         clear: () => {
-          logger.log(`clear (${segment})`);
+          Logger.log(`clear (${segment})`);
           cache.clearAll();
-          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch((reason) => logger.error(reason));
+          PubSubHelper.publish(PubSubChannels.dataloader, { action: 'clear' }).catch((reason) => Logger.error(reason));
         },
       },
     },
@@ -187,7 +184,7 @@ export function cachedDataLoader(segment: string, fn): DataLoader<PrimaryKey, an
 export function cachedPerRequestDataLoader(segment: string, fn): DataLoader<PrimaryKey, any> {
   return new DataLoader(
     (ids) => {
-      logger.debug(`per-request dataloader load ${segment}: ${ids}`);
+      Logger.debug(`per-request dataloader load ${segment}: ${ids}`);
       return fn(ids);
     },
     { batchScheduleFn: (callback) => setTimeout(callback, 20), cacheMap: new LRUMap(100) },
@@ -231,10 +228,10 @@ export function resolveRelationsFromInfo(
         .filter((node) => node.selectionSet)
         .map((node) => node.name.value),
     );
-    logger.debug(`resolved relations ${r({ path, locations, relations })}`);
+    Logger.debug(`resolved relations ${r({ path, locations, relations })}`);
     return { relations };
   } catch (error) {
-    logger.warn(`resolveRelationsFromInfo ${r(error)}`);
+    Logger.warn(`resolveRelationsFromInfo ${r(error)}`);
     return false;
   }
 }
@@ -270,10 +267,10 @@ export function resolveFieldsFromInfo(info: GraphQLResolveInfo, path: string): s
         // .filter((node) => node.selectionSet)
         .map((node) => node.name.value),
     );
-    logger.debug(`resolved relations ${r({ path, locations, fields })}`);
+    Logger.debug(`resolved relations ${r({ path, locations, fields })}`);
     return fields;
   } catch (error) {
-    logger.warn(`resolveRelationsFromInfo ${r(error)}`);
+    Logger.warn(`resolveRelationsFromInfo ${r(error)}`);
     return [];
   }
 }
@@ -297,10 +294,10 @@ export function resolveSelectsFromInfo(info: GraphQLResolveInfo, path: string): 
     const selects = ((selectionNode || fieldNode).selectionSet.selections as FieldNode[])
       .filter((node) => !node.selectionSet)
       .map((node) => node.name.value);
-    logger.debug(`resolved selects ${r({ path, selects })}`);
+    Logger.debug(`resolved selects ${r({ path, selects })}`);
     return selects;
   } catch (error) {
-    logger.warn(`resolveRelationsFromInfo ${r(error)}`);
+    Logger.warn(`resolveRelationsFromInfo ${r(error)}`);
     return null;
   }
 }

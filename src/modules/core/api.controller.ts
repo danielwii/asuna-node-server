@@ -21,11 +21,10 @@ import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 import type { RegDeviceDTO } from '@danielwii/asuna-shared/dist/dto';
 import type { RequestInfo } from '../helper';
 
-const logger = new Logger(resolveModule(__filename));
-
 @ApiTags('core')
 @Controller('api')
 export class ApiController {
+  private readonly logger = new Logger(resolveModule(__filename, ApiController.name));
   private readonly appEnv = AppEnv.instance;
 
   @Get('version')
@@ -86,7 +85,7 @@ export class ApiController {
     if (!scid && !deviceID) {
       throw new AsunaException(AsunaErrorCode.FeatureDisabled, 'device middleware needed.');
     }
-    logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID, body })}`);
+    this.logger.log(`reg device by ${r({ identifier, user, payload, scid, sessionID, deviceID, body })}`);
     // TODO project-id
     await ClientHelper.reg(sessionID, scid ? ClientHelper.parseClientId(scid).sdid : deviceID, req);
     return ApiResponse.success();
@@ -99,7 +98,7 @@ export class ApiController {
     @Req() req: JwtAuthRequest,
   ): Promise<{ expiresIn: number; accessToken: string }> {
     const { identifier, user, payload, scid } = req;
-    logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
+    this.logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
 
     if (scid) {
       return TokenHelper.createSessionToken(null, { scid, ...body });
@@ -112,7 +111,7 @@ export class ApiController {
     @Req() req: JwtAuthRequest,
   ): Promise<ApiResponse<{ expiresIn: number; accessToken: string }>> {
     const { identifier, user, payload, scid } = req;
-    logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
+    this.logger.log(`generate session token by ${r({ identifier, user, payload, scid, body })}`);
 
     if (scid) {
       return ApiResponse.success(await TokenHelper.createSessionToken(null, { scid, ...body }));

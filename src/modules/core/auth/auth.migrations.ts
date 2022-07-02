@@ -1,11 +1,8 @@
 import { Logger } from '@nestjs/common';
 
 import { SimpleIdGenerator } from '../../ids';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { MigrationsHelper } from '../migrations/migrations.helper';
 import { AdminUser } from './auth.entities';
-
-const logger = new Logger(resolveModule(__filename, 'AuthMigrations'));
 
 export class AuthMigrations {
   static readonly version = 1;
@@ -28,9 +25,9 @@ export class AuthMigrations {
   static async migrate(): Promise<void> {
     const key = 'AdminUser';
     const currentVersion = await MigrationsHelper.getVersion(key);
-    logger.log(`migrate: check versions for '${key}' '${currentVersion}' with '${this.version}'`);
+    Logger.log(`migrate: check versions for '${key}' '${currentVersion}' with '${this.version}'`);
     if (currentVersion < this.version) {
-      logger.log(`migrate: run migrations for '${key}' ...`);
+      Logger.log(`migrate: run migrations for '${key}' ...`);
       // eslint-disable-next-line no-restricted-syntax
       for (const user of await AdminUser.find()) {
         if (!user.id) {
@@ -40,7 +37,7 @@ export class AuthMigrations {
         }
       }
       await MigrationsHelper.updateVersion(AdminUser.name, this.version);
-      logger.log(`migrate: run migrations for '${key}' done, update version to '${this.version}' ...`);
+      Logger.log(`migrate: run migrations for '${key}' done, update version to '${this.version}' ...`);
     }
   }
 }

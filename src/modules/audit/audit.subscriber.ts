@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
@@ -7,29 +8,27 @@ import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, U
 
 import { FeaturesConfigObject } from '../config/features.config';
 import { AppDataSource } from '../datasource';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { AuditService } from './audit.service';
-
-const logger = new Logger(resolveModule(__filename, 'AuditSubscriber'));
 
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
+  private readonly logger = new Logger(resolveModule(__filename, AuditSubscriber.name));
   private map = new Map();
   private auditService: AuditService = new AuditService();
   private enabled = FeaturesConfigObject.load().auditEnable;
 
   public constructor() {
-    logger.log(`init ... audit: ${this.enabled}`);
+    this.logger.log(`init ... audit: ${this.enabled}`);
   }
 
   public afterInsert(event: InsertEvent<any>) {
     if (!this.enabled) return;
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    // logger.verbose(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // this.logger.verbose(`call afterInsert... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord('entity', 'insert', { type: event.entity.constructor.name }, null, event.entity, null)
-      .catch((error) => logger.warn(r(error)));
+      .catch((error) => this.logger.warn(r(error)));
   }
 
   public async beforeUpdate(event: UpdateEvent<any>): Promise<any> {
@@ -42,7 +41,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
       loadRelationIds: true,
     });
     if (entity) {
-      // logger.verbose(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
+      // this.logger.verbose(`call beforeUpdate... ${event.entity.constructor.name} ${r(event.entity)}`);
       this.map.set(`${event.entity.name}-${event.entity.id}`, { ...(entity as any) });
     }
   }
@@ -53,7 +52,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
     const from = this.map.get(`${event.entity.name}-${event.entity.id}`);
-    // logger.verbose(
+    // this.logger.verbose(
     //   `call afterUpdate... ${event.entity.constructor.name} ${r({
     //     diff: diff(from, event.entity),
     //   })}`,
@@ -68,7 +67,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
       )
       .then(() => this.map.delete(`${event.entity.name}-${event.entity.id}`))
-      .catch((error) => logger.warn(r(error)));
+      .catch((error) => this.logger.warn(r(error)));
   }
 
   public afterRemove(event: RemoveEvent<any>) {
@@ -76,7 +75,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     // console.log('afterRemove', event.entity, (event, _ => _.entity.constructor.name));
     if (!event.entity || event.entity.constructor.name === 'Object') return;
 
-    // logger.verbose(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
+    // this.logger.verbose(`call afterRemove... ${event.entity.constructor.name} ${r(event.entity)}`);
     this.auditService
       .addRecord(
         'entity',
@@ -86,6 +85,6 @@ export class AuditSubscriber implements EntitySubscriberInterface {
         null,
         null,
       )
-      .catch((error) => logger.warn(r(error)));
+      .catch((error) => this.logger.warn(r(error)));
   }
 }

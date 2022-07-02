@@ -6,11 +6,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 
 import { auth } from '../../helper/auth';
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import type { Request, Response } from 'express';
-
-const logger = new Logger(resolveModule(__filename, 'AdminAuthMiddleware'));
 
 /**
  * 整合客户端和服务端验证，包含服务端头时进行服务端权限验证，否则进行客户端认证
@@ -24,7 +21,7 @@ export class AdminAuthMiddleware {
       if (!matched) {
         return next();
       }
-      logger.verbose(`check url: ${r({ url, routeFilters, matched })}`);
+      Logger.verbose(`check url: ${r({ url, routeFilters, matched })}`);
       if (['/admin/auth/reset-password', '/admin/auth/token'].includes(url)) {
         return next();
       }

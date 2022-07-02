@@ -15,8 +15,6 @@ import { configLoader } from '../config';
 
 import type { Server } from 'ws';
 
-const logger = new Logger(resolveModule(__filename, 'WSGateway(default)'));
-
 export const WSConfigKeys = {
   WS_PORT: 'WS_PORT',
 };
@@ -30,6 +28,8 @@ const port = configLoader.loadNumericConfig(WSConfigKeys.WS_PORT, 3002);
   serveClient: false,
 })
 export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(resolveModule(__filename, WSGateway.name));
+
   @WebSocketServer()
   private server: Server;
 
@@ -52,11 +52,11 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
   }
 
   public afterInit(server: any): any {
-    logger.log(`init... listening on :${port}`);
+    this.logger.log(`init... listening on :${port}`);
   }
 
   handleConnection(client: any, ...args: any[]): any {
-    logger.log(`connected... id: ${client.id}`);
+    this.logger.log(`connected... id: ${client.id}`);
     // eslint-disable-next-line no-param-reassign
     client.id = `id-${Date.now()}`;
     this.server.emit('events', 'hello?');
@@ -67,6 +67,6 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
   }
 
   handleDisconnect(client: any): any {
-    logger.log(`disconnect... id: ${client.id}`);
+    this.logger.log(`disconnect... id: ${client.id}`);
   }
 }

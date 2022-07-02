@@ -16,10 +16,10 @@ import { OrgUser } from './tenant.entities';
 import type { DeepPartial } from 'typeorm';
 import type { OrgJwtAuthRequest } from './auth';
 
-const logger = new Logger(resolveModule(__filename, 'AuthController'));
-
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {
+  private readonly logger = new Logger(resolveModule(__filename, TenantAuthController.name));
+
   public constructor(public readonly authService: TenantAuthService) {
     super(OrgUser, authService);
   }
@@ -35,7 +35,7 @@ export class TenantAuthController extends AbstractAuthController<OrgUser> {
   @UseGuards(OrgJwtAuthGuard)
   public async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
     const { user, payload } = req;
-    logger.log(`current... ${r({ user, payload })}`);
+    this.logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
       throw new AsunaException(AsunaErrorCode.InvalidCredentials, `user '${user.username}' not active or exist.`);
     }
@@ -49,12 +49,12 @@ export class TenantAuthController extends AbstractAuthController<OrgUser> {
     this.authService
       .updateLastLoginDate(payload.id)
       .then(({ sameDay, lastLoginAt }) => {
-        logger.debug(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
+        this.logger.debug(`updateLastLoginDate ${r({ sameDay, lastLoginAt })}`);
         if (!sameDay) Hermes.emit(AbstractAuthController.name, 'user.first-login-everyday', payload);
         // !sameDay && Hermes.emit(AuthController.name, HermesUserEventKeys.firstLoginEveryday, payload);
       })
-      .catch((reason) => logger.error(reason));
-    logger.debug(`current authed user is ${r(loaded)}`);
+      .catch((reason) => this.logger.error(reason));
+    this.logger.debug(`current authed user is ${r(loaded)}`);
     /*
     const result = _.omit(loaded, 'channel', 'info'); // ...
     if (DBHelper.getColumnNames(this.UserEntity).includes('profile')) {
