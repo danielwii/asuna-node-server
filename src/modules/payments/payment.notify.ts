@@ -26,7 +26,7 @@ export class PaymentNotifyHelper {
       const tmplPath = 'payment-success';
       const tmplId = _.get(PaymentNotifyHelper.config.templates, tmplPath);
       const phonePath = 'paymentInfo.mobile';
-      const phoneNumber = _.get(order.transaction, phonePath);
+      const phoneNumber = _.get(order.transaction, phonePath) as string;
       if (PaymentNotifyHelper.config.enable) {
         if (tmplId && phoneNumber) {
           SMSHelper.sendSMS(tmplId, phoneNumber).catch((reason) => Logger.error(reason));

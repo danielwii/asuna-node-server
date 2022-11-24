@@ -530,7 +530,7 @@ export class GraphqlHelper {
     // 同样就认为存在更多，如果刚好不存在，就返回之前的 endCursor 也就是 after
     const hasNextPage = first === items.length;
     const latest = _.last(items);
-    const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? request.after };
+    const cursorInfo = { hasNextPage, endCursor: _.get(latest, 'id') ?? (request.after as any) };
     Logger.debug(
       `handleCursoredQueryRequest ${r({ countOptions, total, findOptions, first, request, latest, cursorInfo })}`,
     );

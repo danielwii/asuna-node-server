@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 
-import { ClassSerializerInterceptor, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, LogLevel, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -56,7 +56,6 @@ import { TracingInterceptor } from './modules/tracing';
 import './typeorm.fixture';
 
 import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
-import type { LogLevel } from '@nestjs/common/services/Logger.service';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 

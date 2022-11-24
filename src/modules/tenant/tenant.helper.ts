@@ -220,9 +220,9 @@ export class TenantHelper {
   static async checkResourceLimit(userId: string, fullModelName: string): Promise<void> {
     const info = await TenantHelper.info(userId);
     const count = info.recordCounts[fullModelName];
-    const limit = _.get(info.config, `limit.${fullModelName}`);
+    const limit = _.get(info.config, `limit.${fullModelName}`) ?? 1;
     Logger.log(`check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`);
-    if (count >= limit) {
+    if (count.total >= limit) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ResourceLimit, ['tenant', limit]);
     }
   }
