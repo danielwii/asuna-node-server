@@ -8,10 +8,11 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 
 import { OrgAuthHelper } from './auth';
-import { OrgUser } from './tenant.entities';
 
+import type { OrgUser } from './tenant.entities';
 import type { AnyAuthRequest } from '../helper';
 import type { JwtPayload } from '../core';
+import { fileURLToPath } from "url";
 
 export type OrgJwtAuthRequest = AnyAuthRequest<JwtPayload, OrgUser>;
 
@@ -22,7 +23,7 @@ export enum TenantRoleName {
 
 @Injectable()
 export class TenantRolesGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(__filename, TenantRolesGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantRolesGuard.name));
 
   public constructor(private readonly oneOf: TenantRoleName[]) {}
 
@@ -52,7 +53,7 @@ export class TenantRolesGuard implements CanActivate {
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
-  private readonly logger = new Logger(resolveModule(__filename, OrgJwtAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), OrgJwtAuthGuard.name));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();

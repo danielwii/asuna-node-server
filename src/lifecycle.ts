@@ -10,10 +10,10 @@ import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/prov
 import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import elasticApmNode from 'elastic-apm-node';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
@@ -26,6 +26,8 @@ import { PrismaService } from './modules/prisma/service';
 import { Store } from './modules/store/store';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
+
+const { Promise } = bluebird;
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   public static async preload(): Promise<void> {
@@ -112,7 +114,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   public static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
     Logger.log(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
-      await handler?.beforeBootstrap?.(app);
+      await handler?.beforeBootstrap?.(app as any);
     }
     Logger.log(`[beforeBootstrap] done`);
   }

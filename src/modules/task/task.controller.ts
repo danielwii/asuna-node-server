@@ -6,10 +6,11 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { IsDefined, IsString } from 'class-validator';
 
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { TaskRecord } from './task.entities';
 import { TaskHelper } from './task.helper';
 
+import type { TaskRecord } from './task.entities';
 import type { AnyAuthRequest } from '../helper/interfaces';
+import { fileURLToPath } from "url";
 
 class CreateTaskDTO {
   @IsString() id: string;
@@ -27,7 +28,7 @@ class SearchTaskDTO {
 
 @Controller('admin/v1/tasks')
 export class TaskController {
-  private readonly logger = new Logger(resolveModule(__filename, TaskController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TaskController.name));
 
   @UseGuards(new JwtAdminAuthGuard())
   @Post()

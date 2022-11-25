@@ -14,7 +14,7 @@ import type { Request } from 'express';
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(Strategy, 'admin-api-key') {
-  public async authenticate(req: Request & ApiKeyRequest, options?: any) {
+  public override async authenticate(req: Request & ApiKeyRequest, options?: any) {
     const self: Strategy = this as any;
     const key = getIgnoreCase(req.headers, API_KEY_HEADER) as string;
     Logger.log(`validate request with options: ${r(options)} key: ${key}`);

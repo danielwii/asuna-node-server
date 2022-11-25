@@ -5,7 +5,7 @@ import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import { MoreThan } from 'typeorm';
 
 import { UserProfile } from '../core/auth';

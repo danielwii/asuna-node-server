@@ -17,11 +17,10 @@ import {
 import { NoPrimaryKeyBaseEntity } from '../../base';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers';
-// eslint-disable-next-line import/no-cycle
-import { UserRelation } from '../interaction/friends.entities';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
+import type { UserRelation } from '../interaction/friends.entities';
 import type { FinancialTransaction, PointExchange, Wallet } from '../../property';
 import type { WXMiniAppUserInfo } from '../../wechat';
 import type { UserFollow } from '../interaction';

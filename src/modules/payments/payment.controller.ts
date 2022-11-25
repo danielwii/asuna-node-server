@@ -13,6 +13,7 @@ import { PaymentHelper } from './payment.helper';
 import { PaymentNotifyHelper } from './payment.notify';
 
 import type { Request, Response } from 'express';
+import { fileURLToPath } from "url";
 
 class CreateOrderDTO {
   @IsString()
@@ -42,7 +43,7 @@ class UpdateOrderDTO {
 
 @Controller('api/v1/payment')
 export class PaymentController {
-  private readonly logger = new Logger(resolveModule(__filename, PaymentController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PaymentController.name));
 
   // @Get('query/:id')
   //  async queryOrder(@Param('id') id) {

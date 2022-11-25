@@ -5,13 +5,14 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import passport from 'passport';
-import { Observable } from 'rxjs';
 
+import type { Observable } from 'rxjs';
 import type { Request, Response } from 'express';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(resolveModule(__filename, AuthInterceptor.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuthInterceptor.name));
   private jwtAuthenticator = passport.authenticate('jwt', { session: false });
 
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {

@@ -21,6 +21,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { DataSource } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { AdminInternalModule } from './admin.module';
 import { AppController } from './app.controller';
@@ -49,7 +50,7 @@ const isProduction = process.env.NODE_ENV === 'production';
                 [SemanticResourceAttributes.SERVICE_NAME]: 'asuna-node-server',
                 [SemanticResourceAttributes.SERVICE_VERSION]: AppEnv.instance.version,
               }),
-            ) as any),*/
+            ) as any), */
       traceAutoInjectors: [ControllerInjector, LoggerInjector],
       instrumentations: getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-pg': { enabled: false },
@@ -64,7 +65,7 @@ const isProduction = process.env.NODE_ENV === 'production';
           new JaegerPropagator(),
           new B3Propagator(),
         ],
-      }),*/
+      }), */
       /*
       spanProcessor: new SimpleSpanProcessor(
         process.env.NODE_ENV === 'production' ? new TraceExporter() : new JaegerExporter(),
@@ -93,7 +94,7 @@ const isProduction = process.env.NODE_ENV === 'production';
           password: configLoader.loadConfig('TYPEORM_PASSWORD') as string,
           entities: process.env.TYPEORM_ENTITIES.split(','),
           subscribers: process.env.TYPEORM_SUBSCRIBERS.split(','),
-          poolSize: configLoader.loadConfig('TYPEORM_POOL_SIZE', 10),
+          // poolSize: configLoader.loadConfig('TYPEORM_POOL_SIZE', 10), TODO
           extra: {
             // based on  https://node-postgres.com/api/pool
             // max connection pool size
@@ -120,7 +121,7 @@ const isProduction = process.env.NODE_ENV === 'production';
   exports: [],
 })
 export class DefaultModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, DefaultModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), DefaultModule.name));
 
   constructor(private readonly dataSource: DataSource) {
     super();

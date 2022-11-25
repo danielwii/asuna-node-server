@@ -6,6 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 import { AnyAuthGuard, JwtAuthRequestExtractor } from './auth/auth.guard';
 import { UserProfile } from './auth/user.entities';
@@ -18,7 +19,7 @@ export class UpdatePortraitDto {
 
 @Controller('api/v1/user')
 export class UserController {
-  private readonly logger = new Logger(resolveModule(__filename, UserController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UserController.name));
 
   @UseGuards(AnyAuthGuard)
   @Put('portrait')

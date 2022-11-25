@@ -9,6 +9,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client';
@@ -112,7 +113,7 @@ import { WebModule } from './web';
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
 export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, AdminInternalModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AdminInternalModule.name));
 
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');

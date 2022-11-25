@@ -11,6 +11,7 @@ import { KvModule } from '../core/kv';
 import { AppDataSource } from '../datasource';
 import { FinancialTransaction, Wallet } from './financial.entities';
 import { PropertyQueryResolver } from './property.resolver';
+import { fileURLToPath } from "url";
 
 @Module({
   imports: [KvModule],
@@ -18,7 +19,7 @@ import { PropertyQueryResolver } from './property.resolver';
   exports: [],
 })
 export class PropertyModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, PropertyModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PropertyModule.name));
 
   async onModuleInit(): Promise<void> {
     this.logger.log('init...');

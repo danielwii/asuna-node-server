@@ -4,10 +4,10 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
 import { IsDefined, IsObject, IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
+import { fileURLToPath } from 'url';
 
 import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';
@@ -16,8 +16,8 @@ import { TenantHelper } from '../tenant/tenant.helper';
 import { Draft } from './draft.entities';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { FeedbackReply } from './feedback.entities';
-import { FeedbackReplyBody } from './feedback.interface';
 
+import type { FeedbackReplyBody } from './feedback.interface';
 import type { PrimaryKey } from '../common';
 import type { JsonMap } from '../common/decorators';
 import type { AnyAuthRequest } from '../helper/interfaces';
@@ -35,7 +35,7 @@ class GetDraftsQuery {
 
 @Controller('admin/v1/content')
 export class ContentAdminController {
-  private readonly logger = new Logger(resolveModule(__filename, ContentAdminController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentAdminController.name));
 
   @UseGuards(AnyAuthGuard)
   @Post('draft')

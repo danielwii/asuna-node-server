@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 
-import { OperationToken } from '../token';
+import type { OperationToken } from '../token';
 
 export class ChunksUploadEvent {
   constructor(public readonly token: OperationToken, public readonly chunk: ChunkInfo) {}

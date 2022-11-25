@@ -12,10 +12,11 @@ import { configLoader } from '../config';
 import { Store } from '../store';
 
 import type { WXJwtPayload } from './interfaces';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {
-  private readonly logger = new Logger(resolveModule(__filename, WXJwtStrategy.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WXJwtStrategy.name));
 
   constructor() {
     super(

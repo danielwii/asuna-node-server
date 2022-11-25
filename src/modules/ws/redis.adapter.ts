@@ -12,13 +12,14 @@ import _ from 'lodash';
 import { createAdapter, RedisAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
+import { fileURLToPath } from "url";
 
 /**
  * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)
  * https://github.com/socketio/socket.io/issues/1739
  */
 export class RedisIoAdapter extends IoAdapter {
-  private readonly logger = new Logger(resolveModule(__filename, RedisIoAdapter.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), RedisIoAdapter.name));
 
   private static redisAdapter: RedisAdapter;
 
@@ -54,7 +55,7 @@ export class RedisIoAdapter extends IoAdapter {
     }
   }
 
-  create(port: number, options: any = {}): any {
+  override create(port: number, options: any = {}): any {
     this.logger.log(`create ${r({ port, options: _.omit(options, 'server') })}`);
     return super.create(port, {
       ...options,
@@ -72,7 +73,7 @@ export class RedisIoAdapter extends IoAdapter {
     });
   }
 
-  createIOServer(port: number, options?: any): any {
+  override createIOServer(port: number, options?: any): any {
     this.logger.log(`createIOServer ${r({ port, options })}`);
     const server = super.createIOServer(port, {
       ...options,

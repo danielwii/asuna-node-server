@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
 
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { Tenant } from './tenant.entities';
 import { TenantHelper, TenantInfo } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
+import type { Tenant } from './tenant.entities';
 import type { AnyAuthRequest } from '../helper/interfaces';
 
 export class RegisterTenantDto {

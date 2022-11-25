@@ -7,6 +7,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { fileURLToPath } from 'url';
 
 import { configLoader } from '../config';
 import { TenantAuthService } from './auth.service';
@@ -15,7 +16,7 @@ import type { JwtPayload } from '../core/auth';
 
 @Injectable()
 export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {
-  private readonly logger = new Logger(resolveModule(__filename, OrgJwtStrategy.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), OrgJwtStrategy.name));
 
   constructor(private readonly authService: TenantAuthService) {
     super(

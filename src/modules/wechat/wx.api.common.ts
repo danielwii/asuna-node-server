@@ -1,10 +1,10 @@
 import { Logger } from '@nestjs/common';
 
-import { Promise } from 'bluebird';
 import { oneLineTrim } from 'common-tags';
 
 import { WxConfigApi } from './wx.api.config';
 
+import type { Promise } from 'bluebird';
 import type { WxAccessToken } from './wx.interfaces';
 
 export class WxBaseApi {

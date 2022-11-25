@@ -6,8 +6,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import DataLoader from 'dataloader';
 import Redis from 'ioredis';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
-import { LRUMap } from 'lru_map';
+import fp from 'lodash/fp';
+import LruMap from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
 import { BaseEntity, In, ObjectType } from 'typeorm';
 
@@ -21,6 +21,8 @@ import type { GraphQLResolveInfo } from 'graphql';
 import type { FieldNode } from 'graphql/language/ast';
 import type { PrimaryKey } from '../common';
 import type { DefaultRegisteredLoaders } from './context';
+
+const { LRUMap } = LruMap;
 
 export interface DataLoaderFunction<Entity extends BaseEntity> {
   load: ((id?: PrimaryKey) => Promise<Entity>) & ((ids?: PrimaryKey[]) => Promise<Entity[]>);

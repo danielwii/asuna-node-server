@@ -1,5 +1,9 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper';
+
+import { fileURLToPath } from 'url';
+
 import { DBService } from './db.service';
 
 @Module({
@@ -8,7 +12,9 @@ import { DBService } from './db.service';
   exports: [DBService],
 })
 export class DBModule implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), DBModule.name));
+
   onModuleInit(): void {
-    Logger.log('init...');
+    this.logger.log('init...');
   }
 }

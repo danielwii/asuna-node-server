@@ -6,10 +6,11 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 import { auth, AuthType } from '../../helper/auth';
-import { AdminUser } from './auth.entities';
 
+import type { AdminUser } from './auth.entities';
 import type { Response } from 'express';
 import type { JwtPayload } from './auth.interfaces';
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
@@ -23,7 +24,7 @@ export class JwtAuthRequestExtractor {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  private readonly logger = new Logger(resolveModule(__filename, JwtAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), JwtAuthGuard.name));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
@@ -52,7 +53,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(__filename, AnyAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AnyAuthGuard.name));
 
   // public constructor(private readonly opts: {}) {}
 

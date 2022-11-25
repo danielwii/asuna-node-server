@@ -3,12 +3,12 @@ import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nes
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
 import { IsString } from 'class-validator';
 
 import { AnyAuthGuard, JwtAuthRequest } from '../auth';
 import { PageHelper } from '../helpers';
 import { UserActivity } from './activities.entities';
+import { fileURLToPath } from "url";
 
 class CreateActivityDTO {
   @IsString() type: string;
@@ -19,7 +19,7 @@ class CreateActivityDTO {
 
 @Controller('api/v1/activities')
 export class ActivitiesController {
-  private readonly logger = new Logger(resolveModule(__filename, ActivitiesController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ActivitiesController.name));
   @UseGuards(AnyAuthGuard)
   @Post()
   async addActivity(@Body() body: CreateActivityDTO, @Req() req: JwtAuthRequest): Promise<UserActivity> {

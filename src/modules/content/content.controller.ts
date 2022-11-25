@@ -4,15 +4,15 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+import { fileURLToPath } from 'url';
 
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { Feedback, FeedbackReply } from './feedback.entities';
-import { FeedbackReplyBody } from './feedback.interface';
 import { ContentMedia, MediaType } from './media.entities';
 
+import type { FeedbackReplyBody } from './feedback.interface';
 import type { JsonArray } from '../common/decorators';
 
 class CreateFeedbackDto {
@@ -30,7 +30,7 @@ class UpsertMediaBody {
 
 @Controller('api/v1/content')
 export class ContentController {
-  private readonly logger = new Logger(resolveModule(__filename, ContentController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentController.name));
 
   @UseGuards(new JwtAuthGuard())
   @Post('feedback')

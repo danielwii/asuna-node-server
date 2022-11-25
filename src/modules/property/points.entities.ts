@@ -31,11 +31,11 @@ export class PointExchange<Body = any> extends InjectMultiUserProfile(AbstractTr
 
   @MetaInfo({ name: '变化类别', accessible: 'readonly' })
   @Column('varchar', { nullable: false, length: 50, name: 'type' })
-  public type: string;
+  declare type: string;
 
   @MetaInfo({ name: 'Body' })
   @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'body' })
-  public body: Body;
+  body: Body;
 
   // --------------------------------------------------------------
   // Relations

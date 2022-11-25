@@ -8,7 +8,8 @@ import { AbstractBaseEntity, EntityConstructorObject } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.entities';
 import { AbstractTransactionEntity } from './base.entities';
-import { ExchangeObject } from './exchange.entities';
+
+import type { ExchangeObject } from './exchange.entities';
 
 export interface ExchangeEventPayload {
   key: string;

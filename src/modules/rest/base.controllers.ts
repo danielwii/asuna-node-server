@@ -6,9 +6,9 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
+// @ts-ignore
 import ow from 'ow';
 import * as R from 'ramda';
-import { BaseEntity, DeleteResult } from 'typeorm';
 
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
 import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
@@ -25,12 +25,14 @@ import { KvHelper } from '../core/kv';
 import { RestHelper } from '../core/rest';
 import { Tenant, TenantHelper } from '../tenant';
 
+import type { BaseEntity, DeleteResult } from 'typeorm';
 import type { AnyAuthRequest } from '../helper';
+import { fileURLToPath } from "url";
 
 // import { AdminUser } from '../../core/auth';
 
 export abstract class RestCrudController {
-  private readonly superLogger = new Logger(resolveModule(__filename, RestCrudController.name));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), RestCrudController.name));
 
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {

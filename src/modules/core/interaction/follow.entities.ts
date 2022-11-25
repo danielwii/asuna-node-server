@@ -4,8 +4,9 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
 import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
-import { UserProfile } from '../auth/user.entities';
 import { InteractionFollowEnumValue, InteractionFollowType } from './enum-values';
+
+import type { UserProfile } from '../auth/user.entities';
 
 @ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })
 @EntityMetaInfo({ name: 'user__follows', internal: true })

@@ -5,10 +5,10 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
@@ -21,6 +21,8 @@ import { KeyValueModel, KVModelFormatType } from './kv.isolated.entities';
 
 import type { IdentifierHelper } from '../../common/identifier';
 import type { EnumValueStatic } from '../../enum-values';
+
+const { Promise } = bluebird;
 
 const castToBoolean = (value): boolean => value === 'true';
 const isJson = (value): boolean => {
@@ -223,9 +225,9 @@ export class KvHelper {
     }
   }
 
-  public static reInitInitializer(kvDef: KvDef) {
+  public static async reInitInitializer(kvDef: KvDef) {
     const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
-    if (initializer) return initializer();
+    if (initializer) await initializer();
   }
 
   public static regInitializer<V = KVGroupFieldsValue>(
@@ -370,7 +372,7 @@ export class KvHelper {
 
   public static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
     const field = await KvHelper.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
-    return field?.value ?? _.get(field, 'field.defaultValue');
+    if (field) return field.value ?? _.get(field, 'field.defaultValue');
   }
 
   /**
@@ -406,7 +408,7 @@ export class KvHelper {
   private static async getGroupFieldsValueByFieldKV(
     kvDef: KvDef,
     fieldKey: string,
-  ): Promise<{ field: KVField; value: any }> {
+  ): Promise<{ field: KVField; value: any } | void> {
     const fields: KVGroupFieldsValue = await CacheWrapper.do({
       prefix: 'kv',
       key: kvDef,

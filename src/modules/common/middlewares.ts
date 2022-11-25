@@ -4,6 +4,8 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 
+import { fileURLToPath } from 'url';
+
 import { ClientHelper, SessionUser } from '../client';
 import { SimpleIdGeneratorHelper } from '../ids';
 import { TimeUnit } from './helpers';
@@ -13,7 +15,7 @@ import type { CommonRequest, SignedCookies } from './interface';
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(__filename, 'IsMobileMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'IsMobileMiddleware'));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
@@ -24,7 +26,7 @@ export class IsMobileMiddleware implements NestMiddleware {
 
 @Injectable()
 export class DeviceMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(__filename, 'DeviceMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'DeviceMiddleware'));
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies: SignedCookies = req.signedCookies;
@@ -77,7 +79,7 @@ export class DeviceMiddleware implements NestMiddleware {
 
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(__filename, 'LandingUrlMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'LandingUrlMiddleware'));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void): any {
     if (!req.session?.landingUrl) {

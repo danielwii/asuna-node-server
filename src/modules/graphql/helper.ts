@@ -3,9 +3,9 @@ import { Logger } from '@nestjs/common';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import {
   BaseEntity,
   FindManyOptions,
@@ -17,22 +17,24 @@ import {
   Repository,
 } from 'typeorm';
 
-import { AbstractCategoryEntity } from '../base';
 import { DBHelper } from '../core/db';
 import { CursoredPageable, PageInfo, PageRequest, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/dataloader';
-import {
+
+import type { AbstractCategoryEntity } from '../base';
+import type {
   CategoryInputQuery,
   CursoredRequestInput,
   ExclusiveQueryConditionInput,
   RelationQueryConditionInput,
   TimeConditionInput,
 } from './input';
-
 import type { ClassType } from '@danielwii/asuna-helper';
 import type { PrimaryKey } from '../common';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
+
+const { Promise } = bluebird;
 
 interface ResolveFindOptionsType<Entity extends BaseEntity> {
   cls: ClassType<Entity>;
@@ -355,7 +357,10 @@ export class GraphqlHelper {
     })) as Entity;
     const id = result[opts.key] as any;
     // Logger.debug(`resolveProperty ${r({ result, opts, id })}`);
-    if (!id) return;
+    if (!id) {
+      // @ts-ignore
+      return;
+    }
     if ((opts as ResolvePropertyByLoader<RelationEntity>).loader) {
       const _opts = opts as ResolvePropertyByLoader<RelationEntity>;
       return _opts.loader.load(id);
@@ -489,7 +494,9 @@ export class GraphqlHelper {
     // cls: Job;
     // key: string;
   }) {
-    if (!origin) return;
+    if (!origin) { // @ts-ignore
+      return;
+    }
 
     const targetRepo = targetCls as any as Repository<RelationEntity>;
     const count = await targetRepo.count({ where: _.assign({}, where, query?.where) });

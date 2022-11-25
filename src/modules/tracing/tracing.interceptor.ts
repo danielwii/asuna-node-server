@@ -2,8 +2,7 @@ import api from '@opentelemetry/api';
 
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { Observable } from 'rxjs';
-
+import type { Observable } from 'rxjs';
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import type { WithSpanContext } from './tracing.helper';
 import type { Request, Response } from 'express';

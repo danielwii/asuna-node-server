@@ -9,6 +9,7 @@ import { DBHelper } from '../core/db';
 import { AppDataSource } from '../datasource';
 
 import type { EntityTarget } from 'typeorm';
+import { fileURLToPath } from "url";
 
 export interface Sort {
   id: number;
@@ -27,7 +28,7 @@ export interface Sort {
  */
 @Injectable()
 export class SortService {
-  private readonly logger = new Logger(resolveModule(__filename, SortService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SortService.name));
 
   public constructor(private readonly Sort: EntityTarget<any>) {}
 

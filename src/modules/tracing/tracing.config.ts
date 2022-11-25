@@ -5,9 +5,10 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP } from '@danielwii/asuna-helper/dist/utils';
 
 import { plainToInstance } from 'class-transformer';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
+import { fileURLToPath } from "url";
 
 export enum TracingConfigKeys {
   enabled = 'enabled',
@@ -16,7 +17,7 @@ export enum TracingConfigKeys {
 }
 
 export class TracingConfigObject {
-  private static logger = new Logger(resolveModule(__filename, 'TracingConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'TracingConfigObject'));
   private static key = YamlConfigKeys.tracing;
   private static prefix = `${TracingConfigObject.key}_`;
 

@@ -4,7 +4,7 @@ import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import * as R from 'ramda';
 import {
   Any,
@@ -25,14 +25,14 @@ import {
   Repository,
   SelectQueryBuilder,
 } from 'typeorm';
-import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
-import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 
 import { Profile } from '../../common/helpers/normal';
 import { AppDataSource } from '../../datasource';
-import { Role } from '../auth/auth.entities';
 import { AsunaContext } from '../context';
 
+import type { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
+import type { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
+import type { Role } from '../auth/auth.entities';
 import type { Condition, EntityMetaInfoOptions, MetaInfoOptions } from '../../common/decorators/meta.decorator';
 
 export interface ColumnSchema {

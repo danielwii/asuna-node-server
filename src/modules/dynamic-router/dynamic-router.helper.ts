@@ -1,6 +1,6 @@
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 
 import { CacheManager } from '../cache';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv';

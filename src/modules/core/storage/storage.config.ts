@@ -8,6 +8,9 @@ import { Expose, plainToInstance, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../../config';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
 
 export const QiniuConfigKeys = {
   QINIU_ENABLE: 'QINIU_ENABLE',
@@ -86,7 +89,7 @@ export class MinioConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${MinioConfigObject.key}_`;
 
-  private static logger = new Logger(resolveModule(__filename, 'MinioConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'MinioConfigObject'));
 
   public enable: boolean;
   public mode: 'alioss-compatibility' | undefined;
@@ -134,7 +137,7 @@ export class AliossConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${AliossConfigObject.key}_`;
 
-  private static logger = new Logger(resolveModule(__filename, 'AliossConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AliossConfigObject'));
 
   public enable: boolean;
   public region: string;

@@ -4,7 +4,7 @@ import { Args, Context, Field, Info, ObjectType, Query, ResolveField, Resolver, 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import { fileURLToPath } from 'url';
 
 import { Pageable } from '../core/helpers';
 import { resolveFieldsByPagedInfo } from '../dataloader/dataloader';
@@ -18,12 +18,12 @@ import type { GraphqlContext } from '../dataloader/dataloader.interceptor';
 @ObjectType({ implements: () => [Pageable] })
 class FeedbackPageable extends Pageable<Feedback> {
   @Field((returns) => [Feedback])
-  items: Feedback[];
+  declare items: Feedback[];
 }
 
 @Resolver()
 export class FeedbackQueryResolver extends QueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'FeedbackQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'FeedbackQueryResolver'));
 
   constructor() {
     super(Feedback);
@@ -59,7 +59,7 @@ export class FeedbackQueryResolver extends QueryResolver {
 
 @Resolver(Feedback)
 export class UserFeedbackResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'UserFeedbackResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserFeedbackResolver'));
 
   @ResolveField('replies', (returns) => [FeedbackReply])
   async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {

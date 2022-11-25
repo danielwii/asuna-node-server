@@ -5,14 +5,16 @@ import { r } from '@danielwii/asuna-helper/dist';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import _ from 'lodash';
-import { FilterQuery, Model } from 'mongoose';
+import type { FilterQuery, Model } from 'mongoose';
+// @ts-ignore
 import ow from 'ow';
 
 import { PageView, PageViewDocument } from './schema';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class WebService {
-  private readonly logger = new Logger(resolveModule(__filename, WebService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WebService.name));
 
   public constructor(@InjectModel(PageView.name) private readonly PageViewModel: Model<PageViewDocument>) {}
 

@@ -4,7 +4,6 @@ import { fnResolve } from '@danielwii/asuna-helper/dist/promise';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
-import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { TimeUnit } from '../common/helpers/utils';

@@ -5,7 +5,6 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
-import { Promise } from 'bluebird';
 import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
@@ -14,6 +13,7 @@ import { AppDataSource } from '../../datasource';
 import { JwtAuthGuard, JwtAuthRequest, JwtAuthRequestExtractor } from '../auth';
 import { UserHelper } from '../user.helper';
 import { UserRelation, UserRelationType } from './friends.entities';
+import { fileURLToPath } from "url";
 
 export class UserFollowDto {
   @IsString()
@@ -36,7 +36,7 @@ class UserRelationRequestDto {
 
 @Controller('api/v1/interaction')
 export class InteractionController {
-  private readonly logger = new Logger(resolveModule(__filename, InteractionController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), InteractionController.name));
 
   @UseGuards(new JwtAuthGuard())
   @Post('follow')

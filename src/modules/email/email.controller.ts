@@ -9,6 +9,7 @@ import { IsArray, IsString } from 'class-validator';
 import { EmailHelper } from './email.helper';
 
 import type { MailAttachment } from './email.interface';
+import { fileURLToPath } from "url";
 
 class MailBody {
   @IsArray({ always: false })
@@ -28,7 +29,7 @@ class MailBody {
 @ApiTags('core')
 @Controller('api/email')
 export class EmailController {
-  private readonly logger = new Logger(resolveModule(__filename, EmailController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), EmailController.name));
 
   @Post()
   public send(@Body() body: MailBody): void {

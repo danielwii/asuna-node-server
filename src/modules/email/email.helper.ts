@@ -2,12 +2,10 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
 import EmailTemplate from 'email-templates';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
-import * as SMTPTransport from 'nodemailer/lib/smtp-transport';
-import * as path from 'path';
+import path from 'path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 
@@ -19,6 +17,7 @@ import { EmailTmplConfigKeys, EmailTmplConfigObject } from './email-tmpl.config'
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { isMailAttachment, MailInfo } from './email.interface';
 
+import type * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import type { Attachment, Options } from 'nodemailer/lib/mailer';
 
 // type SendAction = { future: () => Promise<any> };

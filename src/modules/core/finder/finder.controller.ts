@@ -12,6 +12,7 @@ import querystring from 'query-string';
 import { FinderHelper } from './finder.helper';
 
 import type { Request, Response } from 'express';
+import { fileURLToPath } from "url";
 
 /**
  * 主要应用来定位资源，设计上，可以作为一个调度器，用来调度到其他的平台上
@@ -21,7 +22,7 @@ import type { Request, Response } from 'express';
 @ApiTags('core')
 @Controller('api/v1/finder')
 export class FinderController {
-  private readonly logger = new Logger(resolveModule(__filename, FinderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), FinderController.name));
   @Get()
   async redirect(
     @Query('encrypt') encrypt: boolean,
@@ -50,7 +51,7 @@ export class FinderController {
 @ApiTags('core')
 @Controller('f')
 export class ShortFinderController {
-  private readonly logger = new Logger(resolveModule(__filename, ShortFinderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ShortFinderController.name));
 
   @Get(':q')
   async redirect(@Param('q') q: string, @Req() req: Request, @Res() res: Response): Promise<void> {

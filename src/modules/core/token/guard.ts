@@ -6,9 +6,9 @@ import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { getIgnoreCase } from '../../common';
-import { OperationToken } from './entities';
 import { OperationTokenHelper } from './helper';
 
+import type { OperationToken } from './entities';
 import type { Request } from 'express';
 
 export type OperationTokenRequest = Request & { token: OperationToken };

@@ -11,13 +11,14 @@ import { join } from 'path';
 
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
-import { AliossConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
+import type { AliossConfigObject } from './storage.config';
 import type { Response } from 'express';
+import { fileURLToPath } from "url";
 
 export class AliossStorage implements IStorageEngine {
-  private readonly logger = new Logger(resolveModule(__filename, AliossStorage.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AliossStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: AliossConfigObject;

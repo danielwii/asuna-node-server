@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import * as _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
 
@@ -16,6 +16,8 @@ import { TenantHelper } from './tenant.helper';
 
 import type { PrimaryKey } from '../common';
 import type { StatsResult } from '../stats';
+
+const { Promise } = bluebird;
 
 export class TenantService {
   /**

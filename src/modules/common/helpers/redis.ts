@@ -2,11 +2,14 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
-import { parse } from 'json5';
+import bluebird from 'bluebird';
+import json5 from 'json5';
 import _ from 'lodash';
 
 import type { RedisClientType } from 'redis';
+
+const { Promise } = bluebird;
+const { parse } = json5;
 
 export class RedisHelper {
   /**

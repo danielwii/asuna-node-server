@@ -14,10 +14,11 @@ import type { Response } from 'express';
 import type { WXJwtPayload } from './interfaces';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxCodeSession } from './wx.interfaces';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class WXAuthGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(__filename, WXAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WXAuthGuard.name));
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<WXAuthRequest>();
@@ -41,7 +42,7 @@ export class WXAuthGuard implements CanActivate {
 
 @Injectable()
 export class GqlWXAuthGuard extends AuthGuard('wx-jwt') {
-  private readonly logger = new Logger(resolveModule(__filename, GqlWXAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GqlWXAuthGuard.name));
 
   /**
    * @param opts.anonymousSupport default false

@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import passport from 'passport';
 
 import { wrapErrorInfo } from '../helper/utils';
@@ -11,6 +11,8 @@ import { OrgUser } from './tenant.entities';
 import type { Response } from 'express';
 import type { AnyAuthRequest, AuthResult } from '../helper/interfaces';
 import type { JwtPayload } from '../core/auth/auth.interfaces';
+
+const { Promise } = bluebird;
 
 export type OrgJwtAuthRequest<User = OrgUser> = AnyAuthRequest<JwtPayload, User>;
 

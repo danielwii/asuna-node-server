@@ -4,14 +4,13 @@ import { Args, Context, ObjectType, Query, ResolveField, Resolver, Root } from '
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
-
 import { CursoredPageable, CursoredResponse, Pageable, PaginatedResponse } from '../core/helpers';
 import { CursoredRequestInput, GraphqlHelper, PageRequestInput, QueryResolver } from '../graphql';
 import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entities';
 import { PaymentOrder } from './payment.order.entities';
 
 import type { GraphqlContext } from '../dataloader';
+import { fileURLToPath } from "url";
 
 @ObjectType()
 class PaginatedPaymentItemResponse extends PaginatedResponse(PaymentItem) {}
@@ -21,7 +20,7 @@ class CursoredVisitorResponse extends CursoredResponse(PaymentOrder) {}
 
 @Resolver()
 export class PaymentQueryResolver extends QueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, PaymentQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PaymentQueryResolver.name));
 
   public constructor() {
     super([PaymentOrder, PaymentMethod, PaymentTransaction]);
@@ -74,7 +73,7 @@ export class PaymentQueryResolver extends QueryResolver {
 
 @Resolver((of) => PaymentOrder)
 export class UserPaymentOrderResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'UserPaymentOrderResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserPaymentOrderResolver'));
 
   @ResolveField((returns) => PaymentTransaction)
   public async transaction(@Root() order: PaymentOrder, @Context() ctx: GraphqlContext): Promise<PaymentTransaction> {

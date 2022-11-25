@@ -7,10 +7,11 @@ import * as amqp from 'amqplib';
 import _ from 'lodash';
 
 import { MQConfigObject } from './mq.config';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class MQProvider {
-  private readonly logger = new Logger(resolveModule(__filename, MQProvider.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), MQProvider.name));
   private static _instance: MQProvider;
 
   private _connectionFuture?: amqp.Connection;

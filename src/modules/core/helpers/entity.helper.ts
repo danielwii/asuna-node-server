@@ -4,10 +4,11 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
-import { BaseEntity } from 'typeorm';
 
 import { AppConfigObject } from '../../config/app.config';
 import { ColumnTypeHelper } from './column.helper';
+
+import type { BaseEntity } from 'typeorm';
 
 /**
  * @deprecated {@see safeReloadJSON}

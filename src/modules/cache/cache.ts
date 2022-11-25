@@ -1,15 +1,18 @@
 import { Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper';
 import { fnResolve, FutureResolveType } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
+import { fileURLToPath } from 'url';
 
 import { CacheTTL } from './constants';
 
 const caches = new Map<string, LRUCache<string, any>>();
 export class CacheManager {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), CacheManager.name));
   public static default = new CacheManager('default');
 
   private readonly cache: LRUCache<string, any>;
@@ -19,7 +22,7 @@ export class CacheManager {
       this.cache = caches.get(name);
       // logger.log(`get preset cache: ${name}`);
     } else {
-      Logger.log(`create cache: ${name}`);
+      this.logger.log(`create cache: ${name}`);
       const cache = new LRUCache<string, any>(options ?? { max: 500, ttl: CacheTTL.LONG_1 });
       this.cache = cache;
       caches.set(name, cache);
@@ -36,12 +39,14 @@ export class CacheManager {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const remainingTTL = this.cache.getRemainingTTL(cacheKey);
     const cacheValue = this.cache.get(cacheKey);
-    Logger.verbose(`get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`, 10) })}`);
+    this.logger.verbose(
+      `get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`, 10) })}`,
+    );
     if (cacheValue) return cacheValue;
 
     const value = await fnResolve(resolver)();
     this.cache.set(cacheKey, value, { ttl: seconds ? seconds * 1000 : undefined });
-    Logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
+    this.logger.debug(`cacheable set ${r({ cacheKey, value, seconds })}`);
     return value;
   }
 

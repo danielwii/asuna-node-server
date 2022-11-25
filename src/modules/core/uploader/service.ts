@@ -6,19 +6,23 @@ import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { plainToInstance, Transform } from 'class-transformer';
 import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import highland from 'highland';
 import _ from 'lodash';
 import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 import { AsunaContext } from '../context';
 import { Global } from '../global';
 import { FileInfo } from '../storage';
-import { OperationToken } from '../token';
 import { ChunksUploadPayload, UploaderHelper } from './helper';
+
+import type { OperationToken } from '../token';
+
+const { Promise } = bluebird;
 
 export class ChunkFileInfo {
   @IsString()
@@ -64,7 +68,7 @@ export class RemoteFileInfo extends FileInfo {
 
 @Injectable()
 export class UploaderService {
-  private readonly logger = new Logger(resolveModule(__filename, UploaderService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderService.name));
   private readonly context = AsunaContext.instance;
 
   constructor(private readonly commandBus: CommandBus) {

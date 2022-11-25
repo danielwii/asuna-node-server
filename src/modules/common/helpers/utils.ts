@@ -1,8 +1,10 @@
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import * as path from 'path';
+
+const { Promise } = bluebird;
 
 /**
  * https://www.typescriptlang.org/docs/handbook/mixins.html

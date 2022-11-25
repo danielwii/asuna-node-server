@@ -2,10 +2,13 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { initTracer, JaegerTracer, TracingConfig, TracingOptions } from 'jaeger-client';
-import SpanContext from 'opentracing/lib/span_context';
+import jaegerClient, { JaegerTracer, TracingConfig, TracingOptions } from 'jaeger-client';
 
 import { TracingConfigObject } from './tracing.config';
+
+import type SpanContext from 'opentracing/lib/span_context';
+
+const { initTracer } = jaegerClient;
 
 export interface WithSpanContext {
   trace: SpanContext;

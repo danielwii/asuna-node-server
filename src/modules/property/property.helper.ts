@@ -2,12 +2,13 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
-import { EntityManager } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
 import { AppDataSource } from '../datasource';
 import { ExchangeObject } from './exchange.entities';
 import { FinancialTransaction, FinancialTransactionEventKey, Wallet } from './financial.entities';
+
+import type { EntityManager } from 'typeorm';
 
 export class TopUpPayload {
   @IsString() type: FinancialTransactionEventKey;

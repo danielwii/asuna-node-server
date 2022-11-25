@@ -4,13 +4,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'url';
+
 import { ImportExportService } from './import-export.service';
 
 import type { Request, Response } from 'express';
 
 @Controller('api/v1/import-export')
 export class ImportExportController {
-  private readonly logger = new Logger(resolveModule(__filename, ImportExportController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ImportExportController.name));
 
   public constructor(private readonly importExportService: ImportExportService) {}
 

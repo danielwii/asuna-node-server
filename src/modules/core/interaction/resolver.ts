@@ -3,18 +3,17 @@ import { Args, Context, Info, Query, ResolveField, Resolver, Root } from '@nestj
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { Promise } from 'bluebird';
-
 import { GqlAuthGuard, QueryResolver } from '../../graphql';
 import { UserProfile } from '../auth/user.entities';
 import { UserRelation, UserRelationType } from './friends.entities';
 
 import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 import type { GraphQLResolveInfo } from 'graphql';
+import { fileURLToPath } from "url";
 
 @Resolver()
 export class UserRelationQueryResolver extends QueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'UserRelationQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserRelationQueryResolver'));
 
   constructor() {
     super(UserRelation);
@@ -34,7 +33,7 @@ export class UserRelationQueryResolver extends QueryResolver {
 
 @Resolver((of) => UserRelation)
 export class UserRelationResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'UserRelationResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserRelationResolver'));
 
   /*
   @ResolveField((returns) => UserProfile)

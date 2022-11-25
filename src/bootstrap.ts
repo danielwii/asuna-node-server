@@ -5,11 +5,11 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
-import { getClientIp } from '@danielwii/asuna-helper/dist/req';
-import { r } from '@danielwii/asuna-helper/dist/serializer';
-import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config.js';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider.js';
+import { getClientIp } from '@danielwii/asuna-helper/dist/req.js';
+import { r } from '@danielwii/asuna-helper/dist/serializer.js';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils.js';
 
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
@@ -23,8 +23,8 @@ import _ from 'lodash';
 import morgan from 'morgan';
 import responseTime from 'response-time';
 
-import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
-import { AppLifecycle } from './lifecycle';
+import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper.js';
+import { AppLifecycle } from './lifecycle.js';
 import {
   AppUpgradeMode,
   ExchangeCurrencyEnum,
@@ -37,27 +37,27 @@ import {
   NotificationEnumValue,
   Order,
   Platform,
-} from './modules';
-import { CacheUtils } from './modules/cache';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
-import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
+} from './modules/index.js';
+import { CacheUtils } from './modules/cache/index.js';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common/index.js';
+import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config/index.js';
 import {
   FeedbackSenderEnum,
   FeedbackSenderEnumValue,
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
-} from './modules/content/enum-values';
-import { AsunaContext, Global } from './modules/core';
-import { UserRelationType } from './modules/core/interaction/friends.entities';
-import { DefaultModule } from './modules/default.module';
-import { SimpleIdGeneratorHelper } from './modules/ids';
-import { TracingInterceptor } from './modules/tracing';
+} from './modules/content/enum-values.js';
+import { AsunaContext, Global } from './modules/core/index.js';
+import { UserRelationType } from './modules/core/interaction/friends.entities.js';
+import { DefaultModule } from './modules/default.module.js';
+import { SimpleIdGeneratorHelper } from './modules/ids/index.js';
+import { TracingInterceptor } from './modules/tracing/index.js';
 // add condition function in typeorm find operation
-import './typeorm.fixture';
+import './typeorm.fixture.js';
 
-import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
+import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface.js';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import type { BootstrapOptions } from './interface';
+import type { BootstrapOptions } from './interface.js';
 
 export const bootstrap = (appModule, options: BootstrapOptions) => {
   process.on('unhandledRejection', (reason, p) => {
@@ -120,8 +120,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   Object.assign(options, _.merge({ loadDefaultModule: true }, options));
   validateOptions(options);
 
-  // eslint-disable-next-line
-  require('events').EventEmitter.defaultMaxListeners = 15;
+  (await import('events')).EventEmitter.defaultMaxListeners = 15;
 
   Logger.log(`options: ${r({ appModule, options })}`);
 
@@ -271,7 +270,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
       // name 返回客户端的key的名称，默认为asn.seid,也可以自己设置。
       name: 'asn.seid',
       store: sessionRedis.isEnabled
-        ? new (RedisStoreCreator(session))({ client: sessionRedis.client })
+        ? new (RedisStoreCreator(session))({ client: sessionRedis.client as any })
         : new session.MemoryStore(),
       // 一个String类型的字符串，作为服务器端生成session的签名。
       secret,

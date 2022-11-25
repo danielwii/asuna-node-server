@@ -14,6 +14,7 @@ import { WeChatController } from './wechat.controller';
 import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
 import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
+import { fileURLToPath } from "url";
 
 @Module({
   imports: [],
@@ -22,7 +23,7 @@ import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
   controllers: [WeChatController],
 })
 export class WeChatModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, WeChatModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WeChatModule.name));
 
   async onModuleInit(): Promise<void> {
     this.logger.log('init...');

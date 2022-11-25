@@ -3,13 +3,15 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 
 import { Notification } from './notification.entities';
 
+const { Promise } = bluebird;
+
 @ObjectType()
 export class MixedNotification {
-  @Field()
+  @Field((returns) => Notification)
   origin: Notification;
   @Field()
   read: boolean;

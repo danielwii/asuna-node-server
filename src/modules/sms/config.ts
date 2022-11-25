@@ -5,6 +5,8 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { parseJSONIfCould, withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
 import { configLoader } from '../config';
+import { fileURLToPath } from "url";
+
 
 export enum SMSConfigKeys {
   enable = 'enable',
@@ -25,7 +27,7 @@ export interface AliSMSExtra {
 }
 
 export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
-  private static logger = new Logger(resolveModule(__filename, 'SMSConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'SMSConfigObject'));
   private static key = YamlConfigKeys.sms;
   private static _: SMSConfigObject;
 

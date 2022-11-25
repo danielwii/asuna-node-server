@@ -19,12 +19,12 @@ import {
 } from 'typeorm';
 
 import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators/meta.decorator';
-import { AdminUser } from '../core/auth/auth.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
 import { WxSubscribeSceneType } from './wx.interfaces';
 
+import type { AdminUser } from '../core/auth/auth.entities';
 import type { IdentifierHelper } from '../common/identifier';
 import type { EntityConstructorObject } from '../base/base.entity';
 import type { UserProfile } from '../core/auth/user.entities';

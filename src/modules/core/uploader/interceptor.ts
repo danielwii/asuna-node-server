@@ -4,6 +4,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { from, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { fileURLToPath } from "url";
 
 export interface FastifyUploadedFile {
   filename: string;
@@ -17,7 +18,7 @@ export type FastifyUploadedFileRequest = /* FastifyRequest & */ any & {
 };
 
 export class FastifyFileInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(resolveModule(__filename, FastifyFileInterceptor.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), FastifyFileInterceptor.name));
   // 该 field 目前没有用户，multipart 中直接可以拿到 field
   constructor(private readonly field: string) {}
 

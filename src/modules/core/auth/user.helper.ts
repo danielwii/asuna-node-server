@@ -4,6 +4,8 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 
 import { DBHelper } from '../db/db.helper';

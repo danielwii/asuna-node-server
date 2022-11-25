@@ -3,10 +3,10 @@ import { Logger } from '@nestjs/common';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { BaseEntity } from 'typeorm';
 
 import { DBHelper } from './db/db.helper';
 
+import type { BaseEntity } from 'typeorm';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
 import type { UserProfile } from './auth/user.entities';
 

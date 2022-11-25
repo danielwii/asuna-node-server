@@ -6,6 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import Chance from 'chance';
 import _ from 'lodash';
+// @ts-ignore
 import ow from 'ow';
 import { DataSource, In } from 'typeorm';
 
@@ -14,20 +15,19 @@ import { TenantRoleName } from './auth.guard';
 import { OrgRole, OrgUser } from './tenant.entities';
 
 import type { CreateStaffVO } from '@danielwii/asuna-shared';
+import { fileURLToPath } from "url";
 
 const chance = new Chance();
 
 @Injectable()
 export class TenantAuthService extends AbstractAuthService<OrgUser> {
-  private readonly logger = new Logger(resolveModule(__filename, TenantAuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantAuthService.name));
 
   public constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     super(OrgUser, dataSource.getRepository<OrgUser>(OrgUser));
 
     _.values(TenantRoleName).forEach((name) =>
-      OrgRole.findOne({ where: { name } }).then((exists) => {
-        if (!exists) return OrgRole.create({ name }).save();
-      }),
+      OrgRole.findOne({ where: { name } }).then((exists) => (!exists ? OrgRole.create({ name }).save() : exists)),
     );
   }
 

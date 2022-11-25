@@ -11,13 +11,16 @@ import * as qiniu from 'qiniu';
 
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';
-import { QiniuConfigObject } from './storage.config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
+import type { QiniuConfigObject } from './storage.config';
 import type { Response } from 'express';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
 
 export class QiniuStorage implements IStorageEngine {
-  private readonly logger = new Logger(resolveModule(__filename, QiniuStorage.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), QiniuStorage.name));
 
   private readonly config = UploaderConfigObject.load();
   private readonly configObject: QiniuConfigObject;

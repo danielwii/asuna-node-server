@@ -5,13 +5,15 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { random } from '@danielwii/asuna-helper/dist/random';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'url';
+
 import { CacheKey, InMemoryDB } from '../../cache';
 
 import type { JwtAuthRequest } from '../../core/auth';
 
 @Injectable()
 export class CsurfGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(__filename, CsurfGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), CsurfGuard.name));
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
     // const res = context.switchToHttp().getResponse<Response>();

@@ -6,8 +6,7 @@ import { AbstractTimeBasedBaseEntity } from '../base';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
-// eslint-disable-next-line import/no-cycle
-import { PaymentItem, PaymentTransaction } from './payment.entities';
+import type { PaymentItem, PaymentTransaction } from './payment.entities';
 
 @ObjectType()
 @EntityMetaInfo({ name: 'payment__orders', internal: true, displayName: '订单' })
@@ -37,13 +36,13 @@ export class PaymentOrder extends InjectMultiUserProfile(AbstractTimeBasedBaseEn
   @Column({ nullable: true, length: 36, name: 'transaction__id' })
   transactionId?: string;
 
-  @Field((returns) => PaymentTransaction)
+  // @Field((returns) => PaymentTransaction) TODO Cannot access 'PaymentTransaction' before initialization
   @MetaInfo({ name: '交易' })
   @OneToOne('PaymentTransaction', (inverse: PaymentTransaction) => inverse.order, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'transaction__id' })
   transaction: PaymentTransaction;
 
-  @Field((returns) => [PaymentItem])
+  // @Field((returns) => [PaymentItem]) TODO
   @MetaInfo({ name: '订单内容' })
   @ManyToMany('PaymentItem', (inverse: PaymentItem) => inverse.orders)
   @JoinTable({

@@ -2,10 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { read, utils, write } from 'xlsx';
 
 import { DBHelper } from '../core/db';
+
+const { Promise } = bluebird;
 
 @Injectable()
 export class ImportExportService {

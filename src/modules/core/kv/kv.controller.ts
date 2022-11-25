@@ -12,6 +12,7 @@ import { KvDef, KvHelper } from './kv.helper';
 
 import type { Response } from 'express';
 import type { AnyAuthRequest } from '../../helper';
+import { fileURLToPath } from "url";
 
 class KvPair {
   @IsString()
@@ -59,7 +60,7 @@ class GetKvPairRequest {
 @ApiTags('core')
 @Controller('api')
 export class KvController {
-  private readonly logger = new Logger(resolveModule(__filename, KvController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), KvController.name));
 
   @UseGuards(JwtAdminAuthGuard)
   @Post('kv')

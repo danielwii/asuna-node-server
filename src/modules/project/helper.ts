@@ -2,11 +2,12 @@ import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import Chance from 'chance';
 
-import { Tenant } from '../tenant/tenant.entities';
 import { Project } from './entities';
+
+import type { Tenant } from '../tenant/tenant.entities';
 
 const chance = new Chance();
 

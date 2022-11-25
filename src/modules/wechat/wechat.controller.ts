@@ -12,6 +12,7 @@ import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';
 import type { Request } from 'express';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxQrTicketInfo } from './wx.interfaces';
+import { fileURLToPath } from "url";
 
 class ValidationDto {
   // 随机字符串
@@ -35,7 +36,7 @@ class Code2SessionDto {
 
 @Controller('api/v1/wx')
 export class WeChatController {
-  private readonly logger = new Logger(resolveModule(__filename, WeChatController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WeChatController.name));
 
   @Get()
   async wxValidation(@Query() query: ValidationDto): Promise<string> {

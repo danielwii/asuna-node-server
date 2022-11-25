@@ -1,17 +1,16 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  "extends": "@tsconfig/node18-strictest-esm/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
-    "strict": false,
-    "sourceMap": true,
-    "inlineSources": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "allowJs": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "strict": false,
+    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false,
     "rootDir": "src",
-    "outDir": "./dist"
+    "outDir": "dist"
   },
   "include": ["src/**/*"],
   "exclude": ["**/node_modules/*", "**/*.spec.ts", "./dist"]

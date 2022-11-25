@@ -10,6 +10,7 @@ import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import _ from 'lodash';
+import { fileURLToPath } from 'url';
 
 import { ClientHelper } from '../client/helper';
 import { ActionRateLimitGuard } from '../common/guards';
@@ -24,7 +25,7 @@ import type { RequestInfo } from '../helper';
 @ApiTags('core')
 @Controller('api')
 export class ApiController {
-  private readonly logger = new Logger(resolveModule(__filename, ApiController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ApiController.name));
   private readonly appEnv = AppEnv.instance;
 
   @Get('version')
@@ -103,6 +104,7 @@ export class ApiController {
     if (scid) {
       return TokenHelper.createSessionToken(null, { scid, ...body });
     }
+    throw new AsunaException(AsunaErrorCode.Unprocessable, 'no scid found');
   }
   @UseGuards(new ActionRateLimitGuard('api/v1/session-token'))
   @Post('v2/session-token')

@@ -6,18 +6,19 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import { DataSource, In } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { AppConfigObject } from '../../config/app.config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser, Role } from './auth.entities';
-import { AuthUserChannel } from './base.entities';
 
+import type { AuthUserChannel } from './base.entities';
 import type { CreatedUser } from './auth.service';
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
-  private readonly logger = new Logger(resolveModule(__filename, AdminAuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AdminAuthService.name));
 
   public constructor(private readonly dataSource: DataSource) {
     super(AdminUser, dataSource.getRepository<AdminUser>(AdminUser));

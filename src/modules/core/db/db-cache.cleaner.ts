@@ -3,10 +3,11 @@ import { Logger } from '@nestjs/common';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
-import { BaseEntity } from 'typeorm';
+import fp from 'lodash/fp';
 
 import { AppDataSource } from '../../datasource';
+
+import type { BaseEntity } from 'typeorm';
 
 export class DBCacheCleaner {
   public static registers: { Entity: typeof BaseEntity; trigger: string }[] = [];

@@ -10,14 +10,17 @@ import { addMonths, differenceInCalendarDays } from 'date-fns';
 import * as jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
-import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
 import { named } from '../../helper/annotations';
 import { OperationTokenHelper, SysTokenServiceName } from '../token';
 
+import type { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import type { Secret, SignOptions } from 'jsonwebtoken';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
 import type { JwtPayload } from './auth.interfaces';
@@ -103,7 +106,7 @@ export class TokenHelper {
 }
 
 export abstract class AbstractAuthService<U extends AuthUser> {
-  private readonly superLogger = new Logger(resolveModule(__filename, 'AbstractAuthService'));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AbstractAuthService'));
 
   protected constructor(
     readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,

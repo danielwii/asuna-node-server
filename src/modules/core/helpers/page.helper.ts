@@ -3,14 +3,16 @@ import { Field, ID, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 
 import { deserializeSafely } from '@danielwii/asuna-helper/dist';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import _ from 'lodash';
-import { EntityManager } from 'typeorm';
 
 import { AppDataSource } from '../../datasource';
 
+import type { EntityManager } from 'typeorm';
 import type { CursoredRequest } from '../../graphql';
 import type { ClassType } from '@danielwii/asuna-helper';
+
+const { Promise } = bluebird;
 
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_SIZE = 20;
@@ -77,7 +79,7 @@ export const PaginatedResponse = <Item>(ItemClass: ClassType<Item>) => {
     // here we use the runtime argument
     @Field((type) => [ItemClass])
     // and here the generic type
-    items: Item[];
+    declare items: Item[];
   }
   return PaginatedResponseClass as any;
 };
@@ -89,7 +91,7 @@ export const CursoredResponse = <Item>(ItemClass: ClassType<Item>) => {
     // here we use the runtime argument
     @Field((type) => [ItemClass], { nullable: 'items' })
     // and here the generic type
-    items: Item[];
+    declare items: Item[];
   }
   return CursoredResponseClass as any;
 };

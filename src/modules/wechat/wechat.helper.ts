@@ -5,11 +5,11 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { instanceToPlain } from 'class-transformer';
 import * as crypto from 'crypto';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import { nanoid } from 'nanoid';
 import rawBody from 'raw-body';
 import * as xml2js from 'xml2js';
@@ -28,8 +28,8 @@ import { AdminWsHelper } from '../ws';
 import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
 import { WxConfigApi } from './wx.api.config';
-import { WxUserInfo } from './wx.vo';
 
+import type { WxUserInfo } from './wx.vo';
 import type { Request } from 'express';
 import type { WXJwtPayload } from './interfaces';
 import type {
@@ -41,6 +41,8 @@ import type {
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
+
+const { Promise } = bluebird;
 
 /*
 https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Receiving_standard_messages.html

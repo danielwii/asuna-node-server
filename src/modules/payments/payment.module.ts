@@ -8,13 +8,14 @@ import { PaymentController } from './payment.controller';
 import { PaymentHelper } from './payment.helper';
 import { PaymentQueryResolver, UserPaymentOrderResolver } from './payment.resolver';
 import { PaymentWxpayHelper } from './payment.wxpay.helper';
+import { fileURLToPath } from "url";
 
 @Module({
   providers: [PaymentQueryResolver, UserPaymentOrderResolver],
   controllers: [PaymentController],
 })
 export class PaymentModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, PaymentModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PaymentModule.name));
 
   public async onModuleInit(): Promise<void> {
     this.logger.log('init...');

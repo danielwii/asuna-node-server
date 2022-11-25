@@ -1,10 +1,9 @@
 import { Logger } from '@nestjs/common';
 
-import { DeleteResult } from 'typeorm';
-
-import { UserProfile } from './auth';
 import { UserFollow } from './interaction/follow.entities';
 
+import type { DeleteResult } from 'typeorm';
+import type { UserProfile } from './auth';
 import type { InteractionFollowType } from './interaction/enum-values';
 
 export class UserHelper {

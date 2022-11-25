@@ -5,6 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { FeaturesConfigObject } from '../config/features.config';
 import { AppDataSource } from '../datasource';
@@ -12,7 +13,7 @@ import { AuditService } from './audit.service';
 
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
-  private readonly logger = new Logger(resolveModule(__filename, AuditSubscriber.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuditSubscriber.name));
   private map = new Map();
   private auditService: AuditService = new AuditService();
   private enabled = FeaturesConfigObject.load().auditEnable;

@@ -4,7 +4,7 @@ import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/grap
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 
 import { GqlAdminAuthGuard } from '../../graphql';
 import { KeyValuePair } from './kv.entities';
@@ -12,10 +12,11 @@ import { KvHelper, recognizeTypeValue } from './kv.helper';
 import { KeyValueModel } from './kv.isolated.entities';
 
 import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
+import { fileURLToPath } from "url";
 
 @Resolver()
 export class KvQueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, KvQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), KvQueryResolver.name));
 
   @Query((returns) => KeyValuePair, { nullable: true })
   public async kv(
@@ -44,7 +45,7 @@ export class KvQueryResolver {
 
 @Resolver(KeyValueModel)
 export class KeyValueModelResolver {
-  private logger = new Logger(resolveModule(__filename, 'KeyValueModelResolver'));
+  private logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'KeyValueModelResolver'));
 
   @ResolveField((returns) => KeyValuePair)
   public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {

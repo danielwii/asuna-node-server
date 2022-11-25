@@ -9,18 +9,20 @@ import {
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
-import { EntityMetadata } from 'typeorm';
+import fp from 'lodash/fp';
 
 import { CacheManager } from '../cache';
 import { DBHelper } from '../core/db';
 import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { OrgRole, OrgUser, Tenant } from './tenant.entities';
 
+import type { EntityMetadata } from 'typeorm';
 import type { PrimaryKey } from '../common';
+
+const { Promise } = bluebird;
 
 export class TenantConfig {
   @IsBoolean() @IsOptional() enabled?: boolean;

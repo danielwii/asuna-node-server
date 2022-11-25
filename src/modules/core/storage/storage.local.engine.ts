@@ -16,9 +16,10 @@ import { UploaderConfigObject } from '../uploader/config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 import type { Response } from 'express';
+import { fileURLToPath } from "url";
 
 export class LocalStorage implements IStorageEngine {
-  private readonly logger = new Logger(resolveModule(__filename, LocalStorage.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), LocalStorage.name));
   private readonly storagePath: string;
 
   private readonly bucket: string;

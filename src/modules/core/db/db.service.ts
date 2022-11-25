@@ -4,13 +4,15 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { DataSource, Repository } from 'typeorm';
+import { fileURLToPath } from 'url';
 
-import { Profile } from '../../common';
 import { DBHelper, parseFields } from './db.helper';
+
+import type { Profile } from '../../common';
 
 @Injectable()
 export class DBService {
-  private readonly logger = new Logger(resolveModule(__filename, DBService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), DBService.name));
 
   constructor(private readonly dataSource: DataSource) {}
 

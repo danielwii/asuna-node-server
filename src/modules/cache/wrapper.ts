@@ -1,5 +1,4 @@
 import { CacheScope } from 'apollo-server-types';
-import { Promise } from 'bluebird';
 
 import { CacheKey, InMemoryDB } from './db';
 

@@ -12,11 +12,10 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import appleSignIn from 'apple-signin-auth';
-import { Promise } from 'bluebird';
 import Chance from 'chance';
 import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
-import { BaseEntity, DeepPartial } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { isNotBlank, TimeUnit } from '../../common';
 import { named } from '../../helper/annotations';
@@ -24,11 +23,12 @@ import { DBHelper } from '../db';
 import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { AppleConfigObject } from './apple.config';
-import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { AppleUserProfile, UserProfile } from './user.entities';
 
+import type { BaseEntity, DeepPartial } from 'typeorm';
+import type { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { CreatedUser } from './auth.service';
 
@@ -53,7 +53,7 @@ class SignInWithAppleDTO {
 }
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
-  private readonly superLogger = new Logger(resolveModule(__filename, AbstractAuthController.name));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), AbstractAuthController.name));
   private readonly appleConfig = AppleConfigObject.load();
 
   constructor(
@@ -130,7 +130,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     @Body() dto: SignInWithAppleDTO,
     @Req() req: JwtAuthRequest,
     funcName?: string,
-  ): Promise<CreatedToken> {
+  ): Promise<CreatedToken | void> {
     const { payload } = req;
     this.superLogger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
     if (!this.appleConfig.enable) {
@@ -186,6 +186,8 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       // 未绑定profileId时直接绑定即可
       exists.profileId = dto.profileId;
       await exists.save();
+      // TODO
+      this.superLogger.warn(`#${funcName} should return something`);
       return;
     } else if (!exists.profileId) {
       // 不存在profileId时创建一个并绑定

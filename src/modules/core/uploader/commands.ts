@@ -7,8 +7,10 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import * as mime from 'mime-types';
 
 import { AsunaContext, StorageEngineMode } from '../context';
-import { OperationToken } from '../token';
 import { UploaderRoot } from './model';
+
+import type { OperationToken } from '../token';
+import { fileURLToPath } from "url";
 
 export class UploadCommand {
   public constructor(
@@ -21,7 +23,7 @@ export class UploadCommand {
 
 @CommandHandler(UploadCommand)
 export class UploaderHandler implements ICommandHandler<UploadCommand> {
-  private readonly logger = new Logger(resolveModule(__filename, UploaderHandler.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderHandler.name));
 
   public constructor(private readonly publisher: EventPublisher) {}
 

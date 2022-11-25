@@ -4,6 +4,8 @@ import { Args, Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'url';
+
 import { CacheTTL } from '../cache/constants';
 import { emptyPage, Pageable, toPage } from '../core/helpers/page.helper';
 import { PageRequestInput } from '../graphql/input';
@@ -14,12 +16,12 @@ import type { FindOptionsWhere } from 'typeorm';
 @ObjectType({ implements: () => [Pageable] })
 class AppReleasePageable extends Pageable<AppRelease> {
   @Field((returns) => [AppRelease], { nullable: true })
-  items: AppRelease[];
+  declare items: AppRelease[];
 }
 
 @Resolver()
 export class AppQueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'AppQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AppQueryResolver'));
 
   @Query((returns) => AppReleasePageable)
   public async app_releases(

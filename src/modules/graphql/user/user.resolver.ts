@@ -3,7 +3,7 @@ import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/grap
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 
 import { UserProfile } from '../../core/auth';
 import { Wallet } from '../../property';
@@ -12,9 +12,10 @@ import { GqlAdminAuthGuard } from '../auth.guard';
 import { GraphqlHelper } from '../helper';
 
 import type { GraphqlContext } from '../../dataloader';
+import { fileURLToPath } from "url";
 
 export class UserProfileQueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, 'UserProfileQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserProfileQueryResolver'));
 
   @UseGuards(new GqlWXAuthGuard())
   @Query((returns) => UserProfile)
@@ -32,7 +33,7 @@ export class UserProfileQueryResolver {
 
 @Resolver(UserProfile)
 export class UserProfileResolver {
-  private logger = new Logger(resolveModule(__filename, 'UserProfileResolver'));
+  private logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserProfileResolver'));
 
   @ResolveField((returns) => WXMiniAppUserInfo)
   public async miniAppUserInfo(

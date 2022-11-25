@@ -4,17 +4,17 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 import * as R from 'ramda';
-import { BaseEntity, ObjectLiteral } from 'typeorm';
 
-import { PrimaryKey, Profile } from '../../common';
 import { AppDataSource } from '../../datasource';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
 import { KvHelper } from '../kv/kv.helper';
 
+import type { BaseEntity, ObjectLiteral } from 'typeorm';
+import type { PrimaryKey, Profile } from '../../common';
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 
 export class RestHelper {

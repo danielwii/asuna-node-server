@@ -3,7 +3,11 @@ import { Logger } from '@nestjs/common';
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const configLoader: ConfigLoader = createConfigLoader({
   requiredVariables: [

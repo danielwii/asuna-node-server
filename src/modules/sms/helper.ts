@@ -12,6 +12,7 @@ import { InMemoryDB } from '../cache';
 import { SMSConfigObject } from './config';
 
 import type { RequestInfo } from '../helper';
+import { fileURLToPath } from "url";
 
 const chance = new Chance();
 
@@ -29,7 +30,7 @@ interface AliSendSMSParams {
 }
 
 export class AliyunSMSAdapter implements SMSAdapter {
-  private readonly logger = new Logger(resolveModule(__filename, AliyunSMSAdapter.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AliyunSMSAdapter.name));
 
   private client: AliPopCore;
   private config: SMSConfigObject;

@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import _ from 'lodash';
 import passport from 'passport';
 
@@ -14,15 +14,17 @@ import { UserProfile } from '../core/auth/user.entities';
 import { AuthedUserHelper } from '../core/auth/user.helper';
 import { Store } from '../store/store';
 import { OrgAuthHelper } from '../tenant/auth';
-import { OrgUser } from '../tenant/tenant.entities';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { wrapErrorInfo } from './utils';
 
+import type { OrgUser } from '../tenant/tenant.entities';
 import type { JwtPayload } from '../core/auth/auth.interfaces';
 import type { WXJwtPayload } from '../wechat/interfaces';
 import type { WxCodeSession } from '../wechat/wx.interfaces';
 import type { Request, Response } from 'express';
 import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
+
+const { Promise } = bluebird;
 
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;

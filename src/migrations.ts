@@ -1,6 +1,8 @@
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 
 import { AuthMigrations } from './modules/core/auth/auth.migrations';
+
+const { Promise } = bluebird;
 
 export const renameTables = [
   { from: 'sys__t_tenants', to: 'sass__t_tenants' },

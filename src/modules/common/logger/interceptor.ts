@@ -4,9 +4,9 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+import type { Observable } from 'rxjs';
 import type { Request } from 'express';
 import type { CommonRequest } from '../interface';
 

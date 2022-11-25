@@ -13,6 +13,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import type { Server, Socket } from 'socket.io';
+import { fileURLToPath } from "url";
 
 export class AdminWsHelper {
   private static server: Server;
@@ -50,7 +51,7 @@ export interface AsunaSocketRoomsType {
   serveClient: false,
 })
 export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(resolveModule(__filename, SocketIOGateway.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SocketIOGateway.name));
 
   @WebSocketServer()
   private readonly server?: Server;

@@ -6,14 +6,15 @@ import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
 import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
-import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 
 import { CacheHelper, CleanCacheType } from '../../cache';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
 import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 
+import type { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 import type { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import type { MetaInfoOptions } from '../../common/decorators';
+import { fileURLToPath } from "url";
 
 const safeReload = (metadata: EntityMetadata, entity): void => {
   if (!_.isObject(entity)) return;
@@ -37,7 +38,7 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
-  private readonly logger = new Logger(resolveModule(__filename, EntitySubscriber.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), EntitySubscriber.name));
 
   constructor() {
     this.logger.log('init ...');

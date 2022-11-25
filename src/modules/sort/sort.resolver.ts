@@ -6,7 +6,9 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import * as util from 'util';
 
 import { UnionTypeResolver } from '../graphql';
-import { SortService } from './sort.service';
+
+import type { SortService } from './sort.service';
+import { fileURLToPath } from "url";
 
 /**
  * const SortResolverProvider: Provider = {
@@ -19,7 +21,7 @@ import { SortService } from './sort.service';
  */
 @Resolver('Sort')
 export class SortResolver {
-  private readonly logger = new Logger(resolveModule(__filename, SortResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SortResolver.name));
 
   public constructor(private readonly sortService: SortService, private readonly Sort) {}
 

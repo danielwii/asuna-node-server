@@ -4,7 +4,6 @@ import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-help
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
 import parsePhoneNumber from 'libphonenumber-js';
 import _ from 'lodash';
 
@@ -13,10 +12,11 @@ import { CsurfGuard } from '../common/guards/csurf';
 import { SMSHelper } from './helper';
 
 import type { RequestInfo } from '../helper';
+import { fileURLToPath } from "url";
 
 @Controller('api/v1/sms')
 export class SMSController {
-  private readonly logger = new Logger(resolveModule(__filename, SMSController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SMSController.name));
 
   @UseGuards(new ActionRateLimitGuard('api/v1/sms/verify-code', 5), CsurfGuard)
   @Post('verify-code')

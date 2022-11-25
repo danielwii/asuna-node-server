@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import dayjs from 'dayjs';
-import * as Handlebars from 'handlebars';
+import Handlebars from 'handlebars';
 import _ from 'lodash';
 
 // --------------------------------------------------------------

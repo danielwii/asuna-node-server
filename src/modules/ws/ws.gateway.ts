@@ -14,6 +14,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { configLoader } from '../config';
 
 import type { Server } from 'ws';
+import { fileURLToPath } from "url";
 
 export const WSConfigKeys = {
   WS_PORT: 'WS_PORT',
@@ -28,7 +29,7 @@ const port = configLoader.loadNumericConfig(WSConfigKeys.WS_PORT, 3002);
   serveClient: false,
 })
 export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(resolveModule(__filename, WSGateway.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WSGateway.name));
 
   @WebSocketServer()
   private server: Server;

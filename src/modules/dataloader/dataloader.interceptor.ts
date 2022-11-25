@@ -1,13 +1,13 @@
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 
 import _ from 'lodash';
-import SpanContext from 'opentracing/lib/span_context';
-import { Observable } from 'rxjs';
 
-import { Tenant } from '../tenant';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
+import type SpanContext from 'opentracing/lib/span_context';
+import type { Observable } from 'rxjs';
+import type { Tenant } from '../tenant';
 import type { ResolveInfoCacheControl } from 'apollo-server-types';
 import type { GraphQLResolveInfo } from 'graphql';
 import type { RequestInfo } from '../helper';

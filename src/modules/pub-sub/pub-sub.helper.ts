@@ -4,9 +4,11 @@ import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/prov
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
+
+const { Promise } = bluebird;
 
 export enum PubSubChannels {
   dataloader = 'dataloader',

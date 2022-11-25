@@ -4,10 +4,11 @@ import { INestApplication, Injectable, Logger, OnModuleInit } from '@nestjs/comm
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { fileURLToPath } from "url";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, PrismaService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PrismaService.name));
 
   public constructor() {
     super({

@@ -7,7 +7,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 import { configLoader } from '../config';
 import { Global } from './global';
@@ -24,6 +25,9 @@ import {
 import { AliossStorage } from './storage/storage.alioss.engine';
 import { UploaderConfigObject } from './uploader/config';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export interface IAsunaContextOpts {
   /**
    * default: app
@@ -35,7 +39,7 @@ export interface IAsunaContextOpts {
 export type StorageEngineMode = 'chunks';
 
 export class AsunaContext {
-  private readonly logger = new Logger(resolveModule(__filename, AsunaContext.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AsunaContext.name));
   private readonly config = UploaderConfigObject.load();
 
   public static instance: AsunaContext;

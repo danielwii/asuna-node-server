@@ -8,14 +8,15 @@ import geoip from 'geoip-lite';
 import _ from 'lodash';
 
 import { PageView } from './schema';
-import { WebService } from './service';
 
+import type { WebService } from './service';
 import type { RequestInfo } from '../helper';
 import type { PageViewDTO } from '@danielwii/asuna-shared/dist/dto';
+import { fileURLToPath } from "url";
 
 @Controller('api/v1/web')
 export class WebController {
-  private readonly logger = new Logger(resolveModule(__filename, WebController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WebController.name));
 
   public constructor(private readonly webService: WebService) {}
 

@@ -4,7 +4,7 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import axios from 'axios';
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import Chance from 'chance';
 import * as crypto from 'crypto';
 import _ from 'lodash';
@@ -13,10 +13,12 @@ import { IsNull } from 'typeorm';
 import * as xml2js from 'xml2js';
 
 import { AppConfigObject } from '../config/app.config';
-import { PaymentMethod } from './payment.entities';
 import { PaymentNotifyHelper } from './payment.notify';
 import { PaymentOrder } from './payment.order.entities';
 
+import type { PaymentMethod } from './payment.entities';
+
+const { Promise } = bluebird;
 const chance = new Chance();
 
 type TradeType = 'MWEB' | 'JSAPI' | 'APP' | 'NATIVE';

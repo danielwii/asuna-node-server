@@ -18,6 +18,7 @@ import { TenantAdminController } from './mgmt.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
+import { fileURLToPath } from "url";
 
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
@@ -36,7 +37,7 @@ import { TenantService } from './tenant.service';
   controllers: [TenantController, TenantAdminController, TenantAuthController],
 })
 export class TenantModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, TenantModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantModule.name));
 
   async onModuleInit(): Promise<void> {
     await TenantHelper.preload();

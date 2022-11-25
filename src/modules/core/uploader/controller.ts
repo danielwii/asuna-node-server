@@ -21,7 +21,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
-import { Promise } from 'bluebird';
+import bluebird from 'bluebird';
 import { Transform } from 'class-transformer';
 import { isEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { oneLineTrim } from 'common-tags';
@@ -30,8 +30,11 @@ import _ from 'lodash';
 import * as mime from 'mime-types';
 import * as multer from 'multer';
 import * as os from 'os';
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 import { basename, dirname, extname, join } from 'path';
+import { fileURLToPath } from 'url';
 import * as uuid from 'uuid';
 
 import { named } from '../../helper';
@@ -46,6 +49,8 @@ import { RemoteFileInfo, UploaderService } from './service';
 
 import type { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import type { AnyAuthRequest } from '../../helper/interfaces';
+
+const { Promise } = bluebird;
 
 const fileInterceptorOptions: MulterOptions = {
   storage: multer.diskStorage({
@@ -105,7 +110,7 @@ class CreateChunksUploadTaskQuery {
 @ApiTags('core')
 @Controller('api/v1/uploader')
 export class UploaderController {
-  private readonly logger = new Logger(resolveModule(__filename, UploaderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderController.name));
   private context = AsunaContext.instance;
 
   constructor(private readonly uploaderService: UploaderService) {}

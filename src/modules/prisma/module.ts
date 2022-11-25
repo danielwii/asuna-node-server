@@ -3,6 +3,7 @@ import { Global, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { PrismaService } from './service';
+import { fileURLToPath } from "url";
 
 @Global()
 @Module({
@@ -10,7 +11,7 @@ import { PrismaService } from './service';
   exports: [PrismaService],
 })
 export class PrismaModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, PrismaModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PrismaModule.name));
 
   async onModuleInit(): Promise<void> {
     this.logger.log('init...');

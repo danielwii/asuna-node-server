@@ -1,3 +1,5 @@
+import responseCachePlugin from '@apollo/server-plugin-response-cache';
+
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -11,7 +13,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import { ApolloServerPluginCacheControl } from 'apollo-server-core';
-import responseCachePlugin from 'apollo-server-plugin-response-cache';
+// TODO The `apollo-tracing` package is no longer part of Apollo Server 3. See https://www.apollographql.com/docs/apollo-server/migration/#tracing for details
+import { plugin as apolloTracingPlugin } from 'apollo-tracing';
 import {
   DirectiveLocation,
   GraphQLBoolean,
@@ -21,8 +24,9 @@ import {
   Kind,
   ValueNode,
 } from 'graphql';
-import * as _ from 'lodash';
-import * as path from 'path';
+import _ from 'lodash';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import { AppModule } from './app';
 import { KvModule } from './core';
@@ -32,6 +36,7 @@ import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
 import type { GraphQLServiceContext } from 'apollo-server-types';
+import type { GraphQLRequestContext } from '@apollo/server';
 
 @Scalar('DateTime', (type) => Date)
 export class DateScalar implements CustomScalar<number, Date> {
@@ -60,20 +65,28 @@ export class DateScalar implements CustomScalar<number, Date> {
 
 @Module({ providers: [DateScalar] })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(__filename, GraphqlModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GraphqlModule.name));
 
   public static forRoot(modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);
     const tracer = TracingHelper.init();
     const tracingConfig = TracingConfigObject.load();
     const config = GraphQLConfigObject.load();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const __entrance = pathToFileURL(process.argv[1]).href;
+    const __rootPath = dirname(dirname(fileURLToPath(__entrance)));
+    console.log('-=-=-=-=-', {
+      __dirname,
+      __rootPath,
+    });
     const typePaths = _.uniq(
       _.compact([
-        require.main.path.includes('asuna-node-server') ? null : path.resolve(__dirname, '../../../*/src/**/*.graphql'),
-        `${path.join(require.main.path, '../src')}/**/*.graphql`,
+        __rootPath.includes('asuna-node-server') ? null : resolve(__dirname, '../../../*/src/**/*.graphql'),
+        `${join(__rootPath, '../src')}/**/*.graphql`,
       ]),
     );
-    Logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: require.main.path, __dirname, options })}`);
+    Logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: __rootPath, __dirname, options })}`);
 
     const redisConfig = RedisConfigObject.load('graphql');
     const cache = redisConfig.enable ? new RedisCache(redisConfig.getIoOptions()) : new InMemoryLRUCache();
@@ -139,7 +152,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
               },
             },
             responseCachePlugin({
-              sessionId: (requestContext) => {
+              sessionId: async (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
                 if (sessionID) Logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
@@ -147,7 +160,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
             }),
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
             ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
-            config.debug ? require('apollo-tracing').plugin() : null,
+            config.debug ? (apolloTracingPlugin() as any) : null,
           ]),
           /*
           cacheControl: {

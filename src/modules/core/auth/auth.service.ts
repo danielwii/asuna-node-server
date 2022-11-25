@@ -6,13 +6,17 @@ import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
-import { DataSource } from 'typeorm';
+import { fileURLToPath } from 'url';
 
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AuthUserChannel } from './base.entities';
 import { UserProfile } from './user.entities';
 import { AuthedUserHelper } from './user.helper';
+
+import type { DataSource } from 'typeorm';
 
 export const HermesAuthEventKeys = {
   // 新用户
@@ -26,7 +30,7 @@ export interface CreatedUser<U> {
 
 @Injectable()
 export class AuthService extends AbstractAuthService<UserProfile> {
-  private readonly logger = new Logger(resolveModule(__filename, AuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuthService.name));
 
   /**
    * 这里会根据继承 AbstractAuthUser / AbstractTimeBasedAuthUser 的实体来注册用户

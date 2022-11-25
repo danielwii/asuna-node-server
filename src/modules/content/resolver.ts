@@ -4,7 +4,7 @@ import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
+import { fileURLToPath } from 'url';
 
 import { GqlAuthGuard } from '../graphql/auth.guard';
 import { named } from '../helper/annotations';
@@ -15,7 +15,7 @@ import type { GraphqlContext } from '../dataloader/dataloader.interceptor';
 
 @Resolver()
 export class ContentQueryResolver {
-  private readonly logger = new Logger(resolveModule(__filename, ContentQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentQueryResolver.name));
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => [ContentMedia])

@@ -3,7 +3,7 @@ import { ArgumentMetadata, Injectable, Logger, PipeTransform } from '@nestjs/com
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import * as fp from 'lodash/fp';
+import fp from 'lodash/fp';
 
 import type { FitEnum } from 'sharp';
 

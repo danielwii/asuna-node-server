@@ -4,23 +4,23 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
-import { CreateTenantStaffDTO } from '@danielwii/asuna-shared';
 
-import { Promise } from 'bluebird';
 
 import { AbstractAuthController } from '../core/auth';
 import { OrgJwtAuthGuard, TenantRoleName, TenantRolesGuard } from './auth.guard';
-import { TenantAuthService } from './auth.service';
 import { OrgUser } from './tenant.entities';
 
+import type { CreateTenantStaffDTO } from '@danielwii/asuna-shared';
+import { TenantAuthService } from './auth.service';
 import type { DeepPartial } from 'typeorm';
 import type { OrgJwtAuthRequest } from './auth';
+import { fileURLToPath } from "url";
 
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {
-  private readonly logger = new Logger(resolveModule(__filename, TenantAuthController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantAuthController.name));
 
-  public constructor(public readonly authService: TenantAuthService) {
+  public constructor(public override readonly authService: TenantAuthService) {
     super(OrgUser, authService);
   }
 
@@ -33,7 +33,7 @@ export class TenantAuthController extends AbstractAuthController<OrgUser> {
 
   @Get('current')
   @UseGuards(OrgJwtAuthGuard)
-  public async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
+  public override async current(@Req() req: OrgJwtAuthRequest): Promise<DeepPartial<OrgUser>> {
     const { user, payload } = req;
     this.logger.log(`current... ${r({ user, payload })}`);
     if (!payload) {

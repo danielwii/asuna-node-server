@@ -3,11 +3,12 @@ import { Logger } from '@nestjs/common';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { Promise } from 'bluebird';
-import { glob } from 'glob';
+import bluebird from 'bluebird';
+import glob from 'glob';
 import _ from 'lodash';
 import { dirname, extname, resolve } from 'path';
 import { DataSource } from 'typeorm';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
@@ -16,6 +17,8 @@ import { Global } from './modules/core/global';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
+
+const { Promise } = bluebird;
 
 export function validateOptions(options: BootstrapOptions): void {
   // const config = configLoader.loadConfigs();
@@ -108,22 +111,25 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
  */
 export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<void> {
   // const wasBuilt = __filename.endsWith('js');
-  const rootDir = dirname(require.main.filename);
-  Logger.log(`main entrance is ${r(require.main.filename)}`);
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const __entrance = pathToFileURL(process.argv[1]).href;
+  const __rootPath = dirname(dirname(fileURLToPath(__entrance)));
+  Logger.log(`main entrance is ${r(__dirname)}`);
   const suffix = extname(__filename).slice(1);
-  const currentSuffix = extname(require.main.filename).slice(1);
+  const currentSuffix = extname(import.meta.url).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
   const pathResolver = (mode: 'entities' | 'subscriber') => [
     // `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`,
     // 地址不同时这里认为是用特定的环境配置来拉取 packages 下的相关实体，即 monorepo 模式
-    rootDir !== __dirname
+    __rootPath !== __dirname
       ? `${resolve(__dirname, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`
       : `${resolve(__dirname)}/**/*${mode}.${suffix}`,
-    `${resolve(rootDir)}/**/*${mode}.${currentSuffix}`,
+    `${resolve(__rootPath)}/**/*${mode}.${currentSuffix}`,
   ];
   const entities = _.uniq(_.compact([...pathResolver('entities'), ...(options?.typeormEntities || [])]));
   const subscribers = _.uniq(_.compact([...pathResolver('subscriber'), ...(options?.typeormSubscriber || [])]));
-  Logger.log(`options is ${r({ options, __dirname, rootDir, suffix, entities, subscribers, __filename })}`);
+  Logger.log(`options is ${r({ options, __dirname, __rootPath, suffix, entities, subscribers, __filename })}`);
 
   Logger.log(`resolve typeorm entities: ${r(entities)}`);
   Logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
