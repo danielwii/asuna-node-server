@@ -14,7 +14,7 @@ import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import { ApolloServerPluginCacheControl } from 'apollo-server-core';
 // TODO The `apollo-tracing` package is no longer part of Apollo Server 3. See https://www.apollographql.com/docs/apollo-server/migration/#tracing for details
-import { plugin as apolloTracingPlugin } from 'apollo-tracing';
+// import { plugin as apolloTracingPlugin } from 'apollo-tracing';
 import {
   DirectiveLocation,
   GraphQLBoolean,
@@ -157,10 +157,10 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
                 if (sessionID) Logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
               },
-            }),
+            }) as any,
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
             ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
-            config.debug ? (apolloTracingPlugin() as any) : null,
+            // config.debug ? (apolloTracingPlugin() as any) : null,
           ]),
           /*
           cacheControl: {
