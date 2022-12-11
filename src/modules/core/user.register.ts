@@ -7,15 +7,15 @@ import _ from 'lodash';
 import { DBHelper } from './db/db.helper';
 
 import type { BaseEntity } from 'typeorm';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist';
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 import type { UserProfile } from './auth/user.entities';
 
 export class UserRegister {
-  static Entity: ConstrainedConstructor<any> | any;
-  static onProfileCreate: (profile: UserProfile) => Promise<any>;
-  static onProfileDelete: (profile: UserProfile) => Promise<any>;
+  public static Entity: ConstrainedConstructor<any> | any;
+  public static onProfileCreate: (profile: UserProfile) => Promise<any>;
+  public static onProfileDelete: (profile: UserProfile) => Promise<any>;
 
-  static regCoreUserCreator<User extends BaseEntity>(
+  public static regCoreUserCreator<User extends BaseEntity>(
     Entity: ConstrainedConstructor<any> | any,
     onProfileCreate?: (profile: UserProfile) => Promise<any>,
     onProfileDelete?: (profile: UserProfile) => Promise<any>,
@@ -35,7 +35,7 @@ export class UserRegister {
     this.onProfileDelete = onProfileDelete ?? ((profile) => DBHelper.repo(Entity).delete(profile.id));
   }
 
-  static createUserByProfile(profile: UserProfile): Promise<any> {
+  public static createUserByProfile(profile: UserProfile): Promise<any> {
     Logger.log(`create user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileCreate) {
       Logger.warn(`no core user registered for created.`);
@@ -44,7 +44,7 @@ export class UserRegister {
     return this.onProfileCreate(profile);
   }
 
-  static removeUserByProfile(profile: UserProfile): Promise<any> {
+  public static removeUserByProfile(profile: UserProfile): Promise<any> {
     Logger.log(`remove user by profile ${r(profile)}`);
     if (!this.Entity || !this.onProfileDelete) {
       Logger.warn(`no core user registered for removed.`);

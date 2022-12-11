@@ -1,4 +1,15 @@
-import { Body, Get, HttpCode, HttpStatus, Logger, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Logger,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 
 import {
   AsunaErrorCode,
@@ -15,14 +26,15 @@ import appleSignIn from 'apple-signin-auth';
 import Chance from 'chance';
 import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { isNotBlank, TimeUnit } from '../../common';
+import { EmailHelper } from '../../email/email.helper';
 import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
 import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
-import { AppleConfigObject } from './apple.config';
+import { AppleConfigure } from './apple.configure';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { AppleUserProfile, UserProfile } from './user.entities';
@@ -54,7 +66,6 @@ class SignInWithAppleDTO {
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
   private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), AbstractAuthController.name));
-  private readonly appleConfig = AppleConfigObject.load();
 
   constructor(
     readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
@@ -132,29 +143,34 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     funcName?: string,
   ): Promise<CreatedToken | void> {
     const { payload } = req;
-    this.superLogger.log(`#${funcName} ${r({ dto, payload, appleConfig: this.appleConfig })}`);
-    if (!this.appleConfig.enable) {
+    const appleConfig = await AppleConfigure.load();
+    this.superLogger.log(`#${funcName} ${r({ dto, payload, appleConfig: appleConfig })}`);
+    if (!appleConfig.enable) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `apple sign in is disabled.`);
     }
 
     if (dto.profileId && dto.profileId !== payload.id) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `profileId not match`);
     }
-    const clientID = this.appleConfig.clientID;
+    const clientID = appleConfig.clientID;
     const clientSecret = appleSignIn.getClientSecret({
       clientID, // Apple Client ID
-      teamID: this.appleConfig.teamID, // Apple Developer Team ID.
-      privateKey: this.appleConfig.privateKey, // private key associated with your client ID. -- Or provide a `privateKeyPath` property instead.
-      keyIdentifier: this.appleConfig.keyIdentifier, // identifier of the private key.
+      teamID: appleConfig.teamID, // Apple Developer Team ID.
+      privateKey: appleConfig.privateKey, // private key associated with your client ID. -- Or provide a `privateKeyPath` property instead.
+      keyIdentifier: appleConfig.keyIdentifier, // identifier of the private key.
       // OPTIONAL
       expAfter: TimeUnit.DAYS.toSeconds(30), // Unix time in seconds after which to expire the clientSecret JWT. Default is now+5 minutes.
     });
-    this.superLogger.debug(`#${funcName} ${r({ clientSecret })}`);
+    this.superLogger.debug(`#${funcName} ${r({ clientID, redirectUri: appleConfig.redirectUri, clientSecret })}`);
     const token = await appleSignIn.getAuthorizationToken(dto.code, {
       clientID, // Apple Client ID
-      redirectUri: this.appleConfig.redirectUri, // use the same value which you passed to authorisation URL.
+      redirectUri: appleConfig.redirectUri, // use the same value which you passed to authorisation URL.
       clientSecret,
     });
+    if (_.has(token, 'error')) {
+      throw new AsunaException(AsunaErrorCode.Unprocessable, _.get(token, 'error'));
+    }
+
     this.superLogger.debug(`#${funcName} ${r({ token })}`);
     const verified = await appleSignIn.verifyIdToken(token.id_token, {
       // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
@@ -185,7 +201,8 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     if (!exists.profileId && dto.profileId) {
       // 未绑定profileId时直接绑定即可
       exists.profileId = dto.profileId;
-      await exists.save();
+      // await exists.save();
+      await AppleUserProfile.save(exists);
       // TODO
       this.superLogger.warn(`#${funcName} should return something`);
       return;
@@ -202,7 +219,8 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       }
       this.superLogger.debug(`#${funcName} ${r({ profile })}`);
       exists.profileId = profile.id;
-      await exists.save();
+      // await exists.save();
+      await AppleUserProfile.save(exists);
       return await this.authService.createToken(profile, { uid: `${signed.user.id}` });
     } else {
       // 存在profile时直接创建一个token返回
@@ -217,7 +235,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     this.superLogger.log(`#${funcName} ${r(query)}`);
     return await appleSignIn.verifyIdToken(query.id_token, {
       // Optional Options for further verification - Full list can be found here https://github.com/auth0/node-jsonwebtoken#jwtverifytoken-secretorkey-options-callback
-      audience: 'io.github.danielwii.robin-board', // client id - can also be an array
+      audience: 'io.github.danielwii.****', // client id - can also be an array
       // nonce: 'NONCE', // nonce // Check this note if coming from React Native AS RN automatically SHA256-hashes the nonce https://github.com/invertase/react-native-apple-authentication#nonce
       // If you want to handle expiration on your own, or if you want the expired tokens decoded
       ignoreExpiration: true, // default is false
@@ -255,6 +273,42 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     return { username, defaultPassword: password, token };
   }
 
+  /**
+   * send verification code to email address
+   * @param body
+   * @param funcName
+   */
+  @Post('verify')
+  @named
+  async verify(@Body() body: { email?: string }, funcName?: string): Promise<ApiResponse> {
+    this.superLogger.log(`#${funcName} ${r(body)}`);
+    const email = body.email;
+    if (!email) throw new BadRequestException('email is required');
+    // 检测是否已存在该用户，不存在的话添加一个
+    let user = await this.authService.getUserByEmail(email);
+    this.superLogger.log(`#${funcName} found user ${r(user)}`);
+    if (!user) {
+      this.superLogger.log(`user ${r(body)} not exists, create one...`);
+      const username = chance.string({ length: 18, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
+      const created = await this.authService.createUser(username, email, null, AuthUserChannel.code);
+      this.superLogger.log(`#${funcName} created user ${r(created)}`);
+      user = created.user;
+    }
+    /*
+    const user = await this.authService.getUserByEmail(email);
+    if (!user) throw new NotFoundException('user not found'); */
+    const code = chance.string({ length: 6, pool: '0123456789' });
+    // const result = await this.emailService.sendEmail({
+    await EmailHelper.send({
+      to: [email],
+      subject: 'Verify your email',
+      // text: `Your verification code is ${code}`,
+      content: `Your verification code is ${code}`,
+    });
+    await this.authService.setVerifyCode(user.id, code);
+    return ApiResponse.success();
+  }
+
   @Post('sign-up')
   async signUp(@Body() body) {
     this.superLogger.log(`sign-up: ${r(body)}`);
@@ -269,6 +323,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.AccountExists, [body.email, body.username]);
     }
 
+    this.superLogger.log('exists user not found, create one...');
     return this.authService
       .createUser(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
       .then(async (result) => {
@@ -359,10 +414,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     this.superLogger.debug(`relations is ${r(relations)}`);
     if (relations.includes('profile')) {
       const profileId = _.get(result, 'profileId');
-      const profile = await UserProfile.findOne({
-        where: { id: profileId },
-        relations: ['wallet'],
-      });
+      const profile = await UserProfile.findOne({ where: { id: profileId }, relations: ['wallet'] });
       // const desensitized = _.omit(profile, 'salt', 'password', 'info');
       const { salt, password, ...desensitized } = profile;
       // this.superLogger.debug(`current profile is ${r({ profile, desensitized })}`);

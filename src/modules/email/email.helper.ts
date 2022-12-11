@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import EmailTemplate from 'email-templates';
 import _ from 'lodash';
@@ -10,9 +11,9 @@ import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 
 import { DynamicConfigKeys, DynamicConfigs } from '../config';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv';
+import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
 import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core/storage';
-import { WeChatHelper } from '../wechat';
+import { WeChatHelper } from '../wechat/wechat.helper';
 import { EmailTmplConfigKeys, EmailTmplConfigObject } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { isMailAttachment, MailInfo } from './email.interface';
@@ -31,8 +32,12 @@ export class EmailHelper {
 
   public static async getConfig(): Promise<EmailConfigObject> {
     const kv = await KvHelper.get(this.kvDef);
-    const configObject = new EmailConfigObject(await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys));
-    return !_.isEmpty(kv) ? configObject : EmailConfigObject.load();
+    const configObject = deserializeSafely(
+      EmailConfigObject,
+      await KvHelper.getConfigsByEnumKeys(this.kvDef, EmailConfigKeys),
+    );
+    // 优先从 kv 中取 email 相关配置，否则返回 env 中的配置
+    return !_.isEmpty(kv) && _.get(configObject, 'enable') ? configObject : EmailConfigObject.load();
   }
 
   public static async getTmplConfig(): Promise<EmailTmplConfigObject> {
@@ -56,23 +61,24 @@ export class EmailHelper {
     const config = await EmailHelper.getConfig();
 
     if (config.enable) {
-      Logger.log(`init by ${r(config)}`);
+      Logger.log(`init smtp config ${r(config)}`);
       const transport: SMTPTransport.Options = {
         logger: true,
         host: config.host,
         port: config.port,
         secure: config.ssl, // upgrade later with STARTTLS
-        auth: { user: config.username, pass: config.password },
+        auth: { user: config.user, pass: config.password },
         from: config.from,
       };
       EmailHelper.transporter = createTransport(transport);
+      Logger.log(`init smtp transport ${r(transport)}`);
     } else {
       Logger.warn(`EMAIL settings must be set up and enabled to send mail in real world ${r(config)}`);
       EmailHelper.transporter = createTransport({ jsonTransport: true });
     }
 
     EmailHelper.emailTemplate = new EmailTemplate({
-      message: { from: config.from || config.username },
+      message: { from: config.from || config.user },
       preview: false,
       send: true, // will send emails in development/test env
       subjectPrefix: process.env.NODE_ENV === 'production' ? false : `[${_.upperCase(process.env.ENV)}] `,
@@ -114,6 +120,7 @@ export class EmailHelper {
       ...(content ? { html: content } : {}),
     };
     Logger.debug(`call mail sender ${r(_.omit(mailInfo, 'content', 'attachments'))}`);
+    Logger.debug(`mail options ${r(mailOptions)}`);
     return EmailHelper.transporter.sendMail(mailOptions);
   }
 

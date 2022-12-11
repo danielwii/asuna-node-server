@@ -69,7 +69,7 @@ export class AppQueryResolver {
     this.logger.log(`app_latest_release: ${r({ key, platform })}`);
 
     const appInfo = await AppInfo.findOne({ where: { key, isPublished: true }, cache: CacheTTL.FLASH });
-    return AppRelease.findOne({
+    const release = await AppRelease.findOne({
       where: {
         appInfoId: appInfo?.id,
         platform: platform?.toUpperCase(),
@@ -78,6 +78,8 @@ export class AppQueryResolver {
       order: { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });
+    this.logger.log(`app_latest_release: ${r({ appInfo, release })}`);
+    return release;
   }
 
   @Query((returns) => AppInfo)

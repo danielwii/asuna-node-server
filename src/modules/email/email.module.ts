@@ -1,29 +1,40 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'url';
+
+import { ContentfulModule } from '../contentful';
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
 import { EmailTmplConfigKeys } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
+import { EmailController } from './email.controller';
 import { EmailHelper } from './email.helper';
+import { EmailService } from './email.service';
 
-@Module({})
+@Module({
+  imports: [ContentfulModule],
+  providers: [EmailService],
+  controllers: [EmailController],
+  exports: [EmailService],
+})
 export class EmailModule extends InitContainer implements OnModuleInit {
-  public async onModuleInit(): Promise<void> {
-    return this.init(async () => {
-      Logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'EmailModule'));
+
+  public onModuleInit = async (): Promise<void> =>
+    this.init(async () => {
+      this.logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
 
       await this.initKV();
       await EmailHelper.init();
-      /* test-only
-    interval(300).subscribe((value) => {
-      console.log('internal', value);
-      EmailHelper.sender.next(value);
+      /* // test-only
+      interval(300).subscribe((value) => {
+        console.log('internal', value);
+        EmailHelper.sender.next(value);
+      }); */
     });
-*/
-    });
-  }
 
   public async initKV(): Promise<void> {
     KvHelper.regInitializer<KVGroupFieldsValue>(
@@ -41,7 +52,7 @@ export class EmailModule extends InitContainer implements OnModuleInit {
                 { name: 'SMTP 端口', field: { name: EmailConfigKeys.port, type: 'number', defaultValue: 465 } },
                 { name: '启用 ssl', field: { name: EmailConfigKeys.ssl, type: 'boolean', defaultValue: false } },
                 { name: '发送邮箱', field: { name: EmailConfigKeys.from, type: 'string' } },
-                { name: '用户名', field: { name: EmailConfigKeys.username, type: 'string' } },
+                { name: '用户名', field: { name: EmailConfigKeys.user, type: 'string' } },
                 { name: '密码', field: { name: EmailConfigKeys.password, type: 'string' } },
                 { name: 'interval', field: { name: EmailConfigKeys.interval, type: 'number', defaultValue: 2000 } },
               ],

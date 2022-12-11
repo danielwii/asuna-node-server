@@ -1,5 +1,10 @@
 import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
+import { fileURLToPath } from 'node:url';
+
 import { DBModule } from '../db';
 import { KvModule } from '../kv';
 import { TokenModule } from '../token';
@@ -25,16 +30,21 @@ import { JwtStrategy } from './strategy/jwt.strategy';
   controllers: [AdminAuthController],
   exports: [AuthService],
 })
-export class AuthModule implements NestModule, OnModuleInit {
-  public constructor(private readonly adminAuthService: AdminAuthService) {}
+export class AuthModule extends InitContainer implements NestModule, OnModuleInit {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AuthModule'));
+
+  public constructor(private readonly adminAuthService: AdminAuthService) {
+    super();
+  }
 
   public configure(consumer: MiddlewareConsumer): void {
-    Logger.log('configure...');
+    this.logger.log('configure...');
     consumer.apply(AdminAuthMiddleware.forRoutes('/admin' /* '/rest' */)).forRoutes('*');
   }
 
-  public onModuleInit(): void {
-    Logger.log('init...');
-    this.adminAuthService.initSysAccount().catch((error) => Logger.error(error));
-  }
+  public onModuleInit = async () =>
+    super.init(async () => {
+      // AdminWsSyncHelper.initCron();
+      this.adminAuthService.initSysAccount().catch((error) => Logger.error(error));
+    });
 }

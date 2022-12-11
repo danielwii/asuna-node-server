@@ -14,6 +14,7 @@ export enum AuthUserChannel {
   wechat = 'wechat',
   quickpass = 'quickpass',
   apple = 'apple',
+  code = 'code',
 }
 
 @InterfaceType({ implements: () => [AbstractTimeBasedBaseEntity] })

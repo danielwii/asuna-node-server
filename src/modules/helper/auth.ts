@@ -24,8 +24,6 @@ import type { WxCodeSession } from '../wechat/wx.interfaces';
 import type { Request, Response } from 'express';
 import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
 
-const { Promise } = bluebird;
-
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;
   return authorization ? authorization.startsWith('Mgmt ') : false;
@@ -110,20 +108,25 @@ export class AuthHelper {
   public static authJwt(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
-        Logger.log(`jwt auth ${r({ payload })}`);
-        if (err || info) {
-          Logger.warn(`jwt auth error: ${r(err)}`);
-        } else {
-          // TODO user not include tenant and roles, only admin-user has currently
-          const user = await AuthedUserHelper.getUserByProfileId(payload.id, ['profile']);
-          req.identifier = UserIdentifierHelper.stringify(payload);
-          req.payload = payload;
-          req.profile = user.profile;
-          req.user = user;
-          req.tenant = user.tenant;
-          req.roles = user.roles;
+        try {
+          Logger.log(`jwt auth ${r({ payload })}`);
+          if (err || info) {
+            Logger.warn(`jwt auth error: ${r(err)}`);
+          } else {
+            // TODO user not include tenant and roles, only admin-user had currently
+            const user = await AuthedUserHelper.getUserByProfileId(payload.id, ['profile']);
+            req.identifier = UserIdentifierHelper.stringify(payload);
+            req.payload = payload;
+            req.profile = user.profile;
+            req.user = user;
+            req.tenant = user.tenant;
+            req.roles = user.roles;
+          }
+          resolve({ err: err || wrapErrorInfo(info), payload, info });
+        } catch (e) {
+          Logger.warn(`fetch user info error: ${r(e)}`);
+          resolve({ err: e, payload, info });
         }
-        resolve({ err: err || wrapErrorInfo(info), payload, info });
       })(req, res);
     });
   }

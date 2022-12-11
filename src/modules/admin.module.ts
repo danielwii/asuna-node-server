@@ -16,6 +16,7 @@ import { ClientModule } from './client';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { configLoader } from './config';
 import { ContentModule } from './content';
+import { ContentfulModule } from './contentful';
 import {
   CommandController,
   GetUploadsModule,
@@ -81,6 +82,7 @@ import { WebModule } from './web';
     PropertyModule,
     configLoader.loadConfig('MONGO_ENABLE') ? WebModule : undefined,
     SMSModule,
+    configLoader.loadConfig('CONTENTFUL_ENABLE') ? ContentfulModule : undefined,
     TracingModule,
     CacheModule.registerAsync({
       useFactory: () => {

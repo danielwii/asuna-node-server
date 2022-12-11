@@ -5,11 +5,14 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsArray, IsString } from 'class-validator';
+import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 
+import { ContentfulService } from '../contentful';
 import { EmailHelper } from './email.helper';
+import { EmailService } from './email.service';
 
 import type { MailAttachment } from './email.interface';
-import { fileURLToPath } from "url";
 
 class MailBody {
   @IsArray({ always: false })
@@ -27,9 +30,11 @@ class MailBody {
 }
 
 @ApiTags('core')
-@Controller('api/email')
+@Controller('api/v1/email')
 export class EmailController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), EmailController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'EmailController'));
+
+  constructor(private readonly emailService: EmailService, private readonly contentfulService: ContentfulService) {}
 
   @Post()
   public send(@Body() body: MailBody): void {
@@ -37,6 +42,18 @@ export class EmailController {
 
     EmailHelper.send(body)
       .then((value) => this.logger.log(`send mail done: ${r(value)}`))
-      .catch((error) => this.logger.error(error));
+      .catch((error) => this.logger.error(`send mail '${body.subject}' to ${r(body.to)} error`, error));
+  }
+
+  @Post('sendgrid')
+  public async sendViaSendGrid(@Body() body) {
+    this.logger.log(`sendgrid ${r(body)}`);
+    const template = await this.contentfulService.getTemplates('verification-code.email-signup');
+
+    this.logger.log(`content ${template}`);
+    this.emailService
+      .sendEmail(_.head(body.to), 'service@moment-minder.com', body.subject, template)
+      .then((value) => this.logger.log(`send mail done: ${r(value)}`))
+      .catch((error) => this.logger.error(`send mail '${body.subject}' to ${r(body.to)} error`, error));
   }
 }

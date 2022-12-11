@@ -8,6 +8,7 @@ import _ from 'lodash';
 // eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 
+import { AppDataSource } from '../../datasource';
 import { DBHelper } from '../db/db.helper';
 import { UserRegister } from '../user.register';
 import { UserProfile } from './user.entities';
@@ -15,13 +16,13 @@ import { UserProfile } from './user.entities';
 import type { FindOneOptions } from 'typeorm';
 
 export class AuthedUserHelper {
-  static async createProfile(profile: UserProfile): Promise<any> {
+  public static async createProfile(profile: UserProfile): Promise<any> {
     const saved = await profile.save();
     const user = await UserRegister.createUserByProfile(saved).catch((reason) => Logger.error(reason));
     return [saved, user];
   }
 
-  static getProfileById(
+  public static getProfileById(
     id: string | number,
     options?: Exclude<FindOneOptions<UserProfile>, 'where'>,
   ): Promise<UserProfile> {
@@ -34,7 +35,7 @@ export class AuthedUserHelper {
     return UserProfile.findOneOrFail({ where: { id } as any, ...options });
   }
 
-  static getProfile(
+  public static getProfile(
     { email, username }: { username?: string; email?: string },
     options?: Exclude<FindOneOptions<UserProfile>, 'where'>,
   ): Promise<UserProfile> {
@@ -45,9 +46,13 @@ export class AuthedUserHelper {
     return UserProfile.findOneOrFail({ where: { username, email } as any, ...options });
   }
 
-  static async getUserById<User>(id: string | number, options?: Exclude<FindOneOptions<User>, 'where'>): Promise<User> {
+  public static async getUserById<User>(
+    id: string | number,
+    options?: Exclude<FindOneOptions<User>, 'where'>,
+  ): Promise<User> {
     if (typeof id === 'number') {
       // ow(id, 'id', ow.number.integer);
+      Logger.log(`get user by id '${id}' ${r(options)}`);
       return UserRegister.Entity.findOneOrFail({ where: { id }, ...options });
     }
     ow(id, 'id', ow.string.nonEmpty);
@@ -63,18 +68,18 @@ export class AuthedUserHelper {
     return UserRegister.Entity.findOneOrFail({ where: { id: fixedId }, ...options }); */
   }
 
-  static async getProfileByUserId(userId: string): Promise<UserProfile> {
+  public static async getProfileByUserId(userId: string): Promise<UserProfile> {
     const user: any = await UserRegister.Entity.findOneByOrFail({ id: userId });
     return UserProfile.findOneById(user.profileId);
   }
 
-  static getUserByProfileId<User = any>(profileId: string, relations?: string[]): Promise<User> {
+  public static async getUserByProfileId<User = any>(profileId: string, relations?: string[]): Promise<User> {
     ow(profileId, 'profileId', ow.string.nonEmpty);
     // const existRelations = DBHelper.getRelationPropertyNames(UserRegister.Entity);
-    return UserRegister.Entity.findOneOrFail({ where: { profileId }, relations });
+    return await UserRegister.Entity.findOneOrFail({ where: { profileId }, relations });
   }
 
-  static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {
+  public static getUser<User>({ email, username }: { username?: string; email?: string }): Promise<User> {
     if (!email && !username) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }

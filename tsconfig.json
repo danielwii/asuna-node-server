@@ -9,6 +9,8 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
+    "declarationMap": true,
+    "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist"
   },

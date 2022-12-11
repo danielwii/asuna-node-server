@@ -7,13 +7,13 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { oneLine } from 'common-tags';
 import { addMonths, differenceInCalendarDays } from 'date-fns';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
+import { fileURLToPath } from 'node:url';
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
-import { fileURLToPath } from 'url';
 
 import { formatTime, isBlank, TimeUnit } from '../../common/helpers';
 import { configLoader } from '../../config';
@@ -47,12 +47,12 @@ export interface CreatedToken {
 }
 
 export class TokenHelper {
-  static decode<Payload = JwtPayload>(token: string): Payload {
+  public static decode<Payload = JwtPayload>(token: string): Payload {
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     return jwt.verify(token, secretOrKey) as any;
   }
 
-  static async createSessionToken(clientUser, extra?: { scid?: string }) {
+  public static async createSessionToken(clientUser, extra?: { scid?: string }) {
     const expiresIn = TimeUnit.DAYS.toSeconds(1);
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<Partial<JwtPayload>, 'iat' | 'exp'> = { type: 'SessionToken', ...extra };
@@ -61,7 +61,7 @@ export class TokenHelper {
     return { expiresIn, accessToken: token };
   }
 
-  static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
+  public static async createToken(user: AuthUser, extra?: { sessionId?: string; uid?: string }): Promise<CreatedToken> {
     ow(user, 'user', ow.object.nonEmpty);
 
     const type = _.get(user, 'constructor.name');
@@ -95,7 +95,7 @@ export class TokenHelper {
     return { expiresIn, accessToken, refreshToken: refreshToken.token };
   }
 
-  static createCustomToken(
+  public static createCustomToken(
     payload: string | Buffer | object,
     secretOrPrivateKey: Secret,
     options?: SignOptions,
@@ -202,5 +202,20 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     if (email) authUser.email = email;
     // FIXME authUser.isBound = true;
     return (await authUser.save()) as U;
+  }
+
+  async getUserByEmail(email: string): Promise<U> {
+    ow(_.trim(email), ow.string.nonEmpty);
+    return this.authUserRepository.findOne({
+      where: {
+        email,
+      } as any,
+      select: ['id', 'username', 'email', 'channel', 'password', 'salt'],
+    });
+  }
+
+  async setVerifyCode(id: string, code: string) {
+    this.superLogger.log(`set verify code to ${r({ id, code })}`);
+    return OperationTokenHelper.setVerifyCode(id, code);
   }
 }

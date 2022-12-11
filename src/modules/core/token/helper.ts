@@ -7,6 +7,7 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Transform } from 'class-transformer';
 import { IsDate, IsInt, IsString } from 'class-validator';
+import { addMinutes } from 'date-fns';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 
@@ -15,6 +16,7 @@ import { OperationToken, OperationTokenType, TokenRule } from './entities';
 export const SysTokenServiceName = {
   AdminLogin: 'admin#login',
   User: 'user',
+  Verify: 'user#verify',
   SysInvite: 'sys#sys-invite',
 };
 
@@ -38,8 +40,8 @@ export type ObtainTokenOpts = (
   | { type: 'Unlimited' }
   | { type: 'OneTime' }
   | { type: 'MultiTimes'; remainingCount: number }
-  | { type: 'TimeBased'; expiredAt: Date }
-  | { type: 'TimeBased'; expiredInMinutes: number }
+  | { type: 'TimeBased'; expiredAt: Date; remainingCount?: number }
+  | { type: 'TimeBased'; expiredInMinutes: number; remainingCount?: number }
 ) &
   CommonTokenOpts;
 
@@ -125,10 +127,11 @@ export class OperationTokenHelper {
       // },
       [OperationTokenType.TimeBased]: {
         expiredAt: _.get(opts, 'expiredAt') || dayjs().add(_.get(opts, 'expiredInMinutes'), 'minute').toDate(),
+        remainingCount: _.get(opts, 'remainingCount'),
       },
     }[type];
 
-    Logger.log(`create token with type options ${r(typeOptions)}`);
+    Logger.log(`create token with type options ${r(typeOptions)} and payload ${r(payload)}`);
 
     const operationToken = OperationToken.create<OperationToken>({
       key,
@@ -242,5 +245,19 @@ export class OperationTokenHelper {
       return false;
     }
     return true;
+  }
+
+  static async setVerifyCode(id: string, code: string) {
+    return await this.obtainToken({
+      type: 'TimeBased',
+      key: `verify-code`,
+      role: 'auth',
+      service: SysTokenServiceName.Verify,
+      identifier: id,
+      // expiredAt: addMinutes(new Date(), 15),
+      payload: { code },
+      expiredInMinutes: 15,
+      remainingCount: 1,
+    });
   }
 }

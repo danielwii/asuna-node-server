@@ -74,7 +74,16 @@ export class AuthService extends AbstractAuthService<UserProfile> {
     if (channel === AuthUserChannel.apple) {
       ow(username, 'username', ow.string.nonEmpty);
       const entity = this.authUserRepository.create({ username, isActive: true, channel });
-      this.logger.debug(`create user ${r(entity)}`);
+      this.logger.debug(`create user via ${channel} ${r(entity)}`);
+      return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
+        this.logger.debug(`created ${r({ profile, user })}`);
+        Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });
+        return { profile, user };
+      });
+    } else if (channel === AuthUserChannel.code) {
+      ow(email, 'email', ow.string.nonEmpty);
+      const entity = this.authUserRepository.create({ username, email, isActive: true, channel });
+      this.logger.debug(`create user via ${channel} ${r(entity)}`);
       return AuthedUserHelper.createProfile(entity).then(async ([profile, user]) => {
         this.logger.debug(`created ${r({ profile, user })}`);
         Hermes.emit(AuthService.name, HermesAuthEventKeys.userCreated, { profile, user });

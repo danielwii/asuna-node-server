@@ -151,13 +151,14 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
                 Logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
+            /* TODO not work yet
             responseCachePlugin({
               sessionId: async (requestContext) => {
                 const sessionID = requestContext.request.http.headers.get('sessionid');
                 if (sessionID) Logger.debug(`cache sessionID: ${sessionID}`);
                 return sessionID;
               },
-            }) as any,
+            }) as any, */
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
             ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
             // config.debug ? (apolloTracingPlugin() as any) : null,

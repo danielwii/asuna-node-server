@@ -3,8 +3,8 @@ import { Logger } from '@nestjs/common';
 import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 
 import { ConfigLoader, createConfigLoader } from 'node-buffs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from "url";
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

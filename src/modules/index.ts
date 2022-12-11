@@ -1,6 +1,7 @@
 export * from './app';
 export * from './base';
 export * from './core';
+export * from './contentful';
 export * from './dataloader';
 export * from './admin.module';
 export * from './graphql.module';

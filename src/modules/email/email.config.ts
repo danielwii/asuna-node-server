@@ -1,7 +1,8 @@
 import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
-import { Expose, plainToInstance, Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
@@ -11,7 +12,7 @@ export enum EmailConfigKeys {
   host = 'host',
   port = 'port',
   ssl = 'ssl',
-  username = 'username',
+  user = 'user',
   password = 'password',
   from = 'from',
   interval = 'interval',
@@ -25,7 +26,7 @@ export class EmailConfigObject {
   public host: string;
   public port: number;
   public ssl: boolean;
-  public username: string;
+  public user: string;
   public from: string;
   public interval: number;
 
@@ -33,17 +34,13 @@ export class EmailConfigObject {
   @Transform(({ value }) => !!value, { toPlainOnly: true })
   public password: string;
 
-  public constructor(o: Partial<EmailConfigObject>) {
-    Object.assign(this, plainToInstance(EmailConfigObject, o, { enableImplicitConversion: true }));
-  }
-
   public static load = (): EmailConfigObject =>
     withP3(
       EmailConfigObject.prefix,
       configLoader.loadConfig(EmailConfigObject.key),
       EmailConfigKeys,
       (prefix, config, keys) =>
-        new EmailConfigObject({
+        deserializeSafely(EmailConfigObject, {
           enable: withP(keys.enable, (p) =>
             configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
           ),
@@ -56,8 +53,9 @@ export class EmailConfigObject {
           ssl: withP(keys.ssl, (p) =>
             configLoader.loadBoolConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? false),
           ),
-          username: withP(keys.username, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          user: withP(keys.user, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           password: withP(keys.password, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
+          from: withP(keys.from, (p) => configLoader.loadConfig(_.toUpper(`${prefix}${p}`), _.get(config, p))),
           interval: withP(keys.interval, (p) =>
             configLoader.loadNumericConfig(_.toUpper(`${prefix}${p}`), _.get(config, p) ?? 2000),
           ),

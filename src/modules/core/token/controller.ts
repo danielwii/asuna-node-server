@@ -9,13 +9,13 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 import { Transform } from 'class-transformer';
 import { IsDate, IsIn, IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 
 import { AnyAuthGuard } from '../auth/auth.guard';
 import { OperationToken, OperationTokenType, TokenRule } from './entities';
 import { OperationTokenHelper } from './helper';
 
 import type { AnyAuthRequest } from '../../helper/interfaces';
-import { fileURLToPath } from "url";
 
 export class ObtainOperationTokenDto {
   @IsIn(_.keys(OperationTokenType))

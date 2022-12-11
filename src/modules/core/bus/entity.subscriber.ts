@@ -6,6 +6,7 @@ import { validateObjectSync } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
 import { BaseEntity, EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
+import { fileURLToPath } from 'node:url';
 
 import { CacheHelper, CleanCacheType } from '../../cache';
 import { PubSubChannels, PubSubHelper } from '../../pub-sub/pub-sub.helper';
@@ -14,7 +15,6 @@ import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 import type { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 import type { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
 import type { MetaInfoOptions } from '../../common/decorators';
-import { fileURLToPath } from "url";
 
 const safeReload = (metadata: EntityMetadata, entity): void => {
   if (!_.isObject(entity)) return;

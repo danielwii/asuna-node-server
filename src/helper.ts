@@ -2,13 +2,14 @@ import { Logger } from '@nestjs/common';
 
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { isProductionEnv } from '@danielwii/asuna-helper/dist/utils';
 
 import bluebird from 'bluebird';
 import glob from 'glob';
 import _ from 'lodash';
-import { dirname, extname, resolve } from 'path';
+import { dirname, extname, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { DataSource } from 'typeorm';
-import { fileURLToPath, pathToFileURL } from 'url';
 
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
@@ -117,15 +118,15 @@ export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<v
   const __rootPath = dirname(dirname(fileURLToPath(__entrance)));
   Logger.log(`main entrance is ${r(__dirname)}`);
   const suffix = extname(__filename).slice(1);
-  const currentSuffix = extname(import.meta.url).slice(1);
+  const currentSuffix = isProductionEnv ? 'js' : 'ts'; // extname(import.meta.url).slice(1);
   // const convertPackage = suffix === 'js' ? _.replace(/dist/, 'src') : _.replace(/src/, 'dist');
-  const pathResolver = (mode: 'entities' | 'subscriber') => [
-    // `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`,
+  const pathResolver = (type: 'entities' | 'subscriber') => [
+    // `${resolve(rootDir, '../..')}/packages/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${type}.${suffix}`,
     // 地址不同时这里认为是用特定的环境配置来拉取 packages 下的相关实体，即 monorepo 模式
     __rootPath !== __dirname
-      ? `${resolve(__dirname, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${mode}.${suffix}`
-      : `${resolve(__dirname)}/**/*${mode}.${suffix}`,
-    `${resolve(__rootPath)}/**/*${mode}.${currentSuffix}`,
+      ? `${resolve(__dirname, '../..')}/*/${suffix === 'js' ? 'dist' : 'src'}/**/*${type}.${suffix}`
+      : `${resolve(__dirname)}/**/*${type}.${suffix}`,
+    `${resolve(__rootPath)}/**/*${type}.${currentSuffix}`,
   ];
   const entities = _.uniq(_.compact([...pathResolver('entities'), ...(options?.typeormEntities || [])]));
   const subscribers = _.uniq(_.compact([...pathResolver('subscriber'), ...(options?.typeormSubscriber || [])]));
