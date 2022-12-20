@@ -4,7 +4,7 @@ import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { GqlAuthGuard } from '../graphql/auth.guard';
 import { named } from '../helper/annotations';

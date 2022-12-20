@@ -6,6 +6,7 @@ import _ from 'lodash';
 import fp from 'lodash/fp';
 
 import { AppDataSource } from '../../datasource';
+import { named } from '../../helper';
 
 import type { BaseEntity } from 'typeorm';
 
@@ -16,7 +17,8 @@ export class DBCacheCleaner {
     this.registers.push({ Entity, trigger });
   }
 
-  public static clear(name: string): void {
+  @named
+  public static clear(name: string, funcName?: string): void {
     const triggers = _.flow([
       fp.filter(({ Entity, trigger }) => {
         if (!Entity) Logger.error(`no entity found for trigger: ${trigger}.`);
@@ -26,7 +28,7 @@ export class DBCacheCleaner {
       fp.map(fp.get('trigger')),
     ])(this.registers);
     if (!_.isEmpty(triggers)) {
-      Logger.debug(`clear ${r(triggers)}`);
+      Logger.debug(`#DBCacheCleaner.${funcName}: clear ${r(triggers)}`);
       AppDataSource.dataSource.queryResultCache?.remove(triggers).catch((reason) => Logger.error(reason));
     }
   }

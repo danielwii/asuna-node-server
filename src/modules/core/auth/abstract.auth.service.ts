@@ -178,6 +178,9 @@ export abstract class AbstractAuthService<U extends AuthUser> {
   }
 
   getUserWithPassword(identifier: { email?: string; username?: string }, isActive = true): Promise<U> {
+    if (_.isEmpty(identifier)) {
+      throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
+    }
     return this.authUserRepository.findOne({
       where: {
         // ...R.ifElse(R.identity, R.always({ email: identifier.email }), R.always({}))(!!identifier.email),

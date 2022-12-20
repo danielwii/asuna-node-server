@@ -9,7 +9,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AuthUserChannel } from './base.entities';

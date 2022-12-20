@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AnyAuthGuard, JwtAuthRequestExtractor } from './auth/auth.guard';
 import { UserProfile } from './auth/user.entities';

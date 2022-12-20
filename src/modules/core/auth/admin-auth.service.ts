@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import { DataSource, In } from 'typeorm';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AppConfigObject } from '../../config/app.config';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';

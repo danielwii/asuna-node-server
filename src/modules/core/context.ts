@@ -7,8 +7,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { configLoader } from '../config';
 import { Global } from './global';

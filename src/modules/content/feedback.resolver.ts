@@ -4,7 +4,7 @@ import { Args, Context, Field, Info, ObjectType, Query, ResolveField, Resolver, 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { Pageable } from '../core/helpers';
 import { resolveFieldsByPagedInfo } from '../dataloader/dataloader';

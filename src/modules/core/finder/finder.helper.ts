@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { IsOptional } from 'class-validator';
-import { URL } from 'url';
+import { URL } from 'node:url';
 
 import { configLoader } from '../../config';
 import { AsunaCollections, KvDef, KvHelper } from '../kv';

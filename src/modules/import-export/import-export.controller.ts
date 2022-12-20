@@ -4,7 +4,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { ImportExportService } from './import-export.service';
 

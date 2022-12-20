@@ -5,7 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { FeaturesConfigObject } from '../config/features.config';
 import { AppDataSource } from '../datasource';

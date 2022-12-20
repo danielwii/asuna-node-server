@@ -33,8 +33,8 @@ import * as os from 'os';
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
-import { basename, dirname, extname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { basename, dirname, extname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as uuid from 'uuid';
 
 import { named } from '../../helper';

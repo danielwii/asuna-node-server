@@ -6,6 +6,8 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { tap } from 'rxjs/operators';
 
+import { ASUNA_METADATA_KEYS } from '../../helper';
+
 import type { Observable } from 'rxjs';
 import type { Request } from 'express';
 import type { CommonRequest } from '../interface';
@@ -41,7 +43,10 @@ export class LoggerInterceptor implements NestInterceptor {
       session: req.session,
     };
 
-    const TAG = `${context.getClass().name}.${context.getHandler().name}`;
+    // @metinseylan/nestjs-opentelemetry make handler name null
+    const named = Reflect.getMetadata(ASUNA_METADATA_KEYS.NAMED, context.getHandler());
+    const TAG = `${context.getClass().name}.${context.getHandler().name || named}`;
+
     Logger.debug(`#${TAG} call...`);
     const now = Date.now();
     return next.handle().pipe(

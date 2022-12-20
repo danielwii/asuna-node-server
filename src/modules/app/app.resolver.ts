@@ -4,7 +4,7 @@ import { Args, Field, ObjectType, Query, Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { CacheTTL } from '../cache/constants';
 import { emptyPage, Pageable, toPage } from '../core/helpers/page.helper';
@@ -42,6 +42,7 @@ export class AppQueryResolver {
     return { ...pageInfo, items, total };
   }
 
+  /*
   @Query((returns) => AppRelease, { nullable: true, deprecationReason: 'using app_latest_release instead' })
   public async app_latestRelease(
     @Args('key') key: string,
@@ -59,7 +60,7 @@ export class AppQueryResolver {
       order: { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });
-  }
+  } */
 
   @Query((returns) => AppRelease, { nullable: true })
   public async app_latest_release(

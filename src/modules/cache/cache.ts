@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { CacheTTL } from './constants';
 

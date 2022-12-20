@@ -5,7 +5,7 @@ import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AnyAuthGuard } from './auth/auth.guard';
 

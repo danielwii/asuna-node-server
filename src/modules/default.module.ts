@@ -21,7 +21,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { DataSource } from 'typeorm';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AdminInternalModule } from './admin.module';
 import { AppController } from './app.controller';

@@ -10,7 +10,7 @@ import { detectUA } from '@danielwii/asuna-helper/dist/ua';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import _ from 'lodash';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { ClientHelper } from '../client/helper';
 import { ActionRateLimitGuard } from '../common/guards';

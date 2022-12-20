@@ -9,7 +9,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client';

@@ -4,7 +4,7 @@ import { Args, Context, ID, Query, Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { GraphqlHelper, QueryResolver } from '../../graphql';
 import { NotificationEnum } from './enum-values';

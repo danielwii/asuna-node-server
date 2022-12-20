@@ -25,19 +25,21 @@ import {
   ValueNode,
 } from 'graphql';
 import _ from 'lodash';
-import { dirname, join, resolve } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AppModule } from './app';
 import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
+import { TimeOfDayScalar } from './graphql/scalars';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
 import type { GraphQLServiceContext } from 'apollo-server-types';
 import type { GraphQLRequestContext } from '@apollo/server';
 
+/*
 @Scalar('DateTime', (type) => Date)
 export class DateScalar implements CustomScalar<number, Date> {
   description = 'Date custom scalar type';
@@ -61,9 +63,13 @@ export class DateScalar implements CustomScalar<number, Date> {
     }
     return null;
   }
-}
+} */
 
-@Module({ providers: [DateScalar] })
+@Module({
+  providers: [
+    // DateScalar
+  ],
+})
 export class GraphqlModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GraphqlModule.name));
 
@@ -76,10 +82,6 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
     const __dirname = dirname(__filename);
     const __entrance = pathToFileURL(process.argv[1]).href;
     const __rootPath = dirname(dirname(fileURLToPath(__entrance)));
-    console.log('-=-=-=-=-', {
-      __dirname,
-      __rootPath,
-    });
     const typePaths = _.uniq(
       _.compact([
         __rootPath.includes('asuna-node-server') ? null : resolve(__dirname, '../../../*/src/**/*.graphql'),
@@ -109,7 +111,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           // autoSchemaFile: true,
           sortSchema: true,
           installSubscriptionHandlers: true,
-          // resolvers: { JSON: GraphQLJSON },
+          resolvers: { TimeOfDay: TimeOfDayScalar },
           playground: config.playground_enable,
           // playground: false,
           debug: config.debug,

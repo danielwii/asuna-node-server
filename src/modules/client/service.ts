@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { LeadUser, SessionUser } from './entities';
 

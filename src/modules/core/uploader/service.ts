@@ -12,8 +12,8 @@ import { IsInt, IsString } from 'class-validator';
 import * as fs from 'fs-extra';
 import highland from 'highland';
 import _ from 'lodash';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { AsunaContext } from '../context';
 import { Global } from '../global';

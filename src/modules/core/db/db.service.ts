@@ -4,7 +4,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { DataSource, Repository } from 'typeorm';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { DBHelper, parseFields } from './db.helper';
 

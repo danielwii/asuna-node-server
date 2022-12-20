@@ -20,7 +20,7 @@ import { NameDescAttachable, Publishable } from './abilities';
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityObject<Entity> = Omit<
   Entity,
-  'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator' | 'of' | 'hasId'
+  'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator' | 'of' | 'hasId' | 'save' | 'remove' | 'softRemove'
 >;
 export type EntityConstructorObject<Entity> = Omit<
   Entity,
@@ -65,6 +65,7 @@ export class AbstractBaseEntity extends NoPrimaryKeyBaseEntity {
  */
 @InterfaceType()
 export class AbstractTimeBasedBaseEntity extends BaseEntity {
+  // eslint-disable-next-line no-unused-private-class-members
   readonly #idPrefix: string;
   readonly #generator: SimpleIdGenerator;
 

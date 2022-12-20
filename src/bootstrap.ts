@@ -5,11 +5,11 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config.js';
-import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider.js';
-import { getClientIp } from '@danielwii/asuna-helper/dist/req.js';
-import { r } from '@danielwii/asuna-helper/dist/serializer.js';
-import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils.js';
+import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
+import { getClientIp } from '@danielwii/asuna-helper/dist/req';
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
@@ -18,13 +18,14 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { default as rateLimit, Options as RateLimitOptions } from 'express-rate-limit';
 import session from 'express-session';
+import figlet from 'figlet';
 import helmet from 'helmet';
 import _ from 'lodash';
 import morgan from 'morgan';
 import responseTime from 'response-time';
 
-import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper.js';
-import { AppLifecycle } from './lifecycle.js';
+import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
+import { AppLifecycle } from './lifecycle';
 import {
   AppUpgradeMode,
   ExchangeCurrencyEnum,
@@ -37,27 +38,27 @@ import {
   NotificationEnumValue,
   Order,
   Platform,
-} from './modules/index.js';
-import { CacheUtils } from './modules/cache/index.js';
-import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common/index.js';
-import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config/index.js';
+} from './modules';
+import { CacheUtils } from './modules/cache';
+import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
+import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
 import {
   FeedbackSenderEnum,
   FeedbackSenderEnumValue,
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
-} from './modules/content/enum-values.js';
-import { AsunaContext, Global } from './modules/core/index.js';
-import { UserRelationType } from './modules/core/interaction/friends.entities.js';
-import { DefaultModule } from './modules/default.module.js';
-import { SimpleIdGeneratorHelper } from './modules/ids/index.js';
-import { TracingInterceptor } from './modules/tracing/index.js';
+} from './modules/content/enum-values';
+import { AsunaContext, Global } from './modules/core';
+import { UserRelationType } from './modules/core/interaction/friends.entities';
+import { DefaultModule } from './modules/default.module';
+import { SimpleIdGeneratorHelper } from './modules/ids';
+import { TracingInterceptor } from './modules/tracing';
 // add condition function in typeorm find operation
-import './typeorm.fixture.js';
+import './typeorm.fixture';
 
-import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface.js';
+import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import type { NestExpressApplication } from '@nestjs/platform-express';
-import type { BootstrapOptions } from './interface.js';
+import type { BootstrapOptions } from './interface';
 
 export const bootstrap = (appModule, options: BootstrapOptions) => {
   process.on('unhandledRejection', (reason, p) => {
@@ -310,11 +311,17 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   app.use(express.urlencoded({ limit, extended: true }));
 
   app.useGlobalInterceptors(new TracingInterceptor());
+  app.useGlobalInterceptors(new LoggerInterceptor());
   // WARNING will break graphql pubsub
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      enableDebugMessages: true,
+      transform: true,
+      whitelist: true,
+    }),
+  );
 
   if (options.redisMode === 'redis') {
     app.useWebSocketAdapter(new (await import('./modules/ws/redis.adapter')).RedisIoAdapter(app));
@@ -362,6 +369,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     Logger.log(`===============================================================`);
     Logger.log(`🚀 started in ${Date.now() - startAt}ms, listening on ${port}. ${await app.getUrl()}`);
     Logger.log(`===============================================================`);
+    Logger.log(`\n${figlet.textSync('Asuna Server', { horizontalLayout: 'full' })}`);
     return app;
   });
 }

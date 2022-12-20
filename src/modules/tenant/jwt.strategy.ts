@@ -7,7 +7,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { configLoader } from '../config';
 import { TenantAuthService } from './auth.service';

@@ -3,4 +3,5 @@ export * from './default.resolver';
 export * from './helper';
 export * from './input';
 export * from './auth.interceptor';
+export * from './scalars';
 export * from './resolver';

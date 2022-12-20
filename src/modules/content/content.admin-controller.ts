@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { IsDefined, IsObject, IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';

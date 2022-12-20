@@ -27,6 +27,9 @@ import Chance from 'chance';
 import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
+// @ts-ignore
+// eslint-disable-next-line import/no-unresolved
+import ow from 'ow';
 
 import { isNotBlank, TimeUnit } from '../../common';
 import { EmailHelper } from '../../email/email.helper';
@@ -35,12 +38,12 @@ import { DBHelper } from '../db';
 import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { AppleConfigure } from './apple.configure';
+import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { AppleUserProfile, UserProfile } from './user.entities';
 
 import type { BaseEntity, DeepPartial } from 'typeorm';
-import type { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { CreatedUser } from './auth.service';
 
@@ -359,16 +362,16 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  async getToken(@Body() signInDto: SignInDTO): Promise<CreatedToken> {
-    this.superLogger.log(`getToken() >> ${signInDto.username}`);
-    const profile = await this.authService.getUserWithPassword({ username: signInDto.username });
+  async getToken(@Body() dto: SignInDTO): Promise<CreatedToken> {
+    this.superLogger.log(`getToken() >> ${dto.username}`);
+    const profile = await this.authService.getUserWithPassword({ username: dto.username });
 
     this.superLogger.debug(`get user profile from token ${r(profile)}`);
     if (!profile?.password) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidAccount);
     }
 
-    const verified = PasswordHelper.passwordVerify(signInDto.password, profile);
+    const verified = PasswordHelper.passwordVerify(dto.password, profile);
 
     if (!verified) {
       throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.WrongPassword);

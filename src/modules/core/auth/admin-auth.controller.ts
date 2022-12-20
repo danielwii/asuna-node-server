@@ -14,7 +14,7 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 import { AccessControl } from 'accesscontrol';
 import _ from 'lodash';
 import * as otplib from 'otplib';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';

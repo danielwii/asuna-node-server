@@ -5,7 +5,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
 import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { FeedbackSenderEnumValue } from './enum-values';
