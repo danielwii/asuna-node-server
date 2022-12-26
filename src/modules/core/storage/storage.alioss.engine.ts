@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import OSS from 'ali-oss';
 import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
-import { join } from 'path';
+import { join } from 'node:path';
 
 import { convertFilename } from '../../common/helpers';
 import { UploaderConfigObject } from '../uploader/config';

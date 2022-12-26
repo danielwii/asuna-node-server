@@ -51,10 +51,18 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       Sentry.init({
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
+        // This sets the sample rate to be 10%. You may want this to be 100% while
+        // in development and sample at a lower rate in production
+        // replaysSessionSampleRate: 0.1,
+        // If the entire session is not sampled, use the below sample rate to sample
+        // sessions when an error occurs.
+        // replaysOnErrorSampleRate: 1.0,
         integrations: [
           new Tracing.Integrations.Mysql(),
           // enable HTTP calls tracing
           new Sentry.Integrations.Http({ tracing: true }),
+          // enable Express.js middleware tracing
+          new Tracing.Integrations.Express({ app: app.getHttpServer() }),
         ],
       });
 
@@ -62,6 +70,8 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       app.use(Sentry.Handlers.requestHandler());
       // The error handler must be before any other error middleware and after all controllers
       app.use(Sentry.Handlers.errorHandler());
+      // TracingHandler creates a trace for every incoming request
+      app.use(Sentry.Handlers.tracingHandler());
       /*
       app.getHttpAdapter().get('/debug-sentry', (req, res) => {
         throw new Error('My first Sentry error!');

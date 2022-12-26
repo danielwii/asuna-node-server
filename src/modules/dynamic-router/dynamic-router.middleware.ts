@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 import { DynamicRouterHelper } from './dynamic-router.helper';
 

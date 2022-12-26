@@ -2,7 +2,7 @@ import bluebird from 'bluebird';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import * as path from 'path';
+import * as path from 'node:path';
 
 const { Promise } = bluebird;
 

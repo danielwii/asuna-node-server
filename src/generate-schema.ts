@@ -3,7 +3,7 @@ import { GraphQLDefinitionsFactory, GraphQLSchemaBuilderModule, GraphQLSchemaFac
 
 import { printSchema } from 'graphql/utilities';
 import * as _ from 'lodash';
-import { join, resolve } from 'path';
+import { join, resolve } from 'node:path';
 
 import { KvQueryResolver } from './modules/core/kv/kv.resolver';
 

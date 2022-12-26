@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { oneLineTrim } from 'common-tags';
 import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
-import { extname, join } from 'path';
+import { extname, join } from 'node:path';
 import sharp from 'sharp';
 
 import { convertFilename } from '../../common/helpers';

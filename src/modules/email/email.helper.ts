@@ -6,7 +6,7 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 import EmailTemplate from 'email-templates';
 import _ from 'lodash';
 import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
-import path from 'path';
+import path from 'node:path';
 import { Observable, of, Subject } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 

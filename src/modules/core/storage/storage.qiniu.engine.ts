@@ -6,7 +6,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import * as _ from 'lodash';
-import { join } from 'path';
+import { join } from 'node:path';
 import * as qiniu from 'qiniu';
 
 import { convertFilename } from '../../common/helpers';

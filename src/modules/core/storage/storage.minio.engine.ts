@@ -8,7 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
 import * as minio from 'minio';
-import { join } from 'path';
+import { join } from 'node:path';
 
 import { convertFilename } from '../../common/helpers';
 import { configLoader } from '../../config/loader';

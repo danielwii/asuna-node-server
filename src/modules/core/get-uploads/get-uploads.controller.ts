@@ -8,7 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import crypto from 'crypto';
 import geoip from 'geoip-lite';
 import _ from 'lodash';
-import path from 'path';
+import path from 'node:path';
 
 import { CacheWrapper } from '../../cache';
 import { TimeUnit } from '../../common';

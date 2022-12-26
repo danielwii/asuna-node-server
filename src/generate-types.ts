@@ -1,7 +1,7 @@
 import { GraphQLDefinitionsFactory } from '@nestjs/graphql';
 
 import * as _ from 'lodash';
-import { join, resolve } from 'path';
+import { join, resolve } from 'node:path';
 
 const typePaths = _.uniq(
   _.compact([
