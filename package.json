@@ -41,7 +41,7 @@
     "@aws-sdk/s3-request-presigner": "^3.254.0",
     "@babel/parser": "^7.20.7",
     "@contentful/rich-text-html-renderer": "^16.0.2",
-    "@danielwii/asuna-helper": "^0.1.0",
+    "@danielwii/asuna-helper": "^0.1.1",
     "@danielwii/asuna-shared": "^0.0.8",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^1.2.0",
     "@metinseylan/nestjs-opentelemetry": "^3.0.0",
@@ -161,7 +161,7 @@
     "@types/email-templates": "^10",
     "@types/express-session": "^1",
     "@types/figlet": "^1",
-    "@types/fs-extra": "^9",
+    "@types/fs-extra": "^11",
     "@types/geoip-lite": "^1",
     "@types/glob": "^8",
     "@types/highland": "^2",
@@ -214,5 +214,5 @@
     ],
     "delay": 2.5
   },
-  "packageManager": "yarn@3.3.0"
+  "packageManager": "yarn@3.3.1"
 }
