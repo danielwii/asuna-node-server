@@ -15,11 +15,13 @@ import type { CommonRequest, SignedCookies } from './interface';
 
 @Injectable()
 export class IsMobileMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'IsMobileMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void) {
     const userAgent = req.headers['user-agent'];
-    req.isMobile = detectUA(userAgent).isMobile;
+    const detected = detectUA(userAgent);
+    // this.logger.log(`user agent: ${r({ userAgent, detected })}`);
+    req.isMobile = detected.isMobile;
     next();
   }
 }

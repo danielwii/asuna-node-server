@@ -8,9 +8,9 @@ import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class EmailService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'EmailService'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   public constructor() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    if (process.env.SENDGRID_API_KEY) sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   }
 
   /**
