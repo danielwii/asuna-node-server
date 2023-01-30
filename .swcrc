@@ -1,0 +1,20 @@
+{
+  "sourceMaps": true,
+  "module": {
+    "type": "es6",
+
+    // These are defaults.
+    "strict": false,
+    "strictMode": true,
+    "lazy": true,
+    "noInterop": false
+  },
+  "jsc": {
+    "parser": {
+      "syntax": "typescript",
+      "tsx": false,
+      "decorators": true,
+      "dynamicImport": false
+    }
+  }
+}

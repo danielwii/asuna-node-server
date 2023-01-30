@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-require('fix-esm').register();
-
 import { Module, OnModuleInit } from '@nestjs/common';
 
 import { AdminApiKeys } from './modules/core/auth/auth.entities';
@@ -12,4 +9,5 @@ export class ApplicationModule implements OnModuleInit {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 require('.').bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
