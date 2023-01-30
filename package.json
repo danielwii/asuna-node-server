@@ -43,7 +43,7 @@
     "@babel/parser": "^7.20.13",
     "@contentful/rich-text-html-renderer": "^16.0.2",
     "@danielwii/asuna-helper": "^0.1.3",
-    "@danielwii/asuna-shared": "^0.0.10",
+    "@danielwii/asuna-shared": "^0.0.11",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^1.2.0",
     "@metinseylan/nestjs-opentelemetry": "^3.0.0",
     "@nestjs/apollo": "^10.1.7",
