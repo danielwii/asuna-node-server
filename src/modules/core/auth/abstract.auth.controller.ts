@@ -68,7 +68,7 @@ class SignInWithAppleDTO {
 }
 
 export abstract class AbstractAuthController<U extends WithProfileUser | AuthUser> {
-  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), AbstractAuthController.name));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(
     readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,

@@ -28,7 +28,7 @@ export interface Sort {
  */
 @Injectable()
 export class SortService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SortService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly Sort: EntityTarget<any>) {}
 

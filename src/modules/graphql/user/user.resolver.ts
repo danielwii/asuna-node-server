@@ -15,7 +15,7 @@ import type { GraphqlContext } from '../../dataloader';
 import { fileURLToPath } from "url";
 
 export class UserProfileQueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserProfileQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new GqlWXAuthGuard())
   @Query((returns) => UserProfile)

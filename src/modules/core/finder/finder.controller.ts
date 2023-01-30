@@ -22,7 +22,7 @@ import { fileURLToPath } from "url";
 @ApiTags('core')
 @Controller('api/v1/finder')
 export class FinderController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), FinderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   @Get()
   async redirect(
     @Query('encrypt') encrypt: boolean,
@@ -51,7 +51,7 @@ export class FinderController {
 @ApiTags('core')
 @Controller('f')
 export class ShortFinderController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ShortFinderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @Get(':q')
   async redirect(@Param('q') q: string, @Req() req: Request, @Res() res: Response): Promise<void> {

@@ -29,7 +29,7 @@ const port = configLoader.loadNumericConfig(WSConfigKeys.WS_PORT, 3002);
   serveClient: false,
 })
 export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WSGateway.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @WebSocketServer()
   private server: Server;

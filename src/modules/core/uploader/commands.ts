@@ -23,7 +23,7 @@ export class UploadCommand {
 
 @CommandHandler(UploadCommand)
 export class UploaderHandler implements ICommandHandler<UploadCommand> {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderHandler.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly publisher: EventPublisher) {}
 

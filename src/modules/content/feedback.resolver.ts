@@ -23,7 +23,7 @@ class FeedbackPageable extends Pageable<Feedback> {
 
 @Resolver()
 export class FeedbackQueryResolver extends QueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'FeedbackQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor() {
     super(Feedback);
@@ -59,7 +59,7 @@ export class FeedbackQueryResolver extends QueryResolver {
 
 @Resolver(Feedback)
 export class UserFeedbackResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserFeedbackResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @ResolveField('replies', (returns) => [FeedbackReply])
   async replies(@Root() feedback: Feedback, @Context() ctx: GraphqlContext): Promise<FeedbackReply[]> {

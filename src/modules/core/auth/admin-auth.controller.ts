@@ -29,7 +29,7 @@ import type { AnyAuthRequest } from '../../helper/interfaces';
 @ApiTags('sys-admin')
 @Controller('admin/auth')
 export class AdminAuthController extends RestCrudController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AdminAuthController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly adminAuthService: AdminAuthService) {
     super('auth');

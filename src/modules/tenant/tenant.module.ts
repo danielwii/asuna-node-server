@@ -37,7 +37,7 @@ import { fileURLToPath } from "url";
   controllers: [TenantController, TenantAdminController, TenantAuthController],
 })
 export class TenantModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   async onModuleInit(): Promise<void> {
     await TenantHelper.preload();

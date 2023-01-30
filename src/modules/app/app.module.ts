@@ -1,12 +1,12 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { AppQueryResolver } from './app.resolver';
 
 @Module({
   providers: [AppQueryResolver],
 })
-export class AppModule implements OnModuleInit {
-  public onModuleInit(): void {
-    Logger.log('init...');
-  }
+export class AppModule extends InitContainer implements OnModuleInit {
+  onModuleInit = async (): Promise<void> => super.init();
 }

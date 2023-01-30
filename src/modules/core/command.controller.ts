@@ -17,7 +17,7 @@ export class CommandDTO {}
 @ApiTags('core')
 @Controller('api')
 export class CommandController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), CommandController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   @UseGuards(AnyAuthGuard)
   @Post('v1/commands')
   v1Commands(@Body() commandDto: CommandDTO, @Req() req: AnyAuthRequest): void {

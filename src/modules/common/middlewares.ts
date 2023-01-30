@@ -28,7 +28,7 @@ export class IsMobileMiddleware implements NestMiddleware {
 
 @Injectable()
 export class DeviceMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'DeviceMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public async use(req: Request & CommonRequest, res: Response, next: () => void) {
     const cookies: SignedCookies = req.signedCookies;
@@ -81,7 +81,7 @@ export class DeviceMiddleware implements NestMiddleware {
 
 @Injectable()
 export class LandingUrlMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'LandingUrlMiddleware'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public use(req: Request & CommonRequest, res: Response, next: () => void): any {
     if (!req.session?.landingUrl) {

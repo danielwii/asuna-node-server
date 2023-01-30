@@ -16,7 +16,7 @@ import type { JwtAuthRequest } from './auth.guard';
 
 @Injectable()
 export class JwtAdminAuthGuard extends AuthGuard('admin-jwt') {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), JwtAdminAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   // @ts-ignore
   public async handleRequest(err, payload, info, context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();

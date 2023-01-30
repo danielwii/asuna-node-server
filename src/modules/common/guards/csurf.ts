@@ -13,7 +13,7 @@ import type { JwtAuthRequest } from '../../core/auth';
 
 @Injectable()
 export class CsurfGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), CsurfGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<JwtAuthRequest>();
     // const res = context.switchToHttp().getResponse<Response>();

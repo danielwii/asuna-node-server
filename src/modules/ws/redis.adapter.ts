@@ -19,7 +19,7 @@ import { fileURLToPath } from "url";
  * https://github.com/socketio/socket.io/issues/1739
  */
 export class RedisIoAdapter extends IoAdapter {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), RedisIoAdapter.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   private static redisAdapter: RedisAdapter;
 

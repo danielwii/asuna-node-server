@@ -19,7 +19,7 @@ class CreateActivityDTO {
 
 @Controller('api/v1/activities')
 export class ActivitiesController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ActivitiesController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   @UseGuards(AnyAuthGuard)
   @Post()
   async addActivity(@Body() body: CreateActivityDTO, @Req() req: JwtAuthRequest): Promise<UserActivity> {

@@ -12,7 +12,7 @@ import type { Profile } from '../../common';
 
 @Injectable()
 export class DBService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), DBService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly dataSource: DataSource) {}
 

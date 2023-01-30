@@ -36,7 +36,7 @@ class Code2SessionDto {
 
 @Controller('api/v1/wx')
 export class WeChatController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WeChatController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @Get()
   async wxValidation(@Query() query: ValidationDto): Promise<string> {

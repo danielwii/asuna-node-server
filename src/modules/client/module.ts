@@ -1,4 +1,6 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { ClientService } from './service';
 
@@ -6,8 +8,6 @@ import { ClientService } from './service';
   providers: [ClientService],
   exports: [ClientService],
 })
-export class ClientModule implements OnModuleInit {
-  public async onModuleInit(): Promise<void> {
-    Logger.log('init...');
-  }
+export class ClientModule extends InitContainer implements OnModuleInit {
+  public onModuleInit = async (): Promise<void> => super.init();
 }

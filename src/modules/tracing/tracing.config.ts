@@ -17,7 +17,7 @@ export enum TracingConfigKeys {
 }
 
 export class TracingConfigObject {
-  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'TracingConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private static key = YamlConfigKeys.tracing;
   private static prefix = `${TracingConfigObject.key}_`;
 

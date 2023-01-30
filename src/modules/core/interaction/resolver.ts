@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 
 @Resolver()
 export class UserRelationQueryResolver extends QueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserRelationQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor() {
     super(UserRelation);
@@ -33,7 +33,7 @@ export class UserRelationQueryResolver extends QueryResolver {
 
 @Resolver((of) => UserRelation)
 export class UserRelationResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserRelationResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   /*
   @ResolveField((returns) => UserProfile)

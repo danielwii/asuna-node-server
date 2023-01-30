@@ -27,7 +27,7 @@ export interface AliSMSExtra {
 }
 
 export class SMSConfigObject extends AbstractConfigLoader<SMSConfigObject> {
-  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'SMSConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private static key = YamlConfigKeys.sms;
   private static _: SMSConfigObject;
 

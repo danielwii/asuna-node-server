@@ -32,7 +32,7 @@ import { fileURLToPath } from "url";
 // import { AdminUser } from '../../core/auth';
 
 export abstract class RestCrudController {
-  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), RestCrudController.name));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {

@@ -31,7 +31,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
   exports: [AuthService],
 })
 export class AuthModule extends InitContainer implements NestModule, OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AuthModule'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly adminAuthService: AdminAuthService) {
     super();

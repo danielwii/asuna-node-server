@@ -1,4 +1,6 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { ActivitiesController } from './activities.controller';
 import { ActivitiesResolver } from './activities.resolver';
@@ -11,8 +13,6 @@ import { UserRelationQueryResolver, UserRelationResolver } from './resolver';
   exports: [],
   controllers: [ActivitiesController, InteractionController],
 })
-export class InteractionModule implements OnModuleInit {
-  async onModuleInit(): Promise<void> {
-    Logger.log('init...');
-  }
+export class InteractionModule extends InitContainer implements OnModuleInit {
+  public onModuleInit = async (): Promise<void> => super.init();
 }

@@ -68,7 +68,7 @@ export class RemoteFileInfo extends FileInfo {
 
 @Injectable()
 export class UploaderService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private readonly context = AsunaContext.instance;
 
   constructor(private readonly commandBus: CommandBus) {

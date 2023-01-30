@@ -162,7 +162,7 @@ class ImageProxy {
 @ApiTags('core')
 @Controller('i')
 export class GetImageController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GetImageController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private readonly apiEndpoint = configLoader.loadConfig('MASTER_ADDRESS');
   private readonly thumborEndpoint = configLoader.loadConfig('THUMBOR_ENDPOINT', 'http://localhost:8888');
 
@@ -199,7 +199,7 @@ export class GetImageController {
 @ApiTags('core')
 @Controller('uploads')
 export class GetUploadsController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GetUploadsController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   /**
    * 1. /images/2018/4/****.png
    * 1.1 /images/2018/4/****.png?thumbnail/<Width>x<Height>

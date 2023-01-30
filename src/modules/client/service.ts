@@ -8,7 +8,7 @@ import { LeadUser, SessionUser } from './entities';
 
 @Injectable()
 export class ClientService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ClientService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   /**
    * @param tenantId

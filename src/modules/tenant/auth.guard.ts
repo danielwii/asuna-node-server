@@ -23,7 +23,7 @@ export enum TenantRoleName {
 
 @Injectable()
 export class TenantRolesGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantRolesGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly oneOf: TenantRoleName[]) {}
 
@@ -53,7 +53,7 @@ export class TenantRolesGuard implements CanActivate {
 
 @Injectable()
 export class OrgJwtAuthGuard extends AuthGuard('org-jwt') {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), OrgJwtAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();

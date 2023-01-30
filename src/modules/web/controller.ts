@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
 
 @Controller('api/v1/web')
 export class WebController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WebController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly webService: WebService) {}
 

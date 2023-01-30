@@ -24,7 +24,7 @@ import { fileURLToPath } from "url";
 const styleSuffix = configLoader.loadConfig('STYLE_SUFFIX', '');
 
 export class MinioStorage implements IStorageEngine {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), MinioStorage.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private readonly defaultBucket;
   private readonly config = UploaderConfigObject.load();
 

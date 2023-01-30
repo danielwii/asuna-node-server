@@ -121,7 +121,7 @@ const isProduction = process.env.NODE_ENV === 'production';
   exports: [],
 })
 export class DefaultModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), DefaultModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly dataSource: DataSource) {
     super();

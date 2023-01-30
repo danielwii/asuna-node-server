@@ -12,7 +12,7 @@ import { ContentfulService } from './contentful.service';
 
 @Controller('api/v1/contentful')
 export class ContentfulController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'ContentfulController'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly contentfulService: ContentfulService) {}
 

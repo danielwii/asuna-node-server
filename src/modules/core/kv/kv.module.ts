@@ -1,5 +1,6 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { AppLifecycleType, LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 
 import { KvController } from './kv.controller';
@@ -11,16 +12,15 @@ import { KeyValueModelResolver, KvQueryResolver } from './kv.resolver';
   controllers: [KvController],
   exports: [],
 })
-export class KvModule implements OnModuleInit {
-  public onModuleInit(): void {
-    Logger.log('init...');
-
-    LifecycleRegister.reg(
-      new (class implements AppLifecycleType {
-        public async appStarted(): Promise<void> {
-          await KvHelper.syncMergedConstants();
-        }
-      })(),
-    );
-  }
+export class KvModule extends InitContainer implements OnModuleInit {
+  onModuleInit = async (): Promise<void> =>
+    super.init(async () => {
+      LifecycleRegister.reg(
+        new (class implements AppLifecycleType {
+          public async appStarted(): Promise<void> {
+            await KvHelper.syncMergedConstants();
+          }
+        })(),
+      );
+    });
 }

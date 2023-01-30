@@ -21,7 +21,7 @@ class AppReleasePageable extends Pageable<AppRelease> {
 
 @Resolver()
 export class AppQueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AppQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @Query((returns) => AppReleasePageable)
   public async app_releases(

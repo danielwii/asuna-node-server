@@ -18,7 +18,7 @@ import { fileURLToPath } from "url";
 
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantAuthController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(public override readonly authService: TenantAuthService) {
     super(OrgUser, authService);

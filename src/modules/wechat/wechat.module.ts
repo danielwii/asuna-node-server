@@ -2,8 +2,11 @@ import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { fileURLToPath } from 'node:url';
 
 import { AdminUser } from '../core/auth/auth.entities';
 import { KeyValueType } from '../core/kv/kv.entities';
@@ -11,10 +14,9 @@ import { KVGroupFieldsValue, KvHelper } from '../core/kv/kv.helper';
 import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
 import { CronHelper } from '../helper';
 import { WeChatController } from './wechat.controller';
-import { WeChatHelper, WXEventMessageHelper, WXSubscribedQrSceneMessage } from './wechat.helper';
+import { WXEventMessageHelper, WXSubscribedQrSceneMessage, WeChatHelper } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
 import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
-import { fileURLToPath } from "url";
 
 @Module({
   imports: [],
@@ -22,14 +24,15 @@ import { fileURLToPath } from "url";
   exports: [],
   controllers: [WeChatController],
 })
-export class WeChatModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WeChatModule.name));
+export class WeChatModule extends InitContainer implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   async onModuleInit(): Promise<void> {
-    this.logger.log('init...');
-    await this.initKV();
-    await this.initCron();
-    await this.initSubscriber();
+    return super.init(async () => {
+      await this.initKV();
+      await this.initCron();
+      await this.initSubscriber();
+    });
   }
 
   async initKV(): Promise<void> {

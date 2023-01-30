@@ -71,7 +71,7 @@ export class DateScalar implements CustomScalar<number, Date> {
   ],
 })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GraphqlModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public static forRoot(modules = [], options?): DynamicModule {
     // const providers = createDatabaseProviders(options, entities);

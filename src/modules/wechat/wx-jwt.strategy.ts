@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
 
 @Injectable()
 export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WXJwtStrategy.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor() {
     super(

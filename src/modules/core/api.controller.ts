@@ -25,7 +25,7 @@ import type { RequestInfo } from '../helper';
 @ApiTags('core')
 @Controller('api')
 export class ApiController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ApiController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private readonly appEnv = AppEnv.instance;
 
   @Get('version')
@@ -52,9 +52,9 @@ export class ApiController {
       address: {
         originalForwarded: req.header('x-original-forwarded-for'),
         forwarded: req.header('x-forwarded-for'), // 各阶段ip的CSV, 最左侧的是原始ip
-        remoteAddress: req.connection.remoteAddress,
-        remoteFamily: req.connection.remoteFamily,
-        remotePort: req.connection.remotePort,
+        remoteAddress: req.socket.remoteAddress,
+        remoteFamily: req.socket.remoteFamily,
+        remotePort: req.socket.remotePort,
         ips: req.ips, // 相当于(req.header('x-forwarded-for') || '').split(',')
         ip: req.ip, // 同req.connection.remoteAddress, 但是格式要好一些
       },

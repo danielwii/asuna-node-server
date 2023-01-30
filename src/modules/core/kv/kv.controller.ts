@@ -60,7 +60,7 @@ class GetKvPairRequest {
 @ApiTags('core')
 @Controller('api')
 export class KvController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), KvController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(JwtAdminAuthGuard)
   @Post('kv')

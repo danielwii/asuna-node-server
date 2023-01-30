@@ -115,7 +115,7 @@ import { WebModule } from './web';
   exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
 export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AdminInternalModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');

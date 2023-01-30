@@ -36,7 +36,7 @@ class UserRelationRequestDto {
 
 @Controller('api/v1/interaction')
 export class InteractionController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), InteractionController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new JwtAuthGuard())
   @Post('follow')

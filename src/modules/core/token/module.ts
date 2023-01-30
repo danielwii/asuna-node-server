@@ -1,4 +1,6 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { OperationTokenController } from './controller';
 
@@ -7,8 +9,6 @@ import { OperationTokenController } from './controller';
   // providers: [],
   // exports: [TokenService],
 })
-export class TokenModule implements OnModuleInit {
-  onModuleInit(): any {
-    Logger.log('init...');
-  }
+export class TokenModule extends InitContainer implements OnModuleInit {
+  public onModuleInit = async (): Promise<void> => super.init();
 }

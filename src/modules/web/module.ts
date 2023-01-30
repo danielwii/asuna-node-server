@@ -1,12 +1,14 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
+import { fileURLToPath } from 'node:url';
 
 import { WebController } from './controller';
 import { PageView, PageViewSchema } from './schema';
 import { WebService } from './service';
-import { fileURLToPath } from "url";
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: PageView.name, schema: PageViewSchema }])],
@@ -14,10 +16,8 @@ import { fileURLToPath } from "url";
   controllers: [WebController],
   exports: [WebService],
 })
-export class WebModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WebModule.name));
+export class WebModule extends InitContainer implements OnModuleInit {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  async onModuleInit(): Promise<void> {
-    this.logger.log('init...');
-  }
+  onModuleInit = async (): Promise<void> => super.init();
 }

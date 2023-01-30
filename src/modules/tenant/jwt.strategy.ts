@@ -16,7 +16,7 @@ import type { JwtPayload } from '../core/auth';
 
 @Injectable()
 export class OrgJwtStrategy extends PassportStrategy(Strategy, 'org-jwt') {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), OrgJwtStrategy.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly authService: TenantAuthService) {
     super(

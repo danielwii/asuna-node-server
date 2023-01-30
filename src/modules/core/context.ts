@@ -39,7 +39,7 @@ export interface IAsunaContextOpts {
 export type StorageEngineMode = 'chunks';
 
 export class AsunaContext {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AsunaContext.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private readonly config = UploaderConfigObject.load();
 
   public static instance: AsunaContext;

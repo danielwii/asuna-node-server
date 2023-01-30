@@ -35,7 +35,7 @@ class GetDraftsQuery {
 
 @Controller('admin/v1/content')
 export class ContentAdminController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentAdminController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(AnyAuthGuard)
   @Post('draft')

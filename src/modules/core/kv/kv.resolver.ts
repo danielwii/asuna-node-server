@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
 
 @Resolver()
 export class KvQueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), KvQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @Query((returns) => KeyValuePair, { nullable: true })
   public async kv(
@@ -45,7 +45,7 @@ export class KvQueryResolver {
 
 @Resolver(KeyValueModel)
 export class KeyValueModelResolver {
-  private logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'KeyValueModelResolver'));
+  private logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @ResolveField((returns) => KeyValuePair)
   public async pair(@Root() model: KeyValueModel, @Context() ctx: GraphqlContext): Promise<KeyValuePair> {

@@ -13,7 +13,7 @@ import { AuditService } from './audit.service';
 
 @EventSubscriber()
 export class AuditSubscriber implements EntitySubscriberInterface {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuditSubscriber.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private map = new Map();
   private auditService: AuditService = new AuditService();
   private enabled = FeaturesConfigObject.load().auditEnable;

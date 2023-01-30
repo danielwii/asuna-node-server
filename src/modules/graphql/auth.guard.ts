@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 
 @Injectable()
 export class GqlAdminAuthGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GqlAdminAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const { req, res } = ctx.getContext();
@@ -50,7 +50,7 @@ export class GqlAdminAuthGuard implements CanActivate {
  */
 @Injectable()
 export class GqlAuthGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), GqlAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   /**
    * @param opts.anonymousSupport default false
    */

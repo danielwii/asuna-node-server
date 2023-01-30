@@ -12,7 +12,7 @@ import { fileURLToPath } from "url";
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuthInterceptor.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private jwtAuthenticator = passport.authenticate('jwt', { session: false });
 
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {

@@ -89,7 +89,7 @@ export class MinioConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${MinioConfigObject.key}_`;
 
-  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'MinioConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public enable: boolean;
   public mode: 'alioss-compatibility' | undefined;
@@ -137,7 +137,7 @@ export class AliossConfigObject {
   private static key = YamlConfigKeys.storage;
   private static prefix = `${AliossConfigObject.key}_`;
 
-  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AliossConfigObject'));
+  private static logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public enable: boolean;
   public region: string;

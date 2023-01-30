@@ -30,7 +30,7 @@ export interface CreatedUser<U> {
 
 @Injectable()
 export class AuthService extends AbstractAuthService<UserProfile> {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   /**
    * 这里会根据继承 AbstractAuthUser / AbstractTimeBasedAuthUser 的实体来注册用户

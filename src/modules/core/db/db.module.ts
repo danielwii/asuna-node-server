@@ -1,8 +1,6 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
-
-import { fileURLToPath } from 'node:url';
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { DBService } from './db.service';
 
@@ -11,10 +9,6 @@ import { DBService } from './db.service';
   controllers: [],
   exports: [DBService],
 })
-export class DBModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
-
-  onModuleInit(): void {
-    this.logger.log('init...');
-  }
+export class DBModule extends InitContainer implements OnModuleInit {
+  public onModuleInit = async (): Promise<void> => super.init();
 }

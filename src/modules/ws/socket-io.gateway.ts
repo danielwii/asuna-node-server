@@ -51,7 +51,7 @@ export interface AsunaSocketRoomsType {
   serveClient: false,
 })
 export class SocketIOGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SocketIOGateway.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @WebSocketServer()
   private readonly server?: Server;

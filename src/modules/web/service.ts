@@ -14,7 +14,7 @@ import { fileURLToPath } from "url";
 
 @Injectable()
 export class WebService {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), WebService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(@InjectModel(PageView.name) private readonly PageViewModel: Model<PageViewDocument>) {}
 

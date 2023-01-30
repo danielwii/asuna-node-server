@@ -32,7 +32,7 @@ class MailBody {
 @ApiTags('core')
 @Controller('api/v1/email')
 export class EmailController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'EmailController'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly emailService: EmailService, private readonly contentfulService: ContentfulService) {}
 

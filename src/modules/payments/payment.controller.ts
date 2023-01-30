@@ -43,7 +43,7 @@ class UpdateOrderDTO {
 
 @Controller('api/v1/payment')
 export class PaymentController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PaymentController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   // @Get('query/:id')
   //  async queryOrder(@Param('id') id) {

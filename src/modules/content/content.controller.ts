@@ -30,7 +30,7 @@ class UpsertMediaBody {
 
 @Controller('api/v1/content')
 export class ContentController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new JwtAuthGuard())
   @Post('feedback')

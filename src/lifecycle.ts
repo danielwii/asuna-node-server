@@ -5,15 +5,16 @@ import { BeforeApplicationShutdown, Logger, OnApplicationBootstrap, OnApplicatio
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import bluebird from 'bluebird';
 import elasticApmNode from 'elastic-apm-node';
 import _ from 'lodash';
 import fp from 'lodash/fp';
+import { fileURLToPath } from 'node:url';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
@@ -30,24 +31,28 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 // const { Promise } = bluebird;
 
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  private static _ = new AppLifecycle();
+
   public static async preload(): Promise<void> {
-    Logger.log(`[preload] ...`);
+    AppLifecycle._.logger.log(`[preload] ...`);
     await HandlebarsHelper.init();
     await AsunaContext.init();
     // await RedisProvider.init();
     await RedisLockProvider.init();
     await Store.init();
     await Hermes.initialize();
-    Logger.log(`[preload] ... done`);
+    AppLifecycle._.logger.log(`[preload] ... done`);
   }
 
   public static async onInit(app: NestExpressApplication): Promise<void> {
     const sentryConfig = SentryConfigObject.load();
     const featuresConfig = FeaturesConfigObject.load();
-    Logger.log(`[onInit] ... ${r({ sentryConfig, featuresConfig })}`);
+    AppLifecycle._.logger.log(`[onInit] ... ${r({ sentryConfig, featuresConfig })}`);
     if (sentryConfig.enable) {
       const { dsn } = sentryConfig;
-      Logger.log(`[onInit] sentry ... ${dsn}`);
+      AppLifecycle._.logger.log(`[onInit] sentry ... ${dsn}`);
       Sentry.init({
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
@@ -79,7 +84,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     }
 
     if (featuresConfig.apmEnabled) {
-      Logger.log(`[onInit] apm ...`);
+      AppLifecycle._.logger.log(`[onInit] apm ...`);
       const apm = elasticApmNode.start({
         // Override the service name from package.json
         // Allowed characters: a-z, A-Z, 0-9, -, _, and space
@@ -99,17 +104,19 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     AccessControlHelper.init();
 
     process.on('SIGTERM', () => {
-      Logger.log('Got signal SIGTERM. Graceful shutdown start', new Date().toISOString());
+      AppLifecycle._.logger.log('Got signal SIGTERM. Graceful shutdown start', new Date().toISOString());
     });
     process.on('SIGINT', () => {
-      Logger.log(`Got signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`);
+      AppLifecycle._.logger.log(
+        `Got signal: SIGINT. Run exit processors ${r(_.keys(LifecycleRegister.exitProcessors))}`,
+      );
       Promise.all(
         _.map(LifecycleRegister.exitProcessors, (processor, resource) => {
-          Logger.log(`Run exit processor: ${resource}`);
+          AppLifecycle._.logger.log(`Run exit processor: ${resource}`);
           return processor();
         }),
       ).finally(() => {
-        Logger.log('Exit app gracefully.');
+        AppLifecycle._.logger.log('Exit app gracefully.');
         return process.exit(0);
       });
     });
@@ -117,42 +124,42 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
     const prismaService: PrismaService = app.get(PrismaService);
     await prismaService.enableShutdownHooks(app);
 
-    Logger.log(`[onInit] done`);
+    AppLifecycle._.logger.log(`[onInit] done`);
   }
 
   public static async beforeBootstrap(app: NestExpressApplication): Promise<void> {
-    Logger.log(`[beforeBootstrap] ...`);
+    AppLifecycle._.logger.log(`[beforeBootstrap] ...`);
     for (const handler of LifecycleRegister.handlers) {
       await handler?.beforeBootstrap?.(app as any);
     }
-    Logger.log(`[beforeBootstrap] done`);
+    AppLifecycle._.logger.log(`[beforeBootstrap] done`);
   }
 
   public static async onAppStartListening(app: NestExpressApplication): Promise<void> {
-    Logger.log(`[onAppStartListening] ...`);
+    AppLifecycle._.logger.log(`[onAppStartListening] ...`);
 
-    Logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.clients, fp.omit('client')))}`);
-    Logger.debug(`inspect crons: ${r(CronHelper.crons)}`);
-    Logger.debug(
+    AppLifecycle._.logger.debug(`inspect redis providers: ${r(_.mapValues(RedisProvider.clients, fp.omit('client')))}`);
+    AppLifecycle._.logger.debug(`inspect crons: ${r(CronHelper.crons)}`);
+    AppLifecycle._.logger.debug(
       `inspect id generators: ${r({ byPrefix: IdGenerators.handlers, byEntity: IdGenerators.handlersByEntity })}`,
     );
 
     for (const handler of LifecycleRegister.handlers) {
       await handler?.appStarted?.();
     }
-    Logger.log(`[onAppStartListening] done`);
+    AppLifecycle._.logger.log(`[onAppStartListening] done`);
   }
 
   public async onApplicationBootstrap(): Promise<void> {
-    Logger.log(`[onApplicationBootstrap] ...`);
-    Logger.log(`[onApplicationBootstrap] done`);
+    AppLifecycle._.logger.log(`[onApplicationBootstrap] ...`);
+    AppLifecycle._.logger.log(`[onApplicationBootstrap] done`);
   }
 
   public async beforeApplicationShutdown(signal?: string): Promise<void> {
-    Logger.log(`[beforeApplicationShutdown] ... signal: ${signal}`);
+    AppLifecycle._.logger.log(`[beforeApplicationShutdown] ... signal: ${signal}`);
   }
 
   public async onApplicationShutdown(signal?: string): Promise<void> {
-    Logger.log(`[onApplicationShutdown] ... signal: ${signal}`);
+    AppLifecycle._.logger.log(`[onApplicationShutdown] ... signal: ${signal}`);
   }
 }

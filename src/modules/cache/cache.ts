@@ -12,7 +12,7 @@ import { CacheTTL } from './constants';
 
 const caches = new Map<string, LRUCache<string, any>>();
 export class CacheManager {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), CacheManager.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   public static default = new CacheManager('default');
 
   private readonly cache: LRUCache<string, any>;

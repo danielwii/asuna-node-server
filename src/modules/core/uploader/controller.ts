@@ -110,7 +110,7 @@ class CreateChunksUploadTaskQuery {
 @ApiTags('core')
 @Controller('api/v1/uploader')
 export class UploaderController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UploaderController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private context = AsunaContext.instance;
 
   constructor(private readonly uploaderService: UploaderService) {}

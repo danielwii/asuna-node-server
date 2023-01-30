@@ -21,7 +21,7 @@ import { fileURLToPath } from "url";
  */
 @Resolver('Sort')
 export class SortResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), SortResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly sortService: SortService, private readonly Sort) {}
 

@@ -15,7 +15,7 @@ import type { GraphqlContext } from '../dataloader/dataloader.interceptor';
 
 @Resolver()
 export class ContentQueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), ContentQueryResolver.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new GqlAuthGuard())
   @Query((returns) => [ContentMedia])

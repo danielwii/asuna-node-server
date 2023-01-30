@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { KeyValueType, KvHelper, KVListFieldsValue, KVModelFormatType } from '../core/kv';
 import { DynamicRouterFieldKeys, DynamicRouterHelper } from './dynamic-router.helper';
@@ -12,16 +12,15 @@ export class DynamicTextRouter {
   public description: string;
 }
 
-export class DynamicRouterModule implements NestModule, OnModuleInit {
+export class DynamicRouterModule extends InitContainer implements NestModule, OnModuleInit {
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(DynamicRouterMiddleware).forRoutes('*');
   }
 
-  public async onModuleInit(): Promise<void> {
-    Logger.log('init...');
-
-    await this.initKV();
-  }
+  public onModuleInit = async (): Promise<void> =>
+    super.init(async () => {
+      await this.initKV();
+    });
 
   public async initKV(): Promise<void> {
     KvHelper.regInitializer<KVListFieldsValue<DynamicTextRouter>>(

@@ -2,6 +2,7 @@ import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import { Transform } from 'class-transformer';
+import { IsBoolean, IsString } from 'class-validator';
 
 import { configLoader } from '../config/loader';
 
@@ -12,8 +13,11 @@ export enum ContentfulConfigKeys {
 }
 
 class ContentfulConfigObject implements Record<keyof typeof ContentfulConfigKeys, any> {
+  @IsBoolean()
   enable: boolean;
+  @IsString()
   spaceId: string;
+  @IsString()
   @Transform(({ value }) => !!value, { toPlainOnly: true })
   accessToken: string;
 }

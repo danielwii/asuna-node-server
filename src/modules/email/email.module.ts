@@ -21,7 +21,7 @@ import { EmailService } from './email.service';
   exports: [EmailService],
 })
 export class EmailModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'EmailModule'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public onModuleInit = async (): Promise<void> =>
     this.init(async () => {

@@ -30,7 +30,7 @@ interface AliSendSMSParams {
 }
 
 export class AliyunSMSAdapter implements SMSAdapter {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AliyunSMSAdapter.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   private client: AliPopCore;
   private config: SMSConfigObject;

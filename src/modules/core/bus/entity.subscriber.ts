@@ -38,7 +38,7 @@ const safeReload = (metadata: EntityMetadata, entity): void => {
 
 @EventSubscriber()
 export class EntitySubscriber implements EntitySubscriberInterface {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), EntitySubscriber.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor() {
     this.logger.log('init ...');

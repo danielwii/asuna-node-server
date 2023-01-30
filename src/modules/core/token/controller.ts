@@ -77,7 +77,7 @@ class GetParams {
 @ApiTags('core')
 @Controller('api/v1/operation-token')
 export class OperationTokenController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), OperationTokenController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(AnyAuthGuard)
   @Post()

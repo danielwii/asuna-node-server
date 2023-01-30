@@ -106,7 +106,7 @@ export class TokenHelper {
 }
 
 export abstract class AbstractAuthService<U extends AuthUser> {
-  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'AbstractAuthService'));
+  private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   protected constructor(
     readonly AuthUserEntity: ConstrainedConstructor<U> & AuthUserType,

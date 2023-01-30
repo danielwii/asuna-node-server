@@ -21,7 +21,7 @@ const chance = new Chance();
 
 @Injectable()
 export class TenantAuthService extends AbstractAuthService<OrgUser> {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantAuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(@InjectDataSource() private readonly dataSource: DataSource) {
     super(OrgUser, dataSource.getRepository<OrgUser>(OrgUser));

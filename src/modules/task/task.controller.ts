@@ -28,7 +28,7 @@ class SearchTaskDTO {
 
 @Controller('admin/v1/tasks')
 export class TaskController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TaskController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new JwtAdminAuthGuard())
   @Post()

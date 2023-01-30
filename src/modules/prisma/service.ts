@@ -8,7 +8,7 @@ import { fileURLToPath } from "url";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), PrismaService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor() {
     super({

@@ -18,7 +18,7 @@ class ModelSchemas {
 
 @Resolver()
 export class SchemaQueryResolver {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'SchemaQueryResolver'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly dbService: DBService) {}
 

@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 
 @Controller('api/v1/tenant')
 export class TenantController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), TenantController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(new JwtAuthGuard())
   @Get('info')

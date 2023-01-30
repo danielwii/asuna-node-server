@@ -24,7 +24,7 @@ export class JwtAuthRequestExtractor {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), JwtAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
     super();
@@ -53,7 +53,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
 @Injectable()
 export class AnyAuthGuard implements CanActivate {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AnyAuthGuard.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   // public constructor(private readonly opts: {}) {}
 

@@ -18,7 +18,7 @@ import type { CreatedUser } from './auth.service';
 
 @Injectable()
 export class AdminAuthService extends AbstractAuthService<AdminUser> {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), AdminAuthService.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   public constructor(private readonly dataSource: DataSource) {
     super(AdminUser, dataSource.getRepository<AdminUser>(AdminUser));

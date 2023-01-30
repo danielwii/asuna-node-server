@@ -1,4 +1,6 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
+
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../kv';
 import { FinderController, ShortFinderController } from './finder.controller';
@@ -10,11 +12,11 @@ import { FinderFieldKeys, FinderHelper } from './finder.helper';
   controllers: [FinderController, ShortFinderController],
   exports: [],
 })
-export class FinderModule implements OnModuleInit {
-  async onModuleInit(): Promise<void> {
-    Logger.log('init...');
-    this.initKV();
-  }
+export class FinderModule extends InitContainer implements OnModuleInit {
+  onModuleInit = async (): Promise<void> =>
+    super.init(async () => {
+      this.initKV();
+    });
 
   async initKV(): Promise<void> {
     // const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);

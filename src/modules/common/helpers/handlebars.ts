@@ -1,16 +1,23 @@
 import { Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
 import dayjs from 'dayjs';
 import Handlebars from 'handlebars';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 
 // --------------------------------------------------------------
 // register Handlebars helpers
 // --------------------------------------------------------------
 
 export class HandlebarsHelper {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  private static _: HandlebarsHelper = new HandlebarsHelper();
+
   static init() {
-    Logger.log('init... register Handlebars helpers');
+    HandlebarsHelper._.logger.log('init... register Handlebars helpers');
     Handlebars.registerHelper('dateFormat', (str: dayjs.ConfigType, template: string) => {
       // logger.debug(`dateFormat ${r({ str, value: dayjs(str).valueOf(), template })}`);
       if (template === 'milliseconds') {

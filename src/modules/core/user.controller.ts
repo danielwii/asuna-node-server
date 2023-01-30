@@ -19,7 +19,7 @@ export class UpdatePortraitDto {
 
 @Controller('api/v1/user')
 export class UserController {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), UserController.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   @UseGuards(AnyAuthGuard)
   @Put('portrait')

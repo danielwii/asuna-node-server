@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
   exports: [],
 })
 export class NoModule implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), NoModule.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   async onModuleInit(): Promise<void> {
     this.logger.log('init for nothing.');
