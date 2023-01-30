@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+require('fix-esm').register();
+
 import { Module, OnModuleInit } from '@nestjs/common';
 
 import { AdminApiKeys } from './modules/core/auth/auth.entities';
-
-/* eslint-disable @typescript-eslint/no-require-imports */
-require('fix-esm').register();
 
 @Module({})
 export class ApplicationModule implements OnModuleInit {

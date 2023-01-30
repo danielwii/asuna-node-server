@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
-import { configLoader, FeaturesConfigObject } from './modules/config';
+import { FeaturesConfigObject, configLoader } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { AsunaContext } from './modules/core/context';

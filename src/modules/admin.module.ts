@@ -20,11 +20,11 @@ import { ContentfulModule } from './contentful';
 import {
   CommandController,
   GetUploadsModule,
-  KeyValueType,
   KVFieldsValue,
   KVGroupFieldsValue,
-  KvHelper,
   KVModelFormatType,
+  KeyValueType,
+  KvHelper,
   UserController,
 } from './core';
 import { ApiController } from './core/api.controller';

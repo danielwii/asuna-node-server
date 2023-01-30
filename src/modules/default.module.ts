@@ -20,8 +20,8 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { DataSource } from 'typeorm';
 import { fileURLToPath } from 'node:url';
+import { DataSource } from 'typeorm';
 
 import { AdminInternalModule } from './admin.module';
 import { AppController } from './app.controller';

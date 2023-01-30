@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 
-import { ClassSerializerInterceptor, Logger, LogLevel, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, LogLevel, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -17,7 +17,7 @@ import RedisStoreCreator from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { default as rateLimit, Options as RateLimitOptions } from 'express-rate-limit';
+import { Options as RateLimitOptions, default as rateLimit } from 'express-rate-limit';
 import session from 'express-session';
 import figlet from 'figlet';
 import helmet from 'helmet';
@@ -31,8 +31,8 @@ import { AppLifecycle } from './lifecycle';
 import {
   AppUpgradeMode,
   ExchangeCurrencyEnum,
-  KeyValueType,
   KVModelFormatType,
+  KeyValueType,
   MediaType,
   Mode,
   MongoConfigObject,
@@ -43,7 +43,7 @@ import {
 } from './modules';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
-import { AppConfigObject, configLoader, FeaturesConfigObject } from './modules/config';
+import { AppConfigObject, FeaturesConfigObject, configLoader } from './modules/config';
 import {
   FeedbackSenderEnum,
   FeedbackSenderEnumValue,
@@ -55,6 +55,7 @@ import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
 import { TracingInterceptor } from './modules/tracing';
+
 // add condition function in typeorm find operation
 import './typeorm.fixture';
 
