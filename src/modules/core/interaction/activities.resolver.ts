@@ -4,7 +4,7 @@ import { Resolver } from '@nestjs/graphql';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { UserActivity } from './activities.entities';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Resolver((of) => UserActivity)
 export class ActivitiesResolver {

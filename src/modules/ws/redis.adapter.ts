@@ -12,7 +12,7 @@ import _ from 'lodash';
 import { createAdapter, RedisAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 /**
  * may cause "Session ID unknown" issue with http2 & ssl (not test for other situations)

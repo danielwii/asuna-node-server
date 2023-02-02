@@ -1,10 +1,9 @@
-import type { OrgRole } from '../tenant';
 import type { Request } from 'express';
 import type { CommonRequest } from '../common';
 import type { AdminUser, JwtPayload, Role, UserProfile } from '../core/auth';
-import type { Tenant } from '../tenant';
-import type { WXJwtPayload } from '../wechat';
 import type { ApiKeyRequest } from '../core/auth/strategy';
+import type { OrgRole, Tenant } from '../tenant';
+import type { WXJwtPayload } from '../wechat';
 
 export type PayloadType = JwtPayload | WXJwtPayload | ApiKeyPayload;
 export type AuthInfo<Payload = PayloadType, User = AdminUser | any, Profile = UserProfile> = Partial<{

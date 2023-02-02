@@ -12,7 +12,7 @@ import { PageView } from './schema';
 import type { WebService } from './service';
 import type { RequestInfo } from '../helper';
 import type { PageViewDTO } from '@danielwii/asuna-shared/dist/dto';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Controller('api/v1/web')
 export class WebController {

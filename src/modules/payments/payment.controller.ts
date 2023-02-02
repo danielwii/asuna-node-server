@@ -5,15 +5,15 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsBoolean, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
 import * as _ from 'lodash';
+import { fileURLToPath } from 'url';
 
-import { JwtAuthGuard, JwtAuthRequest } from '../core/auth';
+import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from '../core/auth';
 import { SMSVerifyCodeGuard } from '../sms/guards';
 import { WeChatHelper } from '../wechat';
 import { PaymentHelper } from './payment.helper';
 import { PaymentNotifyHelper } from './payment.notify';
 
 import type { Request, Response } from 'express';
-import { fileURLToPath } from "url";
 
 class CreateOrderDTO {
   @IsString()
@@ -58,7 +58,7 @@ export class PaymentController {
     await PaymentNotifyHelper.handlePaymentNotify(data, isWxPay);
   }
 
-  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), SMSVerifyCodeGuard)
+  @UseGuards(JwtAnonymousSupportAuthGuard, SMSVerifyCodeGuard)
   @Post('order')
   async createOrder(@Body() body: CreateOrderDTO, @Req() req: JwtAuthRequest, @Res() res: Response): Promise<void> {
     this.logger.log(`createOrder ${r(body)}`);
@@ -78,7 +78,7 @@ export class PaymentController {
     }
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put('order')
   async updateOrder(@Body() body: UpdateOrderDTO) {
     return PaymentHelper.updateOrder(body.orderId, body.data);

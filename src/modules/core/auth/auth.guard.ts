@@ -8,12 +8,13 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 
-import { auth, AuthType } from '../../helper/auth';
+import { AuthType } from '../../helper/auth';
+import { RequestAuthService } from './request.service';
 
-import type { AdminUser } from './auth.entities';
 import type { Response } from 'express';
-import type { JwtPayload } from './auth.interfaces';
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
+import type { AdminUser } from './auth.entities';
+import type { JwtPayload } from './auth.interfaces';
 
 export type JwtAuthRequest<User = any> = AnyAuthRequest<JwtPayload, User>;
 
@@ -26,7 +27,7 @@ export class JwtAuthRequestExtractor {
 export class JwtAuthGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  public constructor(private readonly opts: { anonymousSupport: boolean } = { anonymousSupport: false }) {
+  public constructor(private readonly requestAuthService: RequestAuthService) {
     super();
   }
 
@@ -35,9 +36,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
     const res = context.switchToHttp().getResponse();
     if (err || !payload) {
-      if (this.opts.anonymousSupport) {
-        return undefined;
-      }
       this.logger.warn(`auth error, ${r({ err, payload, info, status })}`);
       throw new AsunaException(
         AsunaErrorCode.InvalidAuthToken,
@@ -46,7 +44,29 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       );
     }
     // this.logger.log(`handleRequest ${r({ err, payload, info })}`);
-    await auth(req, res, AuthType.client);
+    await this.requestAuthService.auth(req, res, AuthType.client);
+    return req.user;
+  }
+}
+
+@Injectable()
+export class JwtAnonymousSupportAuthGuard extends AuthGuard('jwt') {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly requestAuthService: RequestAuthService) {
+    super();
+  }
+
+  // @ts-ignore
+  public async handleRequest(err, payload: JwtPayload, info, context: ExecutionContext, status) {
+    const req = context.switchToHttp().getRequest<JwtAuthRequest<AdminUser>>();
+    const res = context.switchToHttp().getResponse();
+    if (err || !payload) {
+      this.logger.warn(`auth error, ${r({ err, payload, info, status })}`);
+      return undefined;
+    }
+    // this.logger.log(`handleRequest ${r({ err, payload, info })}`);
+    await this.requestAuthService.auth(req, res, AuthType.client);
     return req.user;
   }
 }
@@ -55,7 +75,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 export class AnyAuthGuard implements CanActivate {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  // public constructor(private readonly opts: {}) {}
+  public constructor(private readonly requestAuthService: RequestAuthService) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<AnyAuthRequest>();
@@ -63,7 +83,7 @@ export class AnyAuthGuard implements CanActivate {
     // const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
-    const result = await auth(req, res);
+    const result = await this.requestAuthService.auth(req, res);
 
     if (!result.payload) {
       if (result.err instanceof Error) {

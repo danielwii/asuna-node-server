@@ -1,14 +1,17 @@
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
+import { InitContainer } from '@danielwii/asuna-helper';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 
-import { AccessControlHelper, ACResource } from '../core/auth';
+import { ACResource, AccessControlHelper } from '../core/auth';
 import { DBHelper } from '../core/db';
-import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
+import { KVGroupFieldsValue, KVModelFormatType, KeyValueType, KvHelper } from '../core/kv';
+import { RestModule } from '../core/rest/rest.module';
 import { CronHelper } from '../helper';
 import { TenantAuthController } from './auth.controller';
 import { TenantAuthService } from './auth.service';
@@ -18,7 +21,6 @@ import { TenantAdminController } from './mgmt.controller';
 import { Tenant } from './tenant.entities';
 import { TenantFieldKeys, TenantHelper } from './tenant.helper';
 import { TenantService } from './tenant.service';
-import { fileURLToPath } from "url";
 
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
@@ -33,20 +35,26 @@ import { fileURLToPath } from "url";
  * tenant 🤔 的所有表理论上对于数据更新应该包含一个状态位，用于管理员进行审核
  */
 @Module({
-  providers: [TenantAuthService, OrgJwtStrategy],
+  imports: [RestModule],
+  providers: [TenantService, TenantAuthService, OrgJwtStrategy],
   controllers: [TenantController, TenantAdminController, TenantAuthController],
 })
-export class TenantModule implements OnModuleInit {
+export class TenantModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  async onModuleInit(): Promise<void> {
-    await TenantHelper.preload();
-    this.logger.log(`init... ${r(await TenantHelper.getConfig())}`);
-
-    await this.initKV();
-    await this.initAC();
-    await this.initCron();
+  public constructor(private readonly tenantService: TenantService) {
+    super();
   }
+
+  onModuleInit = async () =>
+    super.init(async () => {
+      await TenantHelper.preload();
+      this.logger.log(`init... ${r(await TenantHelper.getConfig())}`);
+
+      await this.initKV();
+      await this.initAC();
+      await this.initCron();
+    });
 
   async initKV(): Promise<void> {
     const entities = _.filter(
@@ -142,13 +150,13 @@ export class TenantModule implements OnModuleInit {
       CronHelper.reg(
         'populate-tenant-for-entities-with-no-tenant',
         CronExpression.EVERY_5_MINUTES,
-        TenantService.populateTenantForEntitiesWithNoTenant,
+        this.tenantService.populateTenantForEntitiesWithNoTenant,
         { runOnInit: true, start: true },
       );
       CronHelper.reg(
         'populate-tenant-for-entities-with-old-tenant',
         CronExpression.EVERY_10_MINUTES,
-        TenantService.populateTenantForEntitiesWithOldTenant,
+        this.tenantService.populateTenantForEntitiesWithOldTenant,
         { runOnInit: true, start: true, ttl: 120 },
       );
     }

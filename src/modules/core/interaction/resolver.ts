@@ -3,13 +3,14 @@ import { Args, Context, Info, Query, ResolveField, Resolver, Root } from '@nestj
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
+import { fileURLToPath } from 'node:url';
+
 import { GqlAuthGuard, QueryResolver } from '../../graphql';
 import { UserProfile } from '../auth/user.entities';
 import { UserRelation, UserRelationType } from './friends.entities';
 
-import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 import type { GraphQLResolveInfo } from 'graphql';
-import { fileURLToPath } from "url";
+import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
 
 @Resolver()
 export class UserRelationQueryResolver extends QueryResolver {
@@ -19,7 +20,7 @@ export class UserRelationQueryResolver extends QueryResolver {
     super(UserRelation);
   }
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => [UserRelation], { nullable: 'items' })
   async api_user_relations(
     @Args('type', { type: () => UserRelationType }) type: UserRelationType,
@@ -41,7 +42,7 @@ export class UserRelationResolver {
     this.logger.debug(`load profile for ${origin.id}`);
     const { profiles: loader } = ctx.getDataLoaders();
     return loader.load(origin.profileId);
-  }*/
+  } */
 
   @ResolveField((returns) => UserProfile)
   public async requester(@Root() origin: UserRelation, @Context() ctx: GraphqlContext): Promise<UserProfile> {

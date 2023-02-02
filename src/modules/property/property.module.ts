@@ -9,13 +9,12 @@ import * as R from 'ramda';
 
 import { AppConfigObject } from '../config/app.config';
 import { PageHelper } from '../core/helpers';
-import { KvModule } from '../core/kv';
 import { AppDataSource } from '../datasource';
 import { FinancialTransaction, Wallet } from './financial.entities';
 import { PropertyQueryResolver } from './property.resolver';
 
 @Module({
-  imports: [KvModule],
+  imports: [],
   providers: [PropertyQueryResolver],
   exports: [],
 })

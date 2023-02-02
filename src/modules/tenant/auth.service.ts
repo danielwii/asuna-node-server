@@ -15,7 +15,7 @@ import { TenantRoleName } from './auth.guard';
 import { OrgRole, OrgUser } from './tenant.entities';
 
 import type { CreateStaffVO } from '@danielwii/asuna-shared';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 const chance = new Chance();
 

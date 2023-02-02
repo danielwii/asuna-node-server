@@ -13,7 +13,7 @@ import { AppDataSource } from '../../datasource';
 import { JwtAuthGuard, JwtAuthRequest, JwtAuthRequestExtractor } from '../auth';
 import { UserHelper } from '../user.helper';
 import { UserRelation, UserRelationType } from './friends.entities';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class UserFollowDto {
   @IsString()
@@ -38,7 +38,7 @@ class UserRelationRequestDto {
 export class InteractionController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('follow')
   async follow(@Body() body: UserFollowDto, @Req() req: JwtAuthRequest): Promise<void> {
     const authInfo = JwtAuthRequestExtractor.of(req);
@@ -46,7 +46,7 @@ export class InteractionController {
     await UserHelper.follow(authInfo.profile, body.type, body.refId);
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('unfollow')
   async unfollow(@Body() body: UserUnfollowDto, @Req() req: JwtAuthRequest): Promise<void> {
     const authInfo = JwtAuthRequestExtractor.of(req);
@@ -54,7 +54,7 @@ export class InteractionController {
     await UserHelper.unfollow(authInfo.profile, body.type, body.refId);
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post(':id/request')
   async request(@Param('id') profileId: string, @Body() dto: UserRelationRequestDto, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -76,7 +76,7 @@ export class InteractionController {
     return ApiResponse.success();
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put(':id/accept')
   async accept(@Param('id') relationId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -113,7 +113,7 @@ export class InteractionController {
     return ApiResponse.success();
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put(':id/ignore')
   async ignore(@Param('id') relationId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -127,7 +127,7 @@ export class InteractionController {
   }
 
   // TODO block 的 user.profileId 是 requester，发起者是自己也就是 UserRelation 的 profileId
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put(':id/block')
   async block(@Param('id') profileId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -141,7 +141,7 @@ export class InteractionController {
   }
 
   // TODO
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put(':id/unblock')
   async unblock(@Param('id') profileId: string, @Req() req: JwtAuthRequest) {
     const { payload } = req;

@@ -10,7 +10,7 @@ import { AsunaContext, StorageEngineMode } from '../context';
 import { UploaderRoot } from './model';
 
 import type { OperationToken } from '../token';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class UploadCommand {
   public constructor(

@@ -9,20 +9,20 @@ import crypto from 'crypto';
 import geoip from 'geoip-lite';
 import _ from 'lodash';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { CacheWrapper } from '../../cache';
 import { TimeUnit } from '../../common';
 import { configLoader } from '../../config';
 import { AsunaContext } from '../context';
-import { FinderHelper } from '../finder';
+import { FinderService } from '../finder/finder.service';
 import { BlurredHelper } from '../image/blurred.helper';
 import { JpegPipe, JpegPipeOptions } from '../image/jpeg.pipe';
 import { ThumbnailPipe, ThumbnailPipeOptions } from '../image/thumbnail.pipe';
 import { LocalStorage } from '../storage';
 
-import type { RequestInfo } from '../../helper';
 import type { Response } from 'express';
-import { fileURLToPath } from "url";
+import type { RequestInfo } from '../../helper';
 
 class ImageProxy {
   private static readonly filterRegexp = /(.+)\((.*)\)/;
@@ -200,6 +200,9 @@ export class GetImageController {
 @Controller('uploads')
 export class GetUploadsController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly finderService: FinderService) {}
+
   /**
    * 1. /images/2018/4/****.png
    * 1.1 /images/2018/4/****.png?thumbnail/<Width>x<Height>
@@ -251,7 +254,7 @@ export class GetUploadsController {
         usingCN,
       })}`,
     );
-    const resolver = (path: string) => FinderHelper.resolveUrl({ type: 'assets', path, internal, isCN: usingCN });
+    const resolver = (path: string) => this.finderService.resolveUrl({ type: 'assets', path, internal, isCN: usingCN });
     if (blurred) {
       const hash = crypto.createHash('md5');
       hash.update('', 'utf8');

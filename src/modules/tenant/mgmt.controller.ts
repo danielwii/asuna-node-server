@@ -1,14 +1,13 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 
-import bluebird from 'bluebird';
 import { IsOptional, IsString } from 'class-validator';
 
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
 import { TenantHelper, TenantInfo } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
-import type { Tenant } from './tenant.entities';
 import type { AnyAuthRequest } from '../helper/interfaces';
+import type { Tenant } from './tenant.entities';
 
 export class RegisterTenantDto {
   @IsString() name: string;
@@ -20,6 +19,8 @@ export class RegisterTenantDto {
 
 @Controller('admin/v1/tenant')
 export class TenantAdminController {
+  public constructor(private readonly tenantService: TenantService) {}
+
   @UseGuards(JwtAdminAuthGuard)
   @Get('info')
   async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
@@ -40,6 +41,6 @@ export class TenantAdminController {
   @Post()
   async mgmtRegisterTenant(@Body() body: RegisterTenantDto, @Req() req: AnyAuthRequest): Promise<Tenant> {
     const { user, identifier } = req;
-    return TenantService.registerTenant(user.id, body, body.payload);
+    return this.tenantService.registerTenant(user.id, body, body.payload);
   }
 }

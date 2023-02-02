@@ -4,19 +4,20 @@ import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/grap
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import bluebird from 'bluebird';
+import { fileURLToPath } from 'node:url';
 
 import { GqlAdminAuthGuard } from '../../graphql';
 import { KeyValuePair } from './kv.entities';
-import { KvHelper, recognizeTypeValue } from './kv.helper';
 import { KeyValueModel } from './kv.isolated.entities';
+import { KvService, recognizeTypeValue } from './kv.service';
 
 import type { GraphqlContext } from '../../dataloader/dataloader.interceptor';
-import { fileURLToPath } from "url";
 
 @Resolver()
 export class KvQueryResolver {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly kvService: KvService) {}
 
   @Query((returns) => KeyValuePair, { nullable: true })
   public async kv(
@@ -26,14 +27,14 @@ export class KvQueryResolver {
   ): Promise<KeyValuePair> {
     this.logger.log(`kv: ${r({ collection, key })}`);
     // await KvHelper.auth(ctx, { collection });
-    return KvHelper.get({ collection, key });
+    return this.kvService.get({ collection, key });
   }
 
   @Query((returns) => [KeyValuePair])
   public async kvs(@Args('collection') collection: string, @Context() ctx): Promise<KeyValuePair[]> {
     this.logger.log(`kvs: ${r({ collection })}`);
-    await KvHelper.auth(ctx, { collection });
-    return KvHelper.find(collection);
+    await this.kvService.auth(ctx, { collection });
+    return this.kvService.find(collection);
   }
 
   @UseGuards(GqlAdminAuthGuard)

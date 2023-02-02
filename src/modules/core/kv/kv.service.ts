@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -163,10 +163,8 @@ export class KvDefIdentifierHelper {
 
 export type ConstantsKeys = 'WXMessageIds';
 
-/**
- * @deprecated use {@link KvService}
- */
-export class KvHelper {
+@Injectable()
+export class KvService {
   private static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
@@ -180,70 +178,70 @@ export class KvHelper {
    * @param key
    * @param constantMap
    */
-  public static async mergeConstantMaps(
+  public async mergeConstantMaps(
     key: ConstantsKeys | string,
     constantMap: { [name: string]: string },
   ): Promise<KeyValuePair> {
     const value = { [key]: constantMap };
-    if (!KvHelper.constantMapsPair) {
-      KvHelper.constantMapsPair = await KvHelper.get(KvHelper.constantKvDef, {
+    if (!KvService.constantMapsPair) {
+      KvService.constantMapsPair = await this.get(KvService.constantKvDef, {
         name: '关键词中文映射表',
         value,
         type: KeyValueType.json,
       });
     }
-    // const pair = await KvHelper.get(KvHelper.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    KvHelper.constantMapsPair.value = { ...KvHelper.constantMapsPair.value, ...value };
-    // return KvHelper.set(pair);
-    return KvHelper.constantMapsPair;
+    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    KvService.constantMapsPair.value = { ...KvService.constantMapsPair.value, ...value };
+    // return this.set(pair);
+    return KvService.constantMapsPair;
   }
 
   /**
    * call syncMergedConstants to sync constants
    * @param enumValue
    */
-  public static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
+  public async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
     const value = { [enumValue.key]: enumValue.data };
-    if (!KvHelper.enumValueConstantMapsPair) {
-      KvHelper.enumValueConstantMapsPair = await KvHelper.get(KvHelper.constantKvDef, {
+    if (!KvService.enumValueConstantMapsPair) {
+      KvService.enumValueConstantMapsPair = await this.get(KvService.constantKvDef, {
         name: '关键词中文映射表',
         value,
         type: KeyValueType.json,
       });
     }
-    // const pair = await KvHelper.get(KvHelper.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
-    KvHelper.enumValueConstantMapsPair.value = { ...KvHelper.enumValueConstantMapsPair.value, ...value };
-    // return KvHelper.set(pair);
-    return KvHelper.enumValueConstantMapsPair;
+    // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
+    KvService.enumValueConstantMapsPair.value = { ...KvService.enumValueConstantMapsPair.value, ...value };
+    // return this.set(pair);
+    return KvService.enumValueConstantMapsPair;
   }
 
-  public static async syncMergedConstants(): Promise<void> {
-    Logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
-    if (KvHelper.constantMapsPair) {
-      await KvHelper.set(KvHelper.constantMapsPair);
+  public async syncMergedConstants(): Promise<void> {
+    Logger.log(`merge constants ${r(KvService.constantMapsPair)}`);
+    if (KvService.constantMapsPair) {
+      await this.set(KvService.constantMapsPair);
     }
-    Logger.log(`merge enum constants ${r(KvHelper.enumValueConstantMapsPair)}`);
-    if (KvHelper.enumValueConstantMapsPair) {
-      await KvHelper.set(KvHelper.enumValueConstantMapsPair);
+    Logger.log(`merge enum constants ${r(KvService.enumValueConstantMapsPair)}`);
+    if (KvService.enumValueConstantMapsPair) {
+      await this.set(KvService.enumValueConstantMapsPair);
     }
   }
 
-  public static async reInitInitializer(kvDef: KvDef) {
-    const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
+  public async reInitInitializer(kvDef: KvDef) {
+    const initializer = KvService.initializers[KvDefIdentifierHelper.stringify(kvDef)];
     if (initializer) await initializer();
   }
 
-  public static regInitializer<V = KVGroupFieldsValue>(
+  public regInitializer<V = KVGroupFieldsValue>(
     kvDef: KvDef,
     opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
     config: { formatType?: KVModelFormatType; noUpdate?: boolean; merge?: boolean },
   ): void {
     const identifier = KvDefIdentifierHelper.stringify(kvDef);
-    KvHelper.initializers[identifier] = (): Promise<KeyValuePair> => KvHelper.set<V>({ ...kvDef, ...opts }, config);
-    KvHelper.initializers[identifier]();
+    KvService.initializers[identifier] = (): Promise<KeyValuePair> => this.set<V>({ ...kvDef, ...opts }, config);
+    KvService.initializers[identifier]();
   }
 
-  public static async set<V = any>(
+  public async set<V = any>(
     opts: { collection?: string; key: string; name?: string; type?: KeyValueType; value?: V; extra?: any },
     {
       formatType,
@@ -277,7 +275,7 @@ export class KvHelper {
       extra: opts.extra,
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
     };
-    const exists = await KvHelper.get(entity);
+    const exists = await this.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOneBy({ name: opts.name });
       Logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
@@ -305,7 +303,7 @@ export class KvHelper {
       .finally(() => CacheUtils.clear({ prefix: 'kv', key: { collection, key } }));
   }
 
-  public static async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
+  public async update(id: number, name: any, type: any, value: any): Promise<KeyValuePair> {
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
 
     const entity = await KeyValuePair.findOneBy({ id });
@@ -313,27 +311,27 @@ export class KvHelper {
     return KeyValuePair.save(entityTo);
   }
 
-  public static async delete(kvDef: KvDef): Promise<void> {
-    const exists = await KvHelper.get(kvDef);
+  public async delete(kvDef: KvDef): Promise<void> {
+    const exists = await this.get(kvDef);
     if (exists) {
       await KeyValuePair.delete({ ...kvDef });
     }
   }
 
-  public static async get(
+  public async get(
     kvDef: KvDef,
     defaultPair?: { name: string; type: KeyValueType; value: any },
   ): Promise<KeyValuePair> {
-    const keyValuePair = (await KvHelper.find(kvDef.collection, kvDef.key))[0];
+    const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
     if (!keyValuePair && defaultPair) {
-      await KvHelper.set({ ...kvDef, ...defaultPair });
-      return (await KvHelper.find(kvDef.collection, kvDef.key))[0];
+      await this.set({ ...kvDef, ...defaultPair });
+      return (await this.find(kvDef.collection, kvDef.key))[0];
     }
 
     return keyValuePair;
   }
 
-  public static async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
+  public async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
     return CacheWrapper.do({
       prefix: 'kv:cache',
       key: { prefix: collection, key },
@@ -364,17 +362,17 @@ export class KvHelper {
   }
 
   @named
-  public static async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
+  public async getConfigsByEnumKeys<KeyValues extends { [key: string]: string }>(
     kvDef: KvDef,
     keyValues: KeyValues,
     funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
     Logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
-    return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
+    return Promise.props(_.mapValues(keyValues, (key) => this.getValueByGroupFieldKV(kvDef, key)));
   }
 
-  public static async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
-    const field = await KvHelper.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
+  public async getValueByGroupFieldKV(kvDef: KvDef, fieldKey: string): Promise<any> {
+    const field = await this.getGroupFieldsValueByFieldKV(kvDef, fieldKey);
     if (field) return field.value ?? _.get(field, 'field.defaultValue');
   }
 
@@ -383,7 +381,7 @@ export class KvHelper {
    * @param kvDef
    * @param identifier
    */
-  public static async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
+  public async checkPermission(kvDef: Partial<KvDef>, identifier: string): Promise<void> {
     if (kvDef.collection.startsWith('system.')) {
       if (AdminUserIdentifierHelper.identify(identifier)) {
         const resolved = AdminUserIdentifierHelper.resolve(identifier);
@@ -397,25 +395,25 @@ export class KvHelper {
     // todo 非系统配置暂时直接略过权限，之后可通过 kv 本身提供更多待认证信息
   }
 
-  public static async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
+  public async auth({ req, res }, { collection }: { collection: string }): Promise<void> {
     if (collection.toUpperCase().startsWith(AsunaCollectionPrefix.SYSTEM)) {
       await auth(req, res, AuthType.admin);
     }
   }
 
-  public static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
-    const value = (await KvHelper.get(kvDef))?.value;
+  public async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
+    const value = (await this.get(kvDef))?.value;
     return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value, strategy: 'cache-first' });
   }
 
-  private static async getGroupFieldsValueByFieldKV(
+  private async getGroupFieldsValueByFieldKV(
     kvDef: KvDef,
     fieldKey: string,
   ): Promise<{ field: KVField; value: any } | void> {
     const fields: KVGroupFieldsValue = await CacheWrapper.do({
       prefix: 'kv',
       key: kvDef,
-      resolver: async () => (await KvHelper.get(kvDef))?.value,
+      resolver: async () => (await this.get(kvDef))?.value,
       strategy: 'cache-first',
       expiresInSeconds: 60,
     });

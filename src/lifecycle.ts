@@ -33,7 +33,12 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstrap, BeforeApplicationShutdown {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  private static _ = new AppLifecycle();
+  public static _ = new AppLifecycle();
+  private app: NestExpressApplication;
+
+  public getApp(): NestExpressApplication {
+    return this.app;
+  }
 
   public static async preload(): Promise<void> {
     AppLifecycle._.logger.log(`[preload] ...`);
@@ -47,6 +52,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   }
 
   public static async onInit(app: NestExpressApplication): Promise<void> {
+    AppLifecycle._.app = app;
     const sentryConfig = SentryConfigObject.load();
     const featuresConfig = FeaturesConfigObject.load();
     AppLifecycle._.logger.log(`[onInit] ... ${r({ sentryConfig, featuresConfig })}`);

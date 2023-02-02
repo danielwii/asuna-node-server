@@ -10,7 +10,7 @@ import type { FilterQuery, Model } from 'mongoose';
 import ow from 'ow';
 
 import { PageView, PageViewDocument } from './schema';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class WebService {

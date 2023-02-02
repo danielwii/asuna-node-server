@@ -11,16 +11,16 @@ import { fileURLToPath } from 'node:url';
 
 import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';
-import { RestHelper } from '../core/rest/rest.helper';
+import { RestService } from '../core/rest/rest.service';
 import { TenantHelper } from '../tenant/tenant.helper';
 import { Draft } from './draft.entities';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { FeedbackReply } from './feedback.entities';
 
-import type { FeedbackReplyBody } from './feedback.interface';
 import type { PrimaryKey } from '../common';
 import type { JsonMap } from '../common/decorators';
 import type { AnyAuthRequest } from '../helper/interfaces';
+import type { FeedbackReplyBody } from './feedback.interface';
 
 class CreateDraftDto {
   @IsObject() content: JsonMap;
@@ -36,6 +36,8 @@ class GetDraftsQuery {
 @Controller('admin/v1/content')
 export class ContentAdminController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly restService: RestService) {}
 
   @UseGuards(AnyAuthGuard)
   @Post('draft')
@@ -65,7 +67,7 @@ export class ContentAdminController {
       // 如果不存在原型，先创建未发布的原型
       if (!refId) {
         const primaryKey = DBHelper.getPrimaryKeyByModel(modelNameObject);
-        const ref = await RestHelper.save<{}>({ model: modelNameObject, body: { ...body.content, tenant } }, req);
+        const ref = await this.restService.save<{}>({ model: modelNameObject, body: { ...body.content, tenant } }, req);
         refId = ref[primaryKey];
         this.logger.log(`save ref ${r(ref)}, ref id is ${r({ primaryKey, refId })}`);
       }

@@ -16,7 +16,7 @@ import { UploaderConfigObject } from '../uploader/config';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
 import type { Response } from 'express';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class LocalStorage implements IStorageEngine {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

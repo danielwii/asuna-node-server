@@ -3,7 +3,7 @@ import { Args, Context, Query, ResolveField, Resolver, Root } from '@nestjs/grap
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
-import bluebird from 'bluebird';
+import { fileURLToPath } from 'url';
 
 import { UserProfile } from '../../core/auth';
 import { Wallet } from '../../property';
@@ -12,7 +12,6 @@ import { GqlAdminAuthGuard } from '../auth.guard';
 import { GraphqlHelper } from '../helper';
 
 import type { GraphqlContext } from '../../dataloader';
-import { fileURLToPath } from "url";
 
 export class UserProfileQueryResolver {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
@@ -23,7 +22,7 @@ export class UserProfileQueryResolver {
     return UserProfile.findOneBy({ id: ctx.getCurrentUser().id });
   }
 
-  @UseGuards(new GqlAdminAuthGuard())
+  @UseGuards(GqlAdminAuthGuard)
   @Query((returns) => UserProfile)
   public async admin_user_profile(@Args('id') id: string, @Context() ctx: GraphqlContext): Promise<UserProfile> {
     const { profiles: loader } = ctx.getDataLoaders();

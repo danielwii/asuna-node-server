@@ -7,7 +7,7 @@ import * as amqp from 'amqplib';
 import _ from 'lodash';
 
 import { MQConfigObject } from './mq.config';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class MQProvider {

@@ -19,7 +19,7 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 
 import type { MinioConfigObject } from './storage.config';
 import type { Response } from 'express';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 const styleSuffix = configLoader.loadConfig('STYLE_SUFFIX', '');
 

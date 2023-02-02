@@ -24,15 +24,15 @@ import {
   KVGroupFieldsValue,
   KVModelFormatType,
   KeyValueType,
-  KvHelper,
   UserController,
 } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
+import { CoreModule } from './core/core.module';
 import { DBModule } from './core/db';
 import { FinderModule } from './core/finder';
 import { InteractionModule } from './core/interaction/interaction.module';
-import { KvModule } from './core/kv';
+import { KvService } from './core/kv/kv.service';
 import { TokenModule } from './core/token';
 import { UploaderController, UploaderModule } from './core/uploader';
 import { DynamicRouterModule } from './dynamic-router';
@@ -70,7 +70,6 @@ import { WebModule } from './web';
     configLoader.loadConfig('FEATURES_PAYMENT_ENABLED') ? PaymentModule : null,
     ContentModule,
     EmailModule,
-    KvModule,
     DBModule,
     TokenModule,
     GetUploadsModule,
@@ -112,10 +111,14 @@ import { WebModule } from './web';
     TaskController,
     UploaderController,
   ],
-  exports: [AuthModule, KvModule, DBModule, TokenModule, PropertyModule, PrismaModule],
+  exports: [AuthModule, DBModule, TokenModule, PropertyModule, PrismaModule],
 })
 export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly kvService: KvService) {
+    super();
+  }
 
   public configure(consumer: MiddlewareConsumer): any {
     consumer.apply(IsMobileMiddleware).forRoutes('*');
@@ -134,7 +137,7 @@ export class AdminInternalModule extends InitContainer implements NestModule, On
     });
 
   public async initKV(): Promise<void> {
-    KvHelper.regInitializer<KVFieldsValue>(
+    this.kvService.regInitializer<KVFieldsValue>(
       { collection: 'app.settings', key: 'site' },
       {
         name: '网站设置',
@@ -150,7 +153,7 @@ export class AdminInternalModule extends InitContainer implements NestModule, On
       },
       { merge: true, formatType: KVModelFormatType.Fields },
     );
-    KvHelper.regInitializer<KVGroupFieldsValue>(
+    this.kvService.regInitializer<KVGroupFieldsValue>(
       { collection: 'app.settings', key: 'sms.notice' },
       {
         name: '短信配置',
@@ -167,6 +170,6 @@ export class AdminInternalModule extends InitContainer implements NestModule, On
   }
 
   public async initConstants(): Promise<void> {
-    await KvHelper.mergeConstantMapsForEnumValue(SexEnumValue);
+    await this.kvService.mergeConstantMapsForEnumValue(SexEnumValue);
   }
 }

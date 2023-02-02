@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import * as scalars from 'graphql-scalars';
 
 import { DBHelper, DBService } from '../core/db';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @ObjectType()
 class ModelSchemas {

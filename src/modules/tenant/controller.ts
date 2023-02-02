@@ -9,13 +9,13 @@ import { JwtAuthGuard } from '../core/auth/auth.guard';
 import { TenantHelper, TenantInfo } from './tenant.helper';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Controller('api/v1/tenant')
 export class TenantController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Get('info')
   async info(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
     const { payload, user, identifier, tenant, profile } = req;

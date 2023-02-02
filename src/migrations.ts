@@ -2,6 +2,8 @@ import bluebird from 'bluebird';
 
 import { AuthMigrations } from './modules/core/auth/auth.migrations';
 
+import type { NestExpressApplication } from '@nestjs/platform-express';
+
 const { Promise } = bluebird;
 
 export const renameTables = [
@@ -12,8 +14,8 @@ export const renameTables = [
   { from: 'im__t_timeline_session_users', to: 'client__t_session_users' },
 ];
 
-export const runCustomMigrations = async (migrations: any[]): Promise<void> => {
-  await AuthMigrations.migrate();
+export const runCustomMigrations = async (app: NestExpressApplication, migrations: any[]): Promise<void> => {
+  await AuthMigrations.migrate(app);
 
   await Promise.each(migrations ?? [], (migration) => migration.migrate());
 };

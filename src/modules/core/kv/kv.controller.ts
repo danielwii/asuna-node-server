@@ -5,14 +5,14 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsOptional, IsString } from 'class-validator';
+import { fileURLToPath } from 'node:url';
 
-import { JwtAdminAuthGuard } from '../auth';
+import { JwtAdminAuthGuard } from '../auth/admin-auth.guard';
 import { KeyValuePair, KeyValueType } from './kv.entities';
-import { KvDef, KvHelper } from './kv.helper';
+import { KvDef, KvService } from './kv.service';
 
 import type { Response } from 'express';
 import type { AnyAuthRequest } from '../../helper';
-import { fileURLToPath } from "url";
 
 class KvPair {
   @IsString()
@@ -62,12 +62,14 @@ class GetKvPairRequest {
 export class KvController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
+  public constructor(private readonly kvService: KvService) {}
+
   @UseGuards(JwtAdminAuthGuard)
   @Post('kv')
   public async set(@Body() kvPair: KvPair, @Req() req: AnyAuthRequest): Promise<KeyValuePair> {
     const { user, identifier } = req;
     this.logger.log(`set ${r({ kvPair, user, identifier })}`);
-    return KvHelper.set(KeyValuePair.create(kvPair));
+    return this.kvService.set(KeyValuePair.create(kvPair));
   }
 
   @UseGuards(JwtAdminAuthGuard)
@@ -75,8 +77,8 @@ export class KvController {
   public async destroy(@Body() kvDef: KvDef, @Req() req: AnyAuthRequest): Promise<void> {
     const { user, identifier } = req;
     this.logger.log(`destroy ${r({ kvDef, user, identifier })}`);
-    await KvHelper.delete(kvDef);
-    await KvHelper.reInitInitializer(kvDef);
+    await this.kvService.delete(kvDef);
+    await this.kvService.reInitInitializer(kvDef);
   }
 
   @Get('kv')
@@ -87,9 +89,9 @@ export class KvController {
   ): Promise<KeyValuePair> {
     const { user, identifier } = req;
     this.logger.log(`get ${r({ query, user, identifier })}`);
-    await KvHelper.auth({ req, res }, query);
-    // await KvHelper.checkPermission(query.toKvDef(), identifier);
-    const result = await KvHelper.get(query.toKvDef());
+    await this.kvService.auth({ req, res }, query);
+    // await this.kvService.checkPermission(query.toKvDef(), identifier);
+    const result = await this.kvService.get(query.toKvDef());
     res.send(result);
     return result;
   }
@@ -102,8 +104,8 @@ export class KvController {
   ): Promise<KeyValuePair[]> {
     const { user, identifier } = req;
     this.logger.log(`get kvs by ${r({ collection, user, identifier })}`);
-    await KvHelper.auth({ req, res }, { collection });
-    const result = await KvHelper.find(collection);
+    await this.kvService.auth({ req, res }, { collection });
+    const result = await this.kvService.find(collection);
     res.send(result);
     return result;
   }

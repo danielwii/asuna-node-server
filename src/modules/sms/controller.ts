@@ -12,7 +12,7 @@ import { CsurfGuard } from '../common/guards/csurf';
 import { SMSHelper } from './helper';
 
 import type { RequestInfo } from '../helper';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Controller('api/v1/sms')
 export class SMSController {

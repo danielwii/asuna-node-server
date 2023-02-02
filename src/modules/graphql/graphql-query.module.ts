@@ -7,6 +7,7 @@ import { SchemaQueryResolver } from './schema.resolver';
 import { UserProfileQueryResolver, UserProfileResolver } from './user/user.resolver';
 
 @Module({
+  imports: [],
   providers: [SchemaQueryResolver, UserProfileQueryResolver, UserProfileResolver, DBService],
 })
 export class GraphqlQueryModule extends InitContainer implements OnModuleInit {

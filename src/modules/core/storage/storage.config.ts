@@ -8,7 +8,7 @@ import { Expose, plainToInstance, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../../config';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 

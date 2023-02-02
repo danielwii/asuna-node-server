@@ -17,7 +17,7 @@ import { ActionRateLimitGuard } from '../common/guards';
 import { CsurfGuard, CsurfHelper } from '../common/guards/csurf';
 import { configLoader } from '../config';
 import { TokenHelper } from './auth/abstract.auth.service';
-import { JwtAuthGuard, JwtAuthRequest } from './auth/auth.guard';
+import { JwtAnonymousSupportAuthGuard, JwtAuthRequest } from './auth/auth.guard';
 
 import type { RegDeviceDTO } from '@danielwii/asuna-shared/dist/dto';
 import type { RequestInfo } from '../helper';
@@ -47,6 +47,7 @@ export class ApiController {
       clientIp: req.clientIp,
       isMobile: req.isMobile,
       headers: req.headers,
+      userAgent: req.headers['user-agent'],
       ua: _.memoize(detectUA)(req.headers['user-agent']),
       ..._.omit(req.session, 'cookie'),
       address: {
@@ -73,7 +74,7 @@ export class ApiController {
     return ApiResponse.success();
   }
 
-  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }), new ActionRateLimitGuard('api/v1/reg-device', 1))
+  @UseGuards(JwtAnonymousSupportAuthGuard, new ActionRateLimitGuard('api/v1/reg-device', 1))
   @Post('v1/reg-device')
   async regDevice(@Req() req: JwtAuthRequest, @Body() body: RegDeviceDTO): Promise<ApiResponse> {
     const { identifier, user, payload, scid, sessionID, deviceID } = req;

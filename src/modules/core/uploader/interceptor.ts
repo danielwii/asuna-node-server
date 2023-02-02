@@ -4,7 +4,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { from, Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export interface FastifyUploadedFile {
   filename: string;

@@ -4,13 +4,13 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsDefined, IsString } from 'class-validator';
+import { fileURLToPath } from 'node:url';
 
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
 import { TaskHelper } from './task.helper';
 
-import type { TaskRecord } from './task.entities';
 import type { AnyAuthRequest } from '../helper/interfaces';
-import { fileURLToPath } from "url";
+import type { TaskRecord } from './task.entities';
 
 class CreateTaskDTO {
   @IsString() id: string;
@@ -30,7 +30,7 @@ class SearchTaskDTO {
 export class TaskController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  @UseGuards(new JwtAdminAuthGuard())
+  @UseGuards(JwtAdminAuthGuard)
   @Post()
   async createTask(@Body() body: CreateTaskDTO, @Req() req: AnyAuthRequest): Promise<TaskRecord> {
     const { identifier } = req;
@@ -38,7 +38,7 @@ export class TaskController {
     return TaskHelper.create(identifier, body.id, body.type, body.service, body.channel, body.payload);
   }
 
-  @UseGuards(new JwtAdminAuthGuard())
+  @UseGuards(JwtAdminAuthGuard)
   @Get()
   async searchTask(@Query() query: SearchTaskDTO, @Req() req: AnyAuthRequest): Promise<TaskRecord> {
     const { identifier } = req;
@@ -46,7 +46,7 @@ export class TaskController {
     return TaskHelper.search(query.type, query.service, query.identifier);
   }
 
-  @UseGuards(new JwtAdminAuthGuard())
+  @UseGuards(JwtAdminAuthGuard)
   @Post(':id/invoke')
   async invoke(@Param('id') id: string, @Req() req: AnyAuthRequest): Promise<void> {
     const { identifier } = req;

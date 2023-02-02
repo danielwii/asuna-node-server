@@ -6,19 +6,23 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'url';
+
+import { RequestAuthService } from '../core/auth/request.service';
 import { UserProfile } from '../core/auth/user.entities';
-import { auth, AuthType } from '../helper/auth';
+import { AuthType } from '../helper/auth';
 import { Store } from '../store';
 
 import type { Response } from 'express';
 import type { WXJwtPayload } from './interfaces';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxCodeSession } from './wx.interfaces';
-import { fileURLToPath } from "url";
 
 @Injectable()
 export class WXAuthGuard implements CanActivate {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly requestAuthService: RequestAuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<WXAuthRequest>();
@@ -26,7 +30,7 @@ export class WXAuthGuard implements CanActivate {
     // const next = context.switchToHttp().getNext();
 
     this.logger.log(`check url: ${req.url}`);
-    const result = await auth(req, res, AuthType.client);
+    const result = await this.requestAuthService.auth(req, res, AuthType.client);
 
     if (!result.payload) {
       if (result.err instanceof Error) {

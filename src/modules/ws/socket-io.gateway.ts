@@ -13,7 +13,7 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import type { Server, Socket } from 'socket.io';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class AdminWsHelper {
   private static server: Server;

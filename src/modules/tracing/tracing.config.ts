@@ -8,7 +8,7 @@ import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',

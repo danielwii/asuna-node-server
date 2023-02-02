@@ -15,6 +15,7 @@ import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
+import { KvService } from './modules/core/kv/kv.service';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
@@ -95,7 +96,7 @@ async function syncDb(app: NestExpressApplication, options: BootstrapOptions): P
   Logger.log(`synchronize ... done`);
 
   Logger.log(`run custom migrations ...`);
-  await runCustomMigrations(options.migrations);
+  await runCustomMigrations(app, options.migrations);
   Logger.log(`run custom migrations ... done`);
 
   if (['mariadb', 'mysql56', 'mysql57', 'mysql8'].includes(Global.dbType)) {

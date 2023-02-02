@@ -8,7 +8,7 @@ import { IsString } from 'class-validator';
 import { AnyAuthGuard, JwtAuthRequest } from '../auth';
 import { PageHelper } from '../helpers';
 import { UserActivity } from './activities.entities';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 class CreateActivityDTO {
   @IsString() type: string;

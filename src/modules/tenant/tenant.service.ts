@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
 
 import { DBHelper } from '../core/db';
-import { RestHelper } from '../core/rest';
+import { RestService } from '../core/rest/rest.service';
 import { WeChatUser } from '../wechat/wechat.entities';
 import { WxConfigApi } from '../wechat/wx.api.config';
 import { OrgUser, Tenant } from './tenant.entities';
@@ -19,13 +19,16 @@ import type { StatsResult } from '../stats';
 
 const { Promise } = bluebird;
 
+@Injectable()
 export class TenantService {
+  public constructor(private readonly restService: RestService) {}
+
   /**
    * @param userId
    * @param body
    * @param firstModelPayload 用来新建需要绑定的核心模型数据
    */
-  static async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
+  async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
     Logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
     const info = await TenantHelper.info(userId);
     if (info.tenant) return info.tenant;
@@ -46,7 +49,7 @@ export class TenantService {
     if (info.config.firstModelBind && info.config.firstModelName && firstModelPayload) {
       Logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
 
-      await RestHelper.save(
+      await this.restService.save(
         { model: DBHelper.getModelNameObject(info.config.firstModelName), body: firstModelPayload },
         { user: user, tenant: user.tenant /* roles: admin.roles */ },
       );
@@ -65,7 +68,7 @@ export class TenantService {
     return user.tenant;
   }
 
-  static async populateTenantForEntitiesWithNoTenant(): Promise<StatsResult> {
+  async populateTenantForEntitiesWithNoTenant(): Promise<StatsResult> {
     const config = await TenantHelper.getConfig();
     if (!config.enabled && !config.firstModelBind && !config.firstModelName) return {};
 
@@ -100,7 +103,7 @@ export class TenantService {
     return { stats };
   }
 
-  static async populateTenantForEntitiesWithOldTenant(): Promise<StatsResult> {
+  async populateTenantForEntitiesWithOldTenant(): Promise<StatsResult> {
     const config = await TenantHelper.getConfig();
     if (!config.enabled && !config.firstModelBind && !config.firstModelName) return {};
 
@@ -142,7 +145,7 @@ export class TenantService {
    * @param entity
    * @deprecated {@see populateTenantForEntitiesWithOldTenant}
    */
-  static async populate<E extends { tenant: Tenant; tenantId: string }>(entity: E): Promise<void> {
+  async populate<E extends { tenant: Tenant; tenantId: string }>(entity: E): Promise<void> {
     const config = await TenantHelper.getConfig();
     if (config.enabled && config.firstModelBind) {
       const { entityInfo } = entity.constructor as any;

@@ -24,14 +24,11 @@ import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
 import appleSignIn from 'apple-signin-auth';
 import Chance from 'chance';
-import { IsOptional, IsString, registerSchema, validate, ValidationSchema } from 'class-validator';
+import { IsOptional, IsString, ValidationSchema, registerSchema, validate } from 'class-validator';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import ow from 'ow';
 
-import { isNotBlank, TimeUnit } from '../../common';
+import { TimeUnit, isNotBlank } from '../../common';
 import { EmailHelper } from '../../email/email.helper';
 import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
@@ -39,12 +36,12 @@ import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
 import { AppleConfigure } from './apple.configure';
 import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
-import { JwtAuthGuard, JwtAuthRequest } from './auth.guard';
+import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from './auth.guard';
 import { AuthUser, AuthUserChannel, WithProfileUser } from './base.entities';
 import { AppleUserProfile, UserProfile } from './user.entities';
 
-import type { BaseEntity, DeepPartial } from 'typeorm';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
+import type { BaseEntity, DeepPartial } from 'typeorm';
 import type { CreatedUser } from './auth.service';
 
 const chance = new Chance();
@@ -82,7 +79,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @HttpCode(200)
   @Post('reset-password')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async resetPassword(@Body() dto: ResetPasswordDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload } = req;
     this.superLogger.log(`reset password: ${r({ dto, payload })}`);
@@ -96,7 +93,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 
   @HttpCode(200)
   @Post('reset-account')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async resetAccount(@Body() dto: ResetAccountDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload, user } = req;
     this.superLogger.log(`reset account: ${r({ dto, payload, user })}`);
@@ -122,7 +119,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Put('profile')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async updateProfile(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
     const { payload, user } = req;
     this.superLogger.log(`update profile: ${r({ dto, payload, user })}`);
@@ -138,7 +135,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Post('sign-in-with-apple')
-  @UseGuards(new JwtAuthGuard({ anonymousSupport: true }))
+  @UseGuards(JwtAnonymousSupportAuthGuard)
   @named
   async signInWithApple(
     @Body() dto: SignInWithAppleDTO,
@@ -344,7 +341,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   // refresh access token by refresh token
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('refresh-token')
   @named
   async refreshToken(
@@ -389,7 +386,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Get('current')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
     const { user, payload } = req;
     this.superLogger.log(`current... ${r({ user, payload })}`);
@@ -428,7 +425,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
   }
 
   @Get('authorized')
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   async authorized(): Promise<void> {
     this.superLogger.log('Authorized route...');
   }

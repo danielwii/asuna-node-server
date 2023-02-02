@@ -8,7 +8,7 @@ import * as util from 'util';
 import { UnionTypeResolver } from '../graphql';
 
 import type { SortService } from './sort.service';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 /**
  * const SortResolverProvider: Provider = {

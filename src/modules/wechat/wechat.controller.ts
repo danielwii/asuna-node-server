@@ -12,7 +12,7 @@ import { UserInfo, WeChatHelper, WxTicketType } from './wechat.helper';
 import type { Request } from 'express';
 import type { WXAuthRequest } from './wechat.interfaces';
 import type { WxQrTicketInfo } from './wx.interfaces';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 class ValidationDto {
   // 随机字符串

@@ -6,10 +6,12 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
+import { fileURLToPath } from 'node:url';
 // @ts-ignore
 import ow from 'ow';
 import * as R from 'ramda';
 
+import { AppLifecycle } from '../../lifecycle';
 import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
 import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
 import {
@@ -22,17 +24,25 @@ import {
   parseWhere,
 } from '../core/db';
 import { KvHelper } from '../core/kv';
-import { RestHelper } from '../core/rest';
+import { RestService } from '../core/rest/rest.service';
+// import { RestHelper } from '../core/rest';
 import { Tenant, TenantHelper } from '../tenant';
 
 import type { BaseEntity, DeleteResult } from 'typeorm';
 import type { AnyAuthRequest } from '../helper';
-import { fileURLToPath } from "url";
 
 // import { AdminUser } from '../../core/auth';
 
 export abstract class RestCrudController {
   private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  private _restService: RestService;
+  private getRestService() {
+    if (!this._restService) {
+      this._restService = AppLifecycle._.getApp().get<RestService>(RestService);
+    }
+    return this._restService;
+  }
 
   // TODO module or prefix may not needed in future
   protected constructor(protected module: string = '', protected prefix: string = 't') {
@@ -68,7 +78,7 @@ export abstract class RestCrudController {
   public unique(@Param('model') model: string, @Query('column') column: string): Promise<string[]> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
-    return RestHelper.unique(modelNameObject, column);
+    return this.getRestService().unique(modelNameObject, column);
   }
 
   @UseGuards(JwtAdminAuthGuard)
@@ -80,7 +90,7 @@ export abstract class RestCrudController {
   ): Promise<{ [id: string]: { [name: string]: number } }> {
     ow(column, 'column', ow.string.nonEmpty);
     const modelNameObject = DBHelper.getModelNameObject(model, this.module);
-    return RestHelper.groupCounts(modelNameObject, parseWhere(whereStr), column);
+    return this.getRestService().groupCounts(modelNameObject, parseWhere(whereStr), column);
   }
 
   /*
@@ -162,7 +172,7 @@ export abstract class RestCrudController {
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
   ): Promise<BaseEntity> {
-    return RestHelper.get(
+    return this.getRestService().get(
       { model: DBHelper.getModelNameObject(model, this.module), id, profile, fields, relationsStr },
       req,
     );
@@ -189,7 +199,7 @@ export abstract class RestCrudController {
     @Body() updateTo: JsonMap,
     @Req() req: AnyAuthRequest,
   ): Promise<any> {
-    return RestHelper.save({ model: DBHelper.getModelNameObject(model, this.module), body: updateTo }, req);
+    return this.getRestService().save({ model: DBHelper.getModelNameObject(model, this.module), body: updateTo }, req);
   }
 
   @UseGuards(JwtAdminAuthGuard)

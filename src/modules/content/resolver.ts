@@ -17,7 +17,7 @@ import type { GraphqlContext } from '../dataloader/dataloader.interceptor';
 export class ContentQueryResolver {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => [ContentMedia])
   @named
   async api_content_medias(
@@ -31,7 +31,7 @@ export class ContentQueryResolver {
     return ContentMedia.find({ where: { profileId: id }, order: { createdAt: 'desc' } });
   }
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => ContentMedia, { nullable: true })
   @named
   async api_content_media(

@@ -14,7 +14,7 @@ import type { CreateTenantStaffDTO } from '@danielwii/asuna-shared';
 import { TenantAuthService } from './auth.service';
 import type { DeepPartial } from 'typeorm';
 import type { OrgJwtAuthRequest } from './auth';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Controller('api/v1/tenant/auth')
 export class TenantAuthController extends AbstractAuthController<OrgUser> {

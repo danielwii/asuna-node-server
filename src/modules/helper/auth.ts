@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import bluebird from 'bluebird';
 import _ from 'lodash';
 import passport from 'passport';
 
@@ -17,12 +16,12 @@ import { OrgAuthHelper } from '../tenant/auth';
 import { isWXAuthRequest } from '../wechat/wechat.interfaces';
 import { wrapErrorInfo } from './utils';
 
-import type { OrgUser } from '../tenant/tenant.entities';
+import type { Request, Response } from 'express';
 import type { JwtPayload } from '../core/auth/auth.interfaces';
+import type { OrgUser } from '../tenant/tenant.entities';
 import type { WXJwtPayload } from '../wechat/interfaces';
 import type { WxCodeSession } from '../wechat/wx.interfaces';
-import type { Request, Response } from 'express';
-import type { AnyAuthRequest, ApiKeyPayload, AuthResult, PayloadType } from './interfaces';
+import type { AnyAuthRequest, AuthResult, PayloadType } from './interfaces';
 
 export function isAdminAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload, AdminUser> {
   const { authorization } = req.headers;
@@ -35,21 +34,6 @@ export function isOrgAuthRequest(req: Request): req is AnyAuthRequest<JwtPayload
 }
 
 export class AuthHelper {
-  public static authAdminApiKey(req: AnyAuthRequest<ApiKeyPayload>, res: Response): Promise<AuthResult<ApiKeyPayload>> {
-    return new Promise((resolve) => {
-      passport.authenticate('admin-api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
-        Logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
-        if (err || info) {
-          Logger.error(`api-key auth error: ${r({ err, info })}`);
-        } else {
-          req.payload = payload;
-          req.identifier = `api-key=${payload.apiKey}`; // { apiKey: xxx }
-        }
-        resolve({ err: err ?? wrapErrorInfo(info), payload, info });
-      })(req, res);
-    });
-  }
-
   public static authAdmin(req: AnyAuthRequest<JwtPayload>, res: Response): Promise<AuthResult<JwtPayload>> {
     return new Promise((resolve) => {
       passport.authenticate('admin-jwt', { session: false, authInfo: true }, async (err, payload: JwtPayload, info) => {
@@ -156,7 +140,7 @@ export async function auth<Payload = PayloadType>(
 
   if (_.includes([AuthType.admin, AuthType.all], type)) {
     if (isApiKeyRequest(req)) {
-      return (await AuthHelper.authAdminApiKey(req, res)) as any;
+      // return (await AuthHelper.authAdminApiKey(req, res)) as any; TODO
     }
 
     if (isAdminAuthRequest(req)) {

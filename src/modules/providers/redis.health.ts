@@ -4,7 +4,7 @@ import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestj
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class RedisHealthIndicator extends HealthIndicator {

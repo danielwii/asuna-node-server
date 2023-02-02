@@ -13,7 +13,7 @@ import { PointExchange } from './points.entities';
 
 import type { ExchangeCurrencyType } from './enum-values';
 import type { GraphQLResolveInfo } from 'graphql';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @ObjectType({ implements: () => [Pageable] })
 class PointExchangePageable extends Pageable<PointExchange> {
@@ -31,7 +31,7 @@ class FinancialTransactionPageable extends Pageable<FinancialTransaction> {
 export class PropertyQueryResolver {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'UserQueryResolver'));
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => PointExchangePageable)
   public async user_paged_exchange_records(
     @Args('type', { nullable: true }) type: string,
@@ -56,7 +56,7 @@ export class PropertyQueryResolver {
     return GraphqlHelper.pagedResult({ pageRequest: toPage(pageRequest), items, total });
   }
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => FinancialTransactionPageable)
   public async user_paged_financial_transactions(
     @Args('type') type: string,

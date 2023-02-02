@@ -32,7 +32,7 @@ class UpsertMediaBody {
 export class ContentController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('feedback')
   async addFeedback(@Body() body: CreateFeedbackDto, @Req() req: JwtAuthRequest): Promise<Feedback> {
     const { user } = req;
@@ -41,7 +41,7 @@ export class ContentController {
     return Feedback.save(feedback);
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('feedback/:feedbackId/reply')
   async addFeedbackReply(
     @Param('feedbackId') feedbackId: number,
@@ -60,7 +60,7 @@ export class ContentController {
     return FeedbackReply.save(feedbackReply);
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Post('media')
   async addMedia(@Body() body: UpsertMediaBody, @Req() req: JwtAuthRequest) {
     const { payload } = req;
@@ -73,7 +73,7 @@ export class ContentController {
     } as ContentMedia).save();
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Put(':id/media')
   async editMedia(@Param('id') id: string, @Body() body: UpsertMediaBody, @Req() req: JwtAuthRequest) {
     // ow(id, 'id', ow.string.nonEmpty);
@@ -90,7 +90,7 @@ export class ContentController {
     return media.save();
   }
 
-  @UseGuards(new JwtAuthGuard())
+  @UseGuards(JwtAuthGuard)
   @Delete(':id/media')
   async deleteMedia(@Param('id') id: string, @Req() req: JwtAuthRequest) {
     // ow(id, 'id', ow.string.nonEmpty);

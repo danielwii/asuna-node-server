@@ -4,6 +4,8 @@ import { SimpleIdGenerator } from '../../ids';
 import { MigrationsHelper } from '../migrations/migrations.helper';
 import { AdminUser } from './auth.entities';
 
+import type { NestExpressApplication } from '@nestjs/platform-express';
+
 export class AuthMigrations {
   static readonly version = 1;
 
@@ -22,9 +24,9 @@ export class AuthMigrations {
   }
 */
 
-  static async migrate(): Promise<void> {
+  static async migrate(app: NestExpressApplication): Promise<void> {
     const key = 'AdminUser';
-    const currentVersion = await MigrationsHelper.getVersion(key);
+    const currentVersion = await MigrationsHelper.getVersion(app, key);
     Logger.log(`migrate: check versions for '${key}' '${currentVersion}' with '${this.version}'`);
     if (currentVersion < this.version) {
       Logger.log(`migrate: run migrations for '${key}' ...`);
@@ -36,7 +38,7 @@ export class AuthMigrations {
           await user.save();
         }
       }
-      await MigrationsHelper.updateVersion(AdminUser.name, this.version);
+      await MigrationsHelper.updateVersion(app, AdminUser.name, this.version);
       Logger.log(`migrate: run migrations for '${key}' done, update version to '${this.version}' ...`);
     }
   }

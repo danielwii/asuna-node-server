@@ -29,7 +29,7 @@ export class FeedbackQueryResolver extends QueryResolver {
     super(Feedback);
   }
 
-  @UseGuards(new GqlAuthGuard())
+  @UseGuards(GqlAuthGuard)
   @Query((returns) => FeedbackPageable)
   @named
   async api_paged_feedback(

@@ -5,6 +5,7 @@ import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { OperationTokenController } from './controller';
 
 @Module({
+  imports: [],
   controllers: [OperationTokenController],
   // providers: [],
   // exports: [TokenService],

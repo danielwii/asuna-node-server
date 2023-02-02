@@ -2,18 +2,23 @@ import { Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
-import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType, KvModule } from '../kv';
+import { KVGroupFieldsValue, KVModelFormatType, KeyValueType } from '../kv';
+import { KvService } from '../kv/kv.service';
 import { FinderController, ShortFinderController } from './finder.controller';
-import { FinderFieldKeys, FinderHelper } from './finder.helper';
+import { FinderFieldKeys, FinderService } from './finder.service';
 
 @Module({
-  imports: [KvModule],
-  providers: [],
+  imports: [],
+  providers: [FinderService],
   controllers: [FinderController, ShortFinderController],
-  exports: [],
+  exports: [FinderService],
 })
 export class FinderModule extends InitContainer implements OnModuleInit {
-  onModuleInit = async (): Promise<void> =>
+  public constructor(private readonly kvService: KvService) {
+    super();
+  }
+
+  onModuleInit = async () =>
     super.init(async () => {
       this.initKV();
     });
@@ -22,8 +27,8 @@ export class FinderModule extends InitContainer implements OnModuleInit {
     // const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     // const internalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
 
-    KvHelper.regInitializer<KVGroupFieldsValue>(
-      FinderHelper.kvDef,
+    this.kvService.regInitializer<KVGroupFieldsValue>(
+      FinderService.kvDef,
       {
         name: '资源位置配置',
         type: KeyValueType.json,

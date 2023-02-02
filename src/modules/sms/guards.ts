@@ -7,7 +7,7 @@ import { SMSConfigObject } from './config';
 import { SMSHelper } from './helper';
 
 import type { JwtAuthRequest } from '../core/auth';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class SMSVerifyCodeGuard implements CanActivate {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

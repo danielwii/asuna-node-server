@@ -10,8 +10,8 @@ import { UserRelationQueryResolver, UserRelationResolver } from './resolver';
 @Module({
   imports: [],
   providers: [ActivitiesResolver, UserRelationQueryResolver, UserRelationResolver],
-  exports: [],
   controllers: [ActivitiesController, InteractionController],
+  exports: [],
 })
 export class InteractionModule extends InitContainer implements OnModuleInit {
   public onModuleInit = async (): Promise<void> => super.init();

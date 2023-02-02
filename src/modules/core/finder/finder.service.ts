@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
@@ -9,7 +9,8 @@ import { IsOptional } from 'class-validator';
 import { URL } from 'node:url';
 
 import { configLoader } from '../../config';
-import { AsunaCollections, KvDef, KvHelper } from '../kv';
+import { AsunaCollections, KvDef } from '../kv';
+import { KvService } from '../kv/kv.service';
 
 export interface HostExchange {
   regex: string;
@@ -29,14 +30,20 @@ export class FinderAssetsSettings {
   @IsOptional() public hostExchanges?: string;
 }
 
-export class FinderHelper {
+@Injectable()
+export class FinderService {
   public static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_SERVER, key: 'settings.finder.assets' };
 
-  public static async getConfig(): Promise<FinderAssetsSettings> {
-    return deserializeSafely(FinderAssetsSettings, await KvHelper.getConfigsByEnumKeys(this.kvDef, FinderFieldKeys));
+  public constructor(private readonly kvService: KvService) {}
+
+  public async getConfig(): Promise<FinderAssetsSettings> {
+    return deserializeSafely(
+      FinderAssetsSettings,
+      await this.kvService.getConfigsByEnumKeys(FinderService.kvDef, FinderFieldKeys),
+    );
   }
 
-  public static async resolveUrl({
+  public async resolveUrl({
     type,
     name,
     path,

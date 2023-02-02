@@ -12,7 +12,7 @@ import { OrgAuthHelper } from './auth';
 import type { OrgUser } from './tenant.entities';
 import type { AnyAuthRequest } from '../helper';
 import type { JwtPayload } from '../core';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export type OrgJwtAuthRequest = AnyAuthRequest<JwtPayload, OrgUser>;
 

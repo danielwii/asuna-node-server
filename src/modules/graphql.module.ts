@@ -29,46 +29,17 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AppModule } from './app';
-import { KvModule } from './core';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
 import { TimeOfDayScalar } from './graphql/scalars';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
-import type { GraphQLServiceContext } from 'apollo-server-types';
 import type { GraphQLRequestContext } from '@apollo/server';
-
-/*
-@Scalar('DateTime', (type) => Date)
-export class DateScalar implements CustomScalar<number, Date> {
-  description = 'Date custom scalar type';
-
-  parseValue(value: number): Date {
-    return new Date(value); // value from the client
-  }
-
-  serialize(value: Date): number {
-    if (_.isString(value)) {
-      // FIXME fix BaseEntity @CreateDateColumn({ name: 'created_at' }) format issue
-      return value as any;
-    } else {
-      return value.getTime(); // value sent to the client
-    }
-  }
-
-  parseLiteral(ast: ValueNode): Date {
-    if (ast.kind === Kind.INT) {
-      return new Date(ast.value);
-    }
-    return null;
-  }
-} */
+import type { GraphQLServiceContext } from 'apollo-server-types';
 
 @Module({
-  providers: [
-    // DateScalar
-  ],
+  imports:[]
 })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
@@ -98,7 +69,6 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
       module: GraphqlModule,
       imports: [
         ...modules,
-        KvModule,
         AppModule,
         GraphQLModule.forRoot<ApolloDriverConfig>({
           driver: ApolloDriver,

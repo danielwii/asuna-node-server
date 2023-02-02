@@ -12,7 +12,7 @@ import { configLoader } from '../config';
 import { Store } from '../store';
 
 import type { WXJwtPayload } from './interfaces';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class WXJwtStrategy extends PassportStrategy(Strategy, 'wx-jwt') {

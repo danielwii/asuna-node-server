@@ -9,7 +9,7 @@ import { DBHelper } from '../core/db';
 import { AppDataSource } from '../datasource';
 
 import type { EntityTarget } from 'typeorm';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export interface Sort {
   id: number;

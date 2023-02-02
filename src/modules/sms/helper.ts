@@ -12,7 +12,7 @@ import { InMemoryDB } from '../cache';
 import { SMSConfigObject } from './config';
 
 import type { RequestInfo } from '../helper';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 const chance = new Chance();
 

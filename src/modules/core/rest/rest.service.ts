@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObject } from '@danielwii/asuna-helper/dist/validate';
@@ -11,14 +11,17 @@ import { AppDataSource } from '../../datasource';
 import { TenantHelper } from '../../tenant/tenant.helper';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
-import { KvHelper } from '../kv/kv.helper';
+import { KvService } from '../kv/kv.service';
 
 import type { BaseEntity, ObjectLiteral } from 'typeorm';
 import type { PrimaryKey, Profile } from '../../common';
 import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 
-export class RestHelper {
-  public static async get<T extends BaseEntity>(
+@Injectable()
+export class RestService {
+  public constructor(private readonly kvService: KvService) {}
+
+  public async get<T extends BaseEntity>(
     {
       model,
       id,
@@ -46,7 +49,7 @@ export class RestHelper {
     return queryBuilder.getOne();
   }
 
-  public static async save<T extends BaseEntity | ObjectLiteral>(
+  public async save<T extends BaseEntity | ObjectLiteral>(
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
@@ -78,7 +81,7 @@ export class RestHelper {
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
       Logger.log(`save by kv... ${r(pair)}`);
-      return (await KvHelper.set(pair)) as any;
+      return (await this.kvService.set(pair)) as any;
     }
 
     const repository = DBHelper.repo(model);
@@ -102,7 +105,7 @@ export class RestHelper {
     return AppDataSource.dataSource.manager.save(entity as any);
   }
 
-  public static async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
+  public async unique(modelNameObject: ModelNameObject, column: string): Promise<string[]> {
     const repository = DBHelper.repo(modelNameObject);
     const columnMetadata = DBHelper.getColumnByPropertyNameAndRepo(repository, column);
     const raw = await repository
@@ -115,7 +118,7 @@ export class RestHelper {
     return arr;
   }
 
-  public static async groupCounts(
+  public async groupCounts(
     modelNameObject: ModelNameObject,
     where: ObjectLiteral,
     column: string,

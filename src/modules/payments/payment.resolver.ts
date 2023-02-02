@@ -10,7 +10,7 @@ import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entiti
 import { PaymentOrder } from './payment.order.entities';
 
 import type { GraphqlContext } from '../dataloader';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @ObjectType()
 class PaginatedPaymentItemResponse extends PaginatedResponse(PaymentItem) {}

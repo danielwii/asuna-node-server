@@ -15,7 +15,7 @@ import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMon
 
 import type { AliossConfigObject } from './storage.config';
 import type { Response } from 'express';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 export class AliossStorage implements IStorageEngine {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

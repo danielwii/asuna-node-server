@@ -7,12 +7,12 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
+import { fileURLToPath } from 'node:url';
 import querystring from 'query-string';
 
-import { FinderHelper } from './finder.helper';
+import { FinderService } from './finder.service';
 
 import type { Request, Response } from 'express';
-import { fileURLToPath } from "url";
 
 /**
  * 主要应用来定位资源，设计上，可以作为一个调度器，用来调度到其他的平台上
@@ -23,6 +23,9 @@ import { fileURLToPath } from "url";
 @Controller('api/v1/finder')
 export class FinderController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly finderService: FinderService) {}
+
   @Get()
   async redirect(
     @Query('encrypt') encrypt: boolean,
@@ -40,7 +43,7 @@ export class FinderController {
     this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
-    const url = await FinderHelper.resolveUrl({ type, name, path });
+    const url = await this.finderService.resolveUrl({ type, name, path });
     return res.redirect(url);
   }
 }
@@ -52,6 +55,8 @@ export class FinderController {
 @Controller('f')
 export class ShortFinderController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly finderService: FinderService) {}
 
   @Get(':q')
   async redirect(@Param('q') q: string, @Req() req: Request, @Res() res: Response): Promise<void> {
@@ -79,7 +84,7 @@ export class ShortFinderController {
     this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
-    const url = await FinderHelper.resolveUrl({ type, name, path });
+    const url = await this.finderService.resolveUrl({ type, name, path });
     return res.redirect(url);
   }
 }

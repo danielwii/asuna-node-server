@@ -6,7 +6,6 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { fileURLToPath } from 'node:url';
 
 import { DBModule } from '../db';
-import { KvModule } from '../kv';
 import { TokenModule } from '../token';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthMiddleware } from './admin-auth.middleware';
@@ -25,7 +24,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
       signOptions: { expiresIn: 60 * 60 * 24 * 30 },
     }),
   ], */
-  imports: [KvModule, DBModule, TokenModule],
+  imports: [DBModule, TokenModule],
   providers: [AuthService, AdminAuthService, JwtStrategy, AdminJwtStrategy, ApiKeyStrategy],
   controllers: [AdminAuthController],
   exports: [AuthService],
@@ -39,7 +38,10 @@ export class AuthModule extends InitContainer implements NestModule, OnModuleIni
 
   public configure(consumer: MiddlewareConsumer): void {
     this.logger.log('configure...');
-    consumer.apply(AdminAuthMiddleware.forRoutes('/admin' /* '/rest' */)).forRoutes('*');
+    consumer.apply(AdminAuthMiddleware).forRoutes(
+      '/admin',
+      /* '/rest' */
+    );
   }
 
   public onModuleInit = async () =>

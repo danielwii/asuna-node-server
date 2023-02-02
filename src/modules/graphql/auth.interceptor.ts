@@ -8,7 +8,7 @@ import passport from 'passport';
 
 import type { Observable } from 'rxjs';
 import type { Request, Response } from 'express';
-import { fileURLToPath } from "url";
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
