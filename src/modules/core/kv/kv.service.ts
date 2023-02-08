@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
@@ -9,6 +10,7 @@ import bluebird from 'bluebird';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
 import fp from 'lodash/fp';
+import { fileURLToPath } from 'node:url';
 
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
@@ -120,7 +122,7 @@ export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueTyp
     newType = KeyValueType.json;
     newValue = toJson(value);
   }
-  // Logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
+  // this.logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
   return [newType || KeyValueType.string, newValue];
 }
 
@@ -165,6 +167,8 @@ export type ConstantsKeys = 'WXMessageIds';
 
 @Injectable()
 export class KvService {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
   private static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
@@ -216,11 +220,11 @@ export class KvService {
   }
 
   public async syncMergedConstants(): Promise<void> {
-    Logger.log(`merge constants ${r(KvService.constantMapsPair)}`);
+    this.logger.log(`merge constants ${r(KvService.constantMapsPair)}`);
     if (KvService.constantMapsPair) {
       await this.set(KvService.constantMapsPair);
     }
-    Logger.log(`merge enum constants ${r(KvService.enumValueConstantMapsPair)}`);
+    this.logger.log(`merge enum constants ${r(KvService.enumValueConstantMapsPair)}`);
     if (KvService.enumValueConstantMapsPair) {
       await this.set(KvService.enumValueConstantMapsPair);
     }
@@ -265,7 +269,7 @@ export class KvService {
     const { name, type, value } = opts;
     const stringifyValue = _.isString(value) ? value : JSON.stringify(value);
     const [newType] = recognizeTypeValue(type, stringifyValue);
-    Logger.verbose(`recognize ${r({ type, newType, value, stringifyValue })}`);
+    this.logger.verbose(`recognize ${r({ type, newType, value, stringifyValue })}`);
 
     const entity = {
       key,
@@ -278,7 +282,7 @@ export class KvService {
     const exists = await this.get(entity);
     if (exists && opts.name) {
       const model = await KeyValueModel.findOneBy({ name: opts.name });
-      Logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
+      this.logger.verbose(`found kv model ${r({ model, name: opts.name })}`);
       if (!model) KeyValueModel.create({ name: opts.name, pair: exists, formatType }).save();
       else {
         model.formatType = formatType;
@@ -289,11 +293,11 @@ export class KvService {
     if (exists && noUpdate && exists.value) return exists;
     if (exists && merge) {
       exists.value = JSON.stringify({ ...exists.value, ..._.omit(value as any, 'values') });
-      Logger.debug(`inspect ${r(exists)}`);
+      this.logger.debug(`inspect ${r(exists)}`);
       return exists.save();
     }
 
-    Logger.debug(`set ${r(entity)}`);
+    this.logger.debug(`set ${r(entity)}`);
     return KeyValuePair.create({
       // ...R.ifElse(R.identity, R.always({ id: exists?.id }), R.always({}))(!!exists),
       ...(exists ? { id: exists.id } : {}),
@@ -367,7 +371,7 @@ export class KvService {
     keyValues: KeyValues,
     funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    Logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
+    this.logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
     return Promise.props(_.mapValues(keyValues, (key) => this.getValueByGroupFieldKV(kvDef, key)));
   }
 
@@ -419,7 +423,7 @@ export class KvService {
     });
     if (!fields) return;
 
-    // Logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
+    // this.logger.verbose(`fields is ${r({ kvDef, fieldKey, fields, result })}`);
     return {
       value: _.get(fields.values, fieldKey),
       field: _.get(

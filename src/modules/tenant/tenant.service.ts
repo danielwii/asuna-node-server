@@ -4,15 +4,18 @@ import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-help
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import bluebird from 'bluebird';
-import * as _ from 'lodash';
-import { IsNull, Not } from 'typeorm';
+import _ from 'lodash';
+import fp from 'lodash/fp';
+import { EntityMetadata, IsNull, Not } from 'typeorm';
 
-import { DBHelper } from '../core/db';
+import { CacheManager } from '../cache/cache';
+import { DBHelper } from '../core/db/db.helper';
+import { AsunaCollections, KvDef, KvService } from '../core/kv/kv.service';
 import { RestService } from '../core/rest/rest.service';
 import { WeChatUser } from '../wechat/wechat.entities';
 import { WxConfigApi } from '../wechat/wx.api.config';
-import { OrgUser, Tenant } from './tenant.entities';
-import { TenantHelper } from './tenant.helper';
+import { OrgRole, OrgUser, Tenant } from './tenant.entities';
+import { TenantConfig, TenantFieldKeys, TenantInfo } from './tenant.helper';
 
 import type { PrimaryKey } from '../common';
 import type { StatsResult } from '../stats';
@@ -21,7 +24,90 @@ const { Promise } = bluebird;
 
 @Injectable()
 export class TenantService {
-  public constructor(private readonly restService: RestService) {}
+  public static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
+
+  public constructor(private readonly kvService: KvService, private readonly restService: RestService) {}
+
+  async getConfig(): Promise<TenantConfig> {
+    return CacheManager.default.cacheable(
+      'tenant.config',
+      async () => {
+        const entities = await DBHelper.getModelsHasRelation(Tenant);
+        const keyValues = _.assign(
+          {},
+          TenantFieldKeys,
+          ...entities.map((entity) => ({ [`limit.${entity.entityInfo.name}`]: `limit.${entity.entityInfo.name}` })),
+          ...entities.map((entity) => ({ [`publish.${entity.entityInfo.name}`]: `publish.${entity.entityInfo.name}` })),
+        );
+        // Logger.log(`load config by ${r({ kvDef: TenantService.kvDef, keyValues })}`);
+        const tenantConfig = new TenantConfig(
+          await this.kvService.getConfigsByEnumKeys(TenantService.kvDef, keyValues),
+        );
+
+        // bind 模式下的资源限制默认是 1
+        if (tenantConfig.firstModelBind && tenantConfig.firstModelName) {
+          tenantConfig[`limit.${tenantConfig.firstModelName}`] = 1;
+        }
+        // Logger.log(`tenant config is ${r(tenantConfig)}`);
+        return tenantConfig;
+      },
+      60,
+    );
+  }
+
+  async preload(): Promise<any> {
+    return this.kvService.preload(TenantService.kvDef);
+  }
+
+  async info(userId: PrimaryKey): Promise<TenantInfo> {
+    const { config, admin } = await Promise.props({
+      config: this.getConfig(),
+      admin: OrgUser.findOne({ where: { id: userId as string }, relations: ['roles', 'tenant'] }),
+      // tenant: await (await AdminUser.findOne(userId)).tenant,
+    });
+
+    Logger.log(`tenant info for ${r({ admin, config })}`);
+
+    const { tenant } = admin ?? {};
+    const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
+      (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
+    );
+    // 仅在 tenant 存在时检测数量
+    const recordCounts = tenant
+      ? await Promise.props<{ [name: string]: { total: number; published?: number } }>(
+          _.assign(
+            {},
+            ...entities.map((entity) => ({
+              [entity.entityInfo.name]: Promise.props({
+                // 拥有 运营及管理员 角色这里"应该"可以返回所有的信息
+                total: entity.count({ tenant } as any),
+                published: DBHelper.getPropertyNames(entity).includes('isPublished')
+                  ? entity.count({ tenant, isPublished: true } as any)
+                  : undefined,
+              }),
+            })),
+          ),
+        )
+      : {};
+
+    const filtered = _.assign({}, ...entities.map((entity) => ({ [entity.entityInfo.name]: entity.entityInfo })));
+    return Promise.props({
+      entities: filtered,
+      config,
+      recordCounts,
+      tenant,
+      roles: this.getTenantRoles(admin?.roles),
+    });
+  }
+
+  async getTenantRoles(roles: OrgRole[]): Promise<string[]> {
+    const config = await this.getConfig();
+    const roleNames = _.map(roles, fp.get('name'));
+    const bindRoles = _.compact(_.split(config.bindRoles, ','));
+    const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
+    Logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
+    return results;
+  }
 
   /**
    * @param userId
@@ -30,7 +116,7 @@ export class TenantService {
    */
   async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
     Logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
-    const info = await TenantHelper.info(userId);
+    const info = await this.info(userId);
     if (info.tenant) return info.tenant;
 
     if (_.isEmpty(info.roles)) {
@@ -68,11 +154,41 @@ export class TenantService {
     return user.tenant;
   }
 
+  async getTenantEntities(): Promise<EntityMetadata[]> {
+    const config = await this.getConfig();
+    if (!config.enabled && !config.firstModelBind) return [];
+
+    const filtered = _.flow([
+      fp.filter<EntityMetadata>(
+        (metadata) =>
+          !['kv__pairs', 'auth__users', 'auth__roles', 'wx__users', config.firstModelName].includes(
+            DBHelper.getEntityInfo(metadata)?.name,
+          ),
+      ),
+      fp.filter<EntityMetadata>((metadata) => DBHelper.getPropertyNamesByMetadata(metadata).includes('tenantId')),
+      // remove entities without direct relation
+      fp.filter<EntityMetadata>(
+        (metadata) =>
+          !!metadata.manyToOneRelations.find(
+            (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
+          ),
+      ),
+    ])(DBHelper.loadMetadatas());
+    Logger.debug(
+      `entities waiting for scan ${r({
+        filtered: filtered.length,
+        entityNames: _.map(filtered, fp.get('name')),
+        entityInfoNames: _.map(filtered, (metadata) => DBHelper.getEntityInfo(metadata)?.name),
+      })}`,
+    );
+    return filtered;
+  }
+
   async populateTenantForEntitiesWithNoTenant(): Promise<StatsResult> {
-    const config = await TenantHelper.getConfig();
+    const config = await this.getConfig();
     if (!config.enabled && !config.firstModelBind && !config.firstModelName) return {};
 
-    const filtered = await TenantHelper.getTenantEntities();
+    const filtered = await this.getTenantEntities();
     if (_.isEmpty(filtered)) return {};
 
     const firstModelMetadata = DBHelper.getMetadata(config.firstModelName);
@@ -104,10 +220,10 @@ export class TenantService {
   }
 
   async populateTenantForEntitiesWithOldTenant(): Promise<StatsResult> {
-    const config = await TenantHelper.getConfig();
+    const config = await this.getConfig();
     if (!config.enabled && !config.firstModelBind && !config.firstModelName) return {};
 
-    const filtered = await TenantHelper.getTenantEntities();
+    const filtered = await this.getTenantEntities();
     if (_.isEmpty(filtered)) return {};
 
     const firstModelMetadata = DBHelper.getMetadata(config.firstModelName);
@@ -146,7 +262,7 @@ export class TenantService {
    * @deprecated {@see populateTenantForEntitiesWithOldTenant}
    */
   async populate<E extends { tenant: Tenant; tenantId: string }>(entity: E): Promise<void> {
-    const config = await TenantHelper.getConfig();
+    const config = await this.getConfig();
     if (config.enabled && config.firstModelBind) {
       const { entityInfo } = entity.constructor as any;
 

@@ -1,4 +1,4 @@
-import type { IAsunaContextOpts } from './modules';
+import type { IAsunaContextOpts } from './modules/core/context';
 
 export interface BootstrapOptions {
   // server folder

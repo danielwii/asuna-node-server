@@ -21,7 +21,11 @@ import { DBHelper } from '../core/db';
 import { CursoredPageable, PageInfo, PageRequest, toPage } from '../core/helpers';
 import { resolveRelationsFromInfo, resolveSelectsFromInfo } from '../dataloader/dataloader';
 
+import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
+import type { GraphQLResolveInfo } from 'graphql';
 import type { AbstractCategoryEntity } from '../base';
+import type { PrimaryKey } from '../common';
+import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
 import type {
   CategoryInputQuery,
   CursoredRequestInput,
@@ -29,10 +33,6 @@ import type {
   RelationQueryConditionInput,
   TimeConditionInput,
 } from './input';
-import type { ClassType } from '@danielwii/asuna-helper';
-import type { PrimaryKey } from '../common';
-import type { GraphQLResolveInfo } from 'graphql';
-import type { DataLoaderFunction, DefaultRegisteredLoaders, GraphqlContext } from '../dataloader';
 
 const { Promise } = bluebird;
 
@@ -494,7 +494,8 @@ export class GraphqlHelper {
     // cls: Job;
     // key: string;
   }) {
-    if (!origin) { // @ts-ignore
+    if (!origin) {
+      // @ts-ignore
       return;
     }
 

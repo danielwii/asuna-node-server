@@ -28,19 +28,6 @@ import responseTime from 'response-time';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
-import {
-  AppUpgradeMode,
-  ExchangeCurrencyEnum,
-  KVModelFormatType,
-  KeyValueType,
-  MediaType,
-  Mode,
-  MongoConfigObject,
-  NotificationEnum,
-  NotificationEnumValue,
-  Order,
-  Platform,
-} from './modules';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
 import { AppConfigObject, FeaturesConfigObject, configLoader } from './modules/config';
@@ -50,7 +37,7 @@ import {
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
 } from './modules/content/enum-values';
-import { AsunaContext, Global } from './modules/core';
+import { AsunaContext, Global, KVModelFormatType, KeyValueType, Order } from './modules/core';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
@@ -58,6 +45,11 @@ import { TracingInterceptor } from './modules/tracing';
 
 // add condition function in typeorm find operation
 import './typeorm.fixture';
+
+import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
+import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
+import { ExchangeCurrencyEnum } from './modules/property/enum-values';
+import { MongoConfigObject } from './modules/providers/mongo.config';
 
 import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import type { NestExpressApplication } from '@nestjs/platform-express';

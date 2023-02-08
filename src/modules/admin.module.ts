@@ -28,7 +28,6 @@ import {
 } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
-import { CoreModule } from './core/core.module';
 import { DBModule } from './core/db';
 import { FinderModule } from './core/finder';
 import { InteractionModule } from './core/interaction/interaction.module';
@@ -111,7 +110,7 @@ import { WebModule } from './web';
     TaskController,
     UploaderController,
   ],
-  exports: [AuthModule, DBModule, TokenModule, PropertyModule, PrismaModule],
+  exports: [AuthModule, DBModule, TokenModule, PropertyModule],
 })
 export class AdminInternalModule extends InitContainer implements NestModule, OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

@@ -1,16 +1,16 @@
 import { Logger } from '@nestjs/common';
 import { Field, ID, Int, InterfaceType, ObjectType } from '@nestjs/graphql';
 
-import { deserializeSafely } from '@danielwii/asuna-helper/dist';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import bluebird from 'bluebird';
 import _ from 'lodash';
 
 import { AppDataSource } from '../../datasource';
 
+import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
 import type { EntityManager } from 'typeorm';
 import type { CursoredRequest } from '../../graphql';
-import type { ClassType } from '@danielwii/asuna-helper';
 
 const { Promise } = bluebird;
 

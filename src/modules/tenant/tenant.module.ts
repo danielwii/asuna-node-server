@@ -1,7 +1,7 @@
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Inject, Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
-import { InitContainer } from '@danielwii/asuna-helper';
+import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
@@ -10,16 +10,17 @@ import { fileURLToPath } from 'node:url';
 
 import { ACResource, AccessControlHelper } from '../core/auth';
 import { DBHelper } from '../core/db';
-import { KVGroupFieldsValue, KVModelFormatType, KeyValueType, KvHelper } from '../core/kv';
+import { KVGroupFieldsValue, KVModelFormatType, KeyValueType } from '../core/kv';
+import { KvService } from '../core/kv/kv.service';
 import { RestModule } from '../core/rest/rest.module';
 import { CronHelper } from '../helper';
 import { TenantAuthController } from './auth.controller';
 import { TenantAuthService } from './auth.service';
-import { TenantController } from './controller';
 import { OrgJwtStrategy } from './jwt.strategy';
 import { TenantAdminController } from './mgmt.controller';
+import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
-import { TenantFieldKeys, TenantHelper } from './tenant.helper';
+import { TenantFieldKeys } from './tenant.helper';
 import { TenantService } from './tenant.service';
 
 /**
@@ -42,14 +43,14 @@ import { TenantService } from './tenant.service';
 export class TenantModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  public constructor(private readonly tenantService: TenantService) {
+  public constructor(private readonly kvService: KvService, private readonly tenantService: TenantService) {
     super();
   }
 
   onModuleInit = async () =>
     super.init(async () => {
-      await TenantHelper.preload();
-      this.logger.log(`init... ${r(await TenantHelper.getConfig())}`);
+      await this.tenantService.preload();
+      this.logger.log(`init... ${r(await this.tenantService.getConfig())}`);
 
       await this.initKV();
       await this.initAC();
@@ -62,8 +63,8 @@ export class TenantModule extends InitContainer implements OnModuleInit {
       (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
 
-    KvHelper.regInitializer<KVGroupFieldsValue>(
-      TenantHelper.kvDef,
+    this.kvService.regInitializer<KVGroupFieldsValue>(
+      TenantService.kvDef,
       {
         name: 'Tenant 配置',
         type: KeyValueType.json,
@@ -145,7 +146,7 @@ export class TenantModule extends InitContainer implements OnModuleInit {
   }
 
   async initCron(): Promise<void> {
-    const config = await TenantHelper.getConfig();
+    const config = await this.tenantService.getConfig();
     if (config.enabled) {
       CronHelper.reg(
         'populate-tenant-for-entities-with-no-tenant',

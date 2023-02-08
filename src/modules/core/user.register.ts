@@ -6,8 +6,8 @@ import _ from 'lodash';
 
 import { DBHelper } from './db/db.helper';
 
+import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { BaseEntity } from 'typeorm';
-import type { ConstrainedConstructor } from '@danielwii/asuna-helper';
 import type { UserProfile } from './auth/user.entities';
 
 export class UserRegister {
