@@ -1,14 +1,16 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 
 import _ from 'lodash';
 import fp from 'lodash/fp';
+import { fileURLToPath } from 'node:url';
 import * as R from 'ramda';
 
 import { AppDataSource } from '../../datasource';
-import { TenantHelper } from '../../tenant/tenant.helper';
+import { TenantService } from '../../tenant/tenant.service';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
 import { KvService } from '../kv/kv.service';
@@ -19,7 +21,9 @@ import type { AnyAuthRequest, AuthInfo } from '../../helper/interfaces';
 
 @Injectable()
 export class RestService {
-  public constructor(private readonly kvService: KvService) {}
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly kvService: KvService, private readonly tenantService: TenantService) {}
 
   public async get<T extends BaseEntity>(
     {
@@ -32,11 +36,11 @@ export class RestService {
     { user, tenant, roles }: AnyAuthRequest,
   ): Promise<T> {
     if (!id) throw new NotFoundException();
-    if (tenant) await TenantHelper.checkPermission(user.id as string, model.entityName);
+    if (tenant) await this.tenantService.checkPermission(user.id as string, model.entityName);
     const repository = DBHelper.repo<T>(model);
     const parsedFields = parseFields(fields);
 
-    Logger.log(`get ${r({ profile, model, id, parsedFields, relationsStr })}`);
+    this.logger.log(`get ${r({ profile, model, id, parsedFields, relationsStr })}`);
 
     const queryBuilder = repository.createQueryBuilder(model.model);
 
@@ -44,7 +48,7 @@ export class RestService {
     DBHelper.wrapProfile(model.model, queryBuilder, repository, profile, relationsStr, parsedFields, null);
 
     queryBuilder.whereInIds(id);
-    if (await TenantHelper.tenantSupport(model.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
+    if (await this.tenantService.tenantSupport(model.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
 
     return queryBuilder.getOne();
   }
@@ -53,13 +57,16 @@ export class RestService {
     { model, body }: { model: ModelNameObject; body: T },
     { user, tenant, roles }: AuthInfo,
   ): Promise<T> {
-    Logger.log(`save ${r({ model, body })}`);
+    this.logger.log(`save ${r({ model, body })}`);
     const tenantRelatedFields = {};
     if (tenant) {
-      await TenantHelper.checkPermission(user.id as string, model.entityName);
-      await TenantHelper.checkResourceLimit(user.id as string, model.entityName);
-      _.assign(tenantRelatedFields, (await TenantHelper.tenantSupport(model.entityName, roles)) ? { tenant } : null);
-      const config = await TenantHelper.getConfig();
+      await this.tenantService.checkPermission(user.id as string, model.entityName);
+      await this.tenantService.checkResourceLimit(user.id as string, model.entityName);
+      _.assign(
+        tenantRelatedFields,
+        (await this.tenantService.tenantSupport(model.entityName, roles)) ? { tenant } : null,
+      );
+      const config = await this.tenantService.getConfig();
       if (config.firstModelBind && config.firstModelName) {
         const originSchema = DBHelper.extractOriginAsunaSchemasByModel(model);
         // console.log('one-2-one', originSchema.oneToOneRelations);
@@ -76,17 +83,17 @@ export class RestService {
         }
       }
     }
-    Logger.debug(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
+    this.logger.debug(`save ${r({ user, model, body, tenant, tenantRelatedFields })}`);
     // TODO 类似 kv 这样需要代理给单独处理单元的需要增加可以注册这类处理器的功能
     if (model.model === 'kv__pairs') {
       const pair = KeyValuePair.create(body);
-      Logger.log(`save by kv... ${r(pair)}`);
+      this.logger.log(`save by kv... ${r(pair)}`);
       return (await this.kvService.set(pair)) as any;
     }
 
     const repository = DBHelper.repo(model);
     const relationKeys = repository.metadata.relations.map((relation) => relation.propertyName);
-    Logger.log(`pick ${r({ relationKeys, body })}`);
+    this.logger.log(`pick ${r({ relationKeys, body })}`);
     const relationIds = R.map((value) => (_.isArray(value) ? value.map((id) => ({ id })) : { id: value }))(
       R.pick(relationKeys, body || {}) as any,
     );
@@ -114,7 +121,7 @@ export class RestService {
       .distinct(true)
       .getRawMany();
     const arr = _.compact(_.flatMap(raw, fp.get(column)));
-    Logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
+    this.logger.log(`get unique column ${column} for model ${r(modelNameObject)} is ${r(arr)}`);
     return arr;
   }
 
@@ -142,7 +149,7 @@ export class RestService {
       fp.mapValues((v) => _.assign({}, ...v)), // merge values
       // fp.mapValues(fp.map(fp.omit(field))), // remove duplicated field in value
     )(raw);
-    Logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats })}`);
+    this.logger.debug(`get group counts of column ${column} for model ${r(modelNameObject)}: ${r({ stats })}`);
     return stats;
   }
 }

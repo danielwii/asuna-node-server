@@ -6,7 +6,7 @@ import _ from 'lodash';
 import fp from 'lodash/fp';
 
 import { AppDataSource } from '../../datasource';
-import { named } from '../../helper';
+import { named } from '../../helper/annotations';
 
 import type { BaseEntity } from 'typeorm';
 

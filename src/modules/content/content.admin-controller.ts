@@ -12,12 +12,12 @@ import { fileURLToPath } from 'node:url';
 import { AccessControlHelper, AnyAuthGuard } from '../core/auth';
 import { DBHelper } from '../core/db/db.helper';
 import { RestService } from '../core/rest/rest.service';
-import { TenantHelper } from '../tenant/tenant.helper';
+import { TenantService } from '../tenant/tenant.service';
 import { Draft } from './draft.entities';
 import { FeedbackSenderEnumValue } from './enum-values';
 import { FeedbackReply } from './feedback.entities';
 
-import type { PrimaryKey } from '../common';
+import type { PrimaryKey } from '../common/identifier';
 import type { JsonMap } from '../common/decorators';
 import type { AnyAuthRequest } from '../helper/interfaces';
 import type { FeedbackReplyBody } from './feedback.interface';
@@ -37,7 +37,7 @@ class GetDraftsQuery {
 export class ContentAdminController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  public constructor(private readonly restService: RestService) {}
+  public constructor(private readonly restService: RestService, private readonly tenantService: TenantService) {}
 
   @UseGuards(AnyAuthGuard)
   @Post('draft')
@@ -59,8 +59,8 @@ export class ContentAdminController {
 
     const modelNameObject = DBHelper.getModelNameObject(body.type);
     this.logger.log(`get model ${r(modelNameObject)}`);
-    const isTenantEntity = await TenantHelper.isTenantEntity(modelNameObject.entityName);
-    const hasTenantRoles = await TenantHelper.hasTenantRole(roles);
+    const isTenantEntity = await this.tenantService.isTenantEntity(modelNameObject.entityName);
+    const hasTenantRoles = await this.tenantService.hasTenantRole(roles);
     this.logger.log(`tenant detect ${r({ isTenantEntity, hasTenantRoles })}`);
     if (isTenantEntity && hasTenantRoles) {
       let { refId } = body;
@@ -142,7 +142,7 @@ export class ContentAdminController {
 
     const modelNameObject = DBHelper.getModelNameObject(draft.type);
     const primaryKey = DBHelper.getPrimaryKey(DBHelper.repo(modelNameObject.entityName));
-    const isTenantEntity = await TenantHelper.isTenantEntity(modelNameObject.entityName);
+    const isTenantEntity = await this.tenantService.isTenantEntity(modelNameObject.entityName);
     // const entity = await DBHelper.repo(modelNameObject.entityName).findOne({ where: { id: draft.refId, tenant } });
     this.logger.log(`update ${r({ modelNameObject, primaryKey, isTenantEntity })}`);
     await DBHelper.repo(modelNameObject.entityName).update(draft.refId, { ...draft.content, isPublished: true });

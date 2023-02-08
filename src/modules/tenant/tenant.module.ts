@@ -1,4 +1,4 @@
-import { Inject, Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CronExpression } from '@nestjs/schedule';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
@@ -12,7 +12,6 @@ import { ACResource, AccessControlHelper } from '../core/auth';
 import { DBHelper } from '../core/db';
 import { KVGroupFieldsValue, KVModelFormatType, KeyValueType } from '../core/kv';
 import { KvService } from '../core/kv/kv.service';
-import { RestModule } from '../core/rest/rest.module';
 import { CronHelper } from '../helper';
 import { TenantAuthController } from './auth.controller';
 import { TenantAuthService } from './auth.service';
@@ -20,8 +19,7 @@ import { OrgJwtStrategy } from './jwt.strategy';
 import { TenantAdminController } from './mgmt.controller';
 import { TenantController } from './tenant.controller';
 import { Tenant } from './tenant.entities';
-import { TenantFieldKeys } from './tenant.helper';
-import { TenantService } from './tenant.service';
+import { TenantFieldKeys, TenantService } from './tenant.service';
 
 /**
  * tenant 🤔 默认可以访问所有包含 tenant 信息的表
@@ -36,9 +34,10 @@ import { TenantService } from './tenant.service';
  * tenant 🤔 的所有表理论上对于数据更新应该包含一个状态位，用于管理员进行审核
  */
 @Module({
-  imports: [RestModule],
+  imports: [],
   providers: [TenantService, TenantAuthService, OrgJwtStrategy],
   controllers: [TenantController, TenantAdminController, TenantAuthController],
+  exports: [TenantService],
 })
 export class TenantModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

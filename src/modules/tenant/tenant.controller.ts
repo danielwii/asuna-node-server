@@ -6,10 +6,9 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { fileURLToPath } from 'node:url';
 
 import { JwtAuthGuard } from '../core/auth/auth.guard';
-import { TenantService } from './tenant.service';
+import { TenantInfo, TenantService } from './tenant.service';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
-import type { TenantInfo } from './tenant.helper';
 
 @Controller('api/v1/tenant')
 export class TenantController {

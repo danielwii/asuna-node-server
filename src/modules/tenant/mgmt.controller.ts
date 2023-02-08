@@ -3,8 +3,7 @@ import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { IsOptional, IsString } from 'class-validator';
 
 import { JwtAdminAuthGuard } from '../core/auth/admin-auth.guard';
-import { TenantHelper, TenantInfo } from './tenant.helper';
-import { TenantService } from './tenant.service';
+import { TenantInfo, TenantService } from './tenant.service';
 
 import type { AnyAuthRequest } from '../helper/interfaces';
 import type { Tenant } from './tenant.entities';
@@ -25,7 +24,7 @@ export class TenantAdminController {
   @Get('info')
   async mgmtTenantInfo(@Req() req: AnyAuthRequest): Promise<TenantInfo> {
     const { user, identifier } = req;
-    return TenantHelper.info(user.id);
+    return this.tenantService.info(user.id);
   }
 
   /*

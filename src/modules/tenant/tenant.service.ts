@@ -1,32 +1,84 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
+import {
+  AsunaErrorCode,
+  AsunaException,
+  AsunaExceptionHelper,
+  AsunaExceptionTypes,
+} from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import bluebird from 'bluebird';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import _ from 'lodash';
 import fp from 'lodash/fp';
+import { fileURLToPath } from 'node:url';
 import { EntityMetadata, IsNull, Not } from 'typeorm';
 
 import { CacheManager } from '../cache/cache';
 import { DBHelper } from '../core/db/db.helper';
 import { AsunaCollections, KvDef, KvService } from '../core/kv/kv.service';
-import { RestService } from '../core/rest/rest.service';
 import { WeChatUser } from '../wechat/wechat.entities';
 import { WxConfigApi } from '../wechat/wx.api.config';
 import { OrgRole, OrgUser, Tenant } from './tenant.entities';
-import { TenantConfig, TenantFieldKeys, TenantInfo } from './tenant.helper';
 
 import type { PrimaryKey } from '../common';
+import type { RestService } from '../core';
 import type { StatsResult } from '../stats';
 
 const { Promise } = bluebird;
 
+export class TenantConfig {
+  @IsBoolean() @IsOptional() enabled?: boolean;
+  @IsBoolean() @IsOptional() activeByDefault?: boolean;
+  @IsString() @IsOptional() bindRoles?: string;
+
+  /**
+   * bind 的模型 limit 是 1，和 tenant 形成天然的指代关系。
+   */
+  @IsBoolean() @IsOptional() firstModelBind?: boolean;
+  @IsString() @IsOptional() firstModelField?: string;
+  @IsString() @IsOptional() firstModelName?: string;
+  @IsString() @IsOptional() firstDisplayName?: string;
+
+  constructor(o: TenantConfig) {
+    Object.assign(this, deserializeSafely(TenantConfig, o));
+  }
+}
+
+export interface TenantInfo {
+  config: TenantConfig;
+  tenant: Tenant;
+  roles: string[];
+  recordCounts: { [name: string]: { total: number; published?: number } };
+}
+
+export enum TenantFieldKeys {
+  enabled = 'enabled',
+  activeByDefault = 'active-by-default',
+  bindRoles = 'bindRoles',
+  // 进入页的待创建模型信息
+  firstModelField = 'first.bind-field',
+  firstModelBind = 'first.bind',
+  firstModelName = 'first.model-name',
+  firstDisplayName = 'first.display-name',
+}
+
 @Injectable()
 export class TenantService {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
   public static kvDef: KvDef = { collection: AsunaCollections.SYSTEM_TENANT, key: 'config' };
 
-  public constructor(private readonly kvService: KvService, private readonly restService: RestService) {}
+  private save: RestService['save'];
+
+  public constructor(private readonly kvService: KvService) {}
+
+  public setSaveHandler(fn: RestService['save']) {
+    this.save = fn;
+  }
 
   async getConfig(): Promise<TenantConfig> {
     return CacheManager.default.cacheable(
@@ -66,7 +118,7 @@ export class TenantService {
       // tenant: await (await AdminUser.findOne(userId)).tenant,
     });
 
-    Logger.log(`tenant info for ${r({ admin, config })}`);
+    this.logger.log(`tenant info for ${r({ admin, config })}`);
 
     const { tenant } = admin ?? {};
     const entities = (await DBHelper.getModelsHasRelation(Tenant)).filter(
@@ -105,7 +157,7 @@ export class TenantService {
     const roleNames = _.map(roles, fp.get('name'));
     const bindRoles = _.compact(_.split(config.bindRoles, ','));
     const results = _.compact(_.filter(bindRoles, (role) => _.includes(roleNames, role)));
-    Logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
+    this.logger.debug(`getTenantRoles ${r({ roleNames, bindRoles, results })}`);
     return results;
   }
 
@@ -115,12 +167,12 @@ export class TenantService {
    * @param firstModelPayload 用来新建需要绑定的核心模型数据
    */
   async registerTenant(userId: PrimaryKey, body: Partial<Tenant>, firstModelPayload?: object): Promise<Tenant> {
-    Logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
+    this.logger.log(`registerTenant ${r({ userId, body, firstModelPayload })}`);
     const info = await this.info(userId);
     if (info.tenant) return info.tenant;
 
     if (_.isEmpty(info.roles)) {
-      Logger.warn(`no tenant roles found for user. ${r({ userId, info })}`);
+      this.logger.warn(`no tenant roles found for user. ${r({ userId, info })}`);
       // throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'no tenant roles found for user.');
     }
 
@@ -133,9 +185,9 @@ export class TenantService {
     await user.save();
 
     if (info.config.firstModelBind && info.config.firstModelName && firstModelPayload) {
-      Logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
+      this.logger.log(`bind ${info.config.firstModelName} with tenant ${user.tenant.id}`);
 
-      await this.restService.save(
+      await this.save(
         { model: DBHelper.getModelNameObject(info.config.firstModelName), body: firstModelPayload },
         { user: user, tenant: user.tenant /* roles: admin.roles */ },
       );
@@ -174,7 +226,7 @@ export class TenantService {
           ),
       ),
     ])(DBHelper.loadMetadatas());
-    Logger.debug(
+    this.logger.debug(
       `entities waiting for scan ${r({
         filtered: filtered.length,
         entityNames: _.map(filtered, fp.get('name')),
@@ -203,7 +255,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        Logger.debug(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        this.logger.debug(`noTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -238,7 +290,7 @@ export class TenantService {
         });
         stats[metadata.name] = total;
         const diff = _.filter(items, (item) => item.tenantId !== item[_.camelCase(firstModelMetadata.name)]?.tenantId);
-        Logger.debug(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
+        this.logger.debug(`diffTenant ${metadata.name} items: ${total} diff: ${diff.length}`);
         if (!_.isEmpty(diff)) {
           await Promise.all(
             diff.map((loaded) => {
@@ -269,37 +321,37 @@ export class TenantService {
       if (!entityInfo) return;
 
       const entities = await DBHelper.getModelsHasRelation(Tenant);
-      // Logger.log(`check entities: ${entities}`);
+      // this.logger.log(`check entities: ${entities}`);
       const modelName = entityInfo.name;
       const hasTenantField = entities.find((o) => o.entityInfo.name === modelName);
       if (!hasTenantField) return;
 
-      Logger.debug(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
+      this.logger.debug(`check tenant ${r({ hasTenantField, tenantId: entity.tenantId })}`);
       const metadata = DBHelper.getMetadata(modelName);
       const relation = metadata.manyToOneRelations.find(
         (o) => (o.inverseEntityMetadata.target as any)?.entityInfo?.name === config.firstModelName,
       );
       if (!relation) return;
 
-      Logger.log(
+      this.logger.log(
         `handle ${r(entityInfo)} ${r({
           entity,
           relation: relation.propertyName,
           firstModelName: config.firstModelName,
         })}`,
       );
-      // Logger.log(`get ${relation.propertyName} for ${r(entity)}`);
+      // this.logger.log(`get ${relation.propertyName} for ${r(entity)}`);
       const firstModel = await entity[relation.propertyName];
       if (firstModel) {
-        Logger.log(`get tenant from firstModel ... ${firstModel} ${r(relation.inverseEntityMetadata.target)}`);
+        this.logger.log(`get tenant from firstModel ... ${firstModel} ${r(relation.inverseEntityMetadata.target)}`);
         const tenant = await Tenant.findOne({ where: { [relation.propertyName]: firstModel } });
         // const relationEntity = await (relation.inverseEntityMetadata.target as any).findOne(firstModel, {
         //   relations: ['tenant'],
         // });
-        Logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
+        this.logger.log(`found tenant for relation ${r(firstModel)} ${r(tenant)}`);
         // 没找到关联资源的情况下移除原有的绑定
         // if (!tenant) {
-        //   Logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
+        //   this.logger.error(`no tenant found for firstModelName: ${firstModel}, create one`);
         //   // this.registerTenant()
         //   return;
         // }
@@ -308,8 +360,55 @@ export class TenantService {
         entity.tenant = tenant;
         await (entity as any).save();
       } else {
-        // Logger.error(`tenant column found but firstModelName not detected.`);
+        // this.logger.error(`tenant column found but firstModelName not detected.`);
       }
+    }
+  }
+
+  async isTenantEntity(fullModelName: string): Promise<boolean> {
+    return DBHelper.hasRelation(fullModelName, Tenant);
+  }
+
+  async checkPermission(userId: string, fullModelName: string): Promise<void> {
+    this.logger.log(`check permission for ${r({ userId, fullModelName })}`);
+    if (!(await this.isTenantEntity(fullModelName))) {
+      return;
+    }
+
+    const admin = await OrgUser.findOne({ where: { id: userId as string }, relations: ['roles', 'tenant'] });
+    if (!admin.tenant) {
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.TenantNeeded, []);
+    }
+    if (!admin.tenant.isPublished) {
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.Unpublished, [`tenant: ${admin.tenant.id}`]);
+    }
+
+    const roles = await this.getTenantRoles(admin.roles);
+    if (_.isEmpty(roles)) {
+      throw new AsunaException(AsunaErrorCode.InsufficientPermissions, 'tenant roles needed');
+    }
+  }
+
+  async hasTenantRole(roles: OrgRole[]): Promise<boolean> {
+    return !_.isEmpty(await this.getTenantRoles(roles));
+  }
+
+  async tenantSupport(fullModelName: string, roles: OrgRole[]): Promise<boolean> {
+    const isTenantEntity = await this.isTenantEntity(fullModelName);
+    const hasTenantRoles = await this.hasTenantRole(roles);
+    this.logger.debug(`tenantSupport ${r({ isTenantEntity, hasTenantRoles })}`);
+    return isTenantEntity && hasTenantRoles;
+  }
+
+  async checkResourceLimit(userId: string, fullModelName: string): Promise<void> {
+    const info = await this.info(userId);
+    const count = info.recordCounts[fullModelName];
+    const limit = _.get(info.config, `limit.${fullModelName}`) ?? 1;
+    this.logger.log(
+      `check resource limit: ${r({ info, fullModelName, path: `limit.${fullModelName}`, count, limit })}`,
+    );
+    if (count.total >= limit) {
+      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.ResourceLimit, ['tenant', limit]);
     }
   }
 }

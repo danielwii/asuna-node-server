@@ -8,6 +8,7 @@ import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 // @ts-ignore
+// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 import * as R from 'ramda';
 
@@ -23,25 +24,36 @@ import {
   parseOrder,
   parseWhere,
 } from '../core/db';
-import { KvHelper } from '../core/kv';
+import { KvService } from '../core/kv/kv.service';
 import { RestService } from '../core/rest/rest.service';
-// import { RestHelper } from '../core/rest';
-import { Tenant, TenantHelper } from '../tenant';
+import { Tenant, TenantService } from '../tenant';
 
 import type { BaseEntity, DeleteResult } from 'typeorm';
 import type { AnyAuthRequest } from '../helper';
 
-// import { AdminUser } from '../../core/auth';
-
 export abstract class RestCrudController {
   private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
+  private _kvService: KvService;
   private _restService: RestService;
+  private _tenantService: TenantService;
+  private getKvService() {
+    if (!this._kvService) {
+      this._kvService = AppLifecycle._.getApp().get<KvService>(KvService);
+    }
+    return this._kvService;
+  }
   private getRestService() {
     if (!this._restService) {
       this._restService = AppLifecycle._.getApp().get<RestService>(RestService);
     }
     return this._restService;
+  }
+  private getTenantService() {
+    if (!this._tenantService) {
+      this._tenantService = AppLifecycle._.getApp().get<TenantService>(TenantService);
+    }
+    return this._tenantService;
   }
 
   // TODO module or prefix may not needed in future
@@ -119,7 +131,7 @@ export abstract class RestCrudController {
     @Query('relations') relationsStr?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
-    if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
+    if (tenant) await this.getTenantService().checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
@@ -151,7 +163,8 @@ export abstract class RestCrudController {
 
     if (filterWheres) queryBuilder.andWhere(filterWheres as any);
 
-    if (await TenantHelper.tenantSupport(modelName.entityName, roles)) queryBuilder.andWhere({ tenant } as any);
+    if (await this.getTenantService().tenantSupport(modelName.entityName, roles))
+      queryBuilder.andWhere({ tenant } as any);
 
     const [items, total] = await queryBuilder.take(query.take).skip(query.skip).getManyAndCount();
 
@@ -187,7 +200,7 @@ export abstract class RestCrudController {
     @Param('id') id: PrimaryKey,
   ): Promise<DeleteResult> {
     const modelName = DBHelper.getModelNameObject(model, this.module);
-    if (tenant) await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
+    if (tenant) await this.getTenantService().checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     return repository.delete(id);
   }
@@ -217,14 +230,14 @@ export abstract class RestCrudController {
     // const whereOptions = { [primaryKey]: id };
     const whereOptions = {};
     if (tenant) {
-      await TenantHelper.checkPermission(admin.id as string, modelName.entityName);
-      if (await TenantHelper.tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
+      await this.getTenantService().checkPermission(admin.id as string, modelName.entityName);
+      if (await this.getTenantService().tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
     }
     this.superLogger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
       this.superLogger.log('update by kv...');
-      return KvHelper.update(id as any, updateTo.name, updateTo.type, updateTo.value);
+      return this.getKvService().update(id as any, updateTo.name, updateTo.type, updateTo.value);
     }
 
     const repository = DBHelper.repo(modelName);
