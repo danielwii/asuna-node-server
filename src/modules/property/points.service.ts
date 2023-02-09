@@ -1,18 +1,21 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import fp from 'lodash/fp';
+import { fileURLToPath } from 'node:url';
 import { MoreThan } from 'typeorm';
 
 import { UserProfile } from '../core/auth';
-import { KvHelper } from '../core/kv';
 import { Wallet } from './financial.entities';
 import { HermesPointChangeEventKeys, PointExchange } from './points.entities';
 import { PropertyHelper } from './property.helper';
+
+import type { KvService } from '../core/kv/kv.service';
 
 export interface PointChangeEventPayload {
   point: number;
@@ -26,15 +29,20 @@ export interface VipVideoExchangeBody {
   uuid: string;
 }
 
-export class PointsHelper {
-  public static async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
+@Injectable()
+export class PointsService {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
+  public constructor(private readonly kvService: KvService) {}
+
+  public async exchangeVipVideo(uuid: string, profileId: string): Promise<PointExchange> {
     const exists = await PointExchange.findOneBy(
       PointExchange.of({ type: 'vipVideoExchange', profileId, refId: uuid }) as any,
     );
     Logger.log(`pointExchange ${r(exists)}`);
     if (exists) return exists;
 
-    const cost = await KvHelper.getValueByGroupFieldKV(PropertyHelper.kvDef, 'vipVideoExchange');
+    const cost = await this.kvService.getValueByGroupFieldKV(PropertyHelper.kvDef, 'vipVideoExchange');
     const current = await UserProfile.findOne({ where: { id: profileId } as any, relations: ['wallet'] });
     if (!current.wallet) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, `not enough points: 0`);
@@ -64,11 +72,11 @@ export class PointsHelper {
     return exchange;
   }
 
-  public static async checkExchange(type: string, profileId: string, body: any): Promise<PointExchange> {
+  public async checkExchange(type: string, profileId: string, body: any): Promise<PointExchange> {
     return PointExchange.findOneBy(PointExchange.of({ type, profileId, body: JSON.stringify(body) }) as any);
   }
 
-  public static async getPointsByType(
+  public async getPointsByType(
     type: string,
     profileId: string,
     after?: Date,
@@ -77,12 +85,7 @@ export class PointsHelper {
     return { total: _.sum(_.map(items, fp.get('change'))), items };
   }
 
-  public static async savePoints(
-    change: number,
-    type: string,
-    profileId: string,
-    remark: string,
-  ): Promise<PointExchange> {
+  public async savePoints(change: number, type: string, profileId: string, remark: string): Promise<PointExchange> {
     Logger.log(`savePoints ${r({ change, type, profileId, remark })}`);
     const profile = await UserProfile.findOneOrFail({ where: { id: profileId } as any, relations: ['wallet'] });
     if (!profile.wallet) {
@@ -99,17 +102,17 @@ export class PointsHelper {
     return exchange;
   }
 
-  public static async handlePoints(
+  public async handlePoints(
     type: string,
     profileId: string,
     event: string,
     change?: number,
     remark?: string,
   ): Promise<void> {
-    const point = (await KvHelper.getValueByGroupFieldKV(PropertyHelper.kvDef, type)) || change;
+    const point = (await this.kvService.getValueByGroupFieldKV(PropertyHelper.kvDef, type)) || change;
     Logger.log(`get point ${r({ point, change })}`);
     if (_.isNumber(point)) {
-      Hermes.emit<PointChangeEventPayload>(PointsHelper.name, HermesPointChangeEventKeys.pointsChange, {
+      Hermes.emit<PointChangeEventPayload>(this.constructor.name, HermesPointChangeEventKeys.pointsChange, {
         point,
         type,
         event,

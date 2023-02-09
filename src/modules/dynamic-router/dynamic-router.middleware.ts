@@ -1,16 +1,19 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
 import { resolve } from 'node:path';
 
-import { DynamicRouterHelper } from './dynamic-router.helper';
+import { DynamicRouterService } from './dynamic-router.service';
 
 import type { NestMiddleware } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
+@Injectable()
 export class DynamicRouterMiddleware implements NestMiddleware {
+  constructor(private readonly dynamicRouterService: DynamicRouterService) {}
+
   async use(req: Request, res: Response, next: () => void): Promise<void> {
     /*
     logger.log(
@@ -21,7 +24,7 @@ export class DynamicRouterMiddleware implements NestMiddleware {
     logger.log(`use ${r(Object.keys(req))}`);
 */
 
-    const config = await DynamicRouterHelper.getConfig();
+    const config = await this.dynamicRouterService.getConfig();
 
     const found = _.find(config?.textRouter, (field) => resolve(`/${field.path}`) === req.baseUrl);
     if (found) {

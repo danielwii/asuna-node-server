@@ -167,19 +167,19 @@ export type ConstantsKeys = 'WXMessageIds';
  * @deprecated use {@link KvService}
  */
 export class KvHelper {
-  private static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
+  // private static initializers: { [key: string]: () => Promise<KeyValuePair> } = {};
   // static registerForms: { [identifier: string]: any } = {};
   // static constantMaps: { [key: string]: { [name: string]: string } } = {};
-  public static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
+  // public static constantKvDef: KvDef = { collection: AsunaCollections.APP_SETTINGS, key: 'constants' };
+  // private static constantMapsPair: KeyValuePair;
+  // private static enumValueConstantMapsPair: KeyValuePair;
 
-  private static constantMapsPair: KeyValuePair;
-  private static enumValueConstantMapsPair: KeyValuePair;
-
-  /**
+/*
+  /!**
    * call syncMergedConstants to sync constants
    * @param key
    * @param constantMap
-   */
+   *!/
   public static async mergeConstantMaps(
     key: ConstantsKeys | string,
     constantMap: { [name: string]: string },
@@ -197,11 +197,13 @@ export class KvHelper {
     // return KvHelper.set(pair);
     return KvHelper.constantMapsPair;
   }
+*/
 
-  /**
+/*
+  /!**
    * call syncMergedConstants to sync constants
    * @param enumValue
-   */
+   *!/
   public static async mergeConstantMapsForEnumValue(enumValue: EnumValueStatic): Promise<KeyValuePair> {
     const value = { [enumValue.key]: enumValue.data };
     if (!KvHelper.enumValueConstantMapsPair) {
@@ -216,7 +218,9 @@ export class KvHelper {
     // return KvHelper.set(pair);
     return KvHelper.enumValueConstantMapsPair;
   }
+*/
 
+/*
   public static async syncMergedConstants(): Promise<void> {
     Logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
     if (KvHelper.constantMapsPair) {
@@ -227,12 +231,16 @@ export class KvHelper {
       await KvHelper.set(KvHelper.enumValueConstantMapsPair);
     }
   }
+*/
 
+/*
   public static async reInitInitializer(kvDef: KvDef) {
     const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
     if (initializer) await initializer();
   }
+*/
 
+/*
   public static regInitializer<V = KVGroupFieldsValue>(
     kvDef: KvDef,
     opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
@@ -242,6 +250,7 @@ export class KvHelper {
     KvHelper.initializers[identifier] = (): Promise<KeyValuePair> => KvHelper.set<V>({ ...kvDef, ...opts }, config);
     KvHelper.initializers[identifier]();
   }
+*/
 
   public static async set<V = any>(
     opts: { collection?: string; key: string; name?: string; type?: KeyValueType; value?: V; extra?: any },
@@ -403,10 +412,12 @@ export class KvHelper {
     }
   }
 
+/*
   public static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
     const value = (await KvHelper.get(kvDef))?.value;
     return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value, strategy: 'cache-first' });
   }
+*/
 
   private static async getGroupFieldsValueByFieldKV(
     kvDef: KvDef,

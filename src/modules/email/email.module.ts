@@ -7,7 +7,9 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { fileURLToPath } from 'node:url';
 
 import { ContentfulModule } from '../contentful';
-import { KeyValueType, KVGroupFieldsValue, KvHelper, KVModelFormatType } from '../core/kv';
+import { KeyValueType } from '../core/kv/kv.entities';
+import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
+import { KVGroupFieldsValue, KvService } from '../core/kv/kv.service';
 import { EmailTmplConfigKeys } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
 import { EmailController } from './email.controller';
@@ -23,6 +25,10 @@ import { EmailService } from './email.service';
 export class EmailModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
+  public constructor(private readonly kvService: KvService) {
+    super();
+  }
+
   public onModuleInit = async (): Promise<void> =>
     this.init(async () => {
       this.logger.log(`init... ${r({ config: EmailConfigObject.load() })}`);
@@ -37,7 +43,7 @@ export class EmailModule extends InitContainer implements OnModuleInit {
     });
 
   public async initKV(): Promise<void> {
-    KvHelper.regInitializer<KVGroupFieldsValue>(
+    this.kvService.regInitializer<KVGroupFieldsValue>(
       EmailHelper.kvDef,
       {
         name: '邮件配置',
@@ -63,7 +69,7 @@ export class EmailModule extends InitContainer implements OnModuleInit {
       },
       { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
     );
-    KvHelper.regInitializer<KVGroupFieldsValue>(
+    this.kvService.regInitializer<KVGroupFieldsValue>(
       EmailHelper.tmplKvDef,
       {
         name: '邮件模版配置',

@@ -3,7 +3,7 @@ export * from './enum-values';
 export * from './exchange.entities';
 export * from './financial.entities';
 export * from './points.entities';
-export * from './points.helper';
+export * from './points.service';
 export * from './property.helper';
 export * from './property.module';
 export * from './property.resolver';

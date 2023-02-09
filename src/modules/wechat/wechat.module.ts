@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 
 import { AdminUser } from '../core/auth/auth.entities';
 import { KeyValueType } from '../core/kv/kv.entities';
-import { KVGroupFieldsValue, KvHelper } from '../core/kv/kv.helper';
 import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
+import { KVGroupFieldsValue, KvService } from '../core/kv/kv.service';
 import { CronHelper } from '../helper';
 import { WeChatController } from './wechat.controller';
 import { WXEventMessageHelper, WXSubscribedQrSceneMessage, WeChatHelper } from './wechat.helper';
@@ -27,6 +27,10 @@ import { WeChatFieldKeys, WxConfigApi } from './wx.api.config';
 export class WeChatModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
+  public constructor(private readonly kvService: KvService) {
+    super();
+  }
+
   async onModuleInit(): Promise<void> {
     return super.init(async () => {
       await this.initKV();
@@ -36,7 +40,7 @@ export class WeChatModule extends InitContainer implements OnModuleInit {
   }
 
   async initKV(): Promise<void> {
-    KvHelper.regInitializer<KVGroupFieldsValue>(
+    this.kvService.regInitializer<KVGroupFieldsValue>(
       WxConfigApi.kvDef,
       {
         name: '微信配置',
