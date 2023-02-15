@@ -8,11 +8,10 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
 
-import { ACResource, AccessControlHelper } from '../core/auth';
-import { DBHelper } from '../core/db';
-import { KVGroupFieldsValue, KVModelFormatType, KeyValueType } from '../core/kv';
-import { KvService } from '../core/kv/kv.service';
-import { CronHelper } from '../helper';
+import { ACResource, AccessControlHelper } from '../core/auth/access-control.helper';
+import { DBHelper } from '../core/db/db.helper';
+import { KVGroupFieldsValue, KVModelFormatType, KeyValueType, KvService } from '../core/kv';
+import { CronHelper } from '../helper/cron';
 import { TenantAuthController } from './auth.controller';
 import { TenantAuthService } from './auth.service';
 import { OrgJwtStrategy } from './jwt.strategy';

@@ -5,21 +5,22 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import EmailTemplate from 'email-templates';
 import _ from 'lodash';
-import { createTransport, SentMessageInfo, Transporter } from 'nodemailer';
 import path from 'node:path';
-import { Observable, of, Subject } from 'rxjs';
+import { SentMessageInfo, Transporter, createTransport } from 'nodemailer';
+import { Observable, Subject, of } from 'rxjs';
 import { concatMap, delay } from 'rxjs/operators';
 
-import { DynamicConfigKeys, DynamicConfigs } from '../config';
-import { AsunaCollections, KvDef, KvHelper } from '../core/kv/kv.helper';
+import { DynamicConfigKeys, DynamicConfigs } from '../config/dynamic_configs';
+import { KvHelper } from '../core/kv/kv.helper';
+import { AsunaCollections, KvDef } from '../core/kv/kv.service';
 import { MinioConfigObject, QiniuConfigObject, StorageMode } from '../core/storage';
 import { WeChatHelper } from '../wechat/wechat.helper';
 import { EmailTmplConfigKeys, EmailTmplConfigObject } from './email-tmpl.config';
 import { EmailConfigKeys, EmailConfigObject } from './email.config';
-import { isMailAttachment, MailInfo } from './email.interface';
+import { MailInfo, isMailAttachment } from './email.interface';
 
-import type * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 import type { Attachment, Options } from 'nodemailer/lib/mailer';
+import type * as SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 // type SendAction = { future: () => Promise<any> };
 

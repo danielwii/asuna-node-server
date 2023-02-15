@@ -23,14 +23,13 @@ import { AuthUserChannel } from '../core/auth/base.entities';
 import { UserProfile } from '../core/auth/user.entities';
 import { AuthedUserHelper } from '../core/auth/user.helper';
 import { PageHelper } from '../core/helpers/page.helper';
-import { AsunaCollections, KvDef } from '../core/kv/kv.helper';
+import { AsunaCollections, KvDef } from '../core/kv/kv.service';
 import { Store } from '../store';
-import { AdminWsHelper } from '../ws';
-import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
+import { AdminWsHelper } from '../ws/socket-io.gateway';
+import { WXMiniAppUserInfo, WeChatUser } from './wechat.entities';
 import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
 import { WxConfigApi } from './wx.api.config';
 
-import type { WxUserInfo } from './wx.vo';
 import type { Request } from 'express';
 import type { WXJwtPayload } from './interfaces';
 import type {
@@ -42,6 +41,7 @@ import type {
   WxQrTicketInfo,
   WxSendTemplateInfo,
 } from './wx.interfaces';
+import type { WxUserInfo } from './wx.vo';
 
 const { Promise } = bluebird;
 

@@ -2,11 +2,8 @@ import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
-import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
-import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
 import bluebird from 'bluebird';
-import { IsString } from 'class-validator';
 import _ from 'lodash';
 import fp from 'lodash/fp';
 
@@ -18,150 +15,9 @@ import { AdminUser } from '../auth/auth.entities';
 import { AdminUserIdentifierHelper } from '../auth/identifier';
 import { KeyValuePair, KeyValueType } from './kv.entities';
 import { KVModelFormatType, KeyValueModel } from './kv.isolated.entities';
-
-import type { IdentifierHelper } from '../../common/identifier';
-import type { EnumValueStatic } from '../../enum-values';
+import { AsunaCollectionPrefix, KVField, KVGroupFieldsValue, KvDef, recognizeTypeValue } from './kv.service';
 
 const { Promise } = bluebird;
-
-const castToBoolean = (value): boolean => value === 'true';
-const isJson = (value): boolean => {
-  try {
-    JSON.parse(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
-const toJson = (value): JSON => {
-  try {
-    return JSON.parse(value);
-  } catch (error) {
-    Logger.error(`${r({ value })} toJson error: ${r(error)}`);
-    return value;
-  }
-};
-
-export interface KVField {
-  name: string;
-  type:
-    | 'number'
-    | 'string'
-    | 'stringArray'
-    | 'text'
-    | 'json'
-    | 'image'
-    | 'color'
-    | 'wxSubscribeData'
-    | 'wxTmplData'
-    | 'emailTmplData'
-    | 'boolean';
-  help?: string;
-  required?: boolean;
-  defaultValue?: boolean | number | string;
-}
-
-export interface KVFields {
-  [key: string]: {
-    name: string;
-    field: KVField;
-  };
-}
-
-export interface KVGroupFields {
-  [groupKey: string]: {
-    name?: string;
-    fields: {
-      /**
-       * name 在整个 KVGroupFields 中必须唯一
-       */
-      name: string;
-      field: KVField;
-    }[];
-  };
-}
-
-export interface KVListFieldsValue<V> {
-  type: string;
-  fields: { name?: string; field: KVField }[];
-  values: V[];
-}
-
-export interface KVFieldsValue {
-  fields: Record<string, KVField>;
-  values: any;
-}
-
-export interface KVGroupFieldsValue {
-  form?: KVGroupFields;
-  values: any;
-}
-
-export function recognizeTypeValue(type: KeyValueType, value: any): [KeyValueType, string] {
-  let newType = type;
-  let newValue = value;
-  if (type) {
-    if (Object.values(KeyValueType).includes(type)) {
-      if (type === KeyValueType.boolean) {
-        newValue = castToBoolean(value);
-      } else if (type === KeyValueType.number) {
-        newValue = Number(value);
-      } else if (['json', 'images', 'videos'].includes(type)) {
-        newValue = _.isString(value) ? toJson(value) : value;
-      }
-    }
-  } else if (value === 'true' || value === 'false') {
-    newType = KeyValueType.boolean;
-    newValue = castToBoolean(value);
-  } else if (!_.isNaN(Number(value))) {
-    newType = KeyValueType.number;
-    newValue = Number(value);
-  } else if (isJson(value)) {
-    newType = KeyValueType.json;
-    newValue = toJson(value);
-  }
-  // Logger.log(`recognizeTypeValue ${r({ type, value, newType, newValue })}`);
-  return [newType || KeyValueType.string, newValue];
-}
-
-export enum AsunaCollectionPrefix {
-  // 限制只有管理员可以访问该前缀的 kv
-  SYSTEM = 'SYSTEM',
-  // 目前不限制权限
-  APP = 'APP',
-}
-
-export const AsunaCollections = {
-  SYSTEM_MIGRATIONS: 'system.migrations',
-  SYSTEM_EMAIL: 'system.email',
-  SYSTEM_SERVER: 'system.server',
-  SYSTEM_WECHAT: 'system.wechat',
-  SYSTEM_DYNAMIC_ROUTER: 'system.dynamic-router',
-  SYSTEM_TENANT: 'system.tenant',
-  APP_SETTINGS: 'app.settings',
-  THIRD_SETTINGS: '3rd.settings',
-};
-
-export class KvDef {
-  @IsString() public collection: string;
-  @IsString() public key: string;
-
-  public constructor(o: KvDef) {
-    Object.assign(this, deserializeSafely(KvDef, o));
-  }
-}
-
-@StaticImplements<IdentifierHelper<KvDef>>()
-export class KvDefIdentifierHelper {
-  public static parse = (identifier: string): KvDef => ({
-    collection: identifier.split('#')[0],
-    key: identifier.split('#')[1],
-  });
-
-  public static stringify = (payload: KvDef): string => `${payload.collection}#${payload.key}`;
-}
-
-export type ConstantsKeys = 'WXMessageIds';
 
 /**
  * @deprecated use {@link KvService}
@@ -174,7 +30,7 @@ export class KvHelper {
   // private static constantMapsPair: KeyValuePair;
   // private static enumValueConstantMapsPair: KeyValuePair;
 
-/*
+  /*
   /!**
    * call syncMergedConstants to sync constants
    * @param key
@@ -199,7 +55,7 @@ export class KvHelper {
   }
 */
 
-/*
+  /*
   /!**
    * call syncMergedConstants to sync constants
    * @param enumValue
@@ -220,7 +76,7 @@ export class KvHelper {
   }
 */
 
-/*
+  /*
   public static async syncMergedConstants(): Promise<void> {
     Logger.log(`merge constants ${r(KvHelper.constantMapsPair)}`);
     if (KvHelper.constantMapsPair) {
@@ -233,14 +89,14 @@ export class KvHelper {
   }
 */
 
-/*
+  /*
   public static async reInitInitializer(kvDef: KvDef) {
     const initializer = KvHelper.initializers[KvDefIdentifierHelper.stringify(kvDef)];
     if (initializer) await initializer();
   }
 */
 
-/*
+  /*
   public static regInitializer<V = KVGroupFieldsValue>(
     kvDef: KvDef,
     opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
@@ -412,7 +268,7 @@ export class KvHelper {
     }
   }
 
-/*
+  /*
   public static async preload(kvDef: KvDef): Promise<KVGroupFieldsValue> {
     const value = (await KvHelper.get(kvDef))?.value;
     return CacheWrapper.do({ prefix: 'kv', key: kvDef, resolver: async () => value, strategy: 'cache-first' });

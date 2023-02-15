@@ -7,7 +7,7 @@ import { TenantModule } from '../tenant/tenant.module';
 import { ContentAdminController } from './content.admin-controller';
 import { ContentController } from './content.controller';
 import { FeedbackQueryResolver, UserFeedbackResolver } from './feedback.resolver';
-import { NotificationModule } from './notification';
+import { NotificationModule } from './notification/notification.module';
 import { ContentQueryResolver } from './resolver';
 
 @Module({

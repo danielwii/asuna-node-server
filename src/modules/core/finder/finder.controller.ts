@@ -39,7 +39,7 @@ export class FinderController {
       throw new AsunaException(AsunaErrorCode.BadRequest, 'params error');
     }
 
-    const queryParam = querystring.parse(encrypt ? Cryptor.desDecrypt(query) : query) as any;
+    const queryParam = querystring.parse(encrypt ? Cryptor.encrypt(query) : query) as any;
     this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
@@ -80,7 +80,7 @@ export class ShortFinderController {
       throw new AsunaException(AsunaErrorCode.InvalidParameter, 'invalid param');
     }
 
-    const queryParam = querystring.parse(encrypt === true ? Cryptor.desDecrypt(query) : query) as any;
+    const queryParam = querystring.parse(encrypt === true ? Cryptor.encrypt(query) : query) as any;
     this.logger.log(`query ${r(queryParam)} with ${type}`);
 
     const { name, path } = queryParam;
