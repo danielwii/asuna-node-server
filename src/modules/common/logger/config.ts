@@ -1,9 +1,8 @@
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
-
 import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../../config/loader';
+import { ConfigKeys } from '../../core/config';
 
 export type LogLevel = 'info' | 'debug' | 'verbose' | 'warn' | 'error';
 

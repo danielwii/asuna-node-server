@@ -1,15 +1,15 @@
 import { CacheModule, Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
-import { fileURLToPath } from 'node:url';
 
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client';
@@ -28,6 +28,7 @@ import {
 } from './core';
 import { ApiController } from './core/api.controller';
 import { AuthModule } from './core/auth/auth.module';
+import { ConfigKeys } from './core/config';
 import { DBModule } from './core/db';
 import { FinderModule } from './core/finder';
 import { InteractionModule } from './core/interaction/interaction.module';

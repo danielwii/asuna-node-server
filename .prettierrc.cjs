@@ -6,7 +6,7 @@ module.exports = {
   trailingComma: 'all',
   singleQuote: true,
   importOrderTypeImportsToBottom: true,
-  importOrder: ['^@nestjs/(.*)$', '^@danielwii/(.*)$', '^@local/(.*)$', '^([a-zA-Z].*)', '^[./]'],
+  importOrder: ['^@nestjs/(.*)$', '^@danielwii/(.*)$', '^@local/(.*)$', '([a-zA-Z].:.*)', '^([a-zA-Z].*)', '^[./]'],
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
   importOrderMergeDuplicateImports: true,
   importOrderSeparation: true,

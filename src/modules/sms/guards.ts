@@ -1,13 +1,15 @@
 import { CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 
-import { AsunaExceptionHelper, AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
+import { AsunaHelper } from '@danielwii/asuna-helper/dist/asuna';
+import { AsunaExceptionTypes } from '@danielwii/asuna-helper/dist/exceptions';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+
+import { fileURLToPath } from 'node:url';
 
 import { SMSConfigObject } from './config';
 import { SMSHelper } from './helper';
 
 import type { JwtAuthRequest } from '../core/auth';
-import { fileURLToPath } from 'node:url';
 
 export class SMSVerifyCodeGuard implements CanActivate {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
@@ -29,13 +31,13 @@ export class SMSVerifyCodeGuard implements CanActivate {
     this.logger.log(`check url: ${req.url} - ${token}`);
 
     if (!token) {
-      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidToken, ['验证码错误']);
+      throw AsunaHelper.Ex.genericException(AsunaExceptionTypes.InvalidToken, ['验证码错误']);
     }
 
     const exists = await SMSHelper.redeemVerifyCode(req, token);
     if (!exists) {
       // throw new AsunaException(AsunaErrorCode.InvalidVerifyToken);
-      throw AsunaExceptionHelper.genericException(AsunaExceptionTypes.InvalidToken, ['验证码无效']);
+      throw AsunaHelper.Ex.genericException(AsunaExceptionTypes.InvalidToken, ['验证码无效']);
     }
 
     return true;

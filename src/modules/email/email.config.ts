@@ -1,4 +1,3 @@
-import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP3 } from '@danielwii/asuna-helper/dist/utils';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
@@ -6,6 +5,7 @@ import { Expose, Transform } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
+import { YamlConfigKeys } from '../core/config';
 
 export enum EmailConfigKeys {
   enable = 'enable',

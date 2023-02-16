@@ -1,16 +1,17 @@
 import { Logger } from '@nestjs/common';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { configLoader } from '../config';
+import { ConfigKeys } from './config';
 import { Global } from './global';
 import {
   AliossConfigObject,

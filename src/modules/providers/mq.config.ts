@@ -1,11 +1,11 @@
 import { Logger } from '@nestjs/common';
 
-import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { Expose, plainToInstance, Transform } from 'class-transformer';
+import { Expose, Transform, plainToInstance } from 'class-transformer';
 
 import { configLoader } from '../config/loader';
+import { YamlConfigKeys } from '../core/config';
 
 export enum MQConfigKeys {
   enable = 'enable',

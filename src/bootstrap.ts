@@ -5,12 +5,13 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { getClientIp } from '@danielwii/asuna-helper/dist/req';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
+
+import { fileURLToPath } from 'node:url';
 
 import compression from 'compression';
 import RedisStoreCreator from 'connect-redis';
@@ -23,7 +24,6 @@ import figlet from 'figlet';
 import helmet from 'helmet';
 import _ from 'lodash';
 import morgan from 'morgan';
-import { fileURLToPath } from 'node:url';
 import responseTime from 'response-time';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
@@ -48,6 +48,7 @@ import './typeorm.fixture';
 
 import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
 import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
+import { ConfigKeys } from './modules/core/config';
 import { ExchangeCurrencyEnum } from './modules/property/enum-values';
 import { MongoConfigObject } from './modules/providers/mongo.config';
 

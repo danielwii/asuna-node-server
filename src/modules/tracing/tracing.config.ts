@@ -1,14 +1,15 @@
 import { Logger } from '@nestjs/common';
 
-import { YamlConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { withP } from '@danielwii/asuna-helper/dist/utils';
+
+import { fileURLToPath } from 'node:url';
 
 import { plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
-import { fileURLToPath } from 'node:url';
+import { YamlConfigKeys } from '../core/config';
 
 export enum TracingConfigKeys {
   enabled = 'enabled',

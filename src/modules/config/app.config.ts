@@ -1,6 +1,6 @@
-import { AbstractConfigLoader, YamlConfigKeys, ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
+import { AbstractConfigLoader, ConfigKeys, YamlConfigKeys } from '../core/config';
 import { configLoader } from './loader';
 
 export enum AppConfigKeys {

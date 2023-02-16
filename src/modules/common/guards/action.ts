@@ -3,7 +3,8 @@ import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/commo
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
+
 import qs from 'qs';
 
 import { InMemoryDB } from '../../cache/db';

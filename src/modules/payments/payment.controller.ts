@@ -5,11 +5,11 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { IsBoolean, IsDefined, IsOptional, IsString, isURL } from 'class-validator';
 import * as _ from 'lodash';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 
-import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from '../core/auth';
+import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from '../core/auth/auth.guard';
 import { SMSVerifyCodeGuard } from '../sms/guards';
-import { WeChatHelper } from '../wechat';
+import { WeChatHelper } from '../wechat/wechat.helper';
 import { PaymentHelper } from './payment.helper';
 import { PaymentNotifyHelper } from './payment.notify';
 

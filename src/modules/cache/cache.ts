@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 
-import { resolveModule } from '@danielwii/asuna-helper';
-import { fnResolve, FutureResolveType } from '@danielwii/asuna-helper/dist/promise';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
+import { FutureResolveType, fnResolve } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';

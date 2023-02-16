@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { configLoader } from '../../../config';
+import { ConfigKeys } from '../../config';
 import { AdminAuthService } from '../admin-auth.service';
 
 import type { JwtPayload } from '../auth.interfaces';

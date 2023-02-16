@@ -3,7 +3,6 @@ import * as Tracing from '@sentry/tracing';
 
 import { BeforeApplicationShutdown, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 
-import { ConfigKeys } from '@danielwii/asuna-helper/dist/config';
 import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
@@ -11,16 +10,18 @@ import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/prov
 import { LifecycleRegister } from '@danielwii/asuna-helper/dist/register';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import elasticApmNode from 'elastic-apm-node';
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import { fileURLToPath } from 'node:url';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
 import { FeaturesConfigObject, configLoader } from './modules/config';
 import { SentryConfigObject } from './modules/config/sentry.config';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
+import { ConfigKeys } from './modules/core/config';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
 import { PrismaService } from './modules/prisma/service';
