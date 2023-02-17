@@ -4,16 +4,18 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { FutureResolveType, fnResolve } from '@danielwii/asuna-helper/dist/promise';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import _ from 'lodash';
 import LRUCache from 'lru-cache';
-import { fileURLToPath } from 'node:url';
 
 import { CacheTTL } from './constants';
 
 const caches = new Map<string, LRUCache<string, any>>();
+
 export class CacheManager {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
-  public static default = new CacheManager('default');
+  public static readonly default = new CacheManager('default');
 
   private readonly cache: LRUCache<string, any>;
 

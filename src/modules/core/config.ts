@@ -104,8 +104,15 @@ export interface ConfigureLoader<T> {
 }
 
 export const ConfigureLoader =
-  (key: YamlConfigKeys, keys, object) =>
+  <Keys extends Record<string, any>>(
+    key: YamlConfigKeys,
+    keys: Keys,
+    object,
+    loadDefaultValue?: () => { [p in keyof Keys]?: any },
+  ) =>
   <T extends new (...args: any[]) => {}>(constructor: T) => {
+    const defaultValue = loadDefaultValue?.() ?? ({} as { [p in keyof Keys]?: any });
+
     @singleton
     class SingletonClass extends constructor {
       public load = () =>
@@ -117,10 +124,11 @@ export const ConfigureLoader =
           (loader, keys) =>
             deserializeSafely(
               object,
-              _.mapValues(keys, (key) => loader(key)),
+              _.mapValues(keys, (key) => loader(key) ?? defaultValue[key]),
             ),
         );
       // );
     }
+
     return SingletonClass;
   };

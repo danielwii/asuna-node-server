@@ -90,7 +90,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    let processed = exception;
+    let processed = _.omit(exception, 'options');
 
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
@@ -129,15 +129,15 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (res.writableEnded) return;
 
-    let body;
-    let message;
+    let body: { error: Partial<AsunaException> };
+    let message: string;
 
     if (R.is(HttpException, processed)) {
       const key = _.isString(exceptionResponse.message) ? 'message' : 'errors';
       message = exceptionResponse.message;
       const error: Partial<AsunaException> = {
-        httpStatus,
-        name: exceptionResponse.error,
+        // httpStatus,
+        message: exceptionResponse.error,
         code: exceptionResponse.code,
         [key]: message,
         // raw: processed,
@@ -146,10 +146,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
     } else if (R.is(Error, processed) && !R.is(AsunaException, processed)) {
       message = processed.message;
       const error: Partial<AsunaException> = {
-        httpStatus,
-        name: processed.name || AsunaErrorCode.Unexpected__do_not_use_it.name,
+        // httpStatus,
+        message: processed.name || AsunaErrorCode.Unexpected__do_not_use_it.name,
         code: `${(processed as any).code || AsunaErrorCode.Unexpected__do_not_use_it.value}`,
-        message,
+        // message,
         // raw: processed,
       };
       body = { error };
@@ -157,8 +157,8 @@ export class AnyExceptionFilter implements ExceptionFilter {
       message = processed.message;
       body = {
         error: {
-          ...(processed as AsunaException),
-          message,
+          // ...(processed as AsunaException),
+          message: processed.name,
           // code: processed.code || processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
         },
       };
@@ -202,9 +202,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
     // Logger.error(`send ${r(body)} status: ${httpStatus}`);
     const response = ApiResponse.failure({
       status: body.error.httpStatus,
-      code: body.error.code,
+      // code: body.error.code,
       error: body.error,
-      message: body.error.message || body.error.name,
+      message, // : body.error.message || body.error.name,
     });
     res.status(httpStatus).send(response);
   }

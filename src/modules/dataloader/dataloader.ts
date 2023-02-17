@@ -11,10 +11,10 @@ import LruMap from 'lru_map';
 import createRedisDataloader from 'redis-dataloader';
 import { BaseEntity, In, ObjectType } from 'typeorm';
 
-import { CacheManager } from '../cache';
+import { CacheManager } from '../cache/cache';
 import { CacheTTL } from '../cache/constants';
-import { configLoader } from '../config';
-import { DBHelper } from '../core/db';
+import { configLoader } from '../config/loader';
+import { DBHelper } from '../core/db/db.helper';
 import { PubSubChannels, PubSubHelper } from '../pub-sub/pub-sub.helper';
 
 import type { GraphQLResolveInfo } from 'graphql';
