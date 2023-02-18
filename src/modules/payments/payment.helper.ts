@@ -4,15 +4,16 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 
+import * as crypto from 'node:crypto';
+
 import { sub } from 'date-fns';
 import * as Handlebars from 'handlebars';
 import _ from 'lodash';
 import fetch from 'node-fetch';
-import * as crypto from 'node:crypto';
 import * as qs from 'qs';
 import { IsNull, LessThan } from 'typeorm';
 
-import { AppConfigObject } from '../config/app.config';
+import { AppConfigure } from '../config/app.configure';
 import { SMSConfigObject } from '../sms/config';
 import { PaymentAlipayHelper } from './payment.alipay.helper';
 import { PaymentItem, PaymentMethod, PaymentTransaction } from './payment.entities';
@@ -106,7 +107,7 @@ export class PaymentHelper {
     order: PaymentOrder,
   ): Promise<PaymentContext> {
     const { createdAt } = transaction;
-    const MASTER_HOST = AppConfigObject.load().masterAddress;
+    const MASTER_HOST = new AppConfigure().load().masterAddress;
     const callback = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/callback`);
     const notify = encodeURIComponent(`${MASTER_HOST}/api/v1/payment/notify`);
     return { method, order, transaction, createdAt, callback, notify };

@@ -11,8 +11,7 @@ SECRET_KEY:
 PORT: 5000
 
 app:
-  # default: admin@example.com
-  sys_admin_email:
+  sys_admin_email: admin@example.com
   # 为空时生成随机密码
   sys_admin_password:
   # default: 500

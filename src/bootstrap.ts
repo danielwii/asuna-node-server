@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 
-import { ClassSerializerInterceptor, LogLevel, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, LogLevel, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -18,7 +18,7 @@ import RedisStoreCreator from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { Options as RateLimitOptions, default as rateLimit } from 'express-rate-limit';
+import { default as rateLimit, Options as RateLimitOptions } from 'express-rate-limit';
 import session from 'express-session';
 import figlet from 'figlet';
 import helmet from 'helmet';
@@ -28,35 +28,33 @@ import responseTime from 'response-time';
 
 import { resolveTypeormPaths, syncDbWithLockIfPossible, validateOptions } from './helper';
 import { AppLifecycle } from './lifecycle';
+import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
-import { AppConfigObject, FeaturesConfigObject, configLoader } from './modules/config';
+import { AppConfigure, configLoader, FeaturesConfigObject } from './modules/config';
+import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
 import {
   FeedbackSenderEnum,
   FeedbackSenderEnumValue,
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
 } from './modules/content/enum-values';
-import { AsunaContext, Global, KVModelFormatType, KeyValueType, Order } from './modules/core';
+import { AsunaContext, Global, KeyValueType, KVModelFormatType, Order } from './modules/core';
+import { ConfigKeys } from './modules/core/config';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
 import { SimpleIdGeneratorHelper } from './modules/ids';
-import { TracingInterceptor } from './modules/tracing';
-
-// add condition function in typeorm find operation
-import './typeorm.fixture';
-
-import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
-import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
-import { ConfigKeys } from './modules/core/config';
 import { ExchangeCurrencyEnum } from './modules/property/enum-values';
 import { MongoConfigObject } from './modules/providers/mongo.config';
+import { TracingInterceptor } from './modules/tracing';
+// add condition function in typeorm find operation
+import './typeorm.fixture';
 
 import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
 
-export const bootstrap = (appModule, options: BootstrapOptions) => {
+export const bootstrap = (appModule, options?: BootstrapOptions) => {
   const logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'bootstrap'));
   process.on('unhandledRejection', (reason, p) => {
     logger.error(`Possibly Unhandled Rejection at: Promise ${r({ p, reason })}`);
@@ -74,6 +72,12 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
   });
   process.on('exit', (reason) => {
     logger[reason ? 'error' : 'log'](`App exit cause: ${r(reason)}`);
+  });
+
+  // handle any other uncaught errors
+  process.on('uncaughtExceptionMonitor', (err, origin) => {
+    logger.error(`uncaughtExceptionMonitor: ${r({ err, origin })}`);
+    Sentry.captureException(err);
   });
 
   // https://docs.nestjs.com/graphql/unions-and-enums#unions
@@ -103,7 +107,7 @@ export const bootstrap = (appModule, options: BootstrapOptions) => {
     logger.debug(`Configs is ${r(configLoader.loadConfigs())}`);
   }
 
-  return run(appModule, options).catch((reason) => {
+  return run(appModule, options ?? {}).catch((reason) => {
     logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
     Sentry.captureException(reason);
     setTimeout(() => {
@@ -140,7 +144,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
     )}`,
   );
 
-  const appSettings = AppConfigObject.load();
+  const appSettings = new AppConfigure().load();
   const features = FeaturesConfigObject.load();
   logger.log(`load app settings ${r(appSettings)}`);
   logger.log(`load features ${r(features)}`);

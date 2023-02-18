@@ -26,7 +26,7 @@ export class ContentQueryResolver {
     funcName?: string,
   ): Promise<ContentMedia[]> {
     const { id } = ctx.getPayload();
-    this.logger.log(`${funcName}: ${r({ id })}`);
+    this.logger.log(`#${funcName}: ${r({ id })}`);
 
     return ContentMedia.find({ where: { profileId: id }, order: { createdAt: 'desc' } });
   }
@@ -41,7 +41,7 @@ export class ContentQueryResolver {
     funcName?: string,
   ): Promise<ContentMedia> {
     const { id } = ctx.getPayload();
-    this.logger.log(`${funcName}: ${r({ id })}`);
+    this.logger.log(`#${funcName}: ${r({ id })}`);
 
     return ContentMedia.findOneBy({ profileId: id, useFor });
   }

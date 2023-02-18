@@ -2,6 +2,7 @@ import { Global, Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
+import { AppLifecycle } from '../../lifecycle';
 import { PrismaService } from './service';
 
 @Global()
@@ -10,5 +11,12 @@ import { PrismaService } from './service';
   exports: [PrismaService],
 })
 export class PrismaModule extends InitContainer implements OnModuleInit {
-  public onModuleInit = async (): Promise<void> => super.init();
+  public constructor(private readonly prismaService: PrismaService) {
+    super();
+  }
+
+  public onModuleInit = async (): Promise<void> =>
+    super.init(() => {
+      this.prismaService.enableShutdownHooks(AppLifecycle._.getApp());
+    });
 }

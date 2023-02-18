@@ -77,7 +77,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     } = {},
   ) {}
 
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Post('reset-password')
   @UseGuards(JwtAuthGuard)
   async resetPassword(@Body() dto: ResetPasswordDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
@@ -91,7 +91,7 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
     return ApiResponse.success();
   }
 
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @Post('reset-account')
   @UseGuards(JwtAuthGuard)
   async resetAccount(@Body() dto: ResetAccountDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {

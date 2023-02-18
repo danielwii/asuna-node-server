@@ -5,7 +5,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import _ from 'lodash';
 import { DateTime, Duration } from 'luxon';
 
-import { AppConfigObject } from '../../config/app.config';
+import { AppConfigObject, AppConfigure } from '../../config/app.configure';
 import { ColumnTypeHelper } from './column.helper';
 
 import type { BaseEntity } from 'typeorm';
@@ -73,7 +73,7 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
 }
 
 export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
-  const hours = AppConfigObject.instance.fixTz;
+  const hours = new AppConfigure().load().fixTz;
   if (hours) {
     if (entity.createdAt) {
       entity.createdAt = DateTime.fromJSDate(entity.createdAt).plus(Duration.fromObject({ hours })).toJSDate();

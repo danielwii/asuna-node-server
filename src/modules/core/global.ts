@@ -1,4 +1,4 @@
-import { configLoader } from '../config';
+import { configLoader } from '../config/loader';
 import { ConfigKeys } from './config';
 
 export class Global {

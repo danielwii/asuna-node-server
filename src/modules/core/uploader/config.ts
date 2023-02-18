@@ -1,6 +1,6 @@
 import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
 
-import { configLoader } from '../../config';
+import { configLoader } from '../../config/loader';
 import { AbstractConfigLoader, YamlConfigKeys } from '../config';
 
 export enum UploaderConfigKeys {

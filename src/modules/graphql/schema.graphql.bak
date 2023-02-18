@@ -5,5 +5,5 @@ type ModelSchema {
 }
 
 type Query {
-  sys_modelSchemas: [ModelSchema]
+  sys_model_schemas: [ModelSchema]
 }

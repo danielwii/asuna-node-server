@@ -4,11 +4,13 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import * as mime from 'mime-types';
 import * as minio from 'minio';
-import { join } from 'node:path';
 
 import { convertFilename } from '../../common/helpers';
 import { configLoader } from '../../config/loader';
@@ -17,11 +19,10 @@ import { UploaderConfigObject } from '../uploader/config';
 import { getS3Region, isS3Endpoint } from './helper';
 import { FileInfo, IStorageEngine, ResolverOpts, SavedFile, StorageMode, yearMonthStr } from './storage.engines';
 
-import type { MinioConfigObject } from './storage.config';
 import type { Response } from 'express';
-import { fileURLToPath } from 'node:url';
+import type { MinioConfigObject } from './storage.config';
 
-const styleSuffix = configLoader.loadConfig('STYLE_SUFFIX', '');
+const styleSuffix = configLoader.loadConfig('STYLE_SUFFIX', '?x-oss-process=style/compressed');
 
 export class MinioStorage implements IStorageEngine {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));

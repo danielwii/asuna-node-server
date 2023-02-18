@@ -37,7 +37,7 @@ export class DynamicRouterModule extends InitContainer implements NestModule, On
     });
 
   public async initKV(): Promise<void> {
-    this.kvService.regInitializer<KVListFieldsValue<DynamicTextRouter>>(
+    await this.kvService.regInitializer<KVListFieldsValue<DynamicTextRouter>>(
       this.dynamicRouterService.kvDef,
       {
         name: '文本路由配置',

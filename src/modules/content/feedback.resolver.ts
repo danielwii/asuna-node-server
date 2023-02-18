@@ -40,7 +40,7 @@ export class FeedbackQueryResolver extends QueryResolver {
   ): Promise<FeedbackPageable> {
     const user = ctx.getCurrentUser();
     const selects = resolveFieldsByPagedInfo(Feedback, info);
-    this.logger.log(`${funcName}: ${r({ pageRequest, user, selects })}`);
+    this.logger.log(`#${funcName}: ${r({ pageRequest, user, selects })}`);
 
     const [items, total] = await Feedback.findAndCount(
       await GraphqlHelper.genericFindOptions<Feedback>({
@@ -52,7 +52,7 @@ export class FeedbackQueryResolver extends QueryResolver {
       }),
     );
 
-    this.logger.debug(`${funcName}: ${r({ total, pageRequest })}`);
+    this.logger.debug(`#${funcName}: ${r({ total, pageRequest })}`);
     return GraphqlHelper.pagedResult({ pageRequest, items, total });
   }
 }

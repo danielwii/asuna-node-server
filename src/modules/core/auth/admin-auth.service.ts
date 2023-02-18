@@ -3,12 +3,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import { DataSource, In } from 'typeorm';
-import { fileURLToPath } from 'node:url';
 
-import { AppConfigObject } from '../../config/app.config';
+import { AppConfigObject, AppConfigure } from '../../config/app.configure';
+import { named } from '../../helper';
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { SYS_ROLE } from './auth.constants';
 import { AdminUser, Role } from './auth.entities';
@@ -51,20 +53,24 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
    * 如果没有则创建预设用户 admin@example.com - password
    * @returns {Promise<void>}
    */
-  public async initSysAccount(): Promise<void> {
-    const email = AppConfigObject.load().sysAdminEmail;
-    const password = AppConfigObject.load().sysAdminPassword ?? nanoid();
+  @named
+  public async initSysAccount(funcName?: string): Promise<void> {
+    const config = new AppConfigure().load();
+    this.logger.log(`#${funcName}: config: ${r(config)}`);
+
+    const email = config.sysAdminEmail;
+    const password = config.sysAdminPassword ?? nanoid();
     const role = await Role.findOneBy({ name: SYS_ROLE });
 
     if (!role) {
       const entity = Role.create({ name: SYS_ROLE });
       await this.dataSource.manager.save(entity);
     }
-    this.logger.log(`found sys role: ${!!role}`);
+    this.logger.log(`#${funcName}: found sys role: ${!!role}`);
 
     const sysRole = await Role.findOne({ where: { name: SYS_ROLE }, relations: ['users'] });
-    this.logger.log(`found sys role: ${r(sysRole)}`);
-    this.logger.log(`found users for sys role: ${sysRole.users.length}`);
+    this.logger.log(`#${funcName}: found sys role: ${r(sysRole)}`);
+    this.logger.log(`#${funcName}: found users for sys role: ${sysRole.users.length}`);
     if (sysRole.users.length === 0) {
       await AdminUser.delete({ email });
       await AdminUser.delete({ email: 'admin@example.com' });
@@ -73,7 +79,7 @@ export class AdminAuthService extends AbstractAuthService<AdminUser> {
       this.logger.log(`create SYS_ADMIN account: ${email}:${password}`);
       this.logger.log(`---------------------------------------------------------------`);
       this.createUser('Administrator', email, password, undefined, [SYS_ROLE]).catch((error) => {
-        this.logger.warn('cannot create default SYS_ADMIN account', error);
+        this.logger.warn(`#${funcName}: cannot create default SYS_ADMIN account`, error);
       });
     }
   }

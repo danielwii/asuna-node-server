@@ -5,9 +5,10 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { fileURLToPath } from 'node:url';
+
 import * as R from 'ramda';
 
-import { AppConfigObject } from '../config/app.config';
+import { AppConfigure } from '../config/app.configure';
 import { PageHelper } from '../core/helpers';
 import { AppDataSource } from '../datasource';
 import { FinancialTransaction, Wallet } from './financial.entities';
@@ -27,7 +28,7 @@ export class PropertyModule extends InitContainer implements OnModuleInit {
       const total = await Wallet.count({ where });
       this.logger.log(`${total} wallets waiting for init...`);
       if (total) {
-        const size = AppConfigObject.load().batchSize;
+        const size = new AppConfigure().load().batchSize;
         await PageHelper.doPageSeries(total, size, async ({ page, totalPages }) => {
           this.logger.log(`do ${page}/${totalPages}...${total}`);
           const wallets = await Wallet.find({ where, take: size /* , skip: size * (page - 1) */ });

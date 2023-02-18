@@ -30,6 +30,7 @@ export class AbstractConfigLoader<Config> {
 export enum YamlConfigKeys {
   graphql = 'graphql',
   sentry = 'sentry',
+  contentful = 'contentful',
   features = 'features',
   app = 'app',
   tracing = 'tracing',

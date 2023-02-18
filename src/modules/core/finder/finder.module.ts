@@ -27,7 +27,7 @@ export class FinderModule extends InitContainer implements OnModuleInit {
     // const endpoint = configLoader.loadConfig(ConfigKeys.ASSETS_ENDPOINT);
     // const internalEndpoint = configLoader.loadConfig(ConfigKeys.ASSETS_INTERNAL_ENDPOINT);
 
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       FinderService.kvDef,
       {
         name: '资源位置配置',

@@ -14,8 +14,7 @@ import rawBody from 'raw-body';
 import * as xml2js from 'xml2js';
 
 import { HandlebarsHelper } from '../common/helpers';
-import { configLoader } from '../config';
-import { AppConfigObject } from '../config/app.config';
+import { AppConfigure, configLoader } from '../config';
 import { TokenHelper } from '../core/auth/abstract.auth.service';
 import { AdminUser } from '../core/auth/auth.entities';
 import { AuthUserChannel } from '../core/auth/base.entities';
@@ -26,7 +25,7 @@ import { PageHelper } from '../core/helpers/page.helper';
 import { AsunaCollections, KvDef } from '../core/kv/kv.service';
 import { Store } from '../store';
 import { AdminWsHelper } from '../ws/socket-io.gateway';
-import { WXMiniAppUserInfo, WeChatUser } from './wechat.entities';
+import { WeChatUser, WXMiniAppUserInfo } from './wechat.entities';
 import { MiniSubscribeInfo, TemplateMsgInfo, WxApi } from './wx.api';
 import { WxConfigApi } from './wx.api.config';
 
@@ -191,7 +190,7 @@ export class WeChatHelper {
     const config = await WxConfigApi.getServiceConfig();
     Logger.debug(`call syncAdminUsers saveToAdmin: ${config.saveToAdmin}`);
     if (config.saveToAdmin) {
-      const BATCH_SIZE = AppConfigObject.load().batchSize;
+      const BATCH_SIZE = new AppConfigure().load().batchSize;
       await PageHelper.doCursorPageSeries(async (next) => {
         const userList = await WxApi.getUserList(next);
         Logger.debug(`userList is ${r(_.omit(userList, 'data'))}`);

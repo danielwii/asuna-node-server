@@ -43,7 +43,7 @@ export class EmailModule extends InitContainer implements OnModuleInit {
     });
 
   public async initKV(): Promise<void> {
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       EmailHelper.kvDef,
       {
         name: '邮件配置',
@@ -69,7 +69,7 @@ export class EmailModule extends InitContainer implements OnModuleInit {
       },
       { merge: true, formatType: KVModelFormatType.KVGroupFieldsValue },
     );
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       EmailHelper.tmplKvDef,
       {
         name: '邮件模版配置',

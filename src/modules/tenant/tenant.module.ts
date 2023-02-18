@@ -61,7 +61,7 @@ export class TenantModule extends InitContainer implements OnModuleInit {
       (entity) => !['wx__users', 'auth__users'].includes(entity.entityInfo.name),
     );
 
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       TenantService.kvDef,
       {
         name: 'Tenant 配置',

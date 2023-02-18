@@ -90,7 +90,7 @@ import { WebModule } from './web';
         return redisConfig.enable ? { store: redisStore, ...redisConfig.getOptions() } : {};
       },
     }),
-    PrismaModule,
+    // PrismaModule,
     ClientModule,
   ]),
   controllers: [
@@ -137,7 +137,7 @@ export class AdminInternalModule extends InitContainer implements NestModule, On
     });
 
   public async initKV(): Promise<void> {
-    this.kvService.regInitializer<KVFieldsValue>(
+    await this.kvService.regInitializer<KVFieldsValue>(
       { collection: 'app.settings', key: 'site' },
       {
         name: '网站设置',
@@ -153,7 +153,7 @@ export class AdminInternalModule extends InitContainer implements NestModule, On
       },
       { merge: true, formatType: KVModelFormatType.Fields },
     );
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       { collection: 'app.settings', key: 'sms.notice' },
       {
         name: '短信配置',

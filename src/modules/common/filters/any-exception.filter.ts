@@ -90,7 +90,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    let processed = _.omit(exception, 'options');
+    let processed = exception;
 
     if (R.is(QueryFailedError, exception)) {
       processed = AnyExceptionFilter.handleSqlExceptions(exception);
@@ -110,8 +110,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
+    processed.message = exception.message;
 
-    // Logger.log(`check status ${r({ httpStatus, processed })}`);
+    // Logger.log(`check status ${r({ httpStatus, processed, exception })}`);
 
     if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
       // Logger.warn(`[bad_request] ${r(processed)}`);
@@ -203,7 +204,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const response = ApiResponse.failure({
       status: body.error.httpStatus,
       // code: body.error.code,
-      error: body.error,
+      error: { code: body.error.code, type: body.error.message },
       message, // : body.error.message || body.error.name,
     });
     res.status(httpStatus).send(response);

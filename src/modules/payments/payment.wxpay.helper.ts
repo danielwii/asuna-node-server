@@ -12,7 +12,7 @@ import * as qs from 'qs';
 import { IsNull } from 'typeorm';
 import * as xml2js from 'xml2js';
 
-import { AppConfigObject } from '../config/app.config';
+import { AppConfigure } from '../config/app.configure';
 import { PaymentNotifyHelper } from './payment.notify';
 import { PaymentOrder } from './payment.order.entities';
 
@@ -164,7 +164,7 @@ export class PaymentWxpayHelper {
     extra: { openid?: string } = {},
   ): Promise<string> {
     Logger.debug(`create xml data ${r({ method, goods, tradeType, extra })}`);
-    const MASTER_HOST = AppConfigObject.load().masterAddress;
+    const MASTER_HOST = new AppConfigure().load().masterAddress;
     const notifyUrl = _.get(method.extra, 'notifyUrl') || `${MASTER_HOST}/api/v1/payment/notify`;
     if (_.isEmpty(notifyUrl)) {
       throw new AsunaException(AsunaErrorCode.Unprocessable, 'no notify url defined.');

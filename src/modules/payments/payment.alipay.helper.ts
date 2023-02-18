@@ -8,7 +8,7 @@ import AlipaySdk, { AlipaySdkCommonResult, AlipaySdkConfig } from 'alipay-sdk/li
 import AlipayFormData from 'alipay-sdk/lib/form';
 import _ from 'lodash';
 
-import { AppConfigObject } from '../config/app.config';
+import { AppConfigure } from '../config/app.configure';
 import { PaymentMethod } from './payment.entities';
 import { PaymentMethodEnumValue } from './payment.enum-values';
 
@@ -79,7 +79,7 @@ export class PaymentAlipayHelper {
       passback_params: JSON.stringify(goods.packParams), // 将会返回的一个参数，可用于自定义商品信息最后做通知使用
     };
 
-    const MASTER_HOST = AppConfigObject.load().masterAddress;
+    const MASTER_HOST = new AppConfigure().load().masterAddress;
     const formData = new AlipayFormData(); // 获取一个实例化对象
     formData.addField('returnUrl', returnUrl || `${MASTER_HOST}/api/v1/payment/callback`); // 客户端支付成功后会同步跳回的地址
     // 支付宝在用户支付成功后会异步通知的回调地址，必须在公网 IP 上才能收到

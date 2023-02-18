@@ -5,8 +5,8 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 
 import { fileURLToPath } from 'node:url';
 
-import { DBModule } from '../db';
-import { TokenModule } from '../token';
+import { DBModule } from '../db/db.module';
+import { TokenModule } from '../token/module';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminAuthMiddleware } from './admin-auth.middleware';
 import { AdminAuthService } from './admin-auth.service';
@@ -47,6 +47,6 @@ export class AuthModule extends InitContainer implements NestModule, OnModuleIni
   public onModuleInit = async () =>
     super.init(async () => {
       // AdminWsSyncHelper.initCron();
-      this.adminAuthService.initSysAccount().catch((error) => Logger.error(error));
+      await this.adminAuthService.initSysAccount().catch((error) => this.logger.error(error));
     });
 }

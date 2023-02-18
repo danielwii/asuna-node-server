@@ -1,10 +1,7 @@
-import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
-import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
-
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
-import { configLoader } from '../config/loader';
+import { ConfigureLoader, YamlConfigKeys } from '../core/config';
 
 export enum ContentfulConfigKeys {
   enable = 'enable',
@@ -13,31 +10,15 @@ export enum ContentfulConfigKeys {
 }
 
 class ContentfulConfigObject implements Record<keyof typeof ContentfulConfigKeys, any> {
-  @IsBoolean()
-  enable: boolean;
+  @IsBoolean() @IsOptional() enable: boolean;
+  @IsString() @IsOptional() spaceId: string;
+
   @IsString()
-  spaceId: string;
-  @IsString()
+  @IsOptional()
   @Transform(({ value }) => !!value, { toPlainOnly: true })
   accessToken: string;
 }
 
-export class ContentfulConfigure {
-  private static key = 'contentful';
-  private static _: ContentfulConfigObject;
-
-  static load = (reload = false): ContentfulConfigObject => {
-    if (ContentfulConfigure._ && !reload) return ContentfulConfigure._;
-    ContentfulConfigure._ = withP2(
-      (p) => configLoader.loadConfig2<any>(ContentfulConfigure.key, p),
-      ContentfulConfigKeys,
-      (loader, keys) =>
-        deserializeSafely(ContentfulConfigObject, {
-          enable: withP(keys.enable, loader),
-          spaceId: withP(keys.spaceId, loader),
-          accessToken: withP(keys.accessToken, loader),
-        }),
-    );
-    return ContentfulConfigure._;
-  };
-}
+export interface ContentfulConfigure extends ConfigureLoader<ContentfulConfigObject> {}
+@ConfigureLoader(YamlConfigKeys.contentful, ContentfulConfigKeys, ContentfulConfigObject)
+export class ContentfulConfigure {}

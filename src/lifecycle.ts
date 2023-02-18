@@ -128,9 +128,6 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       });
     });
 
-    const prismaService: PrismaService = app.get(PrismaService);
-    await prismaService.enableShutdownHooks(app);
-
     AppLifecycle._.logger.log(`[onInit] done`);
   }
 

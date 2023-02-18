@@ -12,7 +12,7 @@ import { AdminUser } from '../core/auth/auth.entities';
 import { KeyValueType } from '../core/kv/kv.entities';
 import { KVModelFormatType } from '../core/kv/kv.isolated.entities';
 import { KVGroupFieldsValue, KvService } from '../core/kv/kv.service';
-import { CronHelper } from '../helper';
+import { CronHelper } from '../helper/cron';
 import { WeChatController } from './wechat.controller';
 import { WXEventMessageHelper, WXSubscribedQrSceneMessage, WeChatHelper } from './wechat.helper';
 import { WXJwtStrategy } from './wx-jwt.strategy';
@@ -40,7 +40,7 @@ export class WeChatModule extends InitContainer implements OnModuleInit {
   }
 
   async initKV(): Promise<void> {
-    this.kvService.regInitializer<KVGroupFieldsValue>(
+    await this.kvService.regInitializer<KVGroupFieldsValue>(
       WxConfigApi.kvDef,
       {
         name: '微信配置',

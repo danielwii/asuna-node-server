@@ -1,18 +1,22 @@
 import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import _ from 'lodash';
-import { tap } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
-import { ASUNA_METADATA_KEYS } from '../../helper';
+import { ASUNA_METADATA_KEYS } from '../../helper/annotations';
 
-import type { Observable } from 'rxjs';
 import type { Request } from 'express';
+import type { Observable } from 'rxjs';
 import type { CommonRequest } from '../interface';
 
 export class LoggerInterceptor implements NestInterceptor {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   public intercept(context: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
     let req = context.switchToHttp().getRequest<Request & CommonRequest>();
     if (!req) {
@@ -43,22 +47,23 @@ export class LoggerInterceptor implements NestInterceptor {
       session: req.session,
     };
 
-    // @metinseylan/nestjs-opentelemetry make handler name null
+    // !!TIPS!! @metinseylan/nestjs-opentelemetry make handler name null
     const named = Reflect.getMetadata(ASUNA_METADATA_KEYS.NAMED, context.getHandler());
     const TAG = `${context.getClass().name}.${context.getHandler().name || named}`;
 
-    Logger.debug(`#${TAG} call...`);
+    this.logger.debug(`#${TAG} call...`);
     const now = Date.now();
     return next.handle().pipe(
-      tap(
-        () => Logger.debug(`#${TAG} spent ${Date.now() - now}ms`),
-        (e) => {
-          const skipNotFound = _.get(e, 'status') !== 404;
-          if (skipNotFound) {
-            Logger.warn(`#${TAG} ${r(info)}`);
-          }
-        },
-      ),
+      finalize(() => {
+        this.logger.debug(`#${TAG} spent ${Date.now() - now}ms`);
+      }),
+      catchError((e) => {
+        const skipNotFound = _.get(e, 'status') !== 404;
+        if (skipNotFound) {
+          this.logger.warn(`#${TAG} ${r(info)}`);
+        }
+        throw e;
+      }),
     );
   }
 }

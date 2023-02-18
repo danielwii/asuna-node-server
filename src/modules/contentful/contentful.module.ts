@@ -16,9 +16,10 @@ import { ContentfulService } from './contentful.service';
   exports: [ContentfulService],
 })
 export class ContentfulModule extends InitContainer implements OnModuleInit {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'ContentfulModule'));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
   onModuleInit = () =>
     this.init(async () => {
-      this.logger.log(`init... ${r({ config: ContentfulConfigure.load() })}`);
+      this.logger.log(`init... ${r({ config: new ContentfulConfigure().load() })}`);
     });
 }

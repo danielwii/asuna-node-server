@@ -239,10 +239,10 @@ export class KvService {
     kvDef: KvDef,
     opts: { name?: string; type?: KeyValueType; value?: V; extra?: any },
     config: { formatType?: KVModelFormatType; noUpdate?: boolean; merge?: boolean },
-  ): void {
+  ): Promise<KeyValuePair> {
     const identifier = KvDefIdentifierHelper.stringify(kvDef);
     KvService.initializers[identifier] = (): Promise<KeyValuePair> => this.set<V>({ ...kvDef, ...opts }, config);
-    KvService.initializers[identifier]();
+    return KvService.initializers[identifier]();
   }
 
   public async set<V = any>(
