@@ -18,7 +18,7 @@ import fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
-import { FeaturesConfigObject, configLoader } from './modules/config';
+import { FeaturesConfigObject, configLoader, FeaturesConfigure } from './modules/config';
 import { SentryConfigure } from './modules/config/sentry.configure';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { ConfigKeys } from './modules/core/config';
@@ -55,7 +55,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
   public static async onInit(app: NestExpressApplication): Promise<void> {
     AppLifecycle._.app = app;
     const sentryConfig = new SentryConfigure().load();
-    const featuresConfig = FeaturesConfigObject.load();
+    const featuresConfig = new FeaturesConfigure().load();
     AppLifecycle._.logger.log(`[onInit] ... ${r({ sentryConfig, featuresConfig })}`);
     if (sentryConfig.enable) {
       const { dsn } = sentryConfig;

@@ -22,11 +22,12 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
+import { fileURLToPath } from 'node:url';
+
 import appleSignIn from 'apple-signin-auth';
 import Chance from 'chance';
 import { IsOptional, IsString, ValidationSchema, registerSchema, validate } from 'class-validator';
 import _ from 'lodash';
-import { fileURLToPath } from 'node:url';
 
 import { TimeUnit, isNotBlank } from '../../common';
 import { EmailHelper } from '../../email/email.helper';

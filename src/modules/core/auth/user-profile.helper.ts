@@ -1,5 +1,4 @@
 // @ts-ignore
-// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 
 import { PasswordHelper } from './abstract.auth.service';

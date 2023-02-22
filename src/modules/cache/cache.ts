@@ -41,9 +41,9 @@ export class CacheManager {
     const cacheKey = _.isString(key) ? (key as string) : JSON.stringify(key);
     const remainingTTL = this.cache.getRemainingTTL(cacheKey);
     const cacheValue = this.cache.get(cacheKey);
-    this.logger.verbose(
-      `get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`, 10) })}`,
-    );
+    // this.logger.verbose(
+    //   `get cacheable ${r({ key, cacheKey, cacheValue, ttl: parseInt(`${remainingTTL / 1000}`, 10) })}`,
+    // );
     if (cacheValue) return cacheValue;
 
     const value = await fnResolve(resolver)();

@@ -168,9 +168,14 @@ function parseCondition(value: Condition): ParsedCondition {
   return value as any;
 }
 
-export function parseOrder(model: string, value: string): { [name: string]: string } {
+export function parseOrder(model: string, value: string | JSON): { [name: string]: string } {
   return value
-    ? _.assign({}, ..._.map(JSON.parse(value), (direction, key) => ({ [`${model}.${key}`]: _.upperCase(direction) })))
+    ? _.assign(
+        {},
+        ..._.map(_.isString(value) ? JSON.parse(value) : value, (direction, key) => ({
+          [`${model}.${key}`]: _.upperCase(direction),
+        })),
+      )
     : undefined;
 }
 
@@ -319,7 +324,7 @@ export class DBHelper {
 
   public static async getModelsHasRelation<E extends BaseEntity>(
     entity: ObjectType<E>,
-    excludes?: typeof BaseEntity[],
+    excludes?: (typeof BaseEntity)[],
   ): Promise<(typeof BaseEntity & { entityInfo: EntityMetaInfoOptions })[]> {
     const excludeNames = new Set(_.map(excludes, fp.get('name')));
     return DBHelper.loadMetadatas()

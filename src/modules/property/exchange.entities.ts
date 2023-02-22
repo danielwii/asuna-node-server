@@ -2,7 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { Column, Entity } from 'typeorm';
 
-import { AbstractNameEntity, Publishable } from '../base';
+import { Publishable } from '../base/abilities';
+import { AbstractNameEntity } from '../base/base.entity';
 import { EntityMetaInfo, MetaInfo } from '../common/decorators';
 import { ColumnTypeHelper } from '../core/helpers';
 import {

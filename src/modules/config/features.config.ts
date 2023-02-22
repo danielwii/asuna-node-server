@@ -1,7 +1,4 @@
-import { withP, withP2 } from '@danielwii/asuna-helper/dist/utils';
-
-import { AbstractConfigLoader, YamlConfigKeys } from '../core/config';
-import { configLoader } from './loader';
+import { ConfigureLoader, YamlConfigKeys } from '../core/config';
 
 export enum FeaturesConfigKeys {
   auditEnable = 'audit_enable',
@@ -15,18 +12,7 @@ export enum FeaturesConfigKeys {
   apmSecretToken = 'apm.secret_token',
 }
 
-export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObject> {
-  private static key = YamlConfigKeys.features;
-  private static _: FeaturesConfigObject;
-
-  public static get instance() {
-    if (FeaturesConfigObject._) {
-      return FeaturesConfigObject._;
-    }
-    FeaturesConfigObject._ = this.load();
-    return FeaturesConfigObject._;
-  }
-
+export class FeaturesConfigObject implements Record<keyof typeof FeaturesConfigKeys, any> {
   public auditEnable: boolean;
   public swaggerEnable: boolean;
   public cronEnable: boolean;
@@ -36,27 +22,8 @@ export class FeaturesConfigObject extends AbstractConfigLoader<FeaturesConfigObj
   public apmServiceName: string;
   public apmServerUrl: string;
   public apmSecretToken: string;
-
-  public static load = (reload = false): FeaturesConfigObject => {
-    if (FeaturesConfigObject._ && !reload) {
-      return FeaturesConfigObject._;
-    }
-    FeaturesConfigObject._ = withP2(
-      (p): any => configLoader.loadConfig2(FeaturesConfigObject.key, p),
-      FeaturesConfigKeys,
-      (loader, keys) =>
-        new FeaturesConfigObject({
-          auditEnable: withP(keys.auditEnable, loader),
-          swaggerEnable: withP(keys.swaggerEnable, loader),
-          cronEnable: withP(keys.cronEnable, loader),
-          errorStats: withP(keys.errorStats, loader),
-          webTracingEnabled: withP(keys.webTracingEnabled, loader),
-          apmEnabled: withP(keys.apmEnabled, loader),
-          apmServiceName: withP(keys.apmServiceName, loader),
-          apmServerUrl: withP(keys.apmServerUrl, loader),
-          apmSecretToken: withP(keys.apmSecretToken, loader),
-        }),
-    );
-    return FeaturesConfigObject._;
-  };
 }
+
+export interface FeaturesConfigure extends ConfigureLoader<FeaturesConfigObject> {}
+@ConfigureLoader(YamlConfigKeys.features, FeaturesConfigKeys, FeaturesConfigObject)
+export class FeaturesConfigure {}

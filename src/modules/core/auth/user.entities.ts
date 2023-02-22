@@ -14,17 +14,18 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 
-import { NoPrimaryKeyBaseEntity } from '../../base';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
-import { ColumnTypeHelper } from '../helpers';
+import { NoPrimaryKeyBaseEntity } from '../../base/base.entity';
+import { EntityMetaInfo, MetaInfo } from '../../common/decorators/meta.decorator';
+import { ColumnTypeHelper } from '../helpers/column.helper';
 import { UserRegister } from '../user.register';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 import type { UserRelation } from '../interaction/friends.entities';
-import type { FinancialTransaction, PointExchange, Wallet } from '../../property';
-import type { WXMiniAppUserInfo } from '../../wechat';
+import type { FinancialTransaction, Wallet } from '../../property/financial.entities';
+import type { WXMiniAppUserInfo } from '../../wechat/wechat.entities';
 import type { UserFollow } from '../interaction';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
+import type { PointExchange } from '../../property/points.entities';
 
 @ObjectType({ implements: () => [AbstractTimeBasedAuthUser] })
 @EntityMetaInfo({ name: 'user__profiles', internal: true })

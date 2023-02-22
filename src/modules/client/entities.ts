@@ -83,7 +83,7 @@ export class VirtualSession extends NoPrimaryKeyBaseEntity {
 }
 
 @ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })
-@EntityMetaInfo({ name: 'lead_users' })
+@EntityMetaInfo({ name: 'lead_users', internal: true })
 @Entity('client__t_lead_users')
 export class LeadUser extends InjectProject(InjectTenant(InjectUserProfile(AbstractTimeBasedBaseEntity))) {
   public constructor() {

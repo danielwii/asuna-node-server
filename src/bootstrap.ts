@@ -31,7 +31,7 @@ import { AppLifecycle } from './lifecycle';
 import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
-import { AppConfigure, configLoader, FeaturesConfigObject } from './modules/config';
+import { AppConfigure, configLoader, FeaturesConfigObject, FeaturesConfigure } from './modules/config';
 import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
 import {
   FeedbackSenderEnum,
@@ -145,7 +145,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   );
 
   const appSettings = new AppConfigure().load();
-  const features = FeaturesConfigObject.load();
+  const features = new FeaturesConfigure().load();
   logger.log(`load app settings ${r(appSettings)}`);
   logger.log(`load features ${r(features)}`);
   logger.log(

@@ -12,7 +12,6 @@ import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
 // @ts-ignore
-// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 
 import { TimeUnit, formatTime, isBlank } from '../../common/helpers';

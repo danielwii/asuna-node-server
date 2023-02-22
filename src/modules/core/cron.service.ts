@@ -1,7 +1,10 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/lock.provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { fileURLToPath } from 'node:url';
 
 import { CronJob, CronJobParameters } from 'cron';
 import cronParser from 'cron-parser';
@@ -10,26 +13,24 @@ import calendar from 'dayjs/plugin/calendar';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import _ from 'lodash';
 
-import { FeaturesConfigure } from '../config/features.config';
-import { StatsHelper } from '../stats/stats.helper';
+import { FeaturesConfigure } from '../config';
+import { StatsHelper, StatsResult } from '../stats';
 
-import type { StatsResult } from '../stats/stats.interface';
+@Injectable()
+export class CronService {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+  private static crons = {};
+  public constructor() {
+    dayjs.extend(calendar);
+    dayjs.extend(relativeTime);
+  }
 
-dayjs.extend(calendar);
-dayjs.extend(relativeTime);
-
-/**
- * @deprecated {@see CronService}
- */
-export class CronHelper {
-  public static crons = {};
-
-  public static nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
+  public nextTime(cronTime: string): { next: Date; calendar: string; fromNow: string } {
     const next = cronParser.parseExpression(cronTime).next().toDate();
     return { next, fromNow: dayjs(next).fromNow(), calendar: dayjs(next).calendar() };
   }
 
-  public static reg<Value>(
+  public reg<Value>(
     operation: string,
     cronTime: string,
     handler: () => Promise<StatsResult<Value> | any>,
@@ -38,24 +39,24 @@ export class CronHelper {
       ttl?: number;
     } = {},
   ): CronJob {
-    CronHelper.crons[operation] = { cronTime, nextTime: CronHelper.nextTime(cronTime) };
+    CronService.crons[operation] = { cronTime, nextTime: this.nextTime(cronTime) };
 
     if (!new FeaturesConfigure().load().cronEnable) {
-      Logger.warn(`skip ${operation} because cron was not enabled.`);
+      this.logger.warn(`skip ${operation} because cron was not enabled.`);
       return undefined;
     }
 
     const ttl = opts.ttl ?? 10;
     const enabledRedis = RedisLockProvider.instance.isEnabled();
-    Logger.debug(
-      `init cron ${r({ operation, cronTime, ...CronHelper.nextTime(cronTime), opts, enabled: enabledRedis })}`,
+    this.logger.debug(
+      `init cron ${r({ operation, cronTime, ...this.nextTime(cronTime), opts, enabled: enabledRedis })}`,
     );
     const callPromise = () =>
       enabledRedis
         ? RedisLockProvider.instance
             .lockProcess(operation, handler, { ttl: ttl * 1000 })
-            .catch((reason) => Logger.error(reason))
-        : handler().catch((reason) => Logger.error(reason));
+            .catch((reason) => this.logger.error(reason))
+        : handler().catch((reason) => this.logger.error(reason));
 
     return new CronJob({
       cronTime,
@@ -65,32 +66,32 @@ export class CronHelper {
             if (result) {
               const event = {
                 cronTime,
-                next: CronHelper.nextTime(cronTime),
+                next: this.nextTime(cronTime),
                 ...(_.isObject(result) ? result : { value: result }),
               };
-              Logger.debug(`cron ${operation} success, next in ${r(event.next.fromNow)}.`);
+              this.logger.debug(`cron ${operation} success, next in ${r(event.next.fromNow)}.`);
               StatsHelper.addCronSuccessEvent(operation, event).catch((reason) =>
-                Logger.error(`cron ${operation} error: ${r(reason)}`),
+                this.logger.error(`cron ${operation} error: ${r(reason)}`),
               );
             }
             return result;
           })
           .catch((reason) => {
-            Logger.error(`${operation} error found: ${r(reason)}`);
+            this.logger.error(`${operation} error found: ${r(reason)}`);
             StatsHelper.addCronFailureEvent(operation, {
               cronTime,
-              next: CronHelper.nextTime(cronTime),
+              next: this.nextTime(cronTime),
               reason,
-            }).catch((err) => Logger.error(`addCronFailureEvent error: ${r(err)}`));
+            }).catch((err) => this.logger.error(`addCronFailureEvent error: ${r(err)}`));
           })
           .finally(() => {
-            const next = CronHelper.nextTime(cronTime);
+            const next = this.nextTime(cronTime);
             if (dayjs(next.next).diff(new Date(), 'minute') > 1)
-              Logger.debug(`${operation} done. ${r({ cronTime, ...next })}`);
+              this.logger.debug(`${operation} done. ${r({ cronTime, ...next })}`);
           }),
       /*
       onComplete: () => {
-        Logger.debug(`${operation} completed.`);
+        this.logger.debug(`${operation} completed.`);
         if (_.isFunction(opts.onComplete)) opts.onComplete();
       }, */
       runOnInit: false,

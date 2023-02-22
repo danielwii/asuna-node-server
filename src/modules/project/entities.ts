@@ -10,7 +10,7 @@ import { InjectTenant } from '../tenant/tenant.entities';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 
 @ObjectType({ implements: () => [NoPrimaryKeyBaseEntity] })
-@EntityMetaInfo({ name: 'im_projects' })
+@EntityMetaInfo({ name: 'im_projects', internal: true })
 @Entity('im__t_projects')
 export class Project extends Publishable(InjectTenant(NoPrimaryKeyBaseEntity)) {
   @Field()

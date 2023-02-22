@@ -6,14 +6,14 @@ import _ from 'lodash';
 
 import { CacheTTL } from '../cache/constants';
 import { InMemoryDB } from '../cache/db';
-import { FeaturesConfigObject } from '../config/features.config';
+import { FeaturesConfigObject, FeaturesConfigure } from '../config/features.config';
 
 import type { CronStatsInterface } from './stats.interface';
 
 type CronStat = Omit<CronStatsInterface, 'events'>;
 
 export class StatsHelper {
-  private static enable = FeaturesConfigObject.instance.errorStats;
+  private static enable = new FeaturesConfigure().load().errorStats;
 
   public static prefix = 'stats';
   public static keys = new Set<string>();

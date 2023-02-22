@@ -18,6 +18,7 @@ import _ from 'lodash';
 import * as otplib from 'otplib';
 
 import { named } from '../../helper';
+import { RestCrudController } from '../../rest/base.controllers';
 import { DeprecateTokenParams, ObtainTokenOpts, OperationTokenHelper, SysTokenServiceName } from '../token';
 import { PasswordHelper, TokenHelper } from './abstract.auth.service';
 import { AdminAuthService } from './admin-auth.service';
@@ -29,11 +30,11 @@ import type { AdminUser } from './auth.entities';
 
 @ApiTags('sys-admin')
 @Controller('admin/auth')
-export class AdminAuthController /*extends RestCrudController*/ {
+export class AdminAuthController extends RestCrudController {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   constructor(private readonly adminAuthService: AdminAuthService) {
-    // super('auth');
+    super('auth');
   }
 
   @Post('otp')

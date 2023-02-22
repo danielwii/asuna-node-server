@@ -3,11 +3,12 @@ import { Logger } from '@nestjs/common';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import _ from 'lodash';
-import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
 import { fileURLToPath } from 'node:url';
 
-import { FeaturesConfigObject } from '../config/features.config';
+import _ from 'lodash';
+import { EntitySubscriberInterface, EventSubscriber, InsertEvent, RemoveEvent, UpdateEvent } from 'typeorm';
+
+import { FeaturesConfigure } from '../config/features.config';
 import { AppDataSource } from '../datasource';
 import { AuditService } from './audit.service';
 
@@ -16,7 +17,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
   private map = new Map();
   private auditService: AuditService = new AuditService();
-  private enabled = FeaturesConfigObject.load().auditEnable;
+  private enabled = new FeaturesConfigure().load().auditEnable;
 
   public constructor() {
     this.logger.log(`init ... audit: ${this.enabled}`);
