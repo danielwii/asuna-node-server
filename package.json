@@ -41,7 +41,7 @@
     "@aws-sdk/client-s3": "^3.276.0",
     "@aws-sdk/s3-request-presigner": "^3.276.0",
     "@contentful/rich-text-html-renderer": "^16.0.2",
-    "@danielwii/asuna-helper": "^0.1.5",
+    "@danielwii/asuna-helper": "^0.1.6",
     "@danielwii/asuna-shared": "^0.0.11",
     "@google-cloud/opentelemetry-cloud-trace-exporter": "^2.0.0",
     "@metinseylan/nestjs-opentelemetry": "^3.0.0",
@@ -218,5 +218,5 @@
     ],
     "delay": 2.5
   },
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@3.4.1"
 }
