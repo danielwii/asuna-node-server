@@ -10,10 +10,10 @@ import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
 import { InjectMultiUserProfile, UserProfile } from '../auth/user.entities';
 
 export enum UserRelationType {
-  request,
-  accepted,
-  ignored,
-  blocked,
+  request = 'request',
+  accepted = 'accepted',
+  ignored = 'ignored',
+  blocked = 'blocked',
 }
 
 @ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })

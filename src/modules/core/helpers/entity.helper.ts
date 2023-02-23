@@ -72,6 +72,10 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
   }
 }
 
+/**
+ * @deprecated use TZ=UTC in env file or process.env.TZ = 'UTC'
+ * @param entity
+ */
 export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
   const hours = new AppConfigure().load().fixTz;
   if (hours) {

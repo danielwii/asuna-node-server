@@ -8,6 +8,9 @@ import { fileURLToPath } from 'node:url';
 
 import { oneLine } from 'common-tags';
 import { addMonths, differenceInCalendarDays } from 'date-fns';
+import dayjs from 'dayjs';
+import calendar from 'dayjs/plugin/calendar';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
@@ -15,7 +18,7 @@ import { Cryptor } from 'node-buffs';
 import ow from 'ow';
 
 import { TimeUnit, formatTime, isBlank } from '../../common/helpers';
-import { configLoader } from '../../config';
+import { AppConfigure, configLoader } from '../../config';
 import { named } from '../../helper/annotations';
 import { ConfigKeys } from '../config';
 import { OperationTokenHelper, SysTokenServiceName } from '../token';
@@ -27,6 +30,9 @@ import type { PrimaryKey } from '../../common';
 import type { JwtPayload } from './auth.interfaces';
 import type { CreatedUser } from './auth.service';
 import type { AuthUser, AuthUserChannel, AuthUserType } from './base.entities';
+
+dayjs.extend(calendar);
+dayjs.extend(relativeTime);
 
 export class PasswordHelper {
   private static readonly cryptor = new Cryptor();
@@ -44,6 +50,9 @@ export interface CreatedToken {
   expiresIn: number;
   accessToken: string;
   refreshToken: string;
+  refreshTokenExpiredAt: Date;
+  expiredAt: string;
+  expiredCalendar: string;
 }
 
 export class TokenHelper {
@@ -66,7 +75,8 @@ export class TokenHelper {
 
     const type = _.get(user, 'constructor.name');
     Logger.log(`createToken >> ${r({ user, extra, type })}`);
-    const expiresIn = TimeUnit.DAYS.toSeconds(30); // one month
+    // const expiresIn = TimeUnit.DAYS.toSeconds(30); // one month
+    const expiresIn = new AppConfigure().load().tokenExpiresInSeconds;
     const secretOrKey = configLoader.loadConfig(ConfigKeys.SECRET_KEY, 'secret');
     const payload: Omit<JwtPayload, 'iat' | 'exp'> = {
       id: `${user.id}`,
@@ -92,7 +102,15 @@ export class TokenHelper {
       identifier: user.id,
       expiredAt: addMonths(new Date(), 3),
     });
-    return { expiresIn, accessToken, refreshToken: refreshToken.token };
+    const expiredAt = dayjs(new Date()).add(expiresIn, 'seconds');
+    return {
+      expiresIn,
+      accessToken,
+      refreshToken: refreshToken.token,
+      refreshTokenExpiredAt: refreshToken.expiredAt,
+      expiredAt: expiredAt.fromNow(),
+      expiredCalendar: expiredAt.calendar(),
+    };
   }
 
   public static createCustomToken(

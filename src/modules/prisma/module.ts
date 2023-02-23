@@ -1,11 +1,10 @@
-import { Global, Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 
 import { AppLifecycle } from '../../lifecycle';
 import { PrismaService } from './service';
 
-@Global()
 @Module({
   providers: [PrismaService],
   exports: [PrismaService],

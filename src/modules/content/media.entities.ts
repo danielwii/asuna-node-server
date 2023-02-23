@@ -9,8 +9,8 @@ import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 export enum MediaType {
-  images,
-  video,
+  images = 'images',
+  video = 'video',
 }
 
 @ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })

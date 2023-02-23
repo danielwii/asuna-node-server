@@ -3,11 +3,15 @@ import * as Sentry from '@sentry/node';
 import { ArgumentsHost, ExceptionFilter, HttpStatus, Logger } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
-import { AsunaErrorCode, AsunaException, ValidationException } from '@danielwii/asuna-helper/dist/exceptions';
+import {
+  AsunaBaseException,
+  AsunaErrorCode,
+  AsunaException,
+  ValidationException,
+} from '@danielwii/asuna-helper/dist/exceptions';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
-import _ from 'lodash';
 import * as R from 'ramda';
 import { QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
@@ -90,23 +94,36 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    let processed = exception;
-
-    if (R.is(QueryFailedError, exception)) {
-      processed = AnyExceptionFilter.handleSqlExceptions(exception);
-      // } else if (R.is(EntityColumnNotFound, exception)) {
-      //   processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
-    } else if (R.is(EntityNotFoundError, exception)) {
-      processed.status = HttpStatus.NOT_FOUND;
-    } else if (exception.name === 'ArgumentError') {
-      processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
-      Logger.warn(`[ArgumentError] found ${r(processed)}, need to convert to 400 error body`);
-    } else if (processed.code) {
-      if (processed.code === 'ERR_ASSERTION') {
-        // TODO wrap with AsunaException
-        processed.status = HttpStatus.BAD_REQUEST;
+    // make all exception to AsunaException
+    const processed = (() => {
+      if (R.is(QueryFailedError, exception)) {
+        Logger.warn(`[QueryFailedError] ${r(exception)}`);
+        return AnyExceptionFilter.handleSqlExceptions(exception);
+        // } else if (R.is(EntityColumnNotFound, exception)) {
+        //   processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
+      } else if (R.is(EntityNotFoundError, exception)) {
+        Logger.warn(`[EntityNotFoundError] ${r(exception)}`);
+        return { ...exception, status: HttpStatus.NOT_FOUND };
+      } else if (exception.name === 'ArgumentError') {
+        Logger.warn(`[ArgumentError] ${r(exception)}`);
+        return { ...exception, status: HttpStatus.UNPROCESSABLE_ENTITY };
+      } else if (R.is(AsunaBaseException, exception)) {
+        Logger.warn(`[AsunaBaseException] ${r(exception)}`);
+        return exception;
+      } else if (R.is(Error, exception)) {
+        Logger.warn(`[Error] ${r(exception)}`);
+        exception.name = 'Error';
+        return new AsunaException(AsunaErrorCode.Unprocessable, exception.message, exception);
+      } else if (exception.code) {
+        Logger.warn(`[Others] ${r(exception)}`);
+        if (exception.code === 'ERR_ASSERTION') {
+          // processed.status = HttpStatus.BAD_REQUEST;
+          return new AsunaException(AsunaErrorCode.BadRequest, exception.message, exception);
+        }
       }
-    }
+    })();
+
+    // Logger.warn(`[exception] ${r({ exception, processed })}`);
 
     const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
     const exceptionResponse = processed.response;
@@ -114,12 +131,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     // Logger.log(`check status ${r({ httpStatus, processed, exception })}`);
 
-    if (httpStatus && httpStatus === HttpStatus.BAD_REQUEST) {
+    if (httpStatus === HttpStatus.BAD_REQUEST) {
       // Logger.warn(`[bad_request] ${r(processed)}`);
       Logger.warn(`[bad_request] ${r(processed.message)}`);
-    } else if (httpStatus && httpStatus === HttpStatus.NOT_FOUND) {
+    } else if (httpStatus === HttpStatus.NOT_FOUND) {
       Logger.warn(`[not_found] ${r(processed.message)}`);
-    } else if (/40[13]/.test(`${httpStatus}`)) {
+    } else if (/40[13]|422/.test(`${httpStatus}`)) {
       // Logger.warn(`[unauthorized] ${r(processed)}`);
     } else if (/4\d+/.test(`${httpStatus}`)) {
       Logger.warn(`[client_error] ${r(processed)}`);
@@ -130,6 +147,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     if (res.writableEnded) return;
 
+    /*
     let body: { error: Partial<AsunaException> };
     let message: string;
 
@@ -160,7 +178,11 @@ export class AnyExceptionFilter implements ExceptionFilter {
         error: {
           // ...(processed as AsunaException),
           message: processed.name,
-          // code: processed.code || processed.status || AsunaErrorCode.Unexpected__do_not_use_it.value,
+          code:
+            _.get(processed, 'errors.code') ||
+            processed.code ||
+            processed.status ||
+            AsunaErrorCode.Unexpected__do_not_use_it.value,
         },
       };
     }
@@ -168,24 +190,27 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (_.isNil(body.error.code)) {
       Logger.warn(`no code found for one error: ${r(message)}`);
     }
+*/
 
     const isGraphqlRes = !res.status;
     const errorInfo = {
-      httpStatus,
+      // httpStatus,
       isGraphqlRes,
-      message,
-      body: _.omit(body, 'error.message'),
-      type: typeof exception,
-      name: exception.constructor.name,
+      // message,
+      // body,
+      // type: typeof exception,
+      processed: processed.constructor.name,
+      exception: exception.constructor.name,
       isHttpException: exception instanceof HttpException,
       isError: exception instanceof Error,
       isAsunaException: exception instanceof AsunaException,
+      isAsunaBaseException: exception instanceof AsunaBaseException,
     };
     if (![404].includes(httpStatus)) {
       if ([401, 403].includes(httpStatus)) {
         Logger.warn(`[unauthorized]: ${r(errorInfo)}`);
       } else {
-        Logger.error(`[ERROR]: ${r(errorInfo)}`);
+        Logger.error(`[ErrorInfo]: ${r(errorInfo)}`);
         StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
       }
     }
@@ -197,15 +222,23 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     // res.status 不存在时可能是 graphql 的请求，不予处理，直接抛出异常r
     if (isGraphqlRes) {
-      throw new Error(JSON.stringify(body));
+      throw new Error(JSON.stringify(exception));
+      // throw new Error(JSON.stringify(body));
     }
 
-    // Logger.error(`send ${r(body)} status: ${httpStatus}`);
+    // Logger.error(`send ${r({ body, message, processed, errorInfo })} status: ${httpStatus}`);
     const response = ApiResponse.failure({
-      status: body.error.httpStatus,
+      status: exception.httpStatus,
+      message: exception.message,
+      error: {
+        code: exception.code || undefined,
+        type: exception.name,
+        details: exception.details,
+      },
+      // status: body.error.httpStatus,
       // code: body.error.code,
-      error: { code: body.error.code, type: body.error.message },
-      message, // : body.error.message || body.error.name,
+      // error: { code: body.error.code, type: body.error.message, details: body.error.details },
+      // message: _.isArray(message) ? _.head(message) : message, // : body.error.message || body.error.name,
     });
     res.status(httpStatus).send(response);
   }

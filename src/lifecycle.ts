@@ -18,13 +18,12 @@ import fp from 'lodash/fp';
 
 import { IdGenerators } from './modules/base';
 import { HandlebarsHelper } from './modules/common/helpers';
-import { FeaturesConfigObject, configLoader, FeaturesConfigure } from './modules/config';
+import { FeaturesConfigure, configLoader } from './modules/config';
 import { SentryConfigure } from './modules/config/sentry.configure';
 import { AccessControlHelper } from './modules/core/auth/access-control.helper';
 import { ConfigKeys } from './modules/core/config';
 import { AsunaContext } from './modules/core/context';
 import { CronHelper } from './modules/helper';
-import { PrismaService } from './modules/prisma/service';
 import { Store } from './modules/store/store';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';

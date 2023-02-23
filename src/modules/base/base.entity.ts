@@ -1,4 +1,4 @@
-import { Field, ID, InterfaceType, Int } from '@nestjs/graphql';
+import { Field, ID, Int, InterfaceType } from '@nestjs/graphql';
 
 import {
   AfterLoad,
@@ -20,7 +20,18 @@ import { NameDescAttachable, Publishable } from './abilities';
 export type ExtendBaseEntity<ExtendType> = BaseEntity & ExtendType;
 export type EntityObject<Entity> = Omit<
   Entity,
-  'recover' | 'reload' | 'preSave' | 'beforeInsert' | 'afterLoad' | 'idPrefix' | 'generator' | 'of' | 'hasId' | 'save' | 'remove' | 'softRemove'
+  | 'recover'
+  | 'reload'
+  | 'preSave'
+  | 'beforeInsert'
+  | 'afterLoad'
+  | 'idPrefix'
+  | 'generator'
+  | 'of'
+  | 'hasId'
+  | 'save'
+  | 'remove'
+  | 'softRemove'
 >;
 export type EntityConstructorObject<Entity> = Omit<
   Entity,

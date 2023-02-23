@@ -1,3 +1,4 @@
+import { TimeUnit } from '../common';
 import { ConfigKeys, ConfigureLoader, YamlConfigKeys } from '../core/config';
 import { configLoader } from './loader';
 
@@ -8,6 +9,7 @@ export enum AppConfigKeys {
   fixTz = 'fix_tz',
   masterAddress = 'master_address',
   payloadLimit = 'payload_limit',
+  tokenExpiresInSeconds = 'token_expires_in_seconds',
 }
 
 export class AppConfigObject implements Record<keyof typeof AppConfigKeys, any> {
@@ -17,6 +19,7 @@ export class AppConfigObject implements Record<keyof typeof AppConfigKeys, any> 
   public fixTz: number;
   public masterAddress: string;
   public payloadLimit: string;
+  public tokenExpiresInSeconds: number;
 }
 
 export interface AppConfigure extends ConfigureLoader<AppConfigObject> {}
@@ -25,5 +28,6 @@ export interface AppConfigure extends ConfigureLoader<AppConfigObject> {}
   batchSize: 500,
   masterAddress: `http://127.0.0.1:${configLoader.loadConfig(ConfigKeys.PORT, 5000)}`,
   payloadLimit: '20mb',
+  tokenExpiresInSeconds: TimeUnit.DAYS.toSeconds(30),
 }))
 export class AppConfigure {}
