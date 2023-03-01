@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import * as scalars from 'graphql-scalars';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base';
@@ -22,7 +23,7 @@ export class Activity extends AbstractBaseEntity {
   @Column({ nullable: false, length: 20 })
   public operation: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
   public from?: string;
 
@@ -30,11 +31,11 @@ export class Activity extends AbstractBaseEntity {
   @Column({ nullable: false })
   public to: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column({ nullable: true })
   public reason?: string;
 
-  // @Field()
+  @Field((returns) => scalars.GraphQLJSONObject, { nullable: true })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public extra?: object;
 }

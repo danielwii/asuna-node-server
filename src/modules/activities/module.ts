@@ -6,11 +6,12 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import { fileURLToPath } from 'node:url';
 
+import { ActivityQueryResolver } from './resolver';
 import { ActivityService } from './service';
 
 @Global()
 @Module({
-  providers: [ActivityService],
+  providers: [ActivityService, ActivityQueryResolver],
   exports: [ActivityService],
 })
 export class ActivityModule extends InitContainer implements OnModuleInit {
