@@ -39,6 +39,7 @@ export class SearchController {
 
     // 处理关联条件查询
 
+    if (_.isArray(where)) throw new Error('array where not implemented yet.');
     const { normalWhere, relatedFields } = parseNormalWhereAndRelatedFields(where, repository);
 
     const selectFilter = R.map((field) => `${model}.${field} like :${field}`, on).join(' or ');

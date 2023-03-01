@@ -43,7 +43,7 @@ export class UserProfileIdentifierHelper {
   }
 
   static identify(identifier: string): boolean {
-    return this.resolve(identifier).type === 'u';
+    return this.resolve(identifier).type === 'p';
   }
 }
 
@@ -58,6 +58,21 @@ export class OrgUserProfileIdentifierHelper {
   }
 
   static identify(identifier: string): boolean {
-    return this.resolve(identifier).type === 'u';
+    return this.resolve(identifier).type === 'org';
+  }
+}
+
+@StaticImplements<IdentifierHelper<Partial<{ id: number }>>>()
+export class ApiKeyIdentifierHelper {
+  static parse = (identifier: string): Partial<{ id: number }> => ({ id: +identifier.split('=')[1] });
+
+  static stringify = (payload: Partial<{ id: number }>): string => `key=${payload.id}`;
+
+  static resolve(identifier: string): { type: string; id: number } {
+    return { type: identifier.split('=')[0], id: +identifier.split('=')[1] };
+  }
+
+  static identify(identifier: string): boolean {
+    return this.resolve(identifier).type === 'key';
   }
 }

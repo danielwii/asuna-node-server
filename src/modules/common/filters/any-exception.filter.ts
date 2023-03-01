@@ -12,6 +12,7 @@ import {
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
 
+import _ from 'lodash';
 import * as R from 'ramda';
 import { QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
@@ -84,6 +85,11 @@ export class AnyExceptionFilter implements ExceptionFilter {
       })();
       return new AsunaException(AsunaErrorCode.Unprocessable, 'connection lost, reconnect...');
     }
+    if (_.has(exception, 'hint')) {
+      _.set(exception, 'details', [_.get(exception, 'hint')]);
+      // _.set(exception, 'httpStatus', HttpStatus.INTERNAL_SERVER_ERROR);
+      return exception;
+    }
 
     Logger.error(`unresolved QueryFailedError: ${r(exception)}`);
     return exception;
@@ -94,8 +100,26 @@ export class AnyExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    // make all exception to AsunaException
-    const processed = (() => {
+    // make all exception to common standard
+    const processed: {
+      httpStatus: string;
+      code?: string;
+      type?: string;
+      message?: string;
+      details?: any[];
+      // cause: Error;
+      parsed?: {
+        // use it all the time
+        status: number;
+        message: string;
+        error: {
+          type: string;
+          code?: string;
+          details?: any[];
+          cause?: Error;
+        };
+      };
+    } = (() => {
       if (R.is(QueryFailedError, exception)) {
         Logger.warn(`[QueryFailedError] ${r(exception)}`);
         return AnyExceptionFilter.handleSqlExceptions(exception);
@@ -110,10 +134,29 @@ export class AnyExceptionFilter implements ExceptionFilter {
       } else if (R.is(AsunaBaseException, exception)) {
         Logger.warn(`[AsunaBaseException] ${r(exception)}`);
         return exception;
+      } else if (R.is(HttpException, exception)) {
+        Logger.warn(`[HttpException] ${r(exception)}`);
+        const details = _.get(exception, 'response.message');
+        return {
+          parsed: {
+            status: exception.getStatus(),
+            message: _.isString(details) ? details : _.get(exception, 'response.error') ?? exception.message,
+            error: {
+              type: exception.constructor.name,
+              details: _.isArray(details) ? details : undefined,
+              cause: _.get(exception, 'cause.message'),
+            },
+          },
+        };
       } else if (R.is(Error, exception)) {
         Logger.warn(`[Error] ${r(exception)}`);
-        exception.name = 'Error';
-        return new AsunaException(AsunaErrorCode.Unprocessable, exception.message, exception);
+        return {
+          parsed: {
+            status: HttpStatus.UNPROCESSABLE_ENTITY,
+            message: exception.message,
+            error: { type: exception.constructor.name },
+          },
+        };
       } else if (exception.code) {
         Logger.warn(`[Others] ${r(exception)}`);
         if (exception.code === 'ERR_ASSERTION') {
@@ -125,11 +168,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
 
     // Logger.warn(`[exception] ${r({ exception, processed })}`);
 
-    const httpStatus: number = processed.status || processed.httpStatus || HttpStatus.INTERNAL_SERVER_ERROR;
-    const exceptionResponse = processed.response;
+    const httpStatus: number =
+      exception.status || processed.httpStatus || processed.parsed?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+    // const exceptionResponse = processed.response;
     processed.message = exception.message;
 
-    // Logger.log(`check status ${r({ httpStatus, processed, exception })}`);
+    Logger.warn(`processed ${r({ httpStatus, processed })}`);
 
     if (httpStatus === HttpStatus.BAD_REQUEST) {
       // Logger.warn(`[bad_request] ${r(processed)}`);
@@ -199,6 +243,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
       // message,
       // body,
       // type: typeof exception,
+      httpStatus,
+      exceptionStatus: exception.status,
+      processedHttpStatus: processed.httpStatus,
       processed: processed.constructor.name,
       exception: exception.constructor.name,
       isHttpException: exception instanceof HttpException,
@@ -226,20 +273,21 @@ export class AnyExceptionFilter implements ExceptionFilter {
       // throw new Error(JSON.stringify(body));
     }
 
-    // Logger.error(`send ${r({ body, message, processed, errorInfo })} status: ${httpStatus}`);
-    const response = ApiResponse.failure({
-      status: exception.httpStatus,
-      message: exception.message,
-      error: {
-        code: exception.code || undefined,
-        type: exception.name,
-        details: exception.details,
-      },
-      // status: body.error.httpStatus,
-      // code: body.error.code,
-      // error: { code: body.error.code, type: body.error.message, details: body.error.details },
-      // message: _.isArray(message) ? _.head(message) : message, // : body.error.message || body.error.name,
-    });
-    res.status(httpStatus).send(response);
+    if (processed.parsed) {
+      res.status(processed.parsed.status).send(processed.parsed);
+    } else {
+      // Logger.error(`send ${r({ body, message, processed, errorInfo })} status: ${httpStatus}`);
+      const details = processed.details ?? exception.details;
+      const response = ApiResponse.failure({
+        status: httpStatus,
+        message: exception.message,
+        error: {
+          code: exception.code || undefined,
+          type: exception.constructor.name || exception.name,
+          details: details === exception.message ? undefined : details,
+        },
+      });
+      res.status(httpStatus).send(response);
+    }
   }
 }

@@ -188,7 +188,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
       { email: identifier.email, username: identifier.username, isActive },
       (v) => !_.isUndefined(v),
     ) as FindOptionsWhere<U>;
-    this.superLogger.debug(`get user by where ${r(where)}`);
+    this.superLogger.verbose(`get user by where ${r(where)}`);
     if (isBlank(where.email) && isBlank(where.username)) {
       throw new AsunaException(AsunaErrorCode.BadRequest, `email or username must not both be empty`);
     }

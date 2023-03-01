@@ -1,5 +1,4 @@
 import { Body, Delete, Get, Logger, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiParam } from '@nestjs/swagger';
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -9,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
 // @ts-ignore
-// eslint-disable-next-line import/no-unresolved
 import ow from 'ow';
 import * as R from 'ramda';
 
@@ -21,16 +19,17 @@ import {
   DBHelper,
   OriginSchema,
   parseFields,
+  parseNormalWhere,
   parseNormalWheres,
   parseOrder,
   parseWhere,
 } from '../core/db';
 import { KvService } from '../core/kv/kv.service';
 import { RestService } from '../core/rest/rest.service';
+import { AnyAuthRequest, named } from '../helper';
 import { Tenant, TenantService } from '../tenant';
 
 import type { BaseEntity, DeleteResult } from 'typeorm';
-import type { AnyAuthRequest } from '../helper';
 
 export abstract class RestCrudController {
   private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
@@ -67,14 +66,13 @@ export abstract class RestCrudController {
   /**
    * @deprecated {@see schema}
    * @param model
+   * @param funcName
    */
-  @ApiParam({
-    name: 'model',
-    description: ['about_us', 'about_us_categories', 'videos', 'video_categories'].join(','),
-  })
   @UseGuards(JwtAdminAuthGuard)
   @Options(':model')
-  public options(@Param('model') model: string): ColumnSchema[] {
+  @named
+  public options(@Param('model') model: string, funcName?: string): ColumnSchema[] {
+    this.superLogger.log(`#${funcName}: ${r({ model })}`);
     const repository = DBHelper.repo(DBHelper.getModelNameObject(model, this.module));
     return DBHelper.extractAsunaSchemas(repository, { module: this.module, prefix: this.prefix });
   }
@@ -118,6 +116,7 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model')
+  @named
   public async list(
     @CurrentUser() admin: JwtPayload,
     @CurrentTenant() tenant: Tenant,
@@ -128,18 +127,20 @@ export abstract class RestCrudController {
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string | string[],
     @Query('where') whereStr?: string,
-    @Query('sort') sortStr?: string,
+    @Query('sort') sort?: string | JSON,
     @Query('relations') relationsStr?: string,
+    funcName?: string,
   ): Promise<{ query: object; items: any[]; total: number; page: number; size: number }> {
+    this.superLogger.log(`#${funcName}: ${r({ model, page, size, whereStr, sort, relationsStr })}`);
     const modelName = DBHelper.getModelNameObject(model, this.module);
     if (tenant) await this.getTenantService().checkPermission(admin.id as string, modelName.entityName);
     const repository = DBHelper.repo(modelName);
     const parsedFields = parseFields(fields);
     const where = parseWhere(whereStr);
-    const order = parseOrder(modelName.model, sortStr);
+    const order = parseOrder(modelName.model, sort);
     const query = { where, order, parsedFields, skip: (page - 1) * size, take: Number(size) };
 
-    // this.superLogger.log(`list ${r({ whereStr, query, order })}`);
+    this.superLogger.log(`list ${r({ whereStr, where, query, order })}`);
 
     const queryBuilder = repository.createQueryBuilder(modelName.model);
     const primaryKeys = repository.metadata.columns
@@ -154,13 +155,16 @@ export abstract class RestCrudController {
 
     const dataFilter = DBHelper.loadDataFilter(roles, modelName.entityName);
     const filterWheres = parseWhere(JSON.stringify(dataFilter));
-    const parsedNormalWheres = parseNormalWheres(where, repository);
-    this.superLogger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
-
     // TODO 这里的 where 是数组 即 or 状态的时候简单使用 qb 来生成，DBHelper.wrapNormalWhere 用来处理更复杂的情况，但不包括最外层的 or。
-    if (parsedNormalWheres.length > 1) queryBuilder.where(where);
-    else if (parsedNormalWheres.length === 1)
+    if (_.isArray(where)) {
+      const parsedNormalWheres = parseNormalWheres(where, repository);
+      this.superLogger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
+      queryBuilder.where(where);
+    } else {
+      const parsedNormalWheres = parseNormalWhere(where, repository);
+      this.superLogger.log(`list ${r(modelName)} with ${r({ where, parsedNormalWheres, filterWheres })}`);
       DBHelper.wrapNormalWhere(modelName.model, queryBuilder, parsedNormalWheres);
+    }
 
     if (filterWheres) queryBuilder.andWhere(filterWheres as any);
 
@@ -245,12 +249,21 @@ export abstract class RestCrudController {
     // const relations = DBHelper.getRelationPropertyNames(repository.target as any);
     const relationKeys = _.merge(
       {},
-      ...repository.metadata.relations.map((relation) => ({
-        [relation.propertyName]: _.get(relation, 'target.entityInfo.name'),
-      })),
+      ...repository.metadata.relations.map((relation) => {
+        this.superLogger.log(
+          `load relation ${r({
+            propertyName: relation.propertyName,
+            entityInfo: _.get(relation, 'target.entityInfo'),
+          })}`,
+        );
+        return {
+          [relation.propertyName]: _.get(relation, 'target.entityInfo.name'),
+        };
+      }),
     );
     this.superLogger.log(`load relationIds ${r({ modelName, id, relationKeys })}`);
     const relationIds = R.mapObjIndexed((value, relation) => {
+      this.superLogger.debug(`resolve ${r({ value, relation, entityName: relationKeys[relation] })}`);
       const primaryKeys = DBHelper.getPrimaryKeys(DBHelper.repo(relationKeys[relation]));
       this.superLogger.debug(`resolve ${r({ value, relationModelName: relation, primaryKeys })}`);
       return _.isArray(value)

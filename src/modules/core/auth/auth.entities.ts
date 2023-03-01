@@ -7,7 +7,8 @@ import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
-export class AdminApiKeys extends Publishable(AbstractNameEntity) {
+export class AdminApiKey extends Publishable(AbstractNameEntity) {
+  @MetaInfo({ name: 'AccessToken', type: 'Generate', extra: { auto: true, length: 128 } })
   @Column({ nullable: false, name: 'key' })
   public key: string;
 

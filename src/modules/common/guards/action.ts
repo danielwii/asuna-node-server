@@ -1,9 +1,11 @@
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import * as crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 
 import qs from 'qs';
 
@@ -14,6 +16,8 @@ import type { PrimaryKey } from '../identifier';
 
 @Injectable()
 export class ActionRateLimitGuard implements CanActivate {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
   public constructor(private readonly key: string, private readonly expiresInSeconds = 5) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -21,7 +25,7 @@ export class ActionRateLimitGuard implements CanActivate {
     // const res = context.switchToHttp().getResponse<Response>();
     // const next = context.switchToHttp().getNext();
 
-    Logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
+    this.logger.log(`check url: ${req.url} ${r({ key: this.key })}`);
     await ActionHelper.check(this.key, req, req.body, req.payload?.id, this.expiresInSeconds);
 
     return true;
@@ -64,7 +68,7 @@ class ActionHelper {
       throw new AsunaException(AsunaErrorCode.TooManyRequests);
     }
     InMemoryDB.save(calcKey, true, { expiresInSeconds: expiresInSeconds || 5, db: 6 }).catch((reason) =>
-      Logger.error(reason),
+      Logger.error(`get action error ${r(reason)}`),
     );
   }
 }

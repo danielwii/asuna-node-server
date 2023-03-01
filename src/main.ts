@@ -1,11 +1,11 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 
-import { AdminApiKeys } from './modules/core/auth/auth.entities';
+import { AdminApiKey } from './modules/core/auth/auth.entities';
 
 @Module({})
 export class ApplicationModule implements OnModuleInit {
   public onModuleInit(): void {
-    AdminApiKeys.create({ name: 'dev-only', key: 'dev', isPublished: true }).save().catch(console.warn);
+    AdminApiKey.create({ name: 'dev-only', key: 'dev', isPublished: true }).save().catch(console.warn);
   }
 }
 

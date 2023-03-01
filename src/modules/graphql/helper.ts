@@ -262,17 +262,17 @@ export class GraphqlHelper {
   }
 
   /**
-   * @param cls
-   * @param info
-   * @param select
-   * @param pageRequest
-   * @param where
-   * @param relationPath
-   * @param categoryRef 类型的引用字段，默认为 category
-   * @param categoryCls
-   * @param query
-   * @param timeCondition
-   * @param cache 所有用户敏感的数据都应该关闭 cache，默认 true
+   * @param opts.cls
+   * @param opts.info
+   * @param opts.select
+   * @param opts.pageRequest
+   * @param opts.where
+   * @param opts.relationPath
+   * @param opts.categoryRef 类型的引用字段，默认为 category
+   * @param opts.categoryCls
+   * @param opts.query
+   * @param opts.timeCondition
+   * @param opts.cache 所有用户敏感的数据都应该关闭 cache，默认 true
    */
   public static async genericFindOptions<Entity extends BaseEntity>(
     opts:

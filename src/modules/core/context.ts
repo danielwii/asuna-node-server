@@ -194,7 +194,7 @@ export class AsunaContext {
     );
   }
 
-  public getFilePath(fullpath: string): string {
+  public static getFilePath(fullpath: string): string {
     return join(Global.uploadPath, '../', fullpath);
   }
 

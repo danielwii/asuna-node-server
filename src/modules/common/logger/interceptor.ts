@@ -65,5 +65,6 @@ export class LoggerInterceptor implements NestInterceptor {
         throw e;
       }),
     );
+    // .pipe(map((data) => ({ data, signed: 'signed' })))
   }
 }

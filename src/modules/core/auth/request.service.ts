@@ -66,7 +66,7 @@ export class RequestAuthService {
 
   public async authAdminApiKey(req: AnyAuthRequest<ApiKeyPayload>, res: Response): Promise<AuthResult<ApiKeyPayload>> {
     return new Promise((resolve) => {
-      passport.authenticate('admin-api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
+      passport.authenticate('api-key', { session: false }, (err, payload: ApiKeyPayload, info) => {
         this.logger.log(`admin-api-key auth: ${r({ err, payload, info })}`);
         if (err || info) {
           this.logger.error(`api-key auth error: ${r({ err, info })}`);

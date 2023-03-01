@@ -11,12 +11,13 @@ import { fileURLToPath } from 'node:url';
 import * as redisStore from 'cache-manager-redis-store';
 import _ from 'lodash';
 
+import { ActivityModule } from './activities/module';
 import { AdminController } from './admin.controller';
-import { ClientModule } from './client';
+import { ClientModule } from './client/module';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
 import { configLoader } from './config';
-import { ContentModule } from './content';
-import { ContentfulModule } from './contentful';
+import { ContentModule } from './content/content.module';
+import { ContentfulModule } from './contentful/contentful.module';
 import {
   CommandController,
   GetUploadsModule,
@@ -41,7 +42,6 @@ import { SexEnumValue } from './enum-values';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
-import { PrismaModule } from './prisma';
 import { PropertyModule } from './property';
 import {
   AdminAppRestController,
@@ -52,7 +52,7 @@ import {
   AdminRestRestController,
   AdminSysRestController,
   AdminWxRestController,
-  WwwRestController,
+  WwwAdminRestController,
 } from './rest';
 import { SearchController } from './search/search.controller';
 import { SMSModule } from './sms';
@@ -66,6 +66,7 @@ import { WebModule } from './web';
     DynamicRouterModule,
     GraphqlQueryModule,
     AuthModule,
+    ActivityModule,
     InteractionModule,
     configLoader.loadConfig('FEATURES_PAYMENT_ENABLED') ? PaymentModule : null,
     ContentModule,
@@ -86,7 +87,7 @@ import { WebModule } from './web';
     CacheModule.registerAsync({
       useFactory: () => {
         const redisConfig = RedisConfigObject.load('graphql');
-        Logger.log(`init cache module with redis: ${r(redisConfig)}`);
+        Logger.log(`[CacheModule] init cache module with redis: ${r(redisConfig)}`);
         return redisConfig.enable ? { store: redisStore, ...redisConfig.getOptions() } : {};
       },
     }),
@@ -104,7 +105,7 @@ import { WebModule } from './web';
     AdminPaymentRestController,
     AdminAuthRestController,
     AdminRestRestController,
-    WwwRestController,
+    WwwAdminRestController,
     CommandController,
     UserController,
     SearchController,

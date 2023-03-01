@@ -4,18 +4,18 @@ import { RedisLockProvider } from '@danielwii/asuna-helper/dist/providers/redis/
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { isProductionEnv } from '@danielwii/asuna-helper/dist/utils';
 
-import bluebird from 'bluebird';
-import glob from 'glob';
-import _ from 'lodash';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import bluebird from 'bluebird';
+import { glob } from 'glob';
+import _ from 'lodash';
 import { DataSource } from 'typeorm';
 
 import { renameTables, runCustomMigrations } from './migrations';
 import { TimeUnit } from './modules/common/helpers/utils';
 import { configLoader } from './modules/config/loader';
 import { Global } from './modules/core/global';
-import { KvService } from './modules/core/kv/kv.service';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import type { BootstrapOptions } from './interface';
@@ -136,13 +136,13 @@ export async function resolveTypeormPaths(options?: BootstrapOptions): Promise<v
   Logger.log(`resolve typeorm entities: ${r(entities)}`);
   Logger.log(`resolve typeorm subscribers: ${r(subscribers)}`);
 
-  await Promise.map(entities, promisifyGlob).then((resolved) => Logger.debug(`resolved entities ${r(resolved)}`));
-  await Promise.map(subscribers, promisifyGlob).then((resolved) => Logger.debug(`resolved subscribers ${r(resolved)}`));
+  await Promise.map(entities, (pattern) => glob(pattern)).then((resolved) =>
+    Logger.debug(`resolved entities ${r(resolved)}`),
+  );
+  await Promise.map(subscribers, (pattern) => glob(pattern)).then((resolved) =>
+    Logger.debug(`resolved subscribers ${r(resolved)}`),
+  );
 
   process.env.TYPEORM_ENTITIES = entities.join();
   process.env.TYPEORM_SUBSCRIBERS = subscribers.join();
-}
-
-function promisifyGlob(pattern: string): Promise<string[]> {
-  return new Promise((resolve, reject) => glob(pattern, {}, (err, matches) => (err ? reject(err) : resolve(matches))));
 }

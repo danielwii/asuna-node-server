@@ -75,7 +75,7 @@ const isProduction = process.env.NODE_ENV === 'production';
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         Logger.log(
-          `resolve entities & subscribers by ${r({
+          `[TypeOrmModule] resolve entities & subscribers by ${r({
             TYPEORM_ENTITIES: process.env.TYPEORM_ENTITIES,
             TYPEORM_SUBSCRIBERS: process.env.TYPEORM_SUBSCRIBERS,
           })}`,
@@ -104,7 +104,7 @@ const isProduction = process.env.NODE_ENV === 'production';
             // connectionTimeoutMillis: 1000,
           },
         };
-        Logger.log(`init datasource by ${r(_.omit(options, 'password'))}`);
+        Logger.log(`[TypeOrmModule] init datasource by ${r(_.omit(options, 'password'))}`);
         return options;
       },
     }),

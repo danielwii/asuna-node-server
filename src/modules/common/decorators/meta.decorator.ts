@@ -111,6 +111,11 @@ export interface EnumFilterMetaInfoOptions extends MetaInfoBaseOptions {
   enumData: { [key: string]: string | object };
 }
 
+export interface GenerateMetaInfoOptions extends MetaInfoBaseOptions {
+  type: 'Generate';
+  extra: { auto: boolean; length: number };
+}
+
 export interface EditableEnumMetaInfoOptions extends MetaInfoBaseOptions {
   type: 'EditableEnum';
   enumData: { [key: string]: string | object };
@@ -159,6 +164,7 @@ export type MetaInfoOptions =
   | EnumMetaInfoOptions
   | EditableEnumMetaInfoOptions
   | JSONMetaInfoOptions
+  | GenerateMetaInfoOptions
   | UploadMetaInfoOptions;
 
 /**

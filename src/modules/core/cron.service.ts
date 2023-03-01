@@ -56,7 +56,7 @@ export class CronService {
         ? RedisLockProvider.instance
             .lockProcess(operation, handler, { ttl: ttl * 1000 })
             .catch((reason) => this.logger.error(reason))
-        : handler().catch((reason) => this.logger.error(reason));
+        : handler().catch((reason) => this.logger.error(`${operation} error: ${r(reason)}`));
 
     return new CronJob({
       cronTime,

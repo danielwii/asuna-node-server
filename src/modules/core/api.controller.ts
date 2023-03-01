@@ -120,6 +120,7 @@ export class ApiController {
     if (scid) {
       return ApiResponse.success(await TokenHelper.createSessionToken(null, { scid, ...body }));
     }
-    return ApiResponse.failure({ message: 'no scid found' });
+    // return ApiResponse.failure({ message: 'no scid found' });
+    throw new AsunaException(AsunaErrorCode.Unprocessable, 'no scid found');
   }
 }

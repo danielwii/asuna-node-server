@@ -491,7 +491,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
 
   @Put('profile')
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<void> {
+  async updateProfile(@Body() dto: UpdateProfileDTO, @Req() req: JwtAuthRequest): Promise<ApiResponse> {
     const { payload, user } = req;
     this.superLogger.log(`update profile: ${r({ dto, payload, user })}`);
 
@@ -503,6 +503,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
     dto.nickname && (profile.nickname = dto.nickname);
     dto.position && (profile.position = dto.position);
     await profile.save();
+    return ApiResponse.success();
   }
 
   @Post('sign-in-with-apple')
@@ -512,7 +513,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
     @Body() dto: SignInWithAppleDTO,
     @Req() req: JwtAuthRequest,
     funcName?: string,
-  ): Promise<CreatedToken | void> {
+  ): Promise<ApiResponse<CreatedToken>> {
     const { payload } = req;
     const appleConfig = await AppleConfigure.load();
     this.superLogger.log(`#${funcName} ${r({ dto, payload, appleConfig: appleConfig })}`);
@@ -576,7 +577,8 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
       await AppleUserProfile.save(exists);
       // TODO
       this.superLogger.warn(`#${funcName} should return something`);
-      return;
+      // return ApiResponse.failure({ message: 'not implemented' });
+      throw new Error('not implemented');
     } else if (!exists.profileId) {
       // 不存在profileId时创建一个并绑定
       const username = chance.string({ length: 12, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
@@ -592,10 +594,12 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
       exists.profileId = profile.id;
       // await exists.save();
       await AppleUserProfile.save(exists);
-      return await this.authService.createToken(profile, { uid: `${signed.user.id}` });
+      const token = await this.authService.createToken(profile, { uid: `${signed.user.id}` });
+      return ApiResponse.success(token);
     } else {
       // 存在profile时直接创建一个token返回
-      return await this.authService.createToken(exists.profile);
+      const token = await this.authService.createToken(exists.profile);
+      return ApiResponse.success(token);
     }
   }
 
@@ -683,7 +687,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
   }
 
   @Post('sign-up')
-  async signUp(@Body() body) {
+  async signUp(@Body() body): Promise<ApiResponse> {
     this.superLogger.log(`sign-up: ${r(body)}`);
     const errors = await validate('usernameValidationSchema', { username: body.username });
     if (errors.length) {
@@ -697,7 +701,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
     }
 
     this.superLogger.log('exists user not found, create one...');
-    return this.authService
+    const data = await this.authService
       .createUser(_.get(body, 'username'), _.get(body, 'email'), _.get(body, 'password'))
       .then(async (result) => {
         this.superLogger.log(`created user ${r(result)}`);
@@ -711,6 +715,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
         return this.UserEntity.findOne({ where: { id: result.user.id } as any, relations });
         // return _.get(user, 'profile');
       });
+    return ApiResponse.success(data);
   }
 
   // refresh access token by refresh token
@@ -721,18 +726,19 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
     @Body('refreshToken') refreshToken: string,
     @Req() req: JwtAuthRequest,
     funcName?: string,
-  ): Promise<CreatedToken> {
+  ): Promise<ApiResponse<CreatedToken>> {
     const available = await OperationTokenHelper.checkAvailableByToken(refreshToken);
     this.superLogger.log(`#${funcName} token is available: ${r({ refreshToken, available })}`);
     if (!available) {
       throw new AsunaException(AsunaErrorCode.InvalidToken, 'refresh token not invalid');
     }
-    return this.authService.createToken(req.profile, { uid: `${req.user.id}` });
+    const data = await this.authService.createToken(req.profile, { uid: `${req.user.id}` });
+    return ApiResponse.success(data);
   }
 
   @Post('token')
   @HttpCode(HttpStatus.OK)
-  async getToken(@Body() dto: SignInDTO): Promise<CreatedToken> {
+  async getToken(@Body() dto: SignInDTO): Promise<ApiResponse<CreatedToken>> {
     this.superLogger.log(`getToken() >> ${dto.username}`);
     const profile = await this.authService.getUserWithPassword({ username: dto.username });
 
@@ -755,12 +761,13 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
       : profile;
     // return TokenHelper.createToken(profile, { uid: user.id });
     this.superLogger.log(`getToken() ${r({ authUser, hasProfile, profile, columnNames })}`);
-    return this.authService.createToken(profile, hasProfile ? { uid: `${authUser.id}` } : undefined);
+    const data = await this.authService.createToken(profile, hasProfile ? { uid: `${authUser.id}` } : undefined);
+    return ApiResponse.success(data);
   }
 
   @Get('current')
   @UseGuards(JwtAuthGuard)
-  async current(@Req() req: JwtAuthRequest): Promise<DeepPartial<WithProfileUser>> {
+  async current(@Req() req: JwtAuthRequest): Promise<ApiResponse<DeepPartial<WithProfileUser>>> {
     const { user, payload } = req;
     this.superLogger.log(`current... ${r({ user, payload })}`);
     if (!payload) {
@@ -794,12 +801,14 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
       _.set(result, 'profile', desensitized);
     }
     result.profile.isBindApple = await AppleUserProfile.findOneBy({ profileId: payload.id }).then((o) => !!o);
-    return this.handlers.onCurrent ? await this.handlers.onCurrent(result) : result;
+    const data = this.handlers.onCurrent ? await this.handlers.onCurrent(result) : result;
+    return ApiResponse.success(data);
   }
 
   @Get('authorized')
   @UseGuards(JwtAuthGuard)
-  async authorized(): Promise<void> {
+  async authorized(): Promise<ApiResponse> {
     this.superLogger.log('Authorized route...');
+    return ApiResponse.success();
   }
 }

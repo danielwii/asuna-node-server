@@ -67,19 +67,19 @@ export const ConfigKeys = {
   ASSETS_INTERNAL_ENDPOINT: 'ASSETS_INTERNAL_ENDPOINT',
 
   /**
-   * @deprecated
+   * @deprecated use STORAGE_DEFAULT
    */
   VIDEOS_STORAGE: 'VIDEOS_STORAGE',
   /**
-   * @deprecated
+   * @deprecated use STORAGE_DEFAULT
    */
   IMAGES_STORAGE: 'IMAGES_STORAGE',
   /**
-   * @deprecated
+   * @deprecated use STORAGE_DEFAULT
    */
   FILES_STORAGE: 'FILES_STORAGE',
   /**
-   * @deprecated
+   * @deprecated use STORAGE_DEFAULT
    */
   CHUNKS_STORAGE: 'CHUNKS_STORAGE',
 

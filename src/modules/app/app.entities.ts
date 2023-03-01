@@ -67,9 +67,17 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   @Column('text', { nullable: true })
   public description: string;
 
+  @Field()
+  @MetaInfo({ name: 'File', type: 'File' })
+  @Column({ nullable: true, name: 'url' })
+  public url: string;
+
+  /**
+   * @deprecated use path
+   */
   @Field((returns) => [String])
-  @MetaInfo({ name: 'File', type: 'File', safeReload: 'json-array' })
-  @Column(ColumnTypeHelper.JSON, { nullable: false, name: 'paths' })
+  @MetaInfo({ name: 'Files', type: 'Files', safeReload: 'json-array' })
+  @Column(ColumnTypeHelper.JSON, { nullable: true, name: 'paths' })
   public paths: JsonArray;
 
   @MetaInfo({ name: '所属应用' })
