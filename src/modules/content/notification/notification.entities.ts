@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractNameEntity, Publishable } from '../../base';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import {
   NotificationEnum,
   NotificationEnumValue,

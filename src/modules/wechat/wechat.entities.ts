@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
+import { EntityMetaInfo, JsonArray, MetaInfo } from '@danielwii/asuna-shared';
 
 import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsIn, IsOptional } from 'class-validator';
@@ -18,15 +19,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators/meta.decorator';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
 import { WxSubscribeSceneType } from './wx.interfaces';
 
-import type { AdminUser } from '../core/auth/auth.entities';
-import type { IdentifierHelper } from '../common/identifier';
 import type { EntityConstructorObject } from '../base/base.entity';
+import type { IdentifierHelper } from '../common/identifier';
+import type { AdminUser } from '../core/auth/auth.entities';
 import type { UserProfile } from '../core/auth/user.entities';
 
 @StaticImplements<IdentifierHelper<Partial<{ openId: string }>>>()

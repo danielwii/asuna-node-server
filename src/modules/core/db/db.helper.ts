@@ -30,9 +30,9 @@ import { Profile } from '../../common/helpers/normal';
 import { AppDataSource } from '../../datasource';
 import { AsunaContext } from '../context';
 
+import type { Condition, EntityMetaInfoOptions, MetaInfoOptions } from '@danielwii/asuna-shared';
 import type { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 import type { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
-import type { Condition, EntityMetaInfoOptions, MetaInfoOptions } from '../../common/decorators/meta.decorator';
 import type { Role } from '../auth/auth.entities';
 
 export interface ColumnSchema {

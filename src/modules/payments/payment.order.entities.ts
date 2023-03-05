@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../base';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 

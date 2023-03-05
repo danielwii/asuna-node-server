@@ -6,7 +6,7 @@ import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
 import { CacheUtils } from '../../cache/utils';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../helpers';
 
 import type { KeyValueModel } from './kv.isolated.entities';

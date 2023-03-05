@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo } from '../common/decorators';
+import { EntityMetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 export const AuditType = {

@@ -1,6 +1,6 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
-import type { JsonArray } from '../common/decorators';
+import type { JsonArray } from '@danielwii/asuna-shared';
 
 export class FeedbackReplyBody {
   @IsArray()

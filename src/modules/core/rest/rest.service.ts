@@ -4,13 +4,15 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { validateObject } from '@danielwii/asuna-helper/dist/validate';
 
+import { fileURLToPath } from 'node:url';
+
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import { fileURLToPath } from 'node:url';
 import * as R from 'ramda';
 
 import { AppDataSource } from '../../datasource';
 import { TenantService } from '../../tenant/tenant.service';
+import { AdminUserIdentifierHelper } from '../auth';
 import { DBHelper, ModelNameObject, parseFields } from '../db';
 import { KeyValuePair } from '../kv/kv.entities';
 import { KvService } from '../kv/kv.service';
@@ -98,11 +100,13 @@ export class RestService {
       R.pick(relationKeys, body || {}) as any,
     );
 
+    const identifier = AdminUserIdentifierHelper.stringify(user);
     const entity = repository.create({
       ...body,
       ...relationIds,
       updatedBy: user.username,
       ...tenantRelatedFields,
+      createdBy: identifier,
     } as any);
     await validateObject(entity);
     /*

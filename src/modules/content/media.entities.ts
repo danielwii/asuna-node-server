@@ -4,7 +4,7 @@ import { Column, Entity } from 'typeorm';
 
 import { SoftDelete } from '../base/abilities';
 import { AbstractTimeBasedBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 

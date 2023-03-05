@@ -5,7 +5,7 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { AbstractBaseEntity, EntityConstructorObject } from '../base';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InjectMultiUserProfile, InjectUserProfile } from '../core/auth/user.entities';
 import { AbstractTransactionEntity } from './base.entities';
 

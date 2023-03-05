@@ -4,7 +4,7 @@ import { Column, Entity } from 'typeorm';
 
 import { Publishable } from '../base/abilities';
 import { AbstractNameEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers';
 import {
   ExchangeCurrencyEnum,

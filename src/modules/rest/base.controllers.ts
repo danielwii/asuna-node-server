@@ -1,7 +1,22 @@
-import { Body, Delete, Get, Logger, Options, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  ForbiddenException,
+  Get,
+  Logger,
+  Options,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UnprocessableEntityException,
+  UseGuards,
+} from '@nestjs/common';
 
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+import { ApiResponse } from '@danielwii/asuna-shared';
 
 import { fileURLToPath } from 'node:url';
 
@@ -12,8 +27,8 @@ import ow from 'ow';
 import * as R from 'ramda';
 
 import { AppLifecycle } from '../../lifecycle';
-import { CurrentRoles, CurrentTenant, CurrentUser, JsonMap, PrimaryKey, Profile } from '../common';
-import { JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
+import { CurrentRoles, CurrentTenant, CurrentUser, PrimaryKey, Profile } from '../common';
+import { AdminUser, AdminUserIdentifierHelper, JwtAdminAuthGuard, JwtPayload, Role } from '../core/auth';
 import {
   ColumnSchema,
   DBHelper,
@@ -29,6 +44,7 @@ import { RestService } from '../core/rest/rest.service';
 import { AnyAuthRequest, named } from '../helper';
 import { Tenant, TenantService } from '../tenant';
 
+import type { JsonMap } from '@danielwii/asuna-shared';
 import type { BaseEntity, DeleteResult } from 'typeorm';
 
 export abstract class RestCrudController {
@@ -182,6 +198,7 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Get(':model/:id')
+  @named
   public async get(
     @Param('model') model: string,
     @Param('id') id: PrimaryKey,
@@ -189,7 +206,9 @@ export abstract class RestCrudController {
     @Query('profile') profile?: Profile,
     @Query('fields') fields?: string,
     @Query('relations') relationsStr?: string | string[],
+    funcName?: string,
   ): Promise<BaseEntity> {
+    this.superLogger.log(`#${funcName}: ${r({ model, id, profile, fields, relationsStr })}`);
     return this.getRestService().get(
       { model: DBHelper.getModelNameObject(model, this.module), id, profile, fields, relationsStr },
       req,
@@ -212,18 +231,52 @@ export abstract class RestCrudController {
 
   @UseGuards(JwtAdminAuthGuard)
   @Post(':model')
+  @named
   public async save(
+    @CurrentUser() current: AdminUser,
     @Param('model') model: string,
     @Body() updateTo: JsonMap,
     @Req() req: AnyAuthRequest,
+    funcName?: string,
   ): Promise<any> {
+    this.superLogger.log(`#${funcName}: ${r({ current, model, updateTo })}`);
     return this.getRestService().save({ model: DBHelper.getModelNameObject(model, this.module), body: updateTo }, req);
+  }
+
+  @UseGuards(JwtAdminAuthGuard)
+  @Get(':model/:id/:field')
+  @named
+  public async viewProtectedField(
+    @CurrentUser() current: AdminUser,
+    // @CurrentTenant() tenant: Tenant,
+    @CurrentRoles() roles: Role[],
+    @Param('model') model: string,
+    @Param('id') id: PrimaryKey,
+    @Param('field') field: string,
+    funcName?: string,
+  ): Promise<ApiResponse> {
+    this.superLogger.log(`#${funcName}: ${r({ current, roles, model, id, field })}`);
+    // all sys admins can view the content
+    if (_.map(roles, (role) => role.name).includes('SYS_ADMIN')) {
+      const modelName = DBHelper.getModelNameObject(model, this.module);
+      const repository = DBHelper.repo(modelName);
+      const primaryKey = DBHelper.getPrimaryKey(repository);
+      const record = await repository.findOne({
+        select: [primaryKey, field] as any,
+        where: { [primaryKey]: id },
+      });
+      if (!record)
+        throw new UnprocessableEntityException(`The record of ${modelName.entityName} with id ${id} does not exist.`);
+      this.superLogger.debug(`#${funcName}: ${r(record[field])}`);
+      return ApiResponse.success({ value: record[field] });
+    }
+    throw new ForbiddenException();
   }
 
   @UseGuards(JwtAdminAuthGuard)
   @Patch(':model/:id')
   public async patch(
-    @CurrentUser() admin: JwtPayload,
+    @CurrentUser() current: AdminUser,
     @CurrentTenant() tenant: Tenant,
     @CurrentRoles() roles: Role[],
     @Param('model') model: string,
@@ -235,10 +288,10 @@ export abstract class RestCrudController {
     // const whereOptions = { [primaryKey]: id };
     const whereOptions = {};
     if (tenant) {
-      await this.getTenantService().checkPermission(admin.id as string, modelName.entityName);
+      await this.getTenantService().checkPermission(current.id as string, modelName.entityName);
       if (await this.getTenantService().tenantSupport(modelName.entityName, roles)) _.assign(whereOptions, { tenant });
     }
-    this.superLogger.log(`patch ${r({ admin, modelName, id, updateTo, whereOptions })}`);
+    this.superLogger.log(`patch ${r({ current, modelName, id, updateTo, whereOptions })}`);
     // TODO remove kv handler from default handler
     if (modelName.model === 'kv__pairs') {
       this.superLogger.log('update by kv...');
@@ -273,8 +326,8 @@ export abstract class RestCrudController {
     this.superLogger.log(`patch ${r({ id, relationKeys, relationIds })}`);
 
     const entity = await repository.findOneOrFail({ where: { id, ...whereOptions } as any });
-
-    const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: admin?.username } as any);
+    const identifier = AdminUserIdentifierHelper.stringify(current);
+    const entityTo = repository.merge(entity, { ...updateTo, ...relationIds, updatedBy: identifier } as any);
     this.superLogger.log(`patch ${r({ entityTo })}`);
     return repository.save(entityTo);
   }

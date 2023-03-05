@@ -2,7 +2,7 @@ import { html } from 'common-tags';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../helpers';
 
 export const TokenRule = {

@@ -2,7 +2,7 @@ import { Field, InterfaceType } from '@nestjs/graphql';
 
 import { BaseEntity, Column, DeleteDateColumn } from 'typeorm';
 
-import { MetaInfo } from '../common/decorators/meta.decorator';
+import { MetaInfo } from '@danielwii/asuna-shared';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 

@@ -1,7 +1,7 @@
 import { Column } from 'typeorm';
 
 import { AbstractNameEntity } from '../base';
-import { JsonArray, MetaInfo } from '../common/decorators';
+import { JsonArray, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core';
 
 export abstract class AbstractSort extends AbstractNameEntity {

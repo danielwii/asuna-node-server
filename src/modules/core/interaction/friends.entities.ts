@@ -5,7 +5,7 @@ import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity, EntityConstructorObject } from '../../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 // eslint-disable-next-line import/no-cycle
 import { InjectMultiUserProfile, UserProfile } from '../auth/user.entities';
 

@@ -6,7 +6,7 @@ import { Column } from 'typeorm';
 import { AbstractBaseEntity } from '../base/base.entity';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
-import type { JsonMap } from '../common/decorators/meta.decorator';
+import type { JsonMap } from '@danielwii/asuna-shared';
 
 @InterfaceType({ implements: () => [AbstractBaseEntity] })
 export class AbstractTransactionEntity extends AbstractBaseEntity {

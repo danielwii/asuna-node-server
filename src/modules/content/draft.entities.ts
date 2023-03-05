@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 @EntityMetaInfo({ name: 'content__drafts', internal: true })

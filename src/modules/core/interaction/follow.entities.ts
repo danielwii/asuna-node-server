@@ -3,7 +3,7 @@ import { ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../../common/decorators';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InteractionFollowEnumValue, InteractionFollowType } from './enum-values';
 
 import type { UserProfile } from '../auth/user.entities';

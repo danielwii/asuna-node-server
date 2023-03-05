@@ -27,6 +27,6 @@ export class ActivityQueryResolver {
     funcName?: string,
   ): Promise<CursoredPageable<Activity>> {
     this.logger.log(`#${funcName}: ${r({ name, refId, request })}`);
-    return GraphqlHelper.handleCursoredQueryRequest({ cls: Activity, where: { name }, request });
+    return GraphqlHelper.handleCursoredQueryRequest({ cls: Activity, where: { name, refId }, request });
   }
 }

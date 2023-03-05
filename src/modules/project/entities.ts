@@ -4,7 +4,7 @@ import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 
 
 import { Publishable } from '../base/abilities';
 import { NoPrimaryKeyBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '../common/decorators/meta.decorator';
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InjectTenant } from '../tenant/tenant.entities';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';

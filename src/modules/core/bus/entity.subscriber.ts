@@ -14,7 +14,7 @@ import { ColumnTypeHelper, safeReloadJSON } from '../helpers';
 
 import type { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 import type { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
-import type { MetaInfoOptions } from '../../common/decorators';
+import type { MetaInfoOptions } from '@danielwii/asuna-shared';
 
 const safeReload = (metadata: EntityMetadata, entity): void => {
   if (!_.isObject(entity)) return;

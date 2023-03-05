@@ -13,7 +13,7 @@ import { Feedback, FeedbackReply } from './feedback.entities';
 import { ContentMedia, MediaType } from './media.entities';
 
 import type { FeedbackReplyBody } from './feedback.interface';
-import type { JsonArray } from '../common/decorators';
+import type { JsonArray } from '@danielwii/asuna-shared';
 
 class CreateFeedbackDto {
   @IsString() name: string;

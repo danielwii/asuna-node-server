@@ -5,7 +5,7 @@ import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
-import { MetaInfo } from '../../common/decorators';
+import { MetaInfo } from '@danielwii/asuna-shared';
 
 import type { UserProfile } from './user.entities';
 

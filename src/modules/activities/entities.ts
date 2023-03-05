@@ -4,7 +4,7 @@ import * as scalars from 'graphql-scalars';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractBaseEntity } from '../base';
-import { EntityMetaInfo } from '../common/decorators/meta.decorator';
+import { EntityMetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
 @ObjectType({ implements: () => [AbstractBaseEntity] })

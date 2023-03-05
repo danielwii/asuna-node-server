@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity } from 'typeorm';
 
 import { AbstractTimeBasedBaseEntity } from '../../base/base.entity';
-import { EntityMetaInfo } from '../../common/decorators';
+import { EntityMetaInfo } from '@danielwii/asuna-shared';
 import { InjectMultiUserProfile } from '../auth/user.entities';
 
 @ObjectType({ implements: () => [AbstractTimeBasedBaseEntity] })

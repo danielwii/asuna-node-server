@@ -1,14 +1,18 @@
+import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '@danielwii/asuna-shared';
+
+import { Transform } from 'class-transformer';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../../base';
-import { EntityMetaInfo, JsonArray, JsonMap, MetaInfo } from '../../common/decorators';
 import { ColumnTypeHelper } from '../helpers/column.helper';
 import { AbstractTimeBasedAuthUser } from './base.entities';
 
 @EntityMetaInfo({ name: 'auth__api_keys', internal: true })
 @Entity('auth__t_api_keys')
 export class AdminApiKey extends Publishable(AbstractNameEntity) {
-  @MetaInfo({ name: 'AccessToken', type: 'Generate', extra: { auto: true, length: 128 } })
+  // @Expose({ name: 'with-secret-key', toPlainOnly: true })
+  @Transform(({ value }) => !!value, { toPlainOnly: true })
+  @MetaInfo({ name: 'AccessToken', type: 'Generate', extra: { auto: true, length: 128 }, protected: true })
   @Column({ nullable: false, name: 'key' })
   public key: string;
 

@@ -1,5 +1,7 @@
 import { Field, ID, Int, InterfaceType } from '@nestjs/graphql';
 
+import { MetaInfo } from '@danielwii/asuna-shared';
+
 import {
   AfterLoad,
   BaseEntity,
@@ -12,7 +14,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { MetaInfo } from '../common/decorators';
 import { fixTZ } from '../core/helpers/entity.helper';
 import { SimpleIdGenerator } from '../ids';
 import { NameDescAttachable, Publishable } from './abilities';
@@ -95,6 +96,10 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   public updatedBy?: string;
+
+  @MetaInfo({ accessible: 'hidden' })
+  @Column({ nullable: true, length: 100, name: 'created_by' })
+  public createdBy?: string;
 
   public constructor(idPrefix = '') {
     super();

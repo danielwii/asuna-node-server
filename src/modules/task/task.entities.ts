@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { AbstractBaseEntity, AbstractTimeBasedBaseEntity } from '../base';
-import { EntityMetaInfo, JsonMap, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, JsonMap, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers';
 
 @EntityMetaInfo({ name: 'sys__tasks', internal: true })

@@ -18,7 +18,7 @@ import { FeedbackSenderEnumValue } from './enum-values';
 import { FeedbackReply } from './feedback.entities';
 
 import type { PrimaryKey } from '../common/identifier';
-import type { JsonMap } from '../common/decorators';
+import type { JsonMap } from '@danielwii/asuna-shared';
 import type { AnyAuthRequest } from '../helper/interfaces';
 import type { FeedbackReplyBody } from './feedback.interface';
 

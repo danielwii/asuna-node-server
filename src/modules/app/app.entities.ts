@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { AbstractBaseEntity, AbstractNameEntity, Publishable } from '../base';
-import { EntityMetaInfo, JsonArray, MetaInfo } from '../common/decorators';
+import { EntityMetaInfo, JsonArray, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../core/helpers';
 
 export const AppUpgradeMode = {
@@ -64,6 +64,7 @@ export class AppRelease extends Publishable(AbstractBaseEntity) {
   public platform: keyof typeof Platform;
 
   @Field()
+  @MetaInfo({ name: '描述', type: 'RichText' })
   @Column('text', { nullable: true })
   public description: string;
 
