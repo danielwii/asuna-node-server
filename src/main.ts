@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { bootstrap } from './bootstrap';
 
 import { AdminApiKey } from './modules/core/auth/auth.entities';
 
@@ -10,4 +11,4 @@ export class ApplicationModule implements OnModuleInit {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-require('.').bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
+bootstrap(ApplicationModule, { redisMode: 'io' }).catch(console.error);
