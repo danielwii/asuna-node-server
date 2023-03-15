@@ -81,7 +81,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           // autoSchemaFile: true,
           sortSchema: true,
           installSubscriptionHandlers: true,
-          resolvers: { TimeOfDay: TimeOfDayScalar },
+          // resolvers: { TimeOfDay: TimeOfDayScalar },
           playground: config.playground_enable,
           // playground: false,
           debug: config.debug,
