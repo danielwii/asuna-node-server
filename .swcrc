@@ -15,6 +15,10 @@
       "tsx": false,
       "decorators": true,
       "dynamicImport": false
+    },
+    "transform": {
+      "legacyDecorator": true,
+      "decoratorMetadata": true
     }
   }
 }

@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node';
 
-import { ClassSerializerInterceptor, Logger, LogLevel, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, LogLevel, Logger, NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { registerEnumType } from '@nestjs/graphql';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -18,7 +18,7 @@ import RedisStoreCreator from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { default as rateLimit, Options as RateLimitOptions } from 'express-rate-limit';
+import { Options as RateLimitOptions, default as rateLimit } from 'express-rate-limit';
 import session from 'express-session';
 import figlet from 'figlet';
 import helmet from 'helmet';
@@ -31,7 +31,7 @@ import { AppLifecycle } from './lifecycle';
 import { AppUpgradeMode, Mode, Platform } from './modules/app/app.entities';
 import { CacheUtils } from './modules/cache';
 import { AnyExceptionFilter, LoggerConfigObject, LoggerInterceptor, TimeUnit } from './modules/common';
-import { AppConfigure, configLoader, FeaturesConfigObject, FeaturesConfigure } from './modules/config';
+import { AppConfigure, FeaturesConfigure, configLoader } from './modules/config';
 import { MediaType, NotificationEnum, NotificationEnumValue } from './modules/content';
 import {
   FeedbackSenderEnum,
@@ -39,7 +39,7 @@ import {
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
 } from './modules/content/enum-values';
-import { AsunaContext, Global, KeyValueType, KVModelFormatType, Order } from './modules/core';
+import { AsunaContext, Global, KVModelFormatType, KeyValueType, Order } from './modules/core';
 import { ConfigKeys } from './modules/core/config';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
@@ -47,8 +47,11 @@ import { SimpleIdGeneratorHelper } from './modules/ids';
 import { ExchangeCurrencyEnum } from './modules/property/enum-values';
 import { MongoConfigObject } from './modules/providers/mongo.config';
 import { TracingInterceptor } from './modules/tracing';
+
 // add condition function in typeorm find operation
 import './typeorm.fixture';
+
+import { EventEmitter } from 'events';
 
 import type { CorsOptions, CorsOptionsDelegate } from '@nestjs/common/interfaces/external/cors-options.interface';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -123,7 +126,8 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   Object.assign(options, _.merge({ loadDefaultModule: true }, options));
   validateOptions(options);
 
-  (await import('events')).EventEmitter.defaultMaxListeners = 15;
+  // fix event emitter warning
+  EventEmitter.defaultMaxListeners = 15;
 
   logger.log(`options: ${r({ appModule, options })}`);
 
