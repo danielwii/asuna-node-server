@@ -1,20 +1,13 @@
 import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 import { ControllerInjector, LoggerInjector, OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
-import api from '@opentelemetry/api';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from '@opentelemetry/core';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { Resource } from '@opentelemetry/resources';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { AppEnv } from '@danielwii/asuna-helper/dist/app.env';
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
@@ -84,8 +77,8 @@ const isProduction = process.env.NODE_ENV === 'production';
           logging: configLoader.loadConfig('TYPEORM_LOGGING', 'all'),
           loggerLevel: configLoader.loadConfig('TYPEORM_LOGGER_LEVEL', 'debug'),
           // url: process.env.DATABASE_URL ?? process.env.TYPEORM_URL,
-          debug: true,
-          trace: true,
+          debug: configLoader.loadConfig('TYPEORM_DEBUG', false),
+          trace: configLoader.loadConfig('TYPEORM_TRACE', false),
           type: configLoader.loadConfig('TYPEORM_TYPE'),
           synchronize: configLoader.loadBoolConfig('TYPEORM_SYNCHRONIZE', false),
           database: configLoader.loadConfig('TYPEORM_DATABASE') as any,

@@ -1,10 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
+
 import { Column, Entity } from 'typeorm';
 
 import { SoftDelete } from '../base/abilities';
 import { AbstractTimeBasedBaseEntity } from '../base/base.entity';
-import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { InjectMultiUserProfile } from '../core/auth/user.entities';
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
 
@@ -23,7 +24,7 @@ export class ContentMedia extends SoftDelete(InjectMultiUserProfile(AbstractTime
 
   @Field((returns) => [String])
   @MetaInfo({ name: 'Body' })
-  @Column(ColumnTypeHelper.JSON, { default: [] })
+  @Column(ColumnTypeHelper.JSON)
   content: any;
 
   @Field({ nullable: true })
