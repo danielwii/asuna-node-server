@@ -19,7 +19,7 @@ export class CacheManager {
 
   private readonly cache: LRUCache<string, any>;
 
-  public constructor(name: string, options?: LRUCache.Options<string, any>) {
+  public constructor(name: string, options?: LRUCache.Options<string, any, any>) {
     if (caches.has(name)) {
       this.cache = caches.get(name);
       // logger.log(`get preset cache: ${name}`);

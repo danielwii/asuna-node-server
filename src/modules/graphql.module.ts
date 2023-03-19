@@ -10,6 +10,9 @@ import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisConfigObject } from '@danielwii/asuna-helper/dist/providers/redis/config';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import { RedisCache } from 'apollo-server-cache-redis';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import { ApolloServerPluginCacheControl } from 'apollo-server-core';
@@ -25,8 +28,6 @@ import {
   ValueNode,
 } from 'graphql';
 import _ from 'lodash';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { AppModule } from './app';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
@@ -35,11 +36,11 @@ import { TimeOfDayScalar } from './graphql/scalars';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
-import type { GraphQLRequestContext } from '@apollo/server';
+import type { GraphQLRequestContext, GraphQLServerContext, GraphQLServerListener } from '@apollo/server';
 import type { GraphQLServiceContext } from 'apollo-server-types';
 
 @Module({
-  imports:[]
+  imports: [],
 })
 export class GraphqlModule extends InitContainer implements OnModuleInit {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
@@ -84,7 +85,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           // resolvers: { TimeOfDay: TimeOfDayScalar },
           playground: config.playground_enable,
           // playground: false,
-          debug: config.debug,
+          // debug: config.debug,
           introspection: config.playground_enable || config.debug,
           // tracing: config.debug,
           resolverValidationOptions: { requireResolversForResolveType: 'warn' },
@@ -119,7 +120,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           },
           plugins: _.compact([
             {
-              async serverWillStart(service: GraphQLServiceContext) {
+              async serverWillStart(service: GraphQLServerContext): Promise<GraphQLServerListener | void> {
                 Logger.log(`GraphQL Server starting! ${r(_.pick(service, 'schemaHash', 'engine'))}`);
               },
             },
@@ -132,7 +133,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
               },
             }) as any, */
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
-            ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
+            // ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }), // TODO type mismatch
             // config.debug ? (apolloTracingPlugin() as any) : null,
           ]),
           /*
@@ -166,13 +167,14 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
               : undefined,
           ]),
           */
+          /*
           formatResponse: (response) => {
             if (response.errors) {
               Logger.error(`response: ${r(response.errors)}`);
             }
             // logger.verbose(`response: ${r(response.data)}`);
             return response;
-          },
+          }, */
         }),
       ],
       providers: [{ provide: APP_INTERCEPTOR, useClass: DataLoaderInterceptor }],
