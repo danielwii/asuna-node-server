@@ -128,7 +128,7 @@ export class UploaderController {
     ow(filename, 'filename', ow.string.nonEmpty);
     ow(bucket, 'bucket', ow.string.nonEmpty);
     ow(prefix, 'prefix', ow.string.nonEmpty);
-    this.logger.log(`#${funcName} ${r({ bucket, prefix, filename })}`);
+    this.logger.log(`#${funcName}: ${r({ bucket, prefix, filename })}`);
 
     const lookup = mime.lookup(filename) as string;
     const extension = mime.extension(lookup || 'bin');
@@ -140,7 +140,7 @@ export class UploaderController {
     const storageEngine = AsunaContext.instance.getStorageEngine(bucket) as MinioStorage;
     const region = storageEngine.region;
     const Bucket = storageEngine.configObject.endpoint.slice(0, storageEngine.configObject.endpoint.indexOf('s3') - 1);
-    this.logger.log(`#${funcName} generate by ${r({ region, key })}`);
+    this.logger.log(`#${funcName}: generate by ${r({ region, key })}`);
     const s3Client = new S3Client({
       region,
       credentials: {
@@ -150,7 +150,7 @@ export class UploaderController {
     });
     const command = new PutObjectCommand({ Bucket, Key: key });
     const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-    this.logger.log(`#${funcName} Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
+    this.logger.log(`#${funcName}: Putting "${key}" using signedUrl with bucket "${Bucket}" in v3`);
     return ApiResponse.success({ signedUrl, fullpath: `/uploads/${key}` });
   }
 

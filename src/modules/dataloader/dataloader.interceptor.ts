@@ -5,13 +5,13 @@ import _ from 'lodash';
 import { GenericDataLoader } from './dataloader';
 import { getRequestFromContext } from './utils';
 
+import type { ResolveInfoCacheControl } from '@apollo/cache-control-types';
+import type { GraphQLResolveInfo } from 'graphql';
 import type SpanContext from 'opentracing/lib/span_context';
 import type { Observable } from 'rxjs';
-import type { Tenant } from '../tenant';
-import type { ResolveInfoCacheControl } from 'apollo-server-types';
-import type { GraphQLResolveInfo } from 'graphql';
-import type { RequestInfo } from '../helper';
 import type { JwtPayload, WithProfileUser } from '../core/auth';
+import type { RequestInfo } from '../helper';
+import type { Tenant } from '../tenant';
 import type { DefaultRegisteredLoaders } from './context';
 
 export type GraphQLResolveCacheInfo = GraphQLResolveInfo & { cacheControl: ResolveInfoCacheControl };

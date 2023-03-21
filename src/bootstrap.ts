@@ -112,6 +112,7 @@ export const bootstrap = (appModule, options?: BootstrapOptions) => {
 
   return run(appModule, options ?? {}).catch((reason) => {
     logger.error(`[bootstrap] error: ${reason?.message} ${r(reason?.stack)}`);
+    if (reason.isAxiosError) logger.error(`[AxiosError]: ${r(reason.response.data)}`);
     Sentry.captureException(reason);
     setTimeout(() => {
       consola.error(`[bootstrap] System will exit in 1s because of error: ${reason?.message} ${r(reason?.stack)}`);

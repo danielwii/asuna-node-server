@@ -1,3 +1,7 @@
+import { Logger } from '@nestjs/common';
+
+import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { AsunaCollections, KeyValuePair, KeyValueType, KvDef } from '../kv';
 import { KvService } from '../kv/kv.service';
 
@@ -23,6 +27,9 @@ export class MigrationsHelper {
       type: KeyValueType.json,
       value: { [key]: version },
     });
+    if (!kvPair) throw new Error(`kvPair not found for ${key}`);
+
+    Logger.log(`update version ${r(kvPair)}`);
     kvPair.value[key] = version;
     return kvService.update(kvPair.id, kvPair.name, kvPair.type, kvPair.value);
   }

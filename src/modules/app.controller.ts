@@ -16,7 +16,7 @@ export class AppController {
   @Get()
   @named
   public info(funcName?: string) {
-    this.logger.log(`#${funcName} called ${r({ funcName })}`);
+    this.logger.log(`#${funcName}: called ${r({ funcName })}`);
     return {
       env: process.env.NODE_ENV,
       name: process.env.APP_NAME,

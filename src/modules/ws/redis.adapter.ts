@@ -1,3 +1,5 @@
+import { RedisAdapter, createAdapter } from '@socket.io/redis-adapter';
+
 import { Logger } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
@@ -10,7 +12,6 @@ import { fileURLToPath } from 'node:url';
 
 import Redis from 'ioredis';
 import _ from 'lodash';
-import { RedisAdapter, createAdapter } from 'socket.io-redis';
 
 import { configLoader } from '../config';
 import { ConfigKeys } from '../core/config';
@@ -22,7 +23,7 @@ import { ConfigKeys } from '../core/config';
 export class RedisIoAdapter extends IoAdapter {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
-  private static redisAdapter: RedisAdapter;
+  private static redisAdapter: (nsp: any) => RedisAdapter;
 
   constructor(app) {
     super(app);
@@ -44,15 +45,7 @@ export class RedisIoAdapter extends IoAdapter {
       const pubClient = redis;
       // const pubClient = RedisProvider.getRedisClient('ws', db, true).client;
       const subClient = pubClient.duplicate();
-      RedisIoAdapter.redisAdapter = createAdapter(
-        { pubClient, subClient },
-        // {
-        //   host: configObject.host,
-        //   port: configObject.port,
-        //   ...(configObject.password ? { password: configObject.password } : undefined),
-        //   db,
-        // } as any /* db is not included in adapter */,
-      );
+      RedisIoAdapter.redisAdapter = createAdapter(pubClient, subClient);
     }
   }
 

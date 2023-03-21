@@ -1,8 +1,6 @@
-import { CacheScope } from 'apollo-server-types';
-
 import { CacheKey, InMemoryDB } from './db';
 
-import type { GraphqlContext, GraphQLResolveCacheInfo } from '../dataloader/dataloader.interceptor';
+import type { GraphQLResolveCacheInfo, GraphqlContext } from '../dataloader/dataloader.interceptor';
 
 interface CacheWrapperDoOptions<V> {
   prefix?: string;
@@ -29,7 +27,7 @@ export class CacheWrapper {
     resolver: () => Promise<V>,
   ): Promise<V> {
     const hint = info.cacheControl.cacheHint;
-    const scope = hint.scope === CacheScope.Private ? ctx.getPayload().id : CacheScope.Public;
+    const scope = hint.scope === 'PRIVATE' ? ctx.getPayload().id : 'PUBLIC';
     return CacheWrapper.do({
       prefix: 'resolver:cache',
       key: { key, prefix: scope },

@@ -6,11 +6,12 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { StaticImplements } from '@danielwii/asuna-helper/dist/types';
 import { deserializeSafely } from '@danielwii/asuna-helper/dist/validate';
 
+import { fileURLToPath } from 'node:url';
+
 import bluebird from 'bluebird';
 import { IsString } from 'class-validator';
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import { fileURLToPath } from 'node:url';
 
 import { CacheUtils } from '../../cache/utils';
 import { CacheWrapper } from '../../cache/wrapper';
@@ -213,6 +214,7 @@ export class KvService {
         type: KeyValueType.json,
       });
     }
+    if (!KvService.enumValueConstantMapsPair) throw new Error(`enumValueConstantMapsPair not found`);
     // const pair = await this.get(this.constantKvDef, { name: '关键词中文映射表', value, type: 'json' });
     KvService.enumValueConstantMapsPair.value = { ...KvService.enumValueConstantMapsPair.value, ...value };
     // return this.set(pair);
@@ -326,7 +328,9 @@ export class KvService {
     kvDef: KvDef,
     defaultPair?: { name: string; type: KeyValueType; value: any },
   ): Promise<KeyValuePair> {
-    const keyValuePair = (await this.find(kvDef.collection, kvDef.key))[0];
+    const keyValuePairs = await this.find(kvDef.collection, kvDef.key);
+    this.logger.log(`get ${r({ kvDef, keyValuePairs })}`);
+    const keyValuePair = keyValuePairs[0];
     if (!keyValuePair && defaultPair) {
       await this.set({ ...kvDef, ...defaultPair });
       return (await this.find(kvDef.collection, kvDef.key))[0];
@@ -336,22 +340,16 @@ export class KvService {
   }
 
   public async find(collection?: string, key?: string): Promise<KeyValuePair[]> {
-    return CacheWrapper.do({
-      prefix: 'kv:cache',
-      key: { prefix: collection, key },
-      resolver: async () =>
-        KeyValuePair.findBy({
-          collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
-          ...(key ? { key } : {}),
-        }).then(
-          fp.map((item) => {
-            // eslint-disable-next-line no-param-reassign
-            [, item.value] = recognizeTypeValue(item.type, item.value);
-            return item;
-          }),
-        ),
-      expiresInSeconds: 60,
-    });
+    return KeyValuePair.findBy({
+      collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
+      ...(key ? { key } : {}),
+    }).then(
+      fp.map((item) => {
+        // eslint-disable-next-line no-param-reassign
+        [, item.value] = recognizeTypeValue(item.type, item.value);
+        return item;
+      }),
+    );
     /*
     return KeyValuePair.findBy({
       collection: collection?.includes('.') ? collection : `user.${collection || 'default'}`,
@@ -371,7 +369,7 @@ export class KvService {
     keyValues: KeyValues,
     funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    this.logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
+    this.logger.log(`#${funcName}: ${r({ kvDef, keyValues })}`);
     return Promise.props(_.mapValues(keyValues, (key) => this.getValueByGroupFieldKV(kvDef, key)));
   }
 

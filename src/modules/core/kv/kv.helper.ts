@@ -234,7 +234,7 @@ export class KvHelper {
     keyValues: KeyValues,
     funcName?: string,
   ): Promise<{ [key in keyof KeyValues]: any }> {
-    Logger.log(`#${funcName} ${r({ kvDef, keyValues })}`);
+    Logger.log(`#${funcName}: ${r({ kvDef, keyValues })}`);
     return Promise.props(_.mapValues(keyValues, (key) => KvHelper.getValueByGroupFieldKV(kvDef, key)));
   }
 

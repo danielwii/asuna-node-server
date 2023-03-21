@@ -1,9 +1,11 @@
-import responseCachePlugin from '@apollo/server-plugin-response-cache';
+import { ApolloServerPluginCacheControl } from '@apollo/server/plugin/cacheControl';
+import { KeyvAdapter } from '@apollo/utils.keyvadapter';
+import { ErrorsAreMissesCache, InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicModule, Logger, Module, OnModuleInit } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CustomScalar, GraphQLModule, Scalar } from '@nestjs/graphql';
+import { GraphQLModule } from '@nestjs/graphql';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
@@ -13,31 +15,19 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { RedisCache } from 'apollo-server-cache-redis';
-import { InMemoryLRUCache } from 'apollo-server-caching';
-import { ApolloServerPluginCacheControl } from 'apollo-server-core';
 // TODO The `apollo-tracing` package is no longer part of Apollo Server 3. See https://www.apollographql.com/docs/apollo-server/migration/#tracing for details
 // import { plugin as apolloTracingPlugin } from 'apollo-tracing';
-import {
-  DirectiveLocation,
-  GraphQLBoolean,
-  GraphQLDirective,
-  GraphQLEnumType,
-  GraphQLInt,
-  Kind,
-  ValueNode,
-} from 'graphql';
+import { DirectiveLocation, GraphQLBoolean, GraphQLDirective, GraphQLEnumType, GraphQLInt } from 'graphql';
+import Keyv from 'keyv';
 import _ from 'lodash';
 
 import { AppModule } from './app';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
 import { GraphQLConfigObject } from './graphql/graphql.config';
-import { TimeOfDayScalar } from './graphql/scalars';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 
-import type { GraphQLRequestContext, GraphQLServerContext, GraphQLServerListener } from '@apollo/server';
-import type { GraphQLServiceContext } from 'apollo-server-types';
+import type { GraphQLServerContext, GraphQLServerListener } from '@apollo/server';
 
 @Module({
   imports: [],
@@ -63,7 +53,11 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
     Logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: __rootPath, __dirname, options })}`);
 
     const redisConfig = RedisConfigObject.load('graphql');
-    const cache = redisConfig.enable ? new RedisCache(redisConfig.getIoOptions()) : new InMemoryLRUCache();
+    const cache = redisConfig.enable
+      ? new ErrorsAreMissesCache(
+          new KeyvAdapter(new Keyv(`"redis://user:${redisConfig.password}@${redisConfig.host}:6379"`)),
+        )
+      : new InMemoryLRUCache();
     Logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
     return {
@@ -133,7 +127,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
               },
             }) as any, */
             // config.playground_enable ? ApolloServerPluginLandingPageLocalDefault() : null,
-            // ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }), // TODO type mismatch
+            ApolloServerPluginCacheControl({ defaultMaxAge: 1, calculateHttpHeaders: false }),
             // config.debug ? (apolloTracingPlugin() as any) : null,
           ]),
           /*

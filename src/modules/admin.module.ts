@@ -39,6 +39,7 @@ import { UploaderController, UploaderModule } from './core/uploader';
 import { DynamicRouterModule } from './dynamic-router';
 import { EmailModule } from './email/email.module';
 import { SexEnumValue } from './enum-values';
+import { FirebaseModule } from './firebase/module';
 import { GraphqlQueryModule } from './graphql/graphql-query.module';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PaymentModule } from './payments/payment.module';
@@ -77,6 +78,7 @@ import { WebModule } from './web';
     FinderModule,
     CqrsModule,
     UploaderModule,
+    FirebaseModule,
     ImportExportModule,
     TenantModule,
     PropertyModule,
