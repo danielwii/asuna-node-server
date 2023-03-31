@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "type": "module",
   "main": "dist/index.js",
@@ -216,5 +216,5 @@
     ],
     "delay": 2.5
   },
-  "packageManager": "yarn@3.4.1"
+  "packageManager": "yarn@3.5.0"
 }
