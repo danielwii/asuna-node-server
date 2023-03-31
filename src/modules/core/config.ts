@@ -6,7 +6,9 @@ import _ from 'lodash';
 
 import { configLoader } from '../config/loader';
 
+import type { ClassType } from '@danielwii/asuna-helper/dist/interface';
 import type { ConfigLoader } from 'node-buffs';
+import type { ValueOf } from '../enum-values';
 
 /**
  * all fields need null as default value to load all keys
@@ -28,6 +30,7 @@ export class AbstractConfigLoader<Config> {
 }
 
 export enum YamlConfigKeys {
+  S = 'S',
   graphql = 'graphql',
   sentry = 'sentry',
   contentful = 'contentful',
@@ -108,8 +111,8 @@ export const ConfigureLoader =
   <Keys extends Record<string, any>>(
     key: YamlConfigKeys,
     keys: Keys,
-    object,
-    loadDefaultValue?: () => { [p in keyof Keys]?: any },
+    object: ClassType<Record<keyof Keys, any>>,
+    loadDefaultValue?: () => { [p in ValueOf<Keys>]?: any },
   ) =>
   <T extends new (...args: any[]) => {}>(constructor: T) => {
     const defaultValue = loadDefaultValue?.() ?? ({} as { [p in keyof Keys]?: any });
