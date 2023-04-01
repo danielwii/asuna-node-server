@@ -21,7 +21,7 @@ export class AdminUserIdentifierHelper {
 export class UserIdentifierHelper {
   static parse = (identifier: string): Partial<{ id: PrimaryKey }> => ({ id: identifier.split('=')[1] });
 
-  static stringify = (payload: Partial<{ id: PrimaryKey }>): string => `u=${payload.id}`;
+  static stringify = (payload: Partial<{ id: PrimaryKey }>): string => `u=${payload.id ?? ''}`;
 
   static resolve(identifier: string): { type: string; id: PrimaryKey } {
     return { type: identifier.split('=')[0], id: identifier.split('=')[1] };
