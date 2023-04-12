@@ -37,7 +37,7 @@ import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
 import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
-import { JwtAnonymousApiKeyAuthGuard, JwtApiKeyAuthGuard } from './api-key.guard';
+import { JwtAnonymousApiKeyAuthGuard } from './api-key.guard';
 import { AppleConfigure } from './apple.configure';
 import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from './auth.guard';
@@ -46,9 +46,9 @@ import { AppleUserProfile, UserProfile } from './user.entities';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { BaseEntity, DeepPartial } from 'typeorm';
+import type { AdminApiKey } from './auth.entities';
 import type { CreatedUser } from './auth.service';
 import type { ApiKeyRequest } from './strategy';
-import type { AdminApiKey } from "./auth.entities";
 
 const chance = new Chance();
 export const UsernameValidationSchema: ValidationSchema = {
@@ -632,6 +632,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
 
   @UseGuards(JwtAnonymousApiKeyAuthGuard)
   @Post('quick-pass')
+  @HttpCode(HttpStatus.OK)
   @named
   async quickPass(
     @Body() body,
