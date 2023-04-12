@@ -10,6 +10,8 @@ export enum FeaturesConfigKeys {
   apmServiceName = 'apm.service_name',
   apmServerUrl = 'apm.server_url',
   apmSecretToken = 'apm.secret_token',
+  quickpassEnabled = 'quickpass_enabled',
+  quickpassApiKeyRequired = 'quickpass_api_key_required',
 }
 
 export class FeaturesConfigObject implements Record<keyof typeof FeaturesConfigKeys, any> {
@@ -22,6 +24,8 @@ export class FeaturesConfigObject implements Record<keyof typeof FeaturesConfigK
   public apmServiceName: string;
   public apmServerUrl: string;
   public apmSecretToken: string;
+  public quickpassEnabled: boolean;
+  public quickpassApiKeyRequired: boolean;
 }
 
 export interface FeaturesConfigure extends ConfigureLoader<FeaturesConfigObject> {}

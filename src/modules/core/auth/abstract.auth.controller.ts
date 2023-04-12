@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -30,11 +31,13 @@ import { IsOptional, IsString, ValidationSchema, registerSchema, validate } from
 import _ from 'lodash';
 
 import { TimeUnit, isNotBlank } from '../../common';
+import { FeaturesConfigure } from '../../config';
 import { EmailHelper } from '../../email/email.helper';
 import { named } from '../../helper/annotations';
 import { DBHelper } from '../db';
 import { OperationTokenHelper } from '../token';
 import { AbstractAuthService, CreatedToken, PasswordHelper } from './abstract.auth.service';
+import { JwtAnonymousApiKeyAuthGuard, JwtApiKeyAuthGuard } from './api-key.guard';
 import { AppleConfigure } from './apple.configure';
 import { ResetAccountDTO, ResetPasswordDTO, SignInDTO, UpdateProfileDTO } from './auth.dto';
 import { JwtAnonymousSupportAuthGuard, JwtAuthGuard, JwtAuthRequest } from './auth.guard';
@@ -44,6 +47,8 @@ import { AppleUserProfile, UserProfile } from './user.entities';
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 import type { BaseEntity, DeepPartial } from 'typeorm';
 import type { CreatedUser } from './auth.service';
+import type { ApiKeyRequest } from './strategy';
+import type { AdminApiKey } from "./auth.entities";
 
 const chance = new Chance();
 export const UsernameValidationSchema: ValidationSchema = {
@@ -438,12 +443,14 @@ export abstract class AbstractAuthController<U extends WithProfileUser | AuthUse
 export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUser> {
   private readonly superLogger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
+  private readonly config = new FeaturesConfigure().load();
+
   constructor(
     readonly UserEntity: ConstrainedConstructor<U> & typeof BaseEntity,
     readonly authService: AbstractAuthService<AuthUser>,
     readonly handlers: {
       onResetPassword?: <Result>(result: Result, body) => Promise<Result>;
-      onSignUp?: (result: CreatedUser<U>, body) => Promise<void>;
+      onSignUp?: (result: CreatedUser<U>, body, apiKey?: AdminApiKey) => Promise<void>;
       onCurrent?: (user: U) => Promise<U & Record<any, any>>;
     } = {},
   ) {}
@@ -623,10 +630,19 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
     this.superLogger.log(`#${funcName}: ${r(query)}`);
   } */
 
+  @UseGuards(JwtAnonymousApiKeyAuthGuard)
   @Post('quick-pass')
+  @named
   async quickPass(
     @Body() body,
+    @Req() req: ApiKeyRequest,
+    funcName?: string,
   ): Promise<ApiResponse<{ username: string; defaultPassword: string; token: CreatedToken }>> {
+    if (!this.config.quickpassEnabled) throw new ForbiddenException();
+
+    this.superLogger.log(`(${req.apiKey?.name}) #${funcName}: ${r({ body })}`);
+    // if (this.config.quickpassApiKeyRequired) throw new ForbiddenException('api-key required');
+
     const username = chance.string({ length: 6, pool: '0123456789abcdefghjkmnpqrstuvwxyz' });
     const password = chance.string({ length: 6, pool: '0123456789' });
 
@@ -635,7 +651,7 @@ export abstract class AbstractAuthController2<U extends WithProfileUser | AuthUs
       .createUser(username, undefined, password, AuthUserChannel.quickpass)
       .then(async (result) => {
         if (this.handlers.onSignUp) {
-          await this.handlers.onSignUp(result as any, body);
+          await this.handlers.onSignUp(result as any, body, req.apiKey);
         }
         return result;
       });

@@ -24,7 +24,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
     this.logger.debug(`validate request with options: ${r({ options, key })}`);
 
     if (_.isNil(key)) {
-      return this.error(new UnauthorizedException());
+      return this.error(new UnauthorizedException( 'missing api key'));
     } else {
       const exists = await AdminApiKey.findOneBy({ key, isPublished: true });
       this.logger.verbose(`found api key: ${r(exists)}`);
@@ -39,7 +39,7 @@ export class ApiKeyStrategy extends PassportStrategy(Strategy, 'api-key') {
       }
       this.logger.error(`invalid api key: '${key}'`);
       // this.fail('Invalid ApiKey', 403);
-      return this.error(new UnauthorizedException('invalid api key'));
+      return this.error(new UnauthorizedException( 'invalid api key'));
     }
   }
 }
