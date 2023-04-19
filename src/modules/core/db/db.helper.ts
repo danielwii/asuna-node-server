@@ -1,7 +1,10 @@
 import { Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException, ErrorException } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
+import { fileURLToPath } from 'node:url';
 
 import _ from 'lodash';
 import fp from 'lodash/fp';
@@ -66,6 +69,8 @@ export type ParsedWheres = ParsedWhere[];
 export type ParsedWhereCondition = { field: string; value: ParsedCondition };
 export type ParsedWhereConditions = ParsedWhereCondition[];
 
+const logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'db-helper'));
+
 /**
  * https://github.com/typeorm/typeorm/issues/1101
  * @param {string} value
@@ -89,16 +94,16 @@ export function parseWhere(value: string): ParsedWhere | ParsedWheres {
           _.map(parsed, (v) => _.omitBy(_.mapValues(v, parseCondition), _.isNil)),
           _.negate(_.isEmpty),
         );
-        Logger.debug(`array condition is ${r({ parsed, condition })}`);
+        logger.debug(`array condition is ${r({ parsed, condition })}`);
         return condition;
       } else {
         // const condition = _.filter(_.omitBy(_.mapValues(parsed, parseCondition), _.isNil), _.negate(_.isEmpty));
         const condition = _.mapValues(parsed, parseCondition);
-        Logger.debug(`condition is ${r({ parsed, condition, before: _.mapValues(parsed, parseCondition) })}`);
+        logger.debug(`condition is ${r({ parsed, condition, before: _.mapValues(parsed, parseCondition) })}`);
         return condition;
       }
     } catch (reason) {
-      Logger.warn(`parse where error ${r({ reason, value })}`);
+      logger.warn(`parse where error ${r({ reason, value })}`);
     }
   }
   return null;
@@ -135,7 +140,7 @@ export function parseNormalWhereAndRelatedFields(
   relatedWhere: { [key: string]: string[] };
 } {
   const allRelations = repository.metadata.relations.map((relation) => relation.propertyName);
-  Logger.debug(`all relations is ${r(allRelations)}`);
+  logger.debug(`all relations is ${r(allRelations)}`);
   const normalWhere: ParsedWhereConditions = [];
   const relatedFields = [];
   const relatedWhere = {};
@@ -144,7 +149,7 @@ export function parseNormalWhereAndRelatedFields(
       _.each(condition, (value, field) => {
         const [extractedModel, extractedField] = _.split(field, '.');
         const included = _.includes(allRelations, extractedModel);
-        Logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
+        logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
         if (included) {
           relatedFields.push(field);
           relatedWhere[extractedModel] = _.compact([...(relatedWhere[extractedModel] || []), extractedField]);
@@ -157,7 +162,7 @@ export function parseNormalWhereAndRelatedFields(
     _.each(where, (value, field) => {
       const [extractedModel, extractedField] = _.split(field, '.');
       const included = _.includes(allRelations, extractedModel);
-      Logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
+      logger.log(`check relations is ${r({ allRelations, field, extractedModel, extractedField, value, included })}`);
       if (included) {
         relatedFields.push(field);
         relatedWhere[extractedModel] = _.compact([...(relatedWhere[extractedModel] || []), extractedField]);
@@ -165,7 +170,7 @@ export function parseNormalWhereAndRelatedFields(
         normalWhere.push({ field, value });
       }
     });
-  Logger.verbose(`parsed conditions is ${r({ normalWhere, relatedFields, relatedWhere, allRelations })}`);
+  logger.verbose(`parsed conditions is ${r({ normalWhere, relatedFields, relatedWhere, allRelations })}`);
   return { normalWhere, relatedFields, relatedWhere, allRelations };
 }
 
@@ -197,7 +202,7 @@ function parseCondition(value: Condition): ParsedCondition | null {
   if (_.has(value, '$isNull')) return IsNull();
   if (_.has(value, '$not')) return Not(value.$not);
   if (_.isBoolean(value) || _.isString(value)) return value;
-  Logger.warn(`no handler found for '${r(value)}'`);
+  logger.warn(`no handler found for '${r(value)}'`);
   // FIXME should throw exception
   return value as any;
 }
@@ -270,7 +275,7 @@ export class DBHelper {
     if (!DBHelper._prismaClient) {
       const dbConfig = await getConnectionOptions();
       if (!['mysql', 'postgres'].includes(dbConfig.type)) {
-        Logger.warn(`not support db type '${dbConfig.type}' for prisma`);
+        logger.warn(`not support db type '${dbConfig.type}' for prisma`);
         return;
       }
 
@@ -280,14 +285,14 @@ export class DBHelper {
           `${dbConfig.type}://${dbConfig.username}:${dbConfig.password}@${dbConfig.host ?? 'localhost'}:${
             dbConfig.port ?? 3306
           }/${dbConfig.database}`;
-        Logger.log(`init db with ${url}`);
+        logger.log(`init db with ${url}`);
         DBHelper._prismaClient = new PrismaClient({
           datasources: { db: { url } },
           log: [{ emit: 'event', level: 'query' }],
           errorFormat: 'pretty',
         });
       } else {
-        Logger.warn(`postgres prisma client init not implemented yet.`);
+        logger.warn(`postgres prisma client init not implemented yet.`);
       }
     }
   }
@@ -297,7 +302,7 @@ export class DBHelper {
     const isNotEntityInfo = _.isNil((metadata.target as any).entityInfo);
     const isRelation = _.includes(metadata.target as string, '__tr_');
     if (isNotEntityInfo && !isRelation) {
-      Logger.warn(`Entity '${metadata.targetName}' must add @EntityMetaInfo on it.`);
+      logger.warn(`Entity '${metadata.targetName}' must add @EntityMetaInfo on it.`);
       return false;
     }
     return !isRelation;
@@ -352,7 +357,7 @@ export class DBHelper {
     const included = relations.find(
       (type: typeof BaseEntity & { entityInfo: EntityMetaInfoOptions }) => type.name === relation.name,
     );
-    // Logger.debug(`hasRelation ${r({ included, relation: relation.name, relations })}`);
+    // logger.debug(`hasRelation ${r({ included, relation: relation.name, relations })}`);
     return !_.isEmpty(included);
   }
 
@@ -399,10 +404,10 @@ export class DBHelper {
       parsedModel = `${module}__${model}`;
     }
 
-    Logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
+    logger.verbose(`getModelName ${r({ parsedModel, model, parsedModule, module })}`);
     const metadata = DBHelper.getMetadata(parsedModel);
     if (!metadata) {
-      Logger.error(`no metadata found for ${r({ parsedModel, model, parsedModule, module })}`);
+      logger.error(`no metadata found for ${r({ parsedModel, model, parsedModule, module })}`);
       throw new AsunaException(AsunaErrorCode.Unprocessable, `model '${parsedModel}' not resolved`);
     }
     const entityInfo = DBHelper.getEntityInfo(metadata);
@@ -416,7 +421,7 @@ export class DBHelper {
 
   public static getMetadata(model: string): EntityMetadata {
     return DBHelper.metadatas.find((metadata) => {
-      // Logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
+      // logger.log(`check ${(metadata.target as any).entityInfo.name} with ${model}`);
       return DBHelper.getEntityInfo(metadata).name === model;
     });
   }
@@ -661,12 +666,12 @@ export class DBHelper {
 
       // 处理条件关联
       const { relatedFields, relatedWhere, allRelations } = parseNormalWhereAndRelatedFields(where, repository);
-      Logger.verbose(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
+      logger.verbose(`wrapProfile resolve relations ${r({ where, relatedFields, relatedWhere })}`);
       relatedFields.forEach((field) => {
         const [relatedModel, relatedField] = _.split(field, '.');
-        // Logger.log('[innerJoinAndSelect]', { field, model, where });
+        // logger.log('[innerJoinAndSelect]', { field, model, where });
         const elementCondition = where[field] as any; // TODO type?
-        Logger.log(
+        logger.log(
           `'${model}' relation with field '${field}' with value is ${r(elementCondition)} ${typeof elementCondition}`,
         );
 
@@ -679,14 +684,14 @@ export class DBHelper {
               `${relatedModel}.id`,
               elementCondition._value._value,
             );
-            Logger.log(`create innerValue for '${relatedModel}.id' by ${r(elementCondition._value._value)}`);
+            logger.log(`create innerValue for '${relatedModel}.id' by ${r(elementCondition._value._value)}`);
           } else {
             innerValue = elementCondition.toSql(AppDataSource.dataSource, `${relatedModel}.${relatedField}`, [
               `'${innerValue}'`,
             ]);
-            Logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}'`);
+            logger.log(`create innerValue for '${relatedModel}.id' by '${innerValue}'`);
           }
-          Logger.log(`innerValue is '${innerValue}'`);
+          logger.log(`innerValue is '${innerValue}'`);
 
           if (elementCondition._type === 'not') {
             const sqlList = innerValue.split(' ');
@@ -708,7 +713,7 @@ export class DBHelper {
 
       const intersection = _.intersection(relations, allRelations);
       if (!_.isEmpty(_.difference(relations, intersection))) {
-        Logger.error(
+        logger.error(
           `unresolved relation found ${r({ model, intersection, unresolved: _.difference(relations, intersection) })}`,
         );
       }
@@ -716,13 +721,13 @@ export class DBHelper {
       const diff = _.difference(relations, _.keys(relatedWhere)).filter((relation) =>
         _.includes(allRelations, relation),
       );
-      Logger.debug(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
+      logger.debug(`resolve normal relations ${r({ relations, extractedRelations: _.keys(relatedWhere), diff })}`);
       _.each(diff, (relation) => {
         const select = parsedFields.relatedFieldsMap[relation];
         if (select) {
           queryBuilder.leftJoin(`${model}.${relation}`, relation).addSelect(select);
         } else {
-          Logger.debug(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
+          logger.debug(`leftJoinAndSelect ${r({ expression: `${model}.${relation}`, relation })}`);
           queryBuilder.leftJoinAndSelect(`${model}.${relation}`, relation);
         }
       });
@@ -734,9 +739,9 @@ export class DBHelper {
     queryBuilder: SelectQueryBuilder<any>,
     wheres: ParsedWhereConditions,
   ): void {
-    Logger.debug(`handle wheres ${r(wheres)}`);
+    logger.debug(`handle wheres ${r(wheres)}`);
     wheres.forEach((condition) => {
-      Logger.debug(`handle condition ${r(condition)}`);
+      logger.debug(`handle condition ${r(condition)}`);
 
       if (_.has(condition.value, '$or')) {
         (condition.value as ParsedOrCondition).$or.forEach((elementCondition) => {
@@ -779,7 +784,7 @@ export class DBHelper {
           const primary = DBHelper.getMetadata(model).primaryColumns[0];
           const type = _.get(primary.type, 'name');
           if (type === 'Number' && process.env.TYPEORM_TYPE === 'postgres') {
-            Logger.verbose(
+            logger.verbose(
               `fix pg int like issue ${r({
                 model,
                 condition,
@@ -796,7 +801,7 @@ export class DBHelper {
 
         // const sqlValue = DBHelper.toSqlValue(queryBuilder, condition);
 
-        Logger.verbose(`[normalWheres-default] ${r(condition)}`);
+        logger.verbose(`[normalWheres-default] ${r(condition)}`);
 
         if (_.isObject(elementCondition)) {
           queryBuilder.andWhere({ [condition.field]: elementCondition });
@@ -823,7 +828,7 @@ export class DBHelper {
       const selection = _.uniq<string>([...parsedFields.fields, ...primaryKeyColumns]).map(
         (field) => `${model}.${field}`,
       );
-      Logger.verbose(`wrapParsedFields '${r(selection)}'`);
+      logger.verbose(`wrapParsedFields '${r(selection)}'`);
       queryBuilder.select(selection);
     }
   }
@@ -836,7 +841,7 @@ export class DBHelper {
   ): string | { [key: string]: string | FindOperator<any> } {
     if (_.isObjectLike(condition.value)) {
       const elementCondition = condition.value as any;
-      Logger.verbose(`[toSqlValue] ${r({ condition, elementCondition })}`);
+      logger.verbose(`[toSqlValue] ${r({ condition, elementCondition })}`);
       if (_.isObjectLike(elementCondition)) {
         const aliasPath = `${condition.field}${suffix}`; // condition.field;
         let innerValue = elementCondition._value;
@@ -868,7 +873,7 @@ export class DBHelper {
           // const parameters = _.isArray(elementCondition.value) ? elementCondition.value : [elementCondition.value];
           innerValue = queryBuilder.computeFindOperatorExpression(elementCondition, aliasPath, parameters);
           // innerValue = elementCondition.toSql(getConnection(), `${condition.field}${suffix}`, parameters);
-          Logger.verbose(`[condition] like ${r({ elementCondition, innerValue, parameters })}`);
+          logger.verbose(`[condition] like ${r({ elementCondition, innerValue, parameters })}`);
         } else {
           const parameters = _.isArray(elementCondition._value)
             ? _.map(elementCondition._value, (v) => `'${v}'`)
@@ -890,7 +895,7 @@ export class DBHelper {
 
   static loadDataFilter(roles: Role[], entityName: string) {
     const dataFilters = _.merge({}, ..._.map(roles, (role) => role.dataFilter));
-    Logger.log(`loaded data filter ${r({ entityName, dataFilters })}`);
+    logger.log(`loaded data filter ${r({ entityName, dataFilters })}`);
     return _.get(dataFilters, entityName);
   }
 }
