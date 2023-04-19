@@ -19,7 +19,7 @@ import type { Document } from '@contentful/rich-text-types';
 @Injectable()
 export class ContentfulService {
   private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
-  private readonly client: ContentfulClientApi;
+  private readonly client: ContentfulClientApi<any>;
 
   public constructor() {
     const config = new ContentfulConfigure().load();
