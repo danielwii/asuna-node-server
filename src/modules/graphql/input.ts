@@ -5,7 +5,7 @@ import { ExclusiveConstraintValidator } from '@danielwii/asuna-helper/dist/valid
 import { Type } from 'class-transformer';
 import { IsInt, IsNumber, IsOptional, IsString, Validate, ValidateNested } from 'class-validator';
 
-import { DEFAULT_PAGE, DEFAULT_SIZE, Order, PageRequest } from '../core/helpers';
+import { DEFAULT_PAGE, DEFAULT_SIZE, OrderBy, PageRequest } from '../core/helpers';
 
 @InputType()
 export class SorterInput {
@@ -14,12 +14,12 @@ export class SorterInput {
   @IsOptional()
   public column?: string;
 
-  @Field((returns) => Order)
+  @Field((returns) => OrderBy)
   @IsOptional()
-  public order?: Order;
+  public order?: OrderBy;
 }
 
-export const toOrder = (sorter: SorterInput) => (sorter?.column ? { [sorter.column]: sorter.order ?? Order.ASC } : {});
+export const toOrder = (sorter: SorterInput) => (sorter?.column ? { [sorter.column]: sorter.order ?? OrderBy.ASC } : {});
 
 export interface CursoredRequest {
   first: number;
@@ -116,7 +116,7 @@ export class RelationQueryConditionInput {
   public where?: object;
 
   @IsOptional()
-  public orderBy?: { column: string; order?: Order };
+  public orderBy?: { column: string; order?: OrderBy };
 }
 
 export class AdminQueryConditionInput {

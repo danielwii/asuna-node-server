@@ -23,7 +23,7 @@ import _ from 'lodash';
 
 import { AppModule } from './app';
 import { DataLoaderInterceptor, GraphqlContext } from './dataloader';
-import { GraphQLConfigObject } from './graphql/graphql.config';
+import { GraphQLConfigObject } from './graphql/config';
 import { TracingHelper } from './tracing';
 import { TracingConfigObject } from './tracing/tracing.config';
 

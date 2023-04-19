@@ -39,7 +39,7 @@ import {
   FeedbackStatusEnum,
   FeedbackStatusEnumValue,
 } from './modules/content/enum-values';
-import { AsunaContext, Global, KVModelFormatType, KeyValueType, Order } from './modules/core';
+import { AsunaContext, Global, KVModelFormatType, KeyValueType, OrderBy } from './modules/core';
 import { ConfigKeys } from './modules/core/config';
 import { UserRelationType } from './modules/core/interaction/friends.entities';
 import { DefaultModule } from './modules/default.module';
@@ -101,7 +101,7 @@ export const bootstrap = (appModule, options?: BootstrapOptions) => {
   registerEnumType(Mode, { name: 'Mode' });
   registerEnumType(AppUpgradeMode, { name: 'AppUpgradeMode' });
   registerEnumType(Platform, { name: 'Platform' });
-  registerEnumType(Order, { name: 'Order' });
+  registerEnumType(OrderBy, { name: 'OrderBy' });
   registerEnumType(KVModelFormatType, { name: 'KVModelFormatType' });
   registerEnumType(KeyValueType, { name: 'KeyValueType' });
   registerEnumType(ExchangeCurrencyEnum, { name: 'ExchangeCurrencyEnum' });

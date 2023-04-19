@@ -18,7 +18,7 @@ export const DEFAULT_PAGE = 0;
 export const DEFAULT_SIZE = 20;
 export const MAX_PAGE_SIZE = 1000;
 
-export enum Order {
+export enum OrderBy {
   ASC = 'ASC',
   DESC = 'DESC',
 }
@@ -31,7 +31,7 @@ export const DefaultPageRequest: PageRequest = {
 export interface PageRequest {
   page?: number;
   size?: number;
-  orderBy?: { column?: string; order?: Order };
+  orderBy?: { column?: string; order?: OrderBy };
 }
 
 export class PageHelper {
