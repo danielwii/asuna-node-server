@@ -2999,7 +2999,7 @@ __metadata:
     elastic-apm-node: ^3.44.1
     email-templates: ^11.0.3
     eslint: ^8.38.0
-    eslint-config-alloy: ^4.9.0
+    eslint-config-alloy: ^5.0.0
     eslint-import-resolver-node: ^0.3.7
     eslint-plugin-import: ^2.27.5
     express-rate-limit: ^6.7.0
@@ -11012,18 +11012,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-alloy@npm:^4.9.0":
-  version: 4.9.0
-  resolution: "eslint-config-alloy@npm:4.9.0"
+"eslint-config-alloy@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "eslint-config-alloy@npm:5.0.0"
   peerDependencies:
     "@babel/eslint-parser": 7.x
     "@babel/preset-react": 7.x
-    "@typescript-eslint/eslint-plugin": ">=5.38.1"
+    "@typescript-eslint/eslint-plugin": ">=5.55.0"
     "@typescript-eslint/parser": 5.x
     eslint: ">=8.24.0"
     eslint-plugin-react: ">=7.31.8"
     eslint-plugin-vue: ">=9.5.1"
-    typescript: 4.x
+    typescript: 5.x
     vue-eslint-parser: 9.x
   peerDependenciesMeta:
     "@babel/eslint-parser":
@@ -11042,7 +11042,7 @@ __metadata:
       optional: true
     vue-eslint-parser:
       optional: true
-  checksum: 32b65d9d65c4a94332aaeeede591b0958863ed7771983e08eea2801c110e66931c79ae69f8fee45eb391f6bdf24c12f6979c53ec9d8f9634a26ae5d5d871121e
+  checksum: 0bdc7522744a87a81e575c77648d1bf389832eeb5debd0f97e09d63033c5da7741a03e635a03154bfdd00b4234c078b0031ec5be6751dfeb788d2f46a318fa28
   languageName: node
   linkType: hard
 
