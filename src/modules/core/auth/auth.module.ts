@@ -38,10 +38,7 @@ export class AuthModule extends InitContainer implements NestModule, OnModuleIni
 
   public configure(consumer: MiddlewareConsumer): void {
     this.logger.log('configure...');
-    consumer.apply(AdminAuthMiddleware).forRoutes(
-      '/admin',
-      /* '/rest' */
-    );
+    consumer.apply(AdminAuthMiddleware).forRoutes('/admin');
   }
 
   public onModuleInit = async () =>
