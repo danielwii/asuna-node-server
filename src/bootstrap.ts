@@ -14,7 +14,7 @@ import { parseJSONIfCould } from '@danielwii/asuna-helper/dist/utils';
 import { fileURLToPath } from 'node:url';
 
 import compression from 'compression';
-import RedisStoreCreator from 'connect-redis';
+import RedisStore from 'connect-redis';
 import consola from 'consola';
 import cookieParser from 'cookie-parser';
 import express from 'express';
@@ -278,7 +278,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
       // name 返回客户端的key的名称，默认为asn.seid,也可以自己设置。
       name: 'asn.seid',
       store: sessionRedis.isEnabled
-        ? new (RedisStoreCreator(session))({ client: sessionRedis.client as any })
+        ? new RedisStore({ client: sessionRedis.client as any })
         : new session.MemoryStore(),
       // 一个String类型的字符串，作为服务器端生成session的签名。
       secret,

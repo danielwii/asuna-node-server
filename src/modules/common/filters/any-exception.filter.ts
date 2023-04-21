@@ -257,8 +257,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
       if ([401, 403].includes(httpStatus)) {
         Logger.warn(`[unauthorized]: ${r(errorInfo)}`);
       } else {
-        Logger.error(`[ErrorInfo]: ${r(errorInfo)}`);
-        StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+        if (httpStatus >= 500) {
+          Logger.error(`[ErrorInfo]: ${r(errorInfo)}`);
+          StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
+        } else {
+          Logger.warn(`${r(errorInfo)}`);
+        }
       }
     }
     /*

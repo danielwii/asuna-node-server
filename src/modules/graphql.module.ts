@@ -53,10 +53,13 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
     Logger.log(`init graphql ${r({ tracingConfig, typePaths, config, main: __rootPath, __dirname, options })}`);
 
     const redisConfig = RedisConfigObject.load('graphql');
+    Logger.log(`init redis ${r(redisConfig)}`);
     const cache = redisConfig.enable
-      ? new ErrorsAreMissesCache(
-          new KeyvAdapter(new Keyv(`"redis://user:${redisConfig.password}@${redisConfig.host}:6379"`)),
-        )
+      ? (() => {
+          const uri = `"redis://user:${redisConfig.password}@${redisConfig.host}:6379"`;
+          Logger.log(`init cache by redis: ${uri}`);
+          return new ErrorsAreMissesCache(new KeyvAdapter(new Keyv(uri)));
+        })()
       : new InMemoryLRUCache();
     Logger.log(`load cache ${r(cache, { depth: 1 })}`);
 
