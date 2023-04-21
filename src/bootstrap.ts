@@ -319,6 +319,7 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   app.useGlobalInterceptors(new LoggerInterceptor());
   // WARNING will break graphql pubsub
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  // app.useGlobalInterceptors(new SentryInterceptor());
   app.useGlobalFilters(new AnyExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({

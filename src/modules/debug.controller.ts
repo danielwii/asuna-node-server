@@ -8,4 +8,9 @@ export class DebugController {
   public configs() {
     return AppEnv.configLoader.loadConfigs();
   }
+
+  @Get('debug-sentry')
+  public debugSentry() {
+    throw new Error('My first Sentry error!');
+  }
 }

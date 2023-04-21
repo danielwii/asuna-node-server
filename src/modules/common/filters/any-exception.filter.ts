@@ -9,8 +9,11 @@ import {
   AsunaException,
   ValidationException,
 } from '@danielwii/asuna-helper/dist/exceptions';
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { ApiResponse } from '@danielwii/asuna-shared/dist/vo';
+
+import { fileURLToPath } from 'node:url';
 
 import _ from 'lodash';
 import * as R from 'ramda';
@@ -21,6 +24,8 @@ import { AppDataSource } from '../../datasource';
 import { StatsHelper } from '../../stats';
 
 import type { Response } from 'express';
+
+const logger = new Logger(resolveModule(fileURLToPath(import.meta.url), 'any-exception-filter'));
 
 type QueryFailedErrorType = QueryFailedError &
   Partial<{
@@ -44,7 +49,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       const [, model] = exception.sql.match(/`(\w+)`.+/);
       const { metadata } = AppDataSource.dataSource.getRepository(model);
       if (!metadata) {
-        Logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
+        logger.error(`unhandled ER_DUP_ENTRY error: ${r(exception)}`);
         return new AsunaException(AsunaErrorCode.Unprocessable, 'dup entry error');
       }
       const [index] = metadata.indices.filter((i) => i.name === key);
@@ -91,7 +96,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
       return exception;
     }
 
-    Logger.error(`unresolved QueryFailedError: ${r(exception)}`);
+    logger.error(`unresolved QueryFailedError: ${r(exception)}`);
     return exception;
   }
 
@@ -121,21 +126,21 @@ export class AnyExceptionFilter implements ExceptionFilter {
       };
     } = (() => {
       if (R.is(QueryFailedError, exception)) {
-        Logger.warn(`[QueryFailedError] ${r(exception)}`);
+        logger.warn(`[QueryFailedError] ${r(exception)}`);
         return AnyExceptionFilter.handleSqlExceptions(exception);
         // } else if (R.is(EntityColumnNotFound, exception)) {
         //   processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
       } else if (R.is(EntityNotFoundError, exception)) {
-        Logger.warn(`[EntityNotFoundError] ${r(exception)}`);
+        logger.warn(`[EntityNotFoundError] ${r(exception)}`);
         return { ...exception, status: HttpStatus.NOT_FOUND };
       } else if (exception.name === 'ArgumentError') {
-        Logger.warn(`[ArgumentError] ${r(exception)}`);
+        logger.warn(`[ArgumentError] ${r(exception)}`);
         return { ...exception, status: HttpStatus.UNPROCESSABLE_ENTITY };
       } else if (R.is(AsunaBaseException, exception)) {
-        Logger.warn(`[AsunaBaseException] ${r(exception)}`);
+        logger.warn(`[AsunaBaseException] ${r(exception)}`);
         return exception;
       } else if (R.is(HttpException, exception)) {
-        Logger.warn(`[HttpException] ${r(exception)}`);
+        logger.warn(`[HttpException] ${r(exception)}`);
         const details = _.get(exception, 'response.message');
         return {
           parsed: {
@@ -149,7 +154,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
           },
         };
       } else if (R.is(Error, exception)) {
-        Logger.warn(`[Error] ${r(exception)}`);
+        logger.warn(`[Error] ${r(exception)}`);
         return {
           parsed: {
             status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -158,7 +163,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
           },
         };
       } else if (exception.code) {
-        Logger.warn(`[Others] ${r(exception)}`);
+        logger.warn(`[Others] ${r(exception)}`);
         if (exception.code === 'ERR_ASSERTION') {
           // processed.status = HttpStatus.BAD_REQUEST;
           return new AsunaException(AsunaErrorCode.BadRequest, exception.message, exception);
@@ -166,26 +171,30 @@ export class AnyExceptionFilter implements ExceptionFilter {
       }
     })();
 
-    // Logger.warn(`[exception] ${r({ exception, processed })}`);
+    // logger.warn(`[exception] ${r({ exception, processed })}`);
 
     const httpStatus: number =
       exception.status || processed.httpStatus || processed.parsed?.status || HttpStatus.INTERNAL_SERVER_ERROR;
     // const exceptionResponse = processed.response;
     processed.message = exception.message;
 
-    Logger.warn(`processed ${r({ httpStatus, processed })}`);
+    logger.warn(`processed ${r({ httpStatus, processed })}`);
 
     if (httpStatus === HttpStatus.BAD_REQUEST) {
-      // Logger.warn(`[bad_request] ${r(processed)}`);
-      Logger.warn(`[bad_request] ${r(processed.message)}`);
+      // logger.warn(`[bad_request] ${r(processed)}`);
+      logger.warn(`[bad_request] ${r(processed.message)}`);
     } else if (httpStatus === HttpStatus.NOT_FOUND) {
-      Logger.warn(`[not_found] ${r(processed.message)}`);
+      logger.warn(`[not_found] ${r(processed.message)}`);
     } else if (/40[13]|422/.test(`${httpStatus}`)) {
-      // Logger.warn(`[unauthorized] ${r(processed)}`);
+      // logger.warn(`[unauthorized] ${r(processed)}`);
     } else if (/4\d+/.test(`${httpStatus}`)) {
-      Logger.warn(`[client_error] ${r(processed)}`);
+      logger.warn(`[client_error] ${r(processed)}`);
     } else {
-      Logger.error(`[unhandled exception] ${r(processed)}`);
+      const traceId = ctx.getResponse().getHeaders()['x-trace-context'];
+      logger.error(`[unhandled exception] ${r({ traceId, processed })}`);
+      Sentry.configureScope((scope) => {
+        scope.setExtra('traceId', traceId);
+      });
       Sentry.captureException(processed);
     }
 
@@ -232,7 +241,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     }
 
     if (_.isNil(body.error.code)) {
-      Logger.warn(`no code found for one error: ${r(message)}`);
+      logger.warn(`no code found for one error: ${r(message)}`);
     }
 */
 
@@ -255,19 +264,19 @@ export class AnyExceptionFilter implements ExceptionFilter {
     };
     if (![404].includes(httpStatus)) {
       if ([401, 403].includes(httpStatus)) {
-        Logger.warn(`[unauthorized]: ${r(errorInfo)}`);
+        logger.warn(`[unauthorized]: ${r(errorInfo)}`);
       } else {
         if (httpStatus >= 500) {
-          Logger.error(`[ErrorInfo]: ${r(errorInfo)}`);
+          logger.error(`[ErrorInfo]: ${r(errorInfo)}`);
           StatsHelper.addErrorInfo(String(httpStatus), errorInfo).catch(console.error);
         } else {
-          Logger.warn(`${r(errorInfo)}`);
+          logger.warn(`${r(errorInfo)}`);
         }
       }
     }
     /*
     if (exception instanceof Error && httpStatus !== 500) {
-      Logger.error(exception);
+      logger.error(exception);
     }
 */
 
@@ -280,7 +289,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
     if (processed.parsed) {
       res.status(processed.parsed.status).send(processed.parsed);
     } else {
-      // Logger.error(`send ${r({ body, message, processed, errorInfo })} status: ${httpStatus}`);
+      // logger.error(`send ${r({ body, message, processed, errorInfo })} status: ${httpStatus}`);
       const details = processed.details ?? exception.details;
       const response = ApiResponse.failure({
         status: httpStatus,

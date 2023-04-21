@@ -61,6 +61,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
       Sentry.init({
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
+        environment: process.env.NODE_ENV,
         integrations: [
           /*
           new Sentry.Integrations.Mysql(),
@@ -77,17 +78,26 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         ],
       });
 
-      // The request handler must be the first middleware on the app
-      app.use(Sentry.Handlers.requestHandler());
-      // The error handler must be before any other error middleware and after all controllers
-      app.use(Sentry.Handlers.errorHandler());
-      // TracingHandler creates a trace for every incoming request
-      app.use(Sentry.Handlers.tracingHandler());
       /*
-      app.getHttpAdapter().get('/debug-sentry', (req, res) => {
+      const httpAdapter = app.getHttpAdapter();
+      // The request handler must be the first middleware on the app
+      httpAdapter.use(Sentry.Handlers.requestHandler());
+      // The error handler must be before any other error middleware and after all controllers
+      httpAdapter.use(
+        Sentry.Handlers.errorHandler({
+          shouldHandleError(error) {
+            AppLifecycle._.logger.log(`[sentry] error handler ... ${r(error)}`, error.stack);
+            // Capture all 404 and 500 errors
+            return error.status === 422 || Number(error.status) >= 500;
+          },
+        }),
+      );
+      // TracingHandler creates a trace for every incoming request
+      httpAdapter.use(Sentry.Handlers.tracingHandler());*/
+      /*
+      httpAdapter.get('/debug-sentry', (req, res) => {
         throw new Error('My first Sentry error!');
-      });
-*/
+      });*/
     }
 
     if (featuresConfig.apmEnabled) {
