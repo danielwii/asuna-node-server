@@ -1,8 +1,9 @@
-import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
-import { ControllerInjector, LoggerInjector, OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+// import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
+// import { ControllerInjector, LoggerInjector, OpenTelemetryModule } from '@metinseylan/nestjs-opentelemetry';
+// import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+// import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+// import { SentryPropagator, SentrySpanProcessor } from '@sentry/opentelemetry-node';
 
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
@@ -29,12 +30,11 @@ import { WSModule } from './ws';
 
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeorm-options.interface';
 
-const isProduction = process.env.NODE_ENV === 'production';
-
 @Module({
   imports: _.compact([
+    /*
     OpenTelemetryModule.forRoot({
-      /*
+      /!*
       applicationName: 'node-server',
       resource:
         process.env.NODE_ENV === 'production'
@@ -44,14 +44,23 @@ const isProduction = process.env.NODE_ENV === 'production';
                 [SemanticResourceAttributes.SERVICE_NAME]: 'asuna-node-server',
                 [SemanticResourceAttributes.SERVICE_VERSION]: AppEnv.instance.version,
               }),
-            ) as any), */
-      traceAutoInjectors: [ControllerInjector, LoggerInjector],
-      instrumentations: getNodeAutoInstrumentations({
-        '@opentelemetry/instrumentation-pg': { enabled: false },
-        '@opentelemetry/instrumentation-net': { enabled: false },
-      }) as any,
-      spanProcessor: new SimpleSpanProcessor(isProduction ? new TraceExporter() : new JaegerExporter()),
-      /*
+            ) as any), *!/
+      // traceAutoInjectors: [ControllerInjector, LoggerInjector],
+      instrumentations: [getNodeAutoInstrumentations()],
+      // spanProcessor: new SimpleSpanProcessor(new TraceExporter()),
+      // traceExporter: new OTLPTraceExporter(),
+
+      ...(new SentryConfigure().load().enable
+        ? {
+            // Sentry config
+            traceExporter: new OTLPTraceExporter(),
+            spanProcessor: new SentrySpanProcessor() as any,
+            textMapPropagator: new SentryPropagator(),
+          }
+        : {
+            spanProcessor: new SimpleSpanProcessor(new TraceExporter()) as any,
+          }),
+      /!*
       textMapPropagator: new CompositePropagator({
         propagators: [
           new W3CBaggagePropagator(),
@@ -59,12 +68,12 @@ const isProduction = process.env.NODE_ENV === 'production';
           new JaegerPropagator(),
           new B3Propagator(),
         ],
-      }), */
-      /*
+      }), *!/
+      /!*
       spanProcessor: new SimpleSpanProcessor(
         process.env.NODE_ENV === 'production' ? new TraceExporter() : new JaegerExporter(),
-      ) as any, */
-    }),
+      ) as any, *!/
+    }),*/
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         Logger.log(
@@ -104,7 +113,7 @@ const isProduction = process.env.NODE_ENV === 'production';
     configLoader.loadConfig('MONGO_ENABLE') ? MongoProvider.forRootAsync() : undefined,
     AdminInternalModule,
     WSModule,
-    TerminusModule,
+    TerminusModule.forRoot({ errorLogStyle: 'json' }),
   ]),
   providers: [],
   controllers: _.compact([

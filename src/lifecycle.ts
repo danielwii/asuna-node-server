@@ -1,4 +1,11 @@
+import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import opentelemetry from '@opentelemetry/sdk-node';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import * as Sentry from '@sentry/node';
+import { SentryPropagator, SentrySpanProcessor } from '@sentry/opentelemetry-node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
 
 import { BeforeApplicationShutdown, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 
@@ -62,6 +69,12 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
         environment: process.env.NODE_ENV,
+        instrumenter: 'otel',
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production
+        tracesSampleRate: 1.0,
+        profilesSampleRate: 1.0, // Profiling sample rate is relative to tracesSampleRate
         integrations: [
           /*
           new Sentry.Integrations.Mysql(),
@@ -73,7 +86,10 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
           // enable HTTP calls tracing
           new Sentry.Integrations.Http({ tracing: true }),
           // enable Express.js middleware tracing
-          new Sentry.Integrations.Express({ app: app.getHttpServer() }),
+          // new Sentry.Integrations.Express({ app: app.getHttpServer() }),
+          // Add profiling integration to list of integrations
+          new ProfilingIntegration(),
+          // Automatically instrument Node.js libraries and frameworks
           ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
         ],
       });
@@ -99,6 +115,35 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         throw new Error('My first Sentry error!');
       });*/
     }
+
+    const sdk = new opentelemetry.NodeSDK(
+      sentryConfig.enable
+        ? {
+            // Existing config
+            traceExporter: new OTLPTraceExporter(),
+            instrumentations: [getNodeAutoInstrumentations()],
+
+            // Sentry config
+            spanProcessor: new SentrySpanProcessor() as any,
+            textMapPropagator: new SentryPropagator(),
+          }
+        : {
+            instrumentations: [getNodeAutoInstrumentations()],
+            spanProcessor: new SimpleSpanProcessor(new TraceExporter()),
+          },
+    );
+
+    await sdk.start();
+
+    process.on('SIGTERM', () => {
+      sdk
+        .shutdown()
+        .then(
+          () => console.log('SDK shut down successfully'),
+          (err) => console.log('Error shutting down SDK', err),
+        )
+        .finally(() => process.exit(0));
+    });
 
     if (featuresConfig.apmEnabled) {
       AppLifecycle._.logger.log(`[onInit] apm ...`);

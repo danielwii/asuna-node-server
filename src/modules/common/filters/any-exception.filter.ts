@@ -155,6 +155,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
         };
       } else if (R.is(Error, exception)) {
         logger.warn(`[Error] ${r(exception)}`);
+        Sentry.captureException(exception);
         return {
           parsed: {
             status: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -190,11 +191,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
     } else if (/4\d+/.test(`${httpStatus}`)) {
       logger.warn(`[client_error] ${r(processed)}`);
     } else {
+      logger.error(`[unhandled exception] ${r(processed)}`);
+      /* trace id already included
       const traceId = ctx.getResponse().getHeaders()['x-trace-context'];
-      logger.error(`[unhandled exception] ${r({ traceId, processed })}`);
       Sentry.configureScope((scope) => {
         scope.setExtra('traceId', traceId);
-      });
+      });*/
       Sentry.captureException(processed);
     }
 
