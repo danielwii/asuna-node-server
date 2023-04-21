@@ -271,15 +271,13 @@ export async function run(appModule, options: BootstrapOptions): Promise<NestExp
   app.use(compression());
 
   const sessionRedisDB = configLoader.loadNumericConfig('SESSION_REDIS_DB', 2);
-  const sessionRedis = RedisProvider.getRedisClient('session', sessionRedisDB, true);
+  const sessionRedis = RedisProvider.getRedisClient('session', sessionRedisDB);
   logger.log(`session redis enabled: ${sessionRedis.isEnabled}`);
   app.use(
     session({
       // name 返回客户端的key的名称，默认为asn.seid,也可以自己设置。
       name: 'asn.seid',
-      store: sessionRedis.isEnabled
-        ? new RedisStore({ client: sessionRedis.client as any })
-        : new session.MemoryStore(),
+      store: sessionRedis.isEnabled ? new RedisStore({ client: sessionRedis.client }) : new session.MemoryStore(),
       // 一个String类型的字符串，作为服务器端生成session的签名。
       secret,
       // (是否允许)当客户端并行发送多个请求时，其中一个请求在另一个请求结束时对session进行修改覆盖并保存。
