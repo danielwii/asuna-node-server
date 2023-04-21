@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/node';
-import * as Tracing from '@sentry/tracing';
 
 import { BeforeApplicationShutdown, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 
@@ -63,16 +62,18 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         dsn,
         debug: configLoader.loadConfig(ConfigKeys.DEBUG),
         integrations: [
-          new Tracing.Integrations.Mysql(),
-          new Tracing.Integrations.Postgres(),
-          new Tracing.Integrations.Prisma(),
+          /*
+          new Sentry.Integrations.Mysql(),
+          new Sentry.Integrations.Postgres(),
+          new Sentry.Integrations.Prisma(),
           new Tracing.Integrations.BrowserTracing(),
-          new Tracing.Integrations.Apollo(),
-          new Tracing.Integrations.GraphQL(),
+          new Sentry.Integrations.Apollo(),
+          new Sentry.Integrations.GraphQL(),*/
           // enable HTTP calls tracing
           new Sentry.Integrations.Http({ tracing: true }),
           // enable Express.js middleware tracing
-          new Tracing.Integrations.Express({ app: app.getHttpServer() }),
+          new Sentry.Integrations.Express({ app: app.getHttpServer() }),
+          ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
         ],
       });
 
