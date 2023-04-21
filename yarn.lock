@@ -2930,7 +2930,6 @@ __metadata:
     "@opentelemetry/semantic-conventions": ^1.12.0
     "@sendgrid/mail": ^7.7.0
     "@sentry/node": ^7.49.0
-    "@sentry/tracing": ^7.49.0
     "@serverless-guru/prettier-plugin-import-order": ^0.4.2
     "@socket.io/redis-adapter": ^8.1.0
     "@tsconfig/node18-strictest-esm": ^1.0.1
@@ -6305,15 +6304,6 @@ __metadata:
     lru_map: ^0.3.3
     tslib: ^1.9.3
   checksum: 13650fb0384e438f18c4cba1d0cff86d4be4c61da4ed12d4fa720bc37627ff7190c2368f934287cb39fe898b38e24f7b097fcb5e4b10aaf24131c46145f1e3c2
-  languageName: node
-  linkType: hard
-
-"@sentry/tracing@npm:^7.49.0":
-  version: 7.49.0
-  resolution: "@sentry/tracing@npm:7.49.0"
-  dependencies:
-    "@sentry-internal/tracing": 7.49.0
-  checksum: 47c609e18ba8abb3876335b3368545a91fc4bc80d3882ab1c05fd7ba4c7ad88fdef177d3eb3e590372d6ad55a3f734298bd3e66f72c0f8572cf1ae49e0ac75fa
   languageName: node
   linkType: hard
 
