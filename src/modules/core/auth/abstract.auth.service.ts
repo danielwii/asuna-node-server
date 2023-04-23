@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { ForbiddenException, Logger } from '@nestjs/common';
 
 import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exceptions';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
@@ -141,7 +141,9 @@ export abstract class AbstractAuthService<U extends AuthUser> {
 
   async validateUser(payload: JwtPayload): Promise<boolean> {
     const identifier = { email: payload.email, username: payload.username };
-    const user = await this.getUser(identifier, true);
+    const user = await this.getUser(identifier);
+
+    if (!user.isActive) throw new ForbiddenException('user is not active');
 
     const left = Math.floor(payload.exp - Date.now() / 1000);
     const validated = !_.isNil(user) && user.id === payload.id;

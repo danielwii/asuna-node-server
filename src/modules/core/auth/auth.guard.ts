@@ -5,8 +5,9 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
+
+import _ from 'lodash';
 
 import { AuthType } from '../../helper/auth';
 import { RequestAuthService } from './request.service';
@@ -37,6 +38,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const res = context.switchToHttp().getResponse();
     if (err || !payload) {
       this.logger.warn(`auth error, ${r({ err, payload, info, status })}`);
+      if (err instanceof Error) throw err;
       throw new AsunaException(
         AsunaErrorCode.InvalidAuthToken,
         'jwt auth failed',

@@ -1,12 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
+
 import * as scalars from 'graphql-scalars';
 import _ from 'lodash';
 import { AfterUpdate, Column, Entity, OneToOne } from 'typeorm';
 
 import { AbstractBaseEntity } from '../../base';
 import { CacheUtils } from '../../cache/utils';
-import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 import { ColumnTypeHelper } from '../helpers';
 
 import type { KeyValueModel } from './kv.isolated.entities';
@@ -42,17 +43,17 @@ export class KeyValuePair extends AbstractBaseEntity {
   @Column({ nullable: true, length: 255 })
   public name?: string;
 
-  @Field((returns) => KeyValueType)
+  @Field(() => KeyValueType)
   @MetaInfo({ name: 'Type', type: 'Enum', enumData: KeyValueType })
   @Column('varchar', { nullable: true })
   public type?: KeyValueType;
 
-  @Field((returns) => scalars.GraphQLJSON, { nullable: true })
+  @Field(() => scalars.GraphQLJSON, { nullable: true })
   @MetaInfo({ name: 'Value' })
   @Column('text', { nullable: true })
   public value?: any;
 
-  @Field((returns) => scalars.GraphQLJSONObject)
+  @Field(() => scalars.GraphQLJSONObject)
   @MetaInfo({ name: 'Extra', type: 'SimpleJSON', jsonType: 'any' })
   @Column(ColumnTypeHelper.JSON, { nullable: true })
   public extra?: Record<string, any>;

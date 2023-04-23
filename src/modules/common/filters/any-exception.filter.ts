@@ -132,13 +132,10 @@ export class AnyExceptionFilter implements ExceptionFilter {
         //   processed.status = HttpStatus.UNPROCESSABLE_ENTITY;
       } else if (R.is(EntityNotFoundError, exception)) {
         logger.warn(`[EntityNotFoundError] ${r(exception)}`);
-        return { ...exception, status: HttpStatus.NOT_FOUND };
+        return { ...exception, httpStatus: HttpStatus.NOT_FOUND };
       } else if (exception.name === 'ArgumentError') {
         logger.warn(`[ArgumentError] ${r(exception)}`);
-        return { ...exception, status: HttpStatus.UNPROCESSABLE_ENTITY };
-      } else if (R.is(AsunaBaseException, exception)) {
-        logger.warn(`[AsunaBaseException] ${r(exception)}`);
-        return exception;
+        return { ...exception, httpStatus: HttpStatus.BAD_REQUEST };
       } else if (R.is(HttpException, exception)) {
         logger.warn(`[HttpException] ${r(exception)}`);
         const details = _.get(exception, 'response.message');
@@ -153,6 +150,9 @@ export class AnyExceptionFilter implements ExceptionFilter {
             },
           },
         };
+      } else if (R.is(AsunaBaseException, exception)) {
+        logger.warn(`[AsunaBaseException] ${r(exception)}`);
+        return exception;
       } else if (R.is(Error, exception)) {
         logger.warn(`[Error] ${r(exception)}`);
         Sentry.captureException(exception);

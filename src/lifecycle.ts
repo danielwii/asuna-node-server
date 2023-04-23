@@ -93,13 +93,11 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
           ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
         ],
       });
-
       /*
-      const httpAdapter = app.getHttpAdapter();
       // The request handler must be the first middleware on the app
-      httpAdapter.use(Sentry.Handlers.requestHandler());
+      app.use(Sentry.Handlers.requestHandler());
       // The error handler must be before any other error middleware and after all controllers
-      httpAdapter.use(
+      app.use(
         Sentry.Handlers.errorHandler({
           shouldHandleError(error) {
             AppLifecycle._.logger.log(`[sentry] error handler ... ${r(error)}`, error.stack);
@@ -109,11 +107,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         }),
       );
       // TracingHandler creates a trace for every incoming request
-      httpAdapter.use(Sentry.Handlers.tracingHandler());*/
-      /*
-      httpAdapter.get('/debug-sentry', (req, res) => {
-        throw new Error('My first Sentry error!');
-      });*/
+      app.use(Sentry.Handlers.tracingHandler());*/
     }
 
     const sdk = new opentelemetry.NodeSDK(
@@ -124,7 +118,7 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
             instrumentations: [getNodeAutoInstrumentations()],
 
             // Sentry config
-            spanProcessor: new SentrySpanProcessor() as any,
+            spanProcessor: new SentrySpanProcessor(),
             textMapPropagator: new SentryPropagator(),
           }
         : {
