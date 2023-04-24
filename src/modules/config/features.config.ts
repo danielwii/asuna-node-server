@@ -12,6 +12,8 @@ export enum FeaturesConfigKeys {
   apmSecretToken = 'apm.secret_token',
   quickpassEnabled = 'quickpass_enabled',
   quickpassApiKeyRequired = 'quickpass_api_key_required',
+  dynamicRouter = 'dynamic_router',
+  paymentEnable = 'payment_enable',
 }
 
 export class FeaturesConfigObject implements Record<keyof typeof FeaturesConfigKeys, any> {
@@ -26,8 +28,12 @@ export class FeaturesConfigObject implements Record<keyof typeof FeaturesConfigK
   public apmSecretToken: string;
   public quickpassEnabled: boolean;
   public quickpassApiKeyRequired: boolean;
+  public dynamicRouter: boolean;
+  public paymentEnable: boolean;
 }
 
 export interface FeaturesConfigure extends ConfigureLoader<FeaturesConfigObject> {}
-@ConfigureLoader(YamlConfigKeys.features, FeaturesConfigKeys, FeaturesConfigObject)
+@ConfigureLoader(YamlConfigKeys.features, FeaturesConfigKeys, FeaturesConfigObject, () => ({
+  [FeaturesConfigKeys.dynamicRouter]: false,
+}))
 export class FeaturesConfigure {}

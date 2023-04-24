@@ -6,6 +6,7 @@
 // import { SentryPropagator, SentrySpanProcessor } from '@sentry/opentelemetry-node';
 
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
+// import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -74,6 +75,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeo
         process.env.NODE_ENV === 'production' ? new TraceExporter() : new JaegerExporter(),
       ) as any, *!/
     }),*/
+    // DevtoolsModule.register({ http: process.env.NODE_ENV !== 'production' }),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         Logger.log(
@@ -87,7 +89,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeo
           loggerLevel: configLoader.loadConfig('TYPEORM_LOGGER_LEVEL', 'debug'),
           // url: process.env.DATABASE_URL ?? process.env.TYPEORM_URL,
           debug: configLoader.loadConfig('TYPEORM_DEBUG', false),
-          trace: configLoader.loadConfig('TYPEORM_TRACE', false),
+          trace: configLoader.loadConfig('TYPEORM_TRACE', true),
           type: configLoader.loadConfig('TYPEORM_TYPE'),
           synchronize: configLoader.loadBoolConfig('TYPEORM_SYNCHRONIZE', false),
           database: configLoader.loadConfig('TYPEORM_DATABASE') as any,
@@ -99,11 +101,12 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeo
           subscribers: process.env.TYPEORM_SUBSCRIBERS.split(','),
           // poolSize: configLoader.loadConfig('TYPEORM_POOL_SIZE', 10), TODO
           extra: {
-            // based on  https://node-postgres.com/api/pool
             // max connection pool size
             max: configLoader.loadConfig('TYPEORM_POOL_SIZE', 10),
-            // connection timeout
-            // connectionTimeoutMillis: 1000,
+            connectionLimit: configLoader.loadConfig('TYPEORM_POOL_SIZE', 10),
+            waitForConnections: true,
+            acquireTimeout: 30000,
+            queueLimit: 1000,
           },
         };
         Logger.log(`[TypeOrmModule] init datasource by ${r(_.omit(options, 'password'))}`);

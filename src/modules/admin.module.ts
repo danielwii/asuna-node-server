@@ -1,4 +1,5 @@
-import { CacheModule, Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Logger, MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { InitContainer } from '@danielwii/asuna-helper/dist/init';
@@ -15,7 +16,7 @@ import { ActivityModule } from './activities/module';
 import { AdminController } from './admin.controller';
 import { ClientModule } from './client/module';
 import { DeviceMiddleware, IsMobileMiddleware, LandingUrlMiddleware } from './common';
-import { configLoader } from './config';
+import { FeaturesConfigure, configLoader } from './config';
 import { ContentModule } from './content/content.module';
 import { ContentfulModule } from './contentful/contentful.module';
 import {
@@ -62,14 +63,16 @@ import { TenantModule } from './tenant';
 import { TracingModule } from './tracing';
 import { WebModule } from './web';
 
+const features = new FeaturesConfigure().load();
+
 @Module({
   imports: _.compact([
-    DynamicRouterModule,
+    features.dynamicRouter ? DynamicRouterModule : undefined,
     GraphqlQueryModule,
     AuthModule,
     ActivityModule,
     InteractionModule,
-    configLoader.loadConfig('FEATURES_PAYMENT_ENABLED') ? PaymentModule : null,
+    features.paymentEnable ? PaymentModule : undefined,
     ContentModule,
     EmailModule,
     DBModule,
