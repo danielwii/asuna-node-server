@@ -2907,6 +2907,7 @@ __metadata:
     "@danielwii/asuna-shared": ^0.0.12
     "@google-cloud/opentelemetry-cloud-trace-exporter": ^2.0.0
     "@nestjs/apollo": ^11.0.5
+    "@nestjs/cache-manager": ^1.0.0
     "@nestjs/cli": ^9.4.1
     "@nestjs/common": ^9.4.0
     "@nestjs/core": ^9.4.0
@@ -2983,7 +2984,7 @@ __metadata:
     bluebird: ^3.7.2
     blurhash: ^2.0.5
     builder-pattern: ^2.2.0
-    cache-manager: ^5.2.0
+    cache-manager: ^5.2.1
     cache-manager-redis-store: ^3.0.1
     chance: ^1.1.11
     class-transformer: ^0.5.1
@@ -4082,6 +4083,18 @@ __metadata:
     "@as-integrations/fastify":
       optional: true
   checksum: f73896587f8e8a4afe1b89c5c9def1176361b45b36dca8f0f806b266812b7ad7e7f0b2eb155f90ff7fe272268d6fea6901e63a74e38f2ecb2d07263a532cb248
+  languageName: node
+  linkType: hard
+
+"@nestjs/cache-manager@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@nestjs/cache-manager@npm:1.0.0"
+  peerDependencies:
+    "@nestjs/common": ^9.0.0
+    cache-manager: <=5
+    reflect-metadata: ^0.1.12
+    rxjs: ^7.0.0
+  checksum: fbdc88dbddf17fc693b119b517532a83e11de449d8eb445e9a2efc9cd61fb2caf23d532dceb307b4e645384805ec76228ce5153f4d201dce45463097e6c1ebe4
   languageName: node
   linkType: hard
 
@@ -8492,13 +8505,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cache-manager@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "cache-manager@npm:5.2.0"
+"cache-manager@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "cache-manager@npm:5.2.1"
   dependencies:
     lodash.clonedeep: ^4.5.0
-    lru-cache: ~7.18.3
-  checksum: 1f1ec19c902c01817af782c2fc3ba96705325794e20fc4865ec9382eb91c1cee76dc560a63f774cb54b85067142134b5338183c4cc7f465375fb063ce62b84ac
+    lru-cache: ~9.1.1
+  checksum: 8e4c4bb3ae9f6a0cb109dc7327167c58db5789af97050f55e956b2a3ae8220759bcc0ceeae83f6606d22ac92b4a9b77ac59198deea3d6026398abf814ba4c7ce
   languageName: node
   linkType: hard
 
@@ -14352,7 +14365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^7.10.1, lru-cache@npm:^7.14.1, lru-cache@npm:^7.7.1, lru-cache@npm:~7.18.3":
+"lru-cache@npm:^7.10.1, lru-cache@npm:^7.14.1, lru-cache@npm:^7.7.1":
   version: 7.18.3
   resolution: "lru-cache@npm:7.18.3"
   checksum: e550d772384709deea3f141af34b6d4fa392e2e418c1498c078de0ee63670f1f46f5eee746e8ef7e69e1c895af0d4224e62ee33e66a543a14763b0f2e74c1356
@@ -14366,7 +14379,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lru-cache@npm:^9.0.0, lru-cache@npm:^9.0.3, lru-cache@npm:^9.1.1":
+"lru-cache@npm:^9.0.0, lru-cache@npm:^9.0.3, lru-cache@npm:^9.1.1, lru-cache@npm:~9.1.1":
   version: 9.1.1
   resolution: "lru-cache@npm:9.1.1"
   checksum: 4d703bb9b66216bbee55ead82a9682820a2b6acbdfca491b235390b1ef1056000a032d56dfb373fdf9ad4492f1fa9d04cc9a05a77f25bd7ce6901d21ad9b68b7
