@@ -9,7 +9,8 @@ import {
 
 import _ from 'lodash';
 
-import { RedisHealthIndicator } from '../providers';
+import { PrismaHealthIndicator } from './prisma.health';
+import { RedisHealthIndicator } from './redis.health';
 
 @Controller('health')
 export class HealthController {
@@ -19,6 +20,7 @@ export class HealthController {
 
   // eslint-disable-next-line max-params
   public constructor(
+    private prisma: PrismaHealthIndicator,
     private health: HealthCheckService,
     // private http: HttpHealthIndicator,
     private memory: MemoryHealthIndicator,
@@ -41,6 +43,7 @@ export class HealthController {
         () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: '/' }),
         () => this.redis.isHealthy('redis'),
         () => this.typeorm.pingCheck('db'),
+        () => this.prisma.isHealthy('prisma'),
         // MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
         // RedisProvider.getRedisClient().isEnabled ? async () => this.redis.isHealthy('redis') : undefined,
       ]),

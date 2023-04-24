@@ -26,6 +26,8 @@ import { AppDataSource } from './datasource';
 import { DebugController } from './debug.controller';
 import { GraphqlModule } from './graphql.module';
 import { HealthController } from './health/health.controller';
+import { PrismaHealthIndicator } from './health/prisma.health';
+import { PrismaModule } from './prisma';
 import { MongoProvider } from './providers';
 import { WSModule } from './ws';
 
@@ -76,6 +78,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeo
       ) as any, *!/
     }),*/
     // DevtoolsModule.register({ http: process.env.NODE_ENV !== 'production' }),
+    PrismaModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         Logger.log(
@@ -118,7 +121,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm/dist/interfaces/typeo
     WSModule,
     TerminusModule.forRoot({ errorLogStyle: 'json' }),
   ]),
-  providers: [],
+  providers: [PrismaHealthIndicator],
   controllers: _.compact([
     AppController,
     HealthController,

@@ -4,11 +4,12 @@ import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestj
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { RedisProvider } from '@danielwii/asuna-helper/dist/providers/redis/provider';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
+
 import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class RedisHealthIndicator extends HealthIndicator {
-  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), RedisHealthIndicator.name));
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
 
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     const redisClientObject = RedisProvider.getRedisClient();
