@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.10.19",
+  "version": "0.10.20",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "type": "module",
   "main": "dist/index.js",
@@ -147,6 +147,7 @@
   "devDependencies": {
     "@nestjs/cli": "^9.4.1",
     "@nestjs/testing": "^9.4.0",
+    "@prisma/client": "^4.13.0",
     "@serverless-guru/prettier-plugin-import-order": "^0.4.2",
     "@tsconfig/node18-strictest-esm": "^1.0.1",
     "@types/ali-oss": "^6",
