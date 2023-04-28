@@ -13,7 +13,7 @@ export class RedisHealthIndicator extends HealthIndicator {
 
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     const redisClientObject = RedisProvider.getRedisClient();
-    const isHealthy = redisClientObject.client.isOpen;
+    const isHealthy = redisClientObject.client?.isOpen;
 
     const status = this.getStatus(key, isHealthy, {
       message: !isHealthy ? 'redis is unhealthy' : undefined,

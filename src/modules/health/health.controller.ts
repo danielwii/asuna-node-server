@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import {
   DiskHealthIndicator,
   HealthCheck,
@@ -7,6 +7,11 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 
+import { resolveModule } from '@danielwii/asuna-helper/dist/logger';
+import { RedisProvider } from '@danielwii/asuna-helper/dist/providers';
+
+import { fileURLToPath } from 'node:url';
+
 import _ from 'lodash';
 
 import { PrismaHealthIndicator } from './prisma.health';
@@ -14,6 +19,8 @@ import { RedisHealthIndicator } from './redis.health';
 
 @Controller('health')
 export class HealthController {
+  private readonly logger = new Logger(resolveModule(fileURLToPath(import.meta.url), this.constructor.name));
+
   // private mq = new MQHealthIndicator();
   private redis = new RedisHealthIndicator();
   // private path = resolve(dirname(require.main.filename), '../..');
@@ -41,7 +48,7 @@ export class HealthController {
         // () => this.memory.checkHeap('memory_heap', size),
         () => this.memory.checkRSS('memory_rss', size),
         () => this.disk.checkStorage('storage', { thresholdPercent: 0.95, path: '/' }),
-        () => this.redis.isHealthy('redis'),
+        RedisProvider.getRedisClient().isEnabled ? () => this.redis.isHealthy('redis') : undefined,
         () => this.typeorm.pingCheck('db'),
         () => this.prisma.isHealthy('prisma'),
         // MQProvider.enabled ? async () => this.mq.isHealthy('mq') : undefined,
