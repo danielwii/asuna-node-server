@@ -4,7 +4,6 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-// @ts-ignore
 import ow from 'ow';
 
 import { AppDataSource } from '../../datasource';

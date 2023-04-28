@@ -1,4 +1,3 @@
-// @ts-ignore
 import ow from 'ow';
 
 import { PasswordHelper } from './abstract.auth.service';

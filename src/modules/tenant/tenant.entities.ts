@@ -1,9 +1,15 @@
 import { Field, InterfaceType, ObjectType } from '@nestjs/graphql';
 
+import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
+
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
-import { AbstractBaseEntity, AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity, Publishable } from '../base';
-import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
+import {
+  AbstractBaseEntity,
+  AbstractTimeBasedBaseEntity,
+  AbstractTimeBasedNameEntity,
+  Publishable,
+} from '../base/base.entity';
 import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';

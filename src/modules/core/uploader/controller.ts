@@ -33,7 +33,6 @@ import _ from 'lodash';
 import * as mime from 'mime-types';
 import * as multer from 'multer';
 import * as os from 'os';
-// @ts-ignore
 import ow from 'ow';
 import * as uuid from 'uuid';
 

@@ -3,12 +3,8 @@ import { Logger } from '@nestjs/common';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-import { DateTime, Duration } from 'luxon';
 
-import { AppConfigObject, AppConfigure } from '../../config/app.configure';
 import { ColumnTypeHelper } from './column.helper';
-
-import type { BaseEntity } from 'typeorm';
 
 /**
  * @deprecated {@see safeReloadJSON}
@@ -68,22 +64,6 @@ export function safeReloadJSON<Entity>(entity: Entity, column: keyof Entity, def
       }
     } else {
       entity[column] = defaultValue;
-    }
-  }
-}
-
-/**
- * @deprecated use TZ=UTC in env file or process.env.TZ = 'UTC'
- * @param entity
- */
-export function fixTZ<T extends BaseEntity & { createdAt?: Date; updatedAt?: Date }>(entity: T): void {
-  const hours = new AppConfigure().load().fixTz;
-  if (hours) {
-    if (entity.createdAt) {
-      entity.createdAt = DateTime.fromJSDate(entity.createdAt).plus(Duration.fromObject({ hours })).toJSDate();
-    }
-    if (entity.updatedAt) {
-      entity.updatedAt = DateTime.fromJSDate(entity.updatedAt).plus(Duration.fromObject({ hours })).toJSDate();
     }
   }
 }

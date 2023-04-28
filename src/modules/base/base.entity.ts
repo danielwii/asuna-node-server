@@ -3,7 +3,6 @@ import { Field, ID, Int, InterfaceType } from '@nestjs/graphql';
 import { MetaInfo } from '@danielwii/asuna-shared';
 
 import {
-  AfterLoad,
   BaseEntity,
   BeforeInsert,
   Column,
@@ -14,7 +13,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { fixTZ } from '../core/helpers/entity.helper';
 import { SimpleIdGenerator } from '../ids';
 import { NameDescAttachable, Publishable } from './abilities';
 
@@ -58,11 +56,6 @@ export class NoPrimaryKeyBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'created_by' })
   public createdBy?: string;
-
-  @AfterLoad()
-  public afterLoad(): void {
-    fixTZ(this);
-  }
 }
 
 @InterfaceType({ implements: () => [NoPrimaryKeyBaseEntity] })
@@ -111,11 +104,6 @@ export class AbstractTimeBasedBaseEntity extends BaseEntity {
   public beforeInsert(): void {
     if (!this.id) this.id = this.#generator.nextId();
   }
-
-  @AfterLoad()
-  public afterLoad(): void {
-    fixTZ(this);
-  }
 }
 
 @InterfaceType({ implements: () => [AbstractTimeBasedBaseEntity] })
@@ -144,11 +132,6 @@ export class AbstractUUIDBaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   public updatedBy: string;
-
-  @AfterLoad()
-  public afterLoad(): void {
-    fixTZ(this);
-  }
 }
 
 @InterfaceType({ implements: () => [AbstractUUIDBaseEntity] })
@@ -171,11 +154,6 @@ export class AbstractUUID2BaseEntity extends BaseEntity {
   @MetaInfo({ accessible: 'hidden' })
   @Column({ nullable: true, length: 100, name: 'updated_by' })
   public updatedBy: string;
-
-  @AfterLoad()
-  public afterLoad(): void {
-    fixTZ(this);
-  }
 }
 
 export class AbstractUUID2NameEntity extends NameDescAttachable(AbstractUUID2BaseEntity) {}

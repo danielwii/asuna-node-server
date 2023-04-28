@@ -14,7 +14,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import jwt from 'jsonwebtoken';
 import _ from 'lodash';
 import { Cryptor } from 'node-buffs';
-// @ts-ignore
 import ow from 'ow';
 
 import { TimeUnit, formatTime, isBlank } from '../../common/helpers';

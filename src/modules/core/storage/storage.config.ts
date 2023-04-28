@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { Expose, Transform, plainToInstance } from 'class-transformer';
 import _ from 'lodash';
 
-import { configLoader } from '../../config';
+import { configLoader } from '../../config/loader';
 import { YamlConfigKeys } from '../config';
 
 const __filename = fileURLToPath(import.meta.url);

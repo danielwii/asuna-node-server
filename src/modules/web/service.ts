@@ -4,9 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-import _ from 'lodash';
 import { fileURLToPath } from 'node:url';
-// @ts-ignore
+
+import _ from 'lodash';
 import ow from 'ow';
 
 import { PageView, PageViewDocument } from './schema';

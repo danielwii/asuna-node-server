@@ -3,7 +3,6 @@ import { AsunaErrorCode, AsunaException } from '@danielwii/asuna-helper/dist/exc
 import { oneLineTrim } from 'common-tags';
 import * as _ from 'lodash';
 import fetch from 'node-fetch';
-// @ts-ignore
 import ow from 'ow';
 
 import { WeChatServiceConfig, WxConfigApi } from './wx.api.config';

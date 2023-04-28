@@ -6,9 +6,9 @@ import { Hermes } from '@danielwii/asuna-helper/dist/hermes/hermes';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
-// @ts-ignore
-import ow from 'ow';
 import { fileURLToPath } from 'node:url';
+
+import ow from 'ow';
 
 import { AbstractAuthService, PasswordHelper } from './abstract.auth.service';
 import { AuthUserChannel } from './base.entities';

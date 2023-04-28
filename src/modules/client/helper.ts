@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
 import _ from 'lodash';
-// @ts-ignore
 import ow from 'ow';
 
 import { AppDataSource } from '../datasource';

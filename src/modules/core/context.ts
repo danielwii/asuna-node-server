@@ -10,7 +10,7 @@ import { instanceToPlain } from 'class-transformer';
 import * as fs from 'fs-extra';
 import _ from 'lodash';
 
-import { configLoader } from '../config';
+import { configLoader } from '../config/loader';
 import { ConfigKeys } from './config';
 import { Global } from './global';
 import {

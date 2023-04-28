@@ -1,11 +1,11 @@
-import api from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 import type { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
+import type { Request, Response } from 'express';
 import type { Observable } from 'rxjs';
 import type { WithSpanContext } from './tracing.helper';
-import type { Request, Response } from 'express';
 
 export type TraceRequest = Request & WithSpanContext;
 
@@ -41,7 +41,7 @@ export class TracingInterceptor implements NestInterceptor {
     const serviceName = `${context.getClass().name}.${context.getHandler().name}`;
     // Logger.debug(`[trace] start span ${serviceName}`);
     if (response.setHeader) {
-      const currentSpan = api.trace.getSpan(api.context.active());
+      const currentSpan = trace.getSpan(context.active());
       response.setHeader('x-trace-context', currentSpan.spanContext().traceId);
     }
     /*

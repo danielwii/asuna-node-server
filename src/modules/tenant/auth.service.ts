@@ -4,9 +4,10 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { resolveModule } from '@danielwii/asuna-helper/dist/logger/factory';
 import { r } from '@danielwii/asuna-helper/dist/serializer';
 
+import { fileURLToPath } from 'node:url';
+
 import Chance from 'chance';
 import _ from 'lodash';
-// @ts-ignore
 import ow from 'ow';
 import { DataSource, In } from 'typeorm';
 
@@ -15,7 +16,6 @@ import { TenantRoleName } from './auth.guard';
 import { OrgRole, OrgUser } from './tenant.entities';
 
 import type { CreateStaffVO } from '@danielwii/asuna-shared';
-import { fileURLToPath } from 'node:url';
 
 const chance = new Chance();
 

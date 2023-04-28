@@ -7,7 +7,7 @@ import { r } from '@danielwii/asuna-helper/dist/serializer';
 import { fileURLToPath } from 'node:url';
 
 import { CacheTTL } from '../cache/constants';
-import { emptyPage, Pageable, toPage } from '../core/helpers/page.helper';
+import { Pageable, emptyPage, toPage } from '../core/helpers/page.helper';
 import { PageRequestInput } from '../graphql/input';
 import { AppInfo, AppRelease } from './app.entities';
 
@@ -75,7 +75,7 @@ export class AppQueryResolver {
         appInfoId: appInfo?.id,
         platform: platform?.toUpperCase(),
         isPublished: true,
-      } as FindOptionsWhere<AppRelease>,
+      } satisfies FindOptionsWhere<AppRelease>,
       order: { id: 'DESC' },
       cache: CacheTTL.FLASH,
     });

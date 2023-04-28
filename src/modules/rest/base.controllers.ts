@@ -22,7 +22,6 @@ import { fileURLToPath } from 'node:url';
 
 import { instanceToPlain } from 'class-transformer';
 import _ from 'lodash';
-// @ts-ignore
 import ow from 'ow';
 import * as R from 'ramda';
 
