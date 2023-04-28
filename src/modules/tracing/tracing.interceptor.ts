@@ -1,4 +1,4 @@
-import { trace } from '@opentelemetry/api';
+import { context, trace } from '@opentelemetry/api';
 
 import { GqlExecutionContext } from '@nestjs/graphql';
 
@@ -10,12 +10,12 @@ import type { WithSpanContext } from './tracing.helper';
 export type TraceRequest = Request & WithSpanContext;
 
 export class TracingInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
-    let request = context.switchToHttp().getRequest<TraceRequest>();
-    let response = context.switchToHttp().getResponse<Response>();
+  intercept(ctx: ExecutionContext, next: CallHandler): Observable<any> | Promise<Observable<any>> {
+    let request = ctx.switchToHttp().getRequest<TraceRequest>();
+    let response = ctx.switchToHttp().getResponse<Response>();
     if (!request) {
-      request = GqlExecutionContext.create(context).getContext().req;
-      response = GqlExecutionContext.create(context).getContext().res;
+      request = GqlExecutionContext.create(ctx).getContext().req;
+      response = GqlExecutionContext.create(ctx).getContext().res;
     }
 
     // ws subscription request
@@ -38,7 +38,7 @@ export class TracingInterceptor implements NestInterceptor {
       hostname: request.hostname,
     };
 
-    const serviceName = `${context.getClass().name}.${context.getHandler().name}`;
+    const serviceName = `${ctx.getClass().name}.${ctx.getHandler().name}`;
     // Logger.debug(`[trace] start span ${serviceName}`);
     if (response.setHeader) {
       const currentSpan = trace.getSpan(context.active());

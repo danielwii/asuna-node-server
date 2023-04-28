@@ -4,12 +4,8 @@ import { EntityMetaInfo, MetaInfo } from '@danielwii/asuna-shared';
 
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 
-import {
-  AbstractBaseEntity,
-  AbstractTimeBasedBaseEntity,
-  AbstractTimeBasedNameEntity,
-  Publishable,
-} from '../base/base.entity';
+import { Publishable } from '../base/abilities';
+import { AbstractBaseEntity, AbstractTimeBasedBaseEntity, AbstractTimeBasedNameEntity } from '../base/base.entity';
 import { AbstractTimeBasedAuthUser } from '../core/auth/base.entities';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';

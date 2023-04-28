@@ -8,7 +8,6 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsIn, IsOptional } from 'class-validator';
 import _ from 'lodash';
 import {
-  AfterLoad,
   BaseEntity,
   Column,
   CreateDateColumn,
@@ -20,7 +19,6 @@ import {
 } from 'typeorm';
 
 import { ColumnTypeHelper } from '../core/helpers/column.helper';
-import { fixTZ } from '../core/helpers/entity.helper';
 import { InjectTenant } from '../tenant/tenant.entities';
 import { WxSubscribeSceneType } from './wx.interfaces';
 
@@ -224,9 +222,4 @@ export class WXMiniAppUserInfo extends BaseEntity {
   @OneToOne('UserProfile', (inverse: UserProfile) => inverse.miniAppUserInfo)
   @JoinColumn({ name: 'profile__id' })
   profile: UserProfile;
-
-  @AfterLoad()
-  afterLoad(): void {
-    fixTZ(this);
-  }
 }

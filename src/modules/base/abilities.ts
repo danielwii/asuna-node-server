@@ -1,8 +1,8 @@
 import { Field, InterfaceType } from '@nestjs/graphql';
 
-import { BaseEntity, Column, DeleteDateColumn } from 'typeorm';
-
 import { MetaInfo } from '@danielwii/asuna-shared';
+
+import { BaseEntity, Column, DeleteDateColumn } from 'typeorm';
 
 import type { ConstrainedConstructor } from '@danielwii/asuna-helper/dist/interface';
 

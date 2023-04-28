@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { CacheTTL } from '../cache/constants';
 import { Pageable, emptyPage, toPage } from '../core/helpers/page.helper';
 import { PageRequestInput } from '../graphql/input';
-import { AppInfo, AppRelease } from './app.entities';
+import { AppInfo, AppRelease, Platform } from './app.entities';
 
 import type { FindOptionsWhere } from 'typeorm';
 
@@ -73,7 +73,7 @@ export class AppQueryResolver {
     const release = await AppRelease.findOne({
       where: {
         appInfoId: appInfo?.id,
-        platform: platform?.toUpperCase(),
+        platform: platform?.toUpperCase() as keyof typeof Platform,
         isPublished: true,
       } satisfies FindOptionsWhere<AppRelease>,
       order: { id: 'DESC' },
