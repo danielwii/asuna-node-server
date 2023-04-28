@@ -1,6 +1,6 @@
 {
   "name": "@danielwii/asuna-node-server",
-  "version": "0.10.21",
+  "version": "0.10.22",
   "author": "Daniel Wei <danielwii0326@gmail.com>",
   "type": "module",
   "main": "dist/index.js",
