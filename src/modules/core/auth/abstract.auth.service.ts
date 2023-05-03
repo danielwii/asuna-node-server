@@ -142,6 +142,7 @@ export abstract class AbstractAuthService<U extends AuthUser> {
     const identifier = { email: payload.email, username: payload.username };
     const user = await this.getUser(identifier);
 
+    if (!user) throw new ForbiddenException('invalid user');
     if (!user.isActive) throw new ForbiddenException('user is not active');
 
     const left = Math.floor(payload.exp - Date.now() / 1000);
