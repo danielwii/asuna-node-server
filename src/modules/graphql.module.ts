@@ -76,6 +76,7 @@ export class GraphqlModule extends InitContainer implements OnModuleInit {
           // },
           // typePaths,
           autoSchemaFile: 'auto-schema.gql',
+          csrfPrevention: config.csrf_prevention ?? true,
           // autoSchemaFile: true,
           sortSchema: true,
           installSubscriptionHandlers: true,

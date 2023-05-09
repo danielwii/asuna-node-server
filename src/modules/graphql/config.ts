@@ -9,6 +9,7 @@ import { YamlConfigKeys } from '../core/config';
 export enum GraphQLConfigKeys {
   debug = 'debug',
   playground_enable = 'playground_enable',
+  csrf_prevention = 'csrf_prevention',
 }
 
 export class GraphQLConfigObject {
@@ -17,6 +18,7 @@ export class GraphQLConfigObject {
 
   debug: boolean;
   playground_enable: boolean;
+  csrf_prevention: boolean;
 
   public constructor(o: Partial<GraphQLConfigObject>) {
     Object.assign(this, plainToInstance(GraphQLConfigObject, o, { enableImplicitConversion: true }));
@@ -33,6 +35,9 @@ export class GraphQLConfigObject {
             configLoader.loadBoolConfig(key, _.get(config, p)),
           ),
           playground_enable: withP2(_.toUpper(`${prefix}${keys.playground_enable}`), keys.playground_enable, (key, p) =>
+            configLoader.loadBoolConfig(key, _.get(config, p)),
+          ),
+          csrf_prevention: withP2(_.toUpper(`${prefix}${keys.csrf_prevention}`), keys.csrf_prevention, (key, p) =>
             configLoader.loadBoolConfig(key, _.get(config, p)),
           ),
         }),
