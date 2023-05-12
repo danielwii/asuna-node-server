@@ -73,8 +73,8 @@ export class AppLifecycle implements OnApplicationShutdown, OnApplicationBootstr
         // Set tracesSampleRate to 1.0 to capture 100%
         // of transactions for performance monitoring.
         // We recommend adjusting this value in production
-        tracesSampleRate: 1.0,
-        profilesSampleRate: 1.0, // Profiling sample rate is relative to tracesSampleRate
+        tracesSampleRate: 0.2,
+        profilesSampleRate: 0.2, // Profiling sample rate is relative to tracesSampleRate
         integrations: [
           /*
           new Sentry.Integrations.Mysql(),
